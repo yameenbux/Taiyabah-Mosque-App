@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#3C0B2A" />
 <link rel="manifest" href="manifest.webmanifest" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
+<link rel="icon" href="icon-192.png?v=2" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Taiyabah" />
@@ -70,10 +70,16 @@
   .nextname{display:flex;align-items:baseline;gap:12px}
   .nextname .en{font-size:33px;font-weight:500;line-height:1}
   .nextname .ar{font-size:27px;color:#D9CBD4}
-  .count{font-size:56px;font-weight:600;letter-spacing:-.5px;color:#fff;margin:14px 0 2px;line-height:1}
-  .count small{font-size:19px;color:#B39FAC;font-weight:500;margin-left:2px}
+  .bigtime{font-size:58px;font-weight:600;letter-spacing:-1px;color:#fff;
+    margin:12px 0 4px;line-height:1}
+  .timerow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .count{font-size:15px;font-weight:600;color:var(--gold-bright);
+    background:rgba(198,162,76,.14);border:1px solid rgba(198,162,76,.32);
+    border-radius:999px;padding:4px 11px}
   .subline{font-size:13.5px;color:#D5C7D0}
   .subline b{color:var(--gold-bright);font-weight:600}
+  .begins-note{font-size:13px;color:#D5C7D0}
+  .begins-note b{color:#fff;font-weight:600}
   .track{margin-top:18px;height:5px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
   .track > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:99px;width:0%}
 
@@ -230,6 +236,41 @@
     font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
     padding:14px;border-radius:13px;box-shadow:var(--shadow)}
   .dnote{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
+
+  /* ---- live player ---- */
+  .lv-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 28px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .lv-hero .girih{position:absolute;right:-48px;top:-42px;width:210px;height:210px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .lv-state{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:#BBA9B4;border:1px solid rgba(255,255,255,.14);
+    border-radius:999px;padding:5px 12px}
+  .lv-dot{width:7px;height:7px;border-radius:50%;background:#A49AA0;flex:0 0 auto}
+  .lv-state[data-s="playing"]{color:var(--gold-bright);border-color:rgba(198,162,76,.45)}
+  .lv-state[data-s="playing"] .lv-dot{background:#E0483C;animation:pulse 2s infinite}
+  .lv-state[data-s="loading"] .lv-dot{background:var(--gold);animation:pulse 1.1s infinite}
+  .lv-state[data-s="error"]{color:#E8A88F;border-color:rgba(232,168,143,.4)}
+  .lv-state[data-s="error"] .lv-dot{background:#E0483C}
+  .lv-play{width:96px;height:96px;border-radius:50%;margin:22px auto 16px;cursor:pointer;
+    display:grid;place-items:center;border:1px solid rgba(198,162,76,.5);
+    background:rgba(198,162,76,.16);color:var(--gold-bright);padding:0}
+  .lv-play:active{background:rgba(198,162,76,.3)}
+  .lv-play svg{width:40px;height:40px;margin-left:4px}
+  .lv-play svg.ic-pause{margin-left:0}
+  .lv-play:disabled{opacity:.5;cursor:default}
+  .lv-title{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600}
+  .lv-sub{font-size:12.5px;color:#BBA9B4;margin-top:3px}
+  .lv-vol{display:flex;align-items:center;gap:11px;max-width:230px;margin:20px auto 0;color:#BBA9B4}
+  .lv-vol svg{width:18px;height:18px;flex:0 0 auto}
+  .lv-vol input{flex:1;accent-color:var(--gold);height:4px}
+  .card.lv-info{padding:4px 16px;margin-top:18px}
+  .lv-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
+    border-top:1px solid var(--line)}
+  .lv-row:first-child{border-top:none}
+  .lv-k{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .lv-v{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .lv-link{color:var(--brand-600);text-decoration:none}
+  .lv-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;margin:14px 6px 26px}
 
   /* ---- about page ---- */
   .ab-body{background:var(--paper)}
@@ -489,8 +530,11 @@
         <span class="en display" id="next-en">—</span>
         <span class="ar" id="next-ar">—</span>
       </div>
-      <div class="count tnum" id="count">--<small>:--:--</small></div>
-      <div class="subline" id="subline">—</div>
+      <div class="bigtime tnum" id="bigtime">--:--</div>
+      <div class="timerow">
+        <span class="count tnum" id="count">--</span>
+        <span class="begins-note" id="subline">—</span>
+      </div>
       <div class="track"><i id="track"></i></div>
     </div>
 
@@ -817,6 +861,45 @@
     </div>
   </div>
 
+  <div class="sheet" id="live" data-open="0" role="dialog" aria-modal="true" aria-label="Listen live">
+    <div class="scrim" id="lv-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left">Listen live</h3>
+        <button class="sh-close" id="lv-close">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="lv-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+
+          <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status">Ready</span></div>
+
+          <button class="lv-play" id="lv-play" aria-label="Play live stream">
+            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+          </button>
+
+          <div class="lv-title">Taiyabah Masjid</div>
+          <div class="lv-sub">Live from the masjid</div>
+
+          <div class="lv-vol">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+            <input type="range" id="lv-volume" min="0" max="100" value="100" aria-label="Volume">
+          </div>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="card lv-info">
+            <div class="lv-row"><span class="lv-k">Radio frequency</span><span class="lv-v tnum">454.1000 MHz</span></div>
+            <div class="lv-row"><span class="lv-k">Also on</span><a class="lv-v lv-link" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener">YouTube &rsaquo;</a></div>
+          </div>
+          <p class="lv-note">Audio continues while you use other apps. If the stream doesn&rsquo;t
+            start, the masjid may not be broadcasting at the moment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
@@ -833,8 +916,11 @@
         <button class="dr-row" data-act="qibla">
           <span class="dr-t">Qibla compass</span><span class="dr-ch">&rsaquo;</span>
         </button>
+        <button class="dr-row" data-act="live">
+          <span class="dr-t">Listen live</span><span class="dr-ch">&rsaquo;</span>
+        </button>
         <a class="dr-row" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener">
-          <span class="dr-t">Live stream &amp; video</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-t">Video &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
         </a>
         <a class="dr-row" href="https://www.taiyabahmasjid.com/bayaans/" target="_blank" rel="noopener">
           <span class="dr-t">Bayaans</span><span class="dr-ch">&rsaquo;</span>
@@ -1920,17 +2006,24 @@ function tick(){
   document.getElementById('next-en').textContent=m.en;
   document.getElementById('next-ar').textContent=m.ar;
 
-  let diff=Math.max(0, Math.floor((nx.at-now)/1000));
-  const h=Math.floor(diff/3600), mn=Math.floor((diff%3600)/60), s=diff%60;
-  const cEl=document.getElementById('count');
-  if(h>0) cEl.innerHTML=`${h}<small>h</small> ${String(mn).padStart(2,'0')}<small>m</small> ${String(s).padStart(2,'0')}<small>s</small>`;
-  else cEl.innerHTML=`${String(mn).padStart(2,'0')}<small>:</small>${String(s).padStart(2,'0')}<small></small>`;
-
   const srcRec = nx.tomorrow ? nx.tomorrowRec : rec;
   const jt = srcRec.jamaat[nx.key];
   const bt = srcRec.begins[nx.key];
+
+  // the time itself leads
+  document.getElementById('bigtime').textContent = hm12(jt);
+
+  // countdown is secondary — minutes precision is enough at a glance
+  let diff=Math.max(0, Math.floor((nx.at-now)/1000));
+  const hh=Math.floor(diff/3600), mn=Math.floor((diff%3600)/60), s=diff%60;
+  let cd;
+  if(hh>0)      cd=`in ${hh}h ${String(mn).padStart(2,'0')}m`;
+  else if(mn>0) cd=`in ${mn} min`;
+  else          cd=`in ${s}s`;
+  document.getElementById('count').textContent = cd;
+
   document.getElementById('subline').innerHTML =
-    `Jamā&#703;ah <b>${hm12(jt)}</b>${bt?` &middot; Begins ${hm12(bt)}`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
+    `${bt?`Begins <b>${hm12(bt)}</b>`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
 
   // progress begins→jamaat for the upcoming prayer (today only)
   const beginsAt = (bt && !nx.tomorrow) ? atToday(base, bt) : null;
@@ -1983,6 +2076,83 @@ function initDonate(){
     const ok=await copyText(text);
     all.textContent = ok ? "Copied" : "Couldn't copy — please copy manually";
     setTimeout(()=>all.textContent="Copy all details", 2000);
+  });
+}
+
+/* ---------------- live audio ----------------
+   Direct Shoutcast/Icecast feed. Playback needs a user gesture (the play
+   button), after which iOS keeps audio running when the app is backgrounded.
+   Media Session gives proper lock-screen controls.
+--------------------------------------------- */
+const LIVE_URL = "https://taiyabahmbolton.radioca.st/;";
+let AUDIO=null;
+
+function lvState(s, text){
+  const el=document.getElementById('lv-state');
+  el.dataset.s=s;
+  document.getElementById('lv-status').textContent=text;
+  const play=document.querySelector('#lv-play .ic-play');
+  const pause=document.querySelector('#lv-play .ic-pause');
+  const on = (s==="playing");
+  play.hidden=on; pause.hidden=!on;
+  document.getElementById('lv-play')
+    .setAttribute('aria-label', on ? "Pause live stream" : "Play live stream");
+}
+
+function ensureAudio(){
+  if(AUDIO) return AUDIO;
+  AUDIO=new Audio();
+  AUDIO.preload="none";
+  AUDIO.crossOrigin=null;
+  AUDIO.addEventListener('playing',()=>lvState("playing","On air"));
+  AUDIO.addEventListener('waiting',()=>lvState("loading","Buffering…"));
+  AUDIO.addEventListener('pause',  ()=>lvState("idle","Paused"));
+  AUDIO.addEventListener('error',  ()=>lvState("error","Stream unavailable"));
+  AUDIO.addEventListener('stalled',()=>lvState("loading","Reconnecting…"));
+  return AUDIO;
+}
+
+async function lvToggle(){
+  const a=ensureAudio();
+  if(!a.paused){ a.pause(); return; }
+  lvState("loading","Connecting…");
+  // cache-bust so a stale connection isn't reused after a drop
+  a.src = LIVE_URL + (LIVE_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+  a.volume = document.getElementById('lv-volume').value/100;
+  try{
+    await a.play();
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata=new MediaMetadata({
+        title:"Live from the masjid", artist:"Taiyabah Masjid",
+        artwork:[{src:"icon-512.png?v=2",sizes:"512x512",type:"image/png"}]
+      });
+      navigator.mediaSession.setActionHandler('play',()=>lvToggle());
+      navigator.mediaSession.setActionHandler('pause',()=>{a.pause();});
+    }
+  }catch(e){
+    lvState("error","Couldn't start the stream");
+  }
+}
+
+function openLive(){
+  document.getElementById('live').dataset.open="1";
+  document.body.style.overflow="hidden";
+  if(!AUDIO || AUDIO.paused) lvState("idle","Ready");
+}
+function closeLive(){
+  document.getElementById('live').dataset.open="0";
+  document.body.style.overflow="";
+  // audio deliberately keeps playing in the background
+}
+function initLive(){
+  document.getElementById('lv-play').addEventListener('click',lvToggle);
+  document.getElementById('lv-close').addEventListener('click',closeLive);
+  document.getElementById('lv-scrim').addEventListener('click',closeLive);
+  document.getElementById('lv-volume').addEventListener('input',e=>{
+    if(AUDIO) AUDIO.volume=e.target.value/100;
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('live').dataset.open==="1") closeLive();
   });
 }
 
@@ -2045,6 +2215,7 @@ function initDrawer(){
       if(act==="qibla"){ switchTab("qibla"); drawTicks(); }
       if(act==="calendar"){ switchTab("times"); setTimeout(openMonth,120); }
       if(act==="about"){ setTimeout(openAbout,120); }
+      if(act==="live"){ setTimeout(openLive,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -2325,6 +2496,7 @@ function boot(){
   initTabs();
   initDrawer();
   initAbout();
+  initLive();
   initQibla();
   initDonate();
   VIEW=today0();
