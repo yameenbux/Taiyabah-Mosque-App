@@ -230,6 +230,45 @@
   .giftaid p{font-size:13.5px;line-height:1.55;color:#31473C}
   .dnote{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
 
+  /* ---- about page ---- */
+  .ab-body{background:var(--paper)}
+  .ab-hero{position:relative;overflow:hidden;padding:26px 20px 24px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--green-800),var(--green-900))}
+  .ab-hero .girih{position:absolute;right:-48px;top:-42px;width:210px;height:210px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .ab-est{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-bright);
+    font-weight:700;margin-bottom:10px}
+  .ab-lead{font-family:"Fraunces",Georgia,serif;font-size:23px;line-height:1.25;color:#F3EFE3}
+  .ab-sub{font-size:13.5px;line-height:1.6;color:#C7D5CB;margin-top:12px}
+  .ab-sub b{color:var(--gold-bright);font-weight:600}
+  .ab-wrap{padding:18px 16px 0}
+  .ab-card{padding:16px}
+  .ab-card p{font-size:14px;line-height:1.65;color:var(--ink)}
+  .ab-card p+p{margin-top:11px}
+  .ab-list{padding:4px 16px}
+  .ab-list div{font-size:14.5px;font-weight:600;color:var(--ink);padding:12px 0;
+    border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ab-list div:first-child{border-top:none}
+  .ab-note{font-size:11px;font-weight:500;color:var(--muted)}
+  .ab-now{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    color:var(--green-600);background:#E6EFE9;border-radius:999px;padding:3px 8px}
+  .ab-video{display:flex;align-items:center;gap:12px;text-decoration:none;margin-top:12px;
+    padding:13px 14px;border-radius:14px;background:var(--card);
+    border:1px solid var(--line);box-shadow:var(--shadow)}
+  .ab-play{flex:0 0 auto;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+    background:var(--green-800);color:var(--gold-bright)}
+  .ab-play svg{width:18px;height:18px}
+  .ab-vt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .ab-v1{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .ab-v2{font-size:12px;color:var(--muted)}
+  .ab-plans{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0}
+  .ab-plans span{font-size:12px;font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
+    border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
+  .ab-donate{width:100%;margin-top:20px;border:none;cursor:pointer;font:inherit;font-weight:700;
+    font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
+    padding:15px;border-radius:13px;box-shadow:var(--shadow)}
+  .ab-foot{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.7;margin:16px 6px 26px}
+
   /* ---- menu button + drawer ---- */
   .menubtn{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border-radius:11px;cursor:pointer;
     border:1px solid rgba(198,162,76,.3);background:rgba(198,162,76,.10);
@@ -264,6 +303,12 @@
   .dr-row:active{background:rgba(35,117,82,.08)}
   .dr-t{flex:1;min-width:0;font-size:14.5px;font-weight:600;color:var(--ink)}
   .dr-ch{flex:0 0 auto;color:var(--muted);font-size:20px;line-height:1}
+  .dr-row.soon{cursor:default}
+  .dr-row.soon .dr-t{color:var(--muted);font-weight:600}
+  .dr-row.soon:active{background:none}
+  .soon-tag{flex:0 0 auto;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--gold);border:1px solid rgba(198,162,76,.45);
+    border-radius:999px;padding:3px 8px;white-space:nowrap}
   .dr-social{display:flex;gap:9px;margin:22px 6px 0}
   .dr-social a{flex:1;display:grid;place-items:center;text-decoration:none;
     color:var(--green-600);background:#E9F0EB;border-radius:12px;padding:12px 4px}
@@ -678,6 +723,93 @@
     </div>
   </main>
 
+  <div class="sheet" id="about" data-open="0" role="dialog" aria-modal="true" aria-label="About Taiyabah Masjid">
+    <div class="scrim" id="ab-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left">About us</h3>
+        <button class="sh-close" id="ab-close">Done</button>
+      </div>
+      <div class="sh-body ab-body">
+
+        <section class="ab-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="ab-est">Established at the end of 1967</div>
+          <p class="ab-lead">One of the first masjids in Bolton.</p>
+          <p class="ab-sub">The name <b>Taiyabah</b> &mdash; from the Arabic <i>Tayyab</i>, meaning purity &mdash;
+            was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb,
+            author of <i>Fazaail-e-Amaal</i>.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="sec-h"><h2>History</h2><span class="rule"></span></div>
+          <div class="card ab-card">
+            <p>The masjid was originally located in Canning Street, where Moulana Faruq Desai
+               was appointed as its first Imam.</p>
+            <p>In February 1988, to accommodate the growing community, the present building on
+               Blackburn Road was purchased &mdash; formerly a Congregational Sunday School.
+               The first Imam in the new masjid was Qari Yakub Nanjee Saheb, followed by
+               Qari Farook Saheb.</p>
+          </div>
+
+          <a class="ab-video" href="https://www.youtube.com/watch?v=N7wFXynmLHM" target="_blank" rel="noopener">
+            <span class="ab-play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+            <span class="ab-vt">
+              <span class="ab-v1">Watch the masjid&rsquo;s story</span>
+              <span class="ab-v2">History &amp; new build journey</span>
+            </span>
+            <span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <div class="sec-h"><h2>Founders</h2><span class="rule"></span><span class="tag">Amongst others</span></div>
+          <div class="card ab-list">
+            <div>Late Haji Ahmed Hakim</div>
+            <div>Late Haji Ibrahim Jamal</div>
+            <div>Late Haji Ismail Lekroo</div>
+            <div>Late Hafiz Adam Matadar</div>
+            <div>Late Haji Bashir Chadat</div>
+            <div>Haji Ismail Kekha</div>
+          </div>
+
+          <div class="sec-h"><h2>Ulema</h2><span class="rule"></span><span class="tag">Imaamat at the masjid</span></div>
+          <div class="card ab-list">
+            <div>Moulana Ibrahim Kaba Saheb</div>
+            <div>Moulana Hashim Saheb</div>
+            <div>Qari Yakub Nanji Saheb</div>
+            <div>Qari Farooq Saheb</div>
+            <div>Moulana Mehboob Saheb <span class="ab-note">Chorley</span></div>
+            <div>Moulana Imran Suba Saheb</div>
+            <div>Mufti Faiyaz Saheb <span class="ab-now">Present Imam</span></div>
+          </div>
+
+          <div class="sec-h"><h2>The future</h2><span class="rule"></span></div>
+          <div class="card ab-card">
+            <p>Plans are in the works to give the community a safe and welcoming space for
+               learning, socialising and conducting ceremonies &mdash; and an educational
+               resource for young and old alike.</p>
+            <div class="ab-plans">
+              <span>Large prayer hall</span>
+              <span>Modern ablution areas</span>
+              <span>Integrated kitchen</span>
+              <span>Additional lecture rooms</span>
+              <span>Wi-Fi &amp; video streaming</span>
+              <span>Educational centre &amp; library</span>
+            </div>
+            <p>The masjid also intends to invest further in Islamic education, supporting the
+               community in matters including marriage and burial practices, and to establish
+               an Islamic educational and cultural centre and library.</p>
+          </div>
+
+          <button class="ab-donate" id="ab-donate">Support the new build</button>
+          <p class="ab-foot">Bolton Central Islamic Society &middot; Registered charity 1041569<br>
+            31a Draycott Street, Bolton BL1 8HD</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
@@ -700,14 +832,7 @@
         <a class="dr-row" href="https://www.taiyabahmasjid.com/bayaans/" target="_blank" rel="noopener">
           <span class="dr-t">Bayaans</span><span class="dr-ch">&rsaquo;</span>
         </a>
-        <a class="dr-row" href="https://www.taiyabahmasjid.com/quran-arabic/" target="_blank" rel="noopener">
-          <span class="dr-t">Qur&rsquo;an &amp; Arabic</span><span class="dr-ch">&rsaquo;</span>
-        </a>
-
         <div class="dr-h">Madrasah</div>
-        <a class="dr-row" href="https://www.taiyabahmasjid.com/madrasah/" target="_blank" rel="noopener">
-          <span class="dr-t">About the madrasah</span><span class="dr-ch">&rsaquo;</span>
-        </a>
         <a class="dr-row" href="https://registrations.ibeuk.org/taiyabahmadarashnewapplications" target="_blank" rel="noopener">
           <span class="dr-t">Application form</span><span class="dr-ch">&rsaquo;</span>
         </a>
@@ -716,15 +841,23 @@
         </a>
 
         <div class="dr-h">The masjid</div>
-        <a class="dr-row" href="https://www.taiyabahmasjid.com/about/" target="_blank" rel="noopener">
+        <button class="dr-row" data-act="about">
           <span class="dr-t">About us</span><span class="dr-ch">&rsaquo;</span>
-        </a>
-        <a class="dr-row" href="https://www.taiyabahmasjid.com/food-court/" target="_blank" rel="noopener">
-          <span class="dr-t">Taiyabah Food Court</span><span class="dr-ch">&rsaquo;</span>
-        </a>
-        <a class="dr-row" href="https://www.taiyabahmasjid.com/video-news/" target="_blank" rel="noopener">
-          <span class="dr-t">News &amp; updates</span><span class="dr-ch">&rsaquo;</span>
-        </a>
+        </button>
+
+        <div class="dr-h">Our services</div>
+        <button class="dr-row soon" disabled aria-disabled="true">
+          <span class="dr-t">Hall / Room Hire</span><span class="soon-tag">Coming soon</span>
+        </button>
+        <button class="dr-row soon" disabled aria-disabled="true">
+          <span class="dr-t">Marriage / Death</span><span class="soon-tag">Coming soon</span>
+        </button>
+        <button class="dr-row soon" disabled aria-disabled="true">
+          <span class="dr-t">Advice</span><span class="soon-tag">Coming soon</span>
+        </button>
+        <button class="dr-row soon" disabled aria-disabled="true">
+          <span class="dr-t">Education</span><span class="soon-tag">Coming soon</span>
+        </button>
 
         <div class="dr-social">
           <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram">
@@ -1827,6 +1960,37 @@ function initDonate(){
   });
 }
 
+/* ---------------- about page ---------------- */
+function openAbout(){
+  document.getElementById('about').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#about .sh-body').scrollTop=0;
+}
+function closeAbout(){
+  document.getElementById('about').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initAbout(){
+  document.getElementById('ab-close').addEventListener('click',closeAbout);
+  document.getElementById('ab-scrim').addEventListener('click',closeAbout);
+  document.getElementById('ab-donate').addEventListener('click',()=>{
+    closeAbout(); switchTab('donate');
+  });
+  (function(){
+    const top=document.querySelector('#about .sh-top');
+    let y0=null;
+    top.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
+    top.addEventListener('touchend',e=>{
+      if(y0===null) return;
+      const dy=e.changedTouches[0].clientY-y0; y0=null;
+      if(dy>45) closeAbout();
+    },{passive:true});
+  })();
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('about').dataset.open==="1") closeAbout();
+  });
+}
+
 /* ---------------- drawer ---------------- */
 function openDrawer(){
   document.getElementById('drawer').dataset.open="1";
@@ -1854,6 +2018,7 @@ function initDrawer(){
       closeDrawer();
       if(act==="qibla"){ switchTab("qibla"); drawTicks(); }
       if(act==="calendar"){ switchTab("times"); setTimeout(openMonth,120); }
+      if(act==="about"){ setTimeout(openAbout,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -2133,6 +2298,7 @@ function boot(){
   initReminders();
   initTabs();
   initDrawer();
+  initAbout();
   initQibla();
   initDonate();
   VIEW=today0();
