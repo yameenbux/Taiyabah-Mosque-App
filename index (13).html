@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0C3B2A" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" href="icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Taiyabah" />
+<title>Taiyabah Masjid — Salah Times</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#0C3B2A;    /* hero canvas */
+    --green-800:#124A36;
+    --green-700:#1A5C44;    /* raised on dark */
+    --green-600:#237552;
+    --gold:#C6A24C;
+    --gold-bright:#DCBB63;
+    --paper:#F5F1E8;        /* light content bg */
+    --card:#FCFAF3;
+    --ink:#1B2621;
+    --muted:#6E7C74;
+    --line:#E4DECF;
+    --danger:#B4532F;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(12,59,42,.06), 0 12px 30px -18px rgba(12,59,42,.35);
+    font-family:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none !important}
+  html,body{background:#EDE7D8;color:var(--ink);-webkit-font-smoothing:antialiased}
+  body{max-width:520px;margin-inline:auto;min-height:100dvh;
+    background:
+      radial-gradient(120% 60% at 50% -10%, rgba(198,162,76,.10), transparent 60%),
+      var(--paper);
+    padding-bottom:calc(78px + env(safe-area-inset-bottom,0))}
+  .display{font-family:"Fraunces", Georgia, serif}
+  .arabic{font-family:"Amiri", serif}
+  .tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+  /* ---- brand bar ---- */
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
+    padding:14px 20px calc(14px);
+    background:linear-gradient(180deg, var(--green-900), var(--green-800));
+    color:#F3EFE3;border-bottom:1px solid rgba(198,162,76,.25)}
+  .mark{width:30px;height:30px;flex:0 0 auto;color:var(--gold-bright)}
+  .brand h1{font-size:16px;font-weight:600;letter-spacing:.2px;line-height:1.05}
+  .brand p{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#A9BBB0;margin-top:2px}
+  .proto{margin-left:auto;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gold-bright);border:1px solid rgba(198,162,76,.4);border-radius:999px;padding:4px 8px}
+
+  /* ---- hero / countdown ---- */
+  .hero{position:relative;overflow:hidden;color:#F3EFE3;
+    background:linear-gradient(180deg, var(--green-800) 0%, var(--green-900) 100%);
+    padding:26px 22px 30px}
+  .hero .girih{position:absolute;right:-46px;top:-40px;width:230px;height:230px;
+    color:var(--gold);opacity:.08;pointer-events:none}
+  .datechip{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#BFD0C6;
+    border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:5px 11px;margin-bottom:20px}
+  .live{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 0 0 rgba(220,187,99,.6);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,187,99,.5)}70%{box-shadow:0 0 0 7px rgba(220,187,99,0)}100%{box-shadow:0 0 0 0 rgba(220,187,99,0)}}
+  .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:9px}
+  .nextname{display:flex;align-items:baseline;gap:12px}
+  .nextname .en{font-size:33px;font-weight:500;line-height:1}
+  .nextname .ar{font-size:27px;color:#CBD9CF}
+  .count{font-size:56px;font-weight:600;letter-spacing:-.5px;color:#fff;margin:14px 0 2px;line-height:1}
+  .count small{font-size:19px;color:#9FB3A7;font-weight:500;margin-left:2px}
+  .subline{font-size:13.5px;color:#C7D5CB}
+  .subline b{color:var(--gold-bright);font-weight:600}
+  .track{margin-top:18px;height:5px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+  .track > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:99px;width:0%}
+
+  /* ---- Jumu'ah panel in hero (day view) ---- */
+  .jum-hero{margin-top:18px;border:1px solid rgba(198,162,76,.35);border-radius:14px;
+    background:rgba(198,162,76,.10);padding:4px 14px}
+  .jh-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;
+    border-top:1px solid rgba(198,162,76,.22)}
+  .jh-row:first-child{border-top:none}
+  .jh-k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#CBD9CF}
+  .jh-v{font-size:21px;font-weight:600;color:var(--gold-bright)}
+
+  /* ---- date navigation ---- */
+  .datenav{display:flex;align-items:center;gap:8px;padding:14px 16px 0}
+  .navbtn{flex:0 0 auto;width:42px;height:42px;border-radius:12px;cursor:pointer;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    font-size:22px;line-height:1;font-family:inherit;box-shadow:var(--shadow)}
+  .navbtn:disabled{opacity:.35;cursor:default}
+  .daypick{flex:1;min-width:0;cursor:pointer;font:inherit;text-align:center;padding:7px 10px;
+    border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow)}
+  .dn-main{display:block;font-size:15px;font-weight:600;color:var(--ink)}
+  .dn-sub{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+  .chips{display:flex;gap:7px;padding:10px 16px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;
+    padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);position:relative}
+  .chip[data-on="1"]{background:var(--green-700);border-color:var(--green-700);color:#F3EFE3}
+  .chip:disabled{opacity:.35;cursor:default}
+  .chip.pick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+  .navbtn:focus-visible,.daypick:focus-visible,.chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ---- Ramadan countdown ---- */
+  .ram{margin:-8px 0 16px 2px;display:flex;flex-direction:column;gap:1px}
+  .ram-t{font-size:12.5px;font-weight:600;color:var(--gold-bright);letter-spacing:.01em}
+  .ram-n{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7E9488}
+
+  /* ---- salam greeting ---- */
+  .salam{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+  .salam .ar{font-size:25px;color:var(--gold-bright);line-height:1.5;letter-spacing:.5px}
+  .salam .tr{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8FA79A}
+
+  /* ---- reminder ribbon ---- */
+  .remind{display:flex;align-items:flex-start;gap:12px;width:calc(100% - 32px);margin:14px 16px 0;
+    text-align:left;font:inherit;cursor:pointer;padding:13px 14px;border-radius:15px;
+    background:linear-gradient(180deg,#FBF6E8,#F7F0DE);border:1px solid #E8DCBC;
+    box-shadow:0 1px 2px rgba(12,59,42,.05)}
+  .rm-mark{flex:0 0 auto;width:26px;height:26px;color:var(--gold);margin-top:2px}
+  .rm-mark svg{width:100%;height:100%;display:block}
+  .rm-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .rm-ar{font-size:19px;color:#8A6A18;line-height:1.6}
+  .rm-t{font-size:14px;font-weight:700;color:#4A3B14}
+  .rm-d{font-size:12.5px;color:#7A6838;line-height:1.45}
+  .rm-dots{flex:0 0 auto;display:flex;gap:4px;align-self:center}
+  .rm-dots i{width:5px;height:5px;border-radius:50%;background:#DFCF9E;display:block}
+  .rm-dots i[data-on="1"]{background:var(--gold)}
+  .remind:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ---- month view sheet ---- */
+  .sheet{position:fixed;inset:0;z-index:50;display:none}
+  .sheet[data-open="1"]{display:block}
+  .sheet .scrim{position:absolute;inset:0;background:rgba(12,32,24,.55);backdrop-filter:blur(2px)}
+  .sheet .panel{position:absolute;left:0;right:0;bottom:0;top:0;max-width:520px;margin-inline:auto;
+    background:var(--paper);display:flex;flex-direction:column}
+  .sh-top{display:flex;align-items:center;gap:10px;padding:14px 16px;flex:0 0 auto;
+    background:linear-gradient(180deg,var(--green-900),var(--green-800));color:#F3EFE3}
+  .sh-top h3{font-family:"Fraunces",serif;font-size:15.5px;font-weight:600;flex:1}
+  .sh-nav{width:36px;height:36px;border-radius:10px;cursor:pointer;font:inherit;font-size:19px;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#F3EFE3}
+  .sh-nav:disabled{opacity:.3;cursor:default}
+  .sh-close{margin-left:2px;border:none;background:none;color:var(--gold-bright);font:inherit;
+    font-size:13px;font-weight:600;cursor:pointer;padding:8px}
+  .sh-toggle{display:flex;gap:6px;padding:11px 16px 9px;flex:0 0 auto;background:var(--card);
+    border-bottom:1px solid var(--line)}
+  .sh-toggle button{flex:1;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;padding:8px;
+    border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
+  .sh-toggle button[data-on="1"]{background:var(--green-700);border-color:var(--green-700);color:#F3EFE3}
+  .sh-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  table.mt{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  table.mt th{position:sticky;top:0;z-index:2;background:var(--card);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);font-weight:600;padding:9px 3px;border-bottom:1px solid var(--line)}
+  table.mt td{font-size:12.5px;padding:9px 3px;text-align:center;border-bottom:1px solid var(--line);color:var(--ink)}
+  table.mt td.d{font-weight:700;text-align:left;padding-left:12px;white-space:nowrap}
+  table.mt td.d small{display:block;font-size:9.5px;font-weight:500;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  table.mt tr.fri td{background:rgba(198,162,76,.10)}
+  table.mt tr.today td{background:rgba(35,117,82,.13);font-weight:700}
+  table.mt tr.today td.d{box-shadow:inset 3px 0 0 var(--green-600)}
+  table.mt tr{cursor:pointer}
+  .mt-foot{padding:14px 16px 26px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
+
+  /* ---- bottom tab bar ---- */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:520px;margin-inline:auto;
+    display:grid;grid-template-columns:repeat(3,1fr);
+    background:rgba(252,250,243,.96);backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom,0)}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font:inherit;
+    border:none;background:none;color:var(--muted);padding:9px 4px 8px}
+  .tab svg{width:22px;height:22px}
+  .tab span{font-size:10.5px;font-weight:600;letter-spacing:.02em}
+  .tab[data-on="1"]{color:var(--green-600)}
+  .tab:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+
+  /* ---- qibla ---- */
+  .qcard{padding:20px 16px 16px;text-align:center}
+  .dial{position:relative;width:min(74vw,270px);aspect-ratio:1;margin:2px auto 4px}
+  .dial-ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--line);
+    background:radial-gradient(circle at 50% 45%, #fff, #F6F2E6 72%);
+    box-shadow:inset 0 2px 14px rgba(12,59,42,.06);transition:transform .18s linear}
+  .cardinal{position:absolute;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+  .cardinal.n{top:9px;left:50%;transform:translateX(-50%);color:var(--danger)}
+  .cardinal.s{bottom:9px;left:50%;transform:translateX(-50%)}
+  .cardinal.e{right:10px;top:50%;transform:translateY(-50%)}
+  .cardinal.w{left:10px;top:50%;transform:translateY(-50%)}
+  .ticks{position:absolute;inset:0}
+  .ticks i{position:absolute;left:50%;top:6px;width:1px;height:7px;background:#D8D0BB;
+    transform-origin:50% calc(50vw);}
+  .needle{position:absolute;inset:0;display:grid;place-items:start center;
+    transition:transform .18s linear}
+  .needle svg{width:34px;height:auto;margin-top:6%}
+  .kaaba{position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+    width:26px;height:26px;display:grid;place-items:center;
+    background:var(--gold);border-radius:7px;box-shadow:0 2px 8px rgba(12,59,42,.25)}
+  .kaaba svg{width:16px;height:16px}
+  .dial-mid{position:absolute;top:50%;left:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+    border-radius:50%;background:var(--green-800);box-shadow:0 0 0 3px rgba(255,255,255,.9)}
+  .qread{margin-top:10px}
+  .qbig{font-size:40px;font-weight:600;color:var(--ink);line-height:1}
+  .qsub{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .qnote{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:11px}
+  .qhelp{margin-top:14px;padding:4px 15px}
+  .qh-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+  .qh-row:first-child{border-top:none}
+  .qh-k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .qh-v{font-size:14.5px;font-weight:600}
+  .qfoot{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:14px 6px 0}
+
+  /* ---- sections ---- */
+  .wrap{padding:20px 16px 0}
+  .sec-h{display:flex;align-items:center;gap:10px;margin:6px 4px 12px}
+  .sec-h h2{font-family:"Fraunces",serif;font-size:15px;font-weight:600}
+  .sec-h .rule{flex:1;height:1px;background:var(--line)}
+  .sec-h .tag{font-size:11px;color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+  /* ---- timetable ---- */
+  .tt{padding:6px 6px}
+  .tt .col-h{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:10px 14px 8px;
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .tt .col-h .r{width:64px;text-align:right}
+  .row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;
+    padding:13px 14px;border-top:1px solid var(--line);border-radius:12px}
+  .row:first-of-type{border-top:none}
+  .row .name{display:flex;flex-direction:column;gap:1px}
+  .row .name .en{font-size:16px;font-weight:600}
+  .row .name .ar{font-size:14px;color:var(--muted)}
+  .row .begins,.row .jam{width:64px;text-align:right;font-size:16px;font-weight:600}
+  .row .begins{color:var(--muted);font-weight:500}
+  .row.sunrise .en{font-weight:500;color:var(--muted)}
+  .row.sunrise .jam{color:var(--line)}
+  .row.is-current{background:linear-gradient(90deg, rgba(198,162,76,.14), rgba(198,162,76,.04));
+    box-shadow:inset 3px 0 0 var(--gold)}
+  .row.is-next .jam{color:var(--green-600)}
+  .pill{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    padding:3px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+  .pill.now{background:var(--gold);color:#3a2c07}
+  .pill.next{background:#E6EFE9;color:var(--green-600)}
+  .jummah{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px dashed var(--line);
+    font-size:13.5px;color:var(--ink)}
+  .jummah b{font-weight:700}
+  .jummah .k{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+  .samplenote{font-size:12px;color:var(--danger);text-align:center;margin:10px 6px 0}
+
+  /* ---- alerts ---- */
+  .alerts{padding:16px}
+  .alerts p.lead{font-size:13.5px;color:var(--muted);line-height:1.5;margin:2px 2px 15px}
+  .enable{width:100%;border:none;cursor:pointer;font:inherit;font-weight:600;font-size:15px;
+    color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
+    padding:14px;border-radius:13px;box-shadow:var(--shadow);letter-spacing:.2px}
+  .enable[data-on="1"]{background:#E9F0EB;color:var(--green-600);box-shadow:none;border:1px solid var(--line)}
+  .toggles{margin-top:6px;opacity:.45;pointer-events:none;transition:opacity .25s}
+  .toggles.live{opacity:1;pointer-events:auto}
+  .tg{display:flex;align-items:center;gap:12px;padding:13px 4px;border-top:1px solid var(--line)}
+  .tg:first-child{border-top:none}
+  .tg .txt{flex:1}
+  .tg .txt .t{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .tg .txt .d{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .urgent{font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--danger);
+    border:1px solid rgba(180,83,47,.35);border-radius:999px;padding:2px 6px}
+  .switch{--w:44px;position:relative;width:var(--w);height:26px;flex:0 0 auto}
+  .switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .switch .sl{position:absolute;inset:0;background:#D9D2C0;border-radius:99px;transition:.2s;pointer-events:none}
+  .switch .sl::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .switch input:checked + .sl{background:var(--green-600)}
+  .switch input:checked + .sl::after{transform:translateX(18px)}
+  .switch input:focus-visible + .sl{outline:2px solid var(--gold);outline-offset:2px}
+  .mins{display:flex;align-items:center;gap:9px;padding:12px 4px 2px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .mins select{font:inherit;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:6px 9px;background:#fff}
+  .save{width:100%;margin-top:14px;border:none;cursor:pointer;font:inherit;font-weight:700;font-size:14.5px;
+    color:#F3EFE3;background:var(--green-700);padding:13px;border-radius:12px;letter-spacing:.2px}
+  .save:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* collapsed confirmation */
+  .done{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
+    cursor:pointer;padding:14px 15px}
+  .dn-ico{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:#E9F0EB;color:var(--green-600)}
+  .dn-ico svg{width:18px;height:18px}
+  .dn-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .dn-1{font-size:14.5px;font-weight:700;color:var(--ink)}
+  .dn-2{font-size:12px;color:var(--muted);line-height:1.4}
+  .dn-edit{flex:0 0 auto;font-size:12.5px;font-weight:600;color:var(--green-600)}
+  .done:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .wirednote{font-size:11.5px;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5}
+
+  /* ---- footer ---- */
+  footer{padding:26px 22px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
+  footer .star{width:16px;height:16px;color:var(--gold);margin-bottom:6px}
+  footer b{color:var(--ink);font-weight:600}
+  footer .fr{margin-top:8px;font-size:11px}
+  footer .charity{margin-top:12px;font-size:10.5px;color:#9AA49D}
+
+  @media (prefers-reduced-motion: reduce){.live{animation:none}.track>i{transition:none}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+    <div class="brand">
+      <h1>Taiyabah Masjid</h1>
+      <p>Bolton Central Islamic Society</p>
+    </div>
+    <span class="proto">Prototype</span>
+  </div>
+
+  <main id="tab-times">
+  <section class="hero">
+    <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+    <div class="salam">
+      <span class="ar arabic">السَّلَامُ عَلَيْكُمْ</span>
+      <span class="tr">As-salāmu ʿalaykum</span>
+    </div>
+    <span class="datechip"><span class="live" id="livedot"></span><span id="dateline">—</span></span>
+    <div class="ram" id="ram" hidden>
+      <span class="ram-t" id="ram-t">—</span>
+      <span class="ram-n" id="ram-n">Subject to moon sighting</span>
+    </div>
+
+    <!-- live countdown: today only -->
+    <div id="mode-today">
+      <div class="eyebrow">Next Jamā&#703;ah</div>
+      <div class="nextname">
+        <span class="en display" id="next-en">—</span>
+        <span class="ar" id="next-ar">—</span>
+      </div>
+      <div class="count tnum" id="count">--<small>:--:--</small></div>
+      <div class="subline" id="subline">—</div>
+      <div class="track"><i id="track"></i></div>
+    </div>
+
+    <!-- day view: any other date -->
+    <div id="mode-date" hidden>
+      <div class="eyebrow" id="dv-eyebrow">Viewing</div>
+      <div class="nextname">
+        <span class="en display" id="dv-date">—</span>
+      </div>
+      <div class="subline" id="dv-sub" style="margin-top:8px">—</div>
+      <div class="jum-hero" id="dv-jum" hidden>
+        <div class="jh-row"><span class="jh-k">1st Jumu&#703;ah</span><span class="jh-v tnum" id="dv-j1">—</span></div>
+        <div class="jh-row"><span class="jh-k">2nd Jumu&#703;ah</span><span class="jh-v tnum" id="dv-j2">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <button class="remind" id="remind" hidden>
+    <span class="rm-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><polygon fill="currentColor" points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26"/><polygon fill="currentColor" points="50,6 94,50 50,94 6,50" opacity=".55"/></svg>
+    </span>
+    <span class="rm-body">
+      <span class="rm-ar arabic" id="rm-ar">—</span>
+      <span class="rm-t" id="rm-t">—</span>
+      <span class="rm-d" id="rm-d">—</span>
+    </span>
+    <span class="rm-dots" id="rm-dots"></span>
+  </button>
+
+  <nav class="datenav" aria-label="Choose a date">
+    <button class="navbtn" id="prev" aria-label="Previous day">&#8249;</button>
+    <button class="daypick" id="daypick">
+      <span class="dn-main" id="dn-main">Today</span>
+      <span class="dn-sub" id="dn-sub">—</span>
+    </button>
+    <button class="navbtn" id="next" aria-label="Next day">&#8250;</button>
+  </nav>
+  <div class="chips">
+    <button class="chip" id="chip-today" data-on="1">Today</button>
+    <button class="chip" id="chip-tom">Tomorrow</button>
+    <button class="chip" id="chip-fri">Next Jumu&#703;ah</button>
+    <label class="chip pick">Pick date<input type="date" id="datein" min="2026-01-01" max="2026-12-31"></label>
+    <button class="chip" id="chip-month">Full month</button>
+  </div>
+
+  <div class="sheet" id="sheet" data-open="0" role="dialog" aria-modal="true" aria-label="Full month timetable">
+    <div class="scrim" id="scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <button class="sh-nav" id="m-prev" aria-label="Previous month">&#8249;</button>
+        <h3 id="m-title">—</h3>
+        <button class="sh-nav" id="m-next" aria-label="Next month">&#8250;</button>
+        <button class="sh-close" id="m-close">Done</button>
+      </div>
+      <div class="sh-toggle">
+        <button id="m-jam" data-on="1">Jamā&#703;ah times</button>
+        <button id="m-beg" data-on="0">Beginning times</button>
+      </div>
+      <div class="sh-body" id="m-body"></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="sec-h"><h2 id="tt-h">Today</h2><span class="rule"></span><span class="tag" id="tt-tag">Begins &amp; Jamā&#703;ah</span></div>
+    <div class="card tt" id="timetable"></div>
+    <div class="samplenote" id="samplenote" hidden></div>
+
+    <footer>
+      <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+      <div><b>31a Draycott Street, Bolton BL1 8HD</b></div>
+      <div>01204 535 997 &middot; Radio 454.1000 MHz</div>
+      <div class="fr">Times from the official 2026 Salah Timetable</div>
+      <div class="charity">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
+    </footer>
+  </div>
+  </main>
+
+  <main id="tab-qibla" hidden>
+    <div class="wrap">
+      <div class="sec-h"><h2>Qibla direction</h2><span class="rule"></span><span class="tag" id="q-src">From the masjid</span></div>
+
+      <div class="card qcard">
+        <div class="dial" id="dial">
+          <div class="dial-ring" id="dial-ring">
+            <span class="cardinal n">N</span><span class="cardinal e">E</span>
+            <span class="cardinal s">S</span><span class="cardinal w">W</span>
+            <div class="ticks" id="ticks"></div>
+          </div>
+          <div class="needle" id="needle">
+            <svg viewBox="0 0 40 200" aria-hidden="true">
+              <polygon points="20,6 30,52 20,44 10,52" fill="#C6A24C"/>
+              <line x1="20" y1="44" x2="20" y2="168" stroke="#C6A24C" stroke-width="2.5" opacity=".55"/>
+            </svg>
+            <span class="kaaba" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="1.5" fill="#0C3B2A"/><rect x="4" y="10" width="16" height="2.6" fill="#C6A24C"/></svg>
+            </span>
+          </div>
+          <div class="dial-mid"></div>
+        </div>
+
+        <div class="qread">
+          <div class="qbig tnum" id="q-bearing">118°</div>
+          <div class="qsub" id="q-sub">from true north &middot; 5,042 km to Makkah</div>
+        </div>
+
+        <button class="enable" id="q-start">Use my phone's compass</button>
+        <p class="qnote" id="q-note">Hold the phone flat. Compasses drift near metal, cars and speakers — turn in a figure-of-eight to calibrate.</p>
+      </div>
+
+      <div class="card qhelp">
+        <div class="qh-row"><span class="qh-k">Bearing</span><span class="qh-v tnum" id="q-b2">118° true</span></div>
+        <div class="qh-row"><span class="qh-k">Distance</span><span class="qh-v tnum" id="q-d2">5,042 km</span></div>
+        <div class="qh-row"><span class="qh-k">Measured from</span><span class="qh-v" id="q-from">Taiyabah Masjid</span></div>
+      </div>
+      <p class="qfoot">A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.</p>
+    </div>
+  </main>
+
+  <main id="tab-alerts" hidden>
+    <div class="wrap">
+    <div class="sec-h" id="alerts-h" style="margin-top:26px"><h2>Prayer alerts</h2><span class="rule"></span></div>
+
+    <!-- collapsed: settings saved -->
+    <button class="card done" id="a-done" hidden>
+      <span class="dn-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+        </svg>
+      </span>
+      <span class="dn-txt">
+        <span class="dn-1">Notifications on</span>
+        <span class="dn-2" id="a-summary">—</span>
+      </span>
+      <span class="dn-edit">Change</span>
+    </button>
+
+    <!-- expanded: setup + settings -->
+    <div class="card alerts" id="a-panel">
+      <p class="lead" id="a-lead">Get a quiet reminder before each jamā&#703;ah, plus masjid announcements — on this device.</p>
+      <button class="enable" id="enable" data-on="0">Enable notifications</button>
+      <div class="toggles" id="toggles">
+        <div class="tg">
+          <div class="txt"><div class="t">Jamā&#703;ah reminders</div><div class="d">A nudge before each congregation</div></div>
+          <label class="switch"><input type="checkbox" checked id="tg-jam"><span class="sl"></span></label>
+        </div>
+        <div class="mins">
+          Remind me
+          <select id="mins"><option value="5">5 min</option><option value="10" selected>10 min</option><option value="15">15 min</option></select>
+          before jamā&#703;ah
+        </div>
+        <div class="tg">
+          <div class="txt"><div class="t">Janāzah <span class="urgent">Urgent</span></div><div class="d">Funeral prayer announcements</div></div>
+          <label class="switch"><input type="checkbox" checked id="tg-jan"><span class="sl"></span></label>
+        </div>
+        <div class="tg">
+          <div class="txt"><div class="t">Announcements</div><div class="d">Timetable changes, Ramadan, Eid</div></div>
+          <label class="switch"><input type="checkbox" checked id="tg-ann"><span class="sl"></span></label>
+        </div>
+        <div class="tg">
+          <div class="txt"><div class="t">Events &amp; talks</div><div class="d">Bayaans, classes, community events</div></div>
+          <label class="switch"><input type="checkbox" id="tg-evt"><span class="sl"></span></label>
+        </div>
+        <button class="save" id="a-save">Save</button>
+      </div>
+      <p class="wirednote" id="wirednote"></p>
+    </div>
+
+    </div>
+  </main>
+
+  <nav class="tabbar" role="tablist">
+    <button class="tab" data-tab="times" data-on="1" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span>Times</span>
+    </button>
+    <button class="tab" data-tab="qibla" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 10.5,10.5 8.5,15.5 13.5,13.5" fill="currentColor" stroke="none"/></svg>
+      <span>Qibla</span>
+    </button>
+    <button class="tab" data-tab="alerts" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span>Alerts</span>
+    </button>
+  </nav>
+
+<script>
+/* ---------------------------------------------------------------
+   DATA — embedded below: the verified full-year dataset
+   generated by parse_timetable.py from the official 2026 PDF.
+   Times are 24h local wall-clock (Europe/London), BST baked in.
+   Maghrib begins == jamaat (prayed at the listed time).
+---------------------------------------------------------------- */
+const DATA = {
+  "masjid": "Taiyabah Masjid (Bolton Central Islamic Society)",
+  "year": 2026,
+  "source": "Official 2026 Salah Timetable (1447\u20131448 AH)",
+  "days": {
+  "2026-01-01":{"hijri":"12 Rajab 1447 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:20","asr":"14:13","maghrib":"16:06","isha":"17:48"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:06","isha":"18:30"}},
+  "2026-01-02":{"hijri":"13 Rajab 1447 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:21","asr":"14:14","maghrib":"16:07","isha":"17:49"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:07","isha":"18:30"},"jummah":{"first":"12:45","second":"13:40"}},
+  "2026-01-03":{"hijri":"14 Rajab 1447 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:21","asr":"14:15","maghrib":"16:08","isha":"17:50"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:08","isha":"18:30"}},
+  "2026-01-04":{"hijri":"15 Rajab 1447 AH","begins":{"fajr":"06:36","sunrise":"08:25","zuhr":"12:22","asr":"14:17","maghrib":"16:09","isha":"17:52"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:09","isha":"18:30"}},
+  "2026-01-05":{"hijri":"16 Rajab 1447 AH","begins":{"fajr":"06:36","sunrise":"08:25","zuhr":"12:22","asr":"14:18","maghrib":"16:11","isha":"17:53"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:11","isha":"19:30"}},
+  "2026-01-06":{"hijri":"17 Rajab 1447 AH","begins":{"fajr":"06:35","sunrise":"08:25","zuhr":"12:23","asr":"14:19","maghrib":"16:12","isha":"17:55"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:12","isha":"19:30"}},
+  "2026-01-07":{"hijri":"18 Rajab 1447 AH","begins":{"fajr":"06:35","sunrise":"08:24","zuhr":"12:23","asr":"14:20","maghrib":"16:13","isha":"17:56"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:13","isha":"19:30"}},
+  "2026-01-08":{"hijri":"19 Rajab 1447 AH","begins":{"fajr":"06:35","sunrise":"08:24","zuhr":"12:24","asr":"14:22","maghrib":"16:15","isha":"17:57"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:15","isha":"19:30"}},
+  "2026-01-09":{"hijri":"20 Rajab 1447 AH","begins":{"fajr":"06:34","sunrise":"08:23","zuhr":"12:24","asr":"14:23","maghrib":"16:16","isha":"17:59"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:16","isha":"19:30"},"jummah":{"first":"12:45","second":"13:50"}},
+  "2026-01-10":{"hijri":"21 Rajab 1447 AH","begins":{"fajr":"06:34","sunrise":"08:22","zuhr":"12:24","asr":"14:25","maghrib":"16:18","isha":"18:01"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:18","isha":"18:30"}},
+  "2026-01-11":{"hijri":"22 Rajab 1447 AH","begins":{"fajr":"06:33","sunrise":"08:22","zuhr":"12:25","asr":"14:26","maghrib":"16:19","isha":"18:02"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:19","isha":"18:30"}},
+  "2026-01-12":{"hijri":"23 Rajab 1447 AH","begins":{"fajr":"06:33","sunrise":"08:21","zuhr":"12:25","asr":"14:28","maghrib":"16:21","isha":"18:04"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:21","isha":"19:30"}},
+  "2026-01-13":{"hijri":"24 Rajab 1447 AH","begins":{"fajr":"06:32","sunrise":"08:20","zuhr":"12:25","asr":"14:29","maghrib":"16:22","isha":"18:05"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:22","isha":"19:30"}},
+  "2026-01-14":{"hijri":"25 Rajab 1447 AH","begins":{"fajr":"06:31","sunrise":"08:19","zuhr":"12:26","asr":"14:31","maghrib":"16:24","isha":"18:07"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:24","isha":"19:30"}},
+  "2026-01-15":{"hijri":"26 Rajab 1447 AH","begins":{"fajr":"06:31","sunrise":"08:18","zuhr":"12:26","asr":"14:32","maghrib":"16:26","isha":"18:09"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:26","isha":"19:30"}},
+  "2026-01-16":{"hijri":"27 Rajab 1447 AH","begins":{"fajr":"06:30","sunrise":"08:17","zuhr":"12:27","asr":"14:34","maghrib":"16:27","isha":"18:11"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:27","isha":"19:30"},"jummah":{"first":"12:45","second":"14:00"}},
+  "2026-01-17":{"hijri":"28 Rajab 1447 AH","begins":{"fajr":"06:29","sunrise":"08:16","zuhr":"12:27","asr":"14:35","maghrib":"16:29","isha":"18:12"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:29","isha":"18:30"}},
+  "2026-01-18":{"hijri":"29 Rajab 1447 AH","begins":{"fajr":"06:28","sunrise":"08:15","zuhr":"12:27","asr":"14:37","maghrib":"16:31","isha":"18:14"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:31","isha":"18:30"}},
+  "2026-01-19":{"hijri":"30 Rajab 1447 AH","begins":{"fajr":"06:28","sunrise":"08:14","zuhr":"12:28","asr":"14:39","maghrib":"16:33","isha":"18:16"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:33","isha":"19:30"}},
+  "2026-01-20":{"hijri":"1 Sha'ban 1447 AH","begins":{"fajr":"06:27","sunrise":"08:13","zuhr":"12:28","asr":"14:40","maghrib":"16:34","isha":"18:18"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:34","isha":"19:30"}},
+  "2026-01-21":{"hijri":"2 Sha'ban 1447 AH","begins":{"fajr":"06:26","sunrise":"08:11","zuhr":"12:28","asr":"14:42","maghrib":"16:36","isha":"18:19"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:36","isha":"19:30"}},
+  "2026-01-22":{"hijri":"3 Sha'ban 1447 AH","begins":{"fajr":"06:25","sunrise":"08:10","zuhr":"12:28","asr":"14:44","maghrib":"16:38","isha":"18:22"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:00","maghrib":"16:38","isha":"19:30"}},
+  "2026-01-23":{"hijri":"4 Sha'ban 1447 AH","begins":{"fajr":"06:24","sunrise":"08:09","zuhr":"12:29","asr":"14:46","maghrib":"16:40","isha":"18:23"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:40","isha":"19:30"},"jummah":{"first":"12:45","second":"14:10"}},
+  "2026-01-24":{"hijri":"5 Sha'ban 1447 AH","begins":{"fajr":"06:22","sunrise":"08:07","zuhr":"12:29","asr":"14:47","maghrib":"16:42","isha":"18:25"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:42","isha":"18:45"}},
+  "2026-01-25":{"hijri":"6 Sha'ban 1447 AH","begins":{"fajr":"06:21","sunrise":"08:06","zuhr":"12:29","asr":"14:49","maghrib":"16:44","isha":"18:27"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:44","isha":"18:45"}},
+  "2026-01-26":{"hijri":"7 Sha'ban 1447 AH","begins":{"fajr":"06:20","sunrise":"08:04","zuhr":"12:29","asr":"14:51","maghrib":"16:46","isha":"18:29"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:46","isha":"19:30"}},
+  "2026-01-27":{"hijri":"8 Sha'ban 1447 AH","begins":{"fajr":"06:19","sunrise":"08:03","zuhr":"12:30","asr":"14:53","maghrib":"16:47","isha":"18:31"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:47","isha":"19:30"}},
+  "2026-01-28":{"hijri":"9 Sha'ban 1447 AH","begins":{"fajr":"06:18","sunrise":"08:01","zuhr":"12:30","asr":"14:55","maghrib":"16:49","isha":"18:33"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:49","isha":"19:30"}},
+  "2026-01-29":{"hijri":"10 Sha'ban 1447 AH","begins":{"fajr":"06:16","sunrise":"08:00","zuhr":"12:30","asr":"14:56","maghrib":"16:51","isha":"18:35"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:30","maghrib":"16:51","isha":"19:30"}},
+  "2026-01-30":{"hijri":"11 Sha'ban 1447 AH","begins":{"fajr":"06:15","sunrise":"07:58","zuhr":"12:30","asr":"14:58","maghrib":"16:53","isha":"18:36"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"16:53","isha":"19:30"},"jummah":{"first":"12:45","second":"14:20"}},
+  "2026-01-31":{"hijri":"12 Sha'ban 1447 AH","begins":{"fajr":"06:13","sunrise":"07:57","zuhr":"12:30","asr":"15:00","maghrib":"16:55","isha":"18:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"16:55","isha":"19:00"}},
+  "2026-02-01":{"hijri":"13 Sha'ban 1447 AH","begins":{"fajr":"06:12","sunrise":"07:55","zuhr":"12:30","asr":"15:02","maghrib":"16:57","isha":"18:39"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"16:57","isha":"19:00"}},
+  "2026-02-02":{"hijri":"14 Sha'ban 1447 AH","begins":{"fajr":"06:10","sunrise":"07:53","zuhr":"12:30","asr":"15:04","maghrib":"16:59","isha":"18:40"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"16:59","isha":"19:30"}},
+  "2026-02-03":{"hijri":"15 Sha'ban 1447 AH","begins":{"fajr":"06:08","sunrise":"07:51","zuhr":"12:31","asr":"15:06","maghrib":"17:01","isha":"18:41"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"17:01","isha":"19:30"}},
+  "2026-02-04":{"hijri":"16 Sha'ban 1447 AH","begins":{"fajr":"06:06","sunrise":"07:50","zuhr":"12:31","asr":"15:07","maghrib":"17:03","isha":"18:43"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"17:03","isha":"19:30"}},
+  "2026-02-05":{"hijri":"17 Sha'ban 1447 AH","begins":{"fajr":"06:05","sunrise":"07:48","zuhr":"12:31","asr":"15:09","maghrib":"17:05","isha":"18:44"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"15:45","maghrib":"17:05","isha":"19:30"}},
+  "2026-02-06":{"hijri":"18 Sha'ban 1447 AH","begins":{"fajr":"06:03","sunrise":"07:46","zuhr":"12:31","asr":"15:11","maghrib":"17:07","isha":"18:46"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:07","isha":"19:30"},"jummah":{"first":"12:45","second":"14:30"}},
+  "2026-02-07":{"hijri":"19 Sha'ban 1447 AH","begins":{"fajr":"06:01","sunrise":"07:44","zuhr":"12:31","asr":"15:13","maghrib":"17:09","isha":"18:47"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:09","isha":"19:00"}},
+  "2026-02-08":{"hijri":"20 Sha'ban 1447 AH","begins":{"fajr":"05:59","sunrise":"07:42","zuhr":"12:31","asr":"15:15","maghrib":"17:11","isha":"18:49"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:11","isha":"19:00"}},
+  "2026-02-09":{"hijri":"21 Sha'ban 1447 AH","begins":{"fajr":"05:57","sunrise":"07:40","zuhr":"12:31","asr":"15:17","maghrib":"17:13","isha":"18:51"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:13","isha":"19:30"}},
+  "2026-02-10":{"hijri":"22 Sha'ban 1447 AH","begins":{"fajr":"05:55","sunrise":"07:38","zuhr":"12:31","asr":"15:19","maghrib":"17:15","isha":"18:53"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:15","isha":"19:30"}},
+  "2026-02-11":{"hijri":"23 Sha'ban 1447 AH","begins":{"fajr":"05:53","sunrise":"07:36","zuhr":"12:31","asr":"15:20","maghrib":"17:17","isha":"18:54"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:17","isha":"19:30"}},
+  "2026-02-12":{"hijri":"24 Sha'ban 1447 AH","begins":{"fajr":"05:51","sunrise":"07:34","zuhr":"12:31","asr":"15:22","maghrib":"17:19","isha":"18:56"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:45","maghrib":"17:19","isha":"19:30"}},
+  "2026-02-13":{"hijri":"25 Sha'ban 1447 AH","begins":{"fajr":"05:49","sunrise":"07:32","zuhr":"12:31","asr":"15:24","maghrib":"17:21","isha":"18:58"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"16:00","maghrib":"17:21","isha":"19:30"},"jummah":{"first":"12:45","second":"14:50"}},
+  "2026-02-14":{"hijri":"26 Sha'ban 1447 AH","begins":{"fajr":"05:47","sunrise":"07:30","zuhr":"12:31","asr":"15:26","maghrib":"17:23","isha":"19:00"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"16:00","maghrib":"17:23","isha":"19:15"}},
+  "2026-02-15":{"hijri":"27 Sha'ban 1447 AH","begins":{"fajr":"05:45","sunrise":"07:28","zuhr":"12:31","asr":"15:28","maghrib":"17:25","isha":"19:01"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"16:00","maghrib":"17:25","isha":"19:15"}},
+  "2026-02-16":{"hijri":"28 Sha'ban 1447 AH","begins":{"fajr":"05:43","sunrise":"07:26","zuhr":"12:31","asr":"15:30","maghrib":"17:27","isha":"19:03"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"16:00","maghrib":"17:27","isha":"19:30"}},
+  "2026-02-17":{"hijri":"29 Sha'ban 1447 AH","begins":{"fajr":"05:41","sunrise":"07:24","zuhr":"12:31","asr":"15:31","maghrib":"17:29","isha":"19:05"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"16:00","maghrib":"17:29","isha":"19:30"}},
+  "2026-02-18":{"hijri":"1 Ramadan 1447 AH","begins":{"fajr":"05:38","sunrise":"07:22","zuhr":"12:31","asr":"15:33","maghrib":"17:31","isha":"19:07"},"jamaat":{"fajr":"06:00","zuhr":"12:45","asr":"16:00","maghrib":"17:31","isha":"19:30"}},
+  "2026-02-19":{"hijri":"2 Ramadan 1447 AH","begins":{"fajr":"05:36","sunrise":"07:20","zuhr":"12:31","asr":"15:35","maghrib":"17:33","isha":"19:08"},"jamaat":{"fajr":"06:00","zuhr":"12:45","asr":"16:00","maghrib":"17:33","isha":"19:30"}},
+  "2026-02-20":{"hijri":"3 Ramadan 1447 AH","begins":{"fajr":"05:34","sunrise":"07:18","zuhr":"12:30","asr":"15:37","maghrib":"17:35","isha":"19:10"},"jamaat":{"fajr":"05:50","zuhr":"12:45","asr":"16:15","maghrib":"17:35","isha":"19:45"},"jummah":{"first":"12:45","second":"15:00"}},
+  "2026-02-21":{"hijri":"4 Ramadan 1447 AH","begins":{"fajr":"05:32","sunrise":"07:15","zuhr":"12:30","asr":"15:38","maghrib":"17:37","isha":"19:12"},"jamaat":{"fajr":"05:50","zuhr":"12:45","asr":"16:15","maghrib":"17:37","isha":"19:45"}},
+  "2026-02-22":{"hijri":"5 Ramadan 1447 AH","begins":{"fajr":"05:30","sunrise":"07:13","zuhr":"12:30","asr":"15:40","maghrib":"17:39","isha":"19:13"},"jamaat":{"fajr":"05:50","zuhr":"12:45","asr":"16:15","maghrib":"17:39","isha":"19:45"}},
+  "2026-02-23":{"hijri":"6 Ramadan 1447 AH","begins":{"fajr":"05:27","sunrise":"07:11","zuhr":"12:30","asr":"15:42","maghrib":"17:41","isha":"19:14"},"jamaat":{"fajr":"05:50","zuhr":"12:45","asr":"16:15","maghrib":"17:41","isha":"19:45"}},
+  "2026-02-24":{"hijri":"7 Ramadan 1447 AH","begins":{"fajr":"05:25","sunrise":"07:09","zuhr":"12:30","asr":"15:44","maghrib":"17:43","isha":"19:16"},"jamaat":{"fajr":"05:40","zuhr":"12:45","asr":"16:15","maghrib":"17:43","isha":"19:45"}},
+  "2026-02-25":{"hijri":"8 Ramadan 1447 AH","begins":{"fajr":"05:23","sunrise":"07:06","zuhr":"12:30","asr":"15:46","maghrib":"17:45","isha":"19:18"},"jamaat":{"fajr":"05:40","zuhr":"12:45","asr":"16:15","maghrib":"17:45","isha":"19:45"}},
+  "2026-02-26":{"hijri":"9 Ramadan 1447 AH","begins":{"fajr":"05:21","sunrise":"07:04","zuhr":"12:30","asr":"15:47","maghrib":"17:47","isha":"19:20"},"jamaat":{"fajr":"05:40","zuhr":"12:45","asr":"16:15","maghrib":"17:47","isha":"19:45"}},
+  "2026-02-27":{"hijri":"10 Ramadan 1447 AH","begins":{"fajr":"05:18","sunrise":"07:02","zuhr":"12:29","asr":"15:49","maghrib":"17:48","isha":"19:21"},"jamaat":{"fajr":"05:35","zuhr":"12:45","asr":"16:30","maghrib":"17:48","isha":"20:00"},"jummah":{"first":"12:45","second":"15:15"}},
+  "2026-02-28":{"hijri":"11 Ramadan 1447 AH","begins":{"fajr":"05:16","sunrise":"07:00","zuhr":"12:29","asr":"15:51","maghrib":"17:50","isha":"19:23"},"jamaat":{"fajr":"05:35","zuhr":"12:45","asr":"16:30","maghrib":"17:50","isha":"20:00"}},
+  "2026-03-01":{"hijri":"12 Ramadan 1447 AH","begins":{"fajr":"05:14","sunrise":"06:57","zuhr":"12:29","asr":"15:52","maghrib":"17:52","isha":"19:24"},"jamaat":{"fajr":"05:35","zuhr":"12:45","asr":"16:30","maghrib":"17:52","isha":"20:00"}},
+  "2026-03-02":{"hijri":"13 Ramadan 1447 AH","begins":{"fajr":"05:11","sunrise":"06:55","zuhr":"12:29","asr":"15:54","maghrib":"17:54","isha":"19:26"},"jamaat":{"fajr":"05:35","zuhr":"12:45","asr":"16:30","maghrib":"17:54","isha":"20:00"}},
+  "2026-03-03":{"hijri":"14 Ramadan 1447 AH","begins":{"fajr":"05:09","sunrise":"06:53","zuhr":"12:29","asr":"15:56","maghrib":"17:56","isha":"19:27"},"jamaat":{"fajr":"05:25","zuhr":"12:45","asr":"16:30","maghrib":"17:56","isha":"20:00"}},
+  "2026-03-04":{"hijri":"15 Ramadan 1447 AH","begins":{"fajr":"05:07","sunrise":"06:50","zuhr":"12:28","asr":"15:57","maghrib":"17:58","isha":"19:29"},"jamaat":{"fajr":"05:25","zuhr":"12:45","asr":"16:30","maghrib":"17:58","isha":"20:00"}},
+  "2026-03-05":{"hijri":"16 Ramadan 1447 AH","begins":{"fajr":"05:04","sunrise":"06:48","zuhr":"12:28","asr":"15:59","maghrib":"18:00","isha":"19:30"},"jamaat":{"fajr":"05:25","zuhr":"12:45","asr":"16:30","maghrib":"18:00","isha":"20:00"}},
+  "2026-03-06":{"hijri":"17 Ramadan 1447 AH","begins":{"fajr":"05:02","sunrise":"06:46","zuhr":"12:28","asr":"16:01","maghrib":"18:02","isha":"19:31"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"16:45","maghrib":"18:02","isha":"20:00"},"jummah":{"first":"12:45","second":"15:15"}},
+  "2026-03-07":{"hijri":"18 Ramadan 1447 AH","begins":{"fajr":"05:00","sunrise":"06:43","zuhr":"12:28","asr":"16:02","maghrib":"18:04","isha":"19:32"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"16:45","maghrib":"18:04","isha":"20:00"}},
+  "2026-03-08":{"hijri":"19 Ramadan 1447 AH","begins":{"fajr":"04:57","sunrise":"06:41","zuhr":"12:27","asr":"16:04","maghrib":"18:06","isha":"19:34"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"16:45","maghrib":"18:06","isha":"20:00"}},
+  "2026-03-09":{"hijri":"20 Ramadan 1447 AH","begins":{"fajr":"04:55","sunrise":"06:38","zuhr":"12:27","asr":"16:05","maghrib":"18:08","isha":"19:36"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"16:45","maghrib":"18:08","isha":"20:00"}},
+  "2026-03-10":{"hijri":"21 Ramadan 1447 AH","begins":{"fajr":"04:52","sunrise":"06:36","zuhr":"12:27","asr":"16:07","maghrib":"18:09","isha":"19:38"},"jamaat":{"fajr":"05:10","zuhr":"12:45","asr":"16:45","maghrib":"18:09","isha":"20:00"}},
+  "2026-03-11":{"hijri":"22 Ramadan 1447 AH","begins":{"fajr":"04:50","sunrise":"06:34","zuhr":"12:27","asr":"16:09","maghrib":"18:11","isha":"19:39"},"jamaat":{"fajr":"05:10","zuhr":"12:45","asr":"16:45","maghrib":"18:11","isha":"20:00"}},
+  "2026-03-12":{"hijri":"23 Ramadan 1447 AH","begins":{"fajr":"04:48","sunrise":"06:31","zuhr":"12:26","asr":"16:10","maghrib":"18:13","isha":"19:41"},"jamaat":{"fajr":"05:10","zuhr":"12:45","asr":"16:45","maghrib":"18:13","isha":"20:00"}},
+  "2026-03-13":{"hijri":"24 Ramadan 1447 AH","begins":{"fajr":"04:45","sunrise":"06:29","zuhr":"12:26","asr":"16:12","maghrib":"18:15","isha":"19:43"},"jamaat":{"fajr":"05:00","zuhr":"12:45","asr":"17:00","maghrib":"18:15","isha":"20:15"},"jummah":{"first":"12:45","second":"15:30"}},
+  "2026-03-14":{"hijri":"25 Ramadan 1447 AH","begins":{"fajr":"04:43","sunrise":"06:26","zuhr":"12:26","asr":"16:13","maghrib":"18:17","isha":"19:44"},"jamaat":{"fajr":"05:00","zuhr":"12:45","asr":"17:00","maghrib":"18:17","isha":"20:15"}},
+  "2026-03-15":{"hijri":"26 Ramadan 1447 AH","begins":{"fajr":"04:40","sunrise":"06:24","zuhr":"12:25","asr":"16:15","maghrib":"18:19","isha":"19:45"},"jamaat":{"fajr":"05:00","zuhr":"12:45","asr":"17:00","maghrib":"18:19","isha":"20:15"}},
+  "2026-03-16":{"hijri":"27 Ramadan 1447 AH","begins":{"fajr":"04:38","sunrise":"06:22","zuhr":"12:25","asr":"16:16","maghrib":"18:21","isha":"19:47"},"jamaat":{"fajr":"05:00","zuhr":"12:45","asr":"17:00","maghrib":"18:21","isha":"20:15"}},
+  "2026-03-17":{"hijri":"28 Ramadan 1447 AH","begins":{"fajr":"04:36","sunrise":"06:19","zuhr":"12:25","asr":"16:18","maghrib":"18:23","isha":"19:49"},"jamaat":{"fajr":"04:55","zuhr":"12:45","asr":"17:00","maghrib":"18:23","isha":"20:15"}},
+  "2026-03-18":{"hijri":"29 Ramadan 1447 AH","begins":{"fajr":"04:33","sunrise":"06:17","zuhr":"12:25","asr":"16:19","maghrib":"18:24","isha":"19:51"},"jamaat":{"fajr":"04:55","zuhr":"12:45","asr":"17:00","maghrib":"18:24","isha":"20:15"}},
+  "2026-03-19":{"hijri":"30 Ramadan 1447 AH","begins":{"fajr":"04:32","sunrise":"06:14","zuhr":"12:24","asr":"16:21","maghrib":"18:26","isha":"19:52"},"jamaat":{"fajr":"04:55","zuhr":"12:45","asr":"17:00","maghrib":"18:26","isha":"20:15"}},
+  "2026-03-20":{"hijri":"1 Shawwal 1447 AH","begins":{"fajr":"04:29","sunrise":"06:12","zuhr":"12:24","asr":"16:22","maghrib":"18:28","isha":"19:54"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:28","isha":"20:30"},"jummah":{"first":"12:45","second":"15:30"}},
+  "2026-03-21":{"hijri":"2 Shawwal 1447 AH","begins":{"fajr":"04:28","sunrise":"06:09","zuhr":"12:24","asr":"16:24","maghrib":"18:30","isha":"19:55"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:30","isha":"20:30"}},
+  "2026-03-22":{"hijri":"3 Shawwal 1447 AH","begins":{"fajr":"04:25","sunrise":"06:07","zuhr":"12:23","asr":"16:25","maghrib":"18:32","isha":"19:57"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:32","isha":"20:30"}},
+  "2026-03-23":{"hijri":"4 Shawwal 1447 AH","begins":{"fajr":"04:23","sunrise":"06:04","zuhr":"12:23","asr":"16:27","maghrib":"18:34","isha":"19:58"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:34","isha":"20:30"}},
+  "2026-03-24":{"hijri":"5 Shawwal 1447 AH","begins":{"fajr":"04:20","sunrise":"06:02","zuhr":"12:23","asr":"16:28","maghrib":"18:35","isha":"20:00"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:35","isha":"20:30"}},
+  "2026-03-25":{"hijri":"6 Shawwal 1447 AH","begins":{"fajr":"04:19","sunrise":"06:00","zuhr":"12:22","asr":"16:30","maghrib":"18:37","isha":"20:02"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:37","isha":"20:30"}},
+  "2026-03-26":{"hijri":"7 Shawwal 1447 AH","begins":{"fajr":"04:17","sunrise":"05:57","zuhr":"12:21","asr":"16:31","maghrib":"18:39","isha":"20:03"},"jamaat":{"fajr":"05:30","zuhr":"12:45","asr":"17:15","maghrib":"18:39","isha":"20:30"}},
+  "2026-03-27":{"hijri":"8 Shawwal 1447 AH","begins":{"fajr":"04:15","sunrise":"05:55","zuhr":"12:21","asr":"16:32","maghrib":"18:41","isha":"20:04"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"17:30","maghrib":"18:41","isha":"20:30"},"jummah":{"first":"12:45","second":"15:30"}},
+  "2026-03-28":{"hijri":"9 Shawwal 1447 AH","begins":{"fajr":"04:13","sunrise":"05:52","zuhr":"12:21","asr":"16:34","maghrib":"18:43","isha":"20:06"},"jamaat":{"fajr":"05:15","zuhr":"12:45","asr":"17:30","maghrib":"18:43","isha":"20:30"}},
+  "2026-03-29":{"hijri":"10 Shawwal 1447 AH","begins":{"fajr":"05:10","sunrise":"06:50","zuhr":"13:21","asr":"17:35","maghrib":"19:45","isha":"21:08"},"jamaat":{"fajr":"06:15","zuhr":"13:45","asr":"18:30","maghrib":"19:45","isha":"21:30"}},
+  "2026-03-30":{"hijri":"11 Shawwal 1447 AH","begins":{"fajr":"05:09","sunrise":"06:47","zuhr":"13:21","asr":"17:37","maghrib":"19:46","isha":"21:09"},"jamaat":{"fajr":"06:15","zuhr":"13:45","asr":"18:30","maghrib":"19:46","isha":"21:30"}},
+  "2026-03-31":{"hijri":"12 Shawwal 1447 AH","begins":{"fajr":"05:06","sunrise":"06:45","zuhr":"13:21","asr":"17:38","maghrib":"19:48","isha":"21:11"},"jamaat":{"fajr":"06:15","zuhr":"13:45","asr":"18:30","maghrib":"19:48","isha":"21:30"}},
+  "2026-04-01":{"hijri":"13 Shawwal 1447 AH","begins":{"fajr":"05:04","sunrise":"06:43","zuhr":"13:20","asr":"17:39","maghrib":"19:50","isha":"21:12"},"jamaat":{"fajr":"06:15","zuhr":"13:45","asr":"18:30","maghrib":"19:50","isha":"21:30"}},
+  "2026-04-02":{"hijri":"14 Shawwal 1447 AH","begins":{"fajr":"05:02","sunrise":"06:40","zuhr":"13:20","asr":"17:41","maghrib":"19:52","isha":"21:13"},"jamaat":{"fajr":"06:15","zuhr":"13:45","asr":"18:30","maghrib":"19:52","isha":"21:30"}},
+  "2026-04-03":{"hijri":"15 Shawwal 1447 AH","begins":{"fajr":"04:59","sunrise":"06:38","zuhr":"13:20","asr":"17:42","maghrib":"19:54","isha":"21:14"},"jamaat":{"fajr":"06:00","zuhr":"13:30","asr":"18:30","maghrib":"19:54","isha":"21:30"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-04-04":{"hijri":"16 Shawwal 1447 AH","begins":{"fajr":"04:57","sunrise":"06:35","zuhr":"13:20","asr":"17:43","maghrib":"19:56","isha":"21:15"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:56","isha":"21:30"}},
+  "2026-04-05":{"hijri":"17 Shawwal 1447 AH","begins":{"fajr":"04:54","sunrise":"06:33","zuhr":"13:19","asr":"17:45","maghrib":"19:57","isha":"21:15"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:57","isha":"21:30"}},
+  "2026-04-06":{"hijri":"18 Shawwal 1447 AH","begins":{"fajr":"04:52","sunrise":"06:31","zuhr":"13:19","asr":"17:46","maghrib":"19:59","isha":"21:16"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:59","isha":"21:30"}},
+  "2026-04-07":{"hijri":"19 Shawwal 1447 AH","begins":{"fajr":"04:50","sunrise":"06:28","zuhr":"13:19","asr":"17:47","maghrib":"20:01","isha":"21:17"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"20:01","isha":"21:30"}},
+  "2026-04-08":{"hijri":"20 Shawwal 1447 AH","begins":{"fajr":"04:47","sunrise":"06:26","zuhr":"13:18","asr":"17:49","maghrib":"20:03","isha":"21:17"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"20:03","isha":"21:30"}},
+  "2026-04-09":{"hijri":"21 Shawwal 1447 AH","begins":{"fajr":"04:45","sunrise":"06:23","zuhr":"13:18","asr":"17:50","maghrib":"20:05","isha":"21:18"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"20:05","isha":"21:30"}},
+  "2026-04-10":{"hijri":"22 Shawwal 1447 AH","begins":{"fajr":"04:43","sunrise":"06:21","zuhr":"13:18","asr":"17:51","maghrib":"20:07","isha":"21:19"},"jamaat":{"fajr":"05:40","zuhr":"13:30","asr":"18:30","maghrib":"20:07","isha":"21:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-04-11":{"hijri":"23 Shawwal 1447 AH","begins":{"fajr":"04:40","sunrise":"06:19","zuhr":"13:18","asr":"17:52","maghrib":"20:08","isha":"21:20"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:08","isha":"21:45"}},
+  "2026-04-12":{"hijri":"24 Shawwal 1447 AH","begins":{"fajr":"04:38","sunrise":"06:16","zuhr":"13:17","asr":"17:54","maghrib":"20:10","isha":"21:22"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:10","isha":"21:45"}},
+  "2026-04-13":{"hijri":"25 Shawwal 1447 AH","begins":{"fajr":"04:35","sunrise":"06:14","zuhr":"13:17","asr":"17:55","maghrib":"20:12","isha":"21:23"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:12","isha":"21:45"}},
+  "2026-04-14":{"hijri":"26 Shawwal 1447 AH","begins":{"fajr":"04:33","sunrise":"06:12","zuhr":"13:17","asr":"17:56","maghrib":"20:14","isha":"21:25"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:14","isha":"21:45"}},
+  "2026-04-15":{"hijri":"27 Shawwal 1447 AH","begins":{"fajr":"04:31","sunrise":"06:09","zuhr":"13:17","asr":"17:57","maghrib":"20:16","isha":"21:27"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:16","isha":"21:45"}},
+  "2026-04-16":{"hijri":"28 Shawwal 1447 AH","begins":{"fajr":"04:29","sunrise":"06:07","zuhr":"13:16","asr":"17:59","maghrib":"20:18","isha":"21:29"},"jamaat":{"fajr":"05:40","zuhr":"13:45","asr":"18:30","maghrib":"20:18","isha":"21:45"}},
+  "2026-04-17":{"hijri":"29 Shawwal 1447 AH","begins":{"fajr":"04:25","sunrise":"06:05","zuhr":"13:16","asr":"18:00","maghrib":"20:19","isha":"21:31"},"jamaat":{"fajr":"05:15","zuhr":"13:30","asr":"19:15","maghrib":"20:19","isha":"22:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-04-18":{"hijri":"1 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:23","sunrise":"06:02","zuhr":"13:16","asr":"18:01","maghrib":"20:21","isha":"21:33"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:21","isha":"22:00"}},
+  "2026-04-19":{"hijri":"2 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:21","sunrise":"06:00","zuhr":"13:16","asr":"18:02","maghrib":"20:23","isha":"21:34"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:23","isha":"22:00"}},
+  "2026-04-20":{"hijri":"3 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:18","sunrise":"05:58","zuhr":"13:16","asr":"18:03","maghrib":"20:25","isha":"21:36"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:25","isha":"22:00"}},
+  "2026-04-21":{"hijri":"4 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:15","sunrise":"05:56","zuhr":"13:15","asr":"18:05","maghrib":"20:27","isha":"21:38"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:27","isha":"22:00"}},
+  "2026-04-22":{"hijri":"5 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:13","sunrise":"05:53","zuhr":"13:15","asr":"18:06","maghrib":"20:29","isha":"21:40"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:29","isha":"22:00"}},
+  "2026-04-23":{"hijri":"6 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:10","sunrise":"05:51","zuhr":"13:15","asr":"18:07","maghrib":"20:30","isha":"21:42"},"jamaat":{"fajr":"05:15","zuhr":"13:45","asr":"19:15","maghrib":"20:30","isha":"22:00"}},
+  "2026-04-24":{"hijri":"7 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:08","sunrise":"05:49","zuhr":"13:15","asr":"18:08","maghrib":"20:32","isha":"21:43"},"jamaat":{"fajr":"05:00","zuhr":"13:30","asr":"19:15","maghrib":"20:32","isha":"22:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-04-25":{"hijri":"8 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:06","sunrise":"05:47","zuhr":"13:15","asr":"18:09","maghrib":"20:34","isha":"21:45"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:34","isha":"22:00"}},
+  "2026-04-26":{"hijri":"9 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:02","sunrise":"05:45","zuhr":"13:14","asr":"18:11","maghrib":"20:36","isha":"21:47"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:36","isha":"22:00"}},
+  "2026-04-27":{"hijri":"10 Dhul Qa'dah 1447 AH","begins":{"fajr":"04:00","sunrise":"05:43","zuhr":"13:14","asr":"18:12","maghrib":"20:38","isha":"21:48"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:38","isha":"22:00"}},
+  "2026-04-28":{"hijri":"11 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:58","sunrise":"05:40","zuhr":"13:14","asr":"18:13","maghrib":"20:40","isha":"21:48"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:40","isha":"22:00"}},
+  "2026-04-29":{"hijri":"12 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:55","sunrise":"05:38","zuhr":"13:14","asr":"18:14","maghrib":"20:41","isha":"21:48"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:41","isha":"22:00"}},
+  "2026-04-30":{"hijri":"13 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:52","sunrise":"05:36","zuhr":"13:14","asr":"18:15","maghrib":"20:43","isha":"21:50"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:15","maghrib":"20:43","isha":"22:00"}},
+  "2026-05-01":{"hijri":"14 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:50","sunrise":"05:34","zuhr":"13:14","asr":"18:16","maghrib":"20:45","isha":"21:51"},"jamaat":{"fajr":"04:45","zuhr":"13:30","asr":"19:30","maghrib":"20:45","isha":"22:15"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-05-02":{"hijri":"15 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:47","sunrise":"05:32","zuhr":"13:14","asr":"18:17","maghrib":"20:47","isha":"21:51"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:47","isha":"22:15"}},
+  "2026-05-03":{"hijri":"16 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:45","sunrise":"05:30","zuhr":"13:14","asr":"18:18","maghrib":"20:49","isha":"21:53"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:49","isha":"22:15"}},
+  "2026-05-04":{"hijri":"17 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:42","sunrise":"05:28","zuhr":"13:13","asr":"18:19","maghrib":"20:50","isha":"21:54"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:50","isha":"22:15"}},
+  "2026-05-05":{"hijri":"18 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:40","sunrise":"05:26","zuhr":"13:13","asr":"18:20","maghrib":"20:52","isha":"21:56"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:52","isha":"22:15"}},
+  "2026-05-06":{"hijri":"19 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:37","sunrise":"05:24","zuhr":"13:13","asr":"18:22","maghrib":"20:54","isha":"21:58"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:54","isha":"22:15"}},
+  "2026-05-07":{"hijri":"20 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:35","sunrise":"05:23","zuhr":"13:13","asr":"18:23","maghrib":"20:56","isha":"22:00"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:30","maghrib":"20:56","isha":"22:15"}},
+  "2026-05-08":{"hijri":"21 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:33","sunrise":"05:21","zuhr":"13:13","asr":"18:24","maghrib":"20:57","isha":"22:02"},"jamaat":{"fajr":"04:30","zuhr":"13:30","asr":"19:45","maghrib":"20:57","isha":"22:25"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-05-09":{"hijri":"22 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:31","sunrise":"05:19","zuhr":"13:13","asr":"18:25","maghrib":"20:59","isha":"22:04"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"20:59","isha":"22:25"}},
+  "2026-05-10":{"hijri":"23 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:28","sunrise":"05:17","zuhr":"13:13","asr":"18:26","maghrib":"21:01","isha":"22:05"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:01","isha":"22:25"}},
+  "2026-05-11":{"hijri":"24 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:26","sunrise":"05:15","zuhr":"13:13","asr":"18:27","maghrib":"21:03","isha":"22:07"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:03","isha":"22:25"}},
+  "2026-05-12":{"hijri":"25 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:23","sunrise":"05:13","zuhr":"13:13","asr":"18:28","maghrib":"21:04","isha":"22:08"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:04","isha":"22:25"}},
+  "2026-05-13":{"hijri":"26 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:22","sunrise":"05:12","zuhr":"13:13","asr":"18:29","maghrib":"21:06","isha":"22:10"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:06","isha":"22:25"}},
+  "2026-05-14":{"hijri":"27 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:19","sunrise":"05:10","zuhr":"13:13","asr":"18:30","maghrib":"21:08","isha":"22:12"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:08","isha":"22:25"}},
+  "2026-05-15":{"hijri":"28 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:17","sunrise":"05:08","zuhr":"13:13","asr":"18:31","maghrib":"21:09","isha":"22:13"},"jamaat":{"fajr":"04:30","zuhr":"13:30","asr":"19:45","maghrib":"21:09","isha":"22:35"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-05-16":{"hijri":"29 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:15","sunrise":"05:07","zuhr":"13:13","asr":"18:32","maghrib":"21:11","isha":"22:14"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:11","isha":"22:35"}},
+  "2026-05-17":{"hijri":"30 Dhul Qa'dah 1447 AH","begins":{"fajr":"03:13","sunrise":"05:05","zuhr":"13:13","asr":"18:33","maghrib":"21:13","isha":"22:16"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:13","isha":"22:35"}},
+  "2026-05-18":{"hijri":"1 Dhul Hijjah 1447 AH","begins":{"fajr":"03:11","sunrise":"05:04","zuhr":"13:13","asr":"18:33","maghrib":"21:14","isha":"22:17"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:14","isha":"22:35"}},
+  "2026-05-19":{"hijri":"2 Dhul Hijjah 1447 AH","begins":{"fajr":"03:09","sunrise":"05:02","zuhr":"13:13","asr":"18:34","maghrib":"21:16","isha":"22:19"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:16","isha":"22:35"}},
+  "2026-05-20":{"hijri":"3 Dhul Hijjah 1447 AH","begins":{"fajr":"03:07","sunrise":"05:01","zuhr":"13:13","asr":"18:35","maghrib":"21:17","isha":"22:21"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:17","isha":"22:35"}},
+  "2026-05-21":{"hijri":"4 Dhul Hijjah 1447 AH","begins":{"fajr":"03:06","sunrise":"04:59","zuhr":"13:13","asr":"18:36","maghrib":"21:19","isha":"22:22"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:19","isha":"22:35"}},
+  "2026-05-22":{"hijri":"5 Dhul Hijjah 1447 AH","begins":{"fajr":"03:03","sunrise":"04:58","zuhr":"13:13","asr":"18:37","maghrib":"21:20","isha":"22:24"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"19:45","maghrib":"21:20","isha":"22:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-05-23":{"hijri":"6 Dhul Hijjah 1447 AH","begins":{"fajr":"03:01","sunrise":"04:57","zuhr":"13:13","asr":"18:38","maghrib":"21:22","isha":"22:25"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:22","isha":"22:45"}},
+  "2026-05-24":{"hijri":"7 Dhul Hijjah 1447 AH","begins":{"fajr":"02:59","sunrise":"04:55","zuhr":"13:14","asr":"18:39","maghrib":"21:23","isha":"22:26"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:23","isha":"22:45"}},
+  "2026-05-25":{"hijri":"8 Dhul Hijjah 1447 AH","begins":{"fajr":"02:57","sunrise":"04:54","zuhr":"13:14","asr":"18:40","maghrib":"21:25","isha":"22:27"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:25","isha":"22:45"}},
+  "2026-05-26":{"hijri":"9 Dhul Hijjah 1447 AH","begins":{"fajr":"02:55","sunrise":"04:53","zuhr":"13:14","asr":"18:40","maghrib":"21:26","isha":"22:28"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:26","isha":"22:45"}},
+  "2026-05-27":{"hijri":"10 Dhul Hijjah 1447 AH","begins":{"fajr":"02:54","sunrise":"04:52","zuhr":"13:14","asr":"18:41","maghrib":"21:27","isha":"22:30"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:27","isha":"22:45"}},
+  "2026-05-28":{"hijri":"11 Dhul Hijjah 1447 AH","begins":{"fajr":"02:52","sunrise":"04:51","zuhr":"13:14","asr":"18:42","maghrib":"21:29","isha":"22:31"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:29","isha":"22:45"}},
+  "2026-05-29":{"hijri":"12 Dhul Hijjah 1447 AH","begins":{"fajr":"02:51","sunrise":"04:50","zuhr":"13:14","asr":"18:43","maghrib":"21:30","isha":"22:32"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"19:45","maghrib":"21:30","isha":"22:50"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-05-30":{"hijri":"13 Dhul Hijjah 1447 AH","begins":{"fajr":"02:49","sunrise":"04:49","zuhr":"13:14","asr":"18:44","maghrib":"21:31","isha":"22:33"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:31","isha":"22:50"}},
+  "2026-05-31":{"hijri":"14 Dhul Hijjah 1447 AH","begins":{"fajr":"02:48","sunrise":"04:48","zuhr":"13:14","asr":"18:44","maghrib":"21:33","isha":"22:34"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:33","isha":"22:50"}},
+  "2026-06-01":{"hijri":"15 Dhul Hijjah 1447 AH","begins":{"fajr":"02:46","sunrise":"04:47","zuhr":"13:15","asr":"18:45","maghrib":"21:34","isha":"22:34"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:34","isha":"22:50"}},
+  "2026-06-02":{"hijri":"16 Dhul Hijjah 1447 AH","begins":{"fajr":"02:45","sunrise":"04:46","zuhr":"13:15","asr":"18:46","maghrib":"21:35","isha":"22:35"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:35","isha":"22:50"}},
+  "2026-06-03":{"hijri":"17 Dhul Hijjah 1447 AH","begins":{"fajr":"02:44","sunrise":"04:45","zuhr":"13:15","asr":"18:46","maghrib":"21:36","isha":"22:36"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:36","isha":"22:50"}},
+  "2026-06-04":{"hijri":"18 Dhul Hijjah 1447 AH","begins":{"fajr":"02:43","sunrise":"04:44","zuhr":"13:15","asr":"18:47","maghrib":"21:37","isha":"22:37"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"19:45","maghrib":"21:37","isha":"22:50"}},
+  "2026-06-05":{"hijri":"19 Dhul Hijjah 1447 AH","begins":{"fajr":"02:41","sunrise":"04:44","zuhr":"13:15","asr":"18:48","maghrib":"21:38","isha":"22:38"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"20:00","maghrib":"21:38","isha":"22:55"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-06-06":{"hijri":"20 Dhul Hijjah 1447 AH","begins":{"fajr":"02:40","sunrise":"04:43","zuhr":"13:15","asr":"18:48","maghrib":"21:39","isha":"22:39"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:39","isha":"22:55"}},
+  "2026-06-07":{"hijri":"21 Dhul Hijjah 1447 AH","begins":{"fajr":"02:39","sunrise":"04:42","zuhr":"13:16","asr":"18:49","maghrib":"21:40","isha":"22:40"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:40","isha":"22:55"}},
+  "2026-06-08":{"hijri":"22 Dhul Hijjah 1447 AH","begins":{"fajr":"02:38","sunrise":"04:42","zuhr":"13:16","asr":"18:49","maghrib":"21:41","isha":"22:41"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:41","isha":"22:55"}},
+  "2026-06-09":{"hijri":"23 Dhul Hijjah 1447 AH","begins":{"fajr":"02:37","sunrise":"04:41","zuhr":"13:16","asr":"18:50","maghrib":"21:42","isha":"22:42"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:42","isha":"22:55"}},
+  "2026-06-10":{"hijri":"24 Dhul Hijjah 1447 AH","begins":{"fajr":"02:37","sunrise":"04:41","zuhr":"13:16","asr":"18:50","maghrib":"21:43","isha":"22:43"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:43","isha":"22:55"}},
+  "2026-06-11":{"hijri":"25 Dhul Hijjah 1447 AH","begins":{"fajr":"02:35","sunrise":"04:40","zuhr":"13:16","asr":"18:51","maghrib":"21:44","isha":"22:44"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:44","isha":"22:55"}},
+  "2026-06-12":{"hijri":"26 Dhul Hijjah 1447 AH","begins":{"fajr":"02:34","sunrise":"04:40","zuhr":"13:17","asr":"18:51","maghrib":"21:44","isha":"22:44"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"20:00","maghrib":"21:44","isha":"23:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-06-13":{"hijri":"27 Dhul Hijjah 1447 AH","begins":{"fajr":"02:34","sunrise":"04:40","zuhr":"13:17","asr":"18:52","maghrib":"21:45","isha":"22:45"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:45","isha":"23:00"}},
+  "2026-06-14":{"hijri":"28 Dhul Hijjah 1447 AH","begins":{"fajr":"02:34","sunrise":"04:40","zuhr":"13:17","asr":"18:52","maghrib":"21:46","isha":"22:46"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:46","isha":"23:00"}},
+  "2026-06-15":{"hijri":"29 Dhul Hijjah 1447 AH","begins":{"fajr":"02:33","sunrise":"04:40","zuhr":"13:17","asr":"18:53","maghrib":"21:46","isha":"22:46"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:46","isha":"23:00"}},
+  "2026-06-16":{"hijri":"1 Muharram 1448 AH","begins":{"fajr":"02:33","sunrise":"04:39","zuhr":"13:17","asr":"18:53","maghrib":"21:47","isha":"22:47"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:47","isha":"23:00"}},
+  "2026-06-17":{"hijri":"2 Muharram 1448 AH","begins":{"fajr":"02:33","sunrise":"04:39","zuhr":"13:18","asr":"18:53","maghrib":"21:47","isha":"22:47"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:47","isha":"23:00"}},
+  "2026-06-18":{"hijri":"3 Muharram 1448 AH","begins":{"fajr":"02:33","sunrise":"04:39","zuhr":"13:18","asr":"18:54","maghrib":"21:47","isha":"22:47"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:47","isha":"23:00"}},
+  "2026-06-19":{"hijri":"4 Muharram 1448 AH","begins":{"fajr":"02:33","sunrise":"04:40","zuhr":"13:18","asr":"18:54","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"20:00","maghrib":"21:48","isha":"23:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-06-20":{"hijri":"5 Muharram 1448 AH","begins":{"fajr":"02:33","sunrise":"04:40","zuhr":"13:18","asr":"18:54","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-21":{"hijri":"6 Muharram 1448 AH","begins":{"fajr":"02:35","sunrise":"04:40","zuhr":"13:19","asr":"18:54","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-22":{"hijri":"7 Muharram 1448 AH","begins":{"fajr":"02:35","sunrise":"04:40","zuhr":"13:19","asr":"18:54","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-23":{"hijri":"8 Muharram 1448 AH","begins":{"fajr":"02:37","sunrise":"04:40","zuhr":"13:19","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-24":{"hijri":"9 Muharram 1448 AH","begins":{"fajr":"02:37","sunrise":"04:41","zuhr":"13:19","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-25":{"hijri":"10 Muharram 1448 AH","begins":{"fajr":"02:38","sunrise":"04:41","zuhr":"13:19","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-26":{"hijri":"11 Muharram 1448 AH","begins":{"fajr":"02:39","sunrise":"04:42","zuhr":"13:20","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"20:00","maghrib":"21:48","isha":"23:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-06-27":{"hijri":"12 Muharram 1448 AH","begins":{"fajr":"02:40","sunrise":"04:42","zuhr":"13:20","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-28":{"hijri":"13 Muharram 1448 AH","begins":{"fajr":"02:41","sunrise":"04:43","zuhr":"13:20","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-29":{"hijri":"14 Muharram 1448 AH","begins":{"fajr":"02:42","sunrise":"04:43","zuhr":"13:20","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-06-30":{"hijri":"15 Muharram 1448 AH","begins":{"fajr":"02:43","sunrise":"04:44","zuhr":"13:20","asr":"18:55","maghrib":"21:48","isha":"22:48"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:48","isha":"23:00"}},
+  "2026-07-01":{"hijri":"16 Muharram 1448 AH","begins":{"fajr":"02:45","sunrise":"04:45","zuhr":"13:21","asr":"18:55","maghrib":"21:47","isha":"22:47"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:47","isha":"23:00"}},
+  "2026-07-02":{"hijri":"17 Muharram 1448 AH","begins":{"fajr":"02:46","sunrise":"04:46","zuhr":"13:21","asr":"18:55","maghrib":"21:47","isha":"22:47"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:47","isha":"23:00"}},
+  "2026-07-03":{"hijri":"18 Muharram 1448 AH","begins":{"fajr":"02:48","sunrise":"04:46","zuhr":"13:21","asr":"18:55","maghrib":"21:46","isha":"22:46"},"jamaat":{"fajr":"04:15","zuhr":"13:30","asr":"20:00","maghrib":"21:46","isha":"23:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-07-04":{"hijri":"19 Muharram 1448 AH","begins":{"fajr":"02:49","sunrise":"04:47","zuhr":"13:21","asr":"18:54","maghrib":"21:46","isha":"22:46"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:46","isha":"23:00"}},
+  "2026-07-05":{"hijri":"20 Muharram 1448 AH","begins":{"fajr":"02:50","sunrise":"04:48","zuhr":"13:21","asr":"18:54","maghrib":"21:45","isha":"22:45"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:45","isha":"23:00"}},
+  "2026-07-06":{"hijri":"21 Muharram 1448 AH","begins":{"fajr":"02:52","sunrise":"04:49","zuhr":"13:21","asr":"18:54","maghrib":"21:45","isha":"22:45"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:45","isha":"23:00"}},
+  "2026-07-07":{"hijri":"22 Muharram 1448 AH","begins":{"fajr":"02:53","sunrise":"04:50","zuhr":"13:21","asr":"18:54","maghrib":"21:44","isha":"22:44"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:44","isha":"23:00"}},
+  "2026-07-08":{"hijri":"23 Muharram 1448 AH","begins":{"fajr":"02:55","sunrise":"04:51","zuhr":"13:21","asr":"18:53","maghrib":"21:43","isha":"22:43"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:43","isha":"23:00"}},
+  "2026-07-09":{"hijri":"24 Muharram 1448 AH","begins":{"fajr":"02:56","sunrise":"04:52","zuhr":"13:21","asr":"18:53","maghrib":"21:42","isha":"22:42"},"jamaat":{"fajr":"04:15","zuhr":"13:45","asr":"20:00","maghrib":"21:42","isha":"23:00"}},
+  "2026-07-10":{"hijri":"25 Muharram 1448 AH","begins":{"fajr":"02:57","sunrise":"04:53","zuhr":"13:21","asr":"18:53","maghrib":"21:41","isha":"22:41"},"jamaat":{"fajr":"04:30","zuhr":"13:30","asr":"20:00","maghrib":"21:41","isha":"22:50"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-07-11":{"hijri":"26 Muharram 1448 AH","begins":{"fajr":"02:59","sunrise":"04:55","zuhr":"13:21","asr":"18:52","maghrib":"21:41","isha":"22:41"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:41","isha":"22:50"}},
+  "2026-07-12":{"hijri":"27 Muharram 1448 AH","begins":{"fajr":"03:00","sunrise":"04:56","zuhr":"13:21","asr":"18:52","maghrib":"21:40","isha":"22:40"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:40","isha":"22:50"}},
+  "2026-07-13":{"hijri":"28 Muharram 1448 AH","begins":{"fajr":"03:03","sunrise":"04:57","zuhr":"13:21","asr":"18:51","maghrib":"21:39","isha":"22:39"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:39","isha":"22:50"}},
+  "2026-07-14":{"hijri":"29 Muharram 1448 AH","begins":{"fajr":"03:04","sunrise":"04:58","zuhr":"13:21","asr":"18:51","maghrib":"21:38","isha":"22:38"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:38","isha":"22:50"}},
+  "2026-07-15":{"hijri":"1 Safar 1448 AH","begins":{"fajr":"03:05","sunrise":"05:00","zuhr":"13:21","asr":"18:50","maghrib":"21:36","isha":"22:36"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:36","isha":"22:50"}},
+  "2026-07-16":{"hijri":"2 Safar 1448 AH","begins":{"fajr":"03:08","sunrise":"05:01","zuhr":"13:21","asr":"18:50","maghrib":"21:35","isha":"22:35"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"20:00","maghrib":"21:35","isha":"22:50"}},
+  "2026-07-17":{"hijri":"3 Safar 1448 AH","begins":{"fajr":"03:09","sunrise":"05:02","zuhr":"13:21","asr":"18:49","maghrib":"21:34","isha":"22:34"},"jamaat":{"fajr":"04:30","zuhr":"13:30","asr":"19:45","maghrib":"21:34","isha":"22:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-07-18":{"hijri":"4 Safar 1448 AH","begins":{"fajr":"03:11","sunrise":"05:04","zuhr":"13:21","asr":"18:48","maghrib":"21:33","isha":"22:33"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:33","isha":"22:45"}},
+  "2026-07-19":{"hijri":"5 Safar 1448 AH","begins":{"fajr":"03:13","sunrise":"05:05","zuhr":"13:21","asr":"18:48","maghrib":"21:32","isha":"22:32"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:32","isha":"22:45"}},
+  "2026-07-20":{"hijri":"6 Safar 1448 AH","begins":{"fajr":"03:14","sunrise":"05:07","zuhr":"13:21","asr":"18:47","maghrib":"21:30","isha":"22:30"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:30","isha":"22:45"}},
+  "2026-07-21":{"hijri":"7 Safar 1448 AH","begins":{"fajr":"03:17","sunrise":"05:08","zuhr":"13:21","asr":"18:46","maghrib":"21:29","isha":"22:29"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:29","isha":"22:45"}},
+  "2026-07-22":{"hijri":"8 Safar 1448 AH","begins":{"fajr":"03:18","sunrise":"05:09","zuhr":"13:21","asr":"18:45","maghrib":"21:27","isha":"22:27"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:27","isha":"22:45"}},
+  "2026-07-23":{"hijri":"9 Safar 1448 AH","begins":{"fajr":"03:21","sunrise":"05:11","zuhr":"13:21","asr":"18:45","maghrib":"21:26","isha":"22:26"},"jamaat":{"fajr":"04:30","zuhr":"13:45","asr":"19:45","maghrib":"21:26","isha":"22:45"}},
+  "2026-07-24":{"hijri":"10 Safar 1448 AH","begins":{"fajr":"03:22","sunrise":"05:13","zuhr":"13:21","asr":"18:44","maghrib":"21:24","isha":"22:25"},"jamaat":{"fajr":"04:45","zuhr":"13:30","asr":"19:45","maghrib":"21:24","isha":"22:35"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-07-25":{"hijri":"11 Safar 1448 AH","begins":{"fajr":"03:25","sunrise":"05:14","zuhr":"13:21","asr":"18:43","maghrib":"21:23","isha":"22:24"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:23","isha":"22:35"}},
+  "2026-07-26":{"hijri":"12 Safar 1448 AH","begins":{"fajr":"03:26","sunrise":"05:16","zuhr":"13:21","asr":"18:42","maghrib":"21:21","isha":"22:23"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:21","isha":"22:35"}},
+  "2026-07-27":{"hijri":"13 Safar 1448 AH","begins":{"fajr":"03:29","sunrise":"05:17","zuhr":"13:21","asr":"18:41","maghrib":"21:20","isha":"22:21"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:20","isha":"22:35"}},
+  "2026-07-28":{"hijri":"14 Safar 1448 AH","begins":{"fajr":"03:31","sunrise":"05:19","zuhr":"13:21","asr":"18:40","maghrib":"21:18","isha":"22:20"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:18","isha":"22:35"}},
+  "2026-07-29":{"hijri":"15 Safar 1448 AH","begins":{"fajr":"03:33","sunrise":"05:20","zuhr":"13:21","asr":"18:39","maghrib":"21:16","isha":"22:18"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:16","isha":"22:35"}},
+  "2026-07-30":{"hijri":"16 Safar 1448 AH","begins":{"fajr":"03:35","sunrise":"05:22","zuhr":"13:21","asr":"18:38","maghrib":"21:15","isha":"22:16"},"jamaat":{"fajr":"04:45","zuhr":"13:45","asr":"19:45","maghrib":"21:15","isha":"22:35"}},
+  "2026-07-31":{"hijri":"17 Safar 1448 AH","begins":{"fajr":"03:37","sunrise":"05:24","zuhr":"13:21","asr":"18:37","maghrib":"21:13","isha":"22:15"},"jamaat":{"fajr":"05:00","zuhr":"13:30","asr":"19:45","maghrib":"21:13","isha":"22:30"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-08-01":{"hijri":"18 Safar 1448 AH","begins":{"fajr":"03:39","sunrise":"05:25","zuhr":"13:21","asr":"18:36","maghrib":"21:11","isha":"22:14"},"jamaat":{"fajr":"05:00","zuhr":"13:30","asr":"19:45","maghrib":"21:11","isha":"22:30"}},
+  "2026-08-02":{"hijri":"19 Safar 1448 AH","begins":{"fajr":"03:42","sunrise":"05:27","zuhr":"13:21","asr":"18:35","maghrib":"21:09","isha":"22:12"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:45","maghrib":"21:09","isha":"22:30"}},
+  "2026-08-03":{"hijri":"20 Safar 1448 AH","begins":{"fajr":"03:44","sunrise":"05:29","zuhr":"13:21","asr":"18:34","maghrib":"21:08","isha":"22:11"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:45","maghrib":"21:08","isha":"22:30"}},
+  "2026-08-04":{"hijri":"21 Safar 1448 AH","begins":{"fajr":"03:46","sunrise":"05:30","zuhr":"13:21","asr":"18:33","maghrib":"21:06","isha":"22:09"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:45","maghrib":"21:06","isha":"22:30"}},
+  "2026-08-05":{"hijri":"22 Safar 1448 AH","begins":{"fajr":"03:47","sunrise":"05:32","zuhr":"13:21","asr":"18:31","maghrib":"21:04","isha":"22:07"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:45","maghrib":"21:04","isha":"22:30"}},
+  "2026-08-06":{"hijri":"23 Safar 1448 AH","begins":{"fajr":"03:50","sunrise":"05:34","zuhr":"13:21","asr":"18:30","maghrib":"21:02","isha":"22:06"},"jamaat":{"fajr":"05:00","zuhr":"13:45","asr":"19:45","maghrib":"21:02","isha":"22:30"}},
+  "2026-08-07":{"hijri":"24 Safar 1448 AH","begins":{"fajr":"03:52","sunrise":"05:35","zuhr":"13:21","asr":"18:29","maghrib":"21:00","isha":"22:04"},"jamaat":{"fajr":"05:10","zuhr":"13:30","asr":"19:30","maghrib":"21:00","isha":"22:15"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-08-08":{"hijri":"25 Safar 1448 AH","begins":{"fajr":"03:54","sunrise":"05:37","zuhr":"13:21","asr":"18:28","maghrib":"20:58","isha":"22:02"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:58","isha":"22:15"}},
+  "2026-08-09":{"hijri":"26 Safar 1448 AH","begins":{"fajr":"03:56","sunrise":"05:39","zuhr":"13:21","asr":"18:26","maghrib":"20:56","isha":"22:00"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:56","isha":"22:15"}},
+  "2026-08-10":{"hijri":"27 Safar 1448 AH","begins":{"fajr":"03:58","sunrise":"05:41","zuhr":"13:21","asr":"18:25","maghrib":"20:54","isha":"21:59"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:54","isha":"22:15"}},
+  "2026-08-11":{"hijri":"28 Safar 1448 AH","begins":{"fajr":"04:00","sunrise":"05:42","zuhr":"13:21","asr":"18:24","maghrib":"20:52","isha":"21:58"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:52","isha":"22:15"}},
+  "2026-08-12":{"hijri":"29 Safar 1448 AH","begins":{"fajr":"04:02","sunrise":"05:44","zuhr":"13:21","asr":"18:22","maghrib":"20:50","isha":"21:57"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:50","isha":"22:15"}},
+  "2026-08-13":{"hijri":"30 Safar 1448 AH","begins":{"fajr":"04:05","sunrise":"05:46","zuhr":"13:21","asr":"18:21","maghrib":"20:48","isha":"21:56"},"jamaat":{"fajr":"05:10","zuhr":"13:45","asr":"19:30","maghrib":"20:48","isha":"22:15"}},
+  "2026-08-14":{"hijri":"1 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:06","sunrise":"05:48","zuhr":"13:21","asr":"18:19","maghrib":"20:46","isha":"21:55"},"jamaat":{"fajr":"05:20","zuhr":"13:30","asr":"19:15","maghrib":"20:46","isha":"22:15"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-08-15":{"hijri":"2 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:08","sunrise":"05:49","zuhr":"13:21","asr":"18:18","maghrib":"20:43","isha":"21:54"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:43","isha":"22:15"}},
+  "2026-08-16":{"hijri":"3 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:10","sunrise":"05:51","zuhr":"13:21","asr":"18:16","maghrib":"20:41","isha":"21:53"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:41","isha":"22:15"}},
+  "2026-08-17":{"hijri":"4 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:13","sunrise":"05:53","zuhr":"13:21","asr":"18:15","maghrib":"20:39","isha":"21:51"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:39","isha":"22:15"}},
+  "2026-08-18":{"hijri":"5 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:14","sunrise":"05:55","zuhr":"13:20","asr":"18:13","maghrib":"20:37","isha":"21:48"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:37","isha":"22:15"}},
+  "2026-08-19":{"hijri":"6 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:17","sunrise":"05:56","zuhr":"13:20","asr":"18:12","maghrib":"20:35","isha":"21:46"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:35","isha":"22:15"}},
+  "2026-08-20":{"hijri":"7 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:19","sunrise":"05:58","zuhr":"13:20","asr":"18:10","maghrib":"20:32","isha":"21:44"},"jamaat":{"fajr":"05:20","zuhr":"13:45","asr":"19:15","maghrib":"20:32","isha":"22:15"}},
+  "2026-08-21":{"hijri":"8 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:21","sunrise":"06:00","zuhr":"13:20","asr":"18:08","maghrib":"20:30","isha":"21:43"},"jamaat":{"fajr":"05:30","zuhr":"13:30","asr":"18:45","maghrib":"20:30","isha":"22:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-08-22":{"hijri":"9 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:23","sunrise":"06:02","zuhr":"13:19","asr":"18:07","maghrib":"20:28","isha":"21:40"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:28","isha":"22:00"}},
+  "2026-08-23":{"hijri":"10 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:24","sunrise":"06:03","zuhr":"13:19","asr":"18:05","maghrib":"20:26","isha":"21:38"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:26","isha":"22:00"}},
+  "2026-08-24":{"hijri":"11 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:25","sunrise":"06:05","zuhr":"13:19","asr":"18:04","maghrib":"20:23","isha":"21:36"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:23","isha":"22:00"}},
+  "2026-08-25":{"hijri":"12 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:26","sunrise":"06:07","zuhr":"13:19","asr":"18:02","maghrib":"20:21","isha":"21:35"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:21","isha":"22:00"}},
+  "2026-08-26":{"hijri":"13 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:27","sunrise":"06:09","zuhr":"13:18","asr":"18:00","maghrib":"20:19","isha":"21:32"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:19","isha":"22:00"}},
+  "2026-08-27":{"hijri":"14 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:28","sunrise":"06:10","zuhr":"13:18","asr":"17:58","maghrib":"20:17","isha":"21:30"},"jamaat":{"fajr":"05:30","zuhr":"13:45","asr":"18:45","maghrib":"20:17","isha":"22:00"}},
+  "2026-08-28":{"hijri":"15 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:29","sunrise":"06:12","zuhr":"13:18","asr":"17:57","maghrib":"20:14","isha":"21:28"},"jamaat":{"fajr":"05:45","zuhr":"13:30","asr":"18:45","maghrib":"20:14","isha":"21:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-08-29":{"hijri":"16 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:30","sunrise":"06:14","zuhr":"13:18","asr":"17:55","maghrib":"20:12","isha":"21:26"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:12","isha":"21:45"}},
+  "2026-08-30":{"hijri":"17 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:31","sunrise":"06:16","zuhr":"13:17","asr":"17:53","maghrib":"20:09","isha":"21:24"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:09","isha":"21:45"}},
+  "2026-08-31":{"hijri":"18 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:31","sunrise":"06:17","zuhr":"13:17","asr":"17:51","maghrib":"20:07","isha":"21:22"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:07","isha":"21:45"}},
+  "2026-09-01":{"hijri":"19 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:33","sunrise":"06:19","zuhr":"13:17","asr":"17:49","maghrib":"20:05","isha":"21:20"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:05","isha":"21:45"}},
+  "2026-09-02":{"hijri":"20 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:36","sunrise":"06:21","zuhr":"13:16","asr":"17:48","maghrib":"20:02","isha":"21:18"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:02","isha":"21:45"}},
+  "2026-09-03":{"hijri":"21 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:38","sunrise":"06:23","zuhr":"13:16","asr":"17:46","maghrib":"20:00","isha":"21:15"},"jamaat":{"fajr":"05:45","zuhr":"13:45","asr":"18:45","maghrib":"20:00","isha":"21:45"}},
+  "2026-09-04":{"hijri":"22 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:40","sunrise":"06:24","zuhr":"13:16","asr":"17:44","maghrib":"19:58","isha":"21:14"},"jamaat":{"fajr":"06:00","zuhr":"13:30","asr":"18:30","maghrib":"19:58","isha":"21:30"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-09-05":{"hijri":"23 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:43","sunrise":"06:26","zuhr":"13:15","asr":"17:42","maghrib":"19:55","isha":"21:12"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:55","isha":"21:30"}},
+  "2026-09-06":{"hijri":"24 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:45","sunrise":"06:28","zuhr":"13:15","asr":"17:40","maghrib":"19:53","isha":"21:09"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:53","isha":"21:30"}},
+  "2026-09-07":{"hijri":"25 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:47","sunrise":"06:30","zuhr":"13:15","asr":"17:38","maghrib":"19:50","isha":"21:08"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:50","isha":"21:30"}},
+  "2026-09-08":{"hijri":"26 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:49","sunrise":"06:31","zuhr":"13:14","asr":"17:36","maghrib":"19:48","isha":"21:05"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:48","isha":"21:30"}},
+  "2026-09-09":{"hijri":"27 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:52","sunrise":"06:33","zuhr":"13:14","asr":"17:34","maghrib":"19:45","isha":"21:03"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:45","isha":"21:30"}},
+  "2026-09-10":{"hijri":"28 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:54","sunrise":"06:35","zuhr":"13:14","asr":"17:32","maghrib":"19:43","isha":"21:00"},"jamaat":{"fajr":"06:00","zuhr":"13:45","asr":"18:30","maghrib":"19:43","isha":"21:30"}},
+  "2026-09-11":{"hijri":"29 Rabi al-Awwal 1448 AH","begins":{"fajr":"04:56","sunrise":"06:36","zuhr":"13:13","asr":"17:30","maghrib":"19:41","isha":"20:59"},"jamaat":{"fajr":"06:10","zuhr":"13:30","asr":"18:15","maghrib":"19:41","isha":"21:15"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-09-12":{"hijri":"1 Rabi al-Thani 1448 AH","begins":{"fajr":"04:58","sunrise":"06:38","zuhr":"13:13","asr":"17:28","maghrib":"19:38","isha":"20:56"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:38","isha":"21:15"}},
+  "2026-09-13":{"hijri":"2 Rabi al-Thani 1448 AH","begins":{"fajr":"05:00","sunrise":"06:40","zuhr":"13:12","asr":"17:26","maghrib":"19:36","isha":"20:54"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:36","isha":"21:15"}},
+  "2026-09-14":{"hijri":"3 Rabi al-Thani 1448 AH","begins":{"fajr":"05:02","sunrise":"06:42","zuhr":"13:12","asr":"17:24","maghrib":"19:33","isha":"20:52"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:33","isha":"21:15"}},
+  "2026-09-15":{"hijri":"4 Rabi al-Thani 1448 AH","begins":{"fajr":"05:05","sunrise":"06:43","zuhr":"13:12","asr":"17:22","maghrib":"19:31","isha":"20:50"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:31","isha":"21:15"}},
+  "2026-09-16":{"hijri":"5 Rabi al-Thani 1448 AH","begins":{"fajr":"05:08","sunrise":"06:45","zuhr":"13:11","asr":"17:20","maghrib":"19:28","isha":"20:48"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:28","isha":"21:15"}},
+  "2026-09-17":{"hijri":"6 Rabi al-Thani 1448 AH","begins":{"fajr":"05:10","sunrise":"06:47","zuhr":"13:11","asr":"17:18","maghrib":"19:26","isha":"20:45"},"jamaat":{"fajr":"06:10","zuhr":"13:45","asr":"18:15","maghrib":"19:26","isha":"21:15"}},
+  "2026-09-18":{"hijri":"7 Rabi al-Thani 1448 AH","begins":{"fajr":"05:12","sunrise":"06:49","zuhr":"13:11","asr":"17:16","maghrib":"19:23","isha":"20:42"},"jamaat":{"fajr":"06:20","zuhr":"13:30","asr":"18:00","maghrib":"19:23","isha":"21:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-09-19":{"hijri":"8 Rabi al-Thani 1448 AH","begins":{"fajr":"05:14","sunrise":"06:50","zuhr":"13:10","asr":"17:14","maghrib":"19:21","isha":"20:40"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:21","isha":"21:00"}},
+  "2026-09-20":{"hijri":"9 Rabi al-Thani 1448 AH","begins":{"fajr":"05:15","sunrise":"06:52","zuhr":"13:10","asr":"17:12","maghrib":"19:18","isha":"20:38"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:18","isha":"21:00"}},
+  "2026-09-21":{"hijri":"10 Rabi al-Thani 1448 AH","begins":{"fajr":"05:18","sunrise":"06:54","zuhr":"13:10","asr":"17:10","maghrib":"19:16","isha":"20:36"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:16","isha":"21:00"}},
+  "2026-09-22":{"hijri":"11 Rabi al-Thani 1448 AH","begins":{"fajr":"05:20","sunrise":"06:56","zuhr":"13:09","asr":"17:08","maghrib":"19:14","isha":"20:34"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:14","isha":"21:00"}},
+  "2026-09-23":{"hijri":"12 Rabi al-Thani 1448 AH","begins":{"fajr":"05:21","sunrise":"06:57","zuhr":"13:09","asr":"17:06","maghrib":"19:11","isha":"20:31"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:11","isha":"21:00"}},
+  "2026-09-24":{"hijri":"13 Rabi al-Thani 1448 AH","begins":{"fajr":"05:23","sunrise":"06:59","zuhr":"13:09","asr":"17:03","maghrib":"19:09","isha":"20:29"},"jamaat":{"fajr":"06:20","zuhr":"13:45","asr":"18:00","maghrib":"19:09","isha":"21:00"}},
+  "2026-09-25":{"hijri":"14 Rabi al-Thani 1448 AH","begins":{"fajr":"05:25","sunrise":"07:01","zuhr":"13:08","asr":"17:01","maghrib":"19:06","isha":"20:28"},"jamaat":{"fajr":"06:30","zuhr":"13:30","asr":"17:30","maghrib":"19:06","isha":"20:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-09-26":{"hijri":"15 Rabi al-Thani 1448 AH","begins":{"fajr":"05:27","sunrise":"07:03","zuhr":"13:08","asr":"16:59","maghrib":"19:04","isha":"20:25"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"19:04","isha":"20:45"}},
+  "2026-09-27":{"hijri":"16 Rabi al-Thani 1448 AH","begins":{"fajr":"05:29","sunrise":"07:05","zuhr":"13:08","asr":"16:57","maghrib":"19:01","isha":"20:23"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"19:01","isha":"20:45"}},
+  "2026-09-28":{"hijri":"17 Rabi al-Thani 1448 AH","begins":{"fajr":"05:31","sunrise":"07:06","zuhr":"13:07","asr":"16:55","maghrib":"18:59","isha":"20:20"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"18:59","isha":"20:45"}},
+  "2026-09-29":{"hijri":"18 Rabi al-Thani 1448 AH","begins":{"fajr":"05:32","sunrise":"07:08","zuhr":"13:07","asr":"16:53","maghrib":"18:56","isha":"20:18"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"18:56","isha":"20:45"}},
+  "2026-09-30":{"hijri":"19 Rabi al-Thani 1448 AH","begins":{"fajr":"05:34","sunrise":"07:10","zuhr":"13:07","asr":"16:51","maghrib":"18:54","isha":"20:15"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"18:54","isha":"20:45"}},
+  "2026-10-01":{"hijri":"20 Rabi al-Thani 1448 AH","begins":{"fajr":"05:36","sunrise":"07:12","zuhr":"13:06","asr":"16:49","maghrib":"18:52","isha":"20:14"},"jamaat":{"fajr":"06:30","zuhr":"13:45","asr":"17:30","maghrib":"18:52","isha":"20:45"}},
+  "2026-10-02":{"hijri":"21 Rabi al-Thani 1448 AH","begins":{"fajr":"05:38","sunrise":"07:13","zuhr":"13:06","asr":"16:46","maghrib":"18:49","isha":"20:11"},"jamaat":{"fajr":"06:45","zuhr":"13:30","asr":"17:30","maghrib":"18:49","isha":"20:30"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-10-03":{"hijri":"22 Rabi al-Thani 1448 AH","begins":{"fajr":"05:40","sunrise":"07:15","zuhr":"13:06","asr":"16:44","maghrib":"18:47","isha":"20:09"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:47","isha":"20:30"}},
+  "2026-10-04":{"hijri":"23 Rabi al-Thani 1448 AH","begins":{"fajr":"05:42","sunrise":"07:17","zuhr":"13:05","asr":"16:42","maghrib":"18:44","isha":"20:07"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:44","isha":"20:30"}},
+  "2026-10-05":{"hijri":"24 Rabi al-Thani 1448 AH","begins":{"fajr":"05:44","sunrise":"07:19","zuhr":"13:05","asr":"16:40","maghrib":"18:42","isha":"20:06"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:42","isha":"20:30"}},
+  "2026-10-06":{"hijri":"25 Rabi al-Thani 1448 AH","begins":{"fajr":"05:46","sunrise":"07:21","zuhr":"13:05","asr":"16:38","maghrib":"18:39","isha":"20:04"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:39","isha":"20:30"}},
+  "2026-10-07":{"hijri":"26 Rabi al-Thani 1448 AH","begins":{"fajr":"05:47","sunrise":"07:22","zuhr":"13:04","asr":"16:36","maghrib":"18:37","isha":"20:02"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:37","isha":"20:30"}},
+  "2026-10-08":{"hijri":"27 Rabi al-Thani 1448 AH","begins":{"fajr":"05:49","sunrise":"07:24","zuhr":"13:04","asr":"16:34","maghrib":"18:35","isha":"19:59"},"jamaat":{"fajr":"06:45","zuhr":"13:45","asr":"17:30","maghrib":"18:35","isha":"20:30"}},
+  "2026-10-09":{"hijri":"28 Rabi al-Thani 1448 AH","begins":{"fajr":"05:51","sunrise":"07:26","zuhr":"13:04","asr":"16:32","maghrib":"18:32","isha":"19:57"},"jamaat":{"fajr":"07:00","zuhr":"13:30","asr":"17:00","maghrib":"18:32","isha":"20:15"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-10-10":{"hijri":"29 Rabi al-Thani 1448 AH","begins":{"fajr":"05:53","sunrise":"07:28","zuhr":"13:04","asr":"16:29","maghrib":"18:30","isha":"19:54"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:30","isha":"20:15"}},
+  "2026-10-11":{"hijri":"30 Rabi al-Thani 1448 AH","begins":{"fajr":"05:55","sunrise":"07:30","zuhr":"13:03","asr":"16:27","maghrib":"18:28","isha":"19:53"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:28","isha":"20:15"}},
+  "2026-10-12":{"hijri":"1 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:57","sunrise":"07:32","zuhr":"13:03","asr":"16:25","maghrib":"18:25","isha":"19:52"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:25","isha":"20:15"}},
+  "2026-10-13":{"hijri":"2 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:58","sunrise":"07:33","zuhr":"13:03","asr":"16:23","maghrib":"18:23","isha":"19:50"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:23","isha":"20:15"}},
+  "2026-10-14":{"hijri":"3 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:00","sunrise":"07:35","zuhr":"13:03","asr":"16:21","maghrib":"18:21","isha":"19:47"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:21","isha":"20:15"}},
+  "2026-10-15":{"hijri":"4 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:01","sunrise":"07:37","zuhr":"13:02","asr":"16:19","maghrib":"18:18","isha":"19:45"},"jamaat":{"fajr":"07:00","zuhr":"13:45","asr":"17:00","maghrib":"18:18","isha":"20:15"}},
+  "2026-10-16":{"hijri":"5 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:02","sunrise":"07:39","zuhr":"13:02","asr":"16:17","maghrib":"18:16","isha":"19:43"},"jamaat":{"fajr":"07:15","zuhr":"13:30","asr":"17:00","maghrib":"18:16","isha":"20:00"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-10-17":{"hijri":"6 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:04","sunrise":"07:41","zuhr":"13:02","asr":"16:15","maghrib":"18:14","isha":"19:40"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:14","isha":"20:00"}},
+  "2026-10-18":{"hijri":"7 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:06","sunrise":"07:43","zuhr":"13:02","asr":"16:13","maghrib":"18:12","isha":"19:38"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:12","isha":"20:00"}},
+  "2026-10-19":{"hijri":"8 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:08","sunrise":"07:45","zuhr":"13:02","asr":"16:11","maghrib":"18:09","isha":"19:37"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:09","isha":"20:00"}},
+  "2026-10-20":{"hijri":"9 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:09","sunrise":"07:47","zuhr":"13:01","asr":"16:09","maghrib":"18:07","isha":"19:36"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:07","isha":"20:00"}},
+  "2026-10-21":{"hijri":"10 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:11","sunrise":"07:48","zuhr":"13:01","asr":"16:07","maghrib":"18:05","isha":"19:34"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:05","isha":"20:00"}},
+  "2026-10-22":{"hijri":"11 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:12","sunrise":"07:50","zuhr":"13:01","asr":"16:05","maghrib":"18:03","isha":"19:31"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"18:03","isha":"20:00"}},
+  "2026-10-23":{"hijri":"12 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:15","sunrise":"07:52","zuhr":"13:01","asr":"16:03","maghrib":"18:01","isha":"19:30"},"jamaat":{"fajr":"07:15","zuhr":"13:30","asr":"17:00","maghrib":"18:01","isha":"19:45"},"jummah":{"first":"13:30","second":"15:30"}},
+  "2026-10-24":{"hijri":"13 Jumada al-Awwal 1448 AH","begins":{"fajr":"06:15","sunrise":"07:54","zuhr":"13:01","asr":"16:01","maghrib":"17:58","isha":"19:29"},"jamaat":{"fajr":"07:15","zuhr":"13:45","asr":"17:00","maghrib":"17:58","isha":"19:45"}},
+  "2026-10-25":{"hijri":"14 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:16","sunrise":"06:56","zuhr":"12:01","asr":"14:59","maghrib":"16:56","isha":"18:27"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:45","maghrib":"16:56","isha":"18:45"}},
+  "2026-10-26":{"hijri":"15 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:18","sunrise":"06:58","zuhr":"12:01","asr":"14:57","maghrib":"16:54","isha":"18:25"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:45","maghrib":"16:54","isha":"19:30"}},
+  "2026-10-27":{"hijri":"16 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:20","sunrise":"07:00","zuhr":"12:00","asr":"14:55","maghrib":"16:52","isha":"18:23"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:45","maghrib":"16:52","isha":"19:30"}},
+  "2026-10-28":{"hijri":"17 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:21","sunrise":"07:02","zuhr":"12:00","asr":"14:53","maghrib":"16:50","isha":"18:21"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:45","maghrib":"16:50","isha":"19:30"}},
+  "2026-10-29":{"hijri":"18 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:23","sunrise":"07:04","zuhr":"12:00","asr":"14:51","maghrib":"16:48","isha":"18:19"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:45","maghrib":"16:48","isha":"19:30"}},
+  "2026-10-30":{"hijri":"19 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:25","sunrise":"07:06","zuhr":"12:00","asr":"14:49","maghrib":"16:46","isha":"18:17"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:46","isha":"19:30"},"jummah":{"first":"12:45","second":"14:15"}},
+  "2026-10-31":{"hijri":"20 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:27","sunrise":"07:07","zuhr":"12:00","asr":"14:47","maghrib":"16:44","isha":"18:15"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:44","isha":"18:30"}},
+  "2026-11-01":{"hijri":"21 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:29","sunrise":"07:09","zuhr":"12:00","asr":"14:45","maghrib":"16:42","isha":"18:15"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:42","isha":"18:30"}},
+  "2026-11-02":{"hijri":"22 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:31","sunrise":"07:11","zuhr":"12:00","asr":"14:44","maghrib":"16:40","isha":"18:13"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:40","isha":"19:30"}},
+  "2026-11-03":{"hijri":"23 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:32","sunrise":"07:13","zuhr":"12:00","asr":"14:42","maghrib":"16:38","isha":"18:12"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:38","isha":"19:30"}},
+  "2026-11-04":{"hijri":"24 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:34","sunrise":"07:15","zuhr":"12:00","asr":"14:40","maghrib":"16:36","isha":"18:10"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:36","isha":"19:30"}},
+  "2026-11-05":{"hijri":"25 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:35","sunrise":"07:17","zuhr":"12:00","asr":"14:38","maghrib":"16:34","isha":"18:09"},"jamaat":{"fajr":"06:30","zuhr":"12:45","asr":"15:30","maghrib":"16:34","isha":"19:30"}},
+  "2026-11-06":{"hijri":"26 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:36","sunrise":"07:19","zuhr":"12:00","asr":"14:37","maghrib":"16:33","isha":"18:07"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:33","isha":"19:30"},"jummah":{"first":"12:45","second":"14:00"}},
+  "2026-11-07":{"hijri":"27 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:38","sunrise":"07:21","zuhr":"12:00","asr":"14:35","maghrib":"16:31","isha":"18:06"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:31","isha":"18:30"}},
+  "2026-11-08":{"hijri":"28 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:40","sunrise":"07:23","zuhr":"12:00","asr":"14:33","maghrib":"16:29","isha":"18:04"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:29","isha":"18:30"}},
+  "2026-11-09":{"hijri":"29 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:41","sunrise":"07:25","zuhr":"12:00","asr":"14:32","maghrib":"16:27","isha":"18:03"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:27","isha":"19:30"}},
+  "2026-11-10":{"hijri":"30 Jumada al-Awwal 1448 AH","begins":{"fajr":"05:43","sunrise":"07:27","zuhr":"12:01","asr":"14:30","maghrib":"16:25","isha":"18:01"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:25","isha":"19:30"}},
+  "2026-11-11":{"hijri":"1 Jumada al-Thani 1448 AH","begins":{"fajr":"05:45","sunrise":"07:28","zuhr":"12:01","asr":"14:28","maghrib":"16:24","isha":"18:00"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:24","isha":"19:30"}},
+  "2026-11-12":{"hijri":"2 Jumada al-Thani 1448 AH","begins":{"fajr":"05:46","sunrise":"07:30","zuhr":"12:01","asr":"14:27","maghrib":"16:22","isha":"17:59"},"jamaat":{"fajr":"06:45","zuhr":"12:45","asr":"15:30","maghrib":"16:22","isha":"19:30"}},
+  "2026-11-13":{"hijri":"3 Jumada al-Thani 1448 AH","begins":{"fajr":"05:48","sunrise":"07:32","zuhr":"12:01","asr":"14:25","maghrib":"16:21","isha":"17:58"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:21","isha":"19:30"},"jummah":{"first":"12:45","second":"13:50"}},
+  "2026-11-14":{"hijri":"4 Jumada al-Thani 1448 AH","begins":{"fajr":"05:50","sunrise":"07:34","zuhr":"12:01","asr":"14:24","maghrib":"16:19","isha":"17:57"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:19","isha":"18:30"}},
+  "2026-11-15":{"hijri":"5 Jumada al-Thani 1448 AH","begins":{"fajr":"05:50","sunrise":"07:36","zuhr":"12:01","asr":"14:23","maghrib":"16:17","isha":"17:55"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:17","isha":"18:30"}},
+  "2026-11-16":{"hijri":"6 Jumada al-Thani 1448 AH","begins":{"fajr":"05:52","sunrise":"07:38","zuhr":"12:01","asr":"14:21","maghrib":"16:16","isha":"17:54"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:16","isha":"19:30"}},
+  "2026-11-17":{"hijri":"7 Jumada al-Thani 1448 AH","begins":{"fajr":"05:54","sunrise":"07:40","zuhr":"12:02","asr":"14:20","maghrib":"16:15","isha":"17:53"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:15","isha":"19:30"}},
+  "2026-11-18":{"hijri":"8 Jumada al-Thani 1448 AH","begins":{"fajr":"05:56","sunrise":"07:41","zuhr":"12:02","asr":"14:19","maghrib":"16:13","isha":"17:52"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:13","isha":"19:30"}},
+  "2026-11-19":{"hijri":"9 Jumada al-Thani 1448 AH","begins":{"fajr":"05:58","sunrise":"07:43","zuhr":"12:02","asr":"14:17","maghrib":"16:12","isha":"17:50"},"jamaat":{"fajr":"07:00","zuhr":"12:45","asr":"15:00","maghrib":"16:12","isha":"19:30"}},
+  "2026-11-20":{"hijri":"10 Jumada al-Thani 1448 AH","begins":{"fajr":"05:59","sunrise":"07:45","zuhr":"12:02","asr":"14:16","maghrib":"16:10","isha":"17:49"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:10","isha":"19:30"},"jummah":{"first":"12:45","second":"13:40"}},
+  "2026-11-21":{"hijri":"11 Jumada al-Thani 1448 AH","begins":{"fajr":"06:01","sunrise":"07:47","zuhr":"12:03","asr":"14:15","maghrib":"16:09","isha":"17:49"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:09","isha":"18:30"}},
+  "2026-11-22":{"hijri":"12 Jumada al-Thani 1448 AH","begins":{"fajr":"06:03","sunrise":"07:49","zuhr":"12:03","asr":"14:14","maghrib":"16:08","isha":"17:48"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:08","isha":"18:30"}},
+  "2026-11-23":{"hijri":"13 Jumada al-Thani 1448 AH","begins":{"fajr":"06:05","sunrise":"07:50","zuhr":"12:03","asr":"14:13","maghrib":"16:07","isha":"17:46"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:07","isha":"19:30"}},
+  "2026-11-24":{"hijri":"14 Jumada al-Thani 1448 AH","begins":{"fajr":"06:06","sunrise":"07:52","zuhr":"12:03","asr":"14:12","maghrib":"16:06","isha":"17:45"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:06","isha":"19:30"}},
+  "2026-11-25":{"hijri":"15 Jumada al-Thani 1448 AH","begins":{"fajr":"06:08","sunrise":"07:54","zuhr":"12:04","asr":"14:11","maghrib":"16:05","isha":"17:45"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:05","isha":"19:30"}},
+  "2026-11-26":{"hijri":"16 Jumada al-Thani 1448 AH","begins":{"fajr":"06:10","sunrise":"07:55","zuhr":"12:04","asr":"14:10","maghrib":"16:04","isha":"17:44"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:04","isha":"19:30"}},
+  "2026-11-27":{"hijri":"17 Jumada al-Thani 1448 AH","begins":{"fajr":"06:11","sunrise":"07:57","zuhr":"12:04","asr":"14:09","maghrib":"16:03","isha":"17:43"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:03","isha":"19:30"},"jummah":{"first":"12:45","second":"13:40"}},
+  "2026-11-28":{"hijri":"18 Jumada al-Thani 1448 AH","begins":{"fajr":"06:13","sunrise":"07:59","zuhr":"12:05","asr":"14:08","maghrib":"16:02","isha":"17:43"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:02","isha":"18:30"}},
+  "2026-11-29":{"hijri":"19 Jumada al-Thani 1448 AH","begins":{"fajr":"06:14","sunrise":"08:00","zuhr":"12:05","asr":"14:07","maghrib":"16:01","isha":"17:42"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:01","isha":"18:30"}},
+  "2026-11-30":{"hijri":"20 Jumada al-Thani 1448 AH","begins":{"fajr":"06:15","sunrise":"08:02","zuhr":"12:05","asr":"14:07","maghrib":"16:00","isha":"17:42"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"16:00","isha":"19:30"}},
+  "2026-12-01":{"hijri":"21 Jumada al-Thani 1448 AH","begins":{"fajr":"06:16","sunrise":"08:03","zuhr":"12:06","asr":"14:06","maghrib":"15:59","isha":"17:41"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:59","isha":"19:30"}},
+  "2026-12-02":{"hijri":"22 Jumada al-Thani 1448 AH","begins":{"fajr":"06:17","sunrise":"08:05","zuhr":"12:06","asr":"14:05","maghrib":"15:59","isha":"17:40"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:59","isha":"19:30"}},
+  "2026-12-03":{"hijri":"23 Jumada al-Thani 1448 AH","begins":{"fajr":"06:18","sunrise":"08:06","zuhr":"12:07","asr":"14:05","maghrib":"15:58","isha":"17:40"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:58","isha":"19:30"}},
+  "2026-12-04":{"hijri":"24 Jumada al-Thani 1448 AH","begins":{"fajr":"06:20","sunrise":"08:08","zuhr":"12:07","asr":"14:04","maghrib":"15:57","isha":"17:39"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:57","isha":"19:30"},"jummah":{"first":"12:45","second":"13:35"}},
+  "2026-12-05":{"hijri":"25 Jumada al-Thani 1448 AH","begins":{"fajr":"06:21","sunrise":"08:09","zuhr":"12:07","asr":"14:04","maghrib":"15:57","isha":"17:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:57","isha":"18:30"}},
+  "2026-12-06":{"hijri":"26 Jumada al-Thani 1448 AH","begins":{"fajr":"06:22","sunrise":"08:10","zuhr":"12:08","asr":"14:03","maghrib":"15:56","isha":"17:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:56","isha":"18:30"}},
+  "2026-12-07":{"hijri":"27 Jumada al-Thani 1448 AH","begins":{"fajr":"06:23","sunrise":"08:12","zuhr":"12:08","asr":"14:03","maghrib":"15:56","isha":"17:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:56","isha":"19:30"}},
+  "2026-12-08":{"hijri":"28 Jumada al-Thani 1448 AH","begins":{"fajr":"06:24","sunrise":"08:13","zuhr":"12:09","asr":"14:03","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-09":{"hijri":"29 Jumada al-Thani 1448 AH","begins":{"fajr":"06:25","sunrise":"08:14","zuhr":"12:09","asr":"14:03","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-10":{"hijri":"1 Rajab 1448 AH","begins":{"fajr":"06:26","sunrise":"08:15","zuhr":"12:10","asr":"14:02","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-11":{"hijri":"2 Rajab 1448 AH","begins":{"fajr":"06:27","sunrise":"08:16","zuhr":"12:10","asr":"14:02","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"},"jummah":{"first":"12:45","second":"13:35"}},
+  "2026-12-12":{"hijri":"3 Rajab 1448 AH","begins":{"fajr":"06:28","sunrise":"08:17","zuhr":"12:10","asr":"14:02","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"18:30"}},
+  "2026-12-13":{"hijri":"4 Rajab 1448 AH","begins":{"fajr":"06:28","sunrise":"08:18","zuhr":"12:11","asr":"14:02","maghrib":"15:55","isha":"17:36"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"18:30"}},
+  "2026-12-14":{"hijri":"5 Rajab 1448 AH","begins":{"fajr":"06:29","sunrise":"08:19","zuhr":"12:11","asr":"14:02","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-15":{"hijri":"6 Rajab 1448 AH","begins":{"fajr":"06:30","sunrise":"08:20","zuhr":"12:12","asr":"14:02","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-16":{"hijri":"7 Rajab 1448 AH","begins":{"fajr":"06:31","sunrise":"08:21","zuhr":"12:12","asr":"14:03","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-17":{"hijri":"8 Rajab 1448 AH","begins":{"fajr":"06:31","sunrise":"08:22","zuhr":"12:13","asr":"14:03","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"}},
+  "2026-12-18":{"hijri":"9 Rajab 1448 AH","begins":{"fajr":"06:32","sunrise":"08:22","zuhr":"12:13","asr":"14:03","maghrib":"15:55","isha":"17:37"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:55","isha":"19:30"},"jummah":{"first":"12:45","second":"13:40"}},
+  "2026-12-19":{"hijri":"10 Rajab 1448 AH","begins":{"fajr":"06:33","sunrise":"08:23","zuhr":"12:14","asr":"14:03","maghrib":"15:56","isha":"17:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:56","isha":"18:30"}},
+  "2026-12-20":{"hijri":"11 Rajab 1448 AH","begins":{"fajr":"06:33","sunrise":"08:24","zuhr":"12:14","asr":"14:04","maghrib":"15:56","isha":"17:38"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:56","isha":"18:30"}},
+  "2026-12-21":{"hijri":"12 Rajab 1448 AH","begins":{"fajr":"06:34","sunrise":"08:24","zuhr":"12:15","asr":"14:04","maghrib":"15:57","isha":"17:39"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:57","isha":"19:30"}},
+  "2026-12-22":{"hijri":"13 Rajab 1448 AH","begins":{"fajr":"06:34","sunrise":"08:25","zuhr":"12:15","asr":"14:05","maghrib":"15:57","isha":"17:39"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:57","isha":"19:30"}},
+  "2026-12-23":{"hijri":"14 Rajab 1448 AH","begins":{"fajr":"06:34","sunrise":"08:25","zuhr":"12:16","asr":"14:05","maghrib":"15:58","isha":"17:40"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:58","isha":"19:30"}},
+  "2026-12-24":{"hijri":"15 Rajab 1448 AH","begins":{"fajr":"06:35","sunrise":"08:26","zuhr":"12:16","asr":"14:06","maghrib":"15:58","isha":"17:40"},"jamaat":{"fajr":"07:15","zuhr":"12:45","asr":"14:45","maghrib":"15:58","isha":"19:30"}},
+  "2026-12-25":{"hijri":"16 Rajab 1448 AH","begins":{"fajr":"06:35","sunrise":"08:26","zuhr":"12:17","asr":"14:07","maghrib":"15:59","isha":"17:41"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"15:59","isha":"18:30"},"jummah":{"first":"12:45","second":"13:40"}},
+  "2026-12-26":{"hijri":"17 Rajab 1448 AH","begins":{"fajr":"06:35","sunrise":"08:26","zuhr":"12:17","asr":"14:07","maghrib":"16:00","isha":"17:42"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:00","isha":"18:30"}},
+  "2026-12-27":{"hijri":"18 Rajab 1448 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:18","asr":"14:08","maghrib":"16:01","isha":"17:43"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:01","isha":"18:30"}},
+  "2026-12-28":{"hijri":"19 Rajab 1448 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:18","asr":"14:09","maghrib":"16:01","isha":"17:43"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:01","isha":"18:30"}},
+  "2026-12-29":{"hijri":"20 Rajab 1448 AH","begins":{"fajr":"06:36","sunrise":"08:27","zuhr":"12:19","asr":"14:10","maghrib":"16:02","isha":"17:44"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:02","isha":"18:30"}},
+  "2026-12-30":{"hijri":"21 Rajab 1448 AH","begins":{"fajr":"06:36","sunrise":"08:27","zuhr":"12:19","asr":"14:11","maghrib":"16:03","isha":"17:45"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:03","isha":"18:30"}},
+  "2026-12-31":{"hijri":"22 Rajab 1448 AH","begins":{"fajr":"06:36","sunrise":"08:26","zuhr":"12:20","asr":"14:12","maghrib":"16:04","isha":"17:46"},"jamaat":{"fajr":"07:45","zuhr":"12:45","asr":"14:45","maghrib":"16:04","isha":"18:30"}}
+  }
+};
+
+const PRAYERS = [
+  {key:"fajr",    en:"Fajr",    ar:"الفجر"},
+  {key:"sunrise", en:"Sunrise", ar:"الشروق", info:true},
+  {key:"zuhr",    en:"Zuhr",    ar:"الظهر"},
+  {key:"asr",     en:"Asr",     ar:"العصر"},
+  {key:"maghrib", en:"Maghrib", ar:"المغرب"},
+  {key:"isha",    en:"Isha",    ar:"العشاء"},
+];
+// jamaat order (excludes sunrise) used for countdown + highlighting
+const JAMAAT_ORDER = ["fajr","zuhr","asr","maghrib","isha"];
+
+/* ---------------- helpers ---------------- */
+function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function hm12(t){let [h,m]=t.split(":").map(Number);const ap=h<12?"am":"pm";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
+function atToday(base, t){const [h,m]=t.split(":").map(Number);const d=new Date(base);d.setHours(h,m,0,0);return d;}
+function dayRec(d){return DATA && DATA.days ? DATA.days[ymd(d)] || null : null;}
+
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* status note (loading / timetable ended / load error) */
+function status(msg){
+  const sn=document.getElementById('samplenote');
+  if(!msg){ sn.hidden=true; sn.textContent=""; return; }
+  sn.hidden=false; sn.textContent=msg;
+}
+
+let STATE = null;
+
+function buildTimetable(rec, baseDate){
+  const tt = document.getElementById("timetable");
+  let html = `<div class="col-h"><span>Prayer</span><span class="r">Begins</span><span class="r">Jamā&#703;ah</span></div>`;
+  PRAYERS.forEach(p=>{
+    const b = rec.begins[p.key];
+    const j = p.info ? null : rec.jamaat[p.key];
+    html += `<div class="row ${p.info?'sunrise':''}" data-key="${p.key}">
+      <div class="name"><span class="en">${p.en}<span class="pill-slot"></span></span><span class="ar">${p.ar}</span></div>
+      <span class="begins tnum">${b?hm12(b):'—'}</span>
+      <span class="jam tnum">${j?hm12(j):'—'}</span>
+    </div>`;
+  });
+  // Jummah line — only what the dataset carries (Fridays); never invented
+  if(rec.jummah && rec.jummah.first){
+    const jm = rec.jummah;
+    html += `<div class="jummah"><span class="k">Jumuʿah</span> <span>1st <b>${hm12(jm.first)}</b>${jm.second?` &middot; 2nd <b>${hm12(jm.second)}</b>`:''}</span></div>`;
+  }
+  tt.innerHTML = html;
+}
+
+function markRows(rec, baseDate, now){
+  // find current (last passed) + next jamaat among today's order
+  const rows = [...document.querySelectorAll('.row[data-key]')];
+  rows.forEach(r=>{r.classList.remove('is-current','is-next');const s=r.querySelector('.pill-slot');if(s)s.innerHTML='';});
+  if(!now) return;   // viewing another day — no Now/Next markers
+  let currentKey=null, nextKey=null;
+  for(const k of JAMAAT_ORDER){
+    const t = atToday(baseDate, rec.jamaat[k]);
+    if(t<=now) currentKey=k;
+    else if(!nextKey) nextKey=k;
+  }
+  const set=(key,cls,label)=>{
+    if(!key) return;
+    const row=document.querySelector(`.row[data-key="${key}"]`);
+    if(!row) return;
+    row.classList.add(cls);
+    const slot=row.querySelector('.pill-slot');
+    if(slot && label) slot.innerHTML=`<span class="pill ${label==='Now'?'now':'next'}">${label}</span>`;
+  };
+  set(currentKey,'is-current','Now');
+  set(nextKey,'is-next','Next');
+}
+
+/* countdown to the next jamaat (rolls to tomorrow's Fajr after Isha) */
+function computeNext(rec, baseDate, now){
+  for(const k of JAMAAT_ORDER){
+    const t=atToday(baseDate, rec.jamaat[k]);
+    if(t>now) return {key:k, at:t, tomorrow:false};
+  }
+  // after Isha → tomorrow's Fajr from the dataset
+  const tomorrow=new Date(baseDate); tomorrow.setDate(tomorrow.getDate()+1);
+  const rec2=dayRec(tomorrow);
+  if(!rec2) return null;   // dataset ends here (e.g. 31 Dec) — handled by tick()
+  return {key:"fajr", at:atToday(tomorrow, rec2.jamaat.fajr), tomorrow:true, tomorrowRec:rec2};
+}
+
+function meta(key){return PRAYERS.find(p=>p.key===key);}
+
+function setDateline(d, rec){
+  document.getElementById('dateline').textContent =
+    `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} · ${rec.hijri}`;
+}
+
+/* ---------------- date navigation ---------------- */
+let VIEW = null;                       // Date currently being viewed
+const FULL_DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const FULL_MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function today0(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function sameDay(a,b){return ymd(a)===ymd(b);}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);x.setHours(0,0,0,0);return x;}
+
+/* next Jumuʿah: today if it's Friday and 2nd Jumuʿah hasn't passed, else the next Friday */
+function nextJummah(){
+  const now=new Date();
+  if(now.getDay()===5){
+    const rec=dayRec(now);
+    const last=rec && rec.jummah ? (rec.jummah.second||rec.jummah.first) : null;
+    if(last && atToday(now,last) > now) return today0();
+  }
+  let d=addDays(today0(),1);
+  while(d.getDay()!==5) d=addDays(d,1);
+  return d;
+}
+
+function relLabel(d){
+  const t=today0();
+  if(sameDay(d,t)) return "Today";
+  if(sameDay(d,addDays(t,1))) return "Tomorrow";
+  if(sameDay(d,addDays(t,-1))) return "Yesterday";
+  return `${FULL_DOW[d.getDay()]}`;
+}
+
+function updateNavUI(){
+  const t=today0();
+  document.getElementById('dn-main').textContent = relLabel(VIEW);
+  document.getElementById('dn-sub').textContent =
+    `${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()]} ${VIEW.getFullYear()}`;
+  document.getElementById('datein').value = ymd(VIEW);
+  // disable stepping outside the loaded year
+  document.getElementById('prev').disabled = !dayRec(addDays(VIEW,-1));
+  document.getElementById('next').disabled = !dayRec(addDays(VIEW,1));
+  // chip states
+  const fri=nextJummah();
+  const on=(id,cond)=>document.getElementById(id).dataset.on = cond?"1":"0";
+  on('chip-today', sameDay(VIEW,t));
+  on('chip-tom',   sameDay(VIEW,addDays(t,1)));
+  on('chip-fri',   sameDay(VIEW,fri));
+  // grey out shortcuts that fall outside the loaded timetable
+  document.getElementById('chip-tom').disabled = !dayRec(addDays(t,1));
+  document.getElementById('chip-fri').disabled = !dayRec(fri);
+  document.getElementById('tt-h').textContent =
+    sameDay(VIEW,t) ? "Today" : `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
+}
+
+/* render the hero for a non-today date */
+function renderDayView(rec){
+  document.getElementById('mode-today').hidden=true;
+  document.getElementById('mode-date').hidden=false;
+  document.getElementById('livedot').style.display='none';
+  const isFri = VIEW.getDay()===5;
+  document.getElementById('dv-eyebrow').textContent = isFri ? "Jumuʿah" : "Jamāʿah times";
+  document.getElementById('dv-date').textContent =
+    `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
+  const jum=document.getElementById('dv-jum');
+  if(isFri && rec.jummah && rec.jummah.first){
+    jum.hidden=false;
+    document.getElementById('dv-j1').textContent=hm12(rec.jummah.first);
+    document.getElementById('dv-j2').textContent=rec.jummah.second?hm12(rec.jummah.second):"—";
+    document.getElementById('dv-sub').innerHTML=`Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
+  }else{
+    jum.hidden=true;
+    document.getElementById('dv-sub').innerHTML =
+      `Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Maghrib <b>${hm12(rec.jamaat.maghrib)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
+  }
+}
+
+function renderTodayHero(){
+  document.getElementById('mode-today').hidden=false;
+  document.getElementById('mode-date').hidden=true;
+  document.getElementById('livedot').style.display='';
+}
+
+/* main render for whatever date VIEW points at */
+function render(){
+  const rec=dayRec(VIEW);
+  if(!rec){ endedState(); return; }
+  STATE={rec, base:new Date(VIEW), key:ymd(VIEW)};
+  setDateline(VIEW, rec);
+  buildTimetable(rec, VIEW);
+  updateNavUI();
+  renderRamadan();
+  RM_IDX=0;
+  renderReminder();
+  if(sameDay(VIEW, today0())){ renderTodayHero(); tick(); }
+  else { renderDayView(rec); markRows(rec, VIEW, null); }
+}
+
+function goto(d){
+  if(!dayRec(d)) return;
+  VIEW=new Date(d); VIEW.setHours(0,0,0,0);
+  render();
+}
+
+/* ---------------- Ramadan countdown ----------------
+   Shows in the final RAM_WINDOW days before Ramadan.
+
+   The date is taken from the timetable itself whenever the dataset
+   contains a future "1 Ramadan" — so when the 2027 timetable is loaded
+   this corrects itself with no code change. Until then it uses the
+   estimate below, which the committee should confirm.
+
+   Hijri dates depend on moon sighting (the masjid's own timetable says
+   so), hence "about" and the caveat line — never present it as exact.
+--------------------------------------------------- */
+const RAM_WINDOW = 30;
+const RAM_FALLBACK = { date:"2027-02-08", year:"1448 AH" };   // estimate — confirm with committee
+
+function ramadanStart(){
+  const t=today0();
+  // 1) from the dataset, if a future 1 Ramadan is present
+  if(DATA && DATA.days){
+    for(const k of Object.keys(DATA.days).sort()){
+      if(/^1\s+Ramadan/i.test(DATA.days[k].hijri||"")){
+        const [Y,M,D]=k.split("-").map(Number);
+        const d=new Date(Y,M-1,D);
+        if(d>=t) return {date:d, year:(DATA.days[k].hijri.match(/(\d+)\s*AH/)||[])[1]+" AH", exact:true};
+      }
+    }
+  }
+  // 2) configured estimate
+  const [Y,M,D]=RAM_FALLBACK.date.split("-").map(Number);
+  const d=new Date(Y,M-1,D);
+  return d>=t ? {date:d, year:RAM_FALLBACK.year, exact:false} : null;
+}
+
+function renderRamadan(){
+  const el=document.getElementById('ram');
+  const r=ramadanStart();
+  if(!r){ el.hidden=true; return; }
+
+  const days=Math.round((r.date-today0())/86400000);
+  if(days>RAM_WINDOW || days<0){ el.hidden=true; return; }
+
+  let txt;
+  if(days===0)      txt="Ramadan begins today";
+  else if(days===1) txt="Ramadan begins tomorrow";
+  else              txt=`Ramadan begins in about ${days} days`;
+
+  el.hidden=false;
+  document.getElementById('ram-t').textContent=txt;
+  document.getElementById('ram-n').textContent =
+    "Subject to moon sighting" + (r.year?` · ${r.year}`:"");
+}
+
+/* ---------------- reminders ----------------
+   Gentle, widely-observed practices — surfaced when they're relevant,
+   not on a random rotation. Wording is deliberately soft ("many read",
+   "a reminder"), and no rulings are given: this is a nudge, not a fatwa.
+--------------------------------------------- */
+/* ---------------- Islamic calendar days ----------------
+   Seeded from the days Taiyabah's OWN printed timetable marks, so the
+   app follows the masjid rather than a generic calendar. Their 2026
+   timetable annotates: 27 Rajab (Shab-e-Miʿrāj), the night of 15 Shaʿbān,
+   1 Ramadan, 8–12 Dhul Hijjah (Hajj), 9 Dhul Hijjah (ʿArafah),
+   10 Dhul Hijjah (Eid al-Adha), 1 Muharram (Islamic New Year),
+   10 Muharram (ʿĀshūrāʾ) and 27 Safar (the Hijrah).
+
+   NOT included by default: 12 Rabiʿ al-Awwal. Deobandi and Barelvi
+   communities are both Hanafi and differ on observing it; Taiyabah's
+   own timetable does not mark it. Set MARK_MAWLID = true only if the
+   committee/imam asks for it.
+-------------------------------------------------------- */
+const MARK_MAWLID = false;
+
+const hIs = (c, day, month) => c.hDay===day && new RegExp(month,"i").test(c.hMonth);
+const tIs = (c, day, month) => c.tDay===day && new RegExp(month,"i").test(c.tMonth);
+
+const CALENDAR_DAYS = [
+  /* --- nights: these begin at Maghrib the evening before --- */
+  { id:"meraj-eve", ar:"شَبِ مِعْرَاج", t:"Shab-e-Miʿrāj tonight",
+    d:"The night of 27 Rajab begins after Maghrib this evening.",
+    when:c => tIs(c,27,"Rajab") },
+  { id:"meraj", ar:"شَبِ مِعْرَاج", t:"Shab-e-Miʿrāj",
+    d:"27 Rajab — the Night Journey and Ascension.",
+    when:c => hIs(c,27,"Rajab") },
+  { id:"baraat-eve", ar:"شَبِ بَرَاءَت", t:"Shab-e-Barāʾat tonight",
+    d:"The night of 15 Shaʿbān begins after Maghrib this evening.",
+    when:c => tIs(c,15,"Sha") },
+  { id:"baraat", ar:"شَبِ بَرَاءَت", t:"Shab-e-Barāʾat",
+    d:"15 Shaʿbān — a night many spend in worship and duʿā.",
+    when:c => hIs(c,15,"Sha") },
+
+  /* --- Eid --- */
+  { id:"fitr-eve", ar:"عِيدُ الْفِطْر", t:"Eid al-Fitr tomorrow",
+    d:"Eid salah times are announced by the masjid. Fitrana should be given before the salah.",
+    when:c => tIs(c,1,"Shawwal") },
+  { id:"fitr", ar:"عِيدُ الْفِطْر", t:"Eid al-Fitr",
+    d:"Eid Mubarak. Eid salah times are announced by the masjid.",
+    when:c => hIs(c,1,"Shawwal") },
+  { id:"adha-eve", ar:"عِيدُ الْأَضْحَىٰ", t:"Eid al-Adha tomorrow",
+    d:"10 Dhul Hijjah falls tomorrow. Eid salah times are announced by the masjid.",
+    when:c => tIs(c,10,"Hijjah") },
+  { id:"adha", ar:"عِيدُ الْأَضْحَىٰ", t:"Eid al-Adha",
+    d:"Eid Mubarak. Qurbani follows the Eid salah.",
+    when:c => hIs(c,10,"Hijjah") },
+
+  /* --- Hajj season --- */
+  { id:"hajj", ar:"أَيَّامُ الْحَجّ", t:"The days of Hajj",
+    d:"8th to 12th Dhul Hijjah.",
+    when:c => /Hijjah/i.test(c.hMonth) && c.hDay>=8 && c.hDay<=12 },
+
+  /* --- Muharram --- */
+  { id:"newyear", ar:"رَأْسُ السَّنَةِ الْهِجْرِيَّة", t:"Islamic New Year",
+    d:"1 Muharram — the start of the Hijri year.",
+    when:c => hIs(c,1,"Muharram") },
+
+  /* --- Ramadan's final third --- */
+  { id:"lastten", ar:"الْعَشْرُ الْأَوَاخِر", t:"The last ten nights",
+    d:"Laylat al-Qadr is sought in the odd nights of the final ten.",
+    when:c => /Ramadan/i.test(c.hMonth) && c.hDay>=21 },
+
+  /* --- 27 Safar --- */
+  { id:"hijrah", ar:"الْهِجْرَة", t:"The Hijrah",
+    d:"27 Safar — the Prophet ﷺ set out for Madinah.",
+    when:c => hIs(c,27,"Safar") },
+
+  /* --- optional, off by default (see MARK_MAWLID above) --- */
+  { id:"mawlid", ar:"رَبِيعُ الْأَوَّل", t:"12 Rabiʿ al-Awwal",
+    d:"A date noted in the Islamic calendar.",
+    when:c => MARK_MAWLID && hIs(c,12,"Rabi al-Awwal") },
+];
+
+const REMINDERS = [
+  ...CALENDAR_DAYS,
+  /* --- heads-up for tomorrow: these need a decision tonight --- */
+  { id:"ramadan-eve", ar:"رَمَضَان", t:"Ramadan begins tomorrow",
+    d:c=>`The first fast is tomorrow.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""} Taraweeh follows Isha jamāʿah.`,
+    when:c => /Ramadan/i.test(c.tMonth) && c.tDay===1 },
+  { id:"arafah-eve", ar:"يَوْمُ عَرَفَة", t:"Day of ʿArafah is tomorrow",
+    d:c=>`The 9th of Dhul Hijjah falls tomorrow — a day of voluntary fasting.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    when:c => /Hijjah/i.test(c.tMonth) && c.tDay===9 },
+  { id:"ashura-eve", ar:"يَوْمُ عَاشُورَاء", t:"ʿĀshūrāʾ fasting tomorrow",
+    d:c=>`Many fast the 9th and 10th of Muharram.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    when:c => /Muharram/i.test(c.tMonth) && (c.tDay===9 || c.tDay===10) },
+  { id:"beed-eve", ar:"الْأَيَّامُ الْبِيض", t:"Optional fasting tomorrow",
+    d:c=>`Tomorrow is one of the white days — the 13th, 14th and 15th of the Islamic month.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    when:c => [13,14,15].includes(c.tDay) },
+  { id:"monthu-eve", ar:"صِيَامُ الِاثْنَيْنِ وَالْخَمِيس", t:"Optional fasting tomorrow",
+    d:c=>`Tomorrow is ${c.tDow===1?"Monday":"Thursday"} — a day many keep a voluntary fast.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    when:c => c.tDow===1 || c.tDow===4 },
+
+  /* --- expiring soon --- */
+  { id:"jumuah-hour", ar:"سَاعَةُ الْإِجَابَة", t:"The last hour of Jumuʿah",
+    d:"The final part of Friday, before Maghrib, is sought for duʿā.",
+    when:c => c.dow===5 && c.live && c.afterAsr && c.beforeMaghrib },
+  { id:"morning", ar:"أَذْكَارُ الصَّبَاح", t:"Morning adhkār",
+    d:"The window after Fajr until sunrise.",
+    when:c => c.live && c.afterFajr && c.beforeSunrise },
+  { id:"evening", ar:"أَذْكَارُ الْمَسَاء", t:"Evening adhkār",
+    d:"From after Asr until Maghrib.",
+    when:c => c.live && c.afterAsr && c.beforeMaghrib },
+
+  /* --- today --- */
+  { id:"ramadan", ar:"رَمَضَان", t:"Ramadan",
+    d:"Suhūr ends 10 minutes before Fajr begins. Taraweeh follows Isha jamāʿah.",
+    when:c => /Ramadan/i.test(c.hMonth) },
+  { id:"arafah", ar:"يَوْمُ عَرَفَة", t:"Day of ʿArafah",
+    d:"The 9th of Dhul Hijjah.",
+    when:c => /Hijjah/i.test(c.hMonth) && c.hDay===9 },
+  { id:"ashura", ar:"يَوْمُ عَاشُورَاء", t:"Day of ʿĀshūrāʾ",
+    d:"The 10th of Muharram — a day of voluntary fasting.",
+    when:c => /Muharram/i.test(c.hMonth) && (c.hDay===9 || c.hDay===10) },
+  { id:"tenhijjah", ar:"عَشْرُ ذِي الْحِجَّة", t:"The first ten days of Dhul Hijjah",
+    d:"A time for extra dhikr, fasting and good deeds.",
+    when:c => /Hijjah/i.test(c.hMonth) && c.hDay<=9 },
+  { id:"beed", ar:"الْأَيَّامُ الْبِيض", t:"The white days",
+    d:"The 13th, 14th and 15th of the Islamic month — days of voluntary fasting.",
+    when:c => [13,14,15].includes(c.hDay) },
+  { id:"monthu", ar:"صِيَامُ الِاثْنَيْنِ وَالْخَمِيس", t:"Monday & Thursday fasting",
+    d:"A voluntary fast many keep through the year.",
+    when:c => c.dow===1 || c.dow===4 },
+
+  /* --- Friday, all day --- */
+  { id:"kahf", ar:"سُورَةُ الْكَهْف", t:"Sūrah al-Kahf",
+    d:"Many read it on Fridays — from Maghrib on Thursday through to Maghrib on Friday.",
+    when:c => c.dow===5 },
+  { id:"salawat", ar:"اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّد", t:"Salawāt upon the Prophet ﷺ",
+    d:"Fridays are a time to send salawāt often.",
+    when:c => c.dow===5 },
+
+  /* --- evergreen --- */
+  { id:"kursi", ar:"آيَةُ الْكُرْسِيّ", t:"Āyat al-Kursī",
+    d:"Recited after each fard salah.",
+    when:c => true },
+  { id:"iqamah", ar:"الدُّعَاءُ بَيْنَ الْأَذَانِ وَالْإِقَامَة", t:"Duʿā before jamāʿah",
+    d:"The time between the adhān and the iqāmah is a time for duʿā.",
+    when:c => true },
+];
+
+let RM_LIST=[], RM_IDX=0;
+
+function minusMins(t, n){
+  const [h,m]=t.split(":").map(Number);
+  let v=h*60+m-n; if(v<0) v+=1440;
+  return `${String(Math.floor(v/60)).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
+}
+
+function reminderCtx(){
+  const rec=STATE.rec, d=VIEW, now=new Date();
+  const live=sameDay(d, today0());
+  const hm=(rec.hijri||"").match(/^(\d+)\s+(.+?)\s+\d+/);
+  const c={ dow:d.getDay(), live,
+            hDay: hm?parseInt(hm[1],10):0, hMonth: hm?hm[2]:"" };
+
+  // tomorrow — used for day-before fasting notices
+  const tmr=addDays(d,1), tRec=dayRec(tmr);
+  if(tRec){
+    const thm=(tRec.hijri||"").match(/^(\d+)\s+(.+?)\s+\d+/);
+    c.tDow=tmr.getDay();
+    c.tDay=thm?parseInt(thm[1],10):0;
+    c.tMonth=thm?thm[2]:"";
+    // masjid's own rule: suhūr ends 10 minutes before Fajr begins
+    c.suhoor = tRec.begins.fajr ? minusMins(tRec.begins.fajr, 10) : null;
+  }else{
+    c.tDow=-1; c.tDay=0; c.tMonth="";
+  }
+
+  if(live){
+    const at=t=>atToday(d,t);
+    c.afterFajr     = now >= at(rec.begins.fajr);
+    c.beforeSunrise = now <  at(rec.begins.sunrise);
+    c.afterAsr      = now >= at(rec.begins.asr);
+    c.beforeMaghrib = now <  at(rec.begins.maghrib);
+  }
+  return c;
+}
+
+function renderReminder(){
+  const el=document.getElementById('remind');
+  if(!STATE || !STATE.rec){ el.hidden=true; return; }
+  const c=reminderCtx();
+  RM_LIST=REMINDERS.filter(r=>{ try{ return r.when(c); }catch(e){ return false; } });
+  if(!RM_LIST.length){ el.hidden=true; return; }
+  if(RM_IDX>=RM_LIST.length) RM_IDX=0;
+  const r=RM_LIST[RM_IDX];
+  el.hidden=false;
+  document.getElementById('rm-ar').textContent=r.ar;
+  document.getElementById('rm-t').textContent=r.t;
+  document.getElementById('rm-d').textContent = typeof r.d==="function" ? r.d(c) : r.d;
+  document.getElementById('rm-dots').innerHTML =
+    RM_LIST.length>1 ? RM_LIST.map((_,i)=>`<i data-on="${i===RM_IDX?1:0}"></i>`).join("") : "";
+  el.setAttribute('aria-label', RM_LIST.length>1
+    ? `${r.t}. Tap for the next reminder.` : r.t);
+}
+
+function initReminders(){
+  document.getElementById('remind').addEventListener('click',()=>{
+    if(RM_LIST.length<2) return;
+    RM_IDX=(RM_IDX+1)%RM_LIST.length;
+    renderReminder();
+  });
+}
+
+/* ---------------- month view ---------------- */
+let M_MONTH = null;      // Date pointing at the 1st of the shown month
+let M_MODE  = "jamaat";  // or "begins"
+
+function monthDays(y, m){          // m: 0-11
+  const out=[];
+  for(let d=1; d<=31; d++){
+    const dt=new Date(y,m,d);
+    if(dt.getMonth()!==m) break;
+    const rec=dayRec(dt);
+    if(rec) out.push({dt, rec});
+  }
+  return out;
+}
+
+function renderMonth(){
+  const y=M_MONTH.getFullYear(), m=M_MONTH.getMonth();
+  document.getElementById('m-title').textContent=`${FULL_MON[m]} ${y}`;
+  const rows=monthDays(y,m);
+  const cols = M_MODE==="jamaat"
+    ? [["fajr","Fajr"],["zuhr","Zuhr"],["asr","Asr"],["maghrib","Mag"],["isha","Isha"]]
+    : [["fajr","Fajr"],["sunrise","Sun"],["zuhr","Zuhr"],["asr","Asr"],["isha","Isha"]];
+  const t=today0();
+  let html=`<table class="mt"><thead><tr><th style="text-align:left;padding-left:12px">Date</th>${
+    cols.map(c=>`<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;
+  rows.forEach(({dt,rec})=>{
+    const src = M_MODE==="jamaat" ? rec.jamaat : rec.begins;
+    const cls=[dt.getDay()===5?"fri":"", sameDay(dt,t)?"today":""].filter(Boolean).join(" ");
+    html+=`<tr class="${cls}" data-d="${ymd(dt)}"><td class="d">${dt.getDate()}<small>${DOW[dt.getDay()]}</small></td>${
+      cols.map(c=>`<td>${src[c[0]]?hm12(src[c[0]]).replace(/ (am|pm)/,''):'—'}</td>`).join("")}</tr>`;
+  });
+  html+=`</tbody></table><div class="mt-foot">${
+    M_MODE==="jamaat" ? "Congregation times. Fridays highlighted — tap any day for Jumuʿah times."
+                      : "Beginning times. Maghrib is prayed at its listed time."
+  }<br>Times shown in 12-hour format without am/pm, as on the printed timetable.</div>`;
+  document.getElementById('m-body').innerHTML=html;
+  document.getElementById('m-body').scrollTop=0;
+  // stepping limits
+  document.getElementById('m-prev').disabled = monthDays(y, m-1<0?11:m-1).length===0 || m===0;
+  document.getElementById('m-next').disabled = m===11 || monthDays(y, m+1).length===0;
+  // tap a row → view that day
+  [...document.querySelectorAll('table.mt tbody tr')].forEach(tr=>{
+    tr.addEventListener('click',()=>{
+      const [Y,M,D]=tr.dataset.d.split("-").map(Number);
+      closeMonth(); goto(new Date(Y,M-1,D));
+    });
+  });
+}
+
+function openMonth(){
+  M_MONTH=new Date(VIEW.getFullYear(), VIEW.getMonth(), 1);
+  document.getElementById('sheet').dataset.open="1";
+  document.body.style.overflow="hidden";
+  renderMonth();
+}
+function closeMonth(){
+  document.getElementById('sheet').dataset.open="0";
+  document.body.style.overflow="";
+}
+
+function initMonth(){
+  document.getElementById('chip-month').addEventListener('click',openMonth);
+  document.getElementById('m-close').addEventListener('click',closeMonth);
+  document.getElementById('scrim').addEventListener('click',closeMonth);
+  document.getElementById('m-prev').addEventListener('click',()=>{
+    M_MONTH=new Date(M_MONTH.getFullYear(),M_MONTH.getMonth()-1,1); renderMonth();
+  });
+  document.getElementById('m-next').addEventListener('click',()=>{
+    M_MONTH=new Date(M_MONTH.getFullYear(),M_MONTH.getMonth()+1,1); renderMonth();
+  });
+  const setMode=(mode)=>{
+    M_MODE=mode;
+    document.getElementById('m-jam').dataset.on = mode==="jamaat"?"1":"0";
+    document.getElementById('m-beg').dataset.on = mode==="begins"?"1":"0";
+    renderMonth();
+  };
+  document.getElementById('m-jam').addEventListener('click',()=>setMode("jamaat"));
+  document.getElementById('m-beg').addEventListener('click',()=>setMode("begins"));
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('sheet').dataset.open==="1") closeMonth();
+  });
+}
+
+function initNav(){
+  document.getElementById('prev').addEventListener('click',()=>goto(addDays(VIEW,-1)));
+  document.getElementById('next').addEventListener('click',()=>goto(addDays(VIEW,1)));
+  document.getElementById('chip-today').addEventListener('click',()=>goto(today0()));
+  document.getElementById('chip-tom').addEventListener('click',()=>goto(addDays(today0(),1)));
+  document.getElementById('chip-fri').addEventListener('click',()=>goto(nextJummah()));
+  document.getElementById('daypick').addEventListener('click',()=>{
+    const el=document.getElementById('datein');
+    if(el.showPicker) { try{ el.showPicker(); }catch(e){ el.focus(); } } else el.focus();
+  });
+  document.getElementById('datein').addEventListener('change',e=>{
+    if(!e.target.value) return;
+    const [Y,M,D]=e.target.value.split("-").map(Number);
+    goto(new Date(Y,M-1,D));
+  });
+  // swipe between days
+  let x0=null;
+  const hero=document.querySelector('.hero');
+  hero.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
+  hero.addEventListener('touchend',e=>{
+    if(x0===null) return;
+    const dx=e.changedTouches[0].clientX-x0; x0=null;
+    if(Math.abs(dx)<50) return;
+    goto(addDays(VIEW, dx<0?1:-1));
+  },{passive:true});
+  // keyboard
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+    if(document.getElementById('sheet').dataset.open==="1") return;
+    if(e.key==='ArrowLeft') goto(addDays(VIEW,-1));
+    if(e.key==='ArrowRight') goto(addDays(VIEW,1));
+    if(e.key.toLowerCase()==='t') goto(today0());
+  });
+}
+
+function endedState(){
+  document.getElementById('next-en').textContent="Timetable ended";
+  document.getElementById('next-ar').textContent="";
+  document.getElementById('count').innerHTML="—";
+  document.getElementById('subline').textContent="The loaded timetable has no further dates.";
+  document.getElementById('track').style.width='0%';
+  status("This app's timetable has ended. Please update the app / check the masjid noticeboard for current times.");
+}
+
+function tick(){
+  const now=new Date();
+  if(!VIEW || !sameDay(VIEW, today0())) return;   // live countdown is for today only
+
+  // midnight rollover: move the view onto the new day
+  if(ymd(now)!==STATE.key){
+    if(!dayRec(now)){ endedState(); return; }
+    VIEW=today0();
+    render();
+    return;
+  }
+
+  const rec=STATE.rec, base=STATE.base;
+  const nx=computeNext(rec, base, now);
+  if(!nx){ endedState(); return; }   // after final Isha of the dataset
+
+  const m=meta(nx.key);
+  document.getElementById('next-en').textContent=m.en;
+  document.getElementById('next-ar').textContent=m.ar;
+
+  let diff=Math.max(0, Math.floor((nx.at-now)/1000));
+  const h=Math.floor(diff/3600), mn=Math.floor((diff%3600)/60), s=diff%60;
+  const cEl=document.getElementById('count');
+  if(h>0) cEl.innerHTML=`${h}<small>h</small> ${String(mn).padStart(2,'0')}<small>m</small> ${String(s).padStart(2,'0')}<small>s</small>`;
+  else cEl.innerHTML=`${String(mn).padStart(2,'0')}<small>:</small>${String(s).padStart(2,'0')}<small></small>`;
+
+  const srcRec = nx.tomorrow ? nx.tomorrowRec : rec;
+  const jt = srcRec.jamaat[nx.key];
+  const bt = srcRec.begins[nx.key];
+  document.getElementById('subline').innerHTML =
+    `Jamā&#703;ah <b>${hm12(jt)}</b>${bt?` &middot; Begins ${hm12(bt)}`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
+
+  // progress begins→jamaat for the upcoming prayer (today only)
+  const beginsAt = (bt && !nx.tomorrow) ? atToday(base, bt) : null;
+  let pct=0;
+  if(beginsAt){
+    const span=nx.at-beginsAt;
+    pct = span>0 ? Math.min(100, Math.max(0, (now-beginsAt)/span*100)) : 0;
+  }
+  document.getElementById('track').style.width=pct+'%';
+
+  // refresh time-window reminders (morning/evening adhkār) on the minute
+  if(now.getSeconds()===0){ const keep=RM_IDX; renderReminder(); RM_IDX=keep; }
+
+  markRows(rec, base, now);
+}
+
+/* ---------------- tabs ---------------- */
+function initTabs(){
+  const tabs=[...document.querySelectorAll('.tab')];
+  tabs.forEach(b=>b.addEventListener('click',()=>{
+    const name=b.dataset.tab;
+    tabs.forEach(t=>t.dataset.on = t===b ? "1" : "0");
+    ["times","qibla","alerts"].forEach(n=>{
+      document.getElementById("tab-"+n).hidden = (n!==name);
+    });
+    window.scrollTo({top:0,behavior:"instant"});
+    if(name==="qibla") drawTicks();
+  }));
+}
+
+/* ---------------- qibla ----------------
+   Bearing is the great-circle initial bearing to the Kaaba.
+   Default origin is the masjid itself; if the user allows location,
+   we recompute from where they actually are.
+   Cross-check: from Taiyabah this gives 118.3°, matching the
+   published Qibla direction for Bolton (118°).
+--------------------------------------- */
+const KAABA={lat:21.4224779, lon:39.8251832};
+const MASJID={lat:53.5869, lon:-2.4361, name:"Taiyabah Masjid"};
+let QIBLA=null, HEADING=null;
+
+function toRad(d){return d*Math.PI/180;}
+function qiblaBearing(lat,lon){
+  const p1=toRad(lat), p2=toRad(KAABA.lat), dl=toRad(KAABA.lon-lon);
+  const y=Math.sin(dl)*Math.cos(p2);
+  const x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+function kmToKaaba(lat,lon){
+  const R=6371, p1=toRad(lat), p2=toRad(KAABA.lat);
+  const dp=toRad(KAABA.lat-lat), dl=toRad(KAABA.lon-lon);
+  const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function drawTicks(){
+  const el=document.getElementById('ticks');
+  if(el.childElementCount) return;
+  const r=el.clientWidth/2 || 130;
+  let h="";
+  for(let i=0;i<72;i++){
+    const major=i%6===0;
+    h+=`<i style="transform-origin:50% ${r-6}px;transform:translateX(-50%) rotate(${i*5}deg);
+         height:${major?9:5}px;opacity:${major?.9:.5}"></i>`;
+  }
+  el.innerHTML=h;
+}
+
+function setQibla(lat,lon,fromLabel){
+  const b=qiblaBearing(lat,lon), d=kmToKaaba(lat,lon);
+  QIBLA=b;
+  const bt=`${b.toFixed(0)}°`;
+  document.getElementById('q-bearing').textContent=bt;
+  document.getElementById('q-b2').textContent=`${b.toFixed(1)}° true`;
+  document.getElementById('q-d2').textContent=`${Math.round(d).toLocaleString()} km`;
+  document.getElementById('q-from').textContent=fromLabel;
+  document.getElementById('q-src').textContent=fromLabel==="Your location"?"From your location":"From the masjid";
+  document.getElementById('q-sub').textContent=`from true north · ${Math.round(d).toLocaleString()} km to Makkah`;
+  renderCompass();
+}
+
+function renderCompass(){
+  const ring=document.getElementById('dial-ring');
+  const needle=document.getElementById('needle');
+  if(QIBLA===null) return;
+  if(HEADING===null){
+    // no compass: dial stays north-up, needle points at the absolute bearing
+    ring.style.transform="rotate(0deg)";
+    needle.style.transform=`rotate(${QIBLA}deg)`;
+  }else{
+    // live: rotate the dial so it stays aligned to north as the phone turns
+    ring.style.transform=`rotate(${-HEADING}deg)`;
+    needle.style.transform=`rotate(${QIBLA-HEADING}deg)`;
+  }
+}
+
+function compassBlockers(){
+  const out=[];
+  if(!window.isSecureContext) out.push("this page isn't on https");
+  if(window.self!==window.top) out.push("it's running inside a preview frame");
+  return out;
+}
+
+function startCompass(){
+  const btn=document.getElementById('q-start');
+  const note=document.getElementById('q-note');
+  let events=0;
+
+  const blockers=compassBlockers();
+  if(blockers.length){
+    note.textContent="The compass can't run here because "+blockers.join(" and ")+
+      ". Open the app from its web address on your phone and it will work. The bearing above is correct either way.";
+    return;
+  }
+
+  const onOrient=e=>{
+    let h=null;
+    if(typeof e.webkitCompassHeading==="number") h=e.webkitCompassHeading;      // iOS, true north
+    else if(e.absolute && typeof e.alpha==="number") h=(360-e.alpha)%360;       // Android absolute
+    if(h===null) return;
+    events++; HEADING=h; renderCompass();
+    if(events===1){
+      btn.textContent="Compass on";
+      note.textContent="Hold the phone flat and turn until the gold marker is at the top. Compasses drift near metal — a figure-of-eight motion recalibrates.";
+    }
+  };
+
+  const attach=()=>{
+    window.addEventListener('deviceorientationabsolute', onOrient, true);
+    window.addEventListener('deviceorientation', onOrient, true);
+    btn.disabled=true;
+    btn.textContent="Starting compass…";
+    note.textContent="Move the phone slightly to wake the compass.";
+    setTimeout(()=>{
+      if(events===0){
+        btn.disabled=false;
+        btn.textContent="Try the compass again";
+        note.textContent="No compass readings came through. This device may not have a magnetometer, or it needs calibrating — move it in a figure-of-eight. The bearing above works with any compass app.";
+      }
+    }, 3000);
+  };
+
+  const D=window.DeviceOrientationEvent;
+  if(D && typeof D.requestPermission==="function"){
+    D.requestPermission().then(r=>{
+      if(r==="granted") attach();
+      else note.textContent="Compass access was declined. You can allow motion & orientation access in Settings → Safari, or use the bearing above with a compass app.";
+    }).catch(()=>{
+      note.textContent="This device wouldn't allow compass access — it usually needs the page opened directly over https. The bearing above still works with a compass app.";
+    });
+  }else if('ondeviceorientationabsolute' in window || 'ondeviceorientation' in window){
+    attach();
+  }else{
+    note.textContent="This device has no compass. Face "+Math.round(QIBLA)+"° using a compass app, or follow the mihrab in the masjid.";
+    btn.disabled=true;
+  }
+}
+
+function initQibla(){
+  setQibla(MASJID.lat, MASJID.lon, MASJID.name);
+  document.getElementById('q-start').addEventListener('click',()=>{
+    startCompass();
+    // refine the bearing from the user's own position, if they allow it
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        p=>setQibla(p.coords.latitude,p.coords.longitude,"Your location"),
+        ()=>{}, {timeout:8000, maximumAge:600000});
+    }
+  });
+}
+
+/* ---------------- notifications ---------------- */
+const prefStore=(()=>{
+  let mem={};
+  const ok=(()=>{try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
+  return {
+    get(k,f){try{const v=ok?localStorage.getItem(k):mem[k];return v?JSON.parse(v):f;}catch(e){return f;}},
+    set(k,v){try{const s=JSON.stringify(v);if(ok)localStorage.setItem(k,s);else mem[k]=s;}catch(e){}}
+  };
+})();
+
+function currentPrefs(){
+  return {
+    jam:document.getElementById('tg-jam').checked,
+    mins:document.getElementById('mins').value,
+    jan:document.getElementById('tg-jan').checked,
+    ann:document.getElementById('tg-ann').checked,
+    evt:document.getElementById('tg-evt').checked,
+  };
+}
+
+function summarise(p){
+  const on=[];
+  if(p.jam) on.push(`Jamāʿah (${p.mins} min before)`);
+  if(p.jan) on.push("Janāzah");
+  if(p.ann) on.push("Announcements");
+  if(p.evt) on.push("Events");
+  return on.length ? on.join(" · ") : "No alerts selected";
+}
+
+function showCollapsed(p){
+  document.getElementById('a-panel').hidden=true;
+  document.getElementById('a-done').hidden=false;
+  document.getElementById('a-summary').textContent=summarise(p);
+  document.getElementById('a-done').querySelector('.dn-1').textContent =
+    (p.jam||p.jan||p.ann||p.evt) ? "Notifications on" : "Notifications off";
+}
+
+function showPanel(){
+  document.getElementById('a-done').hidden=true;
+  document.getElementById('a-panel').hidden=false;
+}
+
+function applyPrefs(p){
+  document.getElementById('tg-jam').checked=p.jam;
+  document.getElementById('tg-jan').checked=p.jan;
+  document.getElementById('tg-ann').checked=p.ann;
+  document.getElementById('tg-evt').checked=p.evt;
+  document.getElementById('mins').value=p.mins;
+  document.getElementById('mins').disabled=!p.jam;
+}
+
+function initAlerts(){
+  const btn=document.getElementById('enable');
+  const toggles=document.getElementById('toggles');
+  const note=document.getElementById('wirednote');
+  const lead=document.getElementById('a-lead');
+
+  const unlock=()=>{
+    btn.dataset.on="1";
+    btn.textContent="Notifications enabled on this device";
+    toggles.classList.add('live');
+    lead.textContent="Choose what you'd like to be told about.";
+    note.textContent="Delivery starts once the masjid's notification service is connected.";
+  };
+
+  btn.addEventListener('click', async ()=>{
+    if(btn.dataset.on==="1") return;
+    try{ if('Notification' in window) await Notification.requestPermission(); }catch(e){}
+    unlock();
+  });
+
+  document.getElementById('tg-jam').addEventListener('change',e=>{
+    document.getElementById('mins').disabled=!e.target.checked;
+  });
+
+  document.getElementById('a-save').addEventListener('click',()=>{
+    const p=currentPrefs();
+    prefStore.set("alerts",p);
+    prefStore.set("alertsSet",true);
+    showCollapsed(p);
+    document.getElementById('a-done').scrollIntoView({block:"nearest",behavior:"smooth"});
+  });
+
+  document.getElementById('a-done').addEventListener('click',()=>{
+    showPanel(); unlock();
+  });
+
+  // restore a previous choice → stay collapsed
+  if(prefStore.get("alertsSet",false)){
+    const p=prefStore.get("alerts",null);
+    if(p){ applyPrefs(p); unlock(); showCollapsed(p); }
+  }
+}
+
+/* ---------------- boot ---------------- */
+function boot(){
+  initAlerts();
+  const rec=dayRec(new Date());
+  if(!rec){ endedState(); return; }
+  initNav();
+  initMonth();
+  initReminders();
+  initTabs();
+  initQibla();
+  VIEW=today0();
+  status(null);
+  render();
+  setInterval(tick, 1000);
+}
+boot();
+
+/* service worker (deployment only; harmless if unsupported/sandboxed) */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
+</script>
+
+</body>
+</html>

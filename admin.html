@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0C3B2A" />
+<title>Send a notification — Taiyabah Masjid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#0C3B2A; --green-800:#124A36; --green-700:#1A5C44; --green-600:#237552;
+    --gold:#C6A24C; --gold-bright:#DCBB63;
+    --paper:#F5F1E8; --card:#FCFAF3; --ink:#1B2621; --muted:#6E7C74; --line:#E4DECF;
+    --danger:#B4532F; --danger-bg:#FBF0EB;
+    --shadow:0 1px 2px rgba(12,59,42,.06), 0 12px 30px -18px rgba(12,59,42,.35);
+    font-family:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);max-width:560px;margin-inline:auto;
+    min-height:100dvh;padding-bottom:44px;-webkit-font-smoothing:antialiased}
+  .display{font-family:"Fraunces",Georgia,serif}
+
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;padding:14px 20px;
+    background:linear-gradient(180deg,var(--green-900),var(--green-800));color:#F3EFE3;
+    border-bottom:1px solid rgba(198,162,76,.25)}
+  .mark{width:28px;height:28px;color:var(--gold-bright);flex:0 0 auto}
+  .topbar h1{font-size:15.5px;font-weight:600;line-height:1.1}
+  .topbar p{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#A9BBB0;margin-top:2px}
+  .backlink{margin-left:auto;font-size:12px;color:var(--gold-bright);text-decoration:none;
+    border:1px solid rgba(198,162,76,.4);border-radius:999px;padding:5px 10px}
+
+  .wrap{padding:18px 16px 0}
+  .sec-h{display:flex;align-items:center;gap:10px;margin:22px 4px 11px}
+  .sec-h:first-child{margin-top:4px}
+  .sec-h h2{font-family:"Fraunces",serif;font-size:14.5px;font-weight:600}
+  .sec-h .rule{flex:1;height:1px;background:var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:15px}
+
+  label.fl{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 7px 2px}
+  input[type=text],textarea,select{width:100%;font:inherit;font-size:15px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+  textarea{resize:vertical;min-height:78px;line-height:1.45}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+  .fieldrow{margin-bottom:14px}
+  .counter{font-size:11.5px;color:var(--muted);text-align:right;margin-top:5px}
+  .counter.over{color:var(--danger);font-weight:600}
+
+  /* topic picker */
+  .topics{display:grid;gap:8px}
+  .topic{display:flex;align-items:center;gap:11px;cursor:pointer;padding:11px 12px;
+    border:1px solid var(--line);border-radius:12px;background:#fff}
+  .topic input{margin:0;accent-color:var(--green-600);width:17px;height:17px;flex:0 0 auto}
+  .topic .tt{flex:1;min-width:0}
+  .topic .tn{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .topic .td{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .topic[data-sel="1"]{border-color:var(--green-600);background:#F1F7F3}
+  .badge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    border-radius:999px;padding:2px 6px}
+  .badge.urgent{color:var(--danger);border:1px solid rgba(180,83,47,.35)}
+  .badge.low{color:var(--muted);border:1px solid var(--line)}
+
+  /* templates */
+  .tpls{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .tpl{cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:999px;
+    border:1px dashed var(--line);background:#fff;color:var(--muted)}
+  .tpl:hover{border-style:solid;color:var(--ink)}
+
+  /* lock screen preview */
+  .phone{background:linear-gradient(160deg,#12251C,#0C3B2A 60%,#16412F);border-radius:22px;
+    padding:26px 14px 30px;position:relative;overflow:hidden}
+  .phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);
+    width:74px;height:5px;border-radius:99px;background:rgba(255,255,255,.18)}
+  .lock-time{text-align:center;color:#EFEFE7;font-size:34px;font-weight:300;letter-spacing:-.5px;margin:6px 0 2px}
+  .lock-date{text-align:center;color:rgba(255,255,255,.6);font-size:12px;margin-bottom:18px}
+  .notif{display:flex;gap:10px;background:rgba(245,243,235,.94);border-radius:15px;padding:11px 12px;
+    box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+  .nicon{width:34px;height:34px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--green-800);color:var(--gold-bright)}
+  .nicon svg{width:20px;height:20px}
+  .nbody{flex:1;min-width:0}
+  .nhead{display:flex;align-items:baseline;gap:6px;font-size:11px;color:#5C6862}
+  .nhead .app{font-weight:700;letter-spacing:.02em;text-transform:uppercase;font-size:10px}
+  .nhead .when{margin-left:auto;flex:0 0 auto}
+  .ntitle{font-size:14px;font-weight:700;margin-top:3px;word-wrap:break-word}
+  .ntext{font-size:13.5px;color:#2C3833;margin-top:1px;line-height:1.35;word-wrap:break-word}
+
+  /* reach guard */
+  .guard{margin-top:14px;border-radius:12px;padding:12px 13px;font-size:12.5px;line-height:1.5;
+    background:#F1F7F3;border:1px solid #D6E5DB;color:#31473C}
+  .guard.hot{background:var(--danger-bg);border-color:#EBCDBF;color:#7C3A20}
+  .guard b{font-weight:700}
+
+  .send{width:100%;margin-top:15px;border:none;cursor:pointer;font:inherit;font-weight:700;font-size:15.5px;
+    color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
+    padding:15px;border-radius:13px;box-shadow:var(--shadow);letter-spacing:.2px}
+  .send:disabled{opacity:.45;cursor:default}
+  .sendnote{font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.5}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,120%);z-index:60;
+    background:var(--green-800);color:#F3EFE3;font-size:13.5px;font-weight:600;
+    padding:12px 18px;border-radius:999px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1);max-width:90vw;text-align:center}
+  .toast.show{transform:translate(-50%,0)}
+
+  /* history */
+  .hist .h{display:flex;gap:10px;align-items:flex-start;padding:12px 2px;border-top:1px solid var(--line)}
+  .hist .h:first-child{border-top:none}
+  .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 auto;background:var(--green-600)}
+  .dot.urgent{background:var(--danger)}
+  .hist .ht{flex:1;min-width:0}
+  .hist .h1{font-size:14px;font-weight:600}
+  .hist .h2{font-size:12.5px;color:var(--muted);margin-top:1px;line-height:1.4}
+  .hist .h3{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.04em;text-transform:uppercase}
+  .empty{font-size:13px;color:var(--muted);text-align:center;padding:16px 8px;line-height:1.5}
+
+  .demo{margin:20px 4px 0;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+  .demo b{color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+    <div>
+      <h1>Send a notification</h1>
+      <p>Taiyabah Masjid</p>
+    </div>
+    <a class="backlink" href="index.html">App</a>
+  </div>
+
+  <div class="wrap">
+    <div class="sec-h"><h2>Who should get this</h2><span class="rule"></span></div>
+    <div class="card">
+      <div class="topics" id="topics">
+        <label class="topic" data-sel="0">
+          <input type="radio" name="topic" value="jamaah" data-label="Jamāʿah reminders" data-share="most">
+          <span class="tt"><span class="tn">Jamāʿah reminders</span><span class="td">People who asked for prayer-time nudges</span></span>
+        </label>
+        <label class="topic" data-sel="1">
+          <input type="radio" name="topic" value="janazah" checked data-label="Janāzah" data-share="most" data-urgent="1">
+          <span class="tt"><span class="tn">Janāzah <span class="badge urgent">Urgent</span></span><span class="td">Funeral prayer — time-critical, goes to nearly everyone</span></span>
+        </label>
+        <label class="topic" data-sel="0">
+          <input type="radio" name="topic" value="announcements" data-label="Announcements" data-share="most">
+          <span class="tt"><span class="tn">Announcements</span><span class="td">Timetable changes, Ramadan, Eid</span></span>
+        </label>
+        <label class="topic" data-sel="0">
+          <input type="radio" name="topic" value="events" data-label="Events &amp; talks" data-share="few">
+          <span class="tt"><span class="tn">Events &amp; talks <span class="badge low">Opt-in</span></span><span class="td">Bayaans, classes, community events</span></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="sec-h"><h2>Message</h2><span class="rule"></span></div>
+    <div class="card">
+      <div class="tpls" id="tpls"></div>
+      <div class="fieldrow">
+        <label class="fl" for="title">Title</label>
+        <input type="text" id="title" maxlength="70" placeholder="Janāzah today" autocomplete="off">
+        <div class="counter" id="c-title">0 / 40 shown on a locked phone</div>
+      </div>
+      <div class="fieldrow" style="margin-bottom:4px">
+        <label class="fl" for="msg">Message</label>
+        <textarea id="msg" maxlength="220" placeholder="Janāzah salah for the late [name] will be held after Zuhr jamāʿah today."></textarea>
+        <div class="counter" id="c-msg">0 / 120 shown on a locked phone</div>
+      </div>
+    </div>
+
+    <div class="sec-h"><h2>How it will look</h2><span class="rule"></span></div>
+    <div class="phone">
+      <div class="lock-time" id="lt">--:--</div>
+      <div class="lock-date" id="ld">—</div>
+      <div class="notif">
+        <div class="nicon"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg></div>
+        <div class="nbody">
+          <div class="nhead"><span class="app">Taiyabah Masjid</span><span class="when">now</span></div>
+          <div class="ntitle" id="p-title">Janāzah today</div>
+          <div class="ntext" id="p-msg">Your message will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guard" id="guard">—</div>
+    <button class="send" id="send">Send notification</button>
+    <p class="sendnote" id="sendnote">Demo mode — sends to this device only.</p>
+
+    <div class="sec-h"><h2>Recently sent</h2><span class="rule"></span></div>
+    <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
+
+    <p class="demo"><b>Demo build.</b> Notifications appear on this device only. Connecting a push service (e.g. OneSignal) delivers to every congregant who opted in — no change to this screen.</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ---------- tiny storage that degrades to memory (sandbox-safe) ---------- */
+const store = (()=>{
+  let mem={};
+  const ok=(()=>{ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
+  return {
+    get(k,f){ try{ const v= ok? localStorage.getItem(k) : mem[k]; return v?JSON.parse(v):f; }catch(e){ return f; } },
+    set(k,v){ try{ const s=JSON.stringify(v); if(ok) localStorage.setItem(k,s); else mem[k]=s; }catch(e){} }
+  };
+})();
+
+const TEMPLATES = {
+  janazah: [
+    {label:"Janāzah — after prayer", title:"Janāzah today",
+     msg:"Janāzah salah for the late [name] will be held after [prayer] jamāʿah today at the masjid."},
+    {label:"Janāzah — set time", title:"Janāzah today",
+     msg:"Janāzah salah for the late [name] will be held today at [time] at the masjid."},
+  ],
+  announcements: [
+    {label:"Timetable change", title:"Jamāʿah time change",
+     msg:"From [date], [prayer] jamāʿah will move to [time]. Please check the app for updated times."},
+    {label:"Ramadan", title:"Ramadan begins",
+     msg:"Taraweeh will begin after Isha jamāʿah tonight. Full timetable is in the app."},
+    {label:"Eid", title:"Eid salah times",
+     msg:"Eid salah will be held at [time] on [date]. Please arrive early — additional hall in use."},
+  ],
+  jamaah: [
+    {label:"Jumuʿah reminder", title:"Jumuʿah today",
+     msg:"1st Jumuʿah at [time], 2nd Jumuʿah at [time]. Please arrive early for a place in the main hall."},
+  ],
+  events: [
+    {label:"Bayaan", title:"Bayaan this [day]",
+     msg:"[Speaker] will deliver a bayaan after [prayer] jamāʿah on [day]. All welcome."},
+    {label:"Madrasah", title:"Madrasah notice",
+     msg:"[Detail]. Please contact the office for more information."},
+  ],
+};
+
+const $ = id => document.getElementById(id);
+const titleEl=$("title"), msgEl=$("msg");
+
+function topicInput(){ return document.querySelector('input[name="topic"]:checked'); }
+
+function renderTemplates(){
+  const t=topicInput().value;
+  const list=TEMPLATES[t]||[];
+  $("tpls").innerHTML = list.map((x,i)=>`<button class="tpl" data-i="${i}">${x.label}</button>`).join("");
+  [...document.querySelectorAll(".tpl")].forEach(b=>{
+    b.addEventListener("click",()=>{
+      const x=list[+b.dataset.i];
+      titleEl.value=x.title; msgEl.value=x.msg; update();
+      msgEl.focus();
+    });
+  });
+}
+
+function updateGuard(){
+  const inp=topicInput();
+  const urgent=inp.dataset.urgent==="1";
+  const wide=inp.dataset.share==="most";
+  const g=$("guard");
+  g.classList.toggle("hot", urgent);
+  if(urgent){
+    g.innerHTML=`<b>This reaches nearly every congregant, immediately.</b> Janāzah alerts are why people keep notifications switched on — send these, and keep routine notices to the other categories.`;
+  }else if(wide){
+    g.innerHTML=`Goes to everyone subscribed to <b>${inp.dataset.label}</b>. People mute apps that message too often — if it can wait for Jumuʿah, it probably should.`;
+  }else{
+    g.innerHTML=`Goes only to people who opted in to <b>${inp.dataset.label}</b>. A smaller, interested audience — lower risk of fatigue.`;
+  }
+}
+
+function update(){
+  const t=titleEl.value.trim(), m=msgEl.value.trim();
+  $("p-title").textContent = t || "Your title";
+  $("p-msg").textContent = m || "Your message will appear here.";
+  const ct=$("c-title"), cm=$("c-msg");
+  ct.textContent=`${t.length} / 40 shown on a locked phone`;
+  cm.textContent=`${m.length} / 120 shown on a locked phone`;
+  ct.classList.toggle("over", t.length>40);
+  cm.classList.toggle("over", m.length>120);
+  $("send").disabled = !(t && m);
+  updateGuard();
+}
+
+function clock(){
+  const d=new Date();
+  $("lt").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  $("ld").textContent=d.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+}
+
+function toast(msg){
+  const el=$("toast"); el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 3200);
+}
+
+function renderHistory(){
+  const items=store.get("sent",[]);
+  const h=$("hist");
+  if(!items.length){ h.innerHTML='<div class="empty">Nothing sent yet. Messages you send will be listed here.</div>'; return; }
+  h.innerHTML=items.slice(0,8).map(x=>`
+    <div class="h">
+      <span class="dot ${x.urgent?'urgent':''}"></span>
+      <div class="ht">
+        <div class="h1">${esc(x.title)}</div>
+        <div class="h2">${esc(x.msg)}</div>
+        <div class="h3">${esc(x.topic)} · ${new Date(x.at).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+      </div>
+    </div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ---------- sending ----------
+   DEMO: raises a real notification on this device.
+   PRODUCTION: replace deliver() with a call to your push provider, e.g.
+     await fetch("https://api.onesignal.com/notifications", {...  filters: [{field:"tag", key:"topic", value: topic}] })
+   The rest of this screen stays exactly the same.
+------------------------------- */
+async function deliver(title, body, tag){
+  if(!("Notification" in window)) throw new Error("unsupported");
+  let perm=Notification.permission;
+  if(perm==="default") perm=await Notification.requestPermission();
+  if(perm!=="granted") throw new Error("denied");
+  const opts={body, tag, icon:"icon-192.png", badge:"icon-192.png"};
+  if("serviceWorker" in navigator){
+    const reg=await navigator.serviceWorker.getRegistration();
+    if(reg){ await reg.showNotification(title, opts); return; }
+  }
+  new Notification(title, opts);
+}
+
+$("send").addEventListener("click", async ()=>{
+  const inp=topicInput();
+  const title=titleEl.value.trim(), msg=msgEl.value.trim();
+  if(!title||!msg) return;
+  if(inp.dataset.urgent==="1" && !confirm(`Send this Janāzah alert now?\n\n${title}\n${msg}`)) return;
+
+  const rec={title,msg,topic:inp.dataset.label,urgent:inp.dataset.urgent==="1",at:Date.now()};
+  const items=store.get("sent",[]); items.unshift(rec); store.set("sent",items.slice(0,20));
+  renderHistory();
+
+  try{
+    await deliver(title, msg, inp.value);
+    toast("Sent — check your notifications");
+  }catch(e){
+    toast(e.message==="denied"
+      ? "Notifications are blocked for this site"
+      : "Saved. This browser can't show notifications here");
+  }
+});
+
+document.querySelectorAll('input[name="topic"]').forEach(r=>{
+  r.addEventListener("change",()=>{
+    document.querySelectorAll(".topic").forEach(t=>t.dataset.sel = t.contains(topicInput())?"1":"0");
+    renderTemplates(); update();
+  });
+});
+titleEl.addEventListener("input",update);
+msgEl.addEventListener("input",update);
+
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+renderTemplates(); update(); clock(); renderHistory();
+setInterval(clock, 10000);
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "Taiyabah Masjid — Salah Times",
+  "short_name": "Taiyabah",
+  "description": "Prayer and jamaʿah times, plus alerts, for Taiyabah Masjid, Bolton.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C3B2A",
+  "theme_color": "#0C3B2A",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
