@@ -1730,16 +1730,37 @@ function buildTimetable(rec, baseDate){
 }
 
 function markRows(rec, baseDate, now){
-  // find current (last passed) + next jamaat among today's order
   const rows = [...document.querySelectorAll('.row[data-key]')];
   rows.forEach(r=>{r.classList.remove('is-current','is-next');const s=r.querySelector('.pill-slot');if(s)s.innerHTML='';});
   if(!now) return;   // viewing another day — no Now/Next markers
-  let currentKey=null, nextKey=null;
+
+  /* Which prayer is it right now?
+     A prayer's time starts at its BEGINNING time, not its jamāʿah.
+     Windows:
+       Fajr     begins → sunrise            (ends at sunrise, not Zuhr)
+       Zuhr     begins → Asr begins
+       Asr      begins → Maghrib
+       Maghrib  begins → Isha begins
+       Isha     begins → next day's Fajr    (so it holds past midnight)
+     Between sunrise and Zuhr there is no prayer time — nothing is marked. */
+  const at = t => atToday(baseDate, t);
+  const b  = rec.begins;
+  let currentKey = null;
+
+  if(now < at(b.fajr))                                   currentKey = "isha";      // before dawn
+  else if(now < at(b.sunrise))                           currentKey = "fajr";
+  else if(now < at(b.zuhr))                              currentKey = null;        // after sunrise
+  else if(now < at(b.asr))                               currentKey = "zuhr";
+  else if(now < at(b.maghrib))                           currentKey = "asr";
+  else if(now < at(b.isha))                              currentKey = "maghrib";
+  else                                                   currentKey = "isha";
+
+  // next jamāʿah still to come today
+  let nextKey = null;
   for(const k of JAMAAT_ORDER){
-    const t = atToday(baseDate, rec.jamaat[k]);
-    if(t<=now) currentKey=k;
-    else if(!nextKey) nextKey=k;
+    if(atToday(baseDate, rec.jamaat[k]) > now){ nextKey = k; break; }
   }
+
   const set=(key,cls,label)=>{
     if(!key) return;
     const row=document.querySelector(`.row[data-key="${key}"]`);
@@ -1749,7 +1770,9 @@ function markRows(rec, baseDate, now){
     if(slot && label) slot.innerHTML=`<span class="pill ${label==='Now'?'now':'next'}">${label}</span>`;
   };
   set(currentKey,'is-current','Now');
-  set(nextKey,'is-next','Next');
+  // don't label the same row twice — "Now" already says it
+  if(nextKey && nextKey!==currentKey) set(nextKey,'is-next','Next');
+  else if(nextKey) document.querySelector(`.row[data-key="${nextKey}"]`)?.classList.add('is-next');
 }
 
 /* countdown to the next jamaat (rolls to tomorrow's Fajr after Isha) */
