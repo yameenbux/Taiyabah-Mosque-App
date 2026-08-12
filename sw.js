@@ -5,7 +5,7 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v50";
+const CACHE = "taiyabah-v51";
 const SHELL = ["./index.html", "./admin.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
 
 self.addEventListener("install", (e) => {
@@ -22,6 +22,8 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+  // never intercept the OneSignal worker scope
+  if (new URL(e.request.url).pathname.includes("/push/onesignal/")) return;
   const url = new URL(e.request.url);
 
   // Timetable data: network-first so committee corrections reach devices,
