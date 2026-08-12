@@ -142,6 +142,21 @@
   .salam .ar{font-size:25px;color:var(--gold-bright);line-height:1.5;letter-spacing:.5px}
   .salam .tr{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#A78F9E}
 
+  .dv-lines{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .dvl{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+    padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.10)}
+  .dvl:last-child{border-bottom:none;padding-bottom:0}
+  .dvl-k{font-size:14px;color:#D5C7D0}
+  .dvl-v{font-size:23px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+  .dvl.sm .dvl-k{font-size:13px}
+  .dvl.sm .dvl-v{font-size:18px}
+  /* Jumuʿah becomes the headline of the day */
+  #mode-date[data-fri="1"] .eyebrow{
+    font-family:"Fraunces",Georgia,serif;font-size:40px;font-weight:600;
+    letter-spacing:-.5px;text-transform:none;color:var(--gold-bright);
+    line-height:1.1;margin:2px 0 0;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .dv-ar{font-size:28px;color:#D5C7D0;font-weight:400}
+
   /* ---- Friday call to give ---- */
   .jcall{margin-top:20px;padding:16px 15px 15px;border-radius:15px;text-align:center;
     background:linear-gradient(180deg,rgba(198,162,76,.16),rgba(198,162,76,.07));
@@ -607,10 +622,7 @@
     <!-- day view: any other date -->
     <div id="mode-date" hidden>
       <div class="eyebrow" id="dv-eyebrow">Viewing</div>
-      <div class="nextname">
-        <span class="en display" id="dv-date">—</span>
-      </div>
-      <div class="subline" id="dv-sub" style="margin-top:8px">—</div>
+      <div class="dv-lines" id="dv-sub">—</div>
     </div>
 
     <div class="jcall" id="jcall" hidden>
@@ -1610,15 +1622,28 @@ function updateNavUI(){
 /* render the hero for a non-today date */
 function renderDayView(rec){
   document.getElementById('mode-today').hidden=true;
-  document.getElementById('mode-date').hidden=false;
+  const md=document.getElementById('mode-date');
+  md.hidden=false;
   document.getElementById('livedot').style.display='none';
-  const isFri = VIEW.getDay()===5;
-  document.getElementById('dv-eyebrow').textContent = isFri ? "Jumuʿah" : "Jamāʿah times";
-  document.getElementById('dv-date').textContent =
-    `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
-  document.getElementById('dv-sub').innerHTML = isFri && rec.jummah && rec.jummah.first
-    ? `1st Jumuʿah <b>${hm12(rec.jummah.first)}</b>${rec.jummah.second?` &middot; 2nd Jumuʿah <b>${hm12(rec.jummah.second)}</b>`:''}`
-    : `Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Maghrib <b>${hm12(rec.jamaat.maghrib)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
+  const isFri = VIEW.getDay()===5 && rec.jummah && rec.jummah.first;
+  md.dataset.fri = isFri ? "1" : "0";
+
+  // On Fridays the day itself is the headline — times live in the timetable below.
+  document.getElementById('dv-eyebrow').innerHTML = isFri
+    ? 'Jumu&#703;ah <span class="dv-ar arabic">الجمعة</span>'
+    : 'Jamā&#703;ah times';
+
+  const sub=document.getElementById('dv-sub');
+  if(isFri){
+    sub.hidden=true;
+    sub.innerHTML='';
+  }else{
+    sub.hidden=false;
+    sub.innerHTML =
+      `<div class="dvl sm"><span class="dvl-k">Fajr</span><span class="dvl-v">${hm12(rec.jamaat.fajr)}</span></div>` +
+      `<div class="dvl sm"><span class="dvl-k">Maghrib</span><span class="dvl-v">${hm12(rec.jamaat.maghrib)}</span></div>` +
+      `<div class="dvl sm"><span class="dvl-k">Isha</span><span class="dvl-v">${hm12(rec.jamaat.isha)}</span></div>`;
+  }
 }
 
 function renderTodayHero(){
