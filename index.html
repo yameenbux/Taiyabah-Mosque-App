@@ -142,6 +142,20 @@
   .salam .ar{font-size:25px;color:var(--gold-bright);line-height:1.5;letter-spacing:.5px}
   .salam .tr{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#A78F9E}
 
+  /* ---- Friday call to give ---- */
+  .jcall{margin-top:20px;padding:16px 15px 15px;border-radius:15px;text-align:center;
+    background:linear-gradient(180deg,rgba(198,162,76,.16),rgba(198,162,76,.07));
+    border:1px solid rgba(198,162,76,.38)}
+  .jc-ar{font-size:18px;line-height:2;color:var(--gold-bright);direction:rtl;margin-bottom:9px}
+  .jc-en{font-family:"Fraunces",Georgia,serif;font-size:14.5px;line-height:1.5;color:#F3EFE3}
+  .jc-src{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#BBA9B4;margin-top:7px}
+  .jc-btn{width:100%;margin-top:14px;border:none;cursor:pointer;font:inherit;font-weight:700;
+    font-size:15px;color:var(--brand-900);letter-spacing:.01em;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    padding:13px;border-radius:12px;box-shadow:0 6px 16px -8px rgba(0,0,0,.5)}
+  .jc-btn:active{transform:translateY(1px)}
+  .jc-note{font-size:11px;letter-spacing:.06em;color:#BBA9B4;margin-top:8px}
+
   /* ---- reminder ribbon ---- */
   .remind{margin:14px 16px 0;padding:13px 14px;border-radius:15px;
     background:linear-gradient(180deg,#FBF6E8,#F7F0DE);border:1px solid #E8DCBC;
@@ -283,7 +297,8 @@
   .lv-vol{display:flex;align-items:center;gap:11px;max-width:230px;margin:20px auto 0;color:#BBA9B4}
   .lv-vol svg{width:18px;height:18px;flex:0 0 auto}
   .lv-vol input{flex:1;accent-color:var(--gold);height:4px}
-  .card.lv-info{padding:4px 16px;margin-top:18px}
+  .card.lv-info{padding:4px 16px;margin-top:4px}
+  .lv-btn{background:none;border:none;font:inherit;cursor:pointer;padding:0}
   .lv-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
     border-top:1px solid var(--line)}
   .lv-row:first-child{border-top:none}
@@ -473,6 +488,9 @@
   .row .name .ar{font-size:14px;color:var(--muted)}
   .row .begins,.row .jam{width:64px;text-align:right;font-size:16px;font-weight:600}
   .row .begins{color:var(--muted);font-weight:500}
+  .jsub{display:block;font-size:11.5px;font-weight:600;color:#9A7A1E;margin-top:4px;
+    letter-spacing:.01em;line-height:1.5}
+  .row.is-jummah{background:rgba(198,162,76,.09)}
   .row.sunrise .en{font-weight:500;color:var(--muted)}
   .row.sunrise .jam{color:var(--line)}
   .row.is-current{background:linear-gradient(90deg, rgba(198,162,76,.14), rgba(198,162,76,.04));
@@ -593,10 +611,14 @@
         <span class="en display" id="dv-date">—</span>
       </div>
       <div class="subline" id="dv-sub" style="margin-top:8px">—</div>
-      <div class="jum-hero" id="dv-jum" hidden>
-        <div class="jh-row"><span class="jh-k">1st Jumu&#703;ah</span><span class="jh-v tnum" id="dv-j1">—</span></div>
-        <div class="jh-row"><span class="jh-k">2nd Jumu&#703;ah</span><span class="jh-v tnum" id="dv-j2">—</span></div>
-      </div>
+    </div>
+
+    <div class="jcall" id="jcall" hidden>
+      <div class="jc-ar arabic">خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ</div>
+      <div class="jc-en">&ldquo;The best day on which the sun has risen is Friday.&rdquo;</div>
+      <div class="jc-src">Ṣaḥīḥ Muslim 854</div>
+      <button class="jc-btn" id="jc-btn">Give this Jumu&#703;ah</button>
+      <div class="jc-note">Support the new Taiyabah Masjid</div>
     </div>
   </section>
 
@@ -909,44 +931,35 @@
     </div>
   </div>
 
-  <div class="sheet" id="live" data-open="0" role="dialog" aria-modal="true" aria-label="Listen live">
-    <div class="scrim" id="lv-scrim"></div>
-    <div class="panel">
-      <div class="sh-top">
-        <h3 style="text-align:left">Listen live</h3>
-        <button class="sh-close" id="lv-close">Done</button>
+  <main id="tab-live" hidden>
+    <section class="lv-hero">
+      <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+
+      <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status">Ready</span></div>
+
+      <button class="lv-play" id="lv-play" aria-label="Play live stream">
+        <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+      </button>
+
+      <div class="lv-title">Taiyabah Masjid</div>
+      <div class="lv-sub">Live from the masjid</div>
+
+      <div class="lv-vol">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <input type="range" id="lv-volume" min="0" max="100" value="100" aria-label="Volume">
       </div>
-      <div class="sh-body">
-        <section class="lv-hero">
-          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+    </section>
 
-          <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status">Ready</span></div>
-
-          <button class="lv-play" id="lv-play" aria-label="Play live stream">
-            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
-          </button>
-
-          <div class="lv-title">Taiyabah Masjid</div>
-          <div class="lv-sub">Live from the masjid</div>
-
-          <div class="lv-vol">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
-            <input type="range" id="lv-volume" min="0" max="100" value="100" aria-label="Volume">
-          </div>
-        </section>
-
-        <div class="ab-wrap">
-          <div class="card lv-info">
-            <div class="lv-row"><span class="lv-k">Radio frequency</span><span class="lv-v tnum">454.1000 MHz</span></div>
-            <div class="lv-row"><span class="lv-k">Also on</span><a class="lv-v lv-link" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener">YouTube &rsaquo;</a></div>
-          </div>
-          <p class="lv-note">Audio continues while you use other apps. If the stream doesn&rsquo;t
-            start, the masjid may not be broadcasting at the moment.</p>
-        </div>
+    <div class="wrap">
+      <div class="card lv-info">
+        <div class="lv-row"><span class="lv-k">Radio frequency</span><span class="lv-v tnum">454.1000 MHz</span></div>
+        <div class="lv-row"><span class="lv-k">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids">Watch &rsaquo;</button></div>
       </div>
+      <p class="lv-note">Audio keeps playing while you use the rest of the app or other apps.
+        If the stream doesn&rsquo;t start, the masjid may not be broadcasting at the moment.</p>
     </div>
-  </div>
+  </main>
 
   <div class="sheet" id="vids" data-open="0" role="dialog" aria-modal="true" aria-label="Videos">
     <div class="scrim" id="vd-scrim"></div>
@@ -1055,9 +1068,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       <span>Times</span>
     </button>
-    <button class="tab" data-tab="qibla" role="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 10.5,10.5 8.5,15.5 13.5,13.5" fill="currentColor" stroke="none"/></svg>
-      <span>Qibla</span>
+    <button class="tab" data-tab="live" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg>
+      <span>Listen</span>
     </button>
     <button class="tab" data-tab="alerts" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -1480,21 +1493,24 @@ let STATE = null;
 
 function buildTimetable(rec, baseDate){
   const tt = document.getElementById("timetable");
+  const isFri = baseDate.getDay()===5 && rec.jummah && rec.jummah.first;
   let html = `<div class="col-h"><span>Prayer</span><span class="r">Beginning</span><span class="r">Jamā&#703;ah</span></div>`;
   PRAYERS.forEach(p=>{
     const b = rec.begins[p.key];
     const j = p.info ? null : rec.jamaat[p.key];
-    html += `<div class="row ${p.info?'sunrise':''}" data-key="${p.key}">
-      <div class="name"><span class="en">${p.en}<span class="pill-slot"></span></span><span class="ar">${p.ar}</span></div>
+    // On Fridays the Zuhr congregation is Jumuʿah
+    const fri = isFri && p.key==="zuhr";
+    const en  = fri ? "Jumuʿah" : p.en;
+    const ar  = fri ? "الجمعة"  : p.ar;
+    const sub = fri
+      ? `<span class="jsub">1st Jumuʿah ${hm12(rec.jummah.first)}${rec.jummah.second?`<br>2nd Jumuʿah ${hm12(rec.jummah.second)}`:''}</span>`
+      : '';
+    html += `<div class="row ${p.info?'sunrise':''} ${fri?'is-jummah':''}" data-key="${p.key}">
+      <div class="name"><span class="en">${en}<span class="pill-slot"></span></span><span class="ar">${ar}</span>${sub}</div>
       <span class="begins tnum">${b?hm12(b):'—'}</span>
       <span class="jam tnum">${j?hm12(j):'—'}</span>
     </div>`;
   });
-  // Jummah line — only what the dataset carries (Fridays); never invented
-  if(rec.jummah && rec.jummah.first){
-    const jm = rec.jummah;
-    html += `<div class="jummah"><span class="k">Jumuʿah</span> <span>1st <b>${hm12(jm.first)}</b>${jm.second?` &middot; 2nd <b>${hm12(jm.second)}</b>`:''}</span></div>`;
-  }
   tt.innerHTML = html;
 }
 
@@ -1600,17 +1616,9 @@ function renderDayView(rec){
   document.getElementById('dv-eyebrow').textContent = isFri ? "Jumuʿah" : "Jamāʿah times";
   document.getElementById('dv-date').textContent =
     `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
-  const jum=document.getElementById('dv-jum');
-  if(isFri && rec.jummah && rec.jummah.first){
-    jum.hidden=false;
-    document.getElementById('dv-j1').textContent=hm12(rec.jummah.first);
-    document.getElementById('dv-j2').textContent=rec.jummah.second?hm12(rec.jummah.second):"—";
-    document.getElementById('dv-sub').innerHTML=`Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
-  }else{
-    jum.hidden=true;
-    document.getElementById('dv-sub').innerHTML =
-      `Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Maghrib <b>${hm12(rec.jamaat.maghrib)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
-  }
+  document.getElementById('dv-sub').innerHTML = isFri && rec.jummah && rec.jummah.first
+    ? `1st Jumuʿah <b>${hm12(rec.jummah.first)}</b>${rec.jummah.second?` &middot; 2nd Jumuʿah <b>${hm12(rec.jummah.second)}</b>`:''}`
+    : `Fajr <b>${hm12(rec.jamaat.fajr)}</b> &middot; Maghrib <b>${hm12(rec.jamaat.maghrib)}</b> &middot; Isha <b>${hm12(rec.jamaat.isha)}</b>`;
 }
 
 function renderTodayHero(){
@@ -1628,6 +1636,7 @@ function render(){
   buildTimetable(rec, VIEW);
   updateNavUI();
   renderRamadan();
+  document.getElementById('jcall').hidden = VIEW.getDay()!==5;
   RM_IDX=0;
   renderReminder();
   if(sameDay(VIEW, today0())){ renderTodayHero(); tick(); }
@@ -1902,6 +1911,12 @@ function rmStep(n){
   renderReminder();
 }
 
+function initFridayCall(){
+  document.getElementById('jc-btn').addEventListener('click',()=>{
+    switchTab('donate');
+  });
+}
+
 function initReminders(){
   document.getElementById('rm-prev').addEventListener('click',()=>rmStep(-1));
   document.getElementById('rm-next').addEventListener('click',()=>rmStep(1));
@@ -2070,8 +2085,9 @@ function tick(){
   if(!nx){ endedState(); return; }   // after final Isha of the dataset
 
   const m=meta(nx.key);
-  document.getElementById('next-en').textContent=m.en;
-  document.getElementById('next-ar').textContent=m.ar;
+  const friJum = nx.key==="zuhr" && (nx.tomorrow ? addDays(base,1) : base).getDay()===5;
+  document.getElementById('next-en').textContent = friJum ? "Jumuʿah" : m.en;
+  document.getElementById('next-ar').textContent = friJum ? "الجمعة" : m.ar;
 
   const srcRec = nx.tomorrow ? nx.tomorrowRec : rec;
   const jt = srcRec.jamaat[nx.key];
@@ -2298,26 +2314,14 @@ async function lvToggle(){
   }
 }
 
-function openLive(){
-  document.getElementById('live').dataset.open="1";
-  document.body.style.overflow="hidden";
-  if(!AUDIO || AUDIO.paused) lvState("idle","Ready");
-}
-function closeLive(){
-  document.getElementById('live').dataset.open="0";
-  document.body.style.overflow="";
-  // audio deliberately keeps playing in the background
-}
+function openLive(){ switchTab('live'); }
+
 function initLive(){
   document.getElementById('lv-play').addEventListener('click',lvToggle);
-  document.getElementById('lv-close').addEventListener('click',closeLive);
-  document.getElementById('lv-scrim').addEventListener('click',closeLive);
   document.getElementById('lv-volume').addEventListener('input',e=>{
     if(AUDIO) AUDIO.volume=e.target.value/100;
   });
-  document.addEventListener('keydown',e=>{
-    if(e.key==="Escape" && document.getElementById('live').dataset.open==="1") closeLive();
-  });
+  document.getElementById('lv-vids').addEventListener('click',openVids);
 }
 
 /* ---------------- about page ---------------- */
@@ -2362,7 +2366,7 @@ function closeDrawer(){
 }
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.dataset.on = t.dataset.tab===name ? "1":"0");
-  ["times","qibla","alerts","donate"].forEach(n=>{
+  ["times","live","alerts","donate","qibla"].forEach(n=>{
     document.getElementById("tab-"+n).hidden = (n!==name);
   });
   window.scrollTo({top:0,behavior:"instant"});
@@ -2379,7 +2383,7 @@ function initDrawer(){
       if(act==="qibla"){ switchTab("qibla"); drawTicks(); }
       if(act==="calendar"){ switchTab("times"); setTimeout(openMonth,120); }
       if(act==="about"){ setTimeout(openAbout,120); }
-      if(act==="live"){ setTimeout(openLive,120); }
+      if(act==="live"){ switchTab("live"); }
       if(act==="vids"){ setTimeout(openVids,120); }
     });
   });
@@ -2407,7 +2411,7 @@ function initTabs(){
   tabs.forEach(b=>b.addEventListener('click',()=>{
     const name=b.dataset.tab;
     tabs.forEach(t=>t.dataset.on = t===b ? "1" : "0");
-    ["times","qibla","alerts","donate"].forEach(n=>{
+    ["times","live","alerts","donate","qibla"].forEach(n=>{
       document.getElementById("tab-"+n).hidden = (n!==name);
     });
     window.scrollTo({top:0,behavior:"instant"});
@@ -2658,6 +2662,7 @@ function boot(){
   initNav();
   initMonth();
   initReminders();
+  initFridayCall();
   initTabs();
   initDrawer();
   initAbout();
