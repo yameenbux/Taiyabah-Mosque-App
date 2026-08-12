@@ -23,6 +23,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#3C0B2A" />
 <link rel="manifest" href="manifest.webmanifest" />
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
 <link rel="icon" href="icon-192.png?v=2" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -479,6 +480,18 @@
     font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
     padding:15px;border-radius:13px;box-shadow:var(--shadow)}
   .ab-foot{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.7;margin:16px 6px 26px}
+
+  /* ---- OneSignal verification dialog ---- */
+  .osdlg{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:22px}
+  .osdlg-scrim{position:absolute;inset:0;background:rgba(9,26,19,.55)}
+  .osdlg-box{position:relative;max-width:340px;width:100%;background:var(--card);
+    border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);
+    text-align:center}
+  .osdlg-box h3{font-family:"Fraunces",Georgia,serif;font-size:17px;font-weight:600;line-height:1.3}
+  .osdlg-box p{font-size:13.5px;line-height:1.6;color:var(--muted);margin-top:9px}
+  .osdlg-btn{width:100%;margin-top:16px;border:none;cursor:pointer;font:inherit;font-weight:700;
+    font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
+    padding:13px;border-radius:12px}
 
   /* ---- menu button + drawer ---- */
   .menubtn{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border-radius:11px;cursor:pointer;
@@ -1280,6 +1293,16 @@
           <p class="ct-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="osdlg" id="os-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="os-dlg-t">
+    <div class="osdlg-scrim"></div>
+    <div class="osdlg-box">
+      <h3 id="os-dlg-t">Your OneSignal SDK integration is complete!</h3>
+      <p>You can now send Push Notifications &amp; In-App Messages through OneSignal.
+         Tap below to enable push notifications.</p>
+      <button class="osdlg-btn" id="os-dlg-ok">Got it</button>
     </div>
   </div>
 
@@ -2533,6 +2556,103 @@ try{
   console.log("Not licensed for reuse elsewhere. See LICENSE.md.");
 }catch(e){}
 
+/* ================= OneSignal integration =================
+   Single module wrapping every OneSignal SDK interaction. No other part of
+   this file calls the SDK directly.
+
+   Web SDK v16, loaded from OneSignal's versionless CDN path (the documented
+   web setup — version pinning applies to package-manager installs).
+
+   The app already registers its own service worker at the site root, so the
+   OneSignal worker is given a separate scope (push/onesignal/) to avoid a
+   registration clash. Paths are derived from location so this works both at
+   a domain root and under a GitHub Pages project path.
+========================================================== */
+const OneSignalManager = (() => {
+  const APP_ID = "2506fafe-179d-401c-b9e3-a0f320d68857";
+  const base   = location.pathname.replace(/[^/]*$/, "");     // e.g. /Taiyabah-Mosque-App/
+  let ready = false;
+  let dialogShown = false;
+
+  // a real, server-assigned subscription id is non-empty and not the local- placeholder
+  const isRegistered = id => typeof id === "string" && id.length > 0 && !id.startsWith("local-");
+
+  function showVerificationDialog(){
+    if(dialogShown) return;
+    dialogShown = true;
+    const dlg = document.getElementById('os-dialog');
+    if(!dlg) return;
+    dlg.hidden = false;
+    document.getElementById('os-dlg-ok').addEventListener('click', async ()=>{
+      dlg.hidden = true;
+      await requestPermission();
+    }, { once:true });
+  }
+
+  function evaluate(id){ if(isRegistered(id)) showVerificationDialog(); }
+
+  function init(){
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async (OneSignal) => {
+      try{
+        await OneSignal.init({
+          appId: APP_ID,
+          serviceWorkerPath: base + "push/onesignal/OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: base + "push/onesignal/" },
+          // the app has its own opt-in UI on the Alerts tab
+          autoResubscribe: true,
+          notifyButton: { enable: false },
+          promptOptions: { slidedown: { prompts: [] } }
+        });
+        ready = true;
+
+        // observe registration, and evaluate the current value immediately in
+        // case the id was assigned before the observer attached
+        OneSignal.User.PushSubscription.addEventListener("change", e => {
+          evaluate(e && e.current && e.current.id);
+          syncAlertsUI();
+        });
+        evaluate(OneSignal.User.PushSubscription.id);
+        syncAlertsUI();
+      }catch(e){
+        console.warn("OneSignal init failed:", e);
+      }
+    });
+  }
+
+  const run = fn => new Promise(res=>{
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async OneSignal => { try{ res(await fn(OneSignal)); }catch(e){ console.warn(e); res(null); } });
+  });
+
+  const requestPermission = () => run(async OneSignal => {
+    await OneSignal.Notifications.requestPermission();
+    if(OneSignal.Notifications.permission) await OneSignal.User.PushSubscription.optIn();
+    return OneSignal.Notifications.permission;
+  });
+
+  const optOut      = () => run(OneSignal => OneSignal.User.PushSubscription.optOut());
+  const setTags     = tags => run(OneSignal => OneSignal.User.addTags(tags));
+  const isOptedIn   = () => run(OneSignal => !!OneSignal.User.PushSubscription.optedIn);
+  const permission  = () => run(OneSignal => OneSignal.Notifications.permission);
+  const isReady     = () => ready;
+
+  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady };
+})();
+
+/* keep the Alerts tab honest about the real subscription state */
+async function syncAlertsUI(){
+  const btn=document.getElementById('enable');
+  if(!btn) return;
+  const on = await OneSignalManager.isOptedIn();
+  if(on && btn.dataset.on!=="1"){
+    btn.dataset.on="1";
+    btn.textContent="Notifications enabled on this device";
+    document.getElementById('toggles').classList.add('unlocked');
+    document.getElementById('a-lead').textContent="Choose what you'd like to be told about.";
+  }
+}
+
 /* ---------------- live metal prices ----------------
    Fetched key-free so nothing sensitive sits in this public repo.
    Spot prices are quoted in USD per troy ounce, so we also need a
@@ -3194,6 +3314,19 @@ function applyPrefs(p){
   document.getElementById('mins').disabled=!p.jam;
 }
 
+/* topics → OneSignal tags, so a send can target one category */
+function pushTopicTags(p){
+  const q = p || currentPrefs();
+  OneSignalManager.setTags({
+    jamaah:        q.jam ? "1" : "0",
+    jamaah_mins:   String(q.mins),
+    janazah:       q.jan ? "1" : "0",
+    announcements: q.ann ? "1" : "0",
+    events:        q.evt ? "1" : "0"
+  });
+  if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut();
+}
+
 function initAlerts(){
   const btn=document.getElementById('enable');
   const toggles=document.getElementById('toggles');
@@ -3210,8 +3343,15 @@ function initAlerts(){
 
   btn.addEventListener('click', async ()=>{
     if(btn.dataset.on==="1") return;
-    try{ if('Notification' in window) await Notification.requestPermission(); }catch(e){}
-    unlock();
+    btn.disabled=true;
+    const perm = await OneSignalManager.requestPermission();
+    btn.disabled=false;
+    if(perm){
+      unlock();
+      pushTopicTags();
+    }else{
+      note.textContent="Notifications are blocked for this site. You can allow them in your browser settings.";
+    }
   });
 
   document.getElementById('tg-jam').addEventListener('change',e=>{
@@ -3222,6 +3362,7 @@ function initAlerts(){
     const p=currentPrefs();
     prefStore.set("alerts",p);
     prefStore.set("alertsSet",true);
+    pushTopicTags(p);
     showCollapsed(p);
     document.getElementById('a-done').scrollIntoView({block:"nearest",behavior:"smooth"});
   });
@@ -3246,6 +3387,7 @@ function boot(){
   initMonth();
   initReminders();
   initFridayCall();
+  OneSignalManager.init();
   initTabs();
   initDrawer();
   initAbout();
