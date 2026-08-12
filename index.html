@@ -2573,6 +2573,7 @@ const OneSignalManager = (() => {
   const base   = location.pathname.replace(/[^/]*$/, "");     // e.g. /Taiyabah-Mosque-App/
   let ready = false;
   let dialogShown = false;
+  let sdk = null;          // direct handle — needed to keep the user-gesture context
 
   // a real, server-assigned subscription id is non-empty and not the local- placeholder
   const isRegistered = id => typeof id === "string" && id.length > 0 && !id.startsWith("local-");
@@ -2585,7 +2586,8 @@ const OneSignalManager = (() => {
     dlg.hidden = false;
     document.getElementById('os-dlg-ok').addEventListener('click', async ()=>{
       dlg.hidden = true;
-      await requestPermission();
+      await requestPermission();        // direct call — keeps the gesture context
+      syncAlertsUI();
     }, { once:true });
   }
 
@@ -2604,6 +2606,7 @@ const OneSignalManager = (() => {
           notifyButton: { enable: false },
           promptOptions: { slidedown: { prompts: [] } }
         });
+        sdk = OneSignal;
         ready = true;
 
         // observe registration, and evaluate the current value immediately in
@@ -2658,11 +2661,25 @@ const OneSignalManager = (() => {
     }
   }
 
-  const requestPermission = () => run(async OneSignal => {
-    await OneSignal.Notifications.requestPermission();
-    if(OneSignal.Notifications.permission) await OneSignal.User.PushSubscription.optIn();
-    return OneSignal.Notifications.permission;
-  });
+  /* iOS ignores a permission request that isn't made directly inside a user
+     gesture. Going through OneSignalDeferred loses that context, so use the
+     live SDK handle when we have one and only fall back to the queue if the
+     SDK is somehow still loading. */
+  async function requestPermission(){
+    const OneSignal = sdk || window.OneSignal;
+    if(!OneSignal || !OneSignal.Notifications){
+      return { ok:false, reason:"loading" };
+    }
+    try{
+      await OneSignal.Notifications.requestPermission();
+      const granted = !!OneSignal.Notifications.permission;
+      if(granted) await OneSignal.User.PushSubscription.optIn();
+      return { ok:granted, reason: granted ? null : "declined" };
+    }catch(e){
+      console.warn("OneSignal permission request failed:", e);
+      return { ok:false, reason:"error" };
+    }
+  }
 
   const optOut      = () => run(OneSignal => OneSignal.User.PushSubscription.optOut());
   const setTags     = tags => run(OneSignal => OneSignal.User.addTags(tags));
@@ -3392,16 +3409,22 @@ function initAlerts(){
     const label = btn.textContent;
     btn.disabled = true;
     btn.textContent = "Just a moment…";
-    const perm = await OneSignalManager.requestPermission();
+    const res = await OneSignalManager.requestPermission();
     btn.disabled = false;
 
-    if(perm){
+    if(res && res.ok){
       unlock();
       pushTopicTags();
-    }else{
-      btn.textContent = label;
+      return;
+    }
+    btn.textContent = label;
+    if(res && res.reason==="loading"){
+      note.textContent = "Still connecting to the notification service — please wait a moment and tap again.";
+    }else if(res && res.reason==="declined"){
       note.textContent = OneSignalManager.blockedReason()
-        || "Couldn’t turn notifications on just now. Please check your connection and try again.";
+        || "Notifications weren’t allowed. You can turn them on in Settings → Notifications.";
+    }else{
+      note.textContent = "Couldn’t turn notifications on just now. Please check your connection and try again.";
     }
   });
 
