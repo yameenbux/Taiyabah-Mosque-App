@@ -1,6 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--
+  ============================================================================
+  Taiyabah Masjid — prayer times, Qibla, live audio and masjid information
+  ----------------------------------------------------------------------------
+  Copyright (c) 2026 Yameen Bux. All rights reserved.
+
+  Designed and built by Yameen Bux (github.com/yameenbux).
+  Licensed to Bolton Central Islamic Society (registered charity 1041569)
+  for use by Taiyabah Masjid. See LICENSE.md.
+
+  Not licensed for reuse, redeployment or adaptation by any other person or
+  organisation. If you are reading this in a codebase that is not Taiyabah
+  Masjid's, it was taken without permission.
+  ============================================================================
+-->
+
+<html lang="en" data-app="taiyabah-masjid" data-author="Yameen Bux" data-build="fd9aa73c54108914">
 <head>
+<meta name="author" content="Yameen Bux" />
+<meta name="copyright" content="Copyright (c) 2026 Yameen Bux. All rights reserved." />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#3C0B2A" />
@@ -272,6 +290,32 @@
   .lv-link{color:var(--brand-600);text-decoration:none}
   .lv-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;margin:14px 6px 26px}
 
+  /* ---- videos ---- */
+  .vd-player{background:#000;position:sticky;top:0;z-index:3}
+  .vd-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+  .vd-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .vd-now{font-size:12.5px;font-weight:600;color:#EDE7D8;padding:10px 14px;
+    background:var(--brand-900);line-height:1.4}
+  .vd-list{display:flex;flex-direction:column;gap:10px}
+  .vd-item{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;
+    cursor:pointer;padding:8px;border-radius:14px;background:var(--card);
+    border:1px solid var(--line);box-shadow:var(--shadow)}
+  .vd-item[data-on="1"]{border-color:var(--gold);background:#FBF6E8}
+  .vd-thumb{flex:0 0 auto;width:112px;aspect-ratio:16/9;border-radius:9px;overflow:hidden;
+    background:var(--brand-900);position:relative}
+  .vd-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .vd-thumb::after{content:"";position:absolute;left:50%;top:50%;width:0;height:0;
+    transform:translate(-50%,-50%);border-left:11px solid rgba(255,255,255,.92);
+    border-top:7px solid transparent;border-bottom:7px solid transparent;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+  .vd-item[data-on="1"] .vd-thumb::after{display:none}
+  .vd-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .vd-t{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.35}
+  .vd-d{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .vd-all{display:block;text-align:center;text-decoration:none;margin:16px 0 26px;
+    font-size:13px;font-weight:600;color:var(--brand-600);
+    background:#F0E9ED;border-radius:12px;padding:13px}
+
   /* ---- about page ---- */
   .ab-body{background:var(--paper)}
   .ab-hero{position:relative;overflow:hidden;padding:26px 20px 24px;color:#F3EFE3;
@@ -495,6 +539,8 @@
   .flink:active{color:var(--brand-600)}
   footer .fr{margin-top:8px;font-size:11px}
   footer .charity{margin-top:12px;font-size:10.5px;color:#A49AA0}
+  footer .credit{margin-top:6px;font-size:10.5px;color:#A49AA0}
+  footer .credit a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(124,110,119,.3)}
 
   @media (prefers-reduced-motion: reduce){.datechip .live{animation:none}.track>i{transition:none}}
 </style>
@@ -615,6 +661,7 @@
       <div><a class="flink" href="mailto:info@taiyabahmasjid.com">info@taiyabahmasjid.com</a></div>
       <div class="fr">Times from the official 2026 Salah Timetable</div>
       <div class="charity">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
+      <div class="credit">App built by <a href="https://github.com/yameenbux" target="_blank" rel="noopener">Yameen Bux</a></div>
     </footer>
   </div>
   </main>
@@ -900,6 +947,28 @@
     </div>
   </div>
 
+  <div class="sheet" id="vids" data-open="0" role="dialog" aria-modal="true" aria-label="Videos">
+    <div class="scrim" id="vd-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left">Videos &amp; bayaans</h3>
+        <button class="sh-close" id="vd-close">Done</button>
+      </div>
+      <div class="sh-body">
+        <div class="vd-player" id="vd-player" hidden>
+          <div class="vd-frame" id="vd-frame"></div>
+          <div class="vd-now" id="vd-now">&mdash;</div>
+        </div>
+        <div class="ab-wrap">
+          <div class="vd-list" id="vd-list"></div>
+          <a class="vd-all" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos" target="_blank" rel="noopener">
+            See the full channel on YouTube &rsaquo;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
@@ -919,9 +988,9 @@
         <button class="dr-row" data-act="live">
           <span class="dr-t">Listen live</span><span class="dr-ch">&rsaquo;</span>
         </button>
-        <a class="dr-row" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener">
-          <span class="dr-t">Video &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
-        </a>
+        <button class="dr-row" data-act="vids">
+          <span class="dr-t">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
+        </button>
         <a class="dr-row" href="https://www.taiyabahmasjid.com/bayaans/" target="_blank" rel="noopener">
           <span class="dr-t">Bayaans</span><span class="dr-ch">&rsaquo;</span>
         </a>
@@ -2079,6 +2148,102 @@ function initDonate(){
   });
 }
 
+
+/* ---------------- build signature ----------------
+   Copyright (c) 2026 Yameen Bux. All rights reserved.
+   Built by Yameen Bux — github.com/yameenbux
+   Fingerprint fd9aa73c54108914 — unique to this build. Its presence in any other
+   codebase indicates this source was copied. See LICENSE.md.
+--------------------------------------------------- */
+const BUILD = {
+  app:"Taiyabah Masjid",
+  author:"Yameen Bux",
+  url:"https://github.com/yameenbux",
+  licensedTo:"Bolton Central Islamic Society (charity 1041569)",
+  built:"2026-08-12",
+  fingerprint:"fd9aa73c54108914"
+};
+Object.freeze(BUILD);
+try{
+  window.__taiyabah = BUILD;
+  console.log("%cTaiyabah Masjid","font:600 15px system-ui;color:#DCBB63;background:#3C0B2A;padding:4px 10px;border-radius:4px");
+  console.log(`Built by ${BUILD.author} · ${BUILD.url}`);
+  console.log(`Licensed to ${BUILD.licensedTo} · build ${BUILD.fingerprint}`);
+  console.log("Not licensed for reuse elsewhere. See LICENSE.md.");
+}catch(e){}
+
+/* ---------------- videos ----------------
+   Thumbnails come from YouTube's static image URLs and playback uses the
+   privacy-enhanced embed player — so there is no API key in this repo and
+   nothing to expire or abuse.
+
+   To add a video: copy the id from its YouTube URL (the part after v=)
+   and add a line below. Newest first.
+----------------------------------------- */
+const VIDEOS = [
+  {id:"gC7H_60vPFU", t:"New Build Update 2026",                        d:"New build"},
+  {id:"N7wFXynmLHM", t:"Taiyabah Masjid — our story",                  d:"History"},
+  {id:"hnrxkmeSmHs", t:"Qari Rashid Musa — message for the new build", d:"Message"},
+  {id:"3t3ut3FZp2A", t:"Syed Aziz ur Rehman Shah at Taiyabah Masjid",  d:"Bayaan"},
+  {id:"mjNi1DoEyR8", t:"Construction update — December 2018",          d:"New build"},
+  {id:"m8Z3KJUTR0c", t:"Fundraiser — mixed grill platter",             d:"Fundraiser"},
+];
+
+function vdPlay(v){
+  const p=document.getElementById('vd-player');
+  p.hidden=false;
+  document.getElementById('vd-frame').innerHTML =
+    `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.id)}?autoplay=1&playsinline=1&rel=0"
+       title="${esc(v.t)}" allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+       allowfullscreen></iframe>`;
+  document.getElementById('vd-now').textContent=v.t;
+  document.querySelectorAll('.vd-item').forEach(b=>b.dataset.on = b.dataset.id===v.id ? "1":"0");
+  document.querySelector('#vids .sh-body').scrollTop=0;
+}
+
+function vdStop(){
+  document.getElementById('vd-frame').innerHTML="";   // stops playback
+  document.getElementById('vd-player').hidden=true;
+  document.querySelectorAll('.vd-item').forEach(b=>b.dataset.on="0");
+}
+
+function buildVideos(){
+  document.getElementById('vd-list').innerHTML = VIDEOS.map(v=>`
+    <button class="vd-item" data-id="${esc(v.id)}" data-on="0">
+      <span class="vd-thumb">
+        <img src="https://i.ytimg.com/vi/${esc(v.id)}/mqdefault.jpg" alt="" loading="lazy">
+      </span>
+      <span class="vd-meta">
+        <span class="vd-t">${esc(v.t)}</span>
+        <span class="vd-d">${esc(v.d)}</span>
+      </span>
+    </button>`).join("");
+  document.querySelectorAll('.vd-item').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const v=VIDEOS.find(x=>x.id===b.dataset.id);
+      if(v) vdPlay(v);
+    });
+  });
+}
+
+function openVids(){
+  document.getElementById('vids').dataset.open="1";
+  document.body.style.overflow="hidden";
+  if(!document.getElementById('vd-list').childElementCount) buildVideos();
+}
+function closeVids(){
+  vdStop();
+  document.getElementById('vids').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initVids(){
+  document.getElementById('vd-close').addEventListener('click',closeVids);
+  document.getElementById('vd-scrim').addEventListener('click',closeVids);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('vids').dataset.open==="1") closeVids();
+  });
+}
+
 /* ---------------- live audio ----------------
    Direct Shoutcast/Icecast feed. Playback needs a user gesture (the play
    button), after which iOS keeps audio running when the app is backgrounded.
@@ -2216,6 +2381,7 @@ function initDrawer(){
       if(act==="calendar"){ switchTab("times"); setTimeout(openMonth,120); }
       if(act==="about"){ setTimeout(openAbout,120); }
       if(act==="live"){ setTimeout(openLive,120); }
+      if(act==="vids"){ setTimeout(openVids,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -2497,6 +2663,7 @@ function boot(){
   initDrawer();
   initAbout();
   initLive();
+  initVids();
   initQibla();
   initDonate();
   VIEW=today0();
