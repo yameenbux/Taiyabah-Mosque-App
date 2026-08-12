@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0C3B2A" />
+<meta name="theme-color" content="#3C0B2A" />
 <title>Send a notification — Taiyabah Masjid</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --green-900:#0C3B2A; --green-800:#124A36; --green-700:#1A5C44; --green-600:#237552;
+    --brand-900:#3C0B2A; --brand-800:#4B1136; --brand-700:#5E1844; --brand-600:#772157;
     --gold:#C6A24C; --gold-bright:#DCBB63;
-    --paper:#F5F1E8; --card:#FCFAF3; --ink:#1B2621; --muted:#6E7C74; --line:#E4DECF;
+    --paper:#F5F1E8; --card:#FCFAF3; --ink:#261B22; --muted:#7C6E77; --line:#E4DECF;
     --danger:#B4532F; --danger-bg:#FBF0EB;
-    --shadow:0 1px 2px rgba(12,59,42,.06), 0 12px 30px -18px rgba(12,59,42,.35);
+    --shadow:0 1px 2px rgba(60,11,42,.06), 0 12px 30px -18px rgba(60,11,42,.35);
     font-family:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -23,12 +23,12 @@
   .display{font-family:"Fraunces",Georgia,serif}
 
   .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;padding:calc(14px + env(safe-area-inset-top,0)) 20px 14px;
-    background:linear-gradient(180deg,var(--green-900),var(--green-800));color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-900),var(--brand-800));color:#F3EFE3;
     border-bottom:1px solid rgba(198,162,76,.25)}
   .brandmark{height:34px;width:auto;flex:0 0 auto;display:block;
     padding-right:11px;border-right:1px solid rgba(198,162,76,.3)}
   .topbar h1{font-size:15.5px;font-weight:600;line-height:1.1}
-  .topbar p{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#A9BBB0;margin-top:2px}
+  .topbar p{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#BBA9B4;margin-top:2px}
   .backlink{margin-left:auto;font-size:12px;color:var(--gold-bright);text-decoration:none;
     border:1px solid rgba(198,162,76,.4);border-radius:999px;padding:5px 10px}
 
@@ -53,11 +53,11 @@
   .topics{display:grid;gap:8px}
   .topic{display:flex;align-items:center;gap:11px;cursor:pointer;padding:11px 12px;
     border:1px solid var(--line);border-radius:12px;background:#fff}
-  .topic input{margin:0;accent-color:var(--green-600);width:17px;height:17px;flex:0 0 auto}
+  .topic input{margin:0;accent-color:var(--brand-600);width:17px;height:17px;flex:0 0 auto}
   .topic .tt{flex:1;min-width:0}
   .topic .tn{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:7px}
   .topic .td{font-size:11.5px;color:var(--muted);margin-top:2px}
-  .topic[data-sel="1"]{border-color:var(--green-600);background:#F1F7F3}
+  .topic[data-sel="1"]{border-color:var(--brand-600);background:#F7F1F5}
   .badge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
     border-radius:999px;padding:2px 6px}
   .badge.urgent{color:var(--danger);border:1px solid rgba(180,83,47,.35)}
@@ -70,7 +70,7 @@
   .tpl:hover{border-style:solid;color:var(--ink)}
 
   /* lock screen preview */
-  .phone{background:linear-gradient(160deg,#12251C,#0C3B2A 60%,#16412F);border-radius:22px;
+  .phone{background:linear-gradient(160deg,#25121E,#3C0B2A 60%,#421532);border-radius:22px;
     padding:26px 14px 30px;position:relative;overflow:hidden}
   .phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);
     width:74px;height:5px;border-radius:99px;background:rgba(255,255,255,.18)}
@@ -79,29 +79,29 @@
   .notif{display:flex;gap:10px;background:rgba(245,243,235,.94);border-radius:15px;padding:11px 12px;
     box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
   .nicon{width:34px;height:34px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;
-    background:var(--green-800);color:var(--gold-bright)}
+    background:var(--brand-800);color:var(--gold-bright)}
   .nicon svg{width:20px;height:20px}
   .nbody{flex:1;min-width:0}
-  .nhead{display:flex;align-items:baseline;gap:6px;font-size:11px;color:#5C6862}
+  .nhead{display:flex;align-items:baseline;gap:6px;font-size:11px;color:#685C64}
   .nhead .app{font-weight:700;letter-spacing:.02em;text-transform:uppercase;font-size:10px}
   .nhead .when{margin-left:auto;flex:0 0 auto}
   .ntitle{font-size:14px;font-weight:700;margin-top:3px;word-wrap:break-word}
-  .ntext{font-size:13.5px;color:#2C3833;margin-top:1px;line-height:1.35;word-wrap:break-word}
+  .ntext{font-size:13.5px;color:#382C34;margin-top:1px;line-height:1.35;word-wrap:break-word}
 
   /* reach guard */
   .guard{margin-top:14px;border-radius:12px;padding:12px 13px;font-size:12.5px;line-height:1.5;
-    background:#F1F7F3;border:1px solid #D6E5DB;color:#31473C}
+    background:#F7F1F5;border:1px solid #E5D6E0;color:#48303F}
   .guard.hot{background:var(--danger-bg);border-color:#EBCDBF;color:#7C3A20}
   .guard b{font-weight:700}
 
   .send{width:100%;margin-top:15px;border:none;cursor:pointer;font:inherit;font-weight:700;font-size:15.5px;
-    color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
+    color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
     padding:15px;border-radius:13px;box-shadow:var(--shadow);letter-spacing:.2px}
   .send:disabled{opacity:.45;cursor:default}
   .sendnote{font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.5}
 
   .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,120%);z-index:60;
-    background:var(--green-800);color:#F3EFE3;font-size:13.5px;font-weight:600;
+    background:var(--brand-800);color:#F3EFE3;font-size:13.5px;font-weight:600;
     padding:12px 18px;border-radius:999px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
     transition:transform .28s cubic-bezier(.2,.8,.3,1);max-width:90vw;text-align:center}
   .toast.show{transform:translate(-50%,0)}
@@ -109,7 +109,7 @@
   /* history */
   .hist .h{display:flex;gap:10px;align-items:flex-start;padding:12px 2px;border-top:1px solid var(--line)}
   .hist .h:first-child{border-top:none}
-  .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 auto;background:var(--green-600)}
+  .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 auto;background:var(--brand-600)}
   .dot.urgent{background:var(--danger)}
   .hist .ht{flex:1;min-width:0}
   .hist .h1{font-size:14px;font-weight:600}
