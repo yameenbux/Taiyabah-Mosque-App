@@ -138,20 +138,24 @@
   .sheet .scrim{position:absolute;inset:0;background:rgba(12,32,24,.55);backdrop-filter:blur(2px)}
   .sheet .panel{position:absolute;left:0;right:0;bottom:0;top:0;max-width:520px;margin-inline:auto;
     background:var(--paper);display:flex;flex-direction:column}
-  .sh-top{display:flex;align-items:center;gap:10px;padding:14px 16px;flex:0 0 auto;
+  .sh-top{display:flex;align-items:center;gap:10px;
+    padding:calc(14px + env(safe-area-inset-top,0)) 14px 14px;flex:0 0 auto;
     background:linear-gradient(180deg,var(--green-900),var(--green-800));color:#F3EFE3}
-  .sh-top h3{font-family:"Fraunces",serif;font-size:15.5px;font-weight:600;flex:1}
-  .sh-nav{width:36px;height:36px;border-radius:10px;cursor:pointer;font:inherit;font-size:19px;
-    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#F3EFE3}
+  .sh-top h3{font-family:"Fraunces",serif;font-size:15.5px;font-weight:600;flex:1;text-align:center}
+  .sh-nav{width:38px;height:38px;flex:0 0 auto;border-radius:11px;cursor:pointer;font:inherit;font-size:20px;
+    border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#F3EFE3}
   .sh-nav:disabled{opacity:.3;cursor:default}
-  .sh-close{margin-left:2px;border:none;background:none;color:var(--gold-bright);font:inherit;
-    font-size:13px;font-weight:600;cursor:pointer;padding:8px}
+  .sh-close{flex:0 0 auto;border:1px solid rgba(198,162,76,.45);background:rgba(198,162,76,.14);
+    color:var(--gold-bright);font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    padding:9px 14px;border-radius:999px;margin-left:2px}
+  .sh-close:active{background:rgba(198,162,76,.28)}
   .sh-toggle{display:flex;gap:6px;padding:11px 16px 9px;flex:0 0 auto;background:var(--card);
     border-bottom:1px solid var(--line)}
   .sh-toggle button{flex:1;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;padding:8px;
     border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
   .sh-toggle button[data-on="1"]{background:var(--green-700);border-color:var(--green-700);color:#F3EFE3}
-  .sh-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sh-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:env(safe-area-inset-bottom,0)}
   table.mt{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
   table.mt th{position:sticky;top:0;z-index:2;background:var(--card);font-size:10px;letter-spacing:.08em;
     text-transform:uppercase;color:var(--muted);font-weight:600;padding:9px 3px;border-bottom:1px solid var(--line)}
@@ -225,6 +229,47 @@
     font-weight:700;margin-bottom:7px}
   .giftaid p{font-size:13.5px;line-height:1.55;color:#31473C}
   .dnote{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
+
+  /* ---- menu button + drawer ---- */
+  .menubtn{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border-radius:11px;cursor:pointer;
+    border:1px solid rgba(198,162,76,.3);background:rgba(198,162,76,.10);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0}
+  .menubtn span{display:block;width:17px;height:2px;border-radius:2px;background:var(--gold-bright)}
+  .menubtn span:nth-child(2){width:13px;align-self:center;margin-right:4px}
+  .menubtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .drawer{position:fixed;inset:0;z-index:60;display:none}
+  .drawer[data-open="1"]{display:block}
+  .dr-scrim{position:absolute;inset:0;background:rgba(9,26,19,.55);backdrop-filter:blur(2px)}
+  .dr-panel{position:absolute;top:0;right:0;bottom:0;width:min(84vw,340px);
+    background:var(--paper);display:flex;flex-direction:column;
+    box-shadow:-18px 0 40px -20px rgba(0,0,0,.5);animation:slidein .22s cubic-bezier(.2,.8,.3,1)}
+  @keyframes slidein{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .dr-top{display:flex;align-items:center;flex:0 0 auto;
+    padding:calc(14px + env(safe-area-inset-top,0)) 14px 14px 16px;
+    background:linear-gradient(180deg,var(--green-900),var(--green-800))}
+  .dr-logo{height:32px;width:auto;flex:1;object-fit:contain;object-position:left}
+  .dr-close{flex:0 0 auto;width:36px;height:36px;border-radius:10px;cursor:pointer;
+    border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);
+    color:#F3EFE3;font-size:24px;line-height:1;font-family:inherit}
+  .dr-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:4px 12px calc(20px + env(safe-area-inset-bottom,0))}
+  .dr-h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin:18px 6px 6px}
+  .dr-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;
+    text-decoration:none;cursor:pointer;background:none;border:none;
+    padding:13px 8px;border-radius:11px;border-top:1px solid var(--line)}
+  .dr-row:first-of-type{border-top:none}
+  .dr-h + .dr-row{border-top:none}
+  .dr-row:active{background:rgba(35,117,82,.08)}
+  .dr-t{flex:1;min-width:0;font-size:14.5px;font-weight:600;color:var(--ink)}
+  .dr-ch{flex:0 0 auto;color:var(--muted);font-size:20px;line-height:1}
+  .dr-social{display:flex;gap:9px;margin:22px 6px 0}
+  .dr-social a{flex:1;display:grid;place-items:center;text-decoration:none;
+    color:var(--green-600);background:#E9F0EB;border-radius:12px;padding:12px 4px}
+  .dr-social a:active{background:#DCE8E0}
+  .dr-social svg{width:21px;height:21px;display:block}
+  .dr-foot{font-size:11px;color:var(--muted);text-align:center;line-height:1.7;margin:16px 6px 0}
 
   /* ---- bottom tab bar ---- */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:520px;margin-inline:auto;
@@ -358,6 +403,9 @@
   footer{padding:26px 22px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
   footer .star{width:16px;height:16px;color:var(--gold);margin-bottom:6px}
   footer b{color:var(--ink);font-weight:600}
+  .flink{color:inherit;text-decoration:none;border-bottom:1px solid rgba(110,124,116,.3);
+    padding-bottom:1px}
+  .flink:active{color:var(--green-600)}
   footer .fr{margin-top:8px;font-size:11px}
   footer .charity{margin-top:12px;font-size:10.5px;color:#9AA49D}
 
@@ -370,7 +418,9 @@
     <div class="brand">
       <p>Bolton Central Islamic Society</p>
     </div>
-    <span class="proto">Prototype</span>
+    <button class="menubtn" id="menubtn" aria-label="More">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 
   <main id="tab-times">
@@ -464,8 +514,9 @@
 
     <footer>
       <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-      <div><b>31a Draycott Street, Bolton BL1 8HD</b></div>
-      <div>01204 535 997 &middot; Radio 454.1000 MHz</div>
+      <div><a class="flink" href="https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD" target="_blank" rel="noopener"><b>31a Draycott Street, Bolton BL1 8HD</b></a></div>
+      <div><a class="flink" href="tel:01204535997">01204 535 997</a> &middot; Radio 454.1000 MHz</div>
+      <div><a class="flink" href="mailto:info@taiyabahmasjid.com">info@taiyabahmasjid.com</a></div>
       <div class="fr">Times from the official 2026 Salah Timetable</div>
       <div class="charity">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
     </footer>
@@ -626,6 +677,79 @@
         masjid office before transferring.</p>
     </div>
   </main>
+
+  <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
+    <div class="dr-scrim" id="dr-scrim"></div>
+    <aside class="dr-panel">
+      <div class="dr-top">
+        <img class="dr-logo" src="logo-cream.png" alt="Taiyabah Masjid">
+        <button class="dr-close" id="dr-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="dr-body">
+
+        <div class="dr-h">Resources</div>
+        <button class="dr-row" data-act="calendar">
+          <span class="dr-t">Full prayer timetable</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <button class="dr-row" data-act="qibla">
+          <span class="dr-t">Qibla compass</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <a class="dr-row" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener">
+          <span class="dr-t">Live stream &amp; video</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/bayaans/" target="_blank" rel="noopener">
+          <span class="dr-t">Bayaans</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/quran-arabic/" target="_blank" rel="noopener">
+          <span class="dr-t">Qur&rsquo;an &amp; Arabic</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+
+        <div class="dr-h">Madrasah</div>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/madrasah/" target="_blank" rel="noopener">
+          <span class="dr-t">About the madrasah</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://registrations.ibeuk.org/taiyabahmadarashnewapplications" target="_blank" rel="noopener">
+          <span class="dr-t">Application form</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://parents.ibeuk.org/taiyabahislamiccentre/" target="_blank" rel="noopener">
+          <span class="dr-t">Parents portal</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+
+        <div class="dr-h">The masjid</div>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/about/" target="_blank" rel="noopener">
+          <span class="dr-t">About us</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/food-court/" target="_blank" rel="noopener">
+          <span class="dr-t">Taiyabah Food Court</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+        <a class="dr-row" href="https://www.taiyabahmasjid.com/video-news/" target="_blank" rel="noopener">
+          <span class="dr-t">News &amp; updates</span><span class="dr-ch">&rsaquo;</span>
+        </a>
+
+        <div class="dr-social">
+          <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a href="https://twitter.com/TaiyabahMasjid" target="_blank" rel="noopener" aria-label="X">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.53 3h3.06l-6.69 7.64L21.75 21h-6.16l-4.83-6.3L5.24 21H2.18l7.15-8.17L2.25 3h6.32l4.36 5.77L17.53 3Zm-1.07 16.13h1.7L7.62 4.78H5.8l10.66 14.35Z"/>
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26.2 26.2 0 0 0 2 12a26.2 26.2 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26.2 26.2 0 0 0 22 12a26.2 26.2 0 0 0-.4-4.8ZM10.1 14.9V9.1l5.05 2.9-5.05 2.9Z"/>
+            </svg>
+          </a>
+        </div>
+        <p class="dr-foot">Radio 454.1000 MHz<br>
+          Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+      </div>
+    </aside>
+  </div>
 
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="times" data-on="1" role="tab">
@@ -1543,6 +1667,17 @@ function initMonth(){
   document.getElementById('chip-month').addEventListener('click',openMonth);
   document.getElementById('m-close').addEventListener('click',closeMonth);
   document.getElementById('scrim').addEventListener('click',closeMonth);
+  // swipe down on the header to dismiss (the scrim isn't reachable on a phone)
+  (function(){
+    const top=document.querySelector('.sh-top');
+    let y0=null;
+    top.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
+    top.addEventListener('touchend',e=>{
+      if(y0===null) return;
+      const dy=e.changedTouches[0].clientY-y0; y0=null;
+      if(dy>45) closeMonth();
+    },{passive:true});
+  })();
   document.getElementById('m-prev').addEventListener('click',()=>{
     M_MONTH=new Date(M_MONTH.getFullYear(),M_MONTH.getMonth()-1,1); renderMonth();
   });
@@ -1689,6 +1824,53 @@ function initDonate(){
     const ok=await copyText(text);
     all.textContent = ok ? "Copied" : "Couldn't copy — please copy manually";
     setTimeout(()=>all.textContent="Copy all details", 2000);
+  });
+}
+
+/* ---------------- drawer ---------------- */
+function openDrawer(){
+  document.getElementById('drawer').dataset.open="1";
+  document.body.style.overflow="hidden";
+}
+function closeDrawer(){
+  document.getElementById('drawer').dataset.open="0";
+  document.body.style.overflow="";
+}
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.dataset.on = t.dataset.tab===name ? "1":"0");
+  ["times","qibla","alerts","donate"].forEach(n=>{
+    document.getElementById("tab-"+n).hidden = (n!==name);
+  });
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function initDrawer(){
+  document.getElementById('menubtn').addEventListener('click',openDrawer);
+  document.getElementById('dr-close').addEventListener('click',closeDrawer);
+  document.getElementById('dr-scrim').addEventListener('click',closeDrawer);
+  // in-app destinations
+  document.querySelectorAll('.dr-row[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const act=b.dataset.act;
+      closeDrawer();
+      if(act==="qibla"){ switchTab("qibla"); drawTicks(); }
+      if(act==="calendar"){ switchTab("times"); setTimeout(openMonth,120); }
+    });
+  });
+  // any external link closes the drawer behind it
+  document.querySelectorAll('.dr-row[href]').forEach(a=>a.addEventListener('click',closeDrawer));
+  // swipe right to dismiss
+  (function(){
+    const p=document.querySelector('.dr-panel');
+    let x0=null;
+    p.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
+    p.addEventListener('touchend',e=>{
+      if(x0===null) return;
+      const dx=e.changedTouches[0].clientX-x0; x0=null;
+      if(dx>55) closeDrawer();
+    },{passive:true});
+  })();
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('drawer').dataset.open==="1") closeDrawer();
   });
 }
 
@@ -1950,6 +2132,7 @@ function boot(){
   initMonth();
   initReminders();
   initTabs();
+  initDrawer();
   initQibla();
   initDonate();
   VIEW=today0();
