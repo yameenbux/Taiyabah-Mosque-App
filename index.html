@@ -117,22 +117,29 @@
   .salam .tr{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8FA79A}
 
   /* ---- reminder ribbon ---- */
-  .remind{display:flex;align-items:flex-start;gap:12px;width:calc(100% - 32px);margin:14px 16px 0;
-    text-align:left;font:inherit;cursor:pointer;padding:13px 14px;border-radius:15px;
+  .remind{margin:14px 16px 0;padding:13px 14px;border-radius:15px;
     background:linear-gradient(180deg,#FBF6E8,#F7F0DE);border:1px solid #E8DCBC;
     box-shadow:0 1px 2px rgba(12,59,42,.05)}
-  .rm-mark{flex:0 0 auto;width:26px;height:26px;color:var(--gold);margin-top:2px}
+  .rm-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}
+  .rm-mark{flex:0 0 auto;width:24px;height:24px;color:var(--gold)}
   .rm-mark svg{width:100%;height:100%;display:block}
-  .rm-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-  .rm-ar{font-size:19px;color:#8A6A18;line-height:1.6}
-  .rm-t{font-size:14px;font-weight:700;color:#4A3B14}
-  .rm-d{font-size:12.5px;color:#7A6838;line-height:1.45}
-  .rm-dots{flex:0 0 auto;display:flex;gap:4px;align-self:center}
-  .rm-dots i{width:5px;height:5px;border-radius:50%;background:#DFCF9E;display:block}
-  .rm-dots i[data-on="1"]{background:var(--gold)}
-  .remind:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .rm-ar{flex:1;min-width:0;font-size:19px;color:#8A6A18;line-height:1.7;
+    direction:rtl;text-align:right}
+  .rm-t{font-size:14px;font-weight:700;color:#4A3B14;line-height:1.3}
+  .rm-d{font-size:12.5px;color:#7A6838;line-height:1.5;margin-top:2px}
+  .rm-nav{display:flex;align-items:center;justify-content:space-between;
+    margin-top:11px;padding-top:10px;border-top:1px solid rgba(198,162,76,.28)}
+  .rm-dots{display:flex;gap:5px;align-items:center}
+  .rm-dots i{width:6px;height:6px;border-radius:50%;background:#E0CF9E;display:block}
+  .rm-dots i[data-on="1"]{background:var(--gold);transform:scale(1.15)}
+  .rm-arrows{display:flex;gap:7px}
+  .rm-a{width:32px;height:32px;border-radius:9px;cursor:pointer;font:inherit;font-size:18px;
+    line-height:1;color:#8A6A18;background:rgba(198,162,76,.14);
+    border:1px solid rgba(198,162,76,.4);display:grid;place-items:center;padding:0}
+  .rm-a:active{background:rgba(198,162,76,.3)}
+  .rm-a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-  /* ---- month view sheet ---- */
+  /* ---- full-screen sheets (month view, about) ---- */
   .sheet{position:fixed;inset:0;z-index:50;display:none}
   .sheet[data-open="1"]{display:block}
   .sheet .scrim{position:absolute;inset:0;background:rgba(12,32,24,.55);backdrop-filter:blur(2px)}
@@ -167,68 +174,6 @@
   table.mt tr.today td.d{box-shadow:inset 3px 0 0 var(--green-600)}
   table.mt tr{cursor:pointer}
   .mt-foot{padding:14px 16px 26px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
-
-  /* ---- donate ---- */
-  .card.phase{padding:16px}
-  .ph-tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green-600);
-    font-weight:700;margin-bottom:8px}
-  .ph-h{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:600;line-height:1.25}
-  .ph-p{font-size:14px;line-height:1.55;color:var(--muted);margin-top:8px}
-  .needs{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
-  .needs span{font-size:12px;font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
-    border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
-
-  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .tier{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;
-    padding:15px 10px;border-radius:14px;background:var(--card);
-    border:1px solid var(--line);box-shadow:var(--shadow)}
-  .t-amt{font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-  .t-name{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
-  .t-bronze{border-color:#D3A47C} .t-bronze .t-name{color:#A2673A}
-  .t-silver{border-color:#BFC4C2} .t-silver .t-name{color:#7A8380}
-  .t-gold{border-color:#D8BC72}   .t-gold .t-name{color:#9A7A1E}
-  .t-plat{border-color:#9FB0B8}   .t-plat .t-name{color:#5E727C}
-  .tier:active{transform:translateY(1px)}
-
-  .donate-cta{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:10px;
-    text-decoration:none;text-align:center;padding:17px 16px;border-radius:15px;
-    background:linear-gradient(180deg,var(--green-700),var(--green-900));
-    box-shadow:0 1px 2px rgba(12,59,42,.08), 0 14px 28px -18px rgba(12,59,42,.6);
-    border:1px solid rgba(198,162,76,.35)}
-  .dc-main{font-size:17px;font-weight:700;color:#F6F2E6;letter-spacing:.01em}
-  .dc-sub{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-bright)}
-  .dc-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:11px 4px 22px;text-align:center}
-  .dc-note b{color:var(--green-600)}
-  .hadith{position:relative;overflow:hidden;padding:26px 22px 24px;color:#F3EFE3;
-    background:linear-gradient(180deg,var(--green-800),var(--green-900))}
-  .hadith .girih{position:absolute;right:-50px;top:-44px;width:220px;height:220px;
-    color:var(--gold);opacity:.09;pointer-events:none}
-  .h-ar{font-size:23px;line-height:2;text-align:right;color:var(--gold-bright);
-    direction:rtl;margin-bottom:16px}
-  .h-en{font-family:"Fraunces",Georgia,serif;font-size:16.5px;line-height:1.55;color:#EDEFE9}
-  .h-src{font-size:11px;letter-spacing:.06em;color:#8FA79A;margin-top:12px;
-    padding-top:11px;border-top:1px solid rgba(198,162,76,.25)}
-  .appeal p{font-size:14.5px;line-height:1.6;color:var(--ink)}
-  .appeal p+p{margin-top:10px}
-  .appeal .strong{font-weight:600;color:var(--green-600)}
-  .card.appeal{padding:16px}
-  .card.bank{padding:4px 4px}
-  .bk{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;font:inherit;
-    cursor:pointer;background:none;border:none;border-top:1px solid var(--line);
-    padding:13px 13px;border-radius:11px}
-  .bk:first-child{border-top:none}
-  .bk:active{background:#F1F7F3}
-  .bk-k{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .bk-v{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:.01em}
-  .bk[data-done="1"] .bk-k::after{content:" · copied";color:var(--green-600);font-weight:700}
-  .copyall{width:100%;margin-top:12px;border:none;cursor:pointer;font:inherit;font-weight:700;
-    font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
-    padding:14px;border-radius:13px;box-shadow:var(--shadow)}
-  .card.giftaid{margin-top:20px;padding:15px;background:#F1F7F3;border-color:#D6E5DB}
-  .ga-h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-600);
-    font-weight:700;margin-bottom:7px}
-  .giftaid p{font-size:13.5px;line-height:1.55;color:#31473C}
-  .dnote{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
 
   /* ---- about page ---- */
   .ab-body{background:var(--paper)}
@@ -507,17 +452,23 @@
     </div>
   </section>
 
-  <button class="remind" id="remind" hidden>
-    <span class="rm-mark" aria-hidden="true">
-      <svg viewBox="0 0 100 100"><polygon fill="currentColor" points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26"/><polygon fill="currentColor" points="50,6 94,50 50,94 6,50" opacity=".55"/></svg>
-    </span>
-    <span class="rm-body">
-      <span class="rm-ar arabic" id="rm-ar">—</span>
-      <span class="rm-t" id="rm-t">—</span>
-      <span class="rm-d" id="rm-d">—</span>
-    </span>
-    <span class="rm-dots" id="rm-dots"></span>
-  </button>
+  <div class="remind" id="remind" hidden>
+    <div class="rm-head">
+      <span class="rm-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><polygon fill="currentColor" points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26"/><polygon fill="currentColor" points="50,6 94,50 50,94 6,50" opacity=".55"/></svg>
+      </span>
+      <span class="rm-ar arabic" id="rm-ar">&mdash;</span>
+    </div>
+    <div class="rm-t" id="rm-t">&mdash;</div>
+    <div class="rm-d" id="rm-d">&mdash;</div>
+    <div class="rm-nav" id="rm-nav">
+      <span class="rm-dots" id="rm-dots"></span>
+      <span class="rm-arrows">
+        <button class="rm-a" id="rm-prev" aria-label="Previous reminder">&#8249;</button>
+        <button class="rm-a" id="rm-next" aria-label="Next reminder">&#8250;</button>
+      </span>
+    </div>
+  </div>
 
   <nav class="datenav" aria-label="Choose a date">
     <button class="navbtn" id="prev" aria-label="Previous day">&#8249;</button>
@@ -1694,7 +1645,6 @@ function reminderCtx(){
     c.tDow=tmr.getDay();
     c.tDay=thm?parseInt(thm[1],10):0;
     c.tMonth=thm?thm[2]:"";
-    // masjid's own rule: suhūr ends 10 minutes before Fajr begins
     c.suhoor = tRec.begins.fajr ? minusMins(tRec.begins.fajr, 10) : null;
   }else{
     c.tDow=-1; c.tDay=0; c.tMonth="";
@@ -1710,6 +1660,8 @@ function reminderCtx(){
   return c;
 }
 
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
 function renderReminder(){
   const el=document.getElementById('remind');
   if(!STATE || !STATE.rec){ el.hidden=true; return; }
@@ -1722,18 +1674,33 @@ function renderReminder(){
   document.getElementById('rm-ar').textContent=r.ar;
   document.getElementById('rm-t').textContent=r.t;
   document.getElementById('rm-d').textContent = typeof r.d==="function" ? r.d(c) : r.d;
-  document.getElementById('rm-dots').innerHTML =
-    RM_LIST.length>1 ? RM_LIST.map((_,i)=>`<i data-on="${i===RM_IDX?1:0}"></i>`).join("") : "";
-  el.setAttribute('aria-label', RM_LIST.length>1
-    ? `${r.t}. Tap for the next reminder.` : r.t);
+  // nav only when there's more than one
+  const nav=document.getElementById('rm-nav');
+  nav.hidden = RM_LIST.length<2;
+  if(RM_LIST.length>1){
+    document.getElementById('rm-dots').innerHTML =
+      RM_LIST.map((_,i)=>`<i data-on="${i===RM_IDX?1:0}"></i>`).join("");
+  }
+}
+
+function rmStep(n){
+  if(RM_LIST.length<2) return;
+  RM_IDX=(RM_IDX+n+RM_LIST.length)%RM_LIST.length;
+  renderReminder();
 }
 
 function initReminders(){
-  document.getElementById('remind').addEventListener('click',()=>{
-    if(RM_LIST.length<2) return;
-    RM_IDX=(RM_IDX+1)%RM_LIST.length;
-    renderReminder();
-  });
+  document.getElementById('rm-prev').addEventListener('click',()=>rmStep(-1));
+  document.getElementById('rm-next').addEventListener('click',()=>rmStep(1));
+  // swipe the card as well
+  const el=document.getElementById('remind');
+  let x0=null;
+  el.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
+  el.addEventListener('touchend',e=>{
+    if(x0===null) return;
+    const dx=e.changedTouches[0].clientX-x0; x0=null;
+    if(Math.abs(dx)>45) rmStep(dx<0?1:-1);
+  },{passive:true});
 }
 
 /* ---------------- month view ---------------- */
@@ -1916,7 +1883,7 @@ function tick(){
   document.getElementById('track').style.width=pct+'%';
 
   // refresh time-window reminders (morning/evening adhkār) on the minute
-  if(now.getSeconds()===0){ const keep=RM_IDX; renderReminder(); RM_IDX=keep; }
+  if(now.getSeconds()===0) renderReminder();
 
   markRows(rec, base, now);
 }
