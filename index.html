@@ -46,7 +46,7 @@
 
   /* ---- brand bar ---- */
   .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
-    padding:14px 20px calc(14px);
+    padding:calc(14px + env(safe-area-inset-top,0)) 20px 14px;
     background:linear-gradient(180deg, var(--green-900), var(--green-800));
     color:#F3EFE3;border-bottom:1px solid rgba(198,162,76,.25)}
   .mark{width:30px;height:30px;flex:0 0 auto;color:var(--gold-bright)}
@@ -63,7 +63,7 @@
     color:var(--gold);opacity:.08;pointer-events:none}
   .datechip{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#BFD0C6;
     border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:5px 11px;margin-bottom:20px}
-  .live{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 0 0 rgba(220,187,99,.6);animation:pulse 2.4s infinite}
+  .datechip .live{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 0 0 rgba(220,187,99,.6);animation:pulse 2.4s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,187,99,.5)}70%{box-shadow:0 0 0 7px rgba(220,187,99,0)}100%{box-shadow:0 0 0 0 rgba(220,187,99,0)}}
   .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:9px}
   .nextname{display:flex;align-items:baseline;gap:12px}
@@ -256,7 +256,7 @@
     padding:14px;border-radius:13px;box-shadow:var(--shadow);letter-spacing:.2px}
   .enable[data-on="1"]{background:#E9F0EB;color:var(--green-600);box-shadow:none;border:1px solid var(--line)}
   .toggles{margin-top:6px;opacity:.45;pointer-events:none;transition:opacity .25s}
-  .toggles.live{opacity:1;pointer-events:auto}
+  .toggles.unlocked{opacity:1;pointer-events:auto}
   .tg{display:flex;align-items:center;gap:12px;padding:13px 4px;border-top:1px solid var(--line)}
   .tg:first-child{border-top:none}
   .tg .txt{flex:1}
@@ -298,7 +298,7 @@
   footer .fr{margin-top:8px;font-size:11px}
   footer .charity{margin-top:12px;font-size:10.5px;color:#9AA49D}
 
-  @media (prefers-reduced-motion: reduce){.live{animation:none}.track>i{transition:none}}
+  @media (prefers-reduced-motion: reduce){.datechip .live{animation:none}.track>i{transition:none}}
 </style>
 </head>
 <body>
@@ -1740,7 +1740,7 @@ function initAlerts(){
   const unlock=()=>{
     btn.dataset.on="1";
     btn.textContent="Notifications enabled on this device";
-    toggles.classList.add('live');
+    toggles.classList.add('unlocked');
     lead.textContent="Choose what you'd like to be told about.";
     note.textContent="Delivery starts once the masjid's notification service is connected.";
   };
