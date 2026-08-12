@@ -2620,10 +2620,43 @@ const OneSignalManager = (() => {
     });
   }
 
-  const run = fn => new Promise(res=>{
+  // never hang: if the SDK never loads, resolve null rather than leaving the UI stuck
+  const run = (fn, ms=8000) => new Promise(res=>{
+    let done=false;
+    const finish = v => { if(!done){ done=true; res(v); } };
+    setTimeout(()=>finish(null), ms);
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async OneSignal => { try{ res(await fn(OneSignal)); }catch(e){ console.warn(e); res(null); } });
+    window.OneSignalDeferred.push(async OneSignal => {
+      try{ finish(await fn(OneSignal)); }catch(e){ console.warn("OneSignal:", e); finish(null); }
+    });
   });
+
+  /* Why push may be impossible on this device, in plain words.
+     Returns null when everything needed is present. */
+  function blockedReason(){
+    try{
+    const ua = navigator.userAgent || "";
+    const iOS = /iPad|iPhone|iPod/.test(ua)
+             || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    const standalone = window.navigator.standalone===true
+             || (typeof window.matchMedia==="function"
+                 && window.matchMedia("(display-mode: standalone)").matches);
+    if(iOS && !standalone)
+      return "On iPhone, notifications only work once the app is added to your Home Screen. Tap Share, then “Add to Home Screen”, and open it from there.";
+    if(!("Notification" in window))
+      return "This browser doesn’t support notifications.";
+    if(!("serviceWorker" in navigator))
+      return "This browser doesn’t support the background service notifications need.";
+    if(!window.isSecureContext)
+      return "Notifications need a secure (https) connection.";
+    if(Notification.permission==="denied")
+      return "Notifications are blocked for this site. You can allow them in your browser or iOS settings.";
+    return null;
+    }catch(e){
+      console.warn("OneSignal capability check failed:", e);
+      return null;   // never block the button because the check itself broke
+    }
+  }
 
   const requestPermission = () => run(async OneSignal => {
     await OneSignal.Notifications.requestPermission();
@@ -2637,7 +2670,7 @@ const OneSignalManager = (() => {
   const permission  = () => run(OneSignal => OneSignal.Notifications.permission);
   const isReady     = () => ready;
 
-  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady };
+  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady, blockedReason };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
@@ -3117,6 +3150,7 @@ function initTabs(){
     ["times","live","alerts","donate","qibla"].forEach(n=>{
       document.getElementById("tab-"+n).hidden = (n!==name);
     });
+    if(name==="alerts") showAlertsBlockedHint();
     window.scrollTo({top:0,behavior:"instant"});
     if(name==="qibla") drawTicks();
   }));
@@ -3327,6 +3361,14 @@ function pushTopicTags(p){
   if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut();
 }
 
+/* if push can't work on this device, say so before they tap */
+function showAlertsBlockedHint(){
+  const why=OneSignalManager.blockedReason();
+  const note=document.getElementById('wirednote');
+  const btn=document.getElementById('enable');
+  if(why && btn && btn.dataset.on!=="1"){ note.textContent=why; }
+}
+
 function initAlerts(){
   const btn=document.getElementById('enable');
   const toggles=document.getElementById('toggles');
@@ -3343,14 +3385,23 @@ function initAlerts(){
 
   btn.addEventListener('click', async ()=>{
     if(btn.dataset.on==="1") return;
-    btn.disabled=true;
+
+    const why = OneSignalManager.blockedReason();
+    if(why){ note.textContent = why; return; }
+
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Just a moment…";
     const perm = await OneSignalManager.requestPermission();
-    btn.disabled=false;
+    btn.disabled = false;
+
     if(perm){
       unlock();
       pushTopicTags();
     }else{
-      note.textContent="Notifications are blocked for this site. You can allow them in your browser settings.";
+      btn.textContent = label;
+      note.textContent = OneSignalManager.blockedReason()
+        || "Couldn’t turn notifications on just now. Please check your connection and try again.";
     }
   });
 
