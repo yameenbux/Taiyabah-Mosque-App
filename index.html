@@ -52,6 +52,8 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none !important}
+  .vis-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;
+    left:16px;top:0;border:0;padding:0;margin:0}
   html,body{background:#EDE7D8;color:var(--ink);-webkit-font-smoothing:antialiased}
   body{max-width:520px;margin-inline:auto;min-height:100dvh;
     background:
@@ -624,11 +626,10 @@
     </button>
     <button class="navbtn" id="next" aria-label="Next day">&#8250;</button>
   </nav>
+  <input type="date" id="datein" class="vis-hidden" min="2026-01-01" max="2026-12-31" aria-label="Choose a date">
   <div class="chips">
     <button class="chip" id="chip-today" data-on="1">Today</button>
-    <button class="chip" id="chip-tom">Tomorrow</button>
     <button class="chip" id="chip-fri">Next Jumu&#703;ah</button>
-    <label class="chip pick">Pick date<input type="date" id="datein" min="2026-01-01" max="2026-12-31"></label>
     <button class="chip" id="chip-month">Full month</button>
   </div>
 
@@ -650,7 +651,7 @@
   </div>
 
   <div class="wrap">
-    <div class="sec-h"><h2 id="tt-h">Today</h2><span class="rule"></span><span class="tag" id="tt-tag">Begins &amp; Jamā&#703;ah</span></div>
+    <div class="sec-h"><h2 id="tt-h">Today</h2><span class="rule"></span><span class="tag" id="tt-tag">Beginning &amp; Jamā&#703;ah</span></div>
     <div class="card tt" id="timetable"></div>
     <div class="samplenote" id="samplenote" hidden></div>
 
@@ -1479,7 +1480,7 @@ let STATE = null;
 
 function buildTimetable(rec, baseDate){
   const tt = document.getElementById("timetable");
-  let html = `<div class="col-h"><span>Prayer</span><span class="r">Begins</span><span class="r">Jamā&#703;ah</span></div>`;
+  let html = `<div class="col-h"><span>Prayer</span><span class="r">Beginning</span><span class="r">Jamā&#703;ah</span></div>`;
   PRAYERS.forEach(p=>{
     const b = rec.begins[p.key];
     const j = p.info ? null : rec.jamaat[p.key];
@@ -1583,10 +1584,8 @@ function updateNavUI(){
   const fri=nextJummah();
   const on=(id,cond)=>document.getElementById(id).dataset.on = cond?"1":"0";
   on('chip-today', sameDay(VIEW,t));
-  on('chip-tom',   sameDay(VIEW,addDays(t,1)));
   on('chip-fri',   sameDay(VIEW,fri));
   // grey out shortcuts that fall outside the loaded timetable
-  document.getElementById('chip-tom').disabled = !dayRec(addDays(t,1));
   document.getElementById('chip-fri').disabled = !dayRec(fri);
   document.getElementById('tt-h').textContent =
     sameDay(VIEW,t) ? "Today" : `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
@@ -2015,7 +2014,6 @@ function initNav(){
   document.getElementById('prev').addEventListener('click',()=>goto(addDays(VIEW,-1)));
   document.getElementById('next').addEventListener('click',()=>goto(addDays(VIEW,1)));
   document.getElementById('chip-today').addEventListener('click',()=>goto(today0()));
-  document.getElementById('chip-tom').addEventListener('click',()=>goto(addDays(today0(),1)));
   document.getElementById('chip-fri').addEventListener('click',()=>goto(nextJummah()));
   document.getElementById('daypick').addEventListener('click',()=>{
     const el=document.getElementById('datein');
@@ -2092,7 +2090,7 @@ function tick(){
   document.getElementById('count').textContent = cd;
 
   document.getElementById('subline').innerHTML =
-    `${bt?`Begins <b>${hm12(bt)}</b>`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
+    `${bt?`Beginning time <b>${hm12(bt)}</b>`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
 
   // progress begins→jamaat for the upcoming prayer (today only)
   const beginsAt = (bt && !nx.tomorrow) ? atToday(base, bt) : null;
