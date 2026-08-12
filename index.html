@@ -164,9 +164,71 @@
   table.mt tr{cursor:pointer}
   .mt-foot{padding:14px 16px 26px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
 
+  /* ---- donate ---- */
+  .card.phase{padding:16px}
+  .ph-tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green-600);
+    font-weight:700;margin-bottom:8px}
+  .ph-h{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:600;line-height:1.25}
+  .ph-p{font-size:14px;line-height:1.55;color:var(--muted);margin-top:8px}
+  .needs{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+  .needs span{font-size:12px;font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
+    border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
+
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .tier{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;
+    padding:15px 10px;border-radius:14px;background:var(--card);
+    border:1px solid var(--line);box-shadow:var(--shadow)}
+  .t-amt{font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .t-name{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+  .t-bronze{border-color:#D3A47C} .t-bronze .t-name{color:#A2673A}
+  .t-silver{border-color:#BFC4C2} .t-silver .t-name{color:#7A8380}
+  .t-gold{border-color:#D8BC72}   .t-gold .t-name{color:#9A7A1E}
+  .t-plat{border-color:#9FB0B8}   .t-plat .t-name{color:#5E727C}
+  .tier:active{transform:translateY(1px)}
+
+  .donate-cta{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:10px;
+    text-decoration:none;text-align:center;padding:17px 16px;border-radius:15px;
+    background:linear-gradient(180deg,var(--green-700),var(--green-900));
+    box-shadow:0 1px 2px rgba(12,59,42,.08), 0 14px 28px -18px rgba(12,59,42,.6);
+    border:1px solid rgba(198,162,76,.35)}
+  .dc-main{font-size:17px;font-weight:700;color:#F6F2E6;letter-spacing:.01em}
+  .dc-sub{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-bright)}
+  .dc-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:11px 4px 22px;text-align:center}
+  .dc-note b{color:var(--green-600)}
+  .hadith{position:relative;overflow:hidden;padding:26px 22px 24px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--green-800),var(--green-900))}
+  .hadith .girih{position:absolute;right:-50px;top:-44px;width:220px;height:220px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .h-ar{font-size:23px;line-height:2;text-align:right;color:var(--gold-bright);
+    direction:rtl;margin-bottom:16px}
+  .h-en{font-family:"Fraunces",Georgia,serif;font-size:16.5px;line-height:1.55;color:#EDEFE9}
+  .h-src{font-size:11px;letter-spacing:.06em;color:#8FA79A;margin-top:12px;
+    padding-top:11px;border-top:1px solid rgba(198,162,76,.25)}
+  .appeal p{font-size:14.5px;line-height:1.6;color:var(--ink)}
+  .appeal p+p{margin-top:10px}
+  .appeal .strong{font-weight:600;color:var(--green-600)}
+  .card.appeal{padding:16px}
+  .card.bank{padding:4px 4px}
+  .bk{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;font:inherit;
+    cursor:pointer;background:none;border:none;border-top:1px solid var(--line);
+    padding:13px 13px;border-radius:11px}
+  .bk:first-child{border-top:none}
+  .bk:active{background:#F1F7F3}
+  .bk-k{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .bk-v{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:.01em}
+  .bk[data-done="1"] .bk-k::after{content:" · copied";color:var(--green-600);font-weight:700}
+  .copyall{width:100%;margin-top:12px;border:none;cursor:pointer;font:inherit;font-weight:700;
+    font-size:15px;color:#F3EFE3;background:linear-gradient(180deg,var(--green-700),var(--green-800));
+    padding:14px;border-radius:13px;box-shadow:var(--shadow)}
+  .card.giftaid{margin-top:20px;padding:15px;background:#F1F7F3;border-color:#D6E5DB}
+  .ga-h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-600);
+    font-weight:700;margin-bottom:7px}
+  .giftaid p{font-size:13.5px;line-height:1.55;color:#31473C}
+  .dnote{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
+
   /* ---- bottom tab bar ---- */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:520px;margin-inline:auto;
-    display:grid;grid-template-columns:repeat(3,1fr);
+    display:grid;grid-template-columns:repeat(4,1fr);
     background:rgba(252,250,243,.96);backdrop-filter:blur(12px);
     border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0)}
@@ -503,7 +565,69 @@
     </div>
   </main>
 
-  <nav class="tabbar" role="tablist">
+    <main id="tab-donate" hidden>
+    <section class="hadith">
+      <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+      <p class="h-ar arabic">مَنْ بَنَى مَسْجِدًا لِلَّهِ بَنَى اللَّهُ لَهُ فِي الْجَنَّةِ مِثْلَهُ</p>
+      <p class="h-en">&ldquo;Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.&rdquo;</p>
+      <p class="h-src">Narrated by ʿUthmān ibn ʿAffān &middot; Ṣaḥīḥ al-Bukhārī 450 &middot; Ṣaḥīḥ Muslim 533</p>
+    </section>
+
+    <div class="wrap">
+      <div class="sec-h"><h2>Where the build is now</h2><span class="rule"></span></div>
+      <div class="card phase">
+        <div class="ph-tag">Current appeal &middot; Phase 3.3</div>
+        <h3 class="ph-h">Internal fixtures &amp; fittings</h3>
+        <p class="ph-p">Help make the masjid ready for salah, Qur&rsquo;an and remembrance
+          for generations to come.</p>
+        <div class="needs">
+          <span>Tiling</span><span>Carpets</span><span>Heating</span>
+          <span>Lighting</span><span>Electrical</span><span>Decor</span>
+        </div>
+      </div>
+
+      <div class="sec-h"><h2>Give online</h2><span class="rule"></span><span class="tag">Apple &amp; Google Pay</span></div>
+      <div class="tiers">
+        <a class="tier t-bronze" href="https://www.taiyabahmasjid.com/product/bronze-donor/" target="_blank" rel="noopener">
+          <span class="t-amt">£250</span><span class="t-name">Bronze</span></a>
+        <a class="tier t-silver" href="https://www.taiyabahmasjid.com/product/silver-donor/" target="_blank" rel="noopener">
+          <span class="t-amt">£500</span><span class="t-name">Silver</span></a>
+        <a class="tier t-gold" href="https://www.taiyabahmasjid.com/product/gold-donor/" target="_blank" rel="noopener">
+          <span class="t-amt">£1,000</span><span class="t-name">Gold</span></a>
+        <a class="tier t-plat" href="https://www.taiyabahmasjid.com/product/platinum-donor/" target="_blank" rel="noopener">
+          <span class="t-amt">£5,000</span><span class="t-name">Platinum</span></a>
+      </div>
+      <a class="donate-cta" href="https://www.taiyabahmasjid.com/product/dome-donation/" target="_blank" rel="noopener">
+        <span class="dc-main">Give any other amount</span>
+        <span class="dc-sub">Card &middot; Apple Pay &middot; Google Pay</span>
+      </a>
+      <p class="dc-note">Opens the masjid&rsquo;s secure donation page. If you are a UK taxpayer,
+        please add Gift Aid &mdash; it adds <b>25p to every £1</b> at no cost to you.</p>
+
+      <div class="sec-h"><h2>Or transfer directly</h2><span class="rule"></span><span class="tag">Tap to copy</span></div>
+      <div class="card bank" id="bank">
+        <button class="bk" data-copy="Bolton Central Islamic Society">
+          <span class="bk-k">Account name</span><span class="bk-v">Bolton Central Islamic Society (BCIS)</span>
+        </button>
+        <button class="bk" data-copy="HSBC">
+          <span class="bk-k">Bank</span><span class="bk-v">HSBC</span>
+        </button>
+        <button class="bk" data-copy="40-04-15">
+          <span class="bk-k">Sort code</span><span class="bk-v tnum">40-04-15</span>
+        </button>
+        <button class="bk" data-copy="02320258">
+          <span class="bk-k">Account number</span><span class="bk-v tnum">02320258</span>
+        </button>
+      </div>
+      <button class="copyall" id="copyall">Copy all details</button>
+
+      <p class="dnote">Bolton Central Islamic Society &middot; Registered charity 1041569.
+        If you are ever unsure about donation details, please confirm them at the
+        masjid office before transferring.</p>
+    </div>
+  </main>
+
+<nav class="tabbar" role="tablist">
     <button class="tab" data-tab="times" data-on="1" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       <span>Times</span>
@@ -515,6 +639,10 @@
     <button class="tab" data-tab="alerts" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
       <span>Alerts</span>
+    </button>
+    <button class="tab" data-tab="donate" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-5h4v5"/><path d="M12 2v3"/></svg>
+      <span>Donate</span>
     </button>
   </nav>
 
@@ -1525,13 +1653,52 @@ function tick(){
   markRows(rec, base, now);
 }
 
+
+/* ---------------- donate: copy helpers ---------------- */
+async function copyText(t){
+  try{
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(t); return true; }
+  }catch(e){}
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=t; ta.setAttribute('readonly','');
+    ta.style.cssText='position:absolute;left:-9999px';
+    document.body.appendChild(ta); ta.select();
+    const ok=document.execCommand('copy'); document.body.removeChild(ta);
+    return ok;
+  }catch(e){ return false; }
+}
+
+function initDonate(){
+  document.querySelectorAll('.bk').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const ok=await copyText(b.dataset.copy);
+      if(!ok) return;
+      b.dataset.done="1";
+      setTimeout(()=>b.dataset.done="0", 1800);
+    });
+  });
+  const all=document.getElementById('copyall');
+  all.addEventListener('click', async ()=>{
+    const text=[
+      "Bolton Central Islamic Society (BCIS)",
+      "HSBC",
+      "Sort code: 40-04-15",
+      "Account number: 02320258"
+    ].join("\n");
+    const ok=await copyText(text);
+    all.textContent = ok ? "Copied" : "Couldn't copy — please copy manually";
+    setTimeout(()=>all.textContent="Copy all details", 2000);
+  });
+}
+
 /* ---------------- tabs ---------------- */
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>b.addEventListener('click',()=>{
     const name=b.dataset.tab;
     tabs.forEach(t=>t.dataset.on = t===b ? "1" : "0");
-    ["times","qibla","alerts"].forEach(n=>{
+    ["times","qibla","alerts","donate"].forEach(n=>{
       document.getElementById("tab-"+n).hidden = (n!==name);
     });
     window.scrollTo({top:0,behavior:"instant"});
@@ -1784,6 +1951,7 @@ function boot(){
   initReminders();
   initTabs();
   initQibla();
+  initDonate();
   VIEW=today0();
   status(null);
   render();
