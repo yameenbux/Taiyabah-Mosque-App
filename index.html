@@ -348,6 +348,77 @@
     font-size:13px;font-weight:600;color:var(--brand-600);
     background:#F0E9ED;border-radius:12px;padding:13px}
 
+  /* ---- zakat calculator ---- */
+  .zk-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 24px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .zk-hero .girih{position:absolute;right:-48px;top:-42px;width:200px;height:200px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .zk-ar{font-size:25px;color:var(--gold-bright);line-height:1.9;direction:rtl}
+  .zk-en{font-family:"Fraunces",Georgia,serif;font-size:16px;color:#EDEFE9;margin-top:8px}
+  .zk-src{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#BBA9B4;margin-top:8px}
+  .card.zk-explain{padding:16px;margin-bottom:4px}
+  .zk-explain h4{font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600;margin-bottom:9px}
+  .zk-explain p{font-size:14px;line-height:1.6;color:var(--ink)}
+  .zk-explain p+p{margin-top:9px}
+  .zk-ul{margin:9px 0 0 2px;padding-left:18px}
+  .zk-ul li{font-size:13.5px;line-height:1.65;color:var(--ink);margin-bottom:4px}
+  .zk-tip{margin-top:11px;font-size:12.5px;line-height:1.55;color:#7A6838;
+    background:rgba(198,162,76,.14);border:1px solid rgba(198,162,76,.3);
+    border-radius:10px;padding:10px 12px}
+  .card.zk-card{padding:16px}
+  .zk-p{font-size:13.5px;line-height:1.6;color:var(--muted);margin-bottom:12px}
+  .zk-seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .zk-seg button{cursor:pointer;font:inherit;font-size:13px;font-weight:600;padding:11px 6px;
+    border-radius:11px;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
+  .zk-seg button[data-on="1"]{background:var(--brand-700);border-color:var(--brand-700);color:#F3EFE3}
+  .zk-note{font-size:12px;line-height:1.55;color:var(--muted);margin-top:10px}
+  .zk-f{display:block;margin-top:14px}
+  .zk-l{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    font-size:12.5px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+  .zk-l a{color:var(--brand-600);font-weight:600;text-decoration:none;white-space:nowrap}
+  .zk-f input{width:100%;font:inherit;font-size:17px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 13px;
+    font-variant-numeric:tabular-nums}
+  .zk-f input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+  .zk-live{font-size:12px;font-weight:600;line-height:1.5;margin-top:13px;
+    border-radius:10px;padding:9px 11px;background:#F0E9ED;color:var(--brand-600);
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .zk-live[data-s="idle"]{display:none}
+  .zk-live[data-s="loading"]{color:var(--muted)}
+  .zk-live[data-s="failed"]{background:var(--danger-bg,#FBF0EB);color:#7C3A20}
+  .zk-refresh{margin-left:auto;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;
+    color:inherit;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);
+    border-radius:999px;padding:4px 10px}
+  .zk-nisab{margin-top:13px;font-size:14px;font-weight:600;color:var(--brand-600);
+    background:#F0E9ED;border-radius:11px;padding:12px 13px;line-height:1.5}
+  .zk-gsnote{font-size:12px;color:var(--muted);margin-top:11px;line-height:1.5}
+  .zk-result{margin-top:20px;border-radius:16px;overflow:hidden;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900));color:#F3EFE3;
+    padding:16px;box-shadow:var(--shadow)}
+  .zk-r-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    font-size:13.5px;color:#D5C7D0;padding:7px 0}
+  .zk-r-row span:last-child{font-weight:600;color:#fff}
+  .zk-net{border-top:1px solid rgba(255,255,255,.14);margin-top:5px;padding-top:11px;font-size:15px}
+  .zk-verdict{font-size:13px;line-height:1.55;color:#BBA9B4;margin-top:12px;
+    border-top:1px solid rgba(255,255,255,.12);padding-top:12px}
+  .zk-due{margin-top:12px;text-align:center;border-radius:13px;padding:14px;
+    background:rgba(198,162,76,.15);border:1px solid rgba(198,162,76,.4)}
+  .zk-due-k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright)}
+  .zk-due-v{font-size:38px;font-weight:700;color:var(--gold-bright);line-height:1.15;margin-top:4px}
+  .zk-reset{width:100%;margin-top:13px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;
+    color:#BBA9B4;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+    border-radius:10px;padding:11px}
+  .card.zk-lists{padding:16px}
+  .zk-lists h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    margin-bottom:9px}
+  .zk-yes h4{color:var(--brand-600)}
+  .zk-no h4{color:var(--danger)}
+  .zk-no{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .zk-lists ul{padding-left:18px}
+  .zk-lists li{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:6px}
+  .zk-disclaimer{font-size:12.5px;line-height:1.65;color:#7C3A20;background:var(--danger-bg,#FBF0EB);
+    border:1px solid #EBCDBF;border-radius:12px;padding:13px;margin:18px 0 28px}
+
   /* ---- about page ---- */
   .ab-body{background:var(--paper)}
   .ab-hero{position:relative;overflow:hidden;padding:26px 20px 24px;color:#F3EFE3;
@@ -995,6 +1066,131 @@
     </div>
   </div>
 
+  <div class="sheet" id="zakat" data-open="0" role="dialog" aria-modal="true" aria-label="Zakat calculator">
+    <div class="scrim" id="zk-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left">Zakat calculator</h3>
+        <button class="sh-close" id="zk-close">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="zk-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <p class="zk-ar arabic">مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ</p>
+          <p class="zk-en">&ldquo;Charity does not decrease wealth.&rdquo;</p>
+          <p class="zk-src">The Prophet &#65018; &middot; Ṣaḥīḥ Muslim 2588</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="card zk-explain">
+            <h4>New to zakat? Start here</h4>
+            <p>Zakat is a share of your savings given each year to those in need. It is
+               <b>2.5%</b> &mdash; £2.50 out of every £100 you have kept for a whole year.</p>
+            <p>You pay it if all of these are true:</p>
+            <ul class="zk-ul">
+              <li>You are Muslim and have reached the age of puberty</li>
+              <li>What you own is worth more than the <b>nisab</b> (the minimum amount, below)</li>
+              <li>You have owned that much for one full <b>lunar year</b></li>
+            </ul>
+            <p class="zk-tip">Pick the same date each Islamic year &mdash; many choose a day in
+               Ramadan &mdash; and work out your zakat on that day every year.</p>
+          </div>
+
+          <div class="sec-h"><h2>1 &middot; The nisab</h2><span class="rule"></span></div>
+          <div class="card zk-card">
+            <p class="zk-p">Nisab is the minimum you must own before zakat is due. It is fixed in
+               gold and silver, so its value in pounds changes with the metal price.</p>
+            <div class="zk-seg" id="zk-standard">
+              <button data-std="silver" data-on="1">Silver &middot; 612.36g</button>
+              <button data-std="gold" data-on="0">Gold &middot; 87.48g</button>
+            </div>
+            <p class="zk-note">The Hanafi school uses the <b>silver</b> nisab, which is lower &mdash;
+               so more people qualify to give.</p>
+            <div class="zk-live" id="zk-live" data-s="idle">&nbsp;</div>
+            <label class="zk-f">
+              <span class="zk-l">Price per gram today (£) <a href="https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/" target="_blank" rel="noopener">check&nbsp;price</a></span>
+              <input type="number" id="zk-price" inputmode="decimal" step="0.01" min="0" placeholder="e.g. 0.85">
+            </label>
+            <div class="zk-nisab" id="zk-nisab">Enter today&rsquo;s price to see the nisab</div>
+          </div>
+
+          <div class="sec-h"><h2>2 &middot; What you own</h2><span class="rule"></span></div>
+          <div class="card zk-card">
+            <label class="zk-f"><span class="zk-l">Cash &mdash; at home, bank, savings (£)</span>
+              <input type="number" id="zk-cash" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <label class="zk-f"><span class="zk-l">Gold you own (grams)</span>
+              <input type="number" id="zk-gold" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <label class="zk-f"><span class="zk-l">Silver you own (grams)</span>
+              <input type="number" id="zk-silver" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <label class="zk-f"><span class="zk-l">Money owed to you that you expect back (£)</span>
+              <input type="number" id="zk-owed" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <label class="zk-f"><span class="zk-l">Business stock &mdash; goods bought to sell (£)</span>
+              <input type="number" id="zk-stock" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <label class="zk-f"><span class="zk-l">Shares, crypto &amp; other investments (£)</span>
+              <input type="number" id="zk-invest" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <p class="zk-gsnote" id="zk-gsnote" hidden></p>
+          </div>
+
+          <div class="sec-h"><h2>3 &middot; What you owe</h2><span class="rule"></span></div>
+          <div class="card zk-card">
+            <label class="zk-f"><span class="zk-l">Debts and bills due now (£)</span>
+              <input type="number" id="zk-debts" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <p class="zk-note">Include what you owe right now &mdash; bills, rent, money borrowed.
+               For a mortgage, most scholars say to deduct only the payments due, not the whole loan.
+               Ask the imam if you are unsure.</p>
+          </div>
+
+          <div class="zk-result" id="zk-result">
+            <div class="zk-r-row"><span>Total you own</span><span class="tnum" id="zk-total">£0.00</span></div>
+            <div class="zk-r-row"><span>Less what you owe</span><span class="tnum" id="zk-less">£0.00</span></div>
+            <div class="zk-r-row zk-net"><span>Zakatable wealth</span><span class="tnum" id="zk-net">£0.00</span></div>
+            <div class="zk-verdict" id="zk-verdict">Enter your amounts above</div>
+            <div class="zk-due" id="zk-due" hidden>
+              <div class="zk-due-k">Zakat due &middot; 2.5%</div>
+              <div class="zk-due-v tnum" id="zk-amount">£0.00</div>
+            </div>
+            <button class="zk-reset" id="zk-reset">Clear all</button>
+          </div>
+
+          <div class="sec-h"><h2>What counts</h2><span class="rule"></span></div>
+          <div class="card zk-lists">
+            <div class="zk-yes">
+              <h4>Include these</h4>
+              <ul>
+                <li>Cash at home, in the bank, or in any savings account</li>
+                <li>All gold and silver you own &mdash; <b>including jewellery you wear</b></li>
+                <li>Money you are saving for something, like a wedding, a car or Hajj</li>
+                <li>Money people owe you that you expect to get back</li>
+                <li>Goods you bought in order to sell them</li>
+                <li>Shares bought to trade, and cryptocurrency</li>
+                <li>Money in a pension you can access</li>
+              </ul>
+            </div>
+            <div class="zk-no">
+              <h4>Leave these out</h4>
+              <ul>
+                <li>The home you live in</li>
+                <li>Your car, clothes, phone and furniture</li>
+                <li>Tools and machinery you use for work &mdash; unless you bought them to sell</li>
+                <li>A property you rent out &mdash; but rent you have saved does count</li>
+                <li>Debts you are owed but do not expect to get back</li>
+                <li>Anything you have already spent</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="zk-disclaimer"><b>This is a guide, not a ruling.</b> It follows the Hanafi
+            position and uses the price you enter. Zakat can depend on your own circumstances,
+            and scholars differ on things like pensions, shares and long-term debt. For anything
+            you are unsure about, please ask the imam at the masjid.</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
@@ -1023,8 +1219,8 @@
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t">Ramadan 2027</span><span class="soon-tag">Coming soon</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Zakat calculator</span><span class="soon-tag">Coming soon</span>
+        <button class="dr-row" data-act="zakat">
+          <span class="dr-t">Zakat calculator</span><span class="dr-ch">&rsaquo;</span>
         </button>
 
         <div class="dr-h">Madrasah</div>
@@ -2219,6 +2415,222 @@ try{
   console.log("Not licensed for reuse elsewhere. See LICENSE.md.");
 }catch(e){}
 
+/* ---------------- live metal prices ----------------
+   Fetched key-free so nothing sensitive sits in this public repo.
+   Spot prices are quoted in USD per troy ounce, so we also need a
+   USD→GBP rate; both providers are free, no-key and CORS-enabled.
+
+   Everything is sanity-checked before use: a wrong nisab is worse than
+   no nisab, so an implausible figure is discarded and the user is asked
+   to enter the price themselves. The calculator works either way.
+--------------------------------------------------- */
+const TROY_OZ_G = 31.1034768;
+const SANE = { gold:[500,20000], silver:[3,500], fx:[0.4,1.6] };   // USD/oz, USD→GBP
+let LIVE = { gold:null, silver:null, at:null, state:"idle" };
+
+async function fetchJSON(url, ms=6000){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(), ms);
+  try{
+    const r=await fetch(url,{signal:c.signal,cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+const inRange=(v,[lo,hi])=> typeof v==="number" && isFinite(v) && v>=lo && v<=hi;
+
+async function fetchMetalPrices(){
+  LIVE.state="loading"; zkPriceUI();
+  try{
+    const [g,s,fx] = await Promise.all([
+      fetchJSON("https://api.gold-api.com/price/XAU"),
+      fetchJSON("https://api.gold-api.com/price/XAG"),
+      fetchJSON("https://api.frankfurter.app/latest?from=USD&to=GBP")
+    ]);
+    const goldUsd   = g && Number(g.price);
+    const silverUsd = s && Number(s.price);
+    const rate      = fx && fx.rates && Number(fx.rates.GBP);
+
+    if(!inRange(goldUsd,SANE.gold) || !inRange(silverUsd,SANE.silver) || !inRange(rate,SANE.fx))
+      throw new Error("implausible values");
+
+    LIVE.gold   = (goldUsd   / TROY_OZ_G) * rate;    // £ per gram
+    LIVE.silver = (silverUsd / TROY_OZ_G) * rate;
+    LIVE.at     = new Date();
+    LIVE.state  = "ok";
+  }catch(e){
+    LIVE.state="failed";
+  }
+  zkPriceUI(true);
+}
+
+/* put the live price into the field unless the user has typed their own */
+function zkPriceUI(applyValue){
+  const el=document.getElementById('zk-live');
+  const input=document.getElementById('zk-price');
+  if(!el) return;
+  if(LIVE.state==="loading"){
+    el.dataset.s="loading"; el.textContent="Fetching today’s price…"; return;
+  }
+  if(LIVE.state==="ok"){
+    const p=LIVE[ZK_STD];
+    el.dataset.s="ok";
+    el.innerHTML = `Live ${ZK_STD} price · £${p.toFixed(2)}/g · updated ${
+      LIVE.at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}
+      <button class="zk-refresh" id="zk-refresh">Refresh</button>`;
+    document.getElementById('zk-refresh').addEventListener('click',fetchMetalPrices);
+    if(applyValue && !input.dataset.touched){
+      input.value = p.toFixed(2);
+      zkCalc();
+    }
+    return;
+  }
+  if(LIVE.state==="failed"){
+    el.dataset.s="failed";
+    el.innerHTML = `Couldn’t fetch today’s price — please enter it below.
+      <button class="zk-refresh" id="zk-refresh">Try again</button>`;
+    document.getElementById('zk-refresh').addEventListener('click',fetchMetalPrices);
+  }
+}
+
+/* ---------------- zakat calculator ----------------
+   Rate: 2.5% (one fortieth) of zakatable wealth held for a lunar year.
+   Nisab (classical weights, unchanged):
+     silver — 612.36 g   (200 dirhams)
+     gold   —  87.48 g   (20 mithqāl)
+   The Hanafi school uses the silver nisab, being the lower threshold.
+   Metal prices move daily, so the price is entered by the user rather
+   than hardcoded — a fixed threshold would be wrong within weeks.
+--------------------------------------------------- */
+const NISAB_G = { silver: 612.36, gold: 87.48 };
+const ZAKAT_RATE = 0.025;
+let ZK_STD = "silver";
+
+function zkNum(id){
+  const v=parseFloat(document.getElementById(id).value);
+  return (isFinite(v) && v>0) ? v : 0;
+}
+function gbp(n){
+  return "£" + n.toLocaleString("en-GB",{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function zkCalc(){
+  const price = zkNum('zk-price');
+  const nisabG = NISAB_G[ZK_STD];
+  const nisab = price>0 ? price*nisabG : 0;
+
+  // nisab line
+  const nEl=document.getElementById('zk-nisab');
+  nEl.textContent = price>0
+    ? `Nisab today: ${gbp(nisab)}  (${nisabG}g of ${ZK_STD} × ${gbp(price)})`
+    : "Enter today’s price to see the nisab";
+
+  // gold and silver are weighed, so they need a price per gram for each metal.
+  // The single price field applies to the chosen standard; the other metal is
+  // valued only if the user is using that standard — otherwise we ask for it.
+  const goldG   = zkNum('zk-gold');
+  const silverG = zkNum('zk-silver');
+  let metalValue = 0, missing = [];
+  if(goldG>0){
+    if(ZK_STD==="gold") metalValue += goldG*price;
+    else missing.push("gold");
+  }
+  if(silverG>0){
+    if(ZK_STD==="silver") metalValue += silverG*price;
+    else missing.push("silver");
+  }
+  const note=document.getElementById('zk-gsnote');
+  if(missing.length){
+    note.hidden=false;
+    note.innerHTML = `To value your ${missing.join(" and ")}, switch the nisab standard above to
+      <b>${missing[0]}</b> and enter that price — or add its value to the cash box.
+      Your ${missing.join(" and ")} is <b>not</b> counted yet.`;
+  }else{
+    note.hidden=true;
+  }
+
+  const assets = zkNum('zk-cash') + metalValue + zkNum('zk-owed')
+               + zkNum('zk-stock') + zkNum('zk-invest');
+  const debts  = zkNum('zk-debts');
+  const net    = Math.max(0, assets - debts);
+
+  document.getElementById('zk-total').textContent = gbp(assets);
+  document.getElementById('zk-less').textContent  = gbp(debts);
+  document.getElementById('zk-net').textContent   = gbp(net);
+
+  const verdict=document.getElementById('zk-verdict');
+  const dueBox=document.getElementById('zk-due');
+
+  if(price<=0){
+    verdict.textContent="Enter today’s metal price above to work out your nisab.";
+    dueBox.hidden=true; return;
+  }
+  if(assets===0){
+    verdict.textContent="Enter what you own above.";
+    dueBox.hidden=true; return;
+  }
+  // compare in whole pence: floating point can make an exact-nisab amount
+  // read as fractionally below it (87.48 × 80 = 6998.400000000001)
+  const pence = x => Math.round(x*100);
+  if(pence(net) < pence(nisab)){
+    verdict.innerHTML = `Your wealth is <b>below</b> the nisab of ${gbp(nisab)}, so zakat is
+      not due. You may still give sadaqah if you wish.`;
+    dueBox.hidden=true; return;
+  }
+  verdict.innerHTML = `Your wealth is <b>above</b> the nisab of ${gbp(nisab)}. Zakat is due if
+    you have held this much for a full lunar year.`;
+  dueBox.hidden=false;
+  document.getElementById('zk-amount').textContent = gbp(net*ZAKAT_RATE);
+}
+
+function initZakat(){
+  ['zk-price','zk-cash','zk-gold','zk-silver','zk-owed','zk-stock','zk-invest','zk-debts']
+    .forEach(id=>document.getElementById(id).addEventListener('input',zkCalc));
+  document.getElementById('zk-price').addEventListener('input',e=>{
+    e.target.dataset.touched = e.target.value.trim() ? "1" : "";
+  });
+
+  document.querySelectorAll('#zk-standard button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      ZK_STD=b.dataset.std;
+      document.querySelectorAll('#zk-standard button')
+        .forEach(x=>x.dataset.on = x===b ? "1":"0");
+      const inp=document.getElementById('zk-price');
+      if(LIVE.state==="ok" && !inp.dataset.touched) inp.value = LIVE[ZK_STD].toFixed(2);
+      zkPriceUI();
+      zkCalc();
+    });
+  });
+
+  document.getElementById('zk-reset').addEventListener('click',()=>{
+    ['zk-price','zk-cash','zk-gold','zk-silver','zk-owed','zk-stock','zk-invest','zk-debts']
+      .forEach(id=>document.getElementById(id).value="");
+    const inp=document.getElementById('zk-price');
+    inp.dataset.touched="";
+    if(LIVE.state==="ok") inp.value = LIVE[ZK_STD].toFixed(2);
+    zkCalc();
+  });
+
+  document.getElementById('zk-close').addEventListener('click',closeZakat);
+  document.getElementById('zk-scrim').addEventListener('click',closeZakat);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('zakat').dataset.open==="1") closeZakat();
+  });
+}
+
+function openZakat(){
+  document.getElementById('zakat').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#zakat .sh-body').scrollTop=0;
+  if(LIVE.state==="idle" || LIVE.state==="failed") fetchMetalPrices();
+  else zkPriceUI();
+  zkCalc();
+}
+function closeZakat(){
+  document.getElementById('zakat').dataset.open="0";
+  document.body.style.overflow="";
+}
+
 /* ---------------- videos ----------------
    Thumbnails come from YouTube's static image URLs and playback uses the
    privacy-enhanced embed player — so there is no API key in this repo and
@@ -2417,6 +2829,7 @@ function initDrawer(){
       if(act==="about"){ setTimeout(openAbout,120); }
       if(act==="live"){ switchTab("live"); }
       if(act==="vids"){ setTimeout(openVids,120); }
+      if(act==="zakat"){ setTimeout(openZakat,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -2700,6 +3113,7 @@ function boot(){
   initAbout();
   initLive();
   initVids();
+  initZakat();
   initQibla();
   initDonate();
   VIEW=today0();
