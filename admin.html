@@ -22,10 +22,11 @@
     min-height:100dvh;padding-bottom:44px;-webkit-font-smoothing:antialiased}
   .display{font-family:"Fraunces",Georgia,serif}
 
-  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;padding:14px 20px;
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;padding:calc(14px + env(safe-area-inset-top,0)) 20px 14px;
     background:linear-gradient(180deg,var(--green-900),var(--green-800));color:#F3EFE3;
     border-bottom:1px solid rgba(198,162,76,.25)}
-  .mark{width:28px;height:28px;color:var(--gold-bright);flex:0 0 auto}
+  .brandmark{height:34px;width:auto;flex:0 0 auto;display:block;
+    padding-right:11px;border-right:1px solid rgba(198,162,76,.3)}
   .topbar h1{font-size:15.5px;font-weight:600;line-height:1.1}
   .topbar p{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#A9BBB0;margin-top:2px}
   .backlink{margin-left:auto;font-size:12px;color:var(--gold-bright);text-decoration:none;
@@ -123,10 +124,10 @@
 </head>
 <body>
   <div class="topbar">
-    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+    <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100">
     <div>
       <h1>Send a notification</h1>
-      <p>Taiyabah Masjid</p>
+      <p>Trustee use</p>
     </div>
     <a class="backlink" href="index.html">App</a>
   </div>
