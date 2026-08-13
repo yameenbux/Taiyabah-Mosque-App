@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<!--
+  ============================================================================
+  Taiyabah Masjid — prayer times, Qibla, live audio and masjid information
+  ----------------------------------------------------------------------------
+  Copyright (c) 2026 Yameen Bux. All rights reserved.
+
+  Designed and built by Yameen Bux (github.com/yameenbux).
+  Licensed to Bolton Central Islamic Society (registered charity 1041569)
+  for use by Taiyabah Masjid. See LICENSE.md.
+
+  Not licensed for reuse, redeployment or adaptation by any other person or
+  organisation. If you are reading this in a codebase that is not Taiyabah
+  Masjid's, it was taken without permission.
+  ============================================================================
+-->
+
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -100,6 +116,24 @@
   .send:disabled{opacity:.45;cursor:default}
   .sendnote{font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.5}
 
+  .gate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:22px;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .gate[hidden]{display:none}
+  .gate-box{width:100%;max-width:330px;text-align:center;color:#F3EFE3}
+  .gate-logo{height:42px;width:auto;margin-bottom:22px}
+  .gate-box h2{font-family:"Fraunces",Georgia,serif;font-size:20px;font-weight:600}
+  .gate-box p{font-size:13px;color:#BBA9B4;margin-top:7px;line-height:1.5}
+  .gate-box input{width:100%;margin-top:18px;font:inherit;font-size:16px;text-align:center;
+    color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px}
+  .gate-btn{width:100%;margin-top:11px;border:none;cursor:pointer;font:inherit;font-weight:700;
+    font-size:15px;color:var(--brand-900);background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    padding:14px;border-radius:12px}
+  .gate-btn:disabled{opacity:.6;cursor:default}
+  .gate-err{color:#E8A88F !important;min-height:18px;margin-top:12px !important}
+  .signout{margin-left:auto;cursor:pointer;font:inherit;font-size:12px;font-weight:600;
+    color:var(--gold-bright);background:rgba(198,162,76,.14);
+    border:1px solid rgba(198,162,76,.4);border-radius:999px;padding:6px 11px}
+
   .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,120%);z-index:60;
     background:var(--brand-800);color:#F3EFE3;font-size:13.5px;font-weight:600;
     padding:12px 18px;border-radius:999px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
@@ -129,10 +163,22 @@
       <h1>Send a notification</h1>
       <p>Trustee use</p>
     </div>
+    <button class="signout" id="signout" hidden>Sign out</button>
     <a class="backlink" href="index.html">App</a>
   </div>
 
-  <div class="wrap">
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <img class="gate-logo" src="logo-cream.png" alt="Taiyabah Masjid">
+      <h2>Trustee sign in</h2>
+      <p>This screen sends notifications to the congregation.</p>
+      <input type="password" id="gate-pw" placeholder="Password" autocomplete="current-password">
+      <button class="gate-btn" id="gate-go">Sign in</button>
+      <p class="gate-err" id="gate-err"></p>
+    </div>
+  </div>
+
+  <div class="wrap" id="wrap" hidden>
     <div class="sec-h"><h2>Who should get this</h2><span class="rule"></span></div>
     <div class="card">
       <div class="topics" id="topics">
@@ -191,7 +237,7 @@
     <div class="sec-h"><h2>Recently sent</h2><span class="rule"></span></div>
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
 
-    <p class="demo"><b>Demo build.</b> Notifications appear on this device only. Connecting a push service (e.g. OneSignal) delivers to every congregant who opted in — no change to this screen.</p>
+    <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid\u2019s own service &mdash; the OneSignal key is never in this page.</p>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -308,43 +354,87 @@ function renderHistory(){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
 /* ---------- sending ----------
-   DEMO: raises a real notification on this device.
-   PRODUCTION: replace deliver() with a call to your push provider, e.g.
-     await fetch("https://api.onesignal.com/notifications", {...  filters: [{field:"tag", key:"topic", value: topic}] })
-   The rest of this screen stays exactly the same.
-------------------------------- */
-async function deliver(title, body, tag){
-  if(!("Notification" in window)) throw new Error("unsupported");
-  let perm=Notification.permission;
-  if(perm==="default") perm=await Notification.requestPermission();
-  if(perm!=="granted") throw new Error("denied");
-  const opts={body, tag, icon:"icon-192.png", badge:"icon-192.png"};
-  if("serviceWorker" in navigator){
-    const reg=await navigator.serviceWorker.getRegistration();
-    if(reg){ await reg.showNotification(title, opts); return; }
+   All sends go through the masjid's sender service, which holds the OneSignal
+   REST API key. That key can message the whole congregation, so it must never
+   appear in this page. Set API_BASE to wherever the service is running.
+------------------------------------------------------------------------- */
+const API_BASE = localStorage.getItem("senderUrl") || "https://taiyabah-sender.yameenbux.workers.dev";
+
+function token(){ return sessionStorage.getItem("trusteeToken") || ""; }
+function setToken(t){ t ? sessionStorage.setItem("trusteeToken",t) : sessionStorage.removeItem("trusteeToken"); }
+
+async function api(path, body, auth=true){
+  const res = await fetch(API_BASE + path, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", ...(auth ? {Authorization:"Bearer "+token()} : {}) },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || `Server returned ${res.status}`);
+  return data;
+}
+
+function showApp(){
+  $("gate").hidden = true;
+  $("wrap").hidden = false;
+  $("signout").hidden = false;
+}
+function showGate(msg){
+  $("gate").hidden = false;
+  $("wrap").hidden = true;
+  $("signout").hidden = true;
+  $("gate-err").textContent = msg || "";
+}
+
+async function signIn(){
+  const pw = $("gate-pw").value;
+  if(!pw) return;
+  const btn = $("gate-go");
+  btn.disabled = true; btn.textContent = "Signing in…";
+  try{
+    const { token:t } = await api("/api/login", { password: pw }, false);
+    setToken(t);
+    $("gate-pw").value = "";
+    showApp();
+  }catch(e){
+    $("gate-err").textContent = /fetch|network|Failed/i.test(e.message)
+      ? "Can't reach the sender service. Is it running?"
+      : e.message;
+  }finally{
+    btn.disabled = false; btn.textContent = "Sign in";
   }
-  new Notification(title, opts);
 }
 
 $("send").addEventListener("click", async ()=>{
   const inp=topicInput();
   const title=titleEl.value.trim(), msg=msgEl.value.trim();
   if(!title||!msg) return;
-  if(inp.dataset.urgent==="1" && !confirm(`Send this Janāzah alert now?\n\n${title}\n${msg}`)) return;
+  if(inp.dataset.urgent==="1" && !confirm(`Send this Janāzah alert to everyone now?\n\n${title}\n${msg}`)) return;
 
-  const rec={title,msg,topic:inp.dataset.label,urgent:inp.dataset.urgent==="1",at:Date.now()};
-  const items=store.get("sent",[]); items.unshift(rec); store.set("sent",items.slice(0,20));
-  renderHistory();
-
+  const btn=$("send");
+  btn.disabled=true; btn.textContent="Sending…";
   try{
-    await deliver(title, msg, inp.value);
-    toast("Sent — check your notifications");
+    const r = await api("/api/send", { topic: inp.value, title, body: msg });
+    const rec = (r.recipients===null || r.recipients===undefined)
+      ? "" : ` to ${r.recipients} ${r.recipients===1?"device":"devices"}`;
+    toast(`Sent${rec}`);
+    const items=store.get("sent",[]);
+    items.unshift({title,msg,topic:inp.dataset.label,urgent:inp.dataset.urgent==="1",
+                   at:Date.now(),id:r.id,recipients:r.recipients});
+    store.set("sent",items.slice(0,20));
+    renderHistory();
+    titleEl.value=""; msgEl.value=""; update();
   }catch(e){
-    toast(e.message==="denied"
-      ? "Notifications are blocked for this site"
-      : "Saved. This browser can't show notifications here");
+    if(/sign|401/i.test(e.message)){ setToken(""); showGate("Your session expired — please sign in again."); }
+    else toast(e.message);
+  }finally{
+    btn.disabled=false; btn.textContent="Send notification"; update();
   }
 });
+
+$("gate-go").addEventListener("click", signIn);
+$("gate-pw").addEventListener("keydown", e=>{ if(e.key==="Enter") signIn(); });
+$("signout").addEventListener("click", ()=>{ setToken(""); showGate(""); });
 
 document.querySelectorAll('input[name="topic"]').forEach(r=>{
   r.addEventListener("change",()=>{
@@ -356,6 +446,7 @@ titleEl.addEventListener("input",update);
 msgEl.addEventListener("input",update);
 
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+if(token()) showApp(); else showGate("");
 renderTemplates(); update(); clock(); renderHistory();
 setInterval(clock, 10000);
 </script>
