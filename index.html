@@ -905,6 +905,7 @@
       <button class="troublebtn" id="troublebtn">Having trouble?</button>
       <div class="diag" id="diag" hidden>
         <pre id="diag-out">…</pre>
+        <button class="diag-fix" id="diag-retag">Send my categories again</button>
         <button class="diag-fix" id="diag-fix">Reset &amp; reload the app</button>
         <p class="diag-note">This clears the app’s stored files and re-installs its
           background service. Your prayer times are built in, so nothing is lost.</p>
@@ -2589,7 +2590,10 @@ const OneSignalManager = (() => {
   const APP_ID = "2506fafe-179d-401c-b9e3-a0f320d68857";
   const base   = location.pathname.replace(/[^/]*$/, "");     // e.g. /Taiyabah-Mosque-App/
   let ready = false;
-  let dialogShown = false;
+  let dialogShown = false;                              // guards against firing twice in one page-load
+  const DIALOG_SEEN_KEY = "osDialogSeen";               // guards against firing on every future launch
+  const alreadySeenDialog = () => { try{ return localStorage.getItem(DIALOG_SEEN_KEY)==="1"; }catch(e){ return false; } };
+  const markDialogSeen   = () => { try{ localStorage.setItem(DIALOG_SEEN_KEY,"1"); }catch(e){} };
   let sdk = null;          // direct handle — needed to keep the user-gesture context
   let initError = null;    // why init failed, if it did
 
@@ -2597,8 +2601,9 @@ const OneSignalManager = (() => {
   const isRegistered = id => typeof id === "string" && id.length > 0 && !id.startsWith("local-");
 
   function showVerificationDialog(){
-    if(dialogShown) return;
+    if(dialogShown || alreadySeenDialog()) return;
     dialogShown = true;
+    markDialogSeen();
     const dlg = document.getElementById('os-dialog');
     if(!dlg) return;
     dlg.hidden = false;
@@ -2635,6 +2640,11 @@ const OneSignalManager = (() => {
         });
         evaluate(OneSignal.User.PushSubscription.id);
         syncAlertsUI();
+
+        // Write this device's categories now. Tagging is harmless if the user
+        // isn't subscribed yet, and a device that subscribed in an earlier
+        // session never fires a change event to trigger it later.
+        setTimeout(()=>{ try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); } }, 600);
       }catch(e){
         initError = (e && e.message) ? e.message : String(e);
         console.warn("OneSignal init failed:", e);
@@ -2709,7 +2719,7 @@ const OneSignalManager = (() => {
   }
 
   const optOut      = () => run(OneSignal => OneSignal.User.PushSubscription.optOut());
-  const setTags     = tags => run(OneSignal => OneSignal.User.addTags(tags));
+  const setTags     = tags => run(async OneSignal => { await OneSignal.User.addTags(tags); return true; });
   const isOptedIn   = () => run(OneSignal => !!OneSignal.User.PushSubscription.optedIn);
   const permission  = () => run(OneSignal => OneSignal.Notifications.permission);
   const isReady     = () => ready;
@@ -3412,15 +3422,20 @@ function applyPrefs(p){
 }
 
 /* topics → OneSignal tags, so a send can target one category */
+let lastTagResult = "not attempted";
 function pushTopicTags(p){
   const q = p || currentPrefs();
-  OneSignalManager.setTags({
+  const tags = {
     jamaah:        q.jam ? "1" : "0",
     jamaah_mins:   String(q.mins),
     janazah:       q.jan ? "1" : "0",
     announcements: q.ann ? "1" : "0",
     events:        q.evt ? "1" : "0"
-  });
+  };
+  lastTagResult = "sending…";
+  OneSignalManager.setTags(tags)
+    .then(()=>{ lastTagResult = "sent " + JSON.stringify(tags); })
+    .catch(e=>{ lastTagResult = "failed: " + (e && e.message ? e.message : e); });
   if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut();
 }
 
@@ -3456,6 +3471,7 @@ async function runDiagnostics(){
     "OneSignal script loaded  : " + (typeof window.OneSignal !== "undefined"),
     "OneSignal initialised    : " + OneSignalManager.isReady(),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
+    "tag write                : " + lastTagResult,
     "service workers:",
     ...regs.map(r => "   • " + r),
   ];
@@ -3463,6 +3479,10 @@ async function runDiagnostics(){
 }
 
 function initDiagnostics(){
+  document.getElementById('diag-retag').addEventListener('click', async ()=>{
+    pushTopicTags();
+    setTimeout(runDiagnostics, 900);
+  });
   document.getElementById('troublebtn').addEventListener('click',()=>{
     const d=document.getElementById('diag');
     d.hidden = !d.hidden;
