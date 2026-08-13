@@ -657,6 +657,16 @@
     color:#F3EFE3;background:var(--brand-700);padding:13px;border-radius:12px;letter-spacing:.2px}
   .save:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
+  .troublebtn{display:block;margin:10px auto 0;cursor:pointer;font:inherit;font-size:12px;
+    font-weight:600;color:var(--muted);background:none;border:none;text-decoration:underline}
+  .diag{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .diag pre{font-size:10.5px;line-height:1.6;color:var(--ink);background:#F0E9ED;
+    border-radius:10px;padding:11px;white-space:pre-wrap;word-break:break-word;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .diag-fix{width:100%;margin-top:10px;cursor:pointer;font:inherit;font-weight:700;font-size:14px;
+    color:#F3EFE3;background:var(--brand-700);border:none;border-radius:11px;padding:12px}
+  .diag-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px;text-align:center}
+
   /* collapsed confirmation */
   .done{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
     cursor:pointer;padding:14px 15px}
@@ -892,6 +902,13 @@
         <button class="save" id="a-save">Save</button>
       </div>
       <p class="wirednote" id="wirednote"></p>
+      <button class="troublebtn" id="troublebtn">Having trouble?</button>
+      <div class="diag" id="diag" hidden>
+        <pre id="diag-out">…</pre>
+        <button class="diag-fix" id="diag-fix">Reset &amp; reload the app</button>
+        <p class="diag-note">This clears the app’s stored files and re-installs its
+          background service. Your prayer times are built in, so nothing is lost.</p>
+      </div>
     </div>
 
     </div>
@@ -2574,6 +2591,7 @@ const OneSignalManager = (() => {
   let ready = false;
   let dialogShown = false;
   let sdk = null;          // direct handle — needed to keep the user-gesture context
+  let initError = null;    // why init failed, if it did
 
   // a real, server-assigned subscription id is non-empty and not the local- placeholder
   const isRegistered = id => typeof id === "string" && id.length > 0 && !id.startsWith("local-");
@@ -2618,6 +2636,7 @@ const OneSignalManager = (() => {
         evaluate(OneSignal.User.PushSubscription.id);
         syncAlertsUI();
       }catch(e){
+        initError = (e && e.message) ? e.message : String(e);
         console.warn("OneSignal init failed:", e);
       }
     });
@@ -2648,6 +2667,14 @@ const OneSignalManager = (() => {
       return "On iPhone, notifications only work once the app is added to your Home Screen. Tap Share, then “Add to Home Screen”, and open it from there.";
     if(!("Notification" in window))
       return "This browser doesn’t support notifications.";
+    // the same capability OneSignal's loader checks — fails on iOS below 16.4
+    const pushCapable = (typeof PushSubscriptionOptions !== "undefined"
+        && Object.prototype.hasOwnProperty.call(PushSubscriptionOptions.prototype, "applicationServerKey"))
+      || (typeof window.safari !== "undefined" && window.safari.pushNotification);
+    if(!pushCapable)
+      return iOS
+        ? "This iPhone’s software is too old for notifications. They need iOS 16.4 or later — you can check in Settings → General → About."
+        : "This browser doesn’t support push notifications.";
     if(!("serviceWorker" in navigator))
       return "This browser doesn’t support the background service notifications need.";
     if(!window.isSecureContext)
@@ -2687,7 +2714,16 @@ const OneSignalManager = (() => {
   const permission  = () => run(OneSignal => OneSignal.Notifications.permission);
   const isReady     = () => ready;
 
-  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady, blockedReason };
+  /* Why the SDK isn't usable — specific enough to act on */
+  function loadingDiagnosis(){
+    if(initError)
+      return "The notification service didn’t start on this device (" + initError + "). Close the app fully and open it again.";
+    if(typeof window.OneSignal === "undefined" && !sdk)
+      return "Couldn’t load the notification service. A content blocker, VPN, or iCloud Private Relay may be blocking cdn.onesignal.com — try turning those off for this site, or switch between Wi-Fi and mobile data.";
+    return "Still connecting to the notification service — please wait a moment and tap again.";
+  }
+
+  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
@@ -3386,6 +3422,61 @@ function showAlertsBlockedHint(){
   if(why && btn && btn.dataset.on!=="1"){ note.textContent=why; }
 }
 
+/* Facts, not guesses — what this device can and can't do right now. */
+async function runDiagnostics(){
+  const ua = navigator.userAgent || "";
+  const iOS = /iPad|iPhone|iPod/.test(ua);
+  const standalone = window.navigator.standalone===true
+    || (typeof window.matchMedia==="function" && window.matchMedia("(display-mode: standalone)").matches);
+  const pushCapable = (typeof PushSubscriptionOptions !== "undefined"
+      && Object.prototype.hasOwnProperty.call(PushSubscriptionOptions.prototype,"applicationServerKey"));
+
+  let regs=[];
+  try{
+    const list = await navigator.serviceWorker.getRegistrations();
+    regs = list.map(r => r.scope + (r.active ? " (active)" : " (inactive)"));
+  }catch(e){ regs=["couldn't read: "+e.message]; }
+
+  const lines = [
+    "installed to home screen : " + standalone,
+    "iOS device               : " + iOS,
+    "push supported (16.4+)   : " + pushCapable,
+    "secure connection        : " + !!window.isSecureContext,
+    "notification permission  : " + (("Notification" in window) ? Notification.permission : "unavailable"),
+    "OneSignal script loaded  : " + (typeof window.OneSignal !== "undefined"),
+    "OneSignal initialised    : " + OneSignalManager.isReady(),
+    "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
+    "service workers:",
+    ...regs.map(r => "   • " + r),
+  ];
+  document.getElementById('diag-out').textContent = lines.join("\n");
+}
+
+function initDiagnostics(){
+  document.getElementById('troublebtn').addEventListener('click',()=>{
+    const d=document.getElementById('diag');
+    d.hidden = !d.hidden;
+    if(!d.hidden) runDiagnostics();
+  });
+
+  /* Clear everything this app has stored and start clean. Fixes the common case
+     where an old service worker from a previous version is still intercepting
+     requests and stopping the notification service from registering. */
+  document.getElementById('diag-fix').addEventListener('click', async ()=>{
+    const btn=document.getElementById('diag-fix');
+    btn.disabled=true; btn.textContent="Resetting…";
+    try{
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+      if(window.caches){
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    }catch(e){ console.warn("reset failed:", e); }
+    location.reload();
+  });
+}
+
 function initAlerts(){
   const btn=document.getElementById('enable');
   const toggles=document.getElementById('toggles');
@@ -3419,7 +3510,7 @@ function initAlerts(){
     }
     btn.textContent = label;
     if(res && res.reason==="loading"){
-      note.textContent = "Still connecting to the notification service — please wait a moment and tap again.";
+      note.textContent = OneSignalManager.loadingDiagnosis();
     }else if(res && res.reason==="declined"){
       note.textContent = OneSignalManager.blockedReason()
         || "Notifications weren’t allowed. You can turn them on in Settings → Notifications.";
@@ -3455,6 +3546,7 @@ function initAlerts(){
 /* ---------------- boot ---------------- */
 function boot(){
   initAlerts();
+  initDiagnostics();
   const rec=dayRec(new Date());
   if(!rec){ endedState(); return; }
   initNav();
