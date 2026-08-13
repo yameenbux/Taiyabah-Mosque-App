@@ -431,6 +431,9 @@ $("send").addEventListener("click", async ()=>{
     titleEl.value=""; msgEl.value=""; update();
   }catch(e){
     if(/sign|401/i.test(e.message)){ setToken(""); showGate("Your session expired — please sign in again."); }
+    else if(/not subscribed|no subscribers|included players/i.test(e.message)){
+      toast("Nobody is set up for this category yet — open the app on a phone, go to Alerts and press Save.");
+    }
     else toast(e.message);
   }finally{
     btn.disabled=false; btn.textContent="Send notification"; update();
