@@ -2727,10 +2727,20 @@ const OneSignalManager = (() => {
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
+let tagsPushed = false;
 async function syncAlertsUI(){
   const btn=document.getElementById('enable');
   if(!btn) return;
   const on = await OneSignalManager.isOptedIn();
+
+  /* A subscription with no tags matches no targeted send. Write the current
+     preferences as soon as the device is subscribed, rather than waiting for
+     the user to press Save. */
+  if(on && !tagsPushed){
+    tagsPushed = true;
+    try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
+  }
+
   if(on && btn.dataset.on!=="1"){
     btn.dataset.on="1";
     btn.textContent="Notifications enabled on this device";
