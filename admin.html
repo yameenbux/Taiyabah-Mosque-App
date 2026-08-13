@@ -415,9 +415,14 @@ $("send").addEventListener("click", async ()=>{
   btn.disabled=true; btn.textContent="Sending…";
   try{
     const r = await api("/api/send", { topic: inp.value, title, body: msg });
-    const rec = (r.recipients===null || r.recipients===undefined)
-      ? "" : ` to ${r.recipients} ${r.recipients===1?"device":"devices"}`;
-    toast(`Sent${rec}`);
+    if(r.recipients===0){
+      // OneSignal accepted it, but the filter matched nobody
+      toast("Sent, but 0 devices matched — nobody has this category switched on yet.");
+    }else{
+      const rec = (r.recipients===null || r.recipients===undefined)
+        ? "" : ` to ${r.recipients} ${r.recipients===1?"device":"devices"}`;
+      toast(`Sent${rec}`);
+    }
     const items=store.get("sent",[]);
     items.unshift({title,msg,topic:inp.dataset.label,urgent:inp.dataset.urgent==="1",
                    at:Date.now(),id:r.id,recipients:r.recipients});
