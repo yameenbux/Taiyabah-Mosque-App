@@ -347,6 +347,6 @@ async function handle(request, env) {
       return json(result, 200, ch);
     }
 
-    return json({ error: "Not found" }, 404, ch);
+    return json({ error: "Not found", receivedPath: url.pathname, receivedMethod: request.method }, 404, ch);
   }
 }
