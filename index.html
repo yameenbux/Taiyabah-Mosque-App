@@ -3242,11 +3242,6 @@ const OneSignalManager = (() => {
         });
         evaluate(OneSignal.User.PushSubscription.id);
         syncAlertsUI();
-
-        // Write this device's categories now. Tagging is harmless if the user
-        // isn't subscribed yet, and a device that subscribed in an earlier
-        // session never fires a change event to trigger it later.
-        setTimeout(()=>{ try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); } }, 600);
       }catch(e){
         initError = (e && e.message) ? e.message : String(e);
         console.warn("OneSignal init failed:", e);
@@ -3255,13 +3250,23 @@ const OneSignalManager = (() => {
   }
 
   // never hang: if the SDK never loads, resolve null rather than leaving the UI stuck
-  const run = (fn, ms=8000) => new Promise(res=>{
+  /* Every OneSignal call not made directly through the `sdk` handle goes
+     through here. A genuine error from the SDK (like a 409) must REJECT
+     this promise so callers — notably pushTopicTags's retry logic — can
+     react to it. Only the "the SDK never loaded" case should resolve
+     safely with null; that is a timeout, not an error, and must not hang
+     the caller forever. Conflating those two cases (as an earlier version
+     of this function did, by resolving null on ANY error) meant a failed
+     write was silently reported as a success, which is how tags could go
+     missing without anything visibly failing. */
+  const run = (fn, ms=8000) => new Promise((res, rej) => {
     let done=false;
     const finish = v => { if(!done){ done=true; res(v); } };
+    const fail   = e => { if(!done){ done=true; rej(e); } };
     setTimeout(()=>finish(null), ms);
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async OneSignal => {
-      try{ finish(await fn(OneSignal)); }catch(e){ console.warn("OneSignal:", e); finish(null); }
+      try{ finish(await fn(OneSignal)); }catch(e){ console.warn("OneSignal:", e); fail(e); }
     });
   });
 
@@ -3343,14 +3348,18 @@ let tagsPushed = false;
 async function syncAlertsUI(){
   const btn=document.getElementById('enable');
   if(!btn) return;
-  const on = await OneSignalManager.isOptedIn();
+  const on = await OneSignalManager.isOptedIn().catch(e=>{ console.warn("isOptedIn:", e); return false; });
 
   /* A subscription with no tags matches no targeted send. Write the current
-     preferences as soon as the device is subscribed, rather than waiting for
-     the user to press Save. */
+     preferences once the device is subscribed, rather than waiting for the
+     user to press Save — but not instantly: a subscription only just created
+     hasn't always settled on OneSignal's side yet, and writing to it too
+     soon is one of the things that produces a 409 from their own SDK. */
   if(on && !tagsPushed){
     tagsPushed = true;
-    try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
+    setTimeout(()=>{
+      try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
+    }, 3000);
   }
 
   if(on && btn.dataset.on!=="1"){
@@ -4154,6 +4163,22 @@ function applyPrefs(p){
 
 /* topics → OneSignal tags, so a send can target one category */
 let lastTagResult = "not attempted";
+/* Tag writes must never overlap — OneSignal rejects a second update to the
+   same subscription with 409 if one is still in flight. Everything funnels
+   through one queue, and a 409 specifically is retried with a generous
+   backoff rather than treated as a normal failure.
+
+   OneSignal's own SDK has its own internal operation executor, separate
+   from our app-level queue. Two things upset it, independent of our code
+   colliding with itself: (1) sending an identical payload twice — its
+   internal dedup logic appears to reject the repeat outright — so we skip
+   any write whose payload exactly matches the last one we sent
+   successfully; (2) writing to a subscription that has only just been
+   created, before its record has settled server-side — so the very first
+   automatic write waits a few seconds rather than firing immediately. */
+let tagQueue = Promise.resolve();
+let lastSentTags = null;
+
 function pushTopicTags(p){
   const q = p || currentPrefs();
   const tags = {
@@ -4163,11 +4188,28 @@ function pushTopicTags(p){
     announcements: q.ann ? "1" : "0",
     events:        q.evt ? "1" : "0"
   };
-  lastTagResult = "sending…";
-  OneSignalManager.setTags(tags)
-    .then(()=>{ lastTagResult = "sent " + JSON.stringify(tags); })
+  const key = JSON.stringify(tags);
+  if(key === lastSentTags){
+    lastTagResult = "unchanged, not re-sent " + key;
+    if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
+    return;
+  }
+  lastTagResult = "queued…";
+
+  const attempt = (n) => OneSignalManager.setTags(tags).catch(e => {
+    const msg = e && e.message ? e.message : String(e);
+    if(n < 3 && /409|conflict/i.test(msg)){
+      return new Promise(res => setTimeout(res, 1500 * n)).then(() => attempt(n + 1));
+    }
+    throw e;
+  });
+
+  tagQueue = tagQueue
+    .then(() => attempt(1))
+    .then(()=>{ lastSentTags = key; lastTagResult = "sent " + key; })
     .catch(e=>{ lastTagResult = "failed: " + (e && e.message ? e.message : e); });
-  if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut();
+
+  if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
 }
 
 /* if push can't work on this device, say so before they tap */
