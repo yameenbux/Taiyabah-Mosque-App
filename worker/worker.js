@@ -294,6 +294,52 @@ async function handle(request, env) {
       return json({ ok: true, id: data.id, recipients: data.recipients ?? null, topic: t.label }, 200, ch);
     }
 
+    /* Ground-truth diagnostic: asks OneSignal's own server what tags it
+       actually has stored for a subscription, bypassing the browser SDK,
+       its local IndexedDB cache, and any client-side "success" reporting
+       entirely. Accepts either the OneSignal ID or the Subscription ID
+       shown on the dashboard — whichever was pasted, since telling the two
+       apart isn't obvious and getting it wrong wastes time.
+       GET /api/check-tags?id=<uuid> */
+    if (url.pathname === "/api/check-tags" && request.method === "GET") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+
+      const id = url.searchParams.get("id");
+      if (!id) return json({ error: "Pass ?id=<the OneSignal ID or Subscription ID from the dashboard>" }, 400, ch);
+
+      const authHeaders = { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` };
+      const base = `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}`;
+
+      // try it directly as a OneSignal ID first
+      let res = await fetch(`${base}/users/by/onesignal_id/${id}`, { headers: authHeaders });
+
+      if (res.status === 404) {
+        // fall back: resolve it as a Subscription ID instead
+        const idRes = await fetch(`${base}/subscriptions/${id}/user/identity`, { headers: authHeaders });
+        if (idRes.ok) {
+          const idData = await idRes.json();
+          const resolvedId = idData && idData.identity && idData.identity.onesignal_id;
+          if (resolvedId) {
+            res = await fetch(`${base}/users/by/onesignal_id/${resolvedId}`, { headers: authHeaders });
+          }
+        }
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return json({ error: `OneSignal returned ${res.status}`, detail: data }, 502, ch);
+      }
+      return json({
+        ok: true,
+        onesignal_id: data.identity && data.identity.onesignal_id,
+        tags: (data.properties && data.properties.tags) || {},
+        subscriptions: (data.subscriptions || []).map(s => ({
+          id: s.id, type: s.type, enabled: s.enabled,
+        })),
+      }, 200, ch);
+    }
+
     if (url.pathname === "/api/test-reminders" && request.method === "POST") {
       const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
       if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
