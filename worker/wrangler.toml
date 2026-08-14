@@ -18,4 +18,4 @@ crons = ["* * * * *"]
 # Paste the id it prints below.
 [[kv_namespaces]]
 binding = "SENT_KV"
-id = "REPLACE_WITH_ID_FROM_WRANGLER"
+id = "376be21472e240acaf04ab1dbd217947"
