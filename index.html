@@ -4275,6 +4275,20 @@ function initDiagnostics(){
         const keys = await caches.keys();
         await Promise.all(keys.map(k => caches.delete(k)));
       }
+      /* OneSignal keeps its own local copy of the subscription record in
+         IndexedDB, separate from the caches above. If that copy drifts out
+         of sync with the server (which repeated resets can cause), every
+         future write conflicts indefinitely — clearing it forces a
+         genuinely fresh subscription on the next load. */
+      if(window.indexedDB && indexedDB.databases){
+        try{
+          const dbs = await indexedDB.databases();
+          await Promise.all(dbs.map(db => new Promise(res=>{
+            const req = indexedDB.deleteDatabase(db.name);
+            req.onsuccess = req.onerror = req.onblocked = () => res();
+          })));
+        }catch(e){ console.warn("IndexedDB reset skipped:", e); }
+      }
     }catch(e){ console.warn("reset failed:", e); }
     location.reload();
   });
