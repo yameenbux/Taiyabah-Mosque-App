@@ -1,0 +1,21 @@
+name = "taiyabah-sender"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://yameenbux.github.io"
+
+# Secrets are NOT set here. Add them with:
+#   npx wrangler secret put ONESIGNAL_APP_ID
+#   npx wrangler secret put ONESIGNAL_REST_API_KEY
+#   npx wrangler secret put ADMIN_PASSWORD_HASH
+#   npx wrangler secret put SESSION_SECRET
+
+[triggers]
+crons = ["* * * * *"]
+
+# Created with: npx wrangler kv namespace create SENT_KV
+# Paste the id it prints below.
+[[kv_namespaces]]
+binding = "SENT_KV"
+id = "REPLACE_WITH_ID_FROM_WRANGLER"
