@@ -65,11 +65,16 @@ It is a progressive web app — no app store, no install friction, one URL.
 ├── icon-192.png            App icons.
 ├── icon-512.png
 ├── apple-touch-icon.png
-└── data/                   Timetable pipeline — not served to users.
-    ├── parse_timetable.py      Converts the published timetable into data.
-    ├── raw_timetable_2026.txt  Source rows from the official PDF.
-    ├── timetable-2026.json     Generated dataset (365 days).
-    └── VERIFICATION.md         Checks performed, and the sign-off checklist.
+├── data/                   Timetable pipeline — not served to users.
+│   ├── parse_timetable.py      Converts the published timetable into data.
+│   ├── raw_timetable_2026.txt  Source rows from the official PDF.
+│   ├── timetable-2026.json     Generated dataset (365 days).
+│   └── VERIFICATION.md         Checks performed, and the sign-off checklist.
+└── worker/                 Sender service — a Cloudflare Worker. Holds the
+                             OneSignal REST API key and the trustee password;
+                             admin.html never sees either. Not served to
+                             users, and not deployed from this repo — see
+                             worker/README.md.
 ```
 
 ## Prayer time data
@@ -112,12 +117,21 @@ Note that the compass, notifications and home-screen install all require
 HTTPS. They will not work from a local file or a preview frame; test against
 the deployed URL.
 
+## Push delivery
+
+`index.html` subscribes devices to OneSignal and tags them by category
+(jamāʿah, janāzah, announcements, events); `admin.html` is the trustee
+compose screen, gated behind a sign-in. Neither page ever holds the
+OneSignal REST API key — sends go through `worker/`, a small Cloudflare
+Worker that is the only place that key and the trustee password live.
+
+The Worker's source is in this repo but it is a **separate deployable**,
+not part of the GitHub Pages site: see `worker/README.md` for the (one-time,
+five-command) deploy steps. Until it's deployed, `admin.html`'s sign-in
+will report that it can't reach the sender service.
+
 ## Roadmap
 
-- **Push delivery.** The opt-in UI and service worker handlers are in place;
-  connecting a push provider will enable delivery to subscribers.
-- **Authentication for the trustee compose screen**, to be completed before
-  push delivery is enabled.
 - **Prayer time alignment.** Some settings are pending confirmation from the
   committee — see the notes in `index.html`.
 
