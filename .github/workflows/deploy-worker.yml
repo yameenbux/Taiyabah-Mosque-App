@@ -1,0 +1,36 @@
+name: Deploy notification worker
+
+# Runs automatically whenever anything in worker/ changes on main — so
+# pushing from the iPad (or anywhere) is the entire deploy process, with
+# no local Wrangler, no Node, no laptop needed.
+#
+# Also runnable by hand from the Actions tab in GitHub's mobile site
+# (Actions → Deploy notification worker → Run workflow) if you ever want
+# to redeploy without changing anything, e.g. after editing a secret.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: worker
+          command: deploy
+
+      - name: Confirm it's live
+        run: |
+          sleep 3
+          curl -sf https://taiyabah-sender.yameenbux.workers.dev/api/health || \
+            (echo "::error::Worker did not respond after deploy" && exit 1)
