@@ -102,6 +102,39 @@ const json = (data, status, headers) =>
     headers: { "Content-Type": "application/json", ...headers },
   });
 
+/* The categories a phone may set on itself, and the only values accepted for
+   each. Everything arriving at /api/tags is rebuilt from this table rather
+   than merged, so no caller can invent a tag, write to an unrelated key, or
+   store a value a filter would never match. */
+const PREF_TAGS = ["jamaah", "janazah", "announcements", "events"];
+const REMINDER_MINUTES = ["5", "10", "15"];
+
+function cleanPrefTags(input) {
+  if (!input || typeof input !== "object") return null;
+  const out = {};
+  for (const k of PREF_TAGS) {
+    const v = String(input[k]);
+    if (v !== "0" && v !== "1") return null;
+    out[k] = v;
+  }
+  const mins = String(input.jamaah_mins);
+  if (!REMINDER_MINUTES.includes(mins)) return null;
+  out.jamaah_mins = mins;
+  return out;
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/* subscription id -> the user record that owns it */
+async function onesignalIdFor(subscriptionId, env) {
+  const res = await fetch(
+    `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/subscriptions/${subscriptionId}/user/identity`,
+    { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
+  if (!res.ok) return null;
+  const data = await res.json().catch(() => ({}));
+  return (data && data.identity && data.identity.onesignal_id) || null;
+}
+
 /* ---------------- worker ---------------- */
 export default {
   async fetch(request, env) {
@@ -299,6 +332,70 @@ async function handle(request, env) {
         return json({ error: message }, 502, ch);
       }
       return json({ ok: true, id: data.id, recipients: data.recipients ?? null, topic: t.label }, 200, ch);
+    }
+
+    /* Where a phone records which categories it wants.
+
+       This deliberately does not go through the browser SDK. Its addTags()
+       writes were accepted locally and never stored: the dashboard showed a
+       subscription carrying only server_test — the tag /api/force-tag wrote
+       server to server — while the phone listed a full set. Every targeted
+       send therefore matched nobody, even though each phone believed it was
+       signed up. The REST path below is the one that demonstrably works on
+       these same subscriptions, so preferences take it too.
+
+       Unauthenticated by necessity — congregants have no password, and the
+       page holds no key worth stealing. What bounds it: a caller must already
+       know a subscription's UUID, the tags are rebuilt from a fixed table so
+       only real categories and matchable values can be stored, CORS keeps
+       browsers off it from other origins, and it is rate limited per address.
+       At worst someone holding another person's subscription id could change
+       that person's categories — the same exposure the browser SDK has by
+       design, and the reason this never accepts anything but preferences.
+
+       POST /api/tags { subscriptionId, tags } -> { ok, tags } */
+    if (url.pathname === "/api/tags" && request.method === "POST") {
+      if (!limit(`tags:${ip}`, 60, 60 * 60e3))
+        return json({ error: "Too many preference updates. Try again later." }, 429, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const subId = String(body.subscriptionId || "");
+      if (!UUID.test(subId)) return json({ error: "Bad subscription id" }, 400, ch);
+
+      const tags = cleanPrefTags(body.tags);
+      if (!tags) return json({ error: "Bad categories" }, 400, ch);
+
+      const oneSignalId = await onesignalIdFor(subId, env);
+      if (!oneSignalId)
+        return json({ error: "OneSignal doesn't recognise this subscription" }, 404, ch);
+
+      const res = await fetch(
+        `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${oneSignalId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}`,
+          },
+          body: JSON.stringify({ properties: { tags } }),
+        });
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        return json({ error: `OneSignal returned ${res.status}`, detail }, 502, ch);
+      }
+
+      /* Read back rather than trusting the write. Reporting a stored state the
+         app can check is the whole point — assuming success is what hid this
+         fault for so long. */
+      const check = await fetch(
+        `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${oneSignalId}`,
+        { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
+      const stored = check.ok
+        ? ((await check.json().catch(() => ({}))).properties || {}).tags || {}
+        : null;
+
+      return json({ ok: true, onesignal_id: oneSignalId, tags: stored }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
