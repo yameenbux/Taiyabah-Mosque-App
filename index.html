@@ -3341,6 +3341,18 @@ const OneSignalManager = (() => {
     }catch(e){ return null; }
   };
 
+  /* The user record's own id. /api/force-tag addressed a user this way and the
+     tag it wrote is the one sitting in the dashboard, so this is the identifier
+     known to work. The subscription id is sent too, as a fallback for a user
+     record the SDK hasn't surfaced yet. */
+  const oneSignalUserId = () => {
+    const OneSignal = sdk || window.OneSignal;
+    try{
+      const id = OneSignal && OneSignal.User && OneSignal.User.onesignalId;
+      return (typeof id === "string" && id.length > 0) ? id : null;
+    }catch(e){ return null; }
+  };
+
   const readTags = () => run(OneSignal =>
     (typeof OneSignal.User.getTags === "function" ? OneSignal.User.getTags() : null));
 
@@ -3365,7 +3377,7 @@ const OneSignalManager = (() => {
   }
 
   return { init, requestPermission, optOut, readTags, tagsAgree, subscriptionId,
-           isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
+           oneSignalUserId, isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
@@ -4195,6 +4207,11 @@ function applyPrefs(p){
    actually holds. */
 const SENDER_BASE = "https://taiyabah-sender.yameenbux.workers.dev";
 
+/* Shown in the diagnostics panel. A phone running an older cached build is
+   indistinguishable from a broken one otherwise, and that ambiguity has cost
+   more than one round of chasing this. Bump it with every change here. */
+const APP_BUILD = "v71";
+
 let lastTagResult = "not attempted";
 
 /* Writes must never overlap, so everything funnels through one queue.
@@ -4216,16 +4233,35 @@ function scheduleTagSync(delay){
   }, typeof delay === "number" ? delay : 3000);
 }
 
-async function writeTagsViaSender(tags){
-  const id = OneSignalManager.subscriptionId();
-  if(!id) throw new Error("no subscription yet");
+/* The last thing a write did, verbatim, for the diagnostics panel. Two rounds
+   of this fault were spent inferring where the write stopped; the answer costs
+   nothing to keep, so keep it. */
+let lastTagDetail = "no write attempted yet";
 
-  const res = await fetch(SENDER_BASE + "/api/tags", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ subscriptionId: id, tags })
-  });
-  const data = await res.json().catch(()=>({}));
+async function writeTagsViaSender(tags){
+  const subId  = OneSignalManager.subscriptionId();
+  const userId = OneSignalManager.oneSignalUserId();
+  if(!subId && !userId){
+    lastTagDetail = "OneSignal has not issued this device an id yet";
+    throw new Error("no subscription yet");
+  }
+
+  let res, data;
+  try{
+    res = await fetch(SENDER_BASE + "/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ subscriptionId: subId, oneSignalId: userId, tags })
+    });
+  }catch(e){
+    // never reached the sender at all: offline, blocked, or refused by CORS
+    lastTagDetail = "couldn't reach the sender service — " + (e && e.message ? e.message : e);
+    throw new Error("couldn't reach the sender service");
+  }
+
+  data = await res.json().catch(()=>({}));
+  lastTagDetail = "HTTP " + res.status + " " + JSON.stringify(data).slice(0, 400);
+
   if(!res.ok) throw new Error(data.error || ("sender returned " + res.status));
   // the sender returns what OneSignal holds after the write, not what we asked for
   if(!data.ok || !OneSignalManager.tagsAgree(tags, data.tags))
@@ -4305,9 +4341,12 @@ async function runDiagnostics(){
     "OneSignal script loaded  : " + (typeof window.OneSignal !== "undefined"),
     "OneSignal initialised    : " + OneSignalManager.isReady(),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
+    "app build                : " + APP_BUILD,
     "subscription id          : " + (OneSignalManager.subscriptionId() || "none yet"),
+    "onesignal user id        : " + (OneSignalManager.oneSignalUserId() || "none yet"),
     "tags on this phone       : " + heldTags,
     "tag write                : " + lastTagResult,
+    "last reply from sender   : " + lastTagDetail,
     "service workers:",
     ...regs.map(r => "   • " + r),
   ];
@@ -4316,9 +4355,24 @@ async function runDiagnostics(){
 
 function initDiagnostics(){
   document.getElementById('diag-retag').addEventListener('click', async ()=>{
+    const btn = document.getElementById('diag-retag');
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Sending…";
     lastVerifiedTags = null;          // force a real write, not a "no change" skip
-    pushTopicTags();
-    setTimeout(runDiagnostics, 3000);
+    try{
+      await writeTagsViaSender({
+        jamaah:        currentPrefs().jam ? "1" : "0",
+        jamaah_mins:   String(currentPrefs().mins),
+        janazah:       currentPrefs().jan ? "1" : "0",
+        announcements: currentPrefs().ann ? "1" : "0",
+        events:        currentPrefs().evt ? "1" : "0"
+      });
+      lastTagResult = "stored by OneSignal";
+    }catch(e){
+      lastTagResult = "failed: " + (e && e.message ? e.message : e);
+    }
+    btn.disabled = false; btn.textContent = label;
+    runDiagnostics();
   });
   document.getElementById('troublebtn').addEventListener('click',()=>{
     const d=document.getElementById('diag');
