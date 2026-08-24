@@ -232,12 +232,12 @@
 
     <div class="guard" id="guard">—</div>
     <button class="send" id="send">Send notification</button>
-    <p class="sendnote" id="sendnote">Demo mode — sends to this device only.</p>
+    <p class="sendnote" id="sendnote">Goes to every device with this category switched on.</p>
 
     <div class="sec-h"><h2>Recently sent</h2><span class="rule"></span></div>
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
 
-    <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid\u2019s own service &mdash; the OneSignal key is never in this page.</p>
+    <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid’s own service &mdash; the OneSignal key is never in this page.</p>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -432,7 +432,7 @@ $("send").addEventListener("click", async ()=>{
   }catch(e){
     if(/sign|401/i.test(e.message)){ setToken(""); showGate("Your session expired — please sign in again."); }
     else if(/not subscribed|no subscribers|included players/i.test(e.message)){
-      toast("Nobody is set up for this category yet — open the app on a phone, go to Alerts and press Save.");
+      toast("Nobody has this category switched on yet — open the app on a phone and check Alerts.");
     }
     else toast(e.message);
   }finally{
