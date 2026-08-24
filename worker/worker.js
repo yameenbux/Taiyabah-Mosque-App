@@ -361,15 +361,30 @@ async function handle(request, env) {
       let body = {};
       try { body = await request.json(); } catch {}
 
-      const subId = String(body.subscriptionId || "");
-      if (!UUID.test(subId)) return json({ error: "Bad subscription id" }, 400, ch);
+      const subId  = String(body.subscriptionId || "");
+      const sentUid = String(body.oneSignalId || "");
+      if (!UUID.test(subId) && !UUID.test(sentUid))
+        return json({ error: "Bad subscription id" }, 400, ch);
 
       const tags = cleanPrefTags(body.tags);
       if (!tags) return json({ error: "Bad categories" }, 400, ch);
 
-      const oneSignalId = await onesignalIdFor(subId, env);
+      /* Prefer the user id the app already holds. /api/force-tag wrote by user
+         id and that tag is what showed up in the dashboard, so this is the path
+         known to work on these records; resolving a subscription id first only
+         adds a call that can fail. Fall back to that resolution when the SDK
+         hasn't surfaced a user id, and as a last resort treat the id we were
+         given as a user id — telling the two apart from the dashboard is not
+         obvious, and guessing wrong is a silent dead end. */
+      let oneSignalId = UUID.test(sentUid) ? sentUid : null;
+      let idSource = oneSignalId ? "user id from app" : null;
+      if (!oneSignalId && UUID.test(subId)) {
+        oneSignalId = await onesignalIdFor(subId, env);
+        idSource = oneSignalId ? "resolved from subscription" : null;
+      }
+      if (!oneSignalId && UUID.test(subId)) { oneSignalId = subId; idSource = "id used as-is"; }
       if (!oneSignalId)
-        return json({ error: "OneSignal doesn't recognise this subscription" }, 404, ch);
+        return json({ error: "OneSignal doesn't recognise this device" }, 404, ch);
 
       const res = await fetch(
         `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${oneSignalId}`, {
@@ -382,7 +397,8 @@ async function handle(request, env) {
         });
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
-        return json({ error: `OneSignal returned ${res.status}`, detail }, 502, ch);
+        return json({ error: `OneSignal returned ${res.status}`, via: idSource,
+                      tried: oneSignalId, detail }, 502, ch);
       }
 
       /* Read back rather than trusting the write. Reporting a stored state the
@@ -395,7 +411,7 @@ async function handle(request, env) {
         ? ((await check.json().catch(() => ({}))).properties || {}).tags || {}
         : null;
 
-      return json({ ok: true, onesignal_id: oneSignalId, tags: stored }, 200, ch);
+      return json({ ok: true, onesignal_id: oneSignalId, via: idSource, tags: stored }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
