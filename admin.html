@@ -153,6 +153,18 @@
 
   .demo{margin:20px 4px 0;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
   .demo b{color:var(--ink)}
+
+  .diagtoggle{display:block;margin:18px auto 0;background:none;border:0;font:inherit;font-size:12.5px;
+    color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px}
+  .diag input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:10px 12px;
+    border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+  .diag .row{display:flex;gap:8px;margin-top:9px}
+  .diag button{flex:1;font:inherit;font-size:13px;font-weight:600;padding:10px;border:0;border-radius:10px;
+    background:var(--brand);color:#fff;cursor:pointer}
+  .diag button:disabled{opacity:.55}
+  .diag pre{white-space:pre-wrap;word-break:break-word;font-size:11.5px;line-height:1.55;margin:11px 0 0;
+    color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .diag .hint{font-size:11.5px;color:var(--muted);line-height:1.55;margin:0 0 10px}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
@@ -238,6 +250,19 @@
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
 
     <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid’s own service &mdash; the OneSignal key is never in this page.</p>
+
+    <button class="diagtoggle" id="diagtoggle">Check a device</button>
+    <div class="card diag" id="diag" hidden>
+      <p class="hint">Asks OneSignal’s own servers what they hold for one device — the categories it is
+        signed up to, and whether its subscription is still live. The app shows its subscription id under
+        Alerts &rarr; Having trouble?. This is the only view that isn’t the phone’s own copy.</p>
+      <input id="diag-id" placeholder="Subscription id from the app" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="row">
+        <button id="diag-go">Check device</button>
+        <button id="diag-health">Check service</button>
+      </div>
+      <pre id="diag-out"></pre>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -374,6 +399,78 @@ async function api(path, body, auth=true){
   return data;
 }
 
+/* ---------- device check ----------
+   The app's own panel can only show OneSignal's copy of the tags as cached on
+   that phone, which is written optimistically — it says what the SDK meant to
+   store, not what OneSignal actually holds. When a send reports no matching
+   devices while a phone insists it is signed up, only the server can settle it.
+   /api/check-tags asks OneSignal directly, server to server.
+------------------------------------------------------------------------- */
+async function apiGet(path){
+  const res = await fetch(API_BASE + path, { headers:{ Authorization:"Bearer "+token() } });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || `Server returned ${res.status}`);
+  return data;
+}
+
+function diagShow(text){ $("diag-out").textContent = text; }
+
+async function checkDevice(){
+  const id = $("diag-id").value.trim();
+  if(!id){ diagShow("Paste the subscription id shown in the app under Alerts → Having trouble?"); return; }
+  const btn = $("diag-go");
+  btn.disabled = true; diagShow("Asking OneSignal…");
+  try{
+    const d = await apiGet("/api/check-tags?id=" + encodeURIComponent(id));
+    const tags = d.tags || {};
+    const names = Object.keys(tags);
+    const live = (d.subscriptions || []).filter(x => x.enabled);
+    const on = ["janazah","jamaah","announcements","events"].filter(k => tags[k] === "1");
+
+    diagShow([
+      "OneSignal holds, for this device:",
+      "",
+      "  categories on   : " + (on.length ? on.join(", ") : "none"),
+      "  live subscription: " + (live.length ? "yes (" + live.length + ")" : "NO — it cannot receive anything"),
+      "  all tags        : " + (names.length ? JSON.stringify(tags) : "NONE STORED"),
+      "",
+      names.length
+        ? (on.length
+            ? "Sends to those categories should reach this device."
+            : "Every category is switched off here, so targeted sends skip it.")
+        : "No tags are stored server-side. The phone's own panel showing tags means the app "
+          + "recorded them locally but OneSignal never accepted them — that is why sends match nobody.",
+    ].join("\n"));
+  }catch(e){
+    diagShow(/401|sign/i.test(e.message)
+      ? "Session expired — sign in again and retry."
+      : "Couldn't check: " + e.message);
+  }finally{ btn.disabled = false; }
+}
+
+async function checkService(){
+  const btn = $("diag-health");
+  btn.disabled = true; diagShow("Checking the sender service…");
+  try{
+    const res = await fetch(API_BASE + "/api/health");
+    const d = await res.json();
+    const c = d.configured || {};
+    diagShow([
+      "Sender service:",
+      "",
+      "  OneSignal app id : " + (d.appId || "not set"),
+      "  REST key set     : " + !!c.restKey,
+      "  password set     : " + !!c.passwordHash,
+      "  session secret   : " + !!c.sessionSecret,
+      "  allowed origin   : " + (c.allowedOrigin || "not set"),
+      "",
+      "The app id must match the one in the OneSignal dashboard. If it doesn't,",
+      "sends go to a different app — which has no subscribers, so nothing arrives.",
+    ].join("\n"));
+  }catch(e){ diagShow("Couldn't reach the sender service: " + e.message); }
+  finally{ btn.disabled = false; }
+}
+
 function showApp(){
   $("gate").hidden = true;
   $("wrap").hidden = false;
@@ -404,6 +501,14 @@ async function signIn(){
     btn.disabled = false; btn.textContent = "Sign in";
   }
 }
+
+$("diagtoggle").addEventListener("click", ()=>{
+  const d = $("diag");
+  d.hidden = !d.hidden;
+  $("diagtoggle").textContent = d.hidden ? "Check a device" : "Hide device check";
+});
+$("diag-go").addEventListener("click", checkDevice);
+$("diag-health").addEventListener("click", checkService);
 
 $("send").addEventListener("click", async ()=>{
   const inp=topicInput();

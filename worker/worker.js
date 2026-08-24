@@ -234,6 +234,13 @@ async function handle(request, env) {
     if (url.pathname === "/api/health") {
       return json({
         ok: true,
+        // The App ID is a public identifier — it ships inside every page that
+        // loads the OneSignal SDK. Reporting it here lets the admin screen
+        // confirm the sender is aimed at the same OneSignal app the phones
+        // registered with; a mismatch sends into an app with no subscribers,
+        // which looks exactly like nobody being signed up. The REST key stays
+        // secret and is only ever reported as present or absent.
+        appId: env.ONESIGNAL_APP_ID || null,
         configured: {
           appId: !!env.ONESIGNAL_APP_ID,
           restKey: !!env.ONESIGNAL_REST_API_KEY,
