@@ -4210,7 +4210,7 @@ const SENDER_BASE = "https://taiyabah-sender.yameenbux.workers.dev";
 /* Shown in the diagnostics panel. A phone running an older cached build is
    indistinguishable from a broken one otherwise, and that ambiguity has cost
    more than one round of chasing this. Bump it with every change here. */
-const APP_BUILD = "v71";
+const APP_BUILD = "v72";
 
 let lastTagResult = "not attempted";
 
@@ -4263,8 +4263,11 @@ async function writeTagsViaSender(tags){
   lastTagDetail = "HTTP " + res.status + " " + JSON.stringify(data).slice(0, 400);
 
   if(!res.ok) throw new Error(data.error || ("sender returned " + res.status));
-  // the sender returns what OneSignal holds after the write, not what we asked for
-  if(!data.ok || !OneSignalManager.tagsAgree(tags, data.tags))
+  /* All categories live in one tag now, because the plan allows fewer tags
+     than there are categories. data.prefs is that tag decoded back by the
+     sender from what OneSignal returned after the write, so this compares
+     against stored state rather than against what we asked for. */
+  if(!data.ok || !OneSignalManager.tagsAgree(tags, data.prefs))
     throw new Error("OneSignal didn't store the categories");
   return true;
 }

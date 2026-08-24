@@ -425,7 +425,9 @@ async function checkDevice(){
     const tags = d.tags || {};
     const names = Object.keys(tags);
     const live = (d.subscriptions || []).filter(x => x.enabled);
-    const on = ["janazah","jamaah","announcements","events"].filter(k => tags[k] === "1");
+    // every category sits in one tag; the sender decodes it back for us
+    const prefs = d.prefs || {};
+    const on = ["janazah","jamaah","announcements","events"].filter(k => prefs[k] === "1");
 
     diagShow([
       "OneSignal holds, for this device:",
@@ -434,12 +436,15 @@ async function checkDevice(){
       "  live subscription: " + (live.length ? "yes (" + live.length + ")" : "NO — it cannot receive anything"),
       "  all tags        : " + (names.length ? JSON.stringify(tags) : "NONE STORED"),
       "",
-      names.length
+      d.prefs
         ? (on.length
             ? "Sends to those categories should reach this device."
             : "Every category is switched off here, so targeted sends skip it.")
-        : "No tags are stored server-side. The phone's own panel showing tags means the app "
-          + "recorded them locally but OneSignal never accepted them — that is why sends match nobody.",
+        : (names.length
+            ? "This device has tags but no readable preference. It is on an older build that "
+              + "wrote a tag per category — open the app on it once and it will rewrite them."
+            : "Nothing stored server-side, so targeted sends skip this device. Open the app "
+              + "on it once; if it still shows nothing, read the panel under Having trouble?"),
     ].join("\n"));
   }catch(e){
     diagShow(/401|sign/i.test(e.message)
