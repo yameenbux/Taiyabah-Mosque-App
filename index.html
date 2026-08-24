@@ -716,6 +716,10 @@
   .soon-tag{flex:0 0 auto;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
     font-weight:700;color:var(--gold);border:1px solid rgba(198,162,76,.45);
     border-radius:999px;padding:3px 8px;white-space:nowrap}
+  .preview-tag{flex:0 0 auto;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--brand-600);border:1px solid rgba(119,33,87,.35);
+    border-radius:999px;padding:3px 8px;white-space:nowrap}
+  .dr-note{font-size:11.5px;color:var(--muted);line-height:1.55;margin:8px 6px 0}
   .dr-social{display:flex;gap:9px;margin:22px 6px 0}
   .dr-social a{flex:1;display:grid;place-items:center;text-decoration:none;
     color:var(--brand-600);background:#F0E9ED;border-radius:12px;padding:12px 4px}
@@ -1959,12 +1963,16 @@
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t">Application form</span><span class="soon-tag">Coming soon</span>
         </button>
+        <a class="dr-row" href="portal/">
+          <span class="dr-t">Parents portal</span><span class="preview-tag">Preview</span>
+        </a>
+        <a class="dr-row" href="portal/">
+          <span class="dr-t">Teachers portal</span><span class="preview-tag">Preview</span>
+        </a>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Parents portal</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t">Holiday planner</span><span class="soon-tag">Coming soon</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Teachers portal</span><span class="soon-tag">Coming soon</span>
-        </button>
+        <p class="dr-note">Parents and teachers portals are a preview — sign-in works, but no account will show real data yet.</p>
 
         <div class="dr-h">The masjid</div>
         <button class="dr-row" data-act="about">

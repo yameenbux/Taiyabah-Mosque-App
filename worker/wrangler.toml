@@ -1,4 +1,12 @@
 name = "taiyabah-sender"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (never stored here — set with `wrangler secret put <NAME>`):
+#   TRUSTEE_PASSWORD        shared password trustees sign in with on admin.html
+#   SESSION_SECRET          random string used to sign/verify login tokens
+#   ONESIGNAL_APP_ID        Taiyabah Masjid's OneSignal app id
+#   ONESIGNAL_REST_API_KEY  OneSignal REST API key (server-side only)
 main = "worker.js"
 compatibility_date = "2026-01-01"
 

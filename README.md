@@ -89,6 +89,34 @@ Progressive web app: no app store, no install friction, one URL.
 ## Repository structure
 
 ```
+├── index.html              The app. Self-contained: the full year's
+│                           timetable is embedded, so no network request
+│                           is needed to show prayer times.
+├── admin.html              Notification compose screen for trustees.
+├── sw.js                   Service worker — offline shell, push handlers.
+├── manifest.webmanifest    Home-screen install metadata.
+├── logo-cream.png          Masjid logo, for dark backgrounds.
+├── logo-dark.png           Masjid logo, for light backgrounds.
+├── icon-192.png            App icons.
+├── icon-512.png
+├── apple-touch-icon.png
+├── portal/                 Madrasah portal — sign-in shell shared with the
+│                           main masjid website (yameenbux.github.io/
+│                           Taiyabah-Mosque-Website-Rebrand/), reached from
+│                           the app's Madrasah drawer. Parent/teacher/admin
+│                           roles are read from Supabase after sign-in;
+│                           currently a preview — no real dashboard content
+│                           behind the roles yet.
+├── data/                   Timetable pipeline — not served to users.
+│   ├── parse_timetable.py      Converts the published timetable into data.
+│   ├── raw_timetable_2026.txt  Source rows from the official PDF.
+│   ├── timetable-2026.json     Generated dataset (365 days).
+│   └── VERIFICATION.md         Checks performed, and the sign-off checklist.
+└── worker/                 Sender service — a Cloudflare Worker. Holds the
+                             OneSignal REST API key and the trustee password;
+                             admin.html never sees either. Not served to
+                             users, and not deployed from this repo — see
+                             worker/README.md.
 ├── index.html               The app. Fully self-contained — the whole
 │                             year's timetable is embedded, so prayer
 │                             times need no network request.
@@ -187,8 +215,41 @@ The `worker/` folder is a small Node/Cloudflare project with its own
 dependencies (`npm install` inside `worker/`) and its own deploy step
 (`npx wrangler deploy`) — separate from the static site above.
 
+## Push delivery
+
+`index.html` subscribes devices to OneSignal and tags them by category
+(jamāʿah, janāzah, announcements, events); `admin.html` is the trustee
+compose screen, gated behind a sign-in. Neither page ever holds the
+OneSignal REST API key — sends go through `worker/`, a small Cloudflare
+Worker that is the only place that key and the trustee password live.
+
+The Worker's source is in this repo but it is a **separate deployable**,
+not part of the GitHub Pages site: see `worker/README.md` for the (one-time,
+five-command) deploy steps. Until it's deployed, `admin.html`'s sign-in
+will report that it can't reach the sender service.
+
+## Madrasah portal
+
+`portal/` is the sign-in shell for the parents and teachers portals, reached
+from the app's Madrasah drawer (`Parents portal` / `Teachers portal`). It is
+the **same file, byte-for-byte**, as `portal/` in
+[Taiyabah-Mosque-Website-Rebrand](https://github.com/yameenbux/Taiyabah-Mosque-Website-Rebrand)
+— both sites point at the same Supabase project, so an account works from
+either. If you change one copy (styling, MFA flow, `config.js`), copy the
+change to the other repo too; nothing keeps them in sync automatically.
+
+Sign-in and role lookup (via Supabase, with MFA) already work. What's
+missing is everything past that: there's no actual parent or teacher
+dashboard content behind a role yet — signing in just confirms who you are
+and what role you hold. That's the next real piece of work here, not a
+copy/mirror task.
+
 ## Roadmap
 
+- **Madrasah portal content.** Build what parents and teachers actually see
+  once signed in — currently a preview of the sign-in shell only.
+- **Prayer time alignment.** Some settings are pending confirmation from the
+  committee — see the notes in `index.html`.
 - **Website companion** — a marketing/info site sharing this app's design
   system, for browsers and search, separate from the day-to-day PWA.
 - **MyMasjid Live integration** and **Apple Pay checkout on Donate** —
