@@ -3347,37 +3347,13 @@ const OneSignalManager = (() => {
   const tagsAgree = (want, got) =>
     !!got && Object.keys(want).every(k => String(got[k]) === String(want[k]));
 
-  /* Writing tags, honestly.
-
-     v16's User.addTags() is fire-and-forget: it hands the write to the SDK's
-     own internal operation queue and returns undefined. Awaiting it therefore
-     proves nothing — an earlier version of this function did exactly that and
-     reported every write as a success, including the ones that never reached
-     OneSignal. That is how devices ended up subscribed but untagged, matching
-     no targeted send.
-
-     Two things make it trustworthy now:
-
-     1. Never write before there is a subscription to write to. A tag update
-        aimed at a record OneSignal hasn't created yet is simply lost (and is
-        the source of the 409s this app kept hitting), so wait for the id.
-     2. Read the tags back afterwards and confirm they say what we asked for.
-        getTags() reads the SDK's local copy, which it updates optimistically,
-        so this catches a dropped write rather than a server rejection — the
-        launch-time re-assert in pushTopicTags covers the rest. Resolve true
-        only on agreement; anything else rejects so the caller can retry. */
-  const setTags = tags => run(async OneSignal => {
-    if(!subscriptionId()) throw new Error("no subscription yet");
-    OneSignal.User.addTags(tags);
-    if(typeof OneSignal.User.getTags !== "function") return true;   // older SDK: nothing to verify against
-    for(let i = 0; i < 8; i++){
-      await new Promise(r => setTimeout(r, 400 + i * 250));
-      let got = null;
-      try{ got = OneSignal.User.getTags(); }catch(e){ /* not ready yet */ }
-      if(tagsAgree(tags, got)) return true;
-    }
-    throw new Error("OneSignal never confirmed the tag write");
-  }, 20000);
+  /* NOTE: the SDK's own User.addTags() is deliberately not used. Its writes
+     were accepted locally and never stored — the OneSignal dashboard showed
+     these subscriptions carrying only the tag written server to server, while
+     the phone reported a full set. Preferences now go through the masjid's
+     sender service, which writes them over OneSignal's REST API. readTags()
+     stays only to show the phone's own copy in the diagnostics panel, where it
+     is labelled as such. */
 
   /* Why the SDK isn't usable — specific enough to act on */
   function loadingDiagnosis(){
@@ -3388,7 +3364,7 @@ const OneSignalManager = (() => {
     return "Still connecting to the notification service — please wait a moment and tap again.";
   }
 
-  return { init, requestPermission, optOut, setTags, readTags, tagsAgree, subscriptionId,
+  return { init, requestPermission, optOut, readTags, tagsAgree, subscriptionId,
            isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
 })();
 
@@ -4209,23 +4185,28 @@ function applyPrefs(p){
    Every category is written on every sync, "1" when the user has it switched
    on and "0" when they don't. The "0" matters as much as the "1": a send is
    filtered on tag = "1", so a category left at "0" — or a device with no tags
-   at all — is excluded. Nobody receives a category they haven't chosen. */
+   at all — is excluded. Nobody receives a category they haven't chosen.
+
+   The write goes to the masjid's sender service rather than through the
+   OneSignal SDK. The SDK's addTags() reported success on this app while
+   OneSignal stored nothing, leaving every phone believing it was signed up to
+   categories that no send could match. The sender writes over the REST API
+   and reads the tags back, so what this app calls confirmed is what OneSignal
+   actually holds. */
+const SENDER_BASE = "https://taiyabah-sender.yameenbux.workers.dev";
+
 let lastTagResult = "not attempted";
 
-/* Tag writes must never overlap — OneSignal rejects a second update to the
-   same subscription with 409 if one is still in flight. Everything funnels
-   through one queue, and a failed write is retried with a generous backoff.
-
-   lastVerifiedTags records only what a write actually confirmed, never what
-   was merely attempted. It is per page load on purpose: re-asserting the
-   tags once per launch is what repairs a device whose earlier write was
-   lost, and it is skipped immediately when OneSignal already agrees. */
+/* Writes must never overlap, so everything funnels through one queue.
+   lastVerifiedTags records only what the sender read back from OneSignal,
+   never what was merely attempted. It is per page load on purpose: writing
+   once per launch is what repairs a device whose earlier attempt was lost. */
 let tagQueue = Promise.resolve();
 let lastVerifiedTags = null;
 let tagSyncTimer = null;
 
 /* One place decides when a write happens. A subscription that has only just
-   been created hasn't settled on OneSignal's side yet, so give it a moment;
+   been created isn't known to OneSignal's API yet, so give it a moment;
    debouncing also collapses the enable-button and subscription-change paths
    into a single write instead of two racing ones. */
 function scheduleTagSync(delay){
@@ -4233,6 +4214,23 @@ function scheduleTagSync(delay){
   tagSyncTimer = setTimeout(()=>{
     try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
   }, typeof delay === "number" ? delay : 3000);
+}
+
+async function writeTagsViaSender(tags){
+  const id = OneSignalManager.subscriptionId();
+  if(!id) throw new Error("no subscription yet");
+
+  const res = await fetch(SENDER_BASE + "/api/tags", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subscriptionId: id, tags })
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || ("sender returned " + res.status));
+  // the sender returns what OneSignal holds after the write, not what we asked for
+  if(!data.ok || !OneSignalManager.tagsAgree(tags, data.tags))
+    throw new Error("OneSignal didn't store the categories");
+  return true;
 }
 
 function pushTopicTags(p){
@@ -4248,34 +4246,22 @@ function pushTopicTags(p){
   const allOff = !(q.jam || q.jan || q.ann || q.evt);
 
   if(key === lastVerifiedTags){
-    lastTagResult = "already set " + key;
+    lastTagResult = "already stored " + key;
     if(allOff) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
     return;
   }
-  lastTagResult = "queued…";
+  lastTagResult = "saving…";
 
-  const attempt = (n) => OneSignalManager.setTags(tags).then(ok => {
-    if(ok !== true) throw new Error("no confirmation from the notification service");
-    return ok;
-  }).catch(e => {
-    if(n < 4){
-      // covers all three ways a write fails to stick: a 409 from an
-      // overlapping update, a subscription that isn't there yet, and a
-      // write the SDK accepted but never applied
-      return new Promise(res => setTimeout(res, 2000 * n)).then(() => attempt(n + 1));
-    }
+  /* Retried rather than given up on: the subscription may not have reached
+     OneSignal's API yet, and the phone may be on a weak connection. */
+  const attempt = (n) => writeTagsViaSender(tags).catch(e => {
+    if(n < 4) return new Promise(res => setTimeout(res, 2000 * n)).then(() => attempt(n + 1));
     throw e;
   });
 
   tagQueue = tagQueue
-    .then(async () => {
-      /* Skip the write when OneSignal already holds exactly these tags — the
-         common case on launch — but treat anything else as needing one. */
-      const got = await OneSignalManager.readTags().catch(()=>null);
-      if(OneSignalManager.tagsAgree(tags, got)) return true;
-      return attempt(1);
-    })
-    .then(()=>{ lastVerifiedTags = key; lastTagResult = "confirmed " + key; })
+    .then(() => attempt(1))
+    .then(()=>{ lastVerifiedTags = key; lastTagResult = "stored by OneSignal " + key; })
     .catch(e=>{ lastTagResult = "failed: " + (e && e.message ? e.message : e); });
 
   if(allOff) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
@@ -4320,7 +4306,7 @@ async function runDiagnostics(){
     "OneSignal initialised    : " + OneSignalManager.isReady(),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
     "subscription id          : " + (OneSignalManager.subscriptionId() || "none yet"),
-    "tags held by OneSignal   : " + heldTags,
+    "tags on this phone       : " + heldTags,
     "tag write                : " + lastTagResult,
     "service workers:",
     ...regs.map(r => "   • " + r),
