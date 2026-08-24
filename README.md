@@ -65,6 +65,13 @@ It is a progressive web app — no app store, no install friction, one URL.
 ├── icon-192.png            App icons.
 ├── icon-512.png
 ├── apple-touch-icon.png
+├── portal/                 Madrasah portal — sign-in shell shared with the
+│                           main masjid website (yameenbux.github.io/
+│                           Taiyabah-Mosque-Website-Rebrand/), reached from
+│                           the app's Madrasah drawer. Parent/teacher/admin
+│                           roles are read from Supabase after sign-in;
+│                           currently a preview — no real dashboard content
+│                           behind the roles yet.
 ├── data/                   Timetable pipeline — not served to users.
 │   ├── parse_timetable.py      Converts the published timetable into data.
 │   ├── raw_timetable_2026.txt  Source rows from the official PDF.
@@ -130,8 +137,26 @@ not part of the GitHub Pages site: see `worker/README.md` for the (one-time,
 five-command) deploy steps. Until it's deployed, `admin.html`'s sign-in
 will report that it can't reach the sender service.
 
+## Madrasah portal
+
+`portal/` is the sign-in shell for the parents and teachers portals, reached
+from the app's Madrasah drawer (`Parents portal` / `Teachers portal`). It is
+the **same file, byte-for-byte**, as `portal/` in
+[Taiyabah-Mosque-Website-Rebrand](https://github.com/yameenbux/Taiyabah-Mosque-Website-Rebrand)
+— both sites point at the same Supabase project, so an account works from
+either. If you change one copy (styling, MFA flow, `config.js`), copy the
+change to the other repo too; nothing keeps them in sync automatically.
+
+Sign-in and role lookup (via Supabase, with MFA) already work. What's
+missing is everything past that: there's no actual parent or teacher
+dashboard content behind a role yet — signing in just confirms who you are
+and what role you hold. That's the next real piece of work here, not a
+copy/mirror task.
+
 ## Roadmap
 
+- **Madrasah portal content.** Build what parents and teachers actually see
+  once signed in — currently a preview of the sign-in shell only.
 - **Prayer time alignment.** Some settings are pending confirmation from the
   committee — see the notes in `index.html`.
 
