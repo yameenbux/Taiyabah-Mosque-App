@@ -3326,10 +3326,58 @@ const OneSignalManager = (() => {
   }
 
   const optOut      = () => run(OneSignal => OneSignal.User.PushSubscription.optOut());
-  const setTags     = tags => run(async OneSignal => { await OneSignal.User.addTags(tags); return true; });
   const isOptedIn   = () => run(OneSignal => !!OneSignal.User.PushSubscription.optedIn);
   const permission  = () => run(OneSignal => OneSignal.Notifications.permission);
   const isReady     = () => ready;
+
+  /* The subscription id, once OneSignal has actually created the record on
+     its servers. Null means there is nothing to tag yet. */
+  const subscriptionId = () => {
+    const OneSignal = sdk || window.OneSignal;
+    try{
+      const id = OneSignal && OneSignal.User && OneSignal.User.PushSubscription
+        && OneSignal.User.PushSubscription.id;
+      return isRegistered(id) ? id : null;
+    }catch(e){ return null; }
+  };
+
+  const readTags = () => run(OneSignal =>
+    (typeof OneSignal.User.getTags === "function" ? OneSignal.User.getTags() : null));
+
+  const tagsAgree = (want, got) =>
+    !!got && Object.keys(want).every(k => String(got[k]) === String(want[k]));
+
+  /* Writing tags, honestly.
+
+     v16's User.addTags() is fire-and-forget: it hands the write to the SDK's
+     own internal operation queue and returns undefined. Awaiting it therefore
+     proves nothing — an earlier version of this function did exactly that and
+     reported every write as a success, including the ones that never reached
+     OneSignal. That is how devices ended up subscribed but untagged, matching
+     no targeted send.
+
+     Two things make it trustworthy now:
+
+     1. Never write before there is a subscription to write to. A tag update
+        aimed at a record OneSignal hasn't created yet is simply lost (and is
+        the source of the 409s this app kept hitting), so wait for the id.
+     2. Read the tags back afterwards and confirm they say what we asked for.
+        getTags() reads the SDK's local copy, which it updates optimistically,
+        so this catches a dropped write rather than a server rejection — the
+        launch-time re-assert in pushTopicTags covers the rest. Resolve true
+        only on agreement; anything else rejects so the caller can retry. */
+  const setTags = tags => run(async OneSignal => {
+    if(!subscriptionId()) throw new Error("no subscription yet");
+    OneSignal.User.addTags(tags);
+    if(typeof OneSignal.User.getTags !== "function") return true;   // older SDK: nothing to verify against
+    for(let i = 0; i < 8; i++){
+      await new Promise(r => setTimeout(r, 400 + i * 250));
+      let got = null;
+      try{ got = OneSignal.User.getTags(); }catch(e){ /* not ready yet */ }
+      if(tagsAgree(tags, got)) return true;
+    }
+    throw new Error("OneSignal never confirmed the tag write");
+  }, 20000);
 
   /* Why the SDK isn't usable — specific enough to act on */
   function loadingDiagnosis(){
@@ -3340,27 +3388,22 @@ const OneSignalManager = (() => {
     return "Still connecting to the notification service — please wait a moment and tap again.";
   }
 
-  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
+  return { init, requestPermission, optOut, setTags, readTags, tagsAgree, subscriptionId,
+           isOptedIn, permission, isReady, blockedReason, loadingDiagnosis };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
-let tagsPushed = false;
 async function syncAlertsUI(){
   const btn=document.getElementById('enable');
   if(!btn) return;
   const on = await OneSignalManager.isOptedIn().catch(e=>{ console.warn("isOptedIn:", e); return false; });
 
-  /* A subscription with no tags matches no targeted send. Write the current
-     preferences once the device is subscribed, rather than waiting for the
-     user to press Save — but not instantly: a subscription only just created
-     hasn't always settled on OneSignal's side yet, and writing to it too
-     soon is one of the things that produces a 409 from their own SDK. */
-  if(on && !tagsPushed){
-    tagsPushed = true;
-    setTimeout(()=>{
-      try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
-    }, 3000);
-  }
+  /* A subscription with no tags matches no targeted send, so re-assert the
+     saved preferences whenever the device is subscribed rather than waiting
+     for the user to press Save. Running on every launch is deliberate: it
+     costs nothing when the tags are already right (pushTopicTags checks
+     first) and it repairs any device whose original write was lost. */
+  if(on) scheduleTagSync();
 
   if(on && btn.dataset.on!=="1"){
     btn.dataset.on="1";
@@ -4161,23 +4204,36 @@ function applyPrefs(p){
   document.getElementById('mins').disabled=!p.jam;
 }
 
-/* topics → OneSignal tags, so a send can target one category */
+/* topics → OneSignal tags, so a send can target one category.
+
+   Every category is written on every sync, "1" when the user has it switched
+   on and "0" when they don't. The "0" matters as much as the "1": a send is
+   filtered on tag = "1", so a category left at "0" — or a device with no tags
+   at all — is excluded. Nobody receives a category they haven't chosen. */
 let lastTagResult = "not attempted";
+
 /* Tag writes must never overlap — OneSignal rejects a second update to the
    same subscription with 409 if one is still in flight. Everything funnels
-   through one queue, and a 409 specifically is retried with a generous
-   backoff rather than treated as a normal failure.
+   through one queue, and a failed write is retried with a generous backoff.
 
-   OneSignal's own SDK has its own internal operation executor, separate
-   from our app-level queue. Two things upset it, independent of our code
-   colliding with itself: (1) sending an identical payload twice — its
-   internal dedup logic appears to reject the repeat outright — so we skip
-   any write whose payload exactly matches the last one we sent
-   successfully; (2) writing to a subscription that has only just been
-   created, before its record has settled server-side — so the very first
-   automatic write waits a few seconds rather than firing immediately. */
+   lastVerifiedTags records only what a write actually confirmed, never what
+   was merely attempted. It is per page load on purpose: re-asserting the
+   tags once per launch is what repairs a device whose earlier write was
+   lost, and it is skipped immediately when OneSignal already agrees. */
 let tagQueue = Promise.resolve();
-let lastSentTags = null;
+let lastVerifiedTags = null;
+let tagSyncTimer = null;
+
+/* One place decides when a write happens. A subscription that has only just
+   been created hasn't settled on OneSignal's side yet, so give it a moment;
+   debouncing also collapses the enable-button and subscription-change paths
+   into a single write instead of two racing ones. */
+function scheduleTagSync(delay){
+  clearTimeout(tagSyncTimer);
+  tagSyncTimer = setTimeout(()=>{
+    try{ pushTopicTags(); }catch(e){ console.warn("tagging failed:", e); }
+  }, typeof delay === "number" ? delay : 3000);
+}
 
 function pushTopicTags(p){
   const q = p || currentPrefs();
@@ -4189,27 +4245,40 @@ function pushTopicTags(p){
     events:        q.evt ? "1" : "0"
   };
   const key = JSON.stringify(tags);
-  if(key === lastSentTags){
-    lastTagResult = "unchanged, not re-sent " + key;
-    if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
+  const allOff = !(q.jam || q.jan || q.ann || q.evt);
+
+  if(key === lastVerifiedTags){
+    lastTagResult = "already set " + key;
+    if(allOff) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
     return;
   }
   lastTagResult = "queued…";
 
-  const attempt = (n) => OneSignalManager.setTags(tags).catch(e => {
-    const msg = e && e.message ? e.message : String(e);
-    if(n < 3 && /409|conflict/i.test(msg)){
-      return new Promise(res => setTimeout(res, 1500 * n)).then(() => attempt(n + 1));
+  const attempt = (n) => OneSignalManager.setTags(tags).then(ok => {
+    if(ok !== true) throw new Error("no confirmation from the notification service");
+    return ok;
+  }).catch(e => {
+    if(n < 4){
+      // covers all three ways a write fails to stick: a 409 from an
+      // overlapping update, a subscription that isn't there yet, and a
+      // write the SDK accepted but never applied
+      return new Promise(res => setTimeout(res, 2000 * n)).then(() => attempt(n + 1));
     }
     throw e;
   });
 
   tagQueue = tagQueue
-    .then(() => attempt(1))
-    .then(()=>{ lastSentTags = key; lastTagResult = "sent " + key; })
+    .then(async () => {
+      /* Skip the write when OneSignal already holds exactly these tags — the
+         common case on launch — but treat anything else as needing one. */
+      const got = await OneSignalManager.readTags().catch(()=>null);
+      if(OneSignalManager.tagsAgree(tags, got)) return true;
+      return attempt(1);
+    })
+    .then(()=>{ lastVerifiedTags = key; lastTagResult = "confirmed " + key; })
     .catch(e=>{ lastTagResult = "failed: " + (e && e.message ? e.message : e); });
 
-  if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
+  if(allOff) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
 }
 
 /* if push can't work on this device, say so before they tap */
@@ -4235,6 +4304,12 @@ async function runDiagnostics(){
     regs = list.map(r => r.scope + (r.active ? " (active)" : " (inactive)"));
   }catch(e){ regs=["couldn't read: "+e.message]; }
 
+  let heldTags = "unknown";
+  try{
+    const t = await OneSignalManager.readTags();
+    heldTags = t ? JSON.stringify(t) : "none";
+  }catch(e){ heldTags = "couldn't read: " + (e && e.message ? e.message : e); }
+
   const lines = [
     "installed to home screen : " + standalone,
     "iOS device               : " + iOS,
@@ -4244,6 +4319,8 @@ async function runDiagnostics(){
     "OneSignal script loaded  : " + (typeof window.OneSignal !== "undefined"),
     "OneSignal initialised    : " + OneSignalManager.isReady(),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
+    "subscription id          : " + (OneSignalManager.subscriptionId() || "none yet"),
+    "tags held by OneSignal   : " + heldTags,
     "tag write                : " + lastTagResult,
     "service workers:",
     ...regs.map(r => "   • " + r),
@@ -4253,8 +4330,9 @@ async function runDiagnostics(){
 
 function initDiagnostics(){
   document.getElementById('diag-retag').addEventListener('click', async ()=>{
+    lastVerifiedTags = null;          // force a real write, not a "no change" skip
     pushTopicTags();
-    setTimeout(runDiagnostics, 900);
+    setTimeout(runDiagnostics, 3000);
   });
   document.getElementById('troublebtn').addEventListener('click',()=>{
     const d=document.getElementById('diag');
@@ -4322,7 +4400,11 @@ function initAlerts(){
 
     if(res && res.ok){
       unlock();
-      pushTopicTags();
+      // don't write tags yet — OneSignal hasn't created the subscription
+      // record at this point, and a write aimed at it now is thrown away.
+      // scheduleTagSync waits for it; syncAlertsUI also fires once the
+      // subscription actually appears, and the two collapse into one write.
+      scheduleTagSync();
       return;
     }
     btn.textContent = label;
