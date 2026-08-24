@@ -294,6 +294,31 @@ async function handle(request, env) {
       return json({ ok: true, id: data.id, recipients: data.recipients ?? null, topic: t.label }, 200, ch);
     }
 
+    /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
+       REST API, completely bypassing the browser SDK, IndexedDB, and every
+       client-side code path. If this succeeds where the client always
+       409s, the bug is in the client SDK call. If this ALSO 409s, the
+       problem is on OneSignal's side for this app/subscription, not ours.
+       GET /api/force-tag?id=<onesignal_id> */
+    if (url.pathname === "/api/force-tag" && request.method === "GET") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+
+      const id = url.searchParams.get("id");
+      if (!id) return json({ error: "Pass ?id=<OneSignal ID>" }, 400, ch);
+
+      const res = await fetch(`https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}`,
+        },
+        body: JSON.stringify({ properties: { tags: { server_test: "1" } } }),
+      });
+      const data = await res.json().catch(() => ({}));
+      return json({ status: res.status, ok: res.ok, response: data }, 200, ch);
+    }
+
     /* Ground-truth diagnostic: asks OneSignal's own server what tags it
        actually has stored for a subscription, bypassing the browser SDK,
        its local IndexedDB cache, and any client-side "success" reporting
