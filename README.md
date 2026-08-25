@@ -2,7 +2,7 @@
 
 # Taiyabah Masjid
 
-**Prayer times, live audio, Qibla, zakat and community alerts for Taiyabah Masjid.**
+**Prayer times, live audio, Qur'an, zakat and community alerts for Taiyabah Masjid.**
 
 Bolton Central Islamic Society · Registered charity 1041569
 31a Draycott Street, Bolton BL1 8HD
@@ -27,238 +27,206 @@ Progressive web app: no app store, no install friction, one URL.
 
 **Prayer times**
 - Beginning and jamāʿah times for all five prayers, from the masjid's own
-  published timetable — not calculated, not sourced from anywhere else
-- Live countdown to the next jamāʿah, current prayer highlighted correctly
-  from its beginning time (not its jamāʿah)
-- Both Jumuʿah times shown inline on Fridays, with Jumuʿah replacing Zuhr
-  in both the timetable and the day's heading
-- Browse any date: previous/next, jump to Today or the next Jumuʿah, or open
-  the full month as a proper timetable
-- A Friday-only call to give, paired with an authentic hadith on the virtue
-  of the day
+  published timetable — never calculated, never sourced elsewhere
+- Live countdown to the next jamāʿah, with the current prayer highlighted from
+  its *beginning* time rather than its jamāʿah
+- Both Jumuʿah times shown inline on Fridays, with Jumuʿah replacing Zuhr in
+  the timetable and the day's heading
+- Browse any date, jump to Today or the next Jumuʿah, or open the full month
+- A Friday-only call to give, paired with an authentic hadith on the day's virtue
 
-**Reminders**
-- Contextual cards tied to the day and time of day — Sūrah al-Kahf and
-  salawāt on Fridays, morning/evening adhkār in their true windows, duʿā
-  between adhān and iqāmah
-- Advance notice of voluntary fasts *the day before*, with the suhūr end
-  time computed from the next day's Fajr
-- The Islamic calendar days the masjid's own timetable marks — Shab-e-Miʿrāj,
-  Shab-e-Barāʾat, Ramadan, both Eids, the days of Hajj, ʿĀshūrāʾ, the Hijrah
+**Reminders on screen**
+- Contextual cards tied to the day and time — Sūrah al-Kahf on Fridays,
+  morning and evening adhkār in their true windows, duʿā between adhān and iqāmah
+- Advance notice of voluntary fasts *the day before*, with the suhūr end time
+  computed from the next day's Fajr
+- The Islamic calendar days the masjid's own timetable marks
 - A quiet countdown to Ramadan, appearing only in the final 30 days
 
+**Notifications**
+- Opt-in by category — jamāʿah reminders, janāzah, announcements, events — so
+  urgent messages stay urgent
+- **Two automatic alerts per prayer**: an advance reminder at each subscriber's
+  own lead time (5/10/15 min), and **"Jamāʿah Time Now"** at the jamāʿah itself
+- A trustee compose screen (`admin.html`), password-protected, sending through
+  the masjid's own Cloudflare Worker — the OneSignal key never touches a browser
+- Built-in diagnostics ("Having trouble?") so notification problems are
+  self-serviceable rather than a support conversation
+
+**Recite**
+- **Daily Athkar** — morning and evening remembrance, sourced and cited
+- **Qur'an** — Sūrah al-Fātiḥah with the official tajweed colour legend
+- **Common Duas** — everyday supplications in a tile grid, each opening in place
+- **40 Rabbanā** — the forty short Qur'anic duʿās, numbered, in Indo-Pak script
+
 **Qibla**
-- Great-circle bearing to the Kaʿbah with a live compass where the device
-  supports it, refining to the user's own location if allowed
-- Degrades honestly: states the bearing even without a working compass,
+- Great-circle bearing to the Kaʿbah with a live compass where supported,
+  refining to the user's own location if allowed
+- Degrades honestly: states the bearing even without a working compass, and
   explains exactly why the compass can't run when it can't
 
 **Listen live**
-- In-app player for the masjid's live audio stream, with background
-  playback and lock-screen controls
-- A full menu of the masjid's videos and bayaans, playing in-app rather
-  than sending people to YouTube
+- In-app player for the masjid's broadcast, with background playback and
+  lock-screen controls
+- The masjid's videos and bayaans, playing in-app rather than sending people away
 
 **Zakat calculator**
-- Nisab calculated from a live gold/silver spot price (fetched key-free,
-  sanity-checked, falls back to manual entry if the fetch fails or looks
-  implausible)
-- Silver standard by default (the Hanafi position — the lower threshold)
-- Plain-English guidance on what counts and what doesn't, written for
-  someone who has never calculated zakat before
+- Nisab from a live gold/silver spot price (fetched key-free, sanity-checked,
+  falling back to manual entry if the figure looks implausible)
+- Silver standard by default — the Hanafi position, being the lower threshold
+- Plain-English guidance written for someone who has never calculated zakat
 - States plainly that it's a guide, not a ruling
 
-**Alerts**
-- Push notifications via OneSignal, opt-in by category — Jamāʿah reminders,
-  Janāzah, Announcements, Events — so urgent messages stay urgent
-- **Automated jamāʿah reminders**, sent by a scheduled job, respecting each
-  subscriber's own lead time (5/10/15 min), correctly relabelled to Jumuʿah
-  on Fridays
-- A trustee compose screen (`admin.html`), password-protected, sending
-  through the masjid's own Cloudflare Worker — the OneSignal key never
-  touches a browser
-- Built-in diagnostics ("Having trouble?") so notification issues are
-  self-serviceable rather than a support conversation
+**Giving**
+- Online donation via Apple Pay, Google Pay, PayPal and card, with Gift Aid
+- Donor tiers as **pledges**, settled afterwards by transfer or at the office
+- Bank details with tap-to-copy
 
-**About & Contact**
-- The masjid's history — established 1967, founders, the ulema who have
-  led imaamat, the present Imam — as a proper in-app page
-- Contact details, address, and social links, one tap to call, email, or
-  get directions
+**Community information**
+- Masjid history — established 1967, founders, the ulema who have led imaamat
+- Contact, hall hire at Taiyabah Centre, Imams' Advice
+- Birth (including circumcision referral), Marriage, Islamic Will, and Funerals
+
+**Settings**
+- **Language** — English, Urdu, Gujarati and Arabic. Packs download on demand,
+  cache offline, and switch the interface instantly, including right-to-left
 
 ## Repository structure
 
 ```
-├── index.html              The app. Self-contained: the full year's
-│                           timetable is embedded, so no network request
-│                           is needed to show prayer times.
-├── admin.html              Notification compose screen for trustees.
-├── sw.js                   Service worker — offline shell, push handlers.
-├── manifest.webmanifest    Home-screen install metadata.
-├── logo-cream.png          Masjid logo, for dark backgrounds.
-├── logo-dark.png           Masjid logo, for light backgrounds.
-├── icon-192.png            App icons.
-├── icon-512.png
-├── apple-touch-icon.png
-├── portal/                 Madrasah portal — sign-in shell shared with the
-│                           main masjid website (yameenbux.github.io/
-│                           Taiyabah-Mosque-Website-Rebrand/), reached from
-│                           the app's Madrasah drawer. Parent/teacher/admin
-│                           roles are read from Supabase after sign-in;
-│                           currently a preview — no real dashboard content
-│                           behind the roles yet.
-├── data/                   Timetable pipeline — not served to users.
-│   ├── parse_timetable.py      Converts the published timetable into data.
-│   ├── raw_timetable_2026.txt  Source rows from the official PDF.
-│   ├── timetable-2026.json     Generated dataset (365 days).
-│   └── VERIFICATION.md         Checks performed, and the sign-off checklist.
-└── worker/                 Sender service — a Cloudflare Worker. Holds the
-                             OneSignal REST API key and the trustee password;
-                             admin.html never sees either. Not served to
-                             users, and not deployed from this repo — see
-                             worker/README.md.
-├── index.html               The app. Fully self-contained — the whole
-│                             year's timetable is embedded, so prayer
-│                             times need no network request.
-├── admin.html                Password-gated notification compose screen.
-├── sw.js                     Service worker — offline shell, OneSignal
-│                             push handlers, network-first page updates.
-├── manifest.webmanifest       Home-screen install metadata.
-├── logo-cream.png             Masjid logo, dark backgrounds.
-├── logo-dark.png               Masjid logo, light backgrounds.
-├── icon-*.png                  App icons (Arabic calligraphy wordmark).
-├── LICENSE.md                  Ownership and usage terms.
+├── index.html                 The app. Self-contained — the whole year's
+│                               timetable is embedded, so prayer times need
+│                               no network request.
+├── admin.html                  Password-gated notification compose screen.
+├── sw.js                       Service worker — offline shell, push handlers.
+├── manifest.webmanifest         Home-screen install metadata.
+├── logo-*.png, icon-*.png       Masjid logo and app icons.
+├── LICENSE.md                   Ownership and usage terms.
 │
-├── push/onesignal/              OneSignal's own service worker files
-│   ├── OneSignalSDKWorker.js       (kept on a separate scope so they
-│   └── OneSignalSDKUpdaterWorker.js don't collide with sw.js above).
+├── .github/workflows/           Deploys the Worker automatically on push,
+│   └── deploy-worker.yml         so no local tooling is ever required.
 │
-├── worker/                      The notification backend — a Cloudflare
-│   ├── worker.js                   Worker, not hosted on any personal
-│   ├── wrangler.toml                server. Holds the OneSignal REST key
-│   ├── hash-password.js             as a Cloudflare secret; the key is
-│   ├── REMINDERS.md                 never in this repo or in a browser.
-│   └── README.md                    See worker/README.md to deploy,
-│                                     worker/REMINDERS.md for the
-│                                     automated jamāʿah reminders.
+├── push/onesignal/              OneSignal's own service workers, kept on a
+│                                 separate scope so they don't collide with sw.js.
+│
+├── worker/                      Notification backend — a Cloudflare Worker.
+│   ├── worker.js                 Holds the OneSignal REST key as a secret;
+│   ├── wrangler.toml              handles manual sends and the scheduled
+│   ├── hash-password.js            jamāʿah reminders.
+│   ├── REMINDERS.md               See README.md to deploy, REMINDERS.md for
+│   └── README.md                   how the automated reminders work.
+│
+├── lang/                        Language packs — fetched only when a user
+│   ├── ur.js  gu.js  ar.js       chooses that language, never on load.
+│
+├── quran/                       Qur'anic content — lazy-loaded, so the main
+│   ├── fatiha-demo.js            app never pays for carrying it.
+│   └── rabbanas.js
 │
 └── data/                        Timetable pipeline — not served to users.
-    ├── parse_timetable.py           Converts the masjid's published PDF
-    ├── raw_timetable_2026.txt        timetable into the app's dataset,
-    ├── timetable-2026.json           with automated verification.
-    └── VERIFICATION.md               Also fetched live, once a minute,
-                                       by the Worker's reminder scheduler.
+    ├── parse_timetable.py           Converts the masjid's published PDF into
+    ├── timetable-2026.json           the app's dataset, with verification.
+    └── VERIFICATION.md               Also read once a minute by the Worker's
+                                       reminder scheduler.
 ```
 
 ## Prayer time data
 
-Times come from the masjid's official published Salah timetable — never
-calculated, never sourced from a third party.
+Times come from the masjid's official published Salah timetable — **never
+calculated, never sourced from a third party**. There is no calculation engine
+in this app.
 
-The dataset is **generated, not hand-entered**. `data/parse_timetable.py`
-reads the published rows, resolves ditto marks, maps Hijri dates, and runs a
-series of checks — correct day counts per month, jamāʿah never earlier than
-beginning time, Jumuʿah present on every Friday, the BST transitions handled
-correctly — before writing anything. If any check fails, it writes no output.
+The dataset is **generated, not hand-entered**. `parse_timetable.py` reads the
+published rows, resolves ditto marks, maps Hijri dates, and runs a series of
+checks — correct day counts per month, jamāʿah never earlier than beginning
+time, Jumuʿah present on every Friday, BST transitions handled — before writing
+anything. If any check fails, it writes no output.
 
 Current dataset: **1 January – 31 December 2026** (1447–1448 AH).
+
+### Times cannot drift
+
+The app displays times embedded in `index.html`; the reminder scheduler reads
+`data/timetable-2026.json`. Both are generated from the same source, but if an
+annual refresh ever updated one and not the other, notifications could fire at
+a time the app doesn't show.
+
+To make that impossible, **every scheduled run cross-checks its times against
+the app's own timetable before sending**, and halts with a logged discrepancy
+rather than announcing a time nobody can see. If the app simply can't be
+reached, it proceeds — an outage shouldn't silence prayer reminders.
 
 ### Annual refresh
 
 The masjid publishes the following year's timetable around late November or
 December. Updating is routine, not a repair:
 
-1. Add the new year's rows to `data/raw_timetable_2026.txt`'s format.
-2. `python3 data/parse_timetable.py` — verifies and refuses to write output
-   on any failure.
-3. Embed the generated JSON into `index.html`, replacing the
-   `const DATA = { … }` block.
-4. Complete the sign-off checklist in `data/VERIFICATION.md` — checking the
-   generated times against the printed board — before deploying.
-5. No change needed to the Worker: the scheduled reminders fetch the live
-   dataset from the deployed app, so they pick up the new year automatically
-   once step 3 is live.
+1. Add the new year's rows in `data/raw_timetable_2026.txt`'s format.
+2. `python3 data/parse_timetable.py` — verifies, and refuses to write output on
+   any failure.
+3. Embed the generated JSON into `index.html`, replacing the `const DATA` block.
+4. **Update `data/timetable-2026.json` too** — the scheduler reads it, and the
+   integrity check above will halt reminders if the two disagree.
+5. Complete the sign-off checklist in `data/VERIFICATION.md`, checking the
+   generated times against the printed board, before deploying.
 
-Step 4 is not optional. Automated checks confirm internal consistency; only
-a person can confirm it matches what the masjid intends.
+Step 5 is not optional. Automated checks confirm internal consistency; only a
+person can confirm it matches what the masjid intends.
 
 ## Notifications — how the pieces fit together
 
 Three separate things, deliberately kept apart:
 
-- **`index.html`** carries the OneSignal Web SDK and the Alerts tab's opt-in
-  UI. It writes each device's topic preferences as OneSignal tags the moment
-  the device subscribes — not only when Save is pressed.
-- **`worker/`** is a Cloudflare Worker holding the OneSignal REST API key as
-  a secret. `admin.html` calls it to send manual messages (janāzah,
-  announcements); a Cron Trigger calls it every minute to check whether any
-  jamāʿah reminder is due.
-- **OneSignal itself** handles actual delivery and device subscriptions.
+- **`index.html`** carries the OneSignal Web SDK and the opt-in UI. It writes
+  each device's topic preferences **via the Worker**, not the browser SDK —
+  the SDK's own tag write proved unreliable across every device tested
+  ([OneSignal-Website-SDK#1093](https://github.com/OneSignal/OneSignal-Website-SDK/issues/1093)).
+- **`worker/`** is a Cloudflare Worker holding the OneSignal REST API key as a
+  secret. `admin.html` calls it to send manual messages; a Cron Trigger calls
+  it every minute to check whether any jamāʿah reminder is due.
+- **OneSignal** handles delivery and device subscriptions.
 
-The REST key can message the entire congregation, so it exists in exactly
-one place: Cloudflare's secret store. It is never in this repository, never
-in `admin.html`, never in a browser.
+The REST key can message the entire congregation, so it exists in exactly one
+place: Cloudflare's secret store. Never in this repository, never in
+`admin.html`, never in a browser.
 
-See `worker/README.md` to deploy the Worker, and `worker/REMINDERS.md` for
-how the automated jamāʿah reminders work.
+**iOS note:** web push only reaches devices where the app has been **added to
+the Home Screen**. A bookmarked tab receives nothing — an Apple restriction, and
+one that makes install instructions part of the feature.
 
 ## Development
 
 No build step, no framework, no dependencies for the app itself — edit
 `index.html` directly and commit. GitHub Pages deploys from `main`.
 
-The compass, notifications, and home-screen install all require HTTPS and
-won't work from a local file or a sandboxed preview — test against the
-deployed URL.
+The compass, notifications and home-screen install all require HTTPS and won't
+work from a local file — test against the deployed URL.
 
-The `worker/` folder is a small Node/Cloudflare project with its own
-dependencies (`npm install` inside `worker/`) and its own deploy step
-(`npx wrangler deploy`) — separate from the static site above.
+`worker/` is a small Cloudflare project with its own deploy step. Pushing any
+change inside `worker/` triggers the GitHub Action, so **no local Node or
+Wrangler is needed** — edit and push from anywhere, including a tablet.
 
-## Push delivery
-
-`index.html` subscribes devices to OneSignal and tags them by category
-(jamāʿah, janāzah, announcements, events); `admin.html` is the trustee
-compose screen, gated behind a sign-in. Neither page ever holds the
-OneSignal REST API key — sends go through `worker/`, a small Cloudflare
-Worker that is the only place that key and the trustee password live.
-
-The Worker's source is in this repo but it is a **separate deployable**,
-not part of the GitHub Pages site: see `worker/README.md` for the (one-time,
-five-command) deploy steps. Until it's deployed, `admin.html`'s sign-in
-will report that it can't reach the sender service.
-
-## Madrasah portal
-
-`portal/` is the sign-in shell for the parents and teachers portals, reached
-from the app's Madrasah drawer (`Parents portal` / `Teachers portal`). It is
-the **same file, byte-for-byte**, as `portal/` in
-[Taiyabah-Mosque-Website-Rebrand](https://github.com/yameenbux/Taiyabah-Mosque-Website-Rebrand)
-— both sites point at the same Supabase project, so an account works from
-either. If you change one copy (styling, MFA flow, `config.js`), copy the
-change to the other repo too; nothing keeps them in sync automatically.
-
-Sign-in and role lookup (via Supabase, with MFA) already work. What's
-missing is everything past that: there's no actual parent or teacher
-dashboard content behind a role yet — signing in just confirms who you are
-and what role you hold. That's the next real piece of work here, not a
-copy/mirror task.
+**Performance principle:** content that is small, permanent and core to daily
+use (prayer times, duʿās) is embedded so it works instantly and offline.
+Content that is large, growing or supplementary (Qur'an, language packs) lives
+in its own folder and is fetched only when opened. Architecture is matched to
+the content, not applied uniformly.
 
 ## Roadmap
 
-- **Madrasah portal content.** Build what parents and teachers actually see
-  once signed in — currently a preview of the sign-in shell only.
-- **Prayer time alignment.** Some settings are pending confirmation from the
-  committee — see the notes in `index.html`.
-- **Website companion** — a marketing/info site sharing this app's design
-  system, for browsers and search, separate from the day-to-day PWA.
-- **MyMasjid Live integration** and **Apple Pay checkout on Donate** —
-  both pending exact URLs/confirmation from the committee.
-- **Vector logo** — current assets are upscaled from a small source image;
-  requested from the masjid for icon and print quality.
-- A small number of fiqh/date decisions are flagged inline in the code
-  (`MARK_MAWLID`, the Ramadan 2027 fallback date) pending the imam's
-  confirmation before launch.
+- **App store release** — mid-October target. Requires wrapping the PWA,
+  an Apple Developer Organization account under BCIS, and Google Play's
+  mandatory 12-tester / 14-day period.
+- **Qur'an** — currently al-Fātiḥah with the tajweed legend. A full Mus-haf
+  needs a verified rules dataset integrated properly, not hand-marked.
+- **Translations** — the Urdu, Gujarati and Arabic packs cover navigation and
+  prayer names only, and **have not been reviewed by a native speaker**.
+- **Religious content review** — the Islamic Will, Marriage and 40 Rabbanā
+  pages, and the transcribed Arabic throughout, need the imam's sign-off
+  before wider release.
+- **Account ownership** — OneSignal, Cloudflare and GitHub are currently under
+  a personal account rather than the charity's.
+- **Vector logo** — current assets are upscaled from a small source image.
 
 ## Credits
 
