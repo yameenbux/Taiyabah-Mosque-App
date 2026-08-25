@@ -3769,20 +3769,61 @@ const OneSignalManager = (() => {
      gesture. Going through OneSignalDeferred loses that context, so use the
      live SDK handle when we have one and only fall back to the queue if the
      SDK is somehow still loading. */
+  /* The browser's own view of permission. Authoritative, and unlike the SDK's
+     copy it is current the instant the person answers the prompt. */
+  const nativePermission = () => {
+    try{ return ("Notification" in window) ? Notification.permission : "default"; }
+    catch(e){ return "default"; }
+  };
+
+  /* Neither SDK call below is guaranteed to settle. requestPermission() can
+     hang when the prompt never appears or is dismissed without an answer, and
+     optIn() can hang while OneSignal registers the subscription. Awaiting them
+     with no bound left the button on "Just a moment…" indefinitely, disabled,
+     with no way back short of force-quitting the app.
+
+     So the prompt is fired and then the browser is watched instead: polling
+     settles the moment the person taps, and the wait is capped so a prompt
+     that never arrives ends in a message rather than in silence. */
+  async function waitForDecision(ms){
+    const until = Date.now() + ms;
+    for(;;){
+      const state = nativePermission();
+      if(state === "granted" || state === "denied") return state;
+      if(Date.now() >= until) return state;
+      await new Promise(r => setTimeout(r, 250));
+    }
+  }
+
   async function requestPermission(){
     const OneSignal = sdk || window.OneSignal;
     if(!OneSignal || !OneSignal.Notifications){
       return { ok:false, reason:"loading" };
     }
+
+    // fire it inside the gesture, but never block on it
     try{
-      await OneSignal.Notifications.requestPermission();
-      const granted = !!OneSignal.Notifications.permission;
-      if(granted) await OneSignal.User.PushSubscription.optIn();
-      return { ok:granted, reason: granted ? null : "declined" };
+      const asked = OneSignal.Notifications.requestPermission();
+      if(asked && typeof asked.catch === "function")
+        asked.catch(e => console.warn("requestPermission:", e));
     }catch(e){
-      console.warn("OneSignal permission request failed:", e);
-      return { ok:false, reason:"error" };
+      console.warn("OneSignal permission request threw:", e);
     }
+
+    const state = await waitForDecision(30000);
+    if(state === "denied")  return { ok:false, reason:"declined" };
+    if(state !== "granted") return { ok:false, reason:"noanswer" };
+
+    /* Permission is granted. optIn() completes the subscription, but the UI
+       must not wait on it: the tag write already retries until a subscription
+       exists, so a slow registration should not look like a failure. */
+    try{
+      const opted = OneSignal.User.PushSubscription.optIn();
+      if(opted && typeof opted.catch === "function")
+        opted.catch(e => console.warn("optIn:", e));
+    }catch(e){ console.warn("optIn threw:", e); }
+
+    return { ok:true, reason:null };
   }
 
   const optOut      = () => run(OneSignal => OneSignal.User.PushSubscription.optOut());
@@ -5115,20 +5156,34 @@ function initAlerts(){
     const label = btn.textContent;
     btn.disabled = true;
     btn.textContent = "Just a moment…";
-    const res = await OneSignalManager.requestPermission();
-    btn.disabled = false;
+
+    /* Whatever happens, the button comes back. Leaving it disabled on a wedged
+       promise is what stranded people on "Just a moment…" with no way to try
+       again short of force-quitting. */
+    let res = null;
+    try{
+      res = await OneSignalManager.requestPermission();
+    }catch(e){
+      console.warn("enable failed:", e);
+    }finally{
+      btn.disabled = false;
+      if(!(res && res.ok)) btn.textContent = label;
+    }
 
     if(res && res.ok){
       unlock();
       pushTopicTags();
       return;
     }
-    btn.textContent = label;
     if(res && res.reason==="loading"){
       note.textContent = OneSignalManager.loadingDiagnosis();
     }else if(res && res.reason==="declined"){
       note.textContent = OneSignalManager.blockedReason()
         || "Notifications weren’t allowed. You can turn them on in Settings → Notifications.";
+    }else if(res && res.reason==="noanswer"){
+      note.textContent = "iPhone didn’t show the permission prompt. Close the app fully "
+        + "(swipe it away), open it from the Home Screen again, and tap once more. If it still "
+        + "doesn’t appear, check Settings → Notifications → Taiyabah Masjid.";
     }else{
       note.textContent = "Couldn’t turn notifications on just now. Please check your connection and try again.";
     }
