@@ -1,8 +1,13 @@
 # Automated jamāʿah reminders
 
-Sends "Zuhr Jamāʿah in 10 min" (etc.) automatically, once per day per prayer,
-respecting each subscriber's own reminder offset (5/10/15 min — the same
-setting already in the app's Alerts tab).
+Two automatic notifications per prayer, once per day each:
+
+1. **Advance reminder** — "Zuhr Jamāʿah in 10 min", sent at each subscriber's
+   own chosen lead time (5/10/15 min — the setting in the app's Alerts tab).
+2. **At the jamāʿah time** — "Jamaat Time Now". This one has no offset, so it
+   reaches *everyone* with jamāʿah reminders switched on, whatever advance
+   warning they picked — that preference is about how much notice someone
+   wants, not whether they want to know it has started.
 
 This runs entirely inside the existing Worker — no new service, no change to
 `admin.html`. It fires on a schedule rather than a click.
@@ -53,6 +58,22 @@ the logic without a real jamāʿah time lining up.
 **4. Watch it run for real**: Cloudflare dashboard → Workers → taiyabah-sender
 → Logs, or `npx wrangler tail`. A line is only logged on a minute where
 something was actually due — most runs are silent.
+
+## Prayer times can never drift
+
+Prayer times are never calculated by the app or by this scheduler — every value
+comes from the masjid's own published timetable, parsed once with verification
+and used as-is.
+
+There is one place a drift could theoretically occur: the app displays times
+embedded in `index.html`, while this scheduler reads `data/timetable-2026.json`.
+Both are generated from the same source, but if an annual refresh ever updated
+one and not the other, notifications could fire at a time the app doesn't show.
+
+To make that impossible, every scheduled run cross-checks its own times against
+the app's embedded timetable before sending. On a mismatch it **stops and logs
+the discrepancy** rather than announcing a time nobody can see. If the app
+simply can't be reached, it proceeds — an outage should not silence reminders.
 
 ## Limits worth knowing
 

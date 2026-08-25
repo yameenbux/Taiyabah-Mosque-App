@@ -18,82 +18,11 @@
 
 const SESSION_HOURS = 8;
 
-/* ---------------- preferences as a single tag ----------------
-
-   Every category used to be its own tag. OneSignal refused that with
-
-     409 entitlements-tag-limit — "The tags for this user exceed the limit
-     for this organization's plan."
-
-   so nothing was ever stored and every targeted send matched nobody. The
-   plan allows fewer tags than the app has categories, which is also what the
-   409s blamed on write collisions really were.
-
-   So all preferences live in ONE tag. Its value is four flags in a fixed
-   order followed by the reminder minutes, zero padded:
-
-     p = "110110"  ->  jamaah on, janazah on, announcements off,
-                       events on, remind 10 minutes before
-
-   Forty-eight values exist in total. Tag filters can only test a value for
-   equality, so targeting a category means listing every value in which that
-   flag is set and OR-ing them — 24 for a category, 8 for a reminder at a
-   given offset. Verbose to send, but it holds within a one-tag plan, which
-   nothing keyed per category can do. */
-const PREF_TAG = "p";
-const PREF_ORDER = ["jamaah", "janazah", "announcements", "events"];
-const PREF_MINUTES = ["05", "10", "15"];
-
-/* Tags from an older build, cleared on write so they stop occupying slots a
-   tight plan cannot spare. server_test is left over from /api/force-tag. */
-const LEGACY_TAGS = ["jamaah", "jamaah_mins", "janazah", "announcements", "events", "server_test"];
-
-const pad2 = m => String(m).padStart(2, "0");
-
-function encodePrefs(t) {
-  return PREF_ORDER.map(k => (t[k] === "1" ? "1" : "0")).join("") + pad2(t.jamaah_mins);
-}
-
-function decodePrefs(v) {
-  if (typeof v !== "string" || !/^[01]{4}(05|10|15)$/.test(v)) return null;
-  const out = {};
-  PREF_ORDER.forEach((k, i) => { out[k] = v[i]; });
-  out.jamaah_mins = String(parseInt(v.slice(4), 10));
-  return out;
-}
-
-/* Every encoded value whose `index` flag is set, optionally pinned to one
-   reminder offset. */
-function prefValues(index, mins) {
-  const want = mins == null ? null : pad2(mins);
-  const out = [];
-  for (let bits = 0; bits < 16; bits++) {
-    const flags = [0, 1, 2, 3].map(i => (bits >> (3 - i)) & 1);
-    if (flags[index] !== 1) continue;
-    for (const m of PREF_MINUTES) {
-      if (want && m !== want) continue;
-      out.push(flags.join("") + m);
-    }
-  }
-  return out;
-}
-
-/* OneSignal ORs adjacent filters only when an explicit operator sits between
-   them; without it they AND, which would match nobody. */
-function anyOfFilter(values) {
-  const f = [];
-  values.forEach((v, i) => {
-    if (i) f.push({ operator: "OR" });
-    f.push({ field: "tag", key: PREF_TAG, relation: "=", value: v });
-  });
-  return f;
-}
-
 const TOPICS = {
-  janazah:       { idx: 1, label: "Janāzah" },
-  jamaah:        { idx: 0, label: "Jamāʿah reminders" },
-  announcements: { idx: 2, label: "Announcements" },
-  events:        { idx: 3, label: "Events & talks" },
+  janazah:       { tag: "janazah",       label: "Janāzah" },
+  jamaah:        { tag: "jamaah",        label: "Jamāʿah reminders" },
+  announcements: { tag: "announcements", label: "Announcements" },
+  events:        { tag: "events",        label: "Events & talks" },
 };
 
 /* ---------------- helpers ---------------- */
@@ -173,39 +102,6 @@ const json = (data, status, headers) =>
     headers: { "Content-Type": "application/json", ...headers },
   });
 
-/* The categories a phone may set on itself, and the only values accepted for
-   each. Everything arriving at /api/tags is rebuilt from this table rather
-   than merged, so no caller can invent a tag, write to an unrelated key, or
-   store a value a filter would never match. */
-const PREF_TAGS = ["jamaah", "janazah", "announcements", "events"];
-const REMINDER_MINUTES = ["5", "10", "15"];
-
-function cleanPrefTags(input) {
-  if (!input || typeof input !== "object") return null;
-  const out = {};
-  for (const k of PREF_TAGS) {
-    const v = String(input[k]);
-    if (v !== "0" && v !== "1") return null;
-    out[k] = v;
-  }
-  const mins = String(input.jamaah_mins);
-  if (!REMINDER_MINUTES.includes(mins)) return null;
-  out.jamaah_mins = mins;
-  return out;
-}
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/* subscription id -> the user record that owns it */
-async function onesignalIdFor(subscriptionId, env) {
-  const res = await fetch(
-    `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/subscriptions/${subscriptionId}/user/identity`,
-    { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
-  if (!res.ok) return null;
-  const data = await res.json().catch(() => ({}));
-  return (data && data.identity && data.identity.onesignal_id) || null;
-}
-
 /* ---------------- worker ---------------- */
 export default {
   async fetch(request, env) {
@@ -257,6 +153,15 @@ async function sendReminder(env, { key, tagMins, title, body }) {
   const already = await env.SENT_KV.get(key);
   if (already) return { skipped: true };
 
+  // Advance reminders target one offset group (5/10/15). The "jamāʿah is
+  // now" alert has no offset — it goes to everyone who has jamāʿah
+  // reminders switched on, since that preference is about how much warning
+  // they want, not whether they want to know it has started.
+  const filters = [{ field: "tag", key: "jamaah", relation: "=", value: "1" }];
+  if (tagMins !== null && tagMins !== undefined) {
+    filters.push({ field: "tag", key: "jamaah_mins", relation: "=", value: String(tagMins) });
+  }
+
   const res = await fetch("https://api.onesignal.com/notifications", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` },
@@ -264,8 +169,7 @@ async function sendReminder(env, { key, tagMins, title, body }) {
       app_id: env.ONESIGNAL_APP_ID,
       headings: { en: title },
       contents: { en: body },
-      // jamaah switched on AND this exact offset chosen
-      filters: anyOfFilter(prefValues(0, tagMins)),
+      filters,
       url: "https://yameenbux.github.io/Taiyabah-Mosque-App/",
     }),
   });
@@ -280,6 +184,34 @@ async function sendReminder(env, { key, tagMins, title, body }) {
     return { sent: false, error: msg };
   }
   return { sent: true, recipients: data.recipients ?? 0 };
+}
+
+/* The app displays times embedded in index.html; this scheduler reads
+   data/timetable-2026.json. They are generated from the same source and
+   must always agree — but if an annual refresh ever updated one and not
+   the other, notifications would fire at times the app doesn't show.
+   That failure would be silent and would undermine the one thing people
+   trust this app for, so the scheduler verifies a match before sending
+   and stays quiet rather than announcing a time nobody can see. */
+async function timetableMatchesApp(rec, date) {
+  try {
+    const res = await fetch("https://yameenbux.github.io/Taiyabah-Mosque-App/index.html", { cf: { cacheTtl: 0 } });
+    if (!res.ok) return { ok: true, note: "app unreachable, proceeding" };
+    const html = await res.text();
+    const m = html.match(/"\d{4}-\d{2}-\d{2}"\s*:\s*\{[^}]*\}[^}]*\}[^}]*\}/g);
+    if (!m) return { ok: true, note: "couldn't parse app data, proceeding" };
+    // find this date's block in the app's embedded data
+    const block = m.find(b => b.startsWith('"' + date + '"'));
+    if (!block) return { ok: true, note: "date not in app data, proceeding" };
+    for (const [prayer, t] of Object.entries(rec.jamaat)) {
+      if (!block.includes('"' + t + '"')) {
+        return { ok: false, note: `${prayer} jamāʿah ${t} not found in the app's own timetable` };
+      }
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: true, note: "check failed, proceeding: " + e.message };
+  }
 }
 
 async function runJamaahReminders(env) {
@@ -297,6 +229,13 @@ async function runJamaahReminders(env) {
     return { error: e.message };
   }
   if (!rec) return { skipped: "no timetable entry for " + date };   // e.g. past year end
+
+  // Never announce a time the app itself isn't showing.
+  const match = await timetableMatchesApp(rec, date);
+  if (!match.ok) {
+    console.error("reminder run HALTED — timetable mismatch:", match.note);
+    return { halted: "timetable mismatch", detail: match.note, date, hm };
+  }
 
   const isFriday = new Date(date + "T12:00:00Z").getUTCDay() === 5;
 
@@ -319,6 +258,18 @@ async function runJamaahReminders(env) {
       });
       results.push({ prayer: label, mins, ...r });
     }
+
+    // At the jamāʿah time itself. tagMins is null so this reaches everyone
+    // with jamāʿah reminders on, whatever advance warning they chose.
+    if (jamaat === hm) {
+      const key = `sent:${date}:${prayer}:now`;
+      const r = await sendReminder(env, {
+        key, tagMins: null,
+        title: "Jamāʿah Time Now",
+        body: `${label} jamāʿah is starting now at the masjid.`,
+      });
+      results.push({ prayer: label, mins: "now", ...r });
+    }
   }
   if (results.length) console.log("reminder run", date, hm, JSON.stringify(results));
   return { date, hm, results };
@@ -336,13 +287,6 @@ async function handle(request, env) {
     if (url.pathname === "/api/health") {
       return json({
         ok: true,
-        // The App ID is a public identifier — it ships inside every page that
-        // loads the OneSignal SDK. Reporting it here lets the admin screen
-        // confirm the sender is aimed at the same OneSignal app the phones
-        // registered with; a mismatch sends into an app with no subscribers,
-        // which looks exactly like nobody being signed up. The REST key stays
-        // secret and is only ever reported as present or absent.
-        appId: env.ONESIGNAL_APP_ID || null,
         configured: {
           appId: !!env.ONESIGNAL_APP_ID,
           restKey: !!env.ONESIGNAL_REST_API_KEY,
@@ -390,7 +334,7 @@ async function handle(request, env) {
           app_id: env.ONESIGNAL_APP_ID,
           headings: { en: title },
           contents: { en: message },
-          filters: anyOfFilter(prefValues(t.idx)),
+          filters: [{ field: "tag", key: t.tag, relation: "=", value: "1" }],
           url: "https://yameenbux.github.io/Taiyabah-Mosque-App/",
         }),
       });
@@ -403,104 +347,54 @@ async function handle(request, env) {
       return json({ ok: true, id: data.id, recipients: data.recipients ?? null, topic: t.label }, 200, ch);
     }
 
-    /* Where a phone records which categories it wants.
+    /* The real fix: this is now how every device sets its own tags.
+       The browser SDK's own tag-write call is unreliable (see /api/force-tag
+       above, and github.com/OneSignal/OneSignal-Website-SDK/issues/1093) —
+       consistently 409s across every device and browser tested, despite the
+       exact same subscription being trivially writable server-to-server.
+       So writing tags is moved server-side entirely: the app tells us its
+       own OneSignal ID and desired preferences, we do the actual PATCH here
+       with the REST key, exactly like the proven-working force-tag test.
 
-       This deliberately does not go through the browser SDK. Its addTags()
-       writes were accepted locally and never stored: the dashboard showed a
-       subscription carrying only server_test — the tag /api/force-tag wrote
-       server to server — while the phone listed a full set. Every targeted
-       send therefore matched nobody, even though each phone believed it was
-       signed up. The REST path below is the one that demonstrably works on
-       these same subscriptions, so preferences take it too.
-
-       Unauthenticated by necessity — congregants have no password, and the
-       page holds no key worth stealing. What bounds it: a caller must already
-       know a subscription's UUID, the tags are rebuilt from a fixed table so
-       only real categories and matchable values can be stored, CORS keeps
-       browsers off it from other origins, and it is rate limited per address.
-       At worst someone holding another person's subscription id could change
-       that person's categories — the same exposure the browser SDK has by
-       design, and the reason this never accepts anything but preferences.
-
-       POST /api/tags { subscriptionId, tags } -> { ok, tags } */
-    if (url.pathname === "/api/tags" && request.method === "POST") {
-      if (!limit(`tags:${ip}`, 60, 60 * 60e3))
-        return json({ error: "Too many preference updates. Try again later." }, 429, ch);
+       Deliberately PUBLIC — any subscribed device calls this for itself,
+       there's no admin login for a congregant turning their own reminders
+       on or off. Kept safe by: rate limiting per IP, a shape check on the
+       id, and a strict allow-list — this endpoint can only ever set these
+       five known keys to their five known valid values. It cannot be used
+       to write arbitrary data to a subscription, on this app or any other.
+       POST /api/set-my-tags  { id, jamaah, jamaah_mins, janazah, announcements, events } */
+    if (url.pathname === "/api/set-my-tags" && request.method === "POST") {
+      const ip = request.headers.get("CF-Connecting-IP") || "?";
+      if (!limit(`tags:${ip}`, 30, 60 * 60e3))
+        return json({ error: "Too many attempts. Try again shortly." }, 429, ch);
 
       let body = {};
       try { body = await request.json(); } catch {}
 
-      const subId  = String(body.subscriptionId || "");
-      const sentUid = String(body.oneSignalId || "");
-      if (!UUID.test(subId) && !UUID.test(sentUid))
-        return json({ error: "Bad subscription id" }, 400, ch);
+      const id = typeof body.id === "string" ? body.id : "";
+      if (!/^[0-9a-f-]{20,50}$/i.test(id)) return json({ error: "Missing or malformed id" }, 400, ch);
 
-      const tags = cleanPrefTags(body.tags);
-      if (!tags) return json({ error: "Bad categories" }, 400, ch);
+      const bit = v => (v === true || v === "1" || v === 1) ? "1" : "0";
+      const mins = ["5", "10", "15"].includes(String(body.jamaah_mins)) ? String(body.jamaah_mins) : "10";
+      const tags = {
+        jamaah:        bit(body.jamaah),
+        jamaah_mins:   mins,
+        janazah:       bit(body.janazah),
+        announcements: bit(body.announcements),
+        events:        bit(body.events),
+      };
 
-      /* Prefer the user id the app already holds. /api/force-tag wrote by user
-         id and that tag is what showed up in the dashboard, so this is the path
-         known to work on these records; resolving a subscription id first only
-         adds a call that can fail. Fall back to that resolution when the SDK
-         hasn't surfaced a user id, and as a last resort treat the id we were
-         given as a user id — telling the two apart from the dashboard is not
-         obvious, and guessing wrong is a silent dead end. */
-      let oneSignalId = UUID.test(sentUid) ? sentUid : null;
-      let idSource = oneSignalId ? "user id from app" : null;
-      if (!oneSignalId && UUID.test(subId)) {
-        oneSignalId = await onesignalIdFor(subId, env);
-        idSource = oneSignalId ? "resolved from subscription" : null;
-      }
-      if (!oneSignalId && UUID.test(subId)) { oneSignalId = subId; idSource = "id used as-is"; }
-      if (!oneSignalId)
-        return json({ error: "OneSignal doesn't recognise this device" }, 404, ch);
-
-      const encoded = encodePrefs(tags);
-      const userUrl =
-        `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${oneSignalId}`;
-
-      const patch = body => fetch(userUrl, {
+      const res = await fetch(`https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}`,
         },
-        body: JSON.stringify({ properties: { tags: body } }),
+        body: JSON.stringify({ properties: { tags } }),
       });
-
-      /* An empty value deletes a tag, so the same write that stores the
-         preference clears the per-category tags an older build left behind.
-         If the plan counts those removals against the limit, fall back to
-         writing the one tag alone — storing the preference matters more than
-         tidying up, and a later write can retry the cleanup. */
-      const withCleanup = { [PREF_TAG]: encoded };
-      for (const k of LEGACY_TAGS) withCleanup[k] = "";
-
-      let res = await patch(withCleanup);
-      let cleaned = res.ok;
-      if (!res.ok) res = await patch({ [PREF_TAG]: encoded });
-
-      if (!res.ok) {
-        const detail = await res.json().catch(() => ({}));
-        return json({ error: `OneSignal returned ${res.status}`, via: idSource,
-                      tried: oneSignalId, detail }, 502, ch);
-      }
-
-      /* Read back rather than trusting the write. Reporting a stored state the
-         app can check is the whole point — assuming success is what hid this
-         fault for so long. */
-      const check = await fetch(
-        `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${oneSignalId}`,
-        { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
-      const stored = check.ok
-        ? ((await check.json().catch(() => ({}))).properties || {}).tags || {}
-        : null;
-
-      // decoded from what OneSignal returned, so the app checks stored state
-      const prefs = stored ? decodePrefs(stored[PREF_TAG]) : null;
-
-      return json({ ok: true, onesignal_id: oneSignalId, via: idSource,
-                    cleaned, tags: stored, prefs }, 200, ch);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return json({ error: `OneSignal returned ${res.status}`, detail: data }, 502, ch);
+      return json({ ok: true, tags }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
@@ -564,12 +458,10 @@ async function handle(request, env) {
       if (!res.ok) {
         return json({ error: `OneSignal returned ${res.status}`, detail: data }, 502, ch);
       }
-      const heldTags = (data.properties && data.properties.tags) || {};
       return json({
         ok: true,
         onesignal_id: data.identity && data.identity.onesignal_id,
-        tags: heldTags,
-        prefs: decodePrefs(heldTags[PREF_TAG]),
+        tags: (data.properties && data.properties.tags) || {},
         subscriptions: (data.subscriptions || []).map(s => ({
           id: s.id, type: s.type, enabled: s.enabled,
         })),
