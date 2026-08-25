@@ -13,7 +13,11 @@ compatibility_date = "2026-01-01"
 # jamāʿah reminder cron.
 
 [vars]
-ALLOWED_ORIGIN = "https://yameenbux.github.io"
+# Both origins: the app now serves from its own domain, but the GitHub Pages
+# URL still works and admin.html may be opened from either. A request from an
+# origin missing here gets no CORS headers back, which a browser reports only
+# as an opaque failure — the call looks like it vanished.
+ALLOWED_ORIGIN = "https://taiyabahapp.ysbdesigns.uk,https://yameenbux.github.io"
 
 # Secrets are NOT set here. Add them with:
 #   npx wrangler secret put ONESIGNAL_APP_ID

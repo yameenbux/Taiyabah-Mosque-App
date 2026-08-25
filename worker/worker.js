@@ -197,7 +197,7 @@ export default {
 
 /* ================= scheduled jamāʿah reminders ================= */
 
-const TIMETABLE_URL = "https://yameenbux.github.io/Taiyabah-Mosque-App/data/timetable-2026.json";
+const TIMETABLE_URL = "https://taiyabahapp.ysbdesigns.uk/data/timetable-2026.json";
 const PRAYER_NAMES = { fajr: "Fajr", zuhr: "Zuhr", asr: "Asr", maghrib: "Maghrib", isha: "Isha" };
 const OFFSETS = [5, 10, 15];      // must match the choices in the app's UI
 const DEDUP_TTL_SECONDS = 60 * 60 * 26;   // a little over a day — always covers the next run
@@ -239,7 +239,7 @@ async function sendReminder(env, { key, tagMins, title, body }) {
       headings: { en: title },
       contents: { en: body },
       filters,
-      url: "https://yameenbux.github.io/Taiyabah-Mosque-App/",
+      url: "https://taiyabahapp.ysbdesigns.uk/",
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -264,7 +264,7 @@ async function sendReminder(env, { key, tagMins, title, body }) {
    and stays quiet rather than announcing a time nobody can see. */
 async function timetableMatchesApp(rec, date) {
   try {
-    const res = await fetch("https://yameenbux.github.io/Taiyabah-Mosque-App/index.html", { cf: { cacheTtl: 0 } });
+    const res = await fetch("https://taiyabahapp.ysbdesigns.uk/index.html", { cf: { cacheTtl: 0 } });
     if (!res.ok) return { ok: true, note: "app unreachable, proceeding" };
     const html = await res.text();
     const m = html.match(/"\d{4}-\d{2}-\d{2}"\s*:\s*\{[^}]*\}[^}]*\}[^}]*\}/g);
@@ -404,7 +404,7 @@ async function handle(request, env) {
           headings: { en: title },
           contents: { en: message },
           filters: anyOfFilter(prefValues(t.idx)),
-          url: "https://yameenbux.github.io/Taiyabah-Mosque-App/",
+          url: "https://taiyabahapp.ysbdesigns.uk/",
         }),
       });
       const data = await res.json().catch(() => ({}));
