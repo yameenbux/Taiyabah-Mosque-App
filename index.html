@@ -914,6 +914,9 @@
   .diag-fix{width:100%;margin-top:10px;cursor:pointer;font:inherit;font-weight:700;font-size:14px;
     color:#F3EFE3;background:var(--brand-700);border:none;border-radius:11px;padding:12px}
   .diag-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px;text-align:center}
+  #diag-note{width:100%;box-sizing:border-box;margin-top:9px;font:inherit;font-size:13px;
+    padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);
+    color:var(--ink);resize:vertical}
 
   /* collapsed confirmation */
   .done{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
@@ -1154,6 +1157,10 @@
       <div class="diag" id="diag" hidden>
         <pre id="diag-out">…</pre>
         <button class="diag-fix" id="diag-retag">Send my categories again</button>
+        <button class="diag-fix" id="diag-send">Send this report to the masjid</button>
+        <textarea id="diag-note" rows="2" placeholder="What went wrong? (optional)"
+                  maxlength="500"></textarea>
+        <p class="diag-note" id="diag-sent"></p>
         <button class="diag-fix" id="diag-fix">Reset &amp; reload the app</button>
         <p class="diag-note">This clears the app’s stored files and re-installs its
           background service. Your prayer times are built in, so nothing is lost.</p>
@@ -5247,6 +5254,49 @@ function initDiagnostics(){
     btn.disabled = false; btn.textContent = label;
     runDiagnostics();
   });
+  /* Send the panel in, rather than asking someone to photograph it.
+
+     Everything that went wrong with notifications was invisible until a
+     screenshot of this panel arrived. This is the same thing without the
+     screenshot: the text already on screen, plus whatever the person wants to
+     say about it. They get a reference back so it can be quoted. */
+  document.getElementById('diag-send').addEventListener('click', async ()=>{
+    const btn  = document.getElementById('diag-send');
+    const out  = document.getElementById('diag-sent');
+    const note = document.getElementById('diag-note');
+    const label = btn.textContent;
+
+    // make sure what gets sent is what they are looking at
+    await runDiagnostics();
+    const report = document.getElementById('diag-out').textContent || "";
+    if(!report.trim()){ out.textContent = "Nothing to send yet — open this panel first."; return; }
+
+    btn.disabled = true; btn.textContent = "Sending…";
+    out.textContent = "";
+    try{
+      const res = await fetch(SENDER_BASE + "/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          report: report + "\n\nuser agent: " + (navigator.userAgent || "unknown"),
+          note: note.value || ""
+        })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.ok) throw new Error(data.error || ("the masjid's service returned " + res.status));
+      out.textContent = "Sent, thank you. Your reference is " + data.ref
+        + " — quote it if you get in touch.";
+      note.value = "";
+    }catch(e){
+      /* Offline or blocked. Don't strand them: the panel can be copied and
+         sent by hand, which is what people were doing anyway. */
+      out.textContent = "Couldn’t send it (" + (e && e.message ? e.message : e)
+        + "). You can copy the text above and send it to the masjid instead.";
+    }finally{
+      btn.disabled = false; btn.textContent = label;
+    }
+  });
+
   document.getElementById('troublebtn').addEventListener('click',()=>{
     const d=document.getElementById('diag');
     d.hidden = !d.hidden;

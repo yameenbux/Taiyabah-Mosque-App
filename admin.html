@@ -165,6 +165,17 @@
   .diag pre{white-space:pre-wrap;word-break:break-word;font-size:11.5px;line-height:1.55;margin:11px 0 0;
     color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   .diag .hint{font-size:11.5px;color:var(--muted);line-height:1.55;margin:0 0 10px}
+  .hint{font-size:11.5px;color:var(--muted);line-height:1.55;margin:0 0 10px}
+  #rep-load{width:100%;font:inherit;font-size:13px;font-weight:600;padding:10px;border:0;
+    border-radius:10px;background:var(--brand);color:#fff;cursor:pointer}
+  #rep-load:disabled{opacity:.55}
+  .rep{border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+  .rep h4{margin:0;font-size:13px}
+  .rep .said{font-size:13px;margin:5px 0 0;line-height:1.5}
+  .rep .when{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
+  .rep pre{white-space:pre-wrap;word-break:break-word;font-size:11px;line-height:1.5;margin:8px 0 0;
+    color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    max-height:260px;overflow:auto;background:var(--bg);padding:9px;border-radius:8px}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
@@ -250,6 +261,14 @@
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
 
     <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid’s own service &mdash; the OneSignal key is never in this page.</p>
+
+    <div class="sec-h"><h2>Reports from congregants</h2><span class="rule"></span></div>
+    <div class="card">
+      <p class="hint">Sent from the app's Having trouble screen. Each one carries what that
+        phone could see about itself at the time, so a problem can be read rather than guessed at.</p>
+      <button id="rep-load">Load reports</button>
+      <div id="rep-out"></div>
+    </div>
 
     <button class="diagtoggle" id="diagtoggle">Check a device</button>
     <div class="card diag" id="diag" hidden>
@@ -506,6 +525,29 @@ async function signIn(){
     btn.disabled = false; btn.textContent = "Sign in";
   }
 }
+
+$("rep-load").addEventListener("click", async ()=>{
+  const btn = $("rep-load"), out = $("rep-out");
+  btn.disabled = true; btn.textContent = "Loading…";
+  try{
+    const d = await apiGet("/api/reports");
+    out.innerHTML = d.reports && d.reports.length
+      ? d.reports.map(r => `
+        <div class="rep">
+          <h4>${esc(r.ref)}</h4>
+          <div class="when">${new Date(r.at).toLocaleString(undefined,
+            {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+          ${r.note ? `<p class="said">“${esc(r.note)}”</p>` : ""}
+          <pre>${esc(r.report)}</pre>
+        </div>`).join("")
+      : `<p class="hint" style="margin-top:12px">Nothing sent in yet.</p>`;
+  }catch(e){
+    out.innerHTML = `<p class="hint" style="margin-top:12px">${esc(
+      /401|sign/i.test(e.message) ? "Session expired — sign in again." : "Couldn't load: " + e.message)}</p>`;
+  }finally{
+    btn.disabled = false; btn.textContent = "Load reports";
+  }
+});
 
 $("diagtoggle").addEventListener("click", ()=>{
   const d = $("diag");
