@@ -433,15 +433,26 @@ async function handle(request, env) {
        to write arbitrary data to a subscription, on this app or any other.
        POST /api/set-my-tags  { id, jamaah, jamaah_mins, janazah, announcements, events } */
     if (url.pathname === "/api/set-my-tags" && request.method === "POST") {
+      /* Rate limited per device rather than per address. Everyone on the
+         masjid's wifi shares one public IP, so a per-IP cap counts a whole
+         congregation as a single caller: ten people opening the app a few
+         times each is enough to exhaust it, and the writes that get refused
+         leave those devices untagged — indistinguishable from the fault this
+         endpoint exists to fix. The per-device cap is what actually bounds
+         abuse here; the address cap stays as a backstop, set high enough that
+         a room full of people never reaches it. */
       const ip = request.headers.get("CF-Connecting-IP") || "?";
-      if (!limit(`tags:${ip}`, 30, 60 * 60e3))
-        return json({ error: "Too many attempts. Try again shortly." }, 429, ch);
+      if (!limit(`tags-ip:${ip}`, 600, 60 * 60e3))
+        return json({ error: "Too many attempts from this network. Try again shortly." }, 429, ch);
 
       let body = {};
       try { body = await request.json(); } catch {}
 
       const id = typeof body.id === "string" ? body.id : "";
       if (!/^[0-9a-f-]{20,50}$/i.test(id)) return json({ error: "Missing or malformed id" }, 400, ch);
+
+      if (!limit(`tags-id:${id}`, 40, 60 * 60e3))
+        return json({ error: "Too many preference updates for this device. Try again shortly." }, 429, ch);
 
       const bit = v => (v === true || v === "1" || v === 1) ? "1" : "0";
       const mins = ["5", "10", "15"].includes(String(body.jamaah_mins)) ? String(body.jamaah_mins) : "10";
