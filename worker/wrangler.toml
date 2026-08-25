@@ -1,14 +1,16 @@
 name = "taiyabah-sender"
-main = "src/index.js"
-compatibility_date = "2024-11-01"
-
-# Secrets (never stored here — set with `wrangler secret put <NAME>`):
-#   TRUSTEE_PASSWORD        shared password trustees sign in with on admin.html
-#   SESSION_SECRET          random string used to sign/verify login tokens
-#   ONESIGNAL_APP_ID        Taiyabah Masjid's OneSignal app id
-#   ONESIGNAL_REST_API_KEY  OneSignal REST API key (server-side only)
 main = "worker.js"
 compatibility_date = "2026-01-01"
+
+# An upload once left two versions of this file concatenated, so `main` and
+# `compatibility_date` were each defined twice. Wrangler rejects that outright
+# ("trying to redefine an already defined table or value"), so every deploy
+# failed and the live Worker silently stayed on an older build while the app
+# moved on. Keep one definition of each.
+#
+# worker.js is the entry point, not src/index.js: it is the one that carries
+# /api/set-my-tags, /api/health (which the deploy workflow checks) and the
+# jamāʿah reminder cron.
 
 [vars]
 ALLOWED_ORIGIN = "https://yameenbux.github.io"

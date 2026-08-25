@@ -18,11 +18,82 @@
 
 const SESSION_HOURS = 8;
 
+/* ---------------- preferences as a single tag ----------------
+
+   A tag per category is what this app used to write, and OneSignal refused it:
+
+     409 entitlements-tag-limit — "The tags for this user exceed the limit for
+     this organization's plan."
+
+   Five categories, fewer tag slots than that, so nothing was stored and every
+   targeted send matched nobody. The 409s once blamed on overlapping writes
+   were this same limit.
+
+   So all preferences live in ONE tag: four flags in a fixed order, then the
+   reminder minutes zero padded.
+
+     p = "110110"  ->  jamaah on, janazah on, announcements off, events on,
+                       remind 10 minutes before
+
+   Forty-eight values exist. Tag filters only test a value for equality, so
+   targeting a category means listing every value in which its flag is set and
+   OR-ing them — 24 for a category, 8 for a reminder at a given offset. Verbose
+   to send, but it holds within a one-tag plan, which nothing keyed per
+   category can do. */
+const PREF_TAG = "p";
+const PREF_ORDER = ["jamaah", "janazah", "announcements", "events"];
+const PREF_MINUTES = ["05", "10", "15"];
+
+/* Tags from older builds, cleared on write so they stop occupying slots a
+   tight plan cannot spare. server_test is left over from /api/force-tag. */
+const LEGACY_TAGS = ["jamaah", "jamaah_mins", "janazah", "announcements", "events", "server_test"];
+
+const pad2 = m => String(m).padStart(2, "0");
+
+function encodePrefs(t) {
+  return PREF_ORDER.map(k => (t[k] === "1" ? "1" : "0")).join("") + pad2(t.jamaah_mins);
+}
+
+function decodePrefs(v) {
+  if (typeof v !== "string" || !/^[01]{4}(05|10|15)$/.test(v)) return null;
+  const out = {};
+  PREF_ORDER.forEach((k, i) => { out[k] = v[i]; });
+  out.jamaah_mins = String(parseInt(v.slice(4), 10));
+  return out;
+}
+
+/* Every encoded value whose `index` flag is set, optionally pinned to one
+   reminder offset. */
+function prefValues(index, mins) {
+  const want = mins == null ? null : pad2(mins);
+  const out = [];
+  for (let bits = 0; bits < 16; bits++) {
+    const flags = [0, 1, 2, 3].map(i => (bits >> (3 - i)) & 1);
+    if (flags[index] !== 1) continue;
+    for (const m of PREF_MINUTES) {
+      if (want && m !== want) continue;
+      out.push(flags.join("") + m);
+    }
+  }
+  return out;
+}
+
+/* OneSignal ORs adjacent filters only when an explicit operator sits between
+   them; without it they AND, which would match nobody. */
+function anyOfFilter(values) {
+  const f = [];
+  values.forEach((v, i) => {
+    if (i) f.push({ operator: "OR" });
+    f.push({ field: "tag", key: PREF_TAG, relation: "=", value: v });
+  });
+  return f;
+}
+
 const TOPICS = {
-  janazah:       { tag: "janazah",       label: "Janāzah" },
-  jamaah:        { tag: "jamaah",        label: "Jamāʿah reminders" },
-  announcements: { tag: "announcements", label: "Announcements" },
-  events:        { tag: "events",        label: "Events & talks" },
+  janazah:       { idx: 1, label: "Janāzah" },
+  jamaah:        { idx: 0, label: "Jamāʿah reminders" },
+  announcements: { idx: 2, label: "Announcements" },
+  events:        { idx: 3, label: "Events & talks" },
 };
 
 /* ---------------- helpers ---------------- */
@@ -157,10 +228,8 @@ async function sendReminder(env, { key, tagMins, title, body }) {
   // now" alert has no offset — it goes to everyone who has jamāʿah
   // reminders switched on, since that preference is about how much warning
   // they want, not whether they want to know it has started.
-  const filters = [{ field: "tag", key: "jamaah", relation: "=", value: "1" }];
-  if (tagMins !== null && tagMins !== undefined) {
-    filters.push({ field: "tag", key: "jamaah_mins", relation: "=", value: String(tagMins) });
-  }
+  // jamaah switched on, and this exact offset chosen
+  const filters = anyOfFilter(prefValues(0, tagMins == null ? null : tagMins));
 
   const res = await fetch("https://api.onesignal.com/notifications", {
     method: "POST",
@@ -334,7 +403,7 @@ async function handle(request, env) {
           app_id: env.ONESIGNAL_APP_ID,
           headings: { en: title },
           contents: { en: message },
-          filters: [{ field: "tag", key: t.tag, relation: "=", value: "1" }],
+          filters: anyOfFilter(prefValues(t.idx)),
           url: "https://yameenbux.github.io/Taiyabah-Mosque-App/",
         }),
       });
@@ -384,17 +453,46 @@ async function handle(request, env) {
         events:        bit(body.events),
       };
 
-      const res = await fetch(`https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${id}`, {
+      /* Stored as one tag, not five — see the note on PREF_TAG. The app still
+         sends the five preferences and still gets them back, so nothing on the
+         phone needs to know how they are packed. */
+      const encoded = encodePrefs(tags);
+      const userUrl = `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${id}`;
+      const patch = body => fetch(userUrl, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}`,
         },
-        body: JSON.stringify({ properties: { tags } }),
+        body: JSON.stringify({ properties: { tags: body } }),
       });
+
+      /* An empty value deletes a tag, so the same write clears the
+         per-category tags older builds left behind. If the plan counts those
+         removals against the limit, fall back to writing the one tag alone —
+         storing the preference matters more than tidying up. */
+      const withCleanup = { [PREF_TAG]: encoded };
+      for (const k of LEGACY_TAGS) withCleanup[k] = "";
+
+      let res = await patch(withCleanup);
+      const cleaned = res.ok;
+      if (!res.ok) res = await patch({ [PREF_TAG]: encoded });
+
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) return json({ error: `OneSignal returned ${res.status}`, detail: data }, 502, ch);
-      return json({ ok: true, tags }, 200, ch);
+      if (!res.ok) return json({ error: `OneSignal returned ${res.status}`, tried: id, detail: data }, 502, ch);
+
+      /* Read back rather than trusting the write: assuming success is exactly
+         what hid the tag-limit failure for so long. */
+      const check = await fetch(userUrl, { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
+      const stored = check.ok
+        ? ((await check.json().catch(() => ({}))).properties || {}).tags || {}
+        : null;
+      const prefs = stored ? decodePrefs(stored[PREF_TAG]) : null;
+
+      if (stored && !prefs)
+        return json({ error: "OneSignal did not store the categories", stored }, 502, ch);
+
+      return json({ ok: true, cleaned, tags: prefs || tags, stored }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
@@ -462,6 +560,7 @@ async function handle(request, env) {
         ok: true,
         onesignal_id: data.identity && data.identity.onesignal_id,
         tags: (data.properties && data.properties.tags) || {},
+        prefs: decodePrefs((((data.properties || {}).tags) || {})[PREF_TAG]),
         subscriptions: (data.subscriptions || []).map(s => ({
           id: s.id, type: s.type, enabled: s.enabled,
         })),

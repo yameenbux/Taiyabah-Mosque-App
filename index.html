@@ -3844,7 +3844,10 @@ const OneSignalManager = (() => {
   /* Waits (briefly) for the OneSignal ID to become available, since on a
      very fresh subscription it can lag a second or two behind the
      subscription itself being created. */
-  async function waitForOnesignalId(timeoutMs = 6000){
+  /* A device registering for the first time can take a while to be issued an
+     id, and the tag write is useless without one. Six seconds was enough for a
+     phone that had subscribed before and too short for one that hadn't. */
+  async function waitForOnesignalId(timeoutMs = 20000){
     if(myOnesignalId) return myOnesignalId;
     const start = Date.now();
     while(!myOnesignalId && Date.now() - start < timeoutMs){
@@ -5022,24 +5025,32 @@ function pushTopicTags(p){
   }
   lastTagResult = "queued…";
 
+  /* Retry on anything, not just a 409. The first attempt on a brand-new device
+     usually fails because OneSignal has not issued it an id yet, which is not
+     a conflict and was previously given up on immediately — leaving that phone
+     untagged, and so unreachable by every targeted send, until someone thought
+     to press Save again. */
+  const MAX_TRIES = 5;
   const attempt = async (n) => {
-    const id = await OneSignalManager.waitForOnesignalId();
-    if(!id) throw new Error("OneSignal ID not available yet");
-    const res = await fetch(SENDER_BASE + "/api/set-my-tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, ...tags }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if(!res.ok){
-      const msg = data.error || `server returned ${res.status}`;
-      if(n < 3 && /409|conflict/i.test(msg)){
-        await new Promise(r => setTimeout(r, 1200 * n));
+    try{
+      const id = await OneSignalManager.waitForOnesignalId();
+      if(!id) throw new Error("OneSignal hasn’t issued this device an id yet");
+
+      const res = await fetch(SENDER_BASE + "/api/set-my-tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...tags }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok) throw new Error(data.error || `server returned ${res.status}`);
+      return data;
+    }catch(e){
+      if(n < MAX_TRIES){
+        await new Promise(r => setTimeout(r, 2000 * n));   // 2s, 4s, 6s, 8s
         return attempt(n + 1);
       }
-      throw new Error(msg);
+      throw e;
     }
-    return data;
   };
 
   tagQueue = tagQueue
