@@ -67,6 +67,19 @@ if (workerEntry && existsSync(`worker/${workerEntry}`)) {
     fail(`${workerEntry} has no /api/health — the deploy workflow curls it and will fail the job`);
 }
 
+/* ---- 3b. OneSignal's worker is served at every path it may be asked for ----
+ * OneSignal stores the service worker path in its own dashboard, which can name
+ * a path this repo no longer serves. When it does, init() fails with "load
+ * failed" and nothing about the app looks wrong. Serving the file at each known
+ * path keeps push working whatever the dashboard says. */
+for (const dir of ["push/onesignal", "Taiyabah-Mosque-App/push/onesignal"]) {
+  for (const f of ["OneSignalSDKWorker.js", "OneSignalSDKUpdaterWorker.js"]) {
+    if (!existsSync(`${dir}/${f}`)) fail(`${dir}/${f} is missing — if OneSignal asks for this path, init() fails and no device can subscribe`);
+    else if (!R(`${dir}/${f}`).includes("importScripts")) fail(`${dir}/${f} does not importScripts the OneSignal SDK`);
+    else ok(`push worker served: ${dir}/${f}`);
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");

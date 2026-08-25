@@ -3897,13 +3897,28 @@ const OneSignalManager = (() => {
      instead, and registration fails with nothing in the UI to show for it —
      which looks exactly like the SDK simply not working. */
   async function checkWorkerFile(){
-    const url = new URL(base + "push/onesignal/OneSignalSDKWorker.js", location.origin).href;
-    try{
-      const r = await fetch(url, { cache: "no-store" });
-      const ct = (r.headers.get("content-type") || "unknown").split(";")[0];
-      const looksRight = r.ok && /javascript|ecmascript/i.test(ct);
-      return "HTTP " + r.status + ", " + ct + (looksRight ? "" : "   <- must be JavaScript");
-    }catch(e){ return "couldn’t fetch: " + (e && e.message ? e.message : e); }
+    /* Check every path the worker might be asked for, not just the one this
+       app computes. OneSignal keeps its own copy of the service worker path in
+       its dashboard and can request a different one — it was still asking for
+       the old GitHub Pages subfolder after the move, which 404'd and killed
+       init(). Checking only our own path reported a healthy 200 while the path
+       that actually mattered was missing. */
+    const paths = [
+      base + "push/onesignal/OneSignalSDKWorker.js",
+      "/Taiyabah-Mosque-App/push/onesignal/OneSignalSDKWorker.js",
+    ].filter((v, i, a) => a.indexOf(v) === i);
+
+    const results = [];
+    for(const path of paths){
+      const url = new URL(path, location.origin).href;
+      try{
+        const r = await fetch(url, { cache: "no-store" });
+        const ct = (r.headers.get("content-type") || "unknown").split(";")[0];
+        const good = r.ok && /javascript|ecmascript/i.test(ct);
+        results.push(path + " -> " + r.status + " " + ct + (good ? " ok" : "  <- must be JavaScript"));
+      }catch(e){ results.push(path + " -> unreachable (" + (e && e.message ? e.message : e) + ")"); }
+    }
+    return results.join("\n                             ");
   }
 
   return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady,
