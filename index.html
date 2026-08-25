@@ -3800,6 +3800,10 @@ const OneSignalManager = (() => {
     if(!OneSignal || !OneSignal.Notifications){
       return { ok:false, reason:"loading" };
     }
+    /* The script being present is not the same as init() having succeeded.
+       Asking an uninitialised SDK for permission raises no prompt, so waiting
+       on an answer just burns 30 seconds before saying nothing useful. */
+    if(!ready) return { ok:false, reason:"loading" };
 
     // fire it inside the gesture, but never block on it
     try{
@@ -3859,7 +3863,10 @@ const OneSignalManager = (() => {
     return myOnesignalId;
   }
 
-  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady, blockedReason, loadingDiagnosis, waitForOnesignalId };
+  const initFailure = () => initError;
+
+  return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady,
+           initFailure, blockedReason, loadingDiagnosis, waitForOnesignalId };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
@@ -5091,7 +5098,10 @@ async function runDiagnostics(){
     "secure connection        : " + !!window.isSecureContext,
     "notification permission  : " + (("Notification" in window) ? Notification.permission : "unavailable"),
     "OneSignal script loaded  : " + (typeof window.OneSignal !== "undefined"),
-    "OneSignal initialised    : " + OneSignalManager.isReady(),
+    "OneSignal initialised    : " + OneSignalManager.isReady()
+      + (OneSignalManager.isReady() ? "" : "  <- nothing works until this is true"),
+    "why init failed          : " + (OneSignalManager.initFailure() || "no error reported"),
+    "page origin              : " + location.origin,
     "OneSignal ID for tags    : " + (await OneSignalManager.waitForOnesignalId(150) || "(not yet available)"),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
     "tag write                : " + lastTagResult,
@@ -5192,9 +5202,14 @@ function initAlerts(){
       note.textContent = OneSignalManager.blockedReason()
         || "Notifications weren’t allowed. You can turn them on in Settings → Notifications.";
     }else if(res && res.reason==="noanswer"){
-      note.textContent = "iPhone didn’t show the permission prompt. Close the app fully "
-        + "(swipe it away), open it from the Home Screen again, and tap once more. If it still "
-        + "doesn’t appear, check Settings → Notifications → Taiyabah Masjid.";
+      /* No prompt appeared. If the SDK never started, that is the reason and
+         tapping again will not help — say so instead of sending people round
+         a loop of force-quitting the app. */
+      note.textContent = OneSignalManager.isReady()
+        ? "iPhone didn’t show the permission prompt. Close the app fully (swipe it away), "
+          + "open it from the Home Screen again, and tap once more. If it still doesn’t "
+          + "appear, check Settings → Notifications → Taiyabah Masjid."
+        : OneSignalManager.loadingDiagnosis();
     }else{
       note.textContent = "Couldn’t turn notifications on just now. Please check your connection and try again.";
     }

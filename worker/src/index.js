@@ -21,7 +21,7 @@
      ONESIGNAL_REST_API_KEY  OneSignal REST API key (server-side only)
    ========================================================================= */
 
-const ALLOWED_ORIGIN = "https://yameenbux.github.io";
+const ALLOWED_ORIGIN = "https://taiyabahapp.ysbdesigns.uk,https://yameenbux.github.io";
 const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 const TOPICS = new Set(["jamaah", "janazah", "announcements", "events"]);
 
