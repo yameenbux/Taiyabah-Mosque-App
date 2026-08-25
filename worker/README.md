@@ -144,3 +144,27 @@ up to 8 hours; to end them immediately, also replace `SESSION_SECRET`.
   control, not the limiter.
 - Cloudflare's dashboard holds request logs; OneSignal's dashboard holds a
   record of every message sent.
+
+## Diagnostic reports
+
+Congregants can send their own diagnostics from the app's **Having trouble**
+screen. Reports are stored in KV and read in `admin.html` under *Reports from
+congregants*. They expire after two months.
+
+That works with no configuration. To have them emailed as well, set two
+secrets — without them the endpoint still stores the report and the admin
+screen still shows it, so a missing or broken email provider never loses one:
+
+    npx wrangler secret put RESEND_API_KEY   # from resend.com
+    npx wrangler secret put REPORT_EMAIL     # where reports should go
+
+Optionally `REPORT_FROM` (defaults to Resend's shared sending address, which
+is fine for testing; a verified domain is better for anything lasting).
+
+The destination address is a secret rather than a value in this file on
+purpose — it is a personal inbox and this repository is public.
+
+Reports carry what the phone could see about itself: subscription and user
+ids, page origin, permission state, service workers, browser user agent. No
+names, no contact details, and nothing the person did not press a button to
+send.

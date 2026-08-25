@@ -18,6 +18,11 @@
 
 const SESSION_HOURS = 8;
 
+/* Diagnostic reports congregants send in. Capped so one report cannot fill a
+   KV value, and expiring so old ones do not accumulate unattended. */
+const REPORT_MAX = 12000;
+const REPORT_TTL_SECONDS = 60 * 60 * 24 * 60;   // two months
+
 /* ---------------- preferences as a single tag ----------------
 
    A tag per category is what this app used to write, and OneSignal refused it:
@@ -433,15 +438,26 @@ async function handle(request, env) {
        to write arbitrary data to a subscription, on this app or any other.
        POST /api/set-my-tags  { id, jamaah, jamaah_mins, janazah, announcements, events } */
     if (url.pathname === "/api/set-my-tags" && request.method === "POST") {
+      /* Rate limited per device rather than per address. Everyone on the
+         masjid's wifi shares one public IP, so a per-IP cap counts a whole
+         congregation as a single caller: ten people opening the app a few
+         times each is enough to exhaust it, and the writes that get refused
+         leave those devices untagged — indistinguishable from the fault this
+         endpoint exists to fix. The per-device cap is what actually bounds
+         abuse here; the address cap stays as a backstop, set high enough that
+         a room full of people never reaches it. */
       const ip = request.headers.get("CF-Connecting-IP") || "?";
-      if (!limit(`tags:${ip}`, 30, 60 * 60e3))
-        return json({ error: "Too many attempts. Try again shortly." }, 429, ch);
+      if (!limit(`tags-ip:${ip}`, 600, 60 * 60e3))
+        return json({ error: "Too many attempts from this network. Try again shortly." }, 429, ch);
 
       let body = {};
       try { body = await request.json(); } catch {}
 
       const id = typeof body.id === "string" ? body.id : "";
       if (!/^[0-9a-f-]{20,50}$/i.test(id)) return json({ error: "Missing or malformed id" }, 400, ch);
+
+      if (!limit(`tags-id:${id}`, 40, 60 * 60e3))
+        return json({ error: "Too many preference updates for this device. Try again shortly." }, 429, ch);
 
       const bit = v => (v === true || v === "1" || v === 1) ? "1" : "0";
       const mins = ["5", "10", "15"].includes(String(body.jamaah_mins)) ? String(body.jamaah_mins) : "10";
@@ -514,6 +530,81 @@ async function handle(request, env) {
         return json({ error: "OneSignal did not store the categories", stored }, 502, ch);
 
       return json({ ok: true, cleaned, via: resolvedVia, tags: prefs || tags, stored }, 200, ch);
+    }
+
+    /* A congregant sending their own diagnostics in.
+
+       Every fault this app has had was invisible until someone photographed
+       the Having trouble panel and sent it over. This does that properly:
+       the panel's own text, plus whatever the person wants to say about it.
+
+       Unauthenticated, because a congregant has no password and the whole
+       point is that it works on a phone that is misbehaving. Bounded by a
+       size cap, a rate limit, and by storing only the two fields it is sent —
+       nothing here is echoed back to any caller, so it cannot be used to keep
+       or serve content for anyone else. Reports expire on their own.
+
+       POST /api/report { report, note } */
+    if (url.pathname === "/api/report" && request.method === "POST") {
+      if (!limit(`report:${ip}`, 20, 60 * 60e3))
+        return json({ error: "Too many reports from this network just now." }, 429, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const report = typeof body.report === "string" ? body.report.slice(0, REPORT_MAX) : "";
+      const note   = typeof body.note   === "string" ? body.note.slice(0, 500)         : "";
+      if (!report.trim()) return json({ error: "Nothing to send" }, 400, ch);
+
+      const at = new Date().toISOString();
+      const ref = at.slice(0, 19).replace(/[:T-]/g, "") + "-" +
+                  Math.random().toString(36).slice(2, 6).toUpperCase();
+
+      await env.SENT_KV.put(`report:${ref}`, JSON.stringify({ ref, at, note, report }),
+        { expirationTtl: REPORT_TTL_SECONDS });
+
+      /* Email as well, when a sender is configured. Deliberately after the
+         store and deliberately not fatal: a report that reached the admin
+         screen is not lost because an email provider was down or unset. */
+      let emailed = false, emailError = null;
+      if (env.RESEND_API_KEY && env.REPORT_EMAIL) {
+        try {
+          const r = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${env.RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: env.REPORT_FROM || "Taiyabah App <onboarding@resend.dev>",
+              to: [env.REPORT_EMAIL],
+              subject: `Taiyabah app diagnostic ${ref}`,
+              text: [note ? `They said:\n${note}\n` : "(no note)\n",
+                     `Reference: ${ref}`, `Sent: ${at}`, "", report].join("\n"),
+            }),
+          });
+          emailed = r.ok;
+          if (!r.ok) emailError = `Resend returned ${r.status}`;
+        } catch (e) { emailError = e && e.message ? e.message : String(e); }
+      }
+
+      // the reference is the person's receipt, so they can quote it
+      return json({ ok: true, ref, emailed, emailError }, 200, ch);
+    }
+
+    /* Reports, newest first. Admin only — these carry device identifiers. */
+    if (url.pathname === "/api/reports" && request.method === "GET") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+
+      const list = await env.SENT_KV.list({ prefix: "report:", limit: 60 });
+      const items = [];
+      for (const k of list.keys) {
+        const v = await env.SENT_KV.get(k.name);
+        if (v) { try { items.push(JSON.parse(v)); } catch {} }
+      }
+      items.sort((a, b) => (a.at < b.at ? 1 : -1));
+      return json({ ok: true, count: items.length, reports: items }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
