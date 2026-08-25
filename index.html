@@ -3903,10 +3903,19 @@ const OneSignalManager = (() => {
        the old GitHub Pages subfolder after the move, which 404'd and killed
        init(). Checking only our own path reported a healthy 200 while the path
        that actually mattered was missing. */
-    const paths = [
-      base + "push/onesignal/OneSignalSDKWorker.js",
-      "/Taiyabah-Mosque-App/push/onesignal/OneSignalSDKWorker.js",
-    ].filter((v, i, a) => a.indexOf(v) === i);
+    /* Include whatever path OneSignal actually asked for. When init fails it
+       names the URL it could not load, and that URL is the dashboard's own
+       setting — the only value that matters, and one this app cannot otherwise
+       know. Guessing a list of likely paths reports on paths nobody requested. */
+    const asked = [];
+    try{
+      const m = String(initError || "").match(/https?:\/\/[^\s]+OneSignalSDKWorker\.js[^\s]*/i);
+      if(m) asked.push(new URL(m[0]).pathname);
+    }catch(e){ /* no usable url in the error */ }
+
+    const paths = asked
+      .concat([base + "push/onesignal/OneSignalSDKWorker.js"])
+      .filter((v, i, a) => a.indexOf(v) === i);
 
     const results = [];
     for(const path of paths){
@@ -3915,7 +3924,8 @@ const OneSignalManager = (() => {
         const r = await fetch(url, { cache: "no-store" });
         const ct = (r.headers.get("content-type") || "unknown").split(";")[0];
         const good = r.ok && /javascript|ecmascript/i.test(ct);
-        results.push(path + " -> " + r.status + " " + ct + (good ? " ok" : "  <- must be JavaScript"));
+        const tag = asked.includes(path) ? " (the path OneSignal asked for)" : "";
+        results.push(path + " -> " + r.status + " " + ct + (good ? " ok" : "  <- must be JavaScript") + tag);
       }catch(e){ results.push(path + " -> unreachable (" + (e && e.message ? e.message : e) + ")"); }
     }
     return results.join("\n                             ");
@@ -5172,6 +5182,11 @@ async function runDiagnostics(){
     (regs.some(r => r.includes("/push/onesignal/"))
       ? "   (OneSignal's worker is registered)"
       : "   ** OneSignal's worker is NOT registered — no push without it **"),
+    (regs.length && !regs.some(r => r.includes("/push/onesignal/")) && regs.length === 1
+      ? "   note: if OneSignal's worker path is set to the site root it would replace\n"
+        + "         this app's own worker rather than sit alongside it — it must be\n"
+        + "         push/onesignal/ so the two have separate scopes"
+      : ""),
   ];
   document.getElementById('diag-out').textContent = lines.join("\n");
 }
