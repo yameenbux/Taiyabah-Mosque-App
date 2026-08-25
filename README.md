@@ -228,7 +228,31 @@ the content, not applied uniformly.
   a personal account rather than the charity's.
 - **Vector logo** — current assets are upscaled from a small source image.
 
-## Credits
+## Ownership and credits
 
-Built for Bolton Central Islamic Society. Prayer times, the Taiyabah Masjid
-name, and the masjid's logo belong to the charity. See `LICENSE.md`.
+Built for Bolton Central Islamic Society by **Yameen Bux**.
+
+Ownership is split, and the distinction matters:
+
+**Owned by Bolton Central Islamic Society (Taiyabah Masjid)**
+- The Taiyabah Masjid name and logo
+- The prayer timetable and all prayer times
+- All masjid content — history, photography, announcements, service details,
+  contact and campaign information
+
+**Owned by Yameen Bux** — © 2026, all rights reserved
+- The source code, in full
+- The interface and visual design, layout and component structure
+- The timetable parsing and verification pipeline
+- The notification architecture and Cloudflare Worker
+- All original written content authored for the app
+
+The charity holds a **perpetual, irrevocable, royalty-free licence** to use,
+host and operate this application for the purposes of the masjid and its
+community — including engaging others to maintain it on the charity's behalf.
+That licence covers use of this app; it does not transfer ownership of the code
+or design, and it grants no right to reuse either elsewhere.
+
+No permission is granted to any other person or organisation to copy, reuse or
+redeploy this code or design — including for another masjid. See
+[`LICENSE.md`](LICENSE.md) for the full terms.
