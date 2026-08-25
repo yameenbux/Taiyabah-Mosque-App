@@ -457,7 +457,28 @@ async function handle(request, env) {
          sends the five preferences and still gets them back, so nothing on the
          phone needs to know how they are packed. */
       const encoded = encodePrefs(tags);
-      const userUrl = `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}/users/by/onesignal_id/${id}`;
+
+      /* The app sends whichever id it can obtain. Usually that is the user id,
+         but the Web SDK does not always surface one, in which case it sends
+         the subscription id instead — a device with a working subscription
+         must never be left untaggable over which identifier came to hand.
+         Try it as a user id, and resolve it as a subscription id if that
+         record does not exist. */
+      const base = `https://api.onesignal.com/apps/${env.ONESIGNAL_APP_ID}`;
+      const auth = { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` };
+      let userId = id, resolvedVia = "id as given";
+
+      const probe = await fetch(`${base}/users/by/onesignal_id/${id}`, { headers: auth });
+      if (probe.status === 404) {
+        const idRes = await fetch(`${base}/subscriptions/${id}/user/identity`, { headers: auth });
+        if (idRes.ok) {
+          const idData = await idRes.json().catch(() => ({}));
+          const resolved = idData && idData.identity && idData.identity.onesignal_id;
+          if (resolved) { userId = resolved; resolvedVia = "resolved from subscription id"; }
+        }
+      }
+
+      const userUrl = `${base}/users/by/onesignal_id/${userId}`;
       const patch = body => fetch(userUrl, {
         method: "PATCH",
         headers: {
@@ -479,7 +500,7 @@ async function handle(request, env) {
       if (!res.ok) res = await patch({ [PREF_TAG]: encoded });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) return json({ error: `OneSignal returned ${res.status}`, tried: id, detail: data }, 502, ch);
+      if (!res.ok) return json({ error: `OneSignal returned ${res.status}`, tried: userId, via: resolvedVia, detail: data }, 502, ch);
 
       /* Read back rather than trusting the write: assuming success is exactly
          what hid the tag-limit failure for so long. */
@@ -492,7 +513,7 @@ async function handle(request, env) {
       if (stored && !prefs)
         return json({ error: "OneSignal did not store the categories", stored }, 502, ch);
 
-      return json({ ok: true, cleaned, tags: prefs || tags, stored }, 200, ch);
+      return json({ ok: true, cleaned, via: resolvedVia, tags: prefs || tags, stored }, 200, ch);
     }
 
     /* Decisive test: writes a tag DIRECTLY via OneSignal's server-to-server
