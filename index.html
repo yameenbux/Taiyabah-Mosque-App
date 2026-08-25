@@ -5134,7 +5134,7 @@ function pushTopicTags(p){
   };
   const key = JSON.stringify(tags);
   if(key === lastSentTags){
-    lastTagResult = "unchanged, not re-sent " + key;
+    lastTagResult = "already stored, nothing to change " + key;
     if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
     return;
   }
@@ -5170,7 +5170,7 @@ function pushTopicTags(p){
 
   tagQueue = tagQueue
     .then(() => attempt(1))
-    .then(()=>{ lastSentTags = key; lastTagResult = "sent " + key; })
+    .then(()=>{ lastSentTags = key; lastTagResult = "stored by OneSignal " + key; })
     .catch(e=>{ lastTagResult = "failed: " + (e && e.message ? e.message : e); });
 
   if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
@@ -5235,8 +5235,17 @@ async function runDiagnostics(){
 
 function initDiagnostics(){
   document.getElementById('diag-retag').addEventListener('click', async ()=>{
+    /* Someone pressing this is asking for a write, not for an opinion about
+       whether one is needed. Clearing the guard makes it a real send rather
+       than a no-op that reports "unchanged" and looks broken. */
+    const btn = document.getElementById('diag-retag');
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Sending…";
+    lastSentTags = null;
     pushTopicTags();
-    setTimeout(runDiagnostics, 900);
+    try{ await tagQueue; }catch(e){ /* pushTopicTags records the outcome */ }
+    btn.disabled = false; btn.textContent = label;
+    runDiagnostics();
   });
   document.getElementById('troublebtn').addEventListener('click',()=>{
     const d=document.getElementById('diag');
