@@ -1,0 +1,29 @@
+name: Release checks
+
+# The notification path has broken three times from configuration drift rather
+# than from bad logic — a duplicate key that made every Worker deploy fail, an
+# origin the Worker didn't allow, an endpoint the deployed Worker didn't have.
+# Each shipped silently and was found on someone's phone. This catches that
+# class before it merges.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Config and syntax
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # the sw.js cache-bump check compares against main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run release checks
+        run: node scripts/check-release.mjs

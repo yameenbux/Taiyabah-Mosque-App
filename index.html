@@ -3645,6 +3645,7 @@ const OneSignalManager = (() => {
   const markDialogSeen   = () => { try{ localStorage.setItem(DIALOG_SEEN_KEY,"1"); }catch(e){} };
   let sdk = null;          // direct handle — needed to keep the user-gesture context
   let initError = null;    // why init failed, if it did
+  let optInError = null;   // why the subscription didn't complete, if it didn't
   let myOnesignalId = null; // the user-level id force-tag/set-my-tags need — distinct from the subscription id
 
   // a real, server-assigned subscription id is non-empty and not the local- placeholder
@@ -3821,11 +3822,22 @@ const OneSignalManager = (() => {
     /* Permission is granted. optIn() completes the subscription, but the UI
        must not wait on it: the tag write already retries until a subscription
        exists, so a slow registration should not look like a failure. */
+    optInError = null;
     try{
       const opted = OneSignal.User.PushSubscription.optIn();
-      if(opted && typeof opted.catch === "function")
-        opted.catch(e => console.warn("optIn:", e));
-    }catch(e){ console.warn("optIn threw:", e); }
+      if(opted && typeof opted.then === "function"){
+        /* Bounded and recorded, but still not blocking. Sending this only to
+           console.warn made a failed subscription invisible on a phone, which
+           is the same silent failure that made the tag problem take so long to
+           find. Whatever happens here has to be readable in the panel. */
+        Promise.race([
+          opted,
+          new Promise(r => setTimeout(() => r("__timeout__"), 15000))
+        ]).then(v => {
+          if(v === "__timeout__") optInError = "optIn didn’t finish within 15s";
+        }).catch(e => { optInError = (e && e.message) ? e.message : String(e); });
+      }
+    }catch(e){ optInError = (e && e.message) ? e.message : String(e); }
 
     return { ok:true, reason:null };
   }
@@ -3863,10 +3875,40 @@ const OneSignalManager = (() => {
     return myOnesignalId;
   }
 
-  const initFailure = () => initError;
+  const initFailure  = () => initError;
+  const optInFailure = () => optInError;
+
+  /* What OneSignal thinks this device's subscription is. A granted permission
+     with no subscription is the state that produces no id and therefore no
+     tags, and nothing was reporting the difference. */
+  const subscriptionState = () => {
+    const OneSignal = sdk || window.OneSignal;
+    try{
+      const ps = OneSignal && OneSignal.User && OneSignal.User.PushSubscription;
+      if(!ps) return "SDK not ready";
+      return "optedIn=" + !!ps.optedIn
+           + "  id=" + (ps.id || "(none)")
+           + "  token=" + (ps.token ? "yes" : "(none)");
+    }catch(e){ return "couldn’t read: " + (e && e.message ? e.message : e); }
+  };
+
+  /* Push cannot register unless this file is served as JavaScript from this
+     origin. A host that answers unknown paths with index.html hands back HTML
+     instead, and registration fails with nothing in the UI to show for it —
+     which looks exactly like the SDK simply not working. */
+  async function checkWorkerFile(){
+    const url = new URL(base + "push/onesignal/OneSignalSDKWorker.js", location.origin).href;
+    try{
+      const r = await fetch(url, { cache: "no-store" });
+      const ct = (r.headers.get("content-type") || "unknown").split(";")[0];
+      const looksRight = r.ok && /javascript|ecmascript/i.test(ct);
+      return "HTTP " + r.status + ", " + ct + (looksRight ? "" : "   <- must be JavaScript");
+    }catch(e){ return "couldn’t fetch: " + (e && e.message ? e.message : e); }
+  }
 
   return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady,
-           initFailure, blockedReason, loadingDiagnosis, waitForOnesignalId };
+           initFailure, optInFailure, subscriptionState, checkWorkerFile,
+           blockedReason, loadingDiagnosis, waitForOnesignalId };
 })();
 
 /* keep the Alerts tab honest about the real subscription state */
@@ -5085,6 +5127,8 @@ async function runDiagnostics(){
   const pushCapable = (typeof PushSubscriptionOptions !== "undefined"
       && Object.prototype.hasOwnProperty.call(PushSubscriptionOptions.prototype,"applicationServerKey"));
 
+  const workerFile = await OneSignalManager.checkWorkerFile();
+
   let regs=[];
   try{
     const list = await navigator.serviceWorker.getRegistrations();
@@ -5102,11 +5146,17 @@ async function runDiagnostics(){
       + (OneSignalManager.isReady() ? "" : "  <- nothing works until this is true"),
     "why init failed          : " + (OneSignalManager.initFailure() || "no error reported"),
     "page origin              : " + location.origin,
+    "push worker file         : " + workerFile,
+    "push subscription        : " + OneSignalManager.subscriptionState(),
+    "why subscribing failed   : " + (OneSignalManager.optInFailure() || "no error reported"),
     "OneSignal ID for tags    : " + (await OneSignalManager.waitForOnesignalId(150) || "(not yet available)"),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
     "tag write                : " + lastTagResult,
     "service workers:",
     ...regs.map(r => "   • " + r),
+    (regs.some(r => r.includes("/push/onesignal/"))
+      ? "   (OneSignal's worker is registered)"
+      : "   ** OneSignal's worker is NOT registered — no push without it **"),
   ];
   document.getElementById('diag-out').textContent = lines.join("\n");
 }
