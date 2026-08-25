@@ -3647,6 +3647,7 @@ const OneSignalManager = (() => {
   let initError = null;    // why init failed, if it did
   let optInError = null;   // why the subscription didn't complete, if it didn't
   let myOnesignalId = null; // the user-level id force-tag/set-my-tags need — distinct from the subscription id
+  let idFailure = null;     // why it could not be read, if it could not
 
   // a real, server-assigned subscription id is non-empty and not the local- placeholder
   const isRegistered = id => typeof id === "string" && id.length > 0 && !id.startsWith("local-");
@@ -3688,7 +3689,7 @@ const OneSignalManager = (() => {
         // on every subscription change too, not just once at init.
         const captureId = async () => {
           try{
-            const id = await OneSignal.User.getOnesignalId();
+            const id = await readUserId(OneSignal);
             if(id) myOnesignalId = id;
           }catch(e){ /* not ready yet — the change listener will retry */ }
         };
@@ -3863,19 +3864,59 @@ const OneSignalManager = (() => {
   /* A device registering for the first time can take a while to be issued an
      id, and the tag write is useless without one. Six seconds was enough for a
      phone that had subscribed before and too short for one that hadn't. */
+  /* Read the user id whichever way this SDK exposes it.
+     The Web SDK v16 publishes it as the property User.onesignalId;
+     getOnesignalId() is the mobile SDKs' API and is not always a function
+     here. Calling it blindly threw a TypeError that was being swallowed by an
+     empty catch, so the wait simply ran its full timeout and reported the id
+     as "not yet available" — on a device whose subscription had been created
+     successfully, with an id and a token. */
+  async function readUserId(OneSignal){
+    const u = OneSignal && OneSignal.User;
+    if(!u) return null;
+
+    const direct = u.onesignalId;
+    if(typeof direct === "string" && direct) return direct;
+
+    try{
+      if(typeof u.getOnesignalId === "function"){
+        const id = await u.getOnesignalId();
+        if(typeof id === "string" && id) return id;
+      }
+    }catch(e){
+      // a throwing accessor must not stop the fallback below from running
+      idFailure = "getOnesignalId failed: " + (e && e.message ? e.message : e);
+    }
+
+    /* Last resort: the subscription's own id. The sender resolves it back to
+       the user record, so a device that has a subscription is never left
+       untaggable just because the user id has not surfaced. */
+    try{
+      const sub = u.PushSubscription && u.PushSubscription.id;
+      if(typeof sub === "string" && sub && !sub.startsWith("local-")){
+        idFailure = "user id unavailable — using the subscription id instead";
+        return sub;
+      }
+    }catch(e){ /* nothing usable */ }
+
+    return null;
+  }
+
   async function waitForOnesignalId(timeoutMs = 20000){
     if(myOnesignalId) return myOnesignalId;
     const start = Date.now();
     while(!myOnesignalId && Date.now() - start < timeoutMs){
       await new Promise(r => setTimeout(r, 250));
       if(sdk && !myOnesignalId){
-        try{ const id = await sdk.User.getOnesignalId(); if(id) myOnesignalId = id; }catch(e){}
+        try{ const id = await readUserId(sdk); if(id) myOnesignalId = id; }
+        catch(e){ idFailure = (e && e.message) ? e.message : String(e); }
       }
     }
     return myOnesignalId;
   }
 
   const initFailure  = () => initError;
+  const idNote       = () => idFailure;
   const optInFailure = () => optInError;
 
   /* What OneSignal thinks this device's subscription is. A granted permission
@@ -3932,7 +3973,7 @@ const OneSignalManager = (() => {
   }
 
   return { init, requestPermission, optOut, setTags, isOptedIn, permission, isReady,
-           initFailure, optInFailure, subscriptionState, checkWorkerFile,
+           initFailure, optInFailure, idNote, subscriptionState, checkWorkerFile,
            blockedReason, loadingDiagnosis, waitForOnesignalId };
 })();
 
@@ -5174,6 +5215,7 @@ async function runDiagnostics(){
     "push worker file         : " + workerFile,
     "push subscription        : " + OneSignalManager.subscriptionState(),
     "why subscribing failed   : " + (OneSignalManager.optInFailure() || "no error reported"),
+    "note on the id           : " + (OneSignalManager.idNote() || "none"),
     "OneSignal ID for tags    : " + (await OneSignalManager.waitForOnesignalId(150) || "(not yet available)"),
     "queued SDK calls waiting : " + ((window.OneSignalDeferred||[]).length),
     "tag write                : " + lastTagResult,
