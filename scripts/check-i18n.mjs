@@ -22,8 +22,13 @@ const baseline = existsSync(BASELINE) ? JSON.parse(readFileSync(BASELINE, "utf8"
 const html = readFileSync("index.html", "utf8");
 const markup = new Set([...html.matchAll(/data-i18n="([^"]+)"/g)].map(m => m[1]));
 
-/* Keys the app looks up from JavaScript rather than from an attribute. */
-const fromJs = new Set([...html.matchAll(/\bt\(\s*["']([\w.]+)["']/g)].map(m => m[1]));
+/* Keys the app looks up from JavaScript rather than from an attribute.
+   A key built by concatenation — t("prayer." + p.key, …) — reads here as the
+   literal "prayer.", which is a fragment and not a key. Drop those: the real
+   keys they build are in the markup or listed explicitly. */
+const fromJs = new Set([...html.matchAll(/\bt\(\s*["']([\w.]+)["']/g)]
+  .map(m => m[1])
+  .filter(k => !k.endsWith(".")));
 
 const needed = new Set([...markup, ...fromJs]);
 const LANGS = ["ur", "gu", "ar"];

@@ -2807,21 +2807,25 @@ let STATE = null;
 function buildTimetable(rec, baseDate){
   const tt = document.getElementById("timetable");
   const isFri = baseDate.getDay()===5 && rec.jummah && rec.jummah.first;
-  let html = `<div class="col-h"><span>Prayer</span><span class="r">Beginning</span><span class="r">Jamā&#703;ah</span></div>`;
+  let html = `<div class="col-h"><span>${t("times.prayer","Prayer")}</span>` +
+             `<span class="r">${t("times.beginning","Beginning")}</span>` +
+             `<span class="r">${t("times.jamaah","Jamāʿah")}</span></div>`;
   PRAYERS.forEach(p=>{
     const b = rec.begins[p.key];
     const j = p.info ? null : rec.jamaat[p.key];
     // On Fridays the Zuhr congregation is Jumuʿah
     const fri = isFri && p.key==="zuhr";
-    const en  = fri ? "Jumuʿah" : p.en;
+    // the row's own name, in the chosen language
+    const en  = fri ? t("prayer.jumuah","Jumuʿah") : t("prayer."+p.key, p.en);
     const ar  = fri ? "الجمعة"  : p.ar;
     const sub = fri
-      ? `<span class="jsub">1st Jumuʿah ${hm12(rec.jummah.first)}${rec.jummah.second?`<br>2nd Jumuʿah ${hm12(rec.jummah.second)}`:''}</span>`
+      ? `<span class="jsub">${t("times.firstJumuah","1st Jumuʿah")} ${num(hm12(rec.jummah.first))}` +
+        `${rec.jummah.second?`<br>${t("times.secondJumuah","2nd Jumuʿah")} ${num(hm12(rec.jummah.second))}`:''}</span>`
       : '';
     html += `<div class="row ${p.info?'sunrise':''} ${fri?'is-jummah':''}" data-key="${p.key}">
       <div class="name"><span class="en">${en}<span class="pill-slot"></span></span><span class="ar">${ar}</span>${sub}</div>
-      <span class="begins tnum">${b?hm12(b):'—'}</span>
-      <span class="jam tnum">${j?hm12(j):'—'}</span>
+      <span class="begins tnum">${b?num(hm12(b)):'—'}</span>
+      <span class="jam tnum">${j?num(hm12(j)):'—'}</span>
     </div>`;
   });
   tt.innerHTML = html;
