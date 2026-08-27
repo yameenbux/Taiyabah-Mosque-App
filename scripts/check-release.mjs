@@ -119,6 +119,22 @@ if (existsSync("quran/rabbanas.js") && existsSync("quran/surahs/1.json")) {
   }
 }
 
+/* ---- 3e. translations cover every string ----
+ * A missing key falls back to English rather than crashing, which is exactly
+ * why it needs checking: a half-translated screen looks deliberate and nobody
+ * reports it. */
+if (existsSync("scripts/check-i18n.mjs")) {
+  try {
+    const out = execSync("node scripts/check-i18n.mjs", { encoding: "utf8" });
+    ok(out.trim().split("\n").filter(l => l.includes("ok")).map(l => l.replace(/^\s*ok\s+/, "")).join("; ")
+       || "translations complete");
+  } catch (e) {
+    const out = String(e.stdout || "") + String(e.stderr || "");
+    for (const line of out.split("\n").filter(l => l.includes("FAIL")))
+      fail("i18n — " + line.replace(/^\s*FAIL\s+/, "").trim());
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");

@@ -990,7 +990,7 @@
   <div class="topbar">
     <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100">
     <div class="brand">
-      <p>Bolton Central Islamic Society</p>
+      <p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p>
     </div>
     <button class="menubtn" id="menubtn" aria-label="More">
       <span></span><span></span><span></span>
@@ -1002,17 +1002,17 @@
     <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
     <div class="salam">
       <span class="ar arabic">السَّلَامُ عَلَيْكُمْ</span>
-      <span class="tr">As-salāmu ʿalaykum</span>
+      <span class="tr" data-i18n="app.as_salamu_alaykum">As-salāmu ʿalaykum</span>
     </div>
     <span class="datechip"><span class="live" id="livedot"></span><span id="dateline">—</span></span>
     <div class="ram" id="ram" hidden>
       <span class="ram-t" id="ram-t">—</span>
-      <span class="ram-n" id="ram-n">Subject to moon sighting</span>
+      <span class="ram-n" id="ram-n" data-i18n="app.subject_to_moon_sighting">Subject to moon sighting</span>
     </div>
 
     <!-- live countdown: today only -->
     <div id="mode-today">
-      <div class="eyebrow">Next Jamā&#703;ah</div>
+      <div class="eyebrow" data-i18n="app.next_jama_ah">Next Jamā&#703;ah</div>
       <div class="nextname">
         <span class="en display" id="next-en">—</span>
         <span class="ar" id="next-ar">—</span>
@@ -1027,16 +1027,16 @@
 
     <!-- day view: any other date -->
     <div id="mode-date" hidden>
-      <div class="eyebrow" id="dv-eyebrow">Viewing</div>
+      <div class="eyebrow" id="dv-eyebrow" data-i18n="app.viewing">Viewing</div>
       <div class="dv-lines" id="dv-sub">—</div>
     </div>
 
     <div class="jcall" id="jcall" hidden>
       <div class="jc-ar arabic">خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ</div>
-      <div class="jc-en">&ldquo;The best day on which the sun has risen is Friday.&rdquo;</div>
-      <div class="jc-src">Ṣaḥīḥ Muslim 854</div>
-      <button class="jc-btn" id="jc-btn">Give this Jumu&#703;ah</button>
-      <div class="jc-note">Support the new Taiyabah Masjid</div>
+      <div class="jc-en" data-i18n="app.the_best_day_on_which">&ldquo;The best day on which the sun has risen is Friday.&rdquo;</div>
+      <div class="jc-src" data-i18n="app.sahih_muslim_854">Ṣaḥīḥ Muslim 854</div>
+      <button class="jc-btn" id="jc-btn" data-i18n="app.give_this_jumu_ah">Give this Jumu&#703;ah</button>
+      <div class="jc-note" data-i18n="app.support_the_new_taiyabah_masjid">Support the new Taiyabah Masjid</div>
     </div>
   </section>
 
@@ -1061,16 +1061,16 @@
   <nav class="datenav" aria-label="Choose a date">
     <button class="navbtn" id="prev" aria-label="Previous day">&#8249;</button>
     <button class="daypick" id="daypick">
-      <span class="dn-main" id="dn-main">Today</span>
+      <span class="dn-main" id="dn-main" data-i18n="app.today">Today</span>
       <span class="dn-sub" id="dn-sub">—</span>
     </button>
     <button class="navbtn" id="next" aria-label="Next day">&#8250;</button>
   </nav>
   <input type="date" id="datein" class="vis-hidden" min="2026-01-01" max="2026-12-31" aria-label="Choose a date">
   <div class="chips">
-    <button class="chip" id="chip-today" data-on="1">Today</button>
-    <button class="chip" id="chip-fri">Next Jumu&#703;ah</button>
-    <button class="chip" id="chip-month">Full month</button>
+    <button class="chip" id="chip-today" data-on="1" data-i18n="app.today">Today</button>
+    <button class="chip" id="chip-fri" data-i18n="app.next_jumu_ah">Next Jumu&#703;ah</button>
+    <button class="chip" id="chip-month" data-i18n="app.full_month">Full month</button>
   </div>
 
   <div class="sheet" id="sheet" data-open="0" role="dialog" aria-modal="true" aria-label="Full month timetable">
@@ -1080,33 +1080,33 @@
         <button class="sh-nav" id="m-prev" aria-label="Previous month">&#8249;</button>
         <h3 id="m-title">—</h3>
         <button class="sh-nav" id="m-next" aria-label="Next month">&#8250;</button>
-        <button class="sh-close" id="m-close">Done</button>
+        <button class="sh-close" id="m-close" data-i18n="sheet.done">Done</button>
       </div>
       <div class="sh-toggle">
-        <button id="m-jam" data-on="1">Jamā&#703;ah times</button>
-        <button id="m-beg" data-on="0">Beginning times</button>
+        <button id="m-jam" data-on="1" data-i18n="sheet.jama_ah_times">Jamā&#703;ah times</button>
+        <button id="m-beg" data-on="0" data-i18n="sheet.beginning_times">Beginning times</button>
       </div>
       <div class="sh-body" id="m-body"></div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="sec-h"><h2 id="tt-h">Today</h2><span class="rule"></span><span class="tag" id="tt-tag">Beginning &amp; Jamā&#703;ah</span></div>
+    <div class="sec-h"><h2 id="tt-h" data-i18n="sheet.today">Today</h2><span class="rule"></span><span class="tag" id="tt-tag" data-i18n="sheet.beginning_jama_ah">Beginning &amp; Jamā&#703;ah</span></div>
     <div class="card tt" id="timetable"></div>
     <div class="samplenote" id="samplenote" hidden></div>
 
     <footer>
       <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-      <div class="fr">Times from the official 2026 Salah Timetable</div>
-      <div class="charity">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
-      <div class="credit">App built by <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener">Yameen Bux</a></div>
+      <div class="fr" data-i18n="sheet.times_from_the_official_2026">Times from the official 2026 Salah Timetable</div>
+      <div class="charity" data-i18n="sheet.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
+      <div class="credit">App built by <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener" data-i18n="sheet.yameen_bux">Yameen Bux</a></div>
     </footer>
   </div>
   </main>
 
   <main id="tab-qibla" hidden>
     <div class="wrap">
-      <div class="sec-h"><h2>Qibla direction</h2><span class="rule"></span><span class="tag" id="q-src">From the masjid</span></div>
+      <div class="sec-h"><h2 data-i18n="sheet.qibla_direction">Qibla direction</h2><span class="rule"></span><span class="tag" id="q-src" data-i18n="sheet.from_the_masjid">From the masjid</span></div>
 
       <div class="card qcard">
         <div class="dial" id="dial">
@@ -1129,25 +1129,25 @@
 
         <div class="qread">
           <div class="qbig tnum" id="q-bearing">118°</div>
-          <div class="qsub" id="q-sub">from true north &middot; 5,042 km to Makkah</div>
+          <div class="qsub" id="q-sub" data-i18n="sheet.from_true_north_5_042">from true north &middot; 5,042 km to Makkah</div>
         </div>
 
-        <button class="enable" id="q-start">Use my phone's compass</button>
-        <p class="qnote" id="q-note">Hold the phone flat. Compasses drift near metal, cars and speakers — turn in a figure-of-eight to calibrate.</p>
+        <button class="enable" id="q-start" data-i18n="sheet.use_my_phone_s_compass">Use my phone's compass</button>
+        <p class="qnote" id="q-note" data-i18n="sheet.hold_the_phone_flat_compasses">Hold the phone flat. Compasses drift near metal, cars and speakers — turn in a figure-of-eight to calibrate.</p>
       </div>
 
       <div class="card qhelp">
-        <div class="qh-row"><span class="qh-k">Bearing</span><span class="qh-v tnum" id="q-b2">118° true</span></div>
-        <div class="qh-row"><span class="qh-k">Distance</span><span class="qh-v tnum" id="q-d2">5,042 km</span></div>
-        <div class="qh-row"><span class="qh-k">Measured from</span><span class="qh-v" id="q-from">Taiyabah Masjid</span></div>
+        <div class="qh-row"><span class="qh-k" data-i18n="sheet.bearing">Bearing</span><span class="qh-v tnum" id="q-b2" data-i18n="sheet.118_true">118° true</span></div>
+        <div class="qh-row"><span class="qh-k" data-i18n="sheet.distance">Distance</span><span class="qh-v tnum" id="q-d2" data-i18n="sheet.5_042_km">5,042 km</span></div>
+        <div class="qh-row"><span class="qh-k" data-i18n="sheet.measured_from">Measured from</span><span class="qh-v" id="q-from" data-i18n="sheet.taiyabah_masjid">Taiyabah Masjid</span></div>
       </div>
-      <p class="qfoot">A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.</p>
+      <p class="qfoot" data-i18n="sheet.a_phone_compass_is_a">A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.</p>
     </div>
   </main>
 
   <main id="tab-alerts" hidden>
     <div class="wrap">
-    <div class="sec-h" id="alerts-h" style="margin-top:26px"><h2>Prayer alerts</h2><span class="rule"></span></div>
+    <div class="sec-h" id="alerts-h" style="margin-top:26px"><h2 data-i18n="sheet.prayer_alerts">Prayer alerts</h2><span class="rule"></span></div>
 
     <!-- collapsed: settings saved -->
     <button class="card done" id="a-done" hidden>
@@ -1157,51 +1157,51 @@
         </svg>
       </span>
       <span class="dn-txt">
-        <span class="dn-1">Notifications on</span>
+        <span class="dn-1" data-i18n="sheet.notifications_on">Notifications on</span>
         <span class="dn-2" id="a-summary">—</span>
       </span>
-      <span class="dn-edit">Change</span>
+      <span class="dn-edit" data-i18n="sheet.change">Change</span>
     </button>
 
     <!-- expanded: setup + settings -->
     <div class="card alerts" id="a-panel">
-      <p class="lead" id="a-lead">Get a quiet reminder before each jamā&#703;ah, plus masjid announcements — on this device.</p>
-      <button class="enable" id="enable" data-on="0">Enable notifications</button>
+      <p class="lead" id="a-lead" data-i18n="sheet.get_a_quiet_reminder_before">Get a quiet reminder before each jamā&#703;ah, plus masjid announcements — on this device.</p>
+      <button class="enable" id="enable" data-on="0" data-i18n="sheet.enable_notifications">Enable notifications</button>
       <div class="toggles" id="toggles">
         <div class="tg">
-          <div class="txt"><div class="t">Jamā&#703;ah reminders</div><div class="d">A nudge before each congregation</div></div>
+          <div class="txt"><div class="t" data-i18n="sheet.jama_ah_reminders">Jamā&#703;ah reminders</div><div class="d" data-i18n="sheet.a_nudge_before_each_congregation">A nudge before each congregation</div></div>
           <label class="switch"><input type="checkbox" checked id="tg-jam"><span class="sl"></span></label>
         </div>
         <div class="mins">
           Remind me
-          <select id="mins"><option value="5">5 min</option><option value="10" selected>10 min</option><option value="15">15 min</option></select>
+          <select id="mins"><option value="5" data-i18n="sheet.5_min">5 min</option><option value="10" selected data-i18n="sheet.10_min">10 min</option><option value="15" data-i18n="sheet.15_min">15 min</option></select>
           before jamā&#703;ah
         </div>
         <div class="tg">
-          <div class="txt"><div class="t">Janāzah <span class="urgent">Urgent</span></div><div class="d">Funeral prayer announcements</div></div>
+          <div class="txt"><div class="t">Janāzah <span class="urgent" data-i18n="sheet.urgent">Urgent</span></div><div class="d" data-i18n="sheet.funeral_prayer_announcements">Funeral prayer announcements</div></div>
           <label class="switch"><input type="checkbox" checked id="tg-jan"><span class="sl"></span></label>
         </div>
         <div class="tg">
-          <div class="txt"><div class="t">Announcements</div><div class="d">Timetable changes, Ramadan, Eid</div></div>
+          <div class="txt"><div class="t" data-i18n="sheet.announcements">Announcements</div><div class="d" data-i18n="sheet.timetable_changes_ramadan_eid">Timetable changes, Ramadan, Eid</div></div>
           <label class="switch"><input type="checkbox" checked id="tg-ann"><span class="sl"></span></label>
         </div>
         <div class="tg">
-          <div class="txt"><div class="t">Events &amp; talks</div><div class="d">Bayaans, classes, community events</div></div>
+          <div class="txt"><div class="t" data-i18n="sheet.events_talks">Events &amp; talks</div><div class="d" data-i18n="sheet.bayaans_classes_community_events">Bayaans, classes, community events</div></div>
           <label class="switch"><input type="checkbox" id="tg-evt"><span class="sl"></span></label>
         </div>
-        <button class="save" id="a-save">Save</button>
+        <button class="save" id="a-save" data-i18n="sheet.save">Save</button>
       </div>
       <p class="wirednote" id="wirednote"></p>
-      <button class="troublebtn" id="troublebtn">Having trouble?</button>
+      <button class="troublebtn" id="troublebtn" data-i18n="sheet.having_trouble">Having trouble?</button>
       <div class="diag" id="diag" hidden>
         <pre id="diag-out">…</pre>
-        <button class="diag-fix" id="diag-retag">Send my categories again</button>
-        <button class="diag-fix" id="diag-send">Send this report to the masjid</button>
+        <button class="diag-fix" id="diag-retag" data-i18n="sheet.send_my_categories_again">Send my categories again</button>
+        <button class="diag-fix" id="diag-send" data-i18n="sheet.send_this_report_to_the">Send this report to the masjid</button>
         <textarea id="diag-note" rows="2" placeholder="What went wrong? (optional)"
                   maxlength="500"></textarea>
         <p class="diag-note" id="diag-sent"></p>
-        <button class="diag-fix" id="diag-fix">Reset &amp; reload the app</button>
-        <p class="diag-note">This clears the app’s stored files and re-installs its
+        <button class="diag-fix" id="diag-fix" data-i18n="sheet.reset_reload_the_app">Reset &amp; reload the app</button>
+        <p class="diag-note" data-i18n="sheet.this_clears_the_app_s">This clears the app’s stored files and re-installs its
           background service. Your prayer times are built in, so nothing is lost.</p>
       </div>
     </div>
@@ -1211,15 +1211,15 @@
 
     <main id="tab-recite" hidden>
       <div class="wrap">
-        <div class="sec-h"><h2>Recite</h2><span class="rule"></span></div>
+        <div class="sec-h"><h2 data-i18n="sheet.recite">Recite</h2><span class="rule"></span></div>
 
         <button class="md-row" id="rc-athkar">
           <span class="md-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3.3 2"/></svg>
           </span>
           <span class="md-t">
-            <span class="md-t1">Daily Athkar</span>
-            <span class="md-t2">Morning &amp; evening remembrance</span>
+            <span class="md-t1" data-i18n="sheet.daily_athkar">Daily Athkar</span>
+            <span class="md-t2" data-i18n="sheet.morning_evening_remembrance">Morning &amp; evening remembrance</span>
           </span>
           <span class="dr-ch">&rsaquo;</span>
         </button>
@@ -1232,8 +1232,8 @@
             </svg>
           </span>
           <span class="md-t">
-            <span class="md-t1">Qur'an</span>
-            <span class="md-t2">Preview &mdash; al-Fātiḥah &amp; tajweed colours</span>
+            <span class="md-t1" data-i18n="sheet.qur_an">Qur'an</span>
+            <span class="md-t2" data-i18n="sheet.preview_al_fatihah_tajweed_colours">Preview &mdash; al-Fātiḥah &amp; tajweed colours</span>
           </span>
           <span class="dr-ch">&rsaquo;</span>
         </button>
@@ -1243,8 +1243,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 20c0-4 2.5-7 6-7s6 3 6 7"/><path d="M12 13V4"/><path d="M9 7l3-3 3 3"/></svg>
           </span>
           <span class="md-t">
-            <span class="md-t1">Common Duas</span>
-            <span class="md-t2">Everyday supplications</span>
+            <span class="md-t1" data-i18n="sheet.common_duas">Common Duas</span>
+            <span class="md-t2" data-i18n="sheet.everyday_supplications">Everyday supplications</span>
           </span>
           <span class="dr-ch">&rsaquo;</span>
         </button>
@@ -1254,13 +1254,13 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-4-6.5-9a3.9 3.9 0 0 1 6.5-3 3.9 3.9 0 0 1 6.5 3c0 5-6.5 9-6.5 9Z"/><path d="M12 8.5v4"/><path d="M10 10.5h4"/></svg>
           </span>
           <span class="md-t">
-            <span class="md-t1">40 Rabbanā</span>
-            <span class="md-t2">Forty short duʿās from the Qur'an</span>
+            <span class="md-t1" data-i18n="sheet.40_rabbana">40 Rabbanā</span>
+            <span class="md-t2" data-i18n="sheet.forty_short_du_as_from">Forty short duʿās from the Qur'an</span>
           </span>
           <span class="dr-ch">&rsaquo;</span>
         </button>
 
-        <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:16px 6px 0">
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:16px 6px 0" data-i18n="sheet.wording_shown_here_is_a">
           Wording shown here is a starting set, not exhaustive. Please have the imam review
           before relying on it as the app's final text.
         </p>
@@ -1271,64 +1271,64 @@
     <section class="hadith">
       <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
       <p class="h-ar arabic">مَنْ بَنَى مَسْجِدًا لِلَّهِ بَنَى اللَّهُ لَهُ فِي الْجَنَّةِ مِثْلَهُ</p>
-      <p class="h-en">&ldquo;Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.&rdquo;</p>
-      <p class="h-src">Narrated by ʿUthmān ibn ʿAffān &middot; Ṣaḥīḥ al-Bukhārī 450 &middot; Ṣaḥīḥ Muslim 533</p>
+      <p class="h-en" data-i18n="sheet.whoever_builds_a_mosque_for">&ldquo;Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.&rdquo;</p>
+      <p class="h-src" data-i18n="sheet.narrated_by_uthman_ibn_affan">Narrated by ʿUthmān ibn ʿAffān &middot; Ṣaḥīḥ al-Bukhārī 450 &middot; Ṣaḥīḥ Muslim 533</p>
     </section>
 
     <div class="wrap">
-      <div class="sec-h"><h2>Where the build is now</h2><span class="rule"></span></div>
+      <div class="sec-h"><h2 data-i18n="sheet.where_the_build_is_now">Where the build is now</h2><span class="rule"></span></div>
       <div class="card phase">
-        <div class="ph-tag">Current appeal &middot; Phase 3.3</div>
-        <h3 class="ph-h">Internal fixtures &amp; fittings</h3>
-        <p class="ph-p">Help make the masjid ready for salah, Qur&rsquo;an and remembrance
+        <div class="ph-tag" data-i18n="sheet.current_appeal_phase_3_3">Current appeal &middot; Phase 3.3</div>
+        <h3 class="ph-h" data-i18n="sheet.internal_fixtures_fittings">Internal fixtures &amp; fittings</h3>
+        <p class="ph-p" data-i18n="sheet.help_make_the_masjid_ready">Help make the masjid ready for salah, Qur&rsquo;an and remembrance
           for generations to come.</p>
         <div class="needs">
-          <span>Tiling</span><span>Carpets</span><span>Heating</span>
-          <span>Lighting</span><span>Electrical</span><span>Decor</span>
+          <span data-i18n="sheet.tiling">Tiling</span><span data-i18n="sheet.carpets">Carpets</span><span data-i18n="sheet.heating">Heating</span>
+          <span data-i18n="sheet.lighting">Lighting</span><span data-i18n="sheet.electrical">Electrical</span><span data-i18n="sheet.decor">Decor</span>
         </div>
       </div>
 
-      <div class="sec-h"><h2>Give now</h2><span class="rule"></span><span class="tag">Apple &amp; Google Pay</span></div>
+      <div class="sec-h"><h2 data-i18n="sheet.give_now">Give now</h2><span class="rule"></span><span class="tag" data-i18n="sheet.apple_google_pay">Apple &amp; Google Pay</span></div>
       <a class="donate-cta" href="https://donorbox.org/taiyabah-masjid-bolton-new-build-mosque-and-madrassah-project" target="_blank" rel="noopener">
-        <span class="dc-main">Donate online</span>
-        <span class="dc-sub">Card &middot; Apple Pay &middot; Google Pay &middot; PayPal</span>
+        <span class="dc-main" data-i18n="sheet.donate_online">Donate online</span>
+        <span class="dc-sub" data-i18n="sheet.card_apple_pay_google_pay">Card &middot; Apple Pay &middot; Google Pay &middot; PayPal</span>
       </a>
       <p class="dc-note">Opens the masjid&rsquo;s secure donation page. If you are a UK taxpayer,
         please add Gift Aid &mdash; it adds <b>25p to every £1</b> at no cost to you.</p>
 
-      <div class="sec-h"><h2>Pledge a donor tier</h2><span class="rule"></span><span class="tag">Pay later</span></div>
+      <div class="sec-h"><h2 data-i18n="sheet.pledge_a_donor_tier">Pledge a donor tier</h2><span class="rule"></span><span class="tag" data-i18n="sheet.pay_later">Pay later</span></div>
       <div class="tiers">
         <a class="tier t-bronze" href="https://www.taiyabahmasjid.com/product/bronze-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£250</span><span class="t-name">Bronze</span></a>
+          <span class="t-amt">£250</span><span class="t-name" data-i18n="sheet.bronze">Bronze</span></a>
         <a class="tier t-silver" href="https://www.taiyabahmasjid.com/product/silver-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£500</span><span class="t-name">Silver</span></a>
+          <span class="t-amt">£500</span><span class="t-name" data-i18n="sheet.silver">Silver</span></a>
         <a class="tier t-gold" href="https://www.taiyabahmasjid.com/product/gold-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£1,000</span><span class="t-name">Gold</span></a>
+          <span class="t-amt">£1,000</span><span class="t-name" data-i18n="sheet.gold">Gold</span></a>
         <a class="tier t-plat" href="https://www.taiyabahmasjid.com/product/platinum-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£5,000</span><span class="t-name">Platinum</span></a>
+          <span class="t-amt">£5,000</span><span class="t-name" data-i18n="sheet.platinum">Platinum</span></a>
       </div>
       <p class="dc-note">A pledge is a commitment to give, settled afterwards by
         <b>bank transfer or at the masjid office</b> &mdash; not paid by card at this stage.
         You can pledge anonymously or publicly.</p>
 
-      <div class="sec-h"><h2>Or transfer directly</h2><span class="rule"></span><span class="tag">Tap to copy</span></div>
+      <div class="sec-h"><h2 data-i18n="sheet.or_transfer_directly">Or transfer directly</h2><span class="rule"></span><span class="tag" data-i18n="sheet.tap_to_copy">Tap to copy</span></div>
       <div class="card bank" id="bank">
         <button class="bk" data-copy="Bolton Central Islamic Society">
-          <span class="bk-k">Account name</span><span class="bk-v">Bolton Central Islamic Society (BCIS)</span>
+          <span class="bk-k" data-i18n="sheet.account_name">Account name</span><span class="bk-v" data-i18n="sheet.bolton_central_islamic_society_bcis">Bolton Central Islamic Society (BCIS)</span>
         </button>
         <button class="bk" data-copy="HSBC">
-          <span class="bk-k">Bank</span><span class="bk-v">HSBC</span>
+          <span class="bk-k" data-i18n="sheet.bank">Bank</span><span class="bk-v" data-i18n="sheet.hsbc">HSBC</span>
         </button>
         <button class="bk" data-copy="40-04-15">
-          <span class="bk-k">Sort code</span><span class="bk-v tnum">40-04-15</span>
+          <span class="bk-k" data-i18n="sheet.sort_code">Sort code</span><span class="bk-v tnum">40-04-15</span>
         </button>
         <button class="bk" data-copy="02320258">
-          <span class="bk-k">Account number</span><span class="bk-v tnum">02320258</span>
+          <span class="bk-k" data-i18n="sheet.account_number">Account number</span><span class="bk-v tnum">02320258</span>
         </button>
       </div>
-      <button class="copyall" id="copyall">Copy all details</button>
+      <button class="copyall" id="copyall" data-i18n="sheet.copy_all_details">Copy all details</button>
 
-      <p class="dnote">Bolton Central Islamic Society &middot; Registered charity 1041569.
+      <p class="dnote" data-i18n="sheet.bolton_central_islamic_society_registered_2">Bolton Central Islamic Society &middot; Registered charity 1041569.
         If you are ever unsure about donation details, please confirm them at the
         masjid office before transferring.</p>
     </div>
@@ -1338,26 +1338,26 @@
     <div class="scrim" id="ab-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">About us</h3>
-        <button class="sh-close" id="ab-close">Done</button>
+        <h3 style="text-align:left" data-i18n="about.about_us">About us</h3>
+        <button class="sh-close" id="ab-close" data-i18n="about.done">Done</button>
       </div>
       <div class="sh-body ab-body">
 
         <section class="ab-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="ab-est">Established at the end of 1967</div>
-          <p class="ab-lead">One of the first masjids in Bolton.</p>
+          <div class="ab-est" data-i18n="about.established_at_the_end_of">Established at the end of 1967</div>
+          <p class="ab-lead" data-i18n="about.one_of_the_first_masjids">One of the first masjids in Bolton.</p>
           <p class="ab-sub">The name <b>Taiyabah</b> &mdash; from the Arabic <i>Tayyab</i>, meaning purity &mdash;
             was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb,
             author of <i>Fazaail-e-Amaal</i>.</p>
         </section>
 
         <div class="ab-wrap">
-          <div class="sec-h"><h2>History</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="about.history">History</h2><span class="rule"></span></div>
           <div class="card ab-card">
-            <p>The masjid was originally located in Canning Street, where Moulana Faruq Desai
+            <p data-i18n="about.the_masjid_was_originally_located">The masjid was originally located in Canning Street, where Moulana Faruq Desai
                was appointed as its first Imam.</p>
-            <p>In February 1988, to accommodate the growing community, the present building on
+            <p data-i18n="about.in_february_1988_to_accommodate">In February 1988, to accommodate the growing community, the present building on
                Blackburn Road was purchased &mdash; formerly a Congregational Sunday School.
                The first Imam in the new masjid was Qari Yakub Nanjee Saheb, followed by
                Qari Farook Saheb.</p>
@@ -1368,52 +1368,52 @@
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </span>
             <span class="ab-vt">
-              <span class="ab-v1">Watch the masjid&rsquo;s story</span>
-              <span class="ab-v2">History &amp; new build journey</span>
+              <span class="ab-v1" data-i18n="about.watch_the_masjid_s_story">Watch the masjid&rsquo;s story</span>
+              <span class="ab-v2" data-i18n="about.history_new_build_journey">History &amp; new build journey</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <div class="sec-h"><h2>Founders</h2><span class="rule"></span><span class="tag">Amongst others</span></div>
+          <div class="sec-h"><h2 data-i18n="about.founders">Founders</h2><span class="rule"></span><span class="tag" data-i18n="about.amongst_others">Amongst others</span></div>
           <div class="card ab-list">
-            <div>Late Haji Ahmed Hakim</div>
-            <div>Late Haji Ibrahim Jamal</div>
-            <div>Late Haji Ismail Lekroo</div>
-            <div>Late Hafiz Adam Matadar</div>
-            <div>Late Haji Bashir Chadat</div>
-            <div>Haji Ismail Kekha</div>
+            <div data-i18n="about.late_haji_ahmed_hakim">Late Haji Ahmed Hakim</div>
+            <div data-i18n="about.late_haji_ibrahim_jamal">Late Haji Ibrahim Jamal</div>
+            <div data-i18n="about.late_haji_ismail_lekroo">Late Haji Ismail Lekroo</div>
+            <div data-i18n="about.late_hafiz_adam_matadar">Late Hafiz Adam Matadar</div>
+            <div data-i18n="about.late_haji_bashir_chadat">Late Haji Bashir Chadat</div>
+            <div data-i18n="about.haji_ismail_kekha">Haji Ismail Kekha</div>
           </div>
 
-          <div class="sec-h"><h2>Ulema</h2><span class="rule"></span><span class="tag">Imaamat at the masjid</span></div>
+          <div class="sec-h"><h2 data-i18n="about.ulema">Ulema</h2><span class="rule"></span><span class="tag" data-i18n="about.imaamat_at_the_masjid">Imaamat at the masjid</span></div>
           <div class="card ab-list">
-            <div>Moulana Ibrahim Kaba Saheb</div>
-            <div>Moulana Hashim Saheb</div>
-            <div>Qari Yakub Nanji Saheb</div>
-            <div>Qari Farooq Saheb</div>
-            <div>Moulana Mehboob Saheb <span class="ab-note">Chorley</span></div>
-            <div>Moulana Imran Suba Saheb</div>
-            <div>Mufti Faiyaz Saheb <span class="ab-now">Present Imam</span></div>
+            <div data-i18n="about.moulana_ibrahim_kaba_saheb">Moulana Ibrahim Kaba Saheb</div>
+            <div data-i18n="about.moulana_hashim_saheb">Moulana Hashim Saheb</div>
+            <div data-i18n="about.qari_yakub_nanji_saheb">Qari Yakub Nanji Saheb</div>
+            <div data-i18n="about.qari_farooq_saheb">Qari Farooq Saheb</div>
+            <div>Moulana Mehboob Saheb <span class="ab-note" data-i18n="about.chorley">Chorley</span></div>
+            <div data-i18n="about.moulana_imran_suba_saheb">Moulana Imran Suba Saheb</div>
+            <div>Mufti Faiyaz Saheb <span class="ab-now" data-i18n="about.present_imam">Present Imam</span></div>
           </div>
 
-          <div class="sec-h"><h2>The future</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="about.the_future">The future</h2><span class="rule"></span></div>
           <div class="card ab-card">
-            <p>Plans are in the works to give the community a safe and welcoming space for
+            <p data-i18n="about.plans_are_in_the_works">Plans are in the works to give the community a safe and welcoming space for
                learning, socialising and conducting ceremonies &mdash; and an educational
                resource for young and old alike.</p>
             <div class="ab-plans">
-              <span>Large prayer hall</span>
-              <span>Modern ablution areas</span>
-              <span>Integrated kitchen</span>
-              <span>Additional lecture rooms</span>
-              <span>Wi-Fi &amp; video streaming</span>
-              <span>Educational centre &amp; library</span>
+              <span data-i18n="about.large_prayer_hall">Large prayer hall</span>
+              <span data-i18n="about.modern_ablution_areas">Modern ablution areas</span>
+              <span data-i18n="about.integrated_kitchen">Integrated kitchen</span>
+              <span data-i18n="about.additional_lecture_rooms">Additional lecture rooms</span>
+              <span data-i18n="about.wi_fi_video_streaming">Wi-Fi &amp; video streaming</span>
+              <span data-i18n="about.educational_centre_library">Educational centre &amp; library</span>
             </div>
-            <p>The masjid also intends to invest further in Islamic education, supporting the
+            <p data-i18n="about.the_masjid_also_intends_to">The masjid also intends to invest further in Islamic education, supporting the
                community in matters including marriage and burial practices, and to establish
                an Islamic educational and cultural centre and library.</p>
           </div>
 
-          <button class="ab-donate" id="ab-donate">Support the new build</button>
+          <button class="ab-donate" id="ab-donate" data-i18n="about.support_the_new_build">Support the new build</button>
           <p class="ab-foot">Bolton Central Islamic Society &middot; Registered charity 1041569<br>
             31a Draycott Street, Bolton BL1 8HD</p>
         </div>
@@ -1425,15 +1425,15 @@
     <section class="lv-hero">
       <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
 
-      <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status">Ready</span></div>
+      <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status" data-i18n="about.ready">Ready</span></div>
 
       <button class="lv-play" id="lv-play" aria-label="Play live stream">
         <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
       </button>
 
-      <div class="lv-title">Taiyabah Masjid</div>
-      <div class="lv-sub">Live from the masjid</div>
+      <div class="lv-title" data-i18n="about.taiyabah_masjid">Taiyabah Masjid</div>
+      <div class="lv-sub" data-i18n="about.live_from_the_masjid">Live from the masjid</div>
 
       <div class="lv-vol">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
@@ -1443,10 +1443,10 @@
 
     <div class="wrap">
       <div class="card lv-info">
-        <div class="lv-row"><span class="lv-k">Radio frequency</span><span class="lv-v tnum">454.1000 MHz</span></div>
-        <div class="lv-row"><span class="lv-k">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids">Watch &rsaquo;</button></div>
+        <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
+        <div class="lv-row"><span class="lv-k" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids" data-i18n="about.watch">Watch &rsaquo;</button></div>
       </div>
-      <p class="lv-note">Audio keeps playing while you use the rest of the app or other apps.
+      <p class="lv-note" data-i18n="about.audio_keeps_playing_while_you">Audio keeps playing while you use the rest of the app or other apps.
         If the stream doesn&rsquo;t start, the masjid may not be broadcasting at the moment.</p>
     </div>
   </main>
@@ -1455,8 +1455,8 @@
     <div class="scrim" id="vd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Videos &amp; bayaans</h3>
-        <button class="sh-close" id="vd-close">Done</button>
+        <h3 style="text-align:left" data-i18n="vids.videos_bayaans">Videos &amp; bayaans</h3>
+        <button class="sh-close" id="vd-close" data-i18n="vids.done">Done</button>
       </div>
       <div class="sh-body">
         <div class="vd-player" id="vd-player" hidden>
@@ -1465,7 +1465,7 @@
         </div>
         <div class="ab-wrap">
           <div class="vd-list" id="vd-list"></div>
-          <a class="vd-all" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos" target="_blank" rel="noopener">
+          <a class="vd-all" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos" target="_blank" rel="noopener" data-i18n="vids.see_the_full_channel_on">
             See the full channel on YouTube &rsaquo;
           </a>
         </div>
@@ -1477,113 +1477,113 @@
     <div class="scrim" id="zk-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Zakat calculator</h3>
-        <button class="sh-close" id="zk-close">Done</button>
+        <h3 style="text-align:left" data-i18n="zakat.zakat_calculator">Zakat calculator</h3>
+        <button class="sh-close" id="zk-close" data-i18n="zakat.done">Done</button>
       </div>
       <div class="sh-body">
 
         <section class="zk-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
           <p class="zk-ar arabic">مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ</p>
-          <p class="zk-en">&ldquo;Charity does not decrease wealth.&rdquo;</p>
-          <p class="zk-src">The Prophet &#65018; &middot; Ṣaḥīḥ Muslim 2588</p>
+          <p class="zk-en" data-i18n="zakat.charity_does_not_decrease_wealth">&ldquo;Charity does not decrease wealth.&rdquo;</p>
+          <p class="zk-src" data-i18n="zakat.the_prophet_sahih_muslim_2588">The Prophet &#65018; &middot; Ṣaḥīḥ Muslim 2588</p>
         </section>
 
         <div class="ab-wrap">
 
           <div class="card zk-explain">
-            <h4>New to zakat? Start here</h4>
+            <h4 data-i18n="zakat.new_to_zakat_start_here">New to zakat? Start here</h4>
             <p>Zakat is a share of your savings given each year to those in need. It is
                <b>2.5%</b> &mdash; £2.50 out of every £100 you have kept for a whole year.</p>
-            <p>You pay it if all of these are true:</p>
+            <p data-i18n="zakat.you_pay_it_if_all">You pay it if all of these are true:</p>
             <ul class="zk-ul">
-              <li>You are Muslim and have reached the age of puberty</li>
+              <li data-i18n="zakat.you_are_muslim_and_have">You are Muslim and have reached the age of puberty</li>
               <li>What you own is worth more than the <b>nisab</b> (the minimum amount, below)</li>
               <li>You have owned that much for one full <b>lunar year</b></li>
             </ul>
-            <p class="zk-tip">Pick the same date each Islamic year &mdash; many choose a day in
+            <p class="zk-tip" data-i18n="zakat.pick_the_same_date_each">Pick the same date each Islamic year &mdash; many choose a day in
                Ramadan &mdash; and work out your zakat on that day every year.</p>
           </div>
 
-          <div class="sec-h"><h2>1 &middot; The nisab</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="zakat.1_the_nisab">1 &middot; The nisab</h2><span class="rule"></span></div>
           <div class="card zk-card">
-            <p class="zk-p">Nisab is the minimum you must own before zakat is due. It is fixed in
+            <p class="zk-p" data-i18n="zakat.nisab_is_the_minimum_you">Nisab is the minimum you must own before zakat is due. It is fixed in
                gold and silver, so its value in pounds changes with the metal price.</p>
             <div class="zk-seg" id="zk-standard">
-              <button data-std="silver" data-on="1">Silver &middot; 612.36g</button>
-              <button data-std="gold" data-on="0">Gold &middot; 87.48g</button>
+              <button data-std="silver" data-on="1" data-i18n="zakat.silver_612_36g">Silver &middot; 612.36g</button>
+              <button data-std="gold" data-on="0" data-i18n="zakat.gold_87_48g">Gold &middot; 87.48g</button>
             </div>
             <p class="zk-note">The Hanafi school uses the <b>silver</b> nisab, which is lower &mdash;
                so more people qualify to give.</p>
             <div class="zk-live" id="zk-live" data-s="idle">&nbsp;</div>
             <label class="zk-f">
-              <span class="zk-l">Price per gram today (£) <a href="https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/" target="_blank" rel="noopener">check&nbsp;price</a></span>
+              <span class="zk-l">Price per gram today (£) <a href="https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/" target="_blank" rel="noopener" data-i18n="zakat.check_price">check&nbsp;price</a></span>
               <input type="number" id="zk-price" inputmode="decimal" step="0.01" min="0" placeholder="e.g. 0.85">
             </label>
-            <div class="zk-nisab" id="zk-nisab">Enter today&rsquo;s price to see the nisab</div>
+            <div class="zk-nisab" id="zk-nisab" data-i18n="zakat.enter_today_s_price_to">Enter today&rsquo;s price to see the nisab</div>
           </div>
 
-          <div class="sec-h"><h2>2 &middot; What you own</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="zakat.2_what_you_own">2 &middot; What you own</h2><span class="rule"></span></div>
           <div class="card zk-card">
-            <label class="zk-f"><span class="zk-l">Cash &mdash; at home, bank, savings (£)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.cash_at_home_bank_savings">Cash &mdash; at home, bank, savings (£)</span>
               <input type="number" id="zk-cash" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <label class="zk-f"><span class="zk-l">Gold you own (grams)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.gold_you_own_grams">Gold you own (grams)</span>
               <input type="number" id="zk-gold" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <label class="zk-f"><span class="zk-l">Silver you own (grams)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.silver_you_own_grams">Silver you own (grams)</span>
               <input type="number" id="zk-silver" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <label class="zk-f"><span class="zk-l">Money owed to you that you expect back (£)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.money_owed_to_you_that">Money owed to you that you expect back (£)</span>
               <input type="number" id="zk-owed" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <label class="zk-f"><span class="zk-l">Business stock &mdash; goods bought to sell (£)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.business_stock_goods_bought_to">Business stock &mdash; goods bought to sell (£)</span>
               <input type="number" id="zk-stock" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <label class="zk-f"><span class="zk-l">Shares, crypto &amp; other investments (£)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.shares_crypto_other_investments">Shares, crypto &amp; other investments (£)</span>
               <input type="number" id="zk-invest" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
             <p class="zk-gsnote" id="zk-gsnote" hidden></p>
           </div>
 
-          <div class="sec-h"><h2>3 &middot; What you owe</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="zakat.3_what_you_owe">3 &middot; What you owe</h2><span class="rule"></span></div>
           <div class="card zk-card">
-            <label class="zk-f"><span class="zk-l">Debts and bills due now (£)</span>
+            <label class="zk-f"><span class="zk-l" data-i18n="zakat.debts_and_bills_due_now">Debts and bills due now (£)</span>
               <input type="number" id="zk-debts" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
-            <p class="zk-note">Include what you owe right now &mdash; bills, rent, money borrowed.
+            <p class="zk-note" data-i18n="zakat.include_what_you_owe_right">Include what you owe right now &mdash; bills, rent, money borrowed.
                For a mortgage, most scholars say to deduct only the payments due, not the whole loan.
                Ask the imam if you are unsure.</p>
           </div>
 
           <div class="zk-result" id="zk-result">
-            <div class="zk-r-row"><span>Total you own</span><span class="tnum" id="zk-total">£0.00</span></div>
-            <div class="zk-r-row"><span>Less what you owe</span><span class="tnum" id="zk-less">£0.00</span></div>
-            <div class="zk-r-row zk-net"><span>Zakatable wealth</span><span class="tnum" id="zk-net">£0.00</span></div>
-            <div class="zk-verdict" id="zk-verdict">Enter your amounts above</div>
+            <div class="zk-r-row"><span data-i18n="zakat.total_you_own">Total you own</span><span class="tnum" id="zk-total">£0.00</span></div>
+            <div class="zk-r-row"><span data-i18n="zakat.less_what_you_owe">Less what you owe</span><span class="tnum" id="zk-less">£0.00</span></div>
+            <div class="zk-r-row zk-net"><span data-i18n="zakat.zakatable_wealth">Zakatable wealth</span><span class="tnum" id="zk-net">£0.00</span></div>
+            <div class="zk-verdict" id="zk-verdict" data-i18n="zakat.enter_your_amounts_above">Enter your amounts above</div>
             <div class="zk-due" id="zk-due" hidden>
-              <div class="zk-due-k">Zakat due &middot; 2.5%</div>
+              <div class="zk-due-k" data-i18n="zakat.zakat_due_2_5">Zakat due &middot; 2.5%</div>
               <div class="zk-due-v tnum" id="zk-amount">£0.00</div>
             </div>
-            <button class="zk-reset" id="zk-reset">Clear all</button>
+            <button class="zk-reset" id="zk-reset" data-i18n="zakat.clear_all">Clear all</button>
           </div>
 
-          <div class="sec-h"><h2>What counts</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="zakat.what_counts">What counts</h2><span class="rule"></span></div>
           <div class="card zk-lists">
             <div class="zk-yes">
-              <h4>Include these</h4>
+              <h4 data-i18n="zakat.include_these">Include these</h4>
               <ul>
-                <li>Cash at home, in the bank, or in any savings account</li>
+                <li data-i18n="zakat.cash_at_home_in_the">Cash at home, in the bank, or in any savings account</li>
                 <li>All gold and silver you own &mdash; <b>including jewellery you wear</b></li>
-                <li>Money you are saving for something, like a wedding, a car or Hajj</li>
-                <li>Money people owe you that you expect to get back</li>
-                <li>Goods you bought in order to sell them</li>
-                <li>Shares bought to trade, and cryptocurrency</li>
-                <li>Money in a pension you can access</li>
+                <li data-i18n="zakat.money_you_are_saving_for">Money you are saving for something, like a wedding, a car or Hajj</li>
+                <li data-i18n="zakat.money_people_owe_you_that">Money people owe you that you expect to get back</li>
+                <li data-i18n="zakat.goods_you_bought_in_order">Goods you bought in order to sell them</li>
+                <li data-i18n="zakat.shares_bought_to_trade_and">Shares bought to trade, and cryptocurrency</li>
+                <li data-i18n="zakat.money_in_a_pension_you">Money in a pension you can access</li>
               </ul>
             </div>
             <div class="zk-no">
-              <h4>Leave these out</h4>
+              <h4 data-i18n="zakat.leave_these_out">Leave these out</h4>
               <ul>
-                <li>The home you live in</li>
-                <li>Your car, clothes, phone and furniture</li>
-                <li>Tools and machinery you use for work &mdash; unless you bought them to sell</li>
-                <li>A property you rent out &mdash; but rent you have saved does count</li>
-                <li>Debts you are owed but do not expect to get back</li>
-                <li>Anything you have already spent</li>
+                <li data-i18n="zakat.the_home_you_live_in">The home you live in</li>
+                <li data-i18n="zakat.your_car_clothes_phone_and">Your car, clothes, phone and furniture</li>
+                <li data-i18n="zakat.tools_and_machinery_you_use">Tools and machinery you use for work &mdash; unless you bought them to sell</li>
+                <li data-i18n="zakat.a_property_you_rent_out">A property you rent out &mdash; but rent you have saved does count</li>
+                <li data-i18n="zakat.debts_you_are_owed_but">Debts you are owed but do not expect to get back</li>
+                <li data-i18n="zakat.anything_you_have_already_spent">Anything you have already spent</li>
               </ul>
             </div>
           </div>
@@ -1602,15 +1602,15 @@
     <div class="scrim" id="ct-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Contact us</h3>
-        <button class="sh-close" id="ct-close">Done</button>
+        <h3 style="text-align:left" data-i18n="contact.contact_us">Contact us</h3>
+        <button class="sh-close" id="ct-close" data-i18n="contact.done">Done</button>
       </div>
       <div class="sh-body">
 
         <section class="ct-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="ct-name">Taiyabah Masjid</div>
-          <div class="ct-org">Bolton Central Islamic Society</div>
+          <div class="ct-name" data-i18n="contact.taiyabah_masjid">Taiyabah Masjid</div>
+          <div class="ct-org" data-i18n="contact.bolton_central_islamic_society">Bolton Central Islamic Society</div>
         </section>
 
         <div class="ab-wrap">
@@ -1619,39 +1619,39 @@
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k">Address</span><span class="ct-v">31a Draycott Street<br>Bolton BL1 8HD</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.address">Address</span><span class="ct-v">31a Draycott Street<br>Bolton BL1 8HD</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="tel:01204535997">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k">Telephone</span><span class="ct-v">01204 535 997</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.telephone">Telephone</span><span class="ct-v">01204 535 997</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="mailto:info@taiyabahmasjid.com">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k">Email</span><span class="ct-v">info@taiyabahmasjid.com</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.email">Email</span><span class="ct-v" data-i18n="contact.info_taiyabahmasjid_com">info@taiyabahmasjid.com</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="https://www.taiyabahmasjid.com/" target="_blank" rel="noopener">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18Z"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k">Website</span><span class="ct-v">taiyabahmasjid.com</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.website">Website</span><span class="ct-v" data-i18n="contact.taiyabahmasjid_com">taiyabahmasjid.com</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <div class="ct-row static">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k">Radio frequency</span><span class="ct-v tnum">454.1000 MHz</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.radio_frequency">Radio frequency</span><span class="ct-v tnum" data-i18n="contact.454_1000_mhz">454.1000 MHz</span></span>
             </div>
           </div>
 
-          <p class="ct-note">Please do not call the masjid during Salah times.</p>
+          <p class="ct-note" data-i18n="contact.please_do_not_call_the">Please do not call the masjid during Salah times.</p>
 
           <div class="dr-social ct-social">
             <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram">
@@ -1665,7 +1665,7 @@
             </a>
           </div>
 
-          <p class="ct-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="ct-foot" data-i18n="contact.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1674,10 +1674,10 @@
   <div class="osdlg" id="os-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="os-dlg-t">
     <div class="osdlg-scrim"></div>
     <div class="osdlg-box">
-      <h3 id="os-dlg-t">Your OneSignal SDK integration is complete!</h3>
-      <p>You can now send Push Notifications &amp; In-App Messages through OneSignal.
+      <h3 id="os-dlg-t" data-i18n="contact.your_onesignal_sdk_integration_is">Your OneSignal SDK integration is complete!</h3>
+      <p data-i18n="contact.you_can_now_send_push">You can now send Push Notifications &amp; In-App Messages through OneSignal.
          Tap below to enable push notifications.</p>
-      <button class="osdlg-btn" id="os-dlg-ok">Got it</button>
+      <button class="osdlg-btn" id="os-dlg-ok" data-i18n="contact.got_it">Got it</button>
     </div>
   </div>
 
@@ -1685,15 +1685,15 @@
     <div class="scrim" id="md-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Birth, Marriage &amp; Death</h3>
-        <button class="sh-close" id="md-close">Done</button>
+        <h3 style="text-align:left" data-i18n="marriagedeath.birth_marriage_death">Birth, Marriage &amp; Death</h3>
+        <button class="sh-close" id="md-close" data-i18n="marriagedeath.done">Done</button>
       </div>
       <div class="sh-body">
 
         <section class="md-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="md-en">Life-stage services</div>
-          <p class="md-sub">Guidance and support from the masjid across life&rsquo;s most
+          <div class="md-en" data-i18n="marriagedeath.life_stage_services">Life-stage services</div>
+          <p class="md-sub" data-i18n="marriagedeath.guidance_and_support_from_the">Guidance and support from the masjid across life&rsquo;s most
              significant moments.</p>
         </section>
 
@@ -1707,8 +1707,8 @@
               </svg>
             </span>
             <span class="md-t">
-              <span class="md-t1">Birth</span>
-              <span class="md-t2">Guidance for new arrivals, including circumcision</span>
+              <span class="md-t1" data-i18n="marriagedeath.birth">Birth</span>
+              <span class="md-t2" data-i18n="marriagedeath.guidance_for_new_arrivals_including">Guidance for new arrivals, including circumcision</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </button>
@@ -1721,8 +1721,8 @@
               </svg>
             </span>
             <span class="md-t">
-              <span class="md-t1">Islamic Marriage at Taiyabah</span>
-              <span class="md-t2">Nikāḥ, based on authentic Islamic tradition</span>
+              <span class="md-t1" data-i18n="marriagedeath.islamic_marriage_at_taiyabah">Islamic Marriage at Taiyabah</span>
+              <span class="md-t2" data-i18n="marriagedeath.nikah_based_on_authentic_islamic">Nikāḥ, based on authentic Islamic tradition</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </button>
@@ -1735,8 +1735,8 @@
               </svg>
             </span>
             <span class="md-t">
-              <span class="md-t1">Importance of an Islamic Will</span>
-              <span class="md-t2">Wasiyyah &mdash; why and how to prepare one</span>
+              <span class="md-t1" data-i18n="marriagedeath.importance_of_an_islamic_will">Importance of an Islamic Will</span>
+              <span class="md-t2" data-i18n="marriagedeath.wasiyyah_why_and_how_to">Wasiyyah &mdash; why and how to prepare one</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </button>
@@ -1749,13 +1749,13 @@
               </svg>
             </span>
             <span class="md-t">
-              <span class="md-t1">Funeral Service</span>
-              <span class="md-t2">Janāzah guidance and support</span>
+              <span class="md-t1" data-i18n="marriagedeath.funeral_service">Funeral Service</span>
+              <span class="md-t2" data-i18n="marriagedeath.janazah_guidance_and_support">Janāzah guidance and support</span>
             </span>
-            <span class="soon-tag">Coming soon</span>
+            <span class="soon-tag" data-i18n="marriagedeath.coming_soon">Coming soon</span>
           </button>
 
-          <p class="md-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="md-foot" data-i18n="marriagedeath.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1765,8 +1765,8 @@
     <div class="scrim" id="hh-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Hall / Room Hire</h3>
-        <button class="sh-close" id="hh-close">Done</button>
+        <h3 style="text-align:left" data-i18n="hallhire.hall_room_hire">Hall / Room Hire</h3>
+        <button class="sh-close" id="hh-close" data-i18n="hallhire.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -1777,14 +1777,14 @@
               <path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/>
             </svg>
           </span>
-          <div class="hh-en">Taiyabah Centre</div>
-          <p class="hh-sub">Available for hire, for community and family events.</p>
+          <div class="hh-en" data-i18n="hallhire.taiyabah_centre">Taiyabah Centre</div>
+          <p class="hh-sub" data-i18n="hallhire.available_for_hire_for_community">Available for hire, for community and family events.</p>
         </section>
 
         <div class="ab-wrap">
           <div class="card hh-facts">
-            <div class="hh-row"><span class="hh-k">Halls available</span><span class="hh-v">3</span></div>
-            <div class="hh-row"><span class="hh-k">Kitchens available</span><span class="hh-v">2</span></div>
+            <div class="hh-row"><span class="hh-k" data-i18n="hallhire.halls_available">Halls available</span><span class="hh-v">3</span></div>
+            <div class="hh-row"><span class="hh-k" data-i18n="hallhire.kitchens_available">Kitchens available</span><span class="hh-v">2</span></div>
           </div>
 
           <a class="hh-addr" href="https://maps.apple.com/?q=Taiyabah+Centre+Astley+Street+Bolton+BL1+8EH" target="_blank" rel="noopener">
@@ -1792,17 +1792,17 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             </span>
             <span class="hh-call-t">
-              <span class="hh-call-k">Taiyabah Centre &middot; get directions</span>
-              <span class="hh-call-v">Astley Street, Bolton BL1 8EH</span>
+              <span class="hh-call-k" data-i18n="hallhire.taiyabah_centre_get_directions">Taiyabah Centre &middot; get directions</span>
+              <span class="hh-call-v" data-i18n="hallhire.astley_street_bolton_bl1_8eh">Astley Street, Bolton BL1 8EH</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
           <div class="card hh-card">
-            <p>Taiyabah Centre &mdash; a separate building owned by the masjid &mdash; offers
+            <p data-i18n="hallhire.taiyabah_centre_a_separate_building">Taiyabah Centre &mdash; a separate building owned by the masjid &mdash; offers
                three halls and two kitchens for hire, suitable for a range of community and
                family occasions.</p>
-            <p>For availability, pricing and to discuss your requirements, please contact
+            <p data-i18n="hallhire.for_availability_pricing_and_to">For availability, pricing and to discuss your requirements, please contact
                the masjid&rsquo;s main office directly.</p>
           </div>
 
@@ -1811,13 +1811,13 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             </span>
             <span class="hh-call-t">
-              <span class="hh-call-k">Call the main office</span>
+              <span class="hh-call-k" data-i18n="hallhire.call_the_main_office">Call the main office</span>
               <span class="hh-call-v tnum">01204 535 997</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="hh-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="hh-foot" data-i18n="hallhire.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1827,8 +1827,8 @@
     <div class="scrim" id="sp-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">System Preferences</h3>
-        <button class="sh-close" id="sp-close">Done</button>
+        <h3 style="text-align:left" data-i18n="sysprefs.system_preferences">System Preferences</h3>
+        <button class="sh-close" id="sp-close" data-i18n="sysprefs.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -1840,24 +1840,24 @@
               <path d="M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z"/>
             </svg>
           </span>
-          <div class="ia-en">Language</div>
+          <div class="ia-en" data-i18n="sysprefs.language">Language</div>
         </section>
 
         <div class="ab-wrap">
-          <p class="sp-intro">Choose the language the app runs in. Packs download once and
+          <p class="sp-intro" data-i18n="sysprefs.choose_the_language_the_app">Choose the language the app runs in. Packs download once and
              then work offline.</p>
 
           <div class="card sp-list" id="sp-langs"></div>
 
           <div class="wl-advisory">
-            <div class="wl-adv-h">Translations not yet reviewed</div>
-            <p>The Urdu, Gujarati and Arabic packs cover the main navigation and prayer names
+            <div class="wl-adv-h" data-i18n="sysprefs.translations_not_yet_reviewed">Translations not yet reviewed</div>
+            <p data-i18n="sysprefs.the_urdu_gujarati_and_arabic">The Urdu, Gujarati and Arabic packs cover the main navigation and prayer names
                only, and have not yet been checked by a native speaker. Anything not yet
                translated stays in English. Please have someone from the community review
                these before launch.</p>
           </div>
 
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot" data-i18n="sysprefs.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1867,9 +1867,9 @@
     <div class="scrim" id="qd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <button class="sh-back" id="qd-back" hidden>&larr; Sūrahs</button>
-        <h3 style="text-align:left" id="qd-title">Qur'an</h3>
-        <button class="sh-close" id="qd-close">Done</button>
+        <button class="sh-back" id="qd-back" hidden data-i18n="quran.surahs">&larr; Sūrahs</button>
+        <h3 style="text-align:left" id="qd-title" data-i18n="quran.qur_an">Qur'an</h3>
+        <button class="sh-close" id="qd-close" data-i18n="quran.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -1878,13 +1878,13 @@
           <section class="wl-hero">
             <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
             <div class="wl-ar">القرآن الكريم</div>
-            <div class="wl-en" id="qd-sub">All 114 sūrahs</div>
+            <div class="wl-en" id="qd-sub" data-i18n="quran.all_114_surahs">All 114 sūrahs</div>
           </section>
           <div class="ab-wrap">
             <input id="qd-search" type="search" placeholder="Search a sūrah — name or number"
                    autocapitalize="off" autocorrect="off" aria-label="Search sūrahs">
             <div id="qd-list"></div>
-            <p class="qd-loaderr" id="qd-loaderr" style="display:none">
+            <p class="qd-loaderr" id="qd-loaderr" style="display:none" data-i18n="quran.couldn_t_load_the_qur">
               Couldn't load the Qur'an text. Check your connection and try again.</p>
             <p class="wl-foot" id="qd-credit"></p>
           </div>
@@ -1914,8 +1914,8 @@
     <div class="scrim" id="rb-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">40 Rabbanā</h3>
-        <button class="sh-close" id="rb-close">Done</button>
+        <h3 style="text-align:left" data-i18n="rabbanas.40_rabbana">40 Rabbanā</h3>
+        <button class="sh-close" id="rb-close" data-i18n="rabbanas.done">Done</button>
       </div>
       <div class="sh-body">
         <section class="wl-hero">
@@ -1924,11 +1924,11 @@
           <div class="wl-en" id="rb-count">&hellip;</div>
         </section>
         <div class="ab-wrap">
-          <p class="ak-intro">The duʿās of the Qur'an that begin “Our Lord…”, in the order they appear.</p>
+          <p class="ak-intro" data-i18n="rabbanas.the_du_as_of_the">The duʿās of the Qur'an that begin “Our Lord…”, in the order they appear.</p>
           <div id="rb-list"></div>
-          <p class="qd-loaderr" id="rb-loaderr" style="display:none">
+          <p class="qd-loaderr" id="rb-loaderr" style="display:none" data-i18n="rabbanas.couldn_t_load_these_du">
             Couldn't load these duʿās. Check your connection and try again.</p>
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot" data-i18n="rabbanas.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1938,23 +1938,23 @@
     <div class="scrim" id="ak-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Daily Athkār</h3>
-        <button class="sh-close" id="ak-close">Done</button>
+        <h3 style="text-align:left" data-i18n="athkar.daily_athkar">Daily Athkār</h3>
+        <button class="sh-close" id="ak-close" data-i18n="athkar.done">Done</button>
       </div>
       <div class="sh-body">
         <section class="wl-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
           <div class="wl-ar">أَذْكَار</div>
-          <div class="wl-en">Morning, evening and after ṣalāh</div>
+          <div class="wl-en" data-i18n="athkar.morning_evening_and_after_salah">Morning, evening and after ṣalāh</div>
         </section>
         <div class="ab-wrap">
           <div class="ak-tabs" id="ak-tabs"></div>
-          <div id="ak-body"><p class="qd-empty">Loading…</p></div>
+          <div id="ak-body"><p class="qd-empty" data-i18n="athkar.loading">Loading…</p></div>
           <div class="wl-advisory">
-            <div class="wl-adv-h">Confirm the wording with the imam</div>
-            <p id="ak-note">Wording varies between narrations and printings.</p>
+            <div class="wl-adv-h" data-i18n="athkar.confirm_the_wording_with_the">Confirm the wording with the imam</div>
+            <p id="ak-note" data-i18n="athkar.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
           </div>
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot" data-i18n="athkar.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -1964,9 +1964,9 @@
     <div class="scrim" id="du-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <button class="sh-back" id="du-back" hidden>&larr; All duʿās</button>
-        <h3 style="text-align:left" id="du-title">Everyday Duʿās</h3>
-        <button class="sh-close" id="du-close">Done</button>
+        <button class="sh-back" id="du-back" hidden data-i18n="duas.all_du_as">&larr; All duʿās</button>
+        <h3 style="text-align:left" id="du-title" data-i18n="duas.everyday_du_as">Everyday Duʿās</h3>
+        <button class="sh-close" id="du-close" data-i18n="duas.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -1974,17 +1974,17 @@
           <section class="wl-hero">
             <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
             <div class="wl-ar">دُعَاء</div>
-            <div class="wl-en" id="du-sub">Duʿās for the day, with transliteration</div>
+            <div class="wl-en" id="du-sub" data-i18n="duas.du_as_for_the_day">Duʿās for the day, with transliteration</div>
           </section>
           <div class="ab-wrap">
             <input id="du-search" type="search" placeholder="Search — travel, sleep, forgiveness…"
                    autocapitalize="off" autocorrect="off" aria-label="Search duʿās">
-            <div id="du-cats"><p class="qd-empty">Loading…</p></div>
+            <div id="du-cats"><p class="qd-empty" data-i18n="duas.loading">Loading…</p></div>
             <div class="wl-advisory">
-              <div class="wl-adv-h">Confirm the wording with the imam</div>
-              <p id="du-note">Wording varies between narrations and printings.</p>
+              <div class="wl-adv-h" data-i18n="duas.confirm_the_wording_with_the">Confirm the wording with the imam</div>
+              <p id="du-note" data-i18n="duas.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
             </div>
-            <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+            <p class="wl-foot" data-i18n="duas.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
           </div>
         </div>
 
@@ -2002,72 +2002,72 @@
     <div class="scrim" id="wl-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Islamic Will</h3>
-        <button class="sh-close" id="wl-close">Done</button>
+        <h3 style="text-align:left" data-i18n="will.islamic_will">Islamic Will</h3>
+        <button class="sh-close" id="wl-close" data-i18n="will.done">Done</button>
       </div>
       <div class="sh-body">
 
         <section class="wl-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
           <div class="wl-ar arabic">الوَصِيَّة</div>
-          <div class="wl-en">The Importance of an Islamic Will</div>
+          <div class="wl-en" data-i18n="will.the_importance_of_an_islamic">The Importance of an Islamic Will</div>
         </section>
 
         <div class="ab-wrap">
 
           <div class="wl-quote">
             <p class="wl-ar2 arabic">مَا حَقُّ امْرِئٍ مُسْلِمٍ لَهُ شَيْءٌ يُوصِي فِيهِ يَبِيتُ لَيْلَتَيْنِ إِلَّا وَوَصِيَّتُهُ مَكْتُوبَةٌ عِنْدَهُ</p>
-            <p class="wl-en2">&ldquo;A Muslim who has something to leave behind should not let
+            <p class="wl-en2" data-i18n="will.a_muslim_who_has_something">&ldquo;A Muslim who has something to leave behind should not let
               two nights pass without having his will written and kept ready.&rdquo;</p>
-            <p class="wl-src">The Prophet &#65018; &middot; Ṣaḥīḥ al-Bukhārī &amp; Ṣaḥīḥ Muslim</p>
+            <p class="wl-src" data-i18n="will.the_prophet_sahih_al_bukhari">The Prophet &#65018; &middot; Ṣaḥīḥ al-Bukhārī &amp; Ṣaḥīḥ Muslim</p>
           </div>
 
           <div class="wl-quote">
             <p class="wl-ar2 arabic">كُتِبَ عَلَيْكُمْ إِذَا حَضَرَ أَحَدَكُمُ الْمَوْتُ إِنْ تَرَكَ خَيْرًا الْوَصِيَّةُ</p>
-            <p class="wl-en2">&ldquo;When death approaches one of you, and you leave behind
+            <p class="wl-en2" data-i18n="will.when_death_approaches_one_of">&ldquo;When death approaches one of you, and you leave behind
               good, it is prescribed that you make a bequest &mdash; a duty upon those mindful
               of Allah.&rdquo;</p>
-            <p class="wl-src">Qur&rsquo;an &middot; Sūrah al-Baqarah, 2:180</p>
+            <p class="wl-src" data-i18n="will.qur_an_surah_al_baqarah">Qur&rsquo;an &middot; Sūrah al-Baqarah, 2:180</p>
           </div>
 
-          <div class="sec-h"><h2>Why it matters</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="will.why_it_matters">Why it matters</h2><span class="rule"></span></div>
           <div class="card wl-card">
-            <p>When a Muslim passes away without having made their wishes clear, their estate
+            <p data-i18n="will.when_a_muslim_passes_away">When a Muslim passes away without having made their wishes clear, their estate
                is left to be settled according to the default rules of the country they lived
                in &mdash; which may not reflect Islamic guidance on how a person&rsquo;s wealth
                should be distributed.</p>
-            <p>An Islamic will sets out, in your own words, while you are able to:</p>
+            <p data-i18n="will.an_islamic_will_sets_out">An Islamic will sets out, in your own words, while you are able to:</p>
             <ul class="wl-ul">
-              <li>Who is entitled to benefit from your estate, and in what shares</li>
-              <li>How your property and other assets should be dealt with</li>
-              <li>Who you trust to carry this out on your behalf &mdash; your executors</li>
-              <li>Any funeral wishes you would like to be followed</li>
+              <li data-i18n="will.who_is_entitled_to_benefit">Who is entitled to benefit from your estate, and in what shares</li>
+              <li data-i18n="will.how_your_property_and_other">How your property and other assets should be dealt with</li>
+              <li data-i18n="will.who_you_trust_to_carry">Who you trust to carry this out on your behalf &mdash; your executors</li>
+              <li data-i18n="will.any_funeral_wishes_you_would">Any funeral wishes you would like to be followed</li>
             </ul>
           </div>
 
-          <div class="sec-h"><h2>Distributing your estate</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="will.distributing_your_estate">Distributing your estate</h2><span class="rule"></span></div>
           <div class="card wl-card">
-            <p>Islamic inheritance follows fixed shares (Farā&rsquo;iḍ) set out in the Qur&rsquo;an
+            <p data-i18n="will.islamic_inheritance_follows_fixed_shares">Islamic inheritance follows fixed shares (Farā&rsquo;iḍ) set out in the Qur&rsquo;an
                for specific family members. A will does not override these shares, but it lets
                you address anything the fixed shares do not cover &mdash; for example, up to a
                third of your estate may be left to people or causes outside your Islamic heirs,
                such as a charitable gift.</p>
-            <p>Because these calculations depend on your own family circumstances, they are
+            <p data-i18n="will.because_these_calculations_depend_on">Because these calculations depend on your own family circumstances, they are
                best worked through individually with the imam or a solicitor experienced in
                Islamic wills &mdash; rather than estimated in general terms here.</p>
           </div>
 
-          <div class="sec-h"><h2>A gift that continues</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="will.a_gift_that_continues">A gift that continues</h2><span class="rule"></span></div>
           <div class="card wl-card">
-            <p>Some choose to include a charitable bequest in their will as a final, lasting
+            <p data-i18n="will.some_choose_to_include_a">Some choose to include a charitable bequest in their will as a final, lasting
                act of Ṣadaqah. If you would like to consider including a gift to Taiyabah
                Masjid, let the solicitor helping you write your will know, or ask the office
                about adding a codicil if you already have a will in place.</p>
           </div>
 
           <div class="wl-advisory">
-            <div class="wl-adv-h">General information, not advice</div>
-            <p>This page is a starting point, not legal, financial or religious advice for
+            <div class="wl-adv-h" data-i18n="will.general_information_not_advice">General information, not advice</div>
+            <p data-i18n="will.this_page_is_a_starting">This page is a starting point, not legal, financial or religious advice for
                your own circumstances. UK inheritance tax and probate rules are detailed and
                change over time &mdash; please speak to a qualified solicitor to write your
                will, and to the imam for guidance on the Islamic shares that apply to your
@@ -2079,13 +2079,13 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             </span>
             <span class="wl-call-t">
-              <span class="wl-call-k">Speak to the imam &middot; call the main office</span>
+              <span class="wl-call-k" data-i18n="will.speak_to_the_imam_call">Speak to the imam &middot; call the main office</span>
               <span class="wl-call-v tnum">01204 535 997</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot" data-i18n="will.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -2095,8 +2095,8 @@
     <div class="scrim" id="ia-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Imams&rsquo; Advice</h3>
-        <button class="sh-close" id="ia-close">Done</button>
+        <h3 style="text-align:left" data-i18n="advice.imams_advice">Imams&rsquo; Advice</h3>
+        <button class="sh-close" id="ia-close" data-i18n="advice.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -2107,15 +2107,15 @@
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/>
             </svg>
           </span>
-          <div class="ia-en">Imams&rsquo; Advice</div>
+          <div class="ia-en" data-i18n="advice.imams_advice">Imams&rsquo; Advice</div>
         </section>
 
         <div class="ab-wrap">
           <div class="card ia-card">
-            <p>Many in the community turn to the masjid for guidance on matters affecting
+            <p data-i18n="advice.many_in_the_community_turn">Many in the community turn to the masjid for guidance on matters affecting
                their day-to-day lives. Our imams are able to advise on a range of subjects,
                including marriage, bereavement, family matters, and general Islamic guidance.</p>
-            <p>If you would like to arrange a time to speak with one of the imams, please
+            <p data-i18n="advice.if_you_would_like_to">If you would like to arrange a time to speak with one of the imams, please
                contact the main office to make an appointment.</p>
           </div>
 
@@ -2124,16 +2124,16 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             </span>
             <span class="ia-call-t">
-              <span class="ia-call-k">Call the main office to book</span>
+              <span class="ia-call-k" data-i18n="advice.call_the_main_office_to">Call the main office to book</span>
               <span class="ia-call-v tnum">01204 535 997</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="ia-note">Appointments are arranged through the office, so the imam
+          <p class="ia-note" data-i18n="advice.appointments_are_arranged_through_the">Appointments are arranged through the office, so the imam
             can make time to see you properly rather than in passing.</p>
 
-          <p class="ia-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="ia-foot" data-i18n="advice.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -2143,8 +2143,8 @@
     <div class="scrim" id="bt-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Birth</h3>
-        <button class="sh-close" id="bt-close">Done</button>
+        <h3 style="text-align:left" data-i18n="birth.birth">Birth</h3>
+        <button class="sh-close" id="bt-close" data-i18n="birth.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -2158,16 +2158,16 @@
             </svg>
           </span>
           <div class="bt-ar arabic">وِلَادَة</div>
-          <div class="bt-en">Guidance for New Arrivals</div>
+          <div class="bt-en" data-i18n="birth.guidance_for_new_arrivals">Guidance for New Arrivals</div>
         </section>
 
         <div class="ab-wrap">
           <div class="card bt-card">
-            <p>Congratulations on the arrival of your child. This section brings together
+            <p data-i18n="birth.congratulations_on_the_arrival_of">Congratulations on the arrival of your child. This section brings together
                guidance and services relevant to a newborn.</p>
           </div>
 
-          <div class="sec-h"><h2>Circumcision (Khitān)</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="birth.circumcision_khitan">Circumcision (Khitān)</h2><span class="rule"></span></div>
 
           <div class="bt-notprovided">
             <span class="bt-np-dot" aria-hidden="true"></span>
@@ -2181,28 +2181,28 @@
           </div>
 
           <div class="card bt-list">
-            <div class="bt-row"><span class="bt-k">Age range</span><span class="bt-v">2 weeks &ndash; 18 months</span></div>
-            <div class="bt-row"><span class="bt-k">2 weeks &ndash; 6 months</span><span class="bt-v tnum">£180</span></div>
-            <div class="bt-row"><span class="bt-k">6 &ndash; 12 months</span><span class="bt-v tnum">£250</span></div>
-            <div class="bt-row"><span class="bt-k">12 &ndash; 18 months</span><span class="bt-v tnum">£300</span></div>
+            <div class="bt-row"><span class="bt-k" data-i18n="birth.age_range">Age range</span><span class="bt-v" data-i18n="birth.2_weeks_18_months">2 weeks &ndash; 18 months</span></div>
+            <div class="bt-row"><span class="bt-k" data-i18n="birth.2_weeks_6_months">2 weeks &ndash; 6 months</span><span class="bt-v tnum">£180</span></div>
+            <div class="bt-row"><span class="bt-k" data-i18n="birth.6_12_months">6 &ndash; 12 months</span><span class="bt-v tnum">£250</span></div>
+            <div class="bt-row"><span class="bt-k" data-i18n="birth.12_18_months">12 &ndash; 18 months</span><span class="bt-v tnum">£300</span></div>
           </div>
-          <p class="bt-note">BCoM does not circumcise babies over 18 months old.</p>
+          <p class="bt-note" data-i18n="birth.bcom_does_not_circumcise_babies">BCoM does not circumcise babies over 18 months old.</p>
 
           <a class="bt-call" href="tel:01204363680">
             <span class="bt-call-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             </span>
             <span class="bt-call-t">
-              <span class="bt-call-k">Call BCoM to book &middot; option 4</span>
+              <span class="bt-call-k" data-i18n="birth.call_bcom_to_book_option">Call BCoM to book &middot; option 4</span>
               <span class="bt-call-v tnum">01204 363 680</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
-          <p class="bt-note">Office hours 9am&ndash;3pm &middot; admin@thebcom.org &middot;
+          <p class="bt-note" data-i18n="birth.office_hours_9am_3pm_admin">Office hours 9am&ndash;3pm &middot; admin@thebcom.org &middot;
             1 Vicarage Street, Bolton BL3 5LE. A service of Bolton Council of Mosques,
             independent of Taiyabah Masjid.</p>
 
-          <p class="bt-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="bt-foot" data-i18n="birth.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -2212,8 +2212,8 @@
     <div class="scrim" id="mg-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Marriage</h3>
-        <button class="sh-close" id="mg-close">Done</button>
+        <h3 style="text-align:left" data-i18n="marriage.marriage">Marriage</h3>
+        <button class="sh-close" id="mg-close" data-i18n="marriage.done">Done</button>
       </div>
       <div class="sh-body">
 
@@ -2226,12 +2226,12 @@
             </svg>
           </span>
           <div class="mg-ar arabic">نِكَاح</div>
-          <div class="mg-en">Nikāḥ &mdash; Islamic Marriage</div>
+          <div class="mg-en" data-i18n="marriage.nikah_islamic_marriage">Nikāḥ &mdash; Islamic Marriage</div>
         </section>
 
         <div class="ab-wrap">
           <div class="card mg-card">
-            <p>For many couples, an Islamic ceremony carries a significance that a civil
+            <p data-i18n="marriage.for_many_couples_an_islamic">For many couples, an Islamic ceremony carries a significance that a civil
                registration alone does not provide. Taiyabah Masjid is able to conduct this
                Nikāḥ on your behalf, in keeping with authentic Islamic practice &mdash; both
                parties giving their free and informed consent, and the groom presenting a
@@ -2239,15 +2239,15 @@
           </div>
 
           <div class="mg-advisory">
-            <div class="mg-adv-h">Please also register your marriage legally</div>
-            <p>A Nikāḥ performed at the masjid is not, by itself, a marriage recognised under
+            <div class="mg-adv-h" data-i18n="marriage.please_also_register_your_marriage">Please also register your marriage legally</div>
+            <p data-i18n="marriage.a_nikah_performed_at_the">A Nikāḥ performed at the masjid is not, by itself, a marriage recognised under
                UK law. We strongly encourage every couple to additionally complete a separate
                civil marriage &mdash; this protects both partners&rsquo; legal rights, including
                around property and inheritance, should the need ever arise.</p>
           </div>
 
           <div class="card mg-card">
-            <p>Requirements such as documentation, witnesses, available dates and any
+            <p data-i18n="marriage.requirements_such_as_documentation_witnesses">Requirements such as documentation, witnesses, available dates and any
                applicable fees vary and are best confirmed directly with the masjid. To
                discuss your circumstances or arrange a booking, please get in touch.</p>
           </div>
@@ -2257,16 +2257,16 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             </span>
             <span class="mg-call-t">
-              <span class="mg-call-k">Call the main office</span>
+              <span class="mg-call-k" data-i18n="marriage.call_the_main_office">Call the main office</span>
               <span class="mg-call-v tnum">01204 535 997</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="mg-note">Specific requirements &mdash; documentation, witnesses, timings and
+          <p class="mg-note" data-i18n="marriage.specific_requirements_documentation_witnesses_">Specific requirements &mdash; documentation, witnesses, timings and
             any applicable fees &mdash; are best discussed directly with the office when you call.</p>
 
-          <p class="mg-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="mg-foot" data-i18n="marriage.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
@@ -2286,7 +2286,7 @@
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><span class="dr-t" data-i18n="menu.notifications">Notifications</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="sysprefs">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z"/></svg></span><span class="dr-t">System Preferences</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z"/></svg></span><span class="dr-t" data-i18n="marriage.system_preferences">System Preferences</span><span class="dr-ch">&rsaquo;</span>
         </button>
 
         <div class="dr-h" data-i18n="menu.resources">Resources</div>
@@ -2300,30 +2300,30 @@
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg></span><span class="dr-t" data-i18n="menu.listenLive">Listen live</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="vids">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M10 9.3v5.4l4.5-2.7L10 9.3Z"/></svg></span><span class="dr-t">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M10 9.3v5.4l4.5-2.7L10 9.3Z"/></svg></span><span class="dr-t" data-i18n="marriage.videos_bayaans">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Hajj / Umrah</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Ramadan 2027</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.ramadan_2027">Ramadan 2027</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row" data-act="zakat">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8 7.5h8"/><circle cx="8.4" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="8.4" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r=".9" fill="currentColor" stroke="none"/></svg></span><span class="dr-t" data-i18n="menu.zakat">Zakat calculator</span><span class="dr-ch">&rsaquo;</span>
         </button>
 
-        <div class="dr-h">Madrasah</div>
+        <div class="dr-h" data-i18n="marriage.madrasah">Madrasah</div>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Application form</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.application_form">Application form</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Parents portal</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.parents_portal">Parents portal</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Teachers portal</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.teachers_portal">Teachers portal</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
 
-        <div class="dr-h">The masjid</div>
+        <div class="dr-h" data-i18n="marriage.the_masjid">The masjid</div>
         <button class="dr-row" data-act="about">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="8.1" r="1" fill="currentColor" stroke="none"/></svg></span><span class="dr-t" data-i18n="menu.about">About us</span><span class="dr-ch">&rsaquo;</span>
         </button>
@@ -2331,21 +2331,21 @@
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="dr-t" data-i18n="menu.contact">Contact us</span><span class="dr-ch">&rsaquo;</span>
         </button>
 
-        <div class="dr-h">Our services</div>
+        <div class="dr-h" data-i18n="marriage.our_services">Our services</div>
         <button class="dr-row" data-act="hallhire">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></svg></span><span class="dr-t">Hall / Room Hire</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></svg></span><span class="dr-t" data-i18n="marriage.hall_room_hire">Hall / Room Hire</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="marriagedeath">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7-4.4-7-9.6a4.4 4.4 0 0 1 7-3.6 4.4 4.4 0 0 1 7 3.6c0 5.2-7 9.6-7 9.6Z"/></svg></span><span class="dr-t">Birth, Marriage &amp; Death</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7-4.4-7-9.6a4.4 4.4 0 0 1 7-3.6 4.4 4.4 0 0 1 7 3.6c0 5.2-7 9.6-7 9.6Z"/></svg></span><span class="dr-t" data-i18n="marriage.birth_marriage_death">Birth, Marriage &amp; Death</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="advice">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span><span class="dr-t">Imams&rsquo; Advice</span><span class="dr-ch">&rsaquo;</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span><span class="dr-t" data-i18n="marriage.imams_advice">Imams&rsquo; Advice</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Education</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.education">Education</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t">Tours &amp; Visits</span><span class="soon-tag">Coming soon</span>
+          <span class="dr-t" data-i18n="marriage.tours_visits">Tours &amp; Visits</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
 
         <div class="dr-social">
@@ -4373,16 +4373,52 @@ function getPack(code){
    data-i18n; the FIRST time we translate one we stash its original English
    in data-i18n-en, so switching back to English is always exact rather
    than needing an English pack of its own. */
+/* Digits are part of the language. A time shown as 05:30 to an Urdu reader is
+   half-translated; these communities read ۰۵:۳۰. Applied to every translated
+   string and to anything the app builds at runtime. */
+const DIGITS = {
+  ur: "\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9",
+  ar: "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669",
+  gu: "\u0AE6\u0AE7\u0AE8\u0AE9\u0AEA\u0AEB\u0AEC\u0AED\u0AEE\u0AEF",
+};
+function num(value){
+  const set = DIGITS[activeLang];
+  if(!set) return String(value);
+  return String(value).replace(/[0-9]/g, d => set[+d]);
+}
+
+/* Look up a string the app builds itself, rather than one sitting in the
+   markup. The English is passed in as the fallback so a missing key shows
+   real words instead of a key name. */
+function t(key, english){
+  const val = activeStrings && activeStrings[key];
+  return num(val || english);
+}
+
+/* Re-apply the current language. Anything rendered after a language change —
+   a sūrah, a duʿā list, the prayer rows — is markup that applyLang has never
+   seen, so every render calls this when it finishes. */
+function retranslate(){ applyLang(activeLang); }
+
 function applyLang(code){
   const pack = getPack(code);
   activeLang = code;
   activeStrings = pack ? pack.strings : null;
 
   document.querySelectorAll('[data-i18n]').forEach(el=>{
+    /* Stash the original English the first time, so switching back is exact
+       and repeated switching never compounds a translation on a translation. */
     if(!el.dataset.i18nEn) el.dataset.i18nEn = el.textContent;
     const key = el.dataset.i18n;
     const val = activeStrings && activeStrings[key];
-    el.textContent = val || el.dataset.i18nEn;   // fall back to English
+    el.textContent = num(val || el.dataset.i18nEn);
+  });
+
+  /* Elements holding a number the app wrote — times, counts, distances. They
+     keep their English original too, so digits convert both ways. */
+  document.querySelectorAll('[data-i18n-num]').forEach(el=>{
+    if(!el.dataset.i18nNumEn) el.dataset.i18nNumEn = el.textContent;
+    el.textContent = num(el.dataset.i18nNumEn);
   });
 
   const dir = pack ? pack.dir : "ltr";
@@ -4514,6 +4550,7 @@ function renderSurahList(filter){
 
   document.querySelectorAll('#qd-list .qd-srow').forEach(b =>
     b.addEventListener('click', () => openSurah(Number(b.dataset.n))));
+  retranslate();
 }
 
 async function openSurah(n){
@@ -4643,6 +4680,7 @@ function renderAthkar(){
         ${it.note ? `<p class="ak-extra">${esc(it.note)}</p>` : ""}
         <p class="wl-src">${esc(it.times)} &middot; ${esc(it.src || it.source)}</p>
       </div>`).join('');
+  retranslate();
 }
 
 async function openAthkar(){
@@ -4701,6 +4739,7 @@ function renderDuaCategories(filter){
     </button>`).join('');
   document.querySelectorAll('#du-cats .qd-srow').forEach(b =>
     b.addEventListener('click', () => openDuaCategory(b.dataset.cat)));
+  retranslate();
 }
 
 function openDuaCategory(id){
@@ -4712,6 +4751,7 @@ function openDuaCategory(id){
   document.getElementById('du-title').textContent = c.title;
   document.querySelector('#duas .sh-body').scrollTop = 0;
   document.getElementById('du-items').innerHTML = c.items.map(duaCard).join('');
+  retranslate();
 }
 
 function showDuaList(){
