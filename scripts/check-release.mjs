@@ -107,6 +107,18 @@ if (existsSync("quran/surahs/index.json")) {
   notes.push("Qur'an data not present — run node scripts/fetch-quran.mjs");
 }
 
+/* ---- 3d. the 40 Rabbanā still match the Mus-haf ---- */
+if (existsSync("quran/rabbanas.js") && existsSync("quran/surahs/1.json")) {
+  try {
+    execSync("node scripts/verify-rabbanas.mjs", { stdio: "pipe" });
+    ok("40 Rabbanā verified against the Qur'an text");
+  } catch (e) {
+    const out = String(e.stdout || "") + String(e.stderr || "");
+    fail("a Rabbanā duʿā no longer matches the āyah it cites — run node scripts/verify-rabbanas.mjs"
+      + (out.match(/#\d+[^\n]*/) ? ` (${out.match(/#\d+[^\n]*/)[0].trim()})` : ""));
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");

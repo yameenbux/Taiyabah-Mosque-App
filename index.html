@@ -459,16 +459,31 @@
   @keyframes sp-spin-anim{to{transform:rotate(360deg)}}
 
   /* ---- common duas tile grid ---- */
-  .du-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-  .du-tile{position:relative;aspect-ratio:.92;border-radius:13px;border:none;cursor:pointer;
-    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
-    padding:8px 4px;color:#F3EFE3;text-align:center;font:inherit;overflow:hidden;
-    background:linear-gradient(165deg,var(--brand-700),var(--brand-900))}
-  .du-tile:nth-child(3n+2){background:linear-gradient(165deg,var(--brand-800),var(--brand-900))}
-  .du-tile:nth-child(3n+3){background:linear-gradient(165deg,var(--brand-600),var(--brand-800))}
-  .du-tile svg{width:19px;height:19px;color:var(--gold-bright)}
-  .du-tile span{font-size:10.5px;font-weight:700;line-height:1.2}
-  .du-tile:active{transform:scale(.96)}
+  /* ---- 40 rabbanā list ---- */
+  .rb-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .rb-item:last-child{border-bottom:0}
+  .rb-n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;
+    display:grid;place-items:center;font-size:11.5px;font-weight:700;margin-top:4px}
+  .rb-body{flex:1;min-width:0}
+  .rb-ar{font-size:20px;line-height:2.1;direction:rtl;text-align:right;color:var(--ink)}
+  .rb-ref{font-size:11.5px;color:var(--muted);margin-top:6px}
+  /* ---- athkār tabs, duʿā cards ---- */
+  .ak-tabs{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;
+    -webkit-overflow-scrolling:touch}
+  .ak-tab{flex:0 0 auto;font:inherit;font-size:12.5px;font-weight:600;padding:8px 13px;
+    border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);
+    cursor:pointer;white-space:nowrap}
+  .ak-tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .ak-intro{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0 0 14px}
+  .ak-extra{font-size:12px;color:var(--muted);line-height:1.55;margin-top:7px;
+    padding-left:10px;border-left:2px solid var(--line)}
+  .du-label{font-size:12px;font-weight:700;color:var(--brand-600);letter-spacing:.02em;
+    text-transform:uppercase;margin:0 0 8px}
+  .du-tr{font-size:12.5px;color:var(--brand-800);line-height:1.6;margin:9px 0 0;font-style:italic}
+  .du-chev{font-size:22px;color:var(--muted);line-height:1}
+  #du-search{width:100%;box-sizing:border-box;font:inherit;font-size:14px;padding:11px 13px;
+    border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);
+    margin-bottom:10px}
 
   /* ---- qur'an preview ---- */
   .qd-ayah{padding:16px;margin-top:10px;border-radius:14px;background:var(--card);
@@ -1892,194 +1907,93 @@
     </div>
   </div>
 
-  <div class="sheet" id="athkar" data-open="0" role="dialog" aria-modal="true" aria-label="Daily Athkar">
-    <div class="scrim" id="ak-scrim"></div>
+  <!-- Restored: the button and the code for this page were both present, but
+       the dialog itself had gone missing from the markup, so tapping "40
+       Rabbanā" threw on a null element and did nothing. -->
+  <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana Duas">
+    <div class="scrim" id="rb-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Daily Athkar</h3>
-        <button class="sh-close" id="ak-close">Done</button>
+        <h3 style="text-align:left">40 Rabbanā</h3>
+        <button class="sh-close" id="rb-close">Done</button>
       </div>
       <div class="sh-body">
-
         <section class="wl-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="wl-ar">أَذْكَار</div>
-          <div class="wl-en">Morning &amp; Evening Remembrance</div>
+          <div class="wl-ar">رَبَّنَا</div>
+          <div class="wl-en" id="rb-count">&hellip;</div>
         </section>
-
         <div class="ab-wrap">
-
-          <div class="wl-quote">
-            <p class="wl-ar2 arabic">قُلْ هُوَ اللَّهُ أَحَدٌ &middot; اللَّهُ الصَّمَدُ &middot; لَمْ يَلِدْ وَلَمْ يُولَدْ &middot; وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</p>
-            <p class="wl-en2">&ldquo;Say: He is Allah, the One. Allah, the Self-Sufficient. He begets not,
-              nor is He begotten. And there is none comparable to Him.&rdquo;</p>
-            <p class="wl-src">Sūrah al-Ikhlāṣ &middot; 112</p>
-          </div>
-
-          <div class="wl-quote">
-            <p class="wl-ar2 arabic">قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ &middot; مِن شَرِّ مَا خَلَقَ &middot; وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ &middot; وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ &middot; وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ</p>
-            <p class="wl-en2">&ldquo;Say: I seek refuge in the Lord of daybreak, from the evil of what
-              He created, from the evil of darkness as it settles, from the evil of those who
-              blow on knots, and from the evil of an envier when he envies.&rdquo;</p>
-            <p class="wl-src">Sūrah al-Falaq &middot; 113</p>
-          </div>
-
-          <div class="wl-quote">
-            <p class="wl-ar2 arabic">قُلْ أَعُوذُ بِرَبِّ النَّاسِ &middot; مَلِكِ النَّاسِ &middot; إِلَٰهِ النَّاسِ &middot; مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ &middot; الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ &middot; مِنَ الْجِنَّةِ وَالنَّاسِ</p>
-            <p class="wl-en2">&ldquo;Say: I seek refuge in the Lord of mankind, the King of mankind, the
-              God of mankind, from the evil of the retreating whisperer who whispers in the
-              breasts of mankind, from among the jinn and mankind.&rdquo;</p>
-            <p class="wl-src">Sūrah an-Nās &middot; 114</p>
-          </div>
-
-          <div class="wl-quote">
-            <p class="wl-ar2 arabic">اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ</p>
-            <p class="wl-en2">&ldquo;O Allah, by You we rise this morning and by You we reach evening,
-              by You we live and by You we die, and to You is the resurrection.&rdquo;
-              <span style="color:var(--muted);font-size:12px">(In the evening, say &ldquo;amsayna
-              &hellip; aṣbaḥnā&rdquo; instead.)</span></p>
-            <p class="wl-src">Sunan Abī Dāwūd &middot; Jāmiʿ al-Tirmidhī</p>
-          </div>
-
-          <div class="wl-quote">
-            <p class="wl-ar2 arabic">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</p>
-            <p class="wl-en2">&ldquo;Glory be to Allah, and praise be to Him.&rdquo;
-              <span style="color:var(--muted);font-size:12px">&mdash; recited 100 times</span></p>
-            <p class="wl-src">Ṣaḥīḥ al-Bukhārī &middot; Ṣaḥīḥ Muslim</p>
-          </div>
-
-          <div class="wl-advisory">
-            <div class="wl-adv-h">A starting set, not the full collection</div>
-            <p>These are among the most well known and widely agreed upon. A fuller set, and
-               confirmation of wording, is best reviewed with the imam before this page is
-               treated as final.</p>
-          </div>
-
+          <p class="ak-intro">The duʿās of the Qur'an that begin “Our Lord…”, in the order they appear.</p>
+          <div id="rb-list"></div>
+          <p class="qd-loaderr" id="rb-loaderr" style="display:none">
+            Couldn't load these duʿās. Check your connection and try again.</p>
           <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="duas" data-open="0" role="dialog" aria-modal="true" aria-label="Common Duas">
+  <div class="sheet" id="athkar" data-open="0" role="dialog" aria-modal="true" aria-label="Daily Athkar">
+    <div class="scrim" id="ak-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left">Daily Athkār</h3>
+        <button class="sh-close" id="ak-close">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="wl-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="wl-ar">أَذْكَار</div>
+          <div class="wl-en">Morning, evening and after ṣalāh</div>
+        </section>
+        <div class="ab-wrap">
+          <div class="ak-tabs" id="ak-tabs"></div>
+          <div id="ak-body"><p class="qd-empty">Loading…</p></div>
+          <div class="wl-advisory">
+            <div class="wl-adv-h">Confirm the wording with the imam</div>
+            <p id="ak-note">Wording varies between narrations and printings.</p>
+          </div>
+          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="duas" data-open="0" role="dialog" aria-modal="true" aria-label="Everyday Duas">
     <div class="scrim" id="du-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Common Duas</h3>
+        <button class="sh-back" id="du-back" hidden>&larr; All duʿās</button>
+        <h3 style="text-align:left" id="du-title">Everyday Duʿās</h3>
         <button class="sh-close" id="du-close">Done</button>
       </div>
       <div class="sh-body">
 
-        <section class="wl-hero">
-          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="wl-ar">دُعَاء</div>
-          <div class="wl-en">Everyday Supplications</div>
-        </section>
-
-        <div class="ab-wrap">
-
-          <div class="du-grid" id="du-grid">
-            <button class="du-tile" data-target="du-waking" data-label="Waking Up">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="16.5" r="4.5"/><path d="M12 3.5v2.5"/><path d="M5.5 8 7.2 9.7"/><path d="M18.5 8 16.8 9.7"/><path d="M2.5 16.5h2"/><path d="M19.5 16.5h2"/></svg>
-              <span>Waking Up</span>
-            </button>
-            <button class="du-tile" data-target="du-sleep" data-label="Before Sleep">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5a8 8 0 1 1-8.5-10 6.5 6.5 0 0 0 8.5 10Z"/></svg>
-              <span>Before Sleep</span>
-            </button>
-            <button class="du-tile" data-target="du-enter" data-label="Entering Home">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10l7-6 7 6v11"/><path d="M9 21v-7h6v7"/><path d="M13.5 14.5v1.5"/></svg>
-              <span>Entering Home</span>
-            </button>
-            <button class="du-tile" data-target="du-leave" data-label="Leaving Home">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-              <span>Leaving Home</span>
-            </button>
-            <button class="du-tile" data-target="du-eating" data-label="Eating">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v6a2 2 0 0 0 4 0V3"/><path d="M9 9v12"/><path d="M17 3c-1.7 0-3 2-3 5s1.3 5 3 5v9"/></svg>
-              <span>Eating</span>
-            </button>
-            <button class="du-tile" data-target="du-salah" data-label="After Ṣalāh">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.5h16"/><path d="M12 4v5.5"/></svg>
-              <span>After Ṣalāh</span>
-            </button>
+        <div id="du-list-view">
+          <section class="wl-hero">
+            <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+            <div class="wl-ar">دُعَاء</div>
+            <div class="wl-en" id="du-sub">Duʿās for the day, with transliteration</div>
+          </section>
+          <div class="ab-wrap">
+            <input id="du-search" type="search" placeholder="Search — travel, sleep, forgiveness…"
+                   autocapitalize="off" autocorrect="off" aria-label="Search duʿās">
+            <div id="du-cats"><p class="qd-empty">Loading…</p></div>
+            <div class="wl-advisory">
+              <div class="wl-adv-h">Confirm the wording with the imam</div>
+              <p id="du-note">Wording varies between narrations and printings.</p>
+            </div>
+            <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
           </div>
-
-          <!-- Content source only — never shown directly. Tapping a tile
-               copies the matching block's markup into the popup below, so
-               the dua appears focused in place rather than the page
-               scrolling to reveal it further down. -->
-          <div hidden id="du-source">
-            <div class="wl-quote" id="du-waking">
-              <p class="wl-ar2 arabic">الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ</p>
-              <p class="wl-en2">&ldquo;Praise be to Allah who gave us life after having caused us to
-                die, and unto Him is the resurrection.&rdquo;</p>
-              <p class="wl-src">Upon waking &middot; Ṣaḥīḥ al-Bukhārī</p>
-            </div>
-
-            <div class="wl-quote" id="du-sleep">
-              <p class="wl-ar2 arabic">بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا</p>
-              <p class="wl-en2">&ldquo;In Your name, O Allah, I die and I live.&rdquo;</p>
-              <p class="wl-src">Before sleeping &middot; Ṣaḥīḥ al-Bukhārī</p>
-            </div>
-
-            <div class="wl-quote" id="du-enter">
-              <p class="wl-ar2 arabic">بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا وَعَلَى رَبِّنَا تَوَكَّلْنَا</p>
-              <p class="wl-en2">&ldquo;In the name of Allah we enter, in the name of Allah we leave,
-                and upon our Lord we place our trust.&rdquo;</p>
-              <p class="wl-src">Entering the home &middot; Sunan Abī Dāwūd</p>
-            </div>
-
-            <div class="wl-quote" id="du-leave">
-              <p class="wl-ar2 arabic">بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ</p>
-              <p class="wl-en2">&ldquo;In the name of Allah, I place my trust in Allah; there is no
-                power and no strength except with Allah.&rdquo;</p>
-              <p class="wl-src">Leaving the home &middot; Sunan Abī Dāwūd &middot; Jāmiʿ al-Tirmidhī</p>
-            </div>
-
-            <div id="du-eating">
-              <div class="wl-quote">
-                <p class="wl-ar2 arabic">بِسْمِ اللَّهِ</p>
-                <p class="wl-en2">&ldquo;In the name of Allah.&rdquo;</p>
-                <p class="wl-src">Before eating &middot; Sunan Abī Dāwūd</p>
-              </div>
-              <div class="wl-quote">
-                <p class="wl-ar2 arabic">الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ</p>
-                <p class="wl-en2">&ldquo;Praise be to Allah who fed me this and provided it for me,
-                  with no power or ability of my own.&rdquo;</p>
-                <p class="wl-src">After eating &middot; Sunan Abī Dāwūd &middot; Jāmiʿ al-Tirmidhī</p>
-              </div>
-            </div>
-
-            <div class="wl-quote" id="du-salah">
-              <p class="wl-ar2 arabic">سُبْحَانَ اللَّهِ &middot; ٣٣ &nbsp;&nbsp;الْحَمْدُ لِلَّهِ &middot; ٣٣ &nbsp;&nbsp;اللَّهُ أَكْبَرُ &middot; ٣٤</p>
-              <p class="wl-en2">&ldquo;Glory be to Allah&rdquo; (33 times), &ldquo;Praise be to
-                Allah&rdquo; (33 times), &ldquo;Allah is the Greatest&rdquo; (34 times).</p>
-              <p class="wl-src">After Ṣalāh &middot; Ṣaḥīḥ Muslim</p>
-            </div>
-          </div>
-
-          <div class="osdlg" id="du-popup" hidden role="dialog" aria-modal="true">
-            <div class="osdlg-scrim" id="du-popup-scrim"></div>
-            <div class="osdlg-box" style="text-align:left">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-                <h3 id="du-popup-title" style="font-size:15px"></h3>
-                <button id="du-popup-close" aria-label="Close"
-                  style="background:none;border:none;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:4px">&times;</button>
-              </div>
-              <div id="du-popup-body"></div>
-            </div>
-          </div>
-
-          <div class="wl-advisory">
-            <div class="wl-adv-h">A starting set, not the full collection</div>
-            <p>These are among the most well known and widely agreed upon everyday duas. A
-               fuller set, and confirmation of wording, is best reviewed with the imam before
-               this page is treated as final.</p>
-          </div>
-
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
+
+        <div id="du-read-view" hidden>
+          <div class="ab-wrap" style="padding-top:18px">
+            <div id="du-items"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -4682,26 +4596,144 @@ function initQuranDemo(){
   });
 }
 
-/* ---------------- daily athkar page ---------------- */
-function openAthkar(){
+/* ---------------- athkār & duʿās ----------------
+   Both are data files fetched the first time their page opens, the same way
+   the Qur'an is: nothing here is in the main bundle.
+
+   The athkār file is generated by scripts/build-athkar.mjs, which lifts the
+   Qur'anic passages straight out of the verified sūrah files — so Āyat
+   al-Kursī in the athkār is the same machine-checked text as in the reader,
+   not a second copy someone has to keep in step. */
+function loadOnce(src, flagName){
+  if(window[flagName]) return Promise.resolve(true);
+  return new Promise(res => {
+    const el = document.createElement('script');
+    el.src = src;
+    el.onload  = () => { window[flagName] = true; res(true); };
+    el.onerror = () => res(false);
+    document.head.appendChild(el);
+  });
+}
+
+/* esc() is already defined above and does exactly this — reuse it rather than
+   keep a second escaper that could drift from the first. */
+
+/* ---- athkār ---- */
+let akSection = 0;
+
+function renderAthkar(){
+  const d = window.ATHKAR;
+  if(!d){ document.getElementById('ak-body').innerHTML =
+    `<p class="qd-empty">Couldn't load the athkār. Check your connection and try again.</p>`; return; }
+
+  document.getElementById('ak-note').textContent = d.reviewNote;
+  document.getElementById('ak-tabs').innerHTML = d.sections.map((sec,i) =>
+    `<button class="ak-tab${i===akSection?' on':''}" data-i="${i}">${esc(sec.title)}</button>`).join('');
+  document.querySelectorAll('#ak-tabs .ak-tab').forEach(b =>
+    b.addEventListener('click', () => { akSection = Number(b.dataset.i); renderAthkar();
+      document.querySelector('#athkar .sh-body').scrollTop = 0; }));
+
+  const sec = d.sections[akSection];
+  document.getElementById('ak-body').innerHTML =
+    `<p class="ak-intro">${esc(sec.intro)}</p>` +
+    sec.items.map(it => `
+      <div class="wl-quote">
+        <p class="wl-ar2 quranic">${esc(it.ar)}</p>
+        <p class="wl-en2">&ldquo;${esc(it.en)}&rdquo;</p>
+        ${it.note ? `<p class="ak-extra">${esc(it.note)}</p>` : ""}
+        <p class="wl-src">${esc(it.times)} &middot; ${esc(it.src || it.source)}</p>
+      </div>`).join('');
+}
+
+async function openAthkar(){
   document.getElementById('athkar').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#athkar .sh-body').scrollTop=0;
+  await loadOnce('quran/athkar.js', 'ATHKAR_LOADED');
+  renderAthkar();
 }
 function closeAthkar(){
   document.getElementById('athkar').dataset.open="0";
   document.body.style.overflow="";
 }
-/* ---------------- common duas page ---------------- */
-function openDuas(){
+
+/* ---- duʿās ---- */
+function duaCard(it){
+  return `
+    <div class="wl-quote">
+      <p class="du-label">${esc(it.label)}</p>
+      <p class="wl-ar2 quranic">${esc(it.ar)}</p>
+      <p class="du-tr">${esc(it.tr)}</p>
+      <p class="wl-en2">&ldquo;${esc(it.en)}&rdquo;</p>
+      ${it.note ? `<p class="ak-extra">${esc(it.note)}</p>` : ""}
+      <p class="wl-src">${esc(it.src)}</p>
+    </div>`;
+}
+
+function renderDuaCategories(filter){
+  const d = window.DUAS;
+  if(!d){ document.getElementById('du-cats').innerHTML =
+    `<p class="qd-empty">Couldn't load the duʿās. Check your connection and try again.</p>`; return; }
+  document.getElementById('du-note').textContent = d.reviewNote;
+
+  const q = (filter || "").trim().toLowerCase();
+  if(q){
+    /* Searching cuts across categories — someone looking for "travel" should
+       not have to guess which heading it lives under. */
+    const hits = [];
+    for(const c of d.categories)
+      for(const it of c.items)
+        if((it.label+" "+it.en+" "+it.tr+" "+c.title).toLowerCase().includes(q)) hits.push(it);
+    document.getElementById('du-cats').innerHTML = hits.length
+      ? `<p class="ak-intro">${hits.length} duʿā${hits.length===1?"":"s"} matching “${esc(filter)}”</p>`
+        + hits.map(duaCard).join('')
+      : `<p class="qd-empty">Nothing matches that.</p>`;
+    return;
+  }
+
+  document.getElementById('du-cats').innerHTML = d.categories.map(c => `
+    <button class="qd-srow" data-cat="${esc(c.id)}">
+      <span class="qd-srow-t">
+        <span class="qd-srow-en">${esc(c.title)}</span>
+        <span class="qd-srow-meta">${c.items.length} duʿā${c.items.length===1?"":"s"}</span>
+      </span>
+      <span class="du-chev">&rsaquo;</span>
+    </button>`).join('');
+  document.querySelectorAll('#du-cats .qd-srow').forEach(b =>
+    b.addEventListener('click', () => openDuaCategory(b.dataset.cat)));
+}
+
+function openDuaCategory(id){
+  const c = window.DUAS.categories.find(x => x.id === id);
+  if(!c) return;
+  document.getElementById('du-list-view').hidden = true;
+  document.getElementById('du-read-view').hidden = false;
+  document.getElementById('du-back').hidden = false;
+  document.getElementById('du-title').textContent = c.title;
+  document.querySelector('#duas .sh-body').scrollTop = 0;
+  document.getElementById('du-items').innerHTML = c.items.map(duaCard).join('');
+}
+
+function showDuaList(){
+  document.getElementById('du-read-view').hidden = true;
+  document.getElementById('du-list-view').hidden = false;
+  document.getElementById('du-back').hidden = true;
+  document.getElementById('du-title').textContent = "Everyday Duʿās";
+  document.querySelector('#duas .sh-body').scrollTop = 0;
+}
+
+async function openDuas(){
   document.getElementById('duas').dataset.open="1";
   document.body.style.overflow="hidden";
-  document.querySelector('#duas .sh-body').scrollTop=0;
+  showDuaList();
+  await loadOnce('quran/duas.js', 'DUAS_LOADED');
+  renderDuaCategories(document.getElementById('du-search').value);
 }
 function closeDuas(){
   document.getElementById('duas').dataset.open="0";
   document.body.style.overflow="";
 }
+
 function initRecite(){
   document.getElementById('ak-close').addEventListener('click',closeAthkar);
   document.getElementById('ak-scrim').addEventListener('click',closeAthkar);
@@ -4709,32 +4741,19 @@ function initRecite(){
   document.getElementById('du-scrim').addEventListener('click',closeDuas);
   document.getElementById('rc-athkar').addEventListener('click',openAthkar);
   document.getElementById('rc-duas').addEventListener('click',openDuas);
-
-  // Tiles show their dua in a small focused popup — nothing scrolls, and
-  // there's no separate full page per tile. The wl-quote markup already
-  // built for each dua is the single source of truth; the popup just
-  // borrows it, so there's never two copies of the same text to keep in
-  // sync.
-  const popup = document.getElementById('du-popup');
-  const showDuaPopup = (targetId, label) => {
-    const source = document.getElementById(targetId);
-    if(!source) return;
-    document.getElementById('du-popup-title').textContent = label;
-    document.getElementById('du-popup-body').innerHTML = source.innerHTML;
-    popup.hidden = false;
-  };
-  const closeDuaPopup = () => { popup.hidden = true; };
-
-  document.querySelectorAll('.du-tile').forEach(t=>{
-    t.addEventListener('click',()=> showDuaPopup(t.dataset.target, t.dataset.label));
+  document.getElementById('du-back').addEventListener('click',showDuaList);
+  document.getElementById('du-search').addEventListener('input', e => {
+    if(window.DUAS) renderDuaCategories(e.target.value);
   });
-  document.getElementById('du-popup-close').addEventListener('click',closeDuaPopup);
-  document.getElementById('du-popup-scrim').addEventListener('click',closeDuaPopup);
 
   document.addEventListener('keydown',e=>{
-    if(e.key==="Escape" && !popup.hidden) closeDuaPopup();
-    if(e.key==="Escape" && document.getElementById('athkar').dataset.open==="1") closeAthkar();
-    if(e.key==="Escape" && document.getElementById('duas').dataset.open==="1") closeDuas();
+    if(e.key!=="Escape") return;
+    if(document.getElementById('athkar').dataset.open==="1"){ closeAthkar(); return; }
+    if(document.getElementById('duas').dataset.open==="1"){
+      // step back to the categories before closing outright
+      if(!document.getElementById('du-read-view').hidden) showDuaList();
+      else closeDuas();
+    }
   });
 }
 

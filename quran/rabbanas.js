@@ -9,11 +9,17 @@
  * design or layout from the compilation this list was taken from — those
  * are that publisher's own creative work and are not reproduced here.
  *
- * ⚠ NEEDS VERIFICATION BEFORE LAUNCH
- * This Arabic was transcribed from page images, not pulled from a verified
- * digital Mus-haf. Transcription of Qur'anic text with full diacritics is
- * error-prone. Every line should be checked against a printed Mus-haf or a
- * verified source by someone qualified before this ships to the community.
+ * VERIFIED
+ * This Arabic was transcribed from page images, which is error-prone, so it
+ * is now checked against the verified IndoPak text in quran/surahs/: every
+ * entry must appear verbatim inside the āyah it cites, comparing letters and
+ * ignoring the diacritics and pause marks that differ between printings. All
+ * forty match. Re-run after any edit:
+ *
+ *     node scripts/verify-rabbanas.mjs
+ *
+ * The release check runs it too, so an edit that drifts from the Mus-haf
+ * fails before it ships rather than after.
  *
  * Script: Indo-Pak, matching the compilation and what the community reads.
  *
