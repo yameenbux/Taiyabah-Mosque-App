@@ -2789,7 +2789,24 @@ const JAMAAT_ORDER = ["fajr","zuhr","asr","maghrib","isha"];
 /* ---------------- helpers ---------------- */
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function hm12(t){let [h,m]=t.split(":").map(Number);const ap=h<12?"am":"pm";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
-function atToday(base, t){const [h,m]=t.split(":").map(Number);const d=new Date(base);d.setHours(h,m,0,0);return d;}
+/* The true moment at which London's clock reads this date and time.
+   Not "the same wall-clock time on this phone": on the two days a year the
+   British clocks change, an hour of the day exists twice or not at all, and a
+   phone in a zone without that change would count down through it by an hour
+   too many or too few. The offset is read from the zone itself and settled by
+   a second pass, since the first guess can land on the wrong side of the
+   change. */
+function londonOffsetMs(instant){
+  return (londonNowMs(instant) - instant.getTimezoneOffset() * 60000) - instant.getTime();
+}
+function atToday(base, t){
+  const [h, m] = t.split(":").map(Number);
+  // base carries London's Y/M/D in its ordinary getters — see nowLondon()
+  const wall = Date.UTC(base.getFullYear(), base.getMonth(), base.getDate(), h, m, 0, 0);
+  let ms = wall;
+  for (let i = 0; i < 2; i++) ms = wall - londonOffsetMs(new Date(ms));
+  return new Date(ms);
+}
 function dayRec(d){return DATA && DATA.days ? DATA.days[ymd(d)] || null : null;}
 
 const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -2902,17 +2919,45 @@ let VIEW = null;                       // Date currently being viewed
 const FULL_DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const FULL_MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-function today0(){const d=new Date();d.setHours(0,0,0,0);return d;}
+/* ---------------- the clock is Bolton's, not the phone's ----------------
+   Every time in the timetable is London wall-clock. Read against a phone set
+   to another timezone, the app picked the wrong day and counted down by the
+   offset — a device in Dubai showed Fajr "in 15 min" when it was three hours
+   away, and one in New York showed the previous day's timetable altogether.
+
+   nowLondon() returns an instant whose ordinary local getters read as London's
+   wall clock, so every calculation downstream — the day key, the next jamāʿah,
+   the countdown — works unchanged. On a phone already set to London the shift
+   is exactly zero, so nothing changes for almost everyone. */
+function londonNowMs(real){
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London", hour12: false,
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).formatToParts(real);
+  const g = t => Number(parts.find(x => x.type === t).value);
+  // hour can come back as 24 at midnight in some engines
+  const londonAsUTC = Date.UTC(g("year"), g("month") - 1, g("day"),
+                               g("hour") % 24, g("minute"), g("second"));
+  return londonAsUTC + real.getTimezoneOffset() * 60000;
+}
+function nowLondon(){
+  try{ return new Date(londonNowMs(new Date())); }
+  catch(e){ return new Date(); }   // no Intl timezone data: fall back rather than break
+}
+
+function today0(){const d=nowLondon();d.setHours(0,0,0,0);return d;}
 function sameDay(a,b){return ymd(a)===ymd(b);}
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);x.setHours(0,0,0,0);return x;}
 
 /* next Jumuʿah: today if it's Friday and 2nd Jumuʿah hasn't passed, else the next Friday */
 function nextJummah(){
-  const now=new Date();
+  const now=nowLondon();          // London's date decides which Friday
+  const realNow=new Date();       // the instant decides whether it has passed
   if(now.getDay()===5){
     const rec=dayRec(now);
     const last=rec && rec.jummah ? (rec.jummah.second||rec.jummah.first) : null;
-    if(last && atToday(now,last) > now) return today0();
+    if(last && atToday(now,last) > realNow) return today0();
   }
   let d=addDays(today0(),1);
   while(d.getDay()!==5) d=addDays(d,1);
@@ -3207,7 +3252,7 @@ function minusMins(t, n){
 }
 
 function reminderCtx(){
-  const rec=STATE.rec, d=VIEW, now=new Date();
+  const rec=STATE.rec, d=VIEW, now=new Date();   // instants, not wall clock
   const live=sameDay(d, today0());
   const hm=(rec.hijri||"").match(/^(\d+)\s+(.+?)\s+\d+/);
   const c={ dow:d.getDay(), live,
@@ -3422,7 +3467,12 @@ function endedState(){
 }
 
 function tick(){
-  const now=new Date();
+  /* Two clocks, deliberately. `now` carries London's wall-clock date, which
+     decides which day's timetable is showing. `realNow` is the actual moment,
+     which decides how long is left — and they are not interchangeable on a
+     phone in another timezone, or during the hour the clocks change. */
+  const now=nowLondon();
+  const realNow=new Date();
   if(!VIEW || !sameDay(VIEW, today0())) return;   // live countdown is for today only
 
   // midnight rollover: move the view onto the new day
@@ -3434,7 +3484,7 @@ function tick(){
   }
 
   const rec=STATE.rec, base=STATE.base;
-  const nx=computeNext(rec, base, now);
+  const nx=computeNext(rec, base, realNow);
   if(!nx){ endedState(); return; }   // after final Isha of the dataset
 
   const m=meta(nx.key);
@@ -3450,7 +3500,7 @@ function tick(){
   document.getElementById('bigtime').textContent = hm12(jt);
 
   // countdown is secondary — minutes precision is enough at a glance
-  let diff=Math.max(0, Math.floor((nx.at-now)/1000));
+  let diff=Math.max(0, Math.floor((nx.at-realNow)/1000));
   const hh=Math.floor(diff/3600), mn=Math.floor((diff%3600)/60), s=diff%60;
   let cd;
   if(hh>0)      cd=`in ${hh}h ${String(mn).padStart(2,'0')}m`;
@@ -3466,14 +3516,14 @@ function tick(){
   let pct=0;
   if(beginsAt){
     const span=nx.at-beginsAt;
-    pct = span>0 ? Math.min(100, Math.max(0, (now-beginsAt)/span*100)) : 0;
+    pct = span>0 ? Math.min(100, Math.max(0, (realNow-beginsAt)/span*100)) : 0;
   }
   document.getElementById('track').style.width=pct+'%';
 
   // refresh time-window reminders (morning/evening adhkār) on the minute
   if(now.getSeconds()===0) renderReminder();
 
-  markRows(rec, base, now);
+  markRows(rec, base, realNow);
 }
 
 
@@ -5552,11 +5602,48 @@ function initAlerts(){
   }
 }
 
+/* ---------------- the clock ----------------
+   setInterval(tick, 1000) has two faults for a prayer app.
+
+   It drifts. Started at .400 of a second it fires at .400 forever, so the
+   countdown changes four tenths of a second after the second it is showing
+   actually turns over — and drifts further as the timer slips. Each tick is
+   scheduled onto the next real second boundary instead, so the display turns
+   over when the second does.
+
+   And it stops. Browsers throttle timers in a background tab and suspend them
+   outright when the phone sleeps, so returning to the app showed a countdown
+   frozen at whatever it read when you left — for a prayer time, the one moment
+   it must not be stale. Coming back to the app now ticks immediately.
+
+   tick() recalculates from the clock every time rather than counting down from
+   a stored number, so a missed tick can never accumulate into a wrong time; it
+   only ever delays the redraw. */
+let clockTimer = null;
+
+function scheduleTick(){
+  clearTimeout(clockTimer);
+  const ms = 1000 - (Date.now() % 1000);   // land on the next second boundary
+  clockTimer = setTimeout(() => { tick(); scheduleTick(); }, ms + 5);
+}
+
+function startClock(){
+  tick();
+  scheduleTick();
+  /* Re-read the clock the instant the app is looked at again, rather than
+     waiting up to a second — or indefinitely, if the timer was suspended. */
+  document.addEventListener("visibilitychange", () => {
+    if(document.visibilityState === "visible"){ tick(); scheduleTick(); }
+  });
+  window.addEventListener("pageshow", () => { tick(); scheduleTick(); });
+  window.addEventListener("focus", () => tick());
+}
+
 /* ---------------- boot ---------------- */
 function boot(){
   initAlerts();
   initDiagnostics();
-  const rec=dayRec(new Date());
+  const rec=dayRec(nowLondon());
   if(!rec){ endedState(); return; }
   initNav();
   initMonth();
@@ -5586,7 +5673,7 @@ function boot(){
   VIEW=today0();
   status(null);
   render();
-  setInterval(tick, 1000);
+  startClock();
 }
 boot();
 

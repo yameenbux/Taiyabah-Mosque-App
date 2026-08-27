@@ -5,7 +5,7 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v91";
+const CACHE = "taiyabah-v92";
 const SHELL = ["./index.html", "./admin.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
 
 self.addEventListener("install", (e) => {
@@ -41,9 +41,34 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Shell: cache-first.
+  /* Content the app fetches after launch — the Qur'an, the athkār and duʿās,
+     the language packs. None of it was ever put in the cache, so it was
+     re-fetched on every open and unavailable without a signal. Serve from
+     cache when it is there, otherwise fetch and keep a copy, so a sūrah read
+     once can be read again in the masjid basement with no bars. */
+  if (url.origin === self.location.origin &&
+      /^\/(quran|lang)\//.test(url.pathname) && /\.(json|js)$/.test(url.pathname)) {
+    e.respondWith(
+      caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
+        return res;
+      }))
+    );
+    return;
+  }
+
+  /* Shell: cache-first.
+
+     The offline fallback is index.html, which is right for a page the person
+     navigated to and wrong for anything else — a failed request for a JSON
+     file was answered with a page of HTML, which then failed to parse. Only
+     navigations get the shell now; everything else is allowed to fail as a
+     failure, which the app already handles and reports. */
   e.respondWith(
-    caches.match(e.request).then((hit) => hit || fetch(e.request).catch(() => caches.match("./index.html")))
+    caches.match(e.request).then((hit) => hit || fetch(e.request).catch((err) => {
+      if (e.request.mode === "navigate") return caches.match("./index.html");
+      throw err;
+    }))
   );
 });
 
