@@ -80,6 +80,33 @@ for (const dir of ["push/onesignal", "Taiyabah-Mosque-App/push/onesignal"]) {
   }
 }
 
+/* ---- 3c. the Qur'an is complete ----
+ * Scripture with a sūrah missing, or an āyah dropped by a half-written file,
+ * must never reach a phone. The counts are canonical (Kufan/Hafs); the files
+ * are checked against them, not the other way round. Rebuild with
+ * `node scripts/fetch-quran.mjs`, which verifies before it writes. */
+const AYAHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,
+112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,
+18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,
+40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
+if (existsSync("quran/surahs/index.json")) {
+  let bad = 0, total = 0;
+  const idx = JSON.parse(R("quran/surahs/index.json"));
+  if (!idx.surahs || idx.surahs.length !== 114) { fail(`quran index lists ${idx.surahs ? idx.surahs.length : 0} sūrahs, expected 114`); bad++; }
+  for (let n = 1; n <= 114; n++) {
+    const f = `quran/surahs/${n}.json`;
+    if (!existsSync(f)) { fail(`${f} is missing`); bad++; continue; }
+    let d; try { d = JSON.parse(R(f)); } catch { fail(`${f} is not valid JSON`); bad++; continue; }
+    const got = (d.verses || []).length;
+    if (got !== AYAHS[n - 1]) { fail(`sūrah ${n} has ${got} āyāt, expected ${AYAHS[n - 1]}`); bad++; continue; }
+    if (d.verses.some(v => !String(v.ar || "").trim())) { fail(`sūrah ${n} has an empty Arabic āyah`); bad++; continue; }
+    total += got;
+  }
+  if (!bad) ok(`Qur'an complete: 114 sūrahs, ${total} āyāt, all counts canonical`);
+} else {
+  notes.push("Qur'an data not present — run node scripts/fetch-quran.mjs");
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");

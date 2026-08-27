@@ -32,7 +32,7 @@
 <title>Taiyabah Masjid — Salah Times</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet" />
 <style>
   :root{
     --brand-900:#3C0B2A;    /* hero canvas */
@@ -62,7 +62,12 @@
       var(--paper);
     padding-bottom:calc(78px + env(safe-area-inset-bottom,0))}
   .display{font-family:"Fraunces", Georgia, serif}
+  /* Amiri is the display face for short Arabic. Qur'anic text uses Noto Naskh
+     Arabic first: the IndoPak edition draws on Arabic Extended-A as well as the
+     main Arabic block, and a font that does not cover those blocks renders parts
+     of scripture as empty boxes. Noto covers them; Amiri stays as the fallback. */
   .arabic{font-family:"Amiri", serif}
+  .quranic{font-family:"Noto Naskh Arabic","Amiri",serif}
   .tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 
   /* ---- brand bar ---- */
@@ -913,6 +918,25 @@
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   .diag-fix{width:100%;margin-top:10px;cursor:pointer;font:inherit;font-weight:700;font-size:14px;
     color:#F3EFE3;background:var(--brand-700);border:none;border-radius:11px;padding:12px}
+  /* ---- qur'an: sūrah list and reader ---- */
+  .sh-back{background:none;border:0;font:inherit;font-size:13px;color:var(--brand-600);
+    cursor:pointer;padding:4px 8px 4px 0;font-weight:600}
+  #qd-search{width:100%;box-sizing:border-box;font:inherit;font-size:14px;padding:11px 13px;
+    border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);
+    margin-bottom:6px}
+  .qd-srow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;
+    border:0;border-bottom:1px solid var(--line);padding:13px 2px;cursor:pointer;font:inherit;
+    color:var(--ink)}
+  .qd-srow:last-child{border-bottom:0}
+  .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;
+    display:grid;place-items:center;font-size:12px;font-weight:700}
+  .qd-srow-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .qd-srow-en{font-size:14.5px;font-weight:600}
+  .qd-srow-meta{font-size:11.5px;color:var(--muted)}
+  .qd-srow-ar{font-size:19px;color:var(--brand-600);white-space:nowrap}
+  .qd-empty{font-size:13px;color:var(--muted);text-align:center;padding:20px 8px}
+  .qd-bism{text-align:center;font-size:22px;color:var(--brand-600);margin:4px 0 18px;line-height:2}
+  .qd-loaderr{font-size:13px;color:var(--muted);text-align:center;padding:14px 8px;line-height:1.6}
   .diag-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px;text-align:center}
   #diag-note{width:100%;box-sizing:border-box;margin-top:9px;font:inherit;font-size:13px;
     padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);
@@ -1824,78 +1848,46 @@
     </div>
   </div>
 
-  <div class="sheet" id="quran" data-open="0" role="dialog" aria-modal="true" aria-label="Qur'an preview">
+  <div class="sheet" id="quran" data-open="0" role="dialog" aria-modal="true" aria-label="Qur'an">
     <div class="scrim" id="qd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left">Qur'an</h3>
+        <button class="sh-back" id="qd-back" hidden>&larr; Sūrahs</button>
+        <h3 style="text-align:left" id="qd-title">Qur'an</h3>
         <button class="sh-close" id="qd-close">Done</button>
       </div>
       <div class="sh-body">
 
-        <section class="wl-hero">
-          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="wl-ar" id="qd-surah-ar">&hellip;</div>
-          <div class="wl-en" id="qd-surah-en">Loading&hellip;</div>
-        </section>
-
-        <div class="ab-wrap">
-
-          <div class="wl-advisory" style="background:#F0E9ED;border-color:var(--line)">
-            <div class="wl-adv-h" style="color:var(--brand-600)">A preview of what's coming</div>
-            <p style="color:var(--ink)">This shows Sūrah al-Fātiḥah, and the real colour system used for
-              tajweed. Colouring each letter of the verses correctly needs a verified rules dataset,
-              not a hand mark-up &mdash; that part comes once it's properly integrated, so nothing
-              here is coloured letter-by-letter yet.</p>
+        <!-- the list of 114 -->
+        <div id="qd-list-view">
+          <section class="wl-hero">
+            <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+            <div class="wl-ar">القرآن الكريم</div>
+            <div class="wl-en" id="qd-sub">All 114 sūrahs</div>
+          </section>
+          <div class="ab-wrap">
+            <input id="qd-search" type="search" placeholder="Search a sūrah — name or number"
+                   autocapitalize="off" autocorrect="off" aria-label="Search sūrahs">
+            <div id="qd-list"></div>
+            <p class="qd-loaderr" id="qd-loaderr" style="display:none">
+              Couldn't load the Qur'an text. Check your connection and try again.</p>
+            <p class="wl-foot" id="qd-credit"></p>
           </div>
-
-          <div class="sec-h"><h2>Sūrah al-Fātiḥah</h2><span class="rule"></span></div>
-          <div id="qd-ayahs"></div>
-
-          <div class="sec-h"><h2>How tajweed colours will work</h2><span class="rule"></span></div>
-          <div class="card" id="qd-legend" style="padding:6px 14px"></div>
-
-          <p class="wl-foot" id="qd-loaderr" style="display:none;color:#B4532F">
-            Couldn't load the preview data. Please check your connection and reopen this page.
-          </p>
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana">
-    <div class="scrim" id="rb-scrim"></div>
-    <div class="panel">
-      <div class="sh-top">
-        <h3 style="text-align:left">40 Rabbanā</h3>
-        <button class="sh-close" id="rb-close">Done</button>
-      </div>
-      <div class="sh-body">
-
-        <section class="wl-hero">
-          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-          <div class="wl-ar">رَبَّنَا</div>
-          <div class="wl-en">Forty Duʿās from the Qur'an</div>
-          <div class="rb-count" id="rb-count">&hellip;</div>
-        </section>
-
-        <div class="ab-wrap">
-          <div id="rb-list"></div>
-
-          <p class="wl-foot" id="rb-loaderr" style="display:none;color:#B4532F">
-            Couldn't load the duʿās. Please check your connection and reopen this page.
-          </p>
-
-          <div class="wl-advisory">
-            <div class="wl-adv-h">Please check before relying on this</div>
-            <p>The Arabic here was transcribed by hand and has not yet been checked against a
-               printed Mus-haf. Please have it verified by someone qualified before this is
-               treated as final.</p>
+        <!-- one sūrah, opened from the list -->
+        <div id="qd-read-view" hidden>
+          <section class="wl-hero">
+            <div class="wl-ar" id="qd-surah-ar">&hellip;</div>
+            <div class="wl-en" id="qd-surah-en"></div>
+          </section>
+          <div class="ab-wrap">
+            <p class="qd-bism quranic" id="qd-bism" hidden>بِسۡمِ اللّٰهِ الرَّحۡمٰنِ الرَّحِيۡمِ</p>
+            <div id="qd-ayahs"></div>
+            <p class="wl-foot" id="qd-read-credit"></p>
           </div>
-
-          <p class="wl-foot">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
         </div>
+
       </div>
     </div>
   </div>
@@ -4556,49 +4548,119 @@ function initSysPrefs(){
   });
 }
 
-/* ---------------- qur'an preview page ----------------
-   Data lives in quran/fatiha-demo.js, deliberately NOT loaded by index.html
-   on boot. A <script> tag is injected only the first time this page opens,
-   so the cost is paid only by someone who actually taps through — nothing
-   here touches the main bundle's load time. */
-let quranDataLoaded = false;
+/* ---------------- qur'an ----------------
+   All 114 sūrahs, in the IndoPak script the community reads. The text is
+   built by scripts/fetch-quran.mjs, which verifies every sūrah against the
+   canonical ayah counts before writing anything — scripture is not typed by
+   hand here and not trusted on arrival either.
 
-function renderQuranDemo(){
-  const data = window.FATIHA_DEMO;
-  if(!data){ document.getElementById('qd-loaderr').style.display='block'; return; }
+   One sūrah is fetched at a time. The whole Qur'an is 2.6MB; al-Baqarah
+   alone is 178KB, and nobody should pay for 113 sūrahs they didn't open. The
+   index is small and loads once. Both are cached after first read, so
+   re-opening a sūrah costs nothing. */
+let quranIndex = null;
+const surahCache = new Map();
 
-  document.getElementById('qd-surah-ar').textContent = data.surah.name;
-  document.getElementById('qd-surah-en').textContent =
-    data.surah.nameEn + ' \u2014 "' + data.surah.meaning + '"';
-
-  document.getElementById('qd-ayahs').innerHTML = data.ayahs.map(a => `
-    <div class="qd-ayah">
-      <div class="qd-ayah-ar">${a.ar}<span class="qd-ayah-n">${a.n}</span></div>
-      <div class="qd-ayah-en">${a.en}</div>
-    </div>`).join('');
-
-  document.getElementById('qd-legend').innerHTML = data.tajweedLegend.map(r => `
-    <div class="qd-legend-row">
-      <span class="qd-dot" style="background:${r.hex}"></span>
-      <span class="qd-legend-t">
-        <span class="qd-legend-name">${r.name}</span>
-        <span class="qd-legend-note">${r.note}</span>
-      </span>
-      <span class="qd-legend-ar">${r.ar}</span>
-    </div>`).join('');
+async function loadQuranIndex(){
+  if(quranIndex) return quranIndex;
+  const res = await fetch('quran/surahs/index.json');
+  if(!res.ok) throw new Error('index ' + res.status);
+  quranIndex = await res.json();
+  return quranIndex;
 }
 
-function openQuran(){
+async function loadSurah(n){
+  if(surahCache.has(n)) return surahCache.get(n);
+  const res = await fetch('quran/surahs/' + n + '.json');
+  if(!res.ok) throw new Error('surah ' + n + ' ' + res.status);
+  const data = await res.json();
+  surahCache.set(n, data);
+  return data;
+}
+
+function renderSurahList(filter){
+  const q = (filter || "").trim().toLowerCase();
+  const list = quranIndex.surahs.filter(su => {
+    if(!q) return true;
+    if(String(su.n) === q) return true;
+    return (su.nameEn + " " + su.meaning + " " + su.name).toLowerCase().includes(q);
+  });
+
+  document.getElementById('qd-list').innerHTML = list.length
+    ? list.map(su => `
+      <button class="qd-srow" data-n="${su.n}">
+        <span class="qd-num">${su.n}</span>
+        <span class="qd-srow-t">
+          <span class="qd-srow-en">${su.nameEn}</span>
+          <span class="qd-srow-meta">${su.meaning} &middot; ${su.revealed} &middot; ${su.ayahs} āyāt</span>
+        </span>
+        <span class="qd-srow-ar quranic">${su.name}</span>
+      </button>`).join('')
+    : `<p class="qd-empty">No sūrah matches that.</p>`;
+
+  document.querySelectorAll('#qd-list .qd-srow').forEach(b =>
+    b.addEventListener('click', () => openSurah(Number(b.dataset.n))));
+}
+
+async function openSurah(n){
+  const read = document.getElementById('qd-read-view');
+  document.getElementById('qd-list-view').hidden = true;
+  read.hidden = false;
+  document.getElementById('qd-back').hidden = false;
+  document.querySelector('#quran .sh-body').scrollTop = 0;
+  document.getElementById('qd-ayahs').innerHTML = `<p class="qd-empty">Loading…</p>`;
+
+  try{
+    const d = await loadSurah(n);
+    document.getElementById('qd-surah-ar').textContent = d.name;
+    document.getElementById('qd-surah-en').textContent =
+      d.nameEn + ' — “' + d.meaning + '” · ' + d.revealed + ' · ' + d.ayahs + ' āyāt';
+    document.getElementById('qd-title').textContent = d.nameEn;
+
+    /* Every sūrah opens with the basmala except at-Tawbah, and in al-Fātiḥah
+       it is the first āyah rather than a heading — so it is shown separately
+       only where it is not already part of the text. */
+    document.getElementById('qd-bism').hidden = (n === 1 || n === 9);
+
+    document.getElementById('qd-ayahs').innerHTML = d.verses.map(v => `
+      <div class="qd-ayah">
+        <div class="qd-ayah-ar quranic">${v.ar}<span class="qd-ayah-n">${v.n}</span></div>
+        <div class="qd-ayah-en">${v.en}</div>
+      </div>`).join('');
+    document.getElementById('qd-read-credit').textContent =
+      'IndoPak script · translation: ' + d.translation;
+  }catch(e){
+    document.getElementById('qd-ayahs').innerHTML =
+      `<p class="qd-empty">Couldn't load this sūrah. Check your connection and try again.</p>`;
+    console.warn('surah load failed:', e);
+  }
+}
+
+function showSurahList(){
+  document.getElementById('qd-read-view').hidden = true;
+  document.getElementById('qd-list-view').hidden = false;
+  document.getElementById('qd-back').hidden = true;
+  document.getElementById('qd-title').textContent = "Qur'an";
+  document.querySelector('#quran .sh-body').scrollTop = 0;
+}
+
+async function openQuran(){
   document.getElementById('quran').dataset.open="1";
   document.body.style.overflow="hidden";
-  document.querySelector('#quran .sh-body').scrollTop=0;
+  showSurahList();
+  if(quranIndex) return;
 
-  if(quranDataLoaded){ renderQuranDemo(); return; }
-  const s = document.createElement('script');
-  s.src = 'quran/fatiha-demo.js';
-  s.onload = () => { quranDataLoaded = true; renderQuranDemo(); };
-  s.onerror = () => { document.getElementById('qd-loaderr').style.display='block'; };
-  document.head.appendChild(s);
+  document.getElementById('qd-list').innerHTML = `<p class="qd-empty">Loading…</p>`;
+  try{
+    await loadQuranIndex();
+    document.getElementById('qd-credit').textContent =
+      quranIndex.script + ' · translation: ' + quranIndex.translation;
+    renderSurahList(document.getElementById('qd-search').value);
+  }catch(e){
+    document.getElementById('qd-list').innerHTML = '';
+    document.getElementById('qd-loaderr').style.display = 'block';
+    console.warn('quran index failed:', e);
+  }
 }
 function closeQuran(){
   document.getElementById('quran').dataset.open="0";
@@ -4608,8 +4670,15 @@ function initQuranDemo(){
   document.getElementById('qd-close').addEventListener('click',closeQuran);
   document.getElementById('qd-scrim').addEventListener('click',closeQuran);
   document.getElementById('rc-quran').addEventListener('click',openQuran);
+  document.getElementById('qd-back').addEventListener('click',showSurahList);
+  document.getElementById('qd-search').addEventListener('input', e => {
+    if(quranIndex) renderSurahList(e.target.value);
+  });
   document.addEventListener('keydown',e=>{
-    if(e.key==="Escape" && document.getElementById('quran').dataset.open==="1") closeQuran();
+    if(e.key!=="Escape" || document.getElementById('quran').dataset.open!=="1") return;
+    // step back to the list first, so Escape doesn't lose your place outright
+    if(!document.getElementById('qd-read-view').hidden) showSurahList();
+    else closeQuran();
   });
 }
 
