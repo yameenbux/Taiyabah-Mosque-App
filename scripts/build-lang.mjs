@@ -15,6 +15,7 @@
  *   node scripts/build-lang.mjs
  */
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { createHash } from "node:crypto";
 
 const LANGS = [
   { code: "ur", i: 0, name: "اردو",     nameEn: "Urdu",     dir: "rtl" },
@@ -74,7 +75,9 @@ for (const lang of LANGS) {
     ` * Loaded only when a user selects this language — never in the main bundle.\n` +
     ` */\n` +
     `window.LANG_PACK = ${JSON.stringify({
-      code: lang.code, name: lang.name, nameEn: lang.nameEn, dir: lang.dir, strings,
+      code: lang.code, name: lang.name, nameEn: lang.nameEn, dir: lang.dir,
+      version: createHash("sha256").update(JSON.stringify(strings)).digest("hex").slice(0, 12),
+      strings,
     }, null, 1)};\n`;
   writeFileSync(`lang/${lang.code}.js`, body);
   console.log(`lang/${lang.code}.js — ${Object.keys(strings).length} strings`);
