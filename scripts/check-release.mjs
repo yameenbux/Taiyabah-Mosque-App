@@ -181,6 +181,37 @@ for (const f of ["index.html", "admin.html"]) {
     fail("index.html no longer loads Noto Naskh Arabic — every waqf mark in the Qur'an becomes a tofu box");
 }
 
+/* ---- 3h. no selector is silently overridden by a second copy of itself ----
+ * The 40 Rabbanā list carried two full sets of .rb-* rules: a card design and
+ * an older flat-list design further down the sheet. The later block re-declared
+ * padding as "14px 0", so the cards kept their background and border but lost
+ * their horizontal padding — the number badge and the Arabic ended up 1px from
+ * the card edge, which reads as text cut off at the edges. Nothing errors; the
+ * cascade just quietly picks the last one. */
+for (const f of ["index.html", "admin.html"]) {
+  if (!existsSync(f)) continue;
+  const css = [...R(f).matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join("\n")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    // rules inside @media / @supports / @keyframes are deliberate overrides
+    .replace(/@(?:media|supports|keyframes|font-face)[^{]*\{(?:[^{}]|\{[^{}]*\})*\}/g, " ");
+  const seen = new Map();
+  const clashes = [];
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const sel = m[1].split(/\s+/).join(" ").trim();
+    const props = new Set([...m[2].matchAll(/(^|;)\s*([a-z-]+)\s*:/g)].map(x => x[2]));
+    const before = seen.get(sel);
+    if (before) {
+      const both = [...props].filter(p => before.has(p));
+      if (both.length) clashes.push(`${sel} (re-declares ${both.slice(0, 4).join(", ")})`);
+      both.forEach(p => before.add(p));
+      props.forEach(p => before.add(p));
+    } else seen.set(sel, props);
+  }
+  if (clashes.length)
+    fail(`${f} declares the same selector twice with conflicting properties — the second silently wins: ${clashes.slice(0, 3).join("; ")}`);
+  else ok(`${f} — no selector is overridden by a second copy of itself`);
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");
