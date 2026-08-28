@@ -135,6 +135,52 @@ if (existsSync("scripts/check-i18n.mjs")) {
   }
 }
 
+/* ---- 3f. no CSS custom property is used without being defined ----
+ * var(--brand) was used in three rules and defined nowhere. A missing custom
+ * property does not fail loudly: the whole declaration is dropped, so an
+ * element renders unpainted — white text on no background — and looks like a
+ * design choice rather than a bug. */
+for (const f of ["index.html", "admin.html"]) {
+  if (!existsSync(f)) continue;
+  // strip comments first — a variable named in a comment is not a use
+  const src = R(f).replace(/\/\*[\s\S]*?\*\//g, " ");
+  const defined = new Set([...src.matchAll(/(--[a-z0-9-]+)\s*:/gi)].map(m => m[1]));
+  // var(--x, something) carries its own fallback and is fine undefined
+  const used = new Set([...src.matchAll(/var\(\s*(--[a-z0-9-]+)\s*\)/gi)].map(m => m[1]));
+  const undef = [...used].filter(v => !defined.has(v));
+  if (undef.length) fail(`${f} uses CSS variables that are never defined: ${undef.join(", ")}`);
+  else ok(`${f} — all ${used.size} CSS variables are defined`);
+}
+
+/* ---- 3g. every Arabic mark we ship has a glyph in the font that will render it ----
+ * The Google-served Amiri webfont contains NONE of the IndoPak waqf marks
+ * (U+08D4-U+08E2 — rukuʿ, qif, waqfa, sakta, sajda …); Noto Naskh Arabic
+ * contains all of them except U+08E2, which Google excludes from the subset
+ * range outright. So scripture must render with the .quranic stack (Noto Naskh
+ * first) and U+08E2 must be stripped at render time. A mark in the wrong stack
+ * is a tofu box sitting in the middle of the Qur'an on a worshipper's phone. */
+{
+  const EXT_A = /[ࡰ-ࣿ]/;
+  const src = existsSync("index.html") ? R("index.html") : "";
+  if (src) {
+    // 1. no element on the Amiri-only stack carries a mark Amiri cannot draw
+    let offenders = 0;
+    for (const m of src.matchAll(/class="[^"]*\barabic\b[^"]*"[^>]*>([^<]*)</g))
+      if (EXT_A.test(m[1])) { offenders++; fail(`index.html renders "${m[1].trim().slice(0, 30)}" with the Amiri-only .arabic stack, but it contains marks Amiri has no glyph for`); }
+
+    // 2. U+08E2 is stripped before display, and nothing wider than that is
+    const strip = src.match(/const UNRENDERABLE_MARKS = ([^;]+);/);
+    if (!strip) fail("index.html no longer strips U+08E2 — it will render as a tofu box in every mus-haf font");
+    else if (!/^\/\\u08E2\/g$/.test(strip[1].trim()))
+      fail(`index.html strips more than U+08E2 from scripture (${strip[1].trim()}) — genuine waqf marks would be deleted from the Qur'an`);
+    else if (!offenders) ok("Arabic marks — scripture is on the Noto Naskh stack and only the unrenderable U+08E2 is stripped");
+  }
+
+  // 3. the page actually asks for the font that has the glyphs
+  if (src && !/fonts\.googleapis\.com[^"']*Noto\+Naskh\+Arabic/.test(src))
+    fail("index.html no longer loads Noto Naskh Arabic — every waqf mark in the Qur'an becomes a tofu box");
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");
