@@ -1,34 +1,138 @@
 {
-  "_note": "Contact details and hall hire. Addresses, email, website and radio frequency stay as they are — a translated address cannot be typed into a map or a phone.",
-
-  "contact.contact_us": ["رابطہ کریں", "સંપર્ક કરો", "اتصل بنا"],
-  "contact.done": ["ہو گیا", "થઈ ગયું", "تم"],
-  "contact.taiyabah_masjid": ["طیبہ مسجد", "તૈયબા મસ્જિદ", "مسجد طيبة"],
-  "contact.bolton_central_islamic_society": [" keep", " keep", " keep"],
-  "contact.address": ["پتہ", "સરનામું", "العنوان"],
-  "contact.telephone": ["ٹیلیفون", "ટેલિફોન", "الهاتف"],
-  "contact.email": ["ای میل", "ઈમેલ", "البريد الإلكتروني"],
-  "contact.info_taiyabahmasjid_com": [" keep", " keep", " keep"],
-  "contact.website": ["ویب سائٹ", "વેબસાઇટ", "الموقع الإلكتروني"],
-  "contact.taiyabahmasjid_com": [" keep", " keep", " keep"],
-  "contact.radio_frequency": ["ریڈیو فریکوئنسی", "રેડિયો ફ્રિકવન્સી", "تردد الراديو"],
-  "contact.454_1000_mhz": ["454.1000 میگاہرٹز", "454.1000 MHz", "454.1000 ميغاهرتز"],
-  "contact.please_do_not_call_the": ["براہِ کرم نماز کے اوقات میں مسجد کو کال نہ کریں۔", "કૃપા કરી નમાઝના સમયે મસ્જિદને કૉલ ન કરો.", "يُرجى عدم الاتصال بالمسجد في أوقات الصلاة."],
-  "contact.bolton_central_islamic_society_registered": [" keep", " keep", " keep"],
-  "contact.your_onesignal_sdk_integration_is": ["آپ کا OneSignal SDK انضمام مکمل ہو گیا!", "તમારું OneSignal SDK એકીકરણ પૂર્ણ થયું!", "اكتمل دمج OneSignal SDK لديك!"],
-  "contact.you_can_now_send_push": ["اب آپ OneSignal کے ذریعے پش اطلاعات اور اِن ایپ پیغامات بھیج سکتے ہیں۔ اس ڈیوائس پر اطلاعات آن کرنے کے لیے نیچے دبائیں۔", "હવે તમે OneSignal મારફતે પુશ સૂચનાઓ અને ઇન-ઍપ સંદેશા મોકલી શકો છો. આ ડિવાઇસ પર સૂચનાઓ ચાલુ કરવા નીચે દબાવો.", "يمكنك الآن إرسال الإشعارات والرسائل داخل التطبيق عبر OneSignal. اضغط أدناه لتفعيل الإشعارات على هذا الجهاز."],
-  "contact.got_it": ["سمجھ گیا", "સમજ્યા", "حسناً"],
-
-  "hallhire.hall_room_hire": ["ہال / کمرہ کرایہ پر", "હૉલ / રૂમ ભાડે", "تأجير القاعات والغرف"],
-  "hallhire.done": ["ہو گیا", "થઈ ગયું", "تم"],
-  "hallhire.taiyabah_centre": ["طیبہ سینٹر", "તૈયબા સેન્ટર", "مركز طيبة"],
-  "hallhire.available_for_hire_for_community": ["برادری اور خاندانی تقریبات کے لیے کرایہ پر دستیاب۔", "સમુદાય અને પારિવારિક પ્રસંગો માટે ભાડે ઉપલબ્ધ.", "متاح للإيجار لمناسبات الجالية والعائلات."],
-  "hallhire.halls_available": ["دستیاب ہال", "ઉપલબ્ધ હૉલ", "القاعات المتاحة"],
-  "hallhire.kitchens_available": ["دستیاب باورچی خانے", "ઉપલબ્ધ રસોડાં", "المطابخ المتاحة"],
-  "hallhire.taiyabah_centre_get_directions": ["طیبہ سینٹر · راستہ معلوم کریں", "તૈયબા સેન્ટર · દિશા મેળવો", "مركز طيبة · احصل على الاتجاهات"],
-  "hallhire.astley_street_bolton_bl1_8eh": [" keep", " keep", " keep"],
-  "hallhire.taiyabah_centre_a_separate_building": ["طیبہ سینٹر — مسجد کی ملکیت میں ایک الگ عمارت — تین ہال اور دو باورچی خانے فراہم کرتا ہے۔", "તૈયબા સેન્ટર — મસ્જિદની માલિકીની અલગ ઇમારત — ત્રણ હૉલ અને બે રસોડાં આપે છે.", "يوفّر مركز طيبة — وهو مبنى مستقل يملكه المسجد — ثلاث قاعات ومطبخين."],
-  "hallhire.for_availability_pricing_and_to": ["دستیابی، قیمت اور اپنی ضروریات پر بات کرنے کے لیے براہِ کرم مسجد کے دفتر سے رابطہ کریں۔", "ઉપલબ્ધતા, ભાવ અને તમારી જરૂરિયાતોની ચર્ચા માટે કૃપા કરી મસ્જિદની ઑફિસનો સંપર્ક કરો.", "للاستفسار عن التوافر والأسعار ومناقشة متطلباتك، يُرجى التواصل مع مكتب المسجد."],
-  "hallhire.call_the_main_office": ["مرکزی دفتر کو کال کریں", "મુખ્ય ઑફિસને કૉલ કરો", "اتصل بالمكتب الرئيسي"],
-  "hallhire.bolton_central_islamic_society_registered": [" keep", " keep", " keep"]
+ "_note": "Contact details and hall hire. Addresses, email, website and radio frequency stay as they are — a translated address cannot be typed into a map or a phone.",
+ "contact.contact_us": [
+  "رابطہ کریں",
+  "સંપર્ક કરો",
+  "اتصل بنا"
+ ],
+ "contact.done": [
+  "ہو گیا",
+  "થઈ ગયું",
+  "تم"
+ ],
+ "contact.taiyabah_masjid": [
+  "طیبہ مسجد",
+  "તૈયબા મસ્જિદ",
+  "مسجد طيبة"
+ ],
+ "contact.bolton_central_islamic_society": [
+  "بولٹن سنٹرل اسلامک سوسائٹی",
+  "બોલ્ટન સેન્ટ્રલ ઇસ્લામિક સોસાયટી",
+  "جمعية بولتون الإسلامية المركزية"
+ ],
+ "contact.address": [
+  "پتہ",
+  "સરનામું",
+  "العنوان"
+ ],
+ "contact.telephone": [
+  "ٹیلیفون",
+  "ટેલિફોન",
+  "الهاتف"
+ ],
+ "contact.email": [
+  "ای میل",
+  "ઈમેલ",
+  "البريد الإلكتروني"
+ ],
+ "contact.info_taiyabahmasjid_com": [
+  " keep",
+  " keep",
+  " keep"
+ ],
+ "contact.website": [
+  "ویب سائٹ",
+  "વેબસાઇટ",
+  "الموقع الإلكتروني"
+ ],
+ "contact.taiyabahmasjid_com": [
+  " keep",
+  " keep",
+  " keep"
+ ],
+ "contact.radio_frequency": [
+  "ریڈیو فریکوئنسی",
+  "રેડિયો ફ્રિકવન્સી",
+  "تردد الراديو"
+ ],
+ "contact.454_1000_mhz": [
+  "454.1000 میگاہرٹز",
+  "454.1000 મેગાહર્ટ્ઝ",
+  "454.1000 ميغاهرتز"
+ ],
+ "contact.please_do_not_call_the": [
+  "براہِ کرم نماز کے اوقات میں مسجد کو کال نہ کریں۔",
+  "કૃપા કરી નમાઝના સમયે મસ્જિદને કૉલ ન કરો.",
+  "يُرجى عدم الاتصال بالمسجد في أوقات الصلاة."
+ ],
+ "contact.your_onesignal_sdk_integration_is": [
+  "آپ کا OneSignal SDK انضمام مکمل ہو گیا!",
+  "તમારું OneSignal SDK એકીકરણ પૂર્ણ થયું!",
+  "اكتمل دمج OneSignal SDK لديك!"
+ ],
+ "contact.you_can_now_send_push": [
+  "اب آپ OneSignal کے ذریعے پش اطلاعات اور اِن ایپ پیغامات بھیج سکتے ہیں۔ اس ڈیوائس پر اطلاعات آن کرنے کے لیے نیچے دبائیں۔",
+  "હવે તમે OneSignal મારફતે પુશ સૂચનાઓ અને ઇન-ઍપ સંદેશા મોકલી શકો છો. આ ડિવાઇસ પર સૂચનાઓ ચાલુ કરવા નીચે દબાવો.",
+  "يمكنك الآن إرسال الإشعارات والرسائل داخل التطبيق عبر OneSignal. اضغط أدناه لتفعيل الإشعارات على هذا الجهاز."
+ ],
+ "contact.got_it": [
+  "سمجھ گیا",
+  "સમજ્યા",
+  "حسناً"
+ ],
+ "hallhire.hall_room_hire": [
+  "ہال / کمرہ کرایہ پر",
+  "હૉલ / રૂમ ભાડે",
+  "تأجير القاعات والغرف"
+ ],
+ "hallhire.done": [
+  "ہو گیا",
+  "થઈ ગયું",
+  "تم"
+ ],
+ "hallhire.taiyabah_centre": [
+  "طیبہ سینٹر",
+  "તૈયબા સેન્ટર",
+  "مركز طيبة"
+ ],
+ "hallhire.available_for_hire_for_community": [
+  "برادری اور خاندانی تقریبات کے لیے کرایہ پر دستیاب۔",
+  "સમુદાય અને પારિવારિક પ્રસંગો માટે ભાડે ઉપલબ્ધ.",
+  "متاح للإيجار لمناسبات الجالية والعائلات."
+ ],
+ "hallhire.halls_available": [
+  "دستیاب ہال",
+  "ઉપલબ્ધ હૉલ",
+  "القاعات المتاحة"
+ ],
+ "hallhire.kitchens_available": [
+  "دستیاب باورچی خانے",
+  "ઉપલબ્ધ રસોડાં",
+  "المطابخ المتاحة"
+ ],
+ "hallhire.taiyabah_centre_get_directions": [
+  "طیبہ سینٹر · راستہ معلوم کریں",
+  "તૈયબા સેન્ટર · દિશા મેળવો",
+  "مركز طيبة · احصل على الاتجاهات"
+ ],
+ "hallhire.astley_street_bolton_bl1_8eh": [
+  " keep",
+  " keep",
+  " keep"
+ ],
+ "hallhire.taiyabah_centre_a_separate_building": [
+  "طیبہ سینٹر — مسجد کی ملکیت میں ایک الگ عمارت — تین ہال اور دو باورچی خانے فراہم کرتا ہے۔",
+  "તૈયબા સેન્ટર — મસ્જિદની માલિકીની અલગ ઇમારત — ત્રણ હૉલ અને બે રસોડાં આપે છે.",
+  "يوفّر مركز طيبة — وهو مبنى مستقل يملكه المسجد — ثلاث قاعات ومطبخين."
+ ],
+ "hallhire.for_availability_pricing_and_to": [
+  "دستیابی، قیمت اور اپنی ضروریات پر بات کرنے کے لیے براہِ کرم مسجد کے دفتر سے رابطہ کریں۔",
+  "ઉપલબ્ધતા, ભાવ અને તમારી જરૂરિયાતોની ચર્ચા માટે કૃપા કરી મસ્જિદની ઑફિસનો સંપર્ક કરો.",
+  "للاستفسار عن التوافر والأسعار ومناقشة متطلباتك، يُرجى التواصل مع مكتب المسجد."
+ ],
+ "hallhire.call_the_main_office": [
+  "مرکزی دفتر کو کال کریں",
+  "મુખ્ય ઑફિસને કૉલ કરો",
+  "اتصل بالمكتب الرئيسي"
+ ]
 }

@@ -66,6 +66,13 @@
      Arabic first: the IndoPak edition draws on Arabic Extended-A as well as the
      main Arabic block, and a font that does not cover those blocks renders parts
      of scripture as empty boxes. Noto covers them; Amiri stays as the fallback. */
+  /* Letter-spacing and small-caps tracking are a Latin typographic device. In
+     Gujarati they push a conjunct apart into separate letters — "આગામી" was
+     rendering as "આ ગા મી" — and in Arabic and Urdu they break the joins that
+     make a word a word. Only English gets the tracking. */
+  :root:not([lang="en"]) [class] { letter-spacing: normal !important; }
+  :root:not([lang="en"]) .bigtime { letter-spacing: normal }
+
   .arabic{font-family:"Amiri", serif}
   .quranic{font-family:"Noto Naskh Arabic","Amiri",serif}
   .tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
@@ -462,7 +469,7 @@
   /* ---- 40 rabbanā list ---- */
   .rb-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
   .rb-item:last-child{border-bottom:0}
-  .rb-n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;
+  .rb-n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--brand-600);color:#fff;
     display:grid;place-items:center;font-size:11.5px;font-weight:700;margin-top:4px}
   .rb-body{flex:1;min-width:0}
   .rb-ar{font-size:20px;line-height:2.1;direction:rtl;text-align:right;color:var(--ink)}
@@ -473,10 +480,27 @@
   .ak-tab{flex:0 0 auto;font:inherit;font-size:12.5px;font-weight:600;padding:8px 13px;
     border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);
     cursor:pointer;white-space:nowrap}
-  .ak-tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  /* Selected reads as the brand purple with light text; the rest stay quiet.
+     This said var(--brand), which the palette never defines — the declaration
+     was dropped, leaving white text on an unpainted pill. */
+  .ak-tab.on{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
   .ak-intro{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0 0 14px}
   .ak-extra{font-size:12px;color:var(--muted);line-height:1.55;margin-top:7px;
     padding-left:10px;border-left:2px solid var(--line)}
+  /* Tiles, as the duʿā page had before: a grid you can take in at a glance,
+     rather than a list you have to read down. Same content behind them. */
+  .du-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .du-tile{position:relative;aspect-ratio:.92;border-radius:13px;border:none;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;
+    padding:8px 5px;color:#F3EFE3;text-align:center;font:inherit;overflow:hidden;
+    background:linear-gradient(165deg,var(--brand-700),var(--brand-900))}
+  .du-tile:nth-child(3n+2){background:linear-gradient(165deg,var(--brand-800),var(--brand-900))}
+  .du-tile:nth-child(3n+3){background:linear-gradient(165deg,var(--brand-600),var(--brand-800))}
+  .du-tile svg{width:21px;height:21px;color:var(--gold-bright);flex:0 0 auto}
+  .du-tile .du-t{font-size:10.5px;font-weight:700;line-height:1.25}
+  .du-tile .du-c{font-size:9px;font-weight:600;opacity:.65;letter-spacing:.03em}
+  .du-tile:active{transform:scale(.96)}
+
   .du-label{font-size:12px;font-weight:700;color:var(--brand-600);letter-spacing:.02em;
     text-transform:uppercase;margin:0 0 8px}
   .du-tr{font-size:12.5px;color:var(--brand-800);line-height:1.6;margin:9px 0 0;font-style:italic}
@@ -943,7 +967,7 @@
     border:0;border-bottom:1px solid var(--line);padding:13px 2px;cursor:pointer;font:inherit;
     color:var(--ink)}
   .qd-srow:last-child{border-bottom:0}
-  .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;
+  .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--brand-600);color:#fff;
     display:grid;place-items:center;font-size:12px;font-weight:700}
   .qd-srow-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .qd-srow-en{font-size:14.5px;font-weight:600}
@@ -954,7 +978,7 @@
   .qd-loaderr{font-size:13px;color:var(--muted);text-align:center;padding:14px 8px;line-height:1.6}
   .diag-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px;text-align:center}
   #diag-note{width:100%;box-sizing:border-box;margin-top:9px;font:inherit;font-size:13px;
-    padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);
+    padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--paper);
     color:var(--ink);resize:vertical}
 
   /* collapsed confirmation */
@@ -988,11 +1012,11 @@
 </head>
 <body>
   <div class="topbar">
-    <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100">
+    <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
     <div class="brand">
       <p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p>
     </div>
-    <button class="menubtn" id="menubtn" aria-label="More">
+    <button class="menubtn" id="menubtn" aria-label="More" data-i18n-attr="aria-label:a11y.more">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -1052,34 +1076,34 @@
     <div class="rm-nav" id="rm-nav">
       <span class="rm-dots" id="rm-dots"></span>
       <span class="rm-arrows">
-        <button class="rm-a" id="rm-prev" aria-label="Previous reminder">&#8249;</button>
-        <button class="rm-a" id="rm-next" aria-label="Next reminder">&#8250;</button>
+        <button class="rm-a" id="rm-prev" aria-label="Previous reminder" data-i18n-attr="aria-label:a11y.previous_reminder">&#8249;</button>
+        <button class="rm-a" id="rm-next" aria-label="Next reminder" data-i18n-attr="aria-label:a11y.next_reminder">&#8250;</button>
       </span>
     </div>
   </div>
 
-  <nav class="datenav" aria-label="Choose a date">
-    <button class="navbtn" id="prev" aria-label="Previous day">&#8249;</button>
+  <nav class="datenav" aria-label="Choose a date" data-i18n-attr="aria-label:a11y.choose_a_date">
+    <button class="navbtn" id="prev" aria-label="Previous day" data-i18n-attr="aria-label:a11y.previous_day">&#8249;</button>
     <button class="daypick" id="daypick">
       <span class="dn-main" id="dn-main" data-i18n="app.today">Today</span>
       <span class="dn-sub" id="dn-sub">—</span>
     </button>
-    <button class="navbtn" id="next" aria-label="Next day">&#8250;</button>
+    <button class="navbtn" id="next" aria-label="Next day" data-i18n-attr="aria-label:a11y.next_day">&#8250;</button>
   </nav>
-  <input type="date" id="datein" class="vis-hidden" min="2026-01-01" max="2026-12-31" aria-label="Choose a date">
+  <input type="date" id="datein" class="vis-hidden" min="2026-01-01" max="2026-12-31" aria-label="Choose a date" data-i18n-attr="aria-label:a11y.choose_a_date">
   <div class="chips">
     <button class="chip" id="chip-today" data-on="1" data-i18n="app.today">Today</button>
     <button class="chip" id="chip-fri" data-i18n="app.next_jumu_ah">Next Jumu&#703;ah</button>
     <button class="chip" id="chip-month" data-i18n="app.full_month">Full month</button>
   </div>
 
-  <div class="sheet" id="sheet" data-open="0" role="dialog" aria-modal="true" aria-label="Full month timetable">
+  <div class="sheet" id="sheet" data-open="0" role="dialog" aria-modal="true" aria-label="Full month timetable" data-i18n-attr="aria-label:a11y.full_month_timetable">
     <div class="scrim" id="scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <button class="sh-nav" id="m-prev" aria-label="Previous month">&#8249;</button>
+        <button class="sh-nav" id="m-prev" aria-label="Previous month" data-i18n-attr="aria-label:a11y.previous_month">&#8249;</button>
         <h3 id="m-title">—</h3>
-        <button class="sh-nav" id="m-next" aria-label="Next month">&#8250;</button>
+        <button class="sh-nav" id="m-next" aria-label="Next month" data-i18n-attr="aria-label:a11y.next_month">&#8250;</button>
         <button class="sh-close" id="m-close" data-i18n="sheet.done">Done</button>
       </div>
       <div class="sh-toggle">
@@ -1098,8 +1122,8 @@
     <footer>
       <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
       <div class="fr" data-i18n="sheet.times_from_the_official_2026">Times from the official 2026 Salah Timetable</div>
-      <div class="charity" data-i18n="sheet.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</div>
-      <div class="credit">App built by <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener" data-i18n="sheet.yameen_bux">Yameen Bux</a></div>
+      <div class="charity"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></div>
+      <div class="credit"><span data-i18n="sheet.app_built_by">App built by</span> <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener" data-i18n="sheet.yameen_bux">Yameen Bux</a></div>
     </footer>
   </div>
   </main>
@@ -1173,12 +1197,12 @@
           <label class="switch"><input type="checkbox" checked id="tg-jam"><span class="sl"></span></label>
         </div>
         <div class="mins">
-          Remind me
+          <span data-i18n="sheet.remind_me">Remind me</span>
           <select id="mins"><option value="5" data-i18n="sheet.5_min">5 min</option><option value="10" selected data-i18n="sheet.10_min">10 min</option><option value="15" data-i18n="sheet.15_min">15 min</option></select>
-          before jamā&#703;ah
+          <span data-i18n="sheet.before_jamaah">before jamā&#703;ah</span>
         </div>
         <div class="tg">
-          <div class="txt"><div class="t">Janāzah <span class="urgent" data-i18n="sheet.urgent">Urgent</span></div><div class="d" data-i18n="sheet.funeral_prayer_announcements">Funeral prayer announcements</div></div>
+          <div class="txt"><div class="t"><span data-i18n="sheet.janazah">Janāzah</span> <span class="urgent" data-i18n="sheet.urgent">Urgent</span></div><div class="d" data-i18n="sheet.funeral_prayer_announcements">Funeral prayer announcements</div></div>
           <label class="switch"><input type="checkbox" checked id="tg-jan"><span class="sl"></span></label>
         </div>
         <div class="tg">
@@ -1198,7 +1222,7 @@
         <button class="diag-fix" id="diag-retag" data-i18n="sheet.send_my_categories_again">Send my categories again</button>
         <button class="diag-fix" id="diag-send" data-i18n="sheet.send_this_report_to_the">Send this report to the masjid</button>
         <textarea id="diag-note" rows="2" placeholder="What went wrong? (optional)"
-                  maxlength="500"></textarea>
+                  maxlength="500" data-i18n-attr="placeholder:a11y.what_went_wrong_optional"></textarea>
         <p class="diag-note" id="diag-sent"></p>
         <button class="diag-fix" id="diag-fix" data-i18n="sheet.reset_reload_the_app">Reset &amp; reload the app</button>
         <p class="diag-note" data-i18n="sheet.this_clears_the_app_s">This clears the app’s stored files and re-installs its
@@ -1293,7 +1317,7 @@
         <span class="dc-main" data-i18n="sheet.donate_online">Donate online</span>
         <span class="dc-sub" data-i18n="sheet.card_apple_pay_google_pay">Card &middot; Apple Pay &middot; Google Pay &middot; PayPal</span>
       </a>
-      <p class="dc-note">Opens the masjid&rsquo;s secure donation page. If you are a UK taxpayer,
+      <p class="dc-note" data-i18n-html="sheet.opens_the_masjids_secure_donation">Opens the masjid&rsquo;s secure donation page. If you are a UK taxpayer,
         please add Gift Aid &mdash; it adds <b>25p to every £1</b> at no cost to you.</p>
 
       <div class="sec-h"><h2 data-i18n="sheet.pledge_a_donor_tier">Pledge a donor tier</h2><span class="rule"></span><span class="tag" data-i18n="sheet.pay_later">Pay later</span></div>
@@ -1307,7 +1331,7 @@
         <a class="tier t-plat" href="https://www.taiyabahmasjid.com/product/platinum-donor/" target="_blank" rel="noopener">
           <span class="t-amt">£5,000</span><span class="t-name" data-i18n="sheet.platinum">Platinum</span></a>
       </div>
-      <p class="dc-note">A pledge is a commitment to give, settled afterwards by
+      <p class="dc-note" data-i18n-html="sheet.a_pledge_is_a_commitment">A pledge is a commitment to give, settled afterwards by
         <b>bank transfer or at the masjid office</b> &mdash; not paid by card at this stage.
         You can pledge anonymously or publicly.</p>
 
@@ -1320,21 +1344,21 @@
           <span class="bk-k" data-i18n="sheet.bank">Bank</span><span class="bk-v" data-i18n="sheet.hsbc">HSBC</span>
         </button>
         <button class="bk" data-copy="40-04-15">
-          <span class="bk-k" data-i18n="sheet.sort_code">Sort code</span><span class="bk-v tnum">40-04-15</span>
+          <span class="bk-k" data-i18n="sheet.sort_code">Sort code</span><span class="bk-v tnum" data-i18n-latin>40-04-15</span>
         </button>
         <button class="bk" data-copy="02320258">
-          <span class="bk-k" data-i18n="sheet.account_number">Account number</span><span class="bk-v tnum">02320258</span>
+          <span class="bk-k" data-i18n="sheet.account_number">Account number</span><span class="bk-v tnum" data-i18n-latin>02320258</span>
         </button>
       </div>
       <button class="copyall" id="copyall" data-i18n="sheet.copy_all_details">Copy all details</button>
 
-      <p class="dnote" data-i18n="sheet.bolton_central_islamic_society_registered_2">Bolton Central Islamic Society &middot; Registered charity 1041569.
-        If you are ever unsure about donation details, please confirm them at the
-        masjid office before transferring.</p>
+      <p class="dnote"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span>.
+        <span data-i18n="sheet.if_you_are_ever_unsure">If you are ever unsure about donation details, please confirm them at the
+        masjid office before transferring.</span></p>
     </div>
   </main>
 
-  <div class="sheet" id="about" data-open="0" role="dialog" aria-modal="true" aria-label="About Taiyabah Masjid">
+  <div class="sheet" id="about" data-open="0" role="dialog" aria-modal="true" aria-label="About Taiyabah Masjid" data-i18n-attr="aria-label:a11y.about_taiyabah_masjid">
     <div class="scrim" id="ab-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1347,7 +1371,7 @@
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
           <div class="ab-est" data-i18n="about.established_at_the_end_of">Established at the end of 1967</div>
           <p class="ab-lead" data-i18n="about.one_of_the_first_masjids">One of the first masjids in Bolton.</p>
-          <p class="ab-sub">The name <b>Taiyabah</b> &mdash; from the Arabic <i>Tayyab</i>, meaning purity &mdash;
+          <p class="ab-sub" data-i18n-html="about.the_name_taiyabah_from_the">The name <b>Taiyabah</b> &mdash; from the Arabic <i>Tayyab</i>, meaning purity &mdash;
             was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb,
             author of <i>Fazaail-e-Amaal</i>.</p>
         </section>
@@ -1390,9 +1414,9 @@
             <div data-i18n="about.moulana_hashim_saheb">Moulana Hashim Saheb</div>
             <div data-i18n="about.qari_yakub_nanji_saheb">Qari Yakub Nanji Saheb</div>
             <div data-i18n="about.qari_farooq_saheb">Qari Farooq Saheb</div>
-            <div>Moulana Mehboob Saheb <span class="ab-note" data-i18n="about.chorley">Chorley</span></div>
+            <div><span data-i18n="about.moulana_mehboob_saheb">Moulana Mehboob Saheb</span> <span class="ab-note" data-i18n="about.chorley">Chorley</span></div>
             <div data-i18n="about.moulana_imran_suba_saheb">Moulana Imran Suba Saheb</div>
-            <div>Mufti Faiyaz Saheb <span class="ab-now" data-i18n="about.present_imam">Present Imam</span></div>
+            <div><span data-i18n="about.mufti_faiyaz_saheb">Mufti Faiyaz Saheb</span> <span class="ab-now" data-i18n="about.present_imam">Present Imam</span></div>
           </div>
 
           <div class="sec-h"><h2 data-i18n="about.the_future">The future</h2><span class="rule"></span></div>
@@ -1414,8 +1438,8 @@
           </div>
 
           <button class="ab-donate" id="ab-donate" data-i18n="about.support_the_new_build">Support the new build</button>
-          <p class="ab-foot">Bolton Central Islamic Society &middot; Registered charity 1041569<br>
-            31a Draycott Street, Bolton BL1 8HD</p>
+          <p class="ab-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span><br>
+            <span data-i18n-latin>31a Draycott Street, Bolton BL1 8HD</span></p>
         </div>
       </div>
     </div>
@@ -1427,7 +1451,7 @@
 
       <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status" data-i18n="about.ready">Ready</span></div>
 
-      <button class="lv-play" id="lv-play" aria-label="Play live stream">
+      <button class="lv-play" id="lv-play" aria-label="Play live stream" data-i18n-attr="aria-label:a11y.play_live_stream">
         <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
       </button>
@@ -1437,13 +1461,13 @@
 
       <div class="lv-vol">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
-        <input type="range" id="lv-volume" min="0" max="100" value="100" aria-label="Volume">
+        <input type="range" id="lv-volume" min="0" max="100" value="100" aria-label="Volume" data-i18n-attr="aria-label:a11y.volume">
       </div>
     </section>
 
     <div class="wrap">
       <div class="card lv-info">
-        <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
+        <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n-latin data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
         <div class="lv-row"><span class="lv-k" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids" data-i18n="about.watch">Watch &rsaquo;</button></div>
       </div>
       <p class="lv-note" data-i18n="about.audio_keeps_playing_while_you">Audio keeps playing while you use the rest of the app or other apps.
@@ -1451,7 +1475,7 @@
     </div>
   </main>
 
-  <div class="sheet" id="vids" data-open="0" role="dialog" aria-modal="true" aria-label="Videos">
+  <div class="sheet" id="vids" data-open="0" role="dialog" aria-modal="true" aria-label="Videos" data-i18n-attr="aria-label:a11y.videos">
     <div class="scrim" id="vd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1473,7 +1497,7 @@
     </div>
   </div>
 
-  <div class="sheet" id="zakat" data-open="0" role="dialog" aria-modal="true" aria-label="Zakat calculator">
+  <div class="sheet" id="zakat" data-open="0" role="dialog" aria-modal="true" aria-label="Zakat calculator" data-i18n-attr="aria-label:a11y.zakat_calculator">
     <div class="scrim" id="zk-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1493,13 +1517,13 @@
 
           <div class="card zk-explain">
             <h4 data-i18n="zakat.new_to_zakat_start_here">New to zakat? Start here</h4>
-            <p>Zakat is a share of your savings given each year to those in need. It is
+            <p data-i18n-html="zakat.zakat_is_a_share_of">Zakat is a share of your savings given each year to those in need. It is
                <b>2.5%</b> &mdash; £2.50 out of every £100 you have kept for a whole year.</p>
             <p data-i18n="zakat.you_pay_it_if_all">You pay it if all of these are true:</p>
             <ul class="zk-ul">
               <li data-i18n="zakat.you_are_muslim_and_have">You are Muslim and have reached the age of puberty</li>
-              <li>What you own is worth more than the <b>nisab</b> (the minimum amount, below)</li>
-              <li>You have owned that much for one full <b>lunar year</b></li>
+              <li data-i18n-html="zakat.what_you_own_is_worth">What you own is worth more than the <b>nisab</b> (the minimum amount, below)</li>
+              <li data-i18n-html="zakat.you_have_owned_that_much">You have owned that much for one full <b>lunar year</b></li>
             </ul>
             <p class="zk-tip" data-i18n="zakat.pick_the_same_date_each">Pick the same date each Islamic year &mdash; many choose a day in
                Ramadan &mdash; and work out your zakat on that day every year.</p>
@@ -1513,11 +1537,11 @@
               <button data-std="silver" data-on="1" data-i18n="zakat.silver_612_36g">Silver &middot; 612.36g</button>
               <button data-std="gold" data-on="0" data-i18n="zakat.gold_87_48g">Gold &middot; 87.48g</button>
             </div>
-            <p class="zk-note">The Hanafi school uses the <b>silver</b> nisab, which is lower &mdash;
+            <p class="zk-note" data-i18n-html="zakat.the_hanafi_school_uses_the">The Hanafi school uses the <b>silver</b> nisab, which is lower &mdash;
                so more people qualify to give.</p>
             <div class="zk-live" id="zk-live" data-s="idle">&nbsp;</div>
             <label class="zk-f">
-              <span class="zk-l">Price per gram today (£) <a href="https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/" target="_blank" rel="noopener" data-i18n="zakat.check_price">check&nbsp;price</a></span>
+              <span class="zk-l"><span data-i18n="zakat.price_per_gram_today">Price per gram today (£)</span> <a href="https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/" target="_blank" rel="noopener" data-i18n="zakat.check_price">check&nbsp;price</a></span>
               <input type="number" id="zk-price" inputmode="decimal" step="0.01" min="0" placeholder="e.g. 0.85">
             </label>
             <div class="zk-nisab" id="zk-nisab" data-i18n="zakat.enter_today_s_price_to">Enter today&rsquo;s price to see the nisab</div>
@@ -1567,7 +1591,7 @@
               <h4 data-i18n="zakat.include_these">Include these</h4>
               <ul>
                 <li data-i18n="zakat.cash_at_home_in_the">Cash at home, in the bank, or in any savings account</li>
-                <li>All gold and silver you own &mdash; <b>including jewellery you wear</b></li>
+                <li data-i18n-html="zakat.all_gold_and_silver_you">All gold and silver you own &mdash; <b>including jewellery you wear</b></li>
                 <li data-i18n="zakat.money_you_are_saving_for">Money you are saving for something, like a wedding, a car or Hajj</li>
                 <li data-i18n="zakat.money_people_owe_you_that">Money people owe you that you expect to get back</li>
                 <li data-i18n="zakat.goods_you_bought_in_order">Goods you bought in order to sell them</li>
@@ -1588,7 +1612,7 @@
             </div>
           </div>
 
-          <p class="zk-disclaimer"><b>This is a guide, not a ruling.</b> It follows the Hanafi
+          <p class="zk-disclaimer" data-i18n-html="zakat.this_is_a_guide_not"><b>This is a guide, not a ruling.</b> It follows the Hanafi
             position and uses the price you enter. Zakat can depend on your own circumstances,
             and scholars differ on things like pensions, shares and long-term debt. For anything
             you are unsure about, please ask the imam at the masjid.</p>
@@ -1598,7 +1622,7 @@
     </div>
   </div>
 
-  <div class="sheet" id="contact" data-open="0" role="dialog" aria-modal="true" aria-label="Contact us">
+  <div class="sheet" id="contact" data-open="0" role="dialog" aria-modal="true" aria-label="Contact us" data-i18n-attr="aria-label:a11y.contact_us">
     <div class="scrim" id="ct-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1619,53 +1643,53 @@
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k" data-i18n="contact.address">Address</span><span class="ct-v">31a Draycott Street<br>Bolton BL1 8HD</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.address">Address</span><span class="ct-v" data-i18n-latin>31a Draycott Street<br>Bolton BL1 8HD</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="tel:01204535997">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k" data-i18n="contact.telephone">Telephone</span><span class="ct-v">01204 535 997</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.telephone">Telephone</span><span class="ct-v" data-i18n-latin>01204 535 997</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="mailto:info@taiyabahmasjid.com">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k" data-i18n="contact.email">Email</span><span class="ct-v" data-i18n="contact.info_taiyabahmasjid_com">info@taiyabahmasjid.com</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.email">Email</span><span class="ct-v" data-i18n-latin data-i18n="contact.info_taiyabahmasjid_com">info@taiyabahmasjid.com</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <a class="ct-row" href="https://www.taiyabahmasjid.com/" target="_blank" rel="noopener">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18Z"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k" data-i18n="contact.website">Website</span><span class="ct-v" data-i18n="contact.taiyabahmasjid_com">taiyabahmasjid.com</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.website">Website</span><span class="ct-v" data-i18n-latin data-i18n="contact.taiyabahmasjid_com">taiyabahmasjid.com</span></span>
               <span class="dr-ch">&rsaquo;</span>
             </a>
             <div class="ct-row static">
               <span class="ct-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg>
               </span>
-              <span class="ct-t"><span class="ct-k" data-i18n="contact.radio_frequency">Radio frequency</span><span class="ct-v tnum" data-i18n="contact.454_1000_mhz">454.1000 MHz</span></span>
+              <span class="ct-t"><span class="ct-k" data-i18n="contact.radio_frequency">Radio frequency</span><span class="ct-v tnum" data-i18n-latin data-i18n="contact.454_1000_mhz">454.1000 MHz</span></span>
             </div>
           </div>
 
           <p class="ct-note" data-i18n="contact.please_do_not_call_the">Please do not call the masjid during Salah times.</p>
 
           <div class="dr-social ct-social">
-            <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram">
+            <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram" data-i18n-attr="aria-label:a11y.instagram">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
             </a>
             <a href="https://twitter.com/TaiyabahMasjid" target="_blank" rel="noopener" aria-label="X">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.53 3h3.06l-6.69 7.64L21.75 21h-6.16l-4.83-6.3L5.24 21H2.18l7.15-8.17L2.25 3h6.32l4.36 5.77L17.53 3Zm-1.07 16.13h1.7L7.62 4.78H5.8l10.66 14.35Z"/></svg>
             </a>
-            <a href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener" aria-label="YouTube">
+            <a href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener" aria-label="YouTube" data-i18n-attr="aria-label:a11y.youtube">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26.2 26.2 0 0 0 2 12a26.2 26.2 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26.2 26.2 0 0 0 22 12a26.2 26.2 0 0 0-.4-4.8ZM10.1 14.9V9.1l5.05 2.9-5.05 2.9Z"/></svg>
             </a>
           </div>
 
-          <p class="ct-foot" data-i18n="contact.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="ct-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
@@ -1681,7 +1705,7 @@
     </div>
   </div>
 
-  <div class="sheet" id="marriagedeath" data-open="0" role="dialog" aria-modal="true" aria-label="Marriage &amp; Death">
+  <div class="sheet" id="marriagedeath" data-open="0" role="dialog" aria-modal="true" aria-label="Marriage &amp; Death" data-i18n-attr="aria-label:a11y.marriage_and_death">
     <div class="scrim" id="md-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1755,13 +1779,13 @@
             <span class="soon-tag" data-i18n="marriagedeath.coming_soon">Coming soon</span>
           </button>
 
-          <p class="md-foot" data-i18n="marriagedeath.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="md-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="hallhire" data-open="0" role="dialog" aria-modal="true" aria-label="Hall and Room Hire">
+  <div class="sheet" id="hallhire" data-open="0" role="dialog" aria-modal="true" aria-label="Hall and Room Hire" data-i18n-attr="aria-label:a11y.hall_and_room_hire">
     <div class="scrim" id="hh-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1793,7 +1817,7 @@
             </span>
             <span class="hh-call-t">
               <span class="hh-call-k" data-i18n="hallhire.taiyabah_centre_get_directions">Taiyabah Centre &middot; get directions</span>
-              <span class="hh-call-v" data-i18n="hallhire.astley_street_bolton_bl1_8eh">Astley Street, Bolton BL1 8EH</span>
+              <span class="hh-call-v" data-i18n-latin data-i18n="hallhire.astley_street_bolton_bl1_8eh">Astley Street, Bolton BL1 8EH</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
@@ -1812,18 +1836,18 @@
             </span>
             <span class="hh-call-t">
               <span class="hh-call-k" data-i18n="hallhire.call_the_main_office">Call the main office</span>
-              <span class="hh-call-v tnum">01204 535 997</span>
+              <span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="hh-foot" data-i18n="hallhire.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="sysprefs" data-open="0" role="dialog" aria-modal="true" aria-label="System Preferences">
+  <div class="sheet" id="sysprefs" data-open="0" role="dialog" aria-modal="true" aria-label="System Preferences" data-i18n-attr="aria-label:a11y.system_preferences">
     <div class="scrim" id="sp-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1851,19 +1875,20 @@
 
           <div class="wl-advisory">
             <div class="wl-adv-h" data-i18n="sysprefs.translations_not_yet_reviewed">Translations not yet reviewed</div>
-            <p data-i18n="sysprefs.the_urdu_gujarati_and_arabic">The Urdu, Gujarati and Arabic packs cover the main navigation and prayer names
-               only, and have not yet been checked by a native speaker. Anything not yet
-               translated stays in English. Please have someone from the community review
-               these before launch.</p>
+            <p data-i18n="sysprefs.the_urdu_gujarati_and_arabic">The Urdu, Gujarati and Arabic packs now cover the whole app, including the
+               duʿās, the athkār and the sūrah names. Postal addresses, phone numbers,
+               email and web addresses stay in Latin script so they still work. Nothing
+               here has been checked by a native speaker yet — please have the imam and
+               someone from the community review it before launch.</p>
           </div>
 
-          <p class="wl-foot" data-i18n="sysprefs.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="quran" data-open="0" role="dialog" aria-modal="true" aria-label="Qur'an">
+  <div class="sheet" id="quran" data-open="0" role="dialog" aria-modal="true" aria-label="Qur'an" data-i18n-attr="aria-label:a11y.qur_an">
     <div class="scrim" id="qd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1882,7 +1907,7 @@
           </section>
           <div class="ab-wrap">
             <input id="qd-search" type="search" placeholder="Search a sūrah — name or number"
-                   autocapitalize="off" autocorrect="off" aria-label="Search sūrahs">
+                   autocapitalize="off" autocorrect="off" aria-label="Search sūrahs" data-i18n-attr="placeholder:a11y.search_a_s_rah_name_or_number,aria-label:a11y.search_s_rahs">
             <div id="qd-list"></div>
             <p class="qd-loaderr" id="qd-loaderr" style="display:none" data-i18n="quran.couldn_t_load_the_qur">
               Couldn't load the Qur'an text. Check your connection and try again.</p>
@@ -1910,7 +1935,7 @@
   <!-- Restored: the button and the code for this page were both present, but
        the dialog itself had gone missing from the markup, so tapping "40
        Rabbanā" threw on a null element and did nothing. -->
-  <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana Duas">
+  <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana Duas" data-i18n-attr="aria-label:a11y.40_rabbana_duas">
     <div class="scrim" id="rb-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1928,13 +1953,13 @@
           <div id="rb-list"></div>
           <p class="qd-loaderr" id="rb-loaderr" style="display:none" data-i18n="rabbanas.couldn_t_load_these_du">
             Couldn't load these duʿās. Check your connection and try again.</p>
-          <p class="wl-foot" data-i18n="rabbanas.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="athkar" data-open="0" role="dialog" aria-modal="true" aria-label="Daily Athkar">
+  <div class="sheet" id="athkar" data-open="0" role="dialog" aria-modal="true" aria-label="Daily Athkar" data-i18n-attr="aria-label:a11y.daily_athkar">
     <div class="scrim" id="ak-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1954,13 +1979,13 @@
             <div class="wl-adv-h" data-i18n="athkar.confirm_the_wording_with_the">Confirm the wording with the imam</div>
             <p id="ak-note" data-i18n="athkar.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
           </div>
-          <p class="wl-foot" data-i18n="athkar.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="duas" data-open="0" role="dialog" aria-modal="true" aria-label="Everyday Duas">
+  <div class="sheet" id="duas" data-open="0" role="dialog" aria-modal="true" aria-label="Everyday Duas" data-i18n-attr="aria-label:a11y.everyday_duas">
     <div class="scrim" id="du-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -1978,13 +2003,13 @@
           </section>
           <div class="ab-wrap">
             <input id="du-search" type="search" placeholder="Search — travel, sleep, forgiveness…"
-                   autocapitalize="off" autocorrect="off" aria-label="Search duʿās">
+                   autocapitalize="off" autocorrect="off" aria-label="Search duʿās" data-i18n-attr="placeholder:a11y.search_travel_sleep_forgiveness,aria-label:a11y.search_du_s">
             <div id="du-cats"><p class="qd-empty" data-i18n="duas.loading">Loading…</p></div>
             <div class="wl-advisory">
               <div class="wl-adv-h" data-i18n="duas.confirm_the_wording_with_the">Confirm the wording with the imam</div>
               <p id="du-note" data-i18n="duas.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
             </div>
-            <p class="wl-foot" data-i18n="duas.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+            <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
           </div>
         </div>
 
@@ -1998,7 +2023,7 @@
     </div>
   </div>
 
-  <div class="sheet" id="will" data-open="0" role="dialog" aria-modal="true" aria-label="Importance of an Islamic Will">
+  <div class="sheet" id="will" data-open="0" role="dialog" aria-modal="true" aria-label="Importance of an Islamic Will" data-i18n-attr="aria-label:a11y.importance_of_an_islamic_will">
     <div class="scrim" id="wl-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -2085,13 +2110,13 @@
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="wl-foot" data-i18n="will.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="advice" data-open="0" role="dialog" aria-modal="true" aria-label="Imams' Advice">
+  <div class="sheet" id="advice" data-open="0" role="dialog" aria-modal="true" aria-label="Imams' Advice" data-i18n-attr="aria-label:a11y.imams_advice">
     <div class="scrim" id="ia-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -2133,13 +2158,13 @@
           <p class="ia-note" data-i18n="advice.appointments_are_arranged_through_the">Appointments are arranged through the office, so the imam
             can make time to see you properly rather than in passing.</p>
 
-          <p class="ia-foot" data-i18n="advice.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="ia-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="birth" data-open="0" role="dialog" aria-modal="true" aria-label="Birth">
+  <div class="sheet" id="birth" data-open="0" role="dialog" aria-modal="true" aria-label="Birth" data-i18n-attr="aria-label:a11y.birth">
     <div class="scrim" id="bt-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -2175,7 +2200,7 @@
           </div>
 
           <div class="card bt-card">
-            <p>Circumcision can be arranged through the <b>Bolton Council of Mosques
+            <p data-i18n-html="birth.circumcision_can_be_arranged_through">Circumcision can be arranged through the <b>Bolton Council of Mosques
                (BCoM)</b>, which runs a long-established weekly clinic performed by
                experienced NHS doctors.</p>
           </div>
@@ -2198,17 +2223,19 @@
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
-          <p class="bt-note" data-i18n="birth.office_hours_9am_3pm_admin">Office hours 9am&ndash;3pm &middot; admin@thebcom.org &middot;
-            1 Vicarage Street, Bolton BL3 5LE. A service of Bolton Council of Mosques,
-            independent of Taiyabah Masjid.</p>
+          <p class="bt-note"><span data-i18n="birth.office_hours">Office hours 9am&ndash;3pm</span> &middot;
+            <span data-i18n-latin>admin@thebcom.org</span> &middot;
+            <span data-i18n-latin>1 Vicarage Street, Bolton BL3 5LE</span>.
+            <span data-i18n="birth.a_service_of_bcom">A service of Bolton Council of Mosques,
+            independent of Taiyabah Masjid.</span></p>
 
-          <p class="bt-foot" data-i18n="birth.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="bt-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="sheet" id="marriage" data-open="0" role="dialog" aria-modal="true" aria-label="Marriage">
+  <div class="sheet" id="marriage" data-open="0" role="dialog" aria-modal="true" aria-label="Marriage" data-i18n-attr="aria-label:a11y.marriage">
     <div class="scrim" id="mg-scrim"></div>
     <div class="panel">
       <div class="sh-top">
@@ -2266,18 +2293,18 @@
           <p class="mg-note" data-i18n="marriage.specific_requirements_documentation_witnesses_">Specific requirements &mdash; documentation, witnesses, timings and
             any applicable fees &mdash; are best discussed directly with the office when you call.</p>
 
-          <p class="mg-foot" data-i18n="marriage.bolton_central_islamic_society_registered">Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+          <p class="mg-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More">
+  <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More" data-i18n-attr="aria-label:a11y.more">
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
       <div class="dr-top">
-        <img class="dr-logo" src="logo-cream.png" alt="Taiyabah Masjid">
-        <button class="dr-close" id="dr-close" aria-label="Close">&times;</button>
+        <img class="dr-logo" src="logo-cream.png" alt="Taiyabah Masjid" data-i18n-attr="alt:a11y.taiyabah_masjid">
+        <button class="dr-close" id="dr-close" aria-label="Close" data-i18n-attr="aria-label:a11y.close">&times;</button>
       </div>
       <div class="dr-body">
 
@@ -2349,7 +2376,7 @@
         </button>
 
         <div class="dr-social">
-          <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram">
+          <a href="https://www.instagram.com/taiyabahmasjid/" target="_blank" rel="noopener" aria-label="Instagram" data-i18n-attr="aria-label:a11y.instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="5"/>
               <circle cx="12" cy="12" r="4"/>
@@ -2361,14 +2388,14 @@
               <path d="M17.53 3h3.06l-6.69 7.64L21.75 21h-6.16l-4.83-6.3L5.24 21H2.18l7.15-8.17L2.25 3h6.32l4.36 5.77L17.53 3Zm-1.07 16.13h1.7L7.62 4.78H5.8l10.66 14.35Z"/>
             </svg>
           </a>
-          <a href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener" aria-label="YouTube">
+          <a href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw" target="_blank" rel="noopener" aria-label="YouTube" data-i18n-attr="aria-label:a11y.youtube">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26.2 26.2 0 0 0 2 12a26.2 26.2 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26.2 26.2 0 0 0 22 12a26.2 26.2 0 0 0-.4-4.8ZM10.1 14.9V9.1l5.05 2.9-5.05 2.9Z"/>
             </svg>
           </a>
         </div>
-        <p class="dr-foot">Radio 454.1000 MHz<br>
-          Bolton Central Islamic Society &middot; Registered charity 1041569</p>
+        <p class="dr-foot"><span data-i18n="drawer.radio">Radio</span> <span data-i18n-latin>454.1000</span> <span data-i18n="drawer.mhz">MHz</span><br>
+          <span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
       </div>
     </aside>
   </div>
@@ -2788,7 +2815,19 @@ const JAMAAT_ORDER = ["fajr","zuhr","asr","maghrib","isha"];
 
 /* ---------------- helpers ---------------- */
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function hm12(t){let [h,m]=t.split(":").map(Number);const ap=h<12?"am":"pm";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
+/* "am" and "pm" are Latin abbreviations that mean nothing in Urdu, Gujarati or
+   Arabic, and a straight translation of "pm" is wrong anyway: Urdu calls 1pm
+   دوپہر and 10pm رات, not one word for both. So the marker is chosen from the
+   hour — morning, afternoon, evening or night — which is how all three
+   languages actually say a time out loud. English keeps am/pm. */
+function meridiem(h){
+  if(activeLang === "en") return h < 12 ? "am" : "pm";
+  if(h < 12) return t("time.morning",   "am");
+  if(h < 16) return t("time.afternoon", "pm");
+  if(h < 20) return t("time.evening",   "pm");
+  return             t("time.night",    "pm");
+}
+function hm12(t){let [h,m]=t.split(":").map(Number);let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+meridiem(h);}
 /* The true moment at which London's clock reads this date and time.
    Not "the same wall-clock time on this phone": on the two days a year the
    British clocks change, an hour of the day exists twice or not at all, and a
@@ -2809,8 +2848,33 @@ function atToday(base, t){
 }
 function dayRec(d){return DATA && DATA.days ? DATA.days[ymd(d)] || null : null;}
 
-const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+/* Day, month and Hijri month names are read straight off the screen by every
+   worshipper checking a date, so they are looked up at the moment they are
+   drawn rather than baked in — a name fixed at load time stays English when
+   the language changes under it. */
+const DOW_EN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MON_EN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const FULL_DOW_EN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const FULL_MON_EN=["January","February","March","April","May","June","July","August",
+                   "September","October","November","December"];
+const dow      = i => t("date.dow."      + i, DOW_EN[i]);
+const mon      = i => t("date.mon."      + i, MON_EN[i]);
+const fullDow  = i => t("date.fulldow."  + i, FULL_DOW_EN[i]);
+const fullMon  = i => t("date.fullmon."  + i, FULL_MON_EN[i]);
+
+/* The timetable stores each Hijri date as one English string — "15 Rabi
+   al-Awwal 1448 AH". Split it so the month name can be translated and the day
+   and year can be shown in the reader's own digits. */
+const HIJRI_MONTHS = ["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani",
+  "Jumada al-Awwal","Jumada al-Thani","Rajab","Sha'ban","Ramadan","Shawwal",
+  "Dhul Qa'dah","Dhul Hijjah"];
+function hijriLabel(raw){
+  const m = String(raw||"").match(/^(\d+)\s+(.+?)\s+(\d+)\s*AH$/);
+  if(!m) return num(raw||"");
+  const i = HIJRI_MONTHS.indexOf(m[2]);
+  const month = i < 0 ? m[2] : t("date.hijri." + i, m[2]);
+  return `${num(m[1])} ${month} ${num(m[3])} ${t("date.ah","AH")}`;
+}
 
 /* status note (loading / timetable ended / load error) */
 function status(msg){
@@ -2880,17 +2944,18 @@ function markRows(rec, baseDate, now){
     if(atToday(baseDate, rec.jamaat[k]) > now){ nextKey = k; break; }
   }
 
-  const set=(key,cls,label)=>{
+  const set=(key,cls,which)=>{
     if(!key) return;
     const row=document.querySelector(`.row[data-key="${key}"]`);
     if(!row) return;
     row.classList.add(cls);
     const slot=row.querySelector('.pill-slot');
-    if(slot && label) slot.innerHTML=`<span class="pill ${label==='Now'?'now':'next'}">${label}</span>`;
+    if(slot && which) slot.innerHTML =
+      `<span class="pill ${which}">${esc(which==='now' ? t("times.now","Now") : t("times.next","Next"))}</span>`;
   };
-  set(currentKey,'is-current','Now');
+  set(currentKey,'is-current','now');
   // don't label the same row twice — "Now" already says it
-  if(nextKey && nextKey!==currentKey) set(nextKey,'is-next','Next');
+  if(nextKey && nextKey!==currentKey) set(nextKey,'is-next','next');
   else if(nextKey) document.querySelector(`.row[data-key="${nextKey}"]`)?.classList.add('is-next');
 }
 
@@ -2911,13 +2976,11 @@ function meta(key){return PRAYERS.find(p=>p.key===key);}
 
 function setDateline(d, rec){
   document.getElementById('dateline').textContent =
-    `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} · ${rec.hijri}`;
+    `${dow(d.getDay())} ${num(d.getDate())} ${mon(d.getMonth())} · ${hijriLabel(rec.hijri)}`;
 }
 
 /* ---------------- date navigation ---------------- */
 let VIEW = null;                       // Date currently being viewed
-const FULL_DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const FULL_MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 /* ---------------- the clock is Bolton's, not the phone's ----------------
    Every time in the timetable is London wall-clock. Read against a phone set
@@ -2965,18 +3028,18 @@ function nextJummah(){
 }
 
 function relLabel(d){
-  const t=today0();
-  if(sameDay(d,t)) return "Today";
-  if(sameDay(d,addDays(t,1))) return "Tomorrow";
-  if(sameDay(d,addDays(t,-1))) return "Yesterday";
-  return `${FULL_DOW[d.getDay()]}`;
+  const todayD=today0();
+  if(sameDay(d,todayD)) return t("date.today","Today");
+  if(sameDay(d,addDays(todayD,1))) return t("date.tomorrow","Tomorrow");
+  if(sameDay(d,addDays(todayD,-1))) return t("date.yesterday","Yesterday");
+  return fullDow(d.getDay());
 }
 
 function updateNavUI(){
-  const t=today0();
+  const todayD=today0();
   document.getElementById('dn-main').textContent = relLabel(VIEW);
   document.getElementById('dn-sub').textContent =
-    `${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()]} ${VIEW.getFullYear()}`;
+    `${num(VIEW.getDate())} ${fullMon(VIEW.getMonth())} ${num(VIEW.getFullYear())}`;
   document.getElementById('datein').value = ymd(VIEW);
   // disable stepping outside the loaded year
   document.getElementById('prev').disabled = !dayRec(addDays(VIEW,-1));
@@ -2984,12 +3047,13 @@ function updateNavUI(){
   // chip states
   const fri=nextJummah();
   const on=(id,cond)=>document.getElementById(id).dataset.on = cond?"1":"0";
-  on('chip-today', sameDay(VIEW,t));
+  on('chip-today', sameDay(VIEW,todayD));
   on('chip-fri',   sameDay(VIEW,fri));
   // grey out shortcuts that fall outside the loaded timetable
   document.getElementById('chip-fri').disabled = !dayRec(fri);
   document.getElementById('tt-h').textContent =
-    sameDay(VIEW,t) ? "Today" : `${FULL_DOW[VIEW.getDay()]} ${VIEW.getDate()} ${FULL_MON[VIEW.getMonth()].slice(0,3)}`;
+    sameDay(VIEW,todayD) ? t("date.today","Today")
+                         : `${fullDow(VIEW.getDay())} ${num(VIEW.getDate())} ${mon(VIEW.getMonth())}`;
 }
 
 /* render the hero for a non-today date */
@@ -3003,8 +3067,8 @@ function renderDayView(rec){
 
   // On Fridays the day itself is the headline — times live in the timetable below.
   document.getElementById('dv-eyebrow').innerHTML = isFri
-    ? 'Jumu&#703;ah <span class="dv-ar arabic">الجمعة</span>'
-    : 'Jamā&#703;ah times';
+    ? `${t("prayer.jumuah","Jumu\u02BFah")} <span class="dv-ar arabic">الجمعة</span>`
+    : t("times.jamaah_times","Jam\u0101\u02BFah times");
 
   const sub=document.getElementById('dv-sub');
   if(isFri){
@@ -3013,9 +3077,9 @@ function renderDayView(rec){
   }else{
     sub.hidden=false;
     sub.innerHTML =
-      `<div class="dvl sm"><span class="dvl-k">Fajr</span><span class="dvl-v">${hm12(rec.jamaat.fajr)}</span></div>` +
-      `<div class="dvl sm"><span class="dvl-k">Maghrib</span><span class="dvl-v">${hm12(rec.jamaat.maghrib)}</span></div>` +
-      `<div class="dvl sm"><span class="dvl-k">Isha</span><span class="dvl-v">${hm12(rec.jamaat.isha)}</span></div>`;
+      ["fajr","maghrib","isha"].map(k =>
+        `<div class="dvl sm"><span class="dvl-k">${t("prayer."+k, meta(k).en)}</span>` +
+        `<span class="dvl-v">${num(hm12(rec.jamaat[k]))}</span></div>`).join("");
   }
 }
 
@@ -3062,21 +3126,21 @@ const RAM_WINDOW = 30;
 const RAM_FALLBACK = { date:"2027-02-08", year:"1448 AH" };   // estimate — confirm with committee
 
 function ramadanStart(){
-  const t=today0();
+  const todayD=today0();
   // 1) from the dataset, if a future 1 Ramadan is present
   if(DATA && DATA.days){
     for(const k of Object.keys(DATA.days).sort()){
       if(/^1\s+Ramadan/i.test(DATA.days[k].hijri||"")){
         const [Y,M,D]=k.split("-").map(Number);
         const d=new Date(Y,M-1,D);
-        if(d>=t) return {date:d, year:(DATA.days[k].hijri.match(/(\d+)\s*AH/)||[])[1]+" AH", exact:true};
+        if(d>=todayD) return {date:d, year:(DATA.days[k].hijri.match(/(\d+)\s*AH/)||[])[1]+" AH", exact:true};
       }
     }
   }
   // 2) configured estimate
   const [Y,M,D]=RAM_FALLBACK.date.split("-").map(Number);
   const d=new Date(Y,M-1,D);
-  return d>=t ? {date:d, year:RAM_FALLBACK.year, exact:false} : null;
+  return d>=todayD ? {date:d, year:RAM_FALLBACK.year, exact:false} : null;
 }
 
 function renderRamadan(){
@@ -3088,14 +3152,14 @@ function renderRamadan(){
   if(days>RAM_WINDOW || days<0){ el.hidden=true; return; }
 
   let txt;
-  if(days===0)      txt="Ramadan begins today";
-  else if(days===1) txt="Ramadan begins tomorrow";
-  else              txt=`Ramadan begins in about ${days} days`;
+  if(days===0)      txt=t("ramadan.begins_today","Ramadan begins today");
+  else if(days===1) txt=t("ramadan.begins_tomorrow","Ramadan begins tomorrow");
+  else              txt=t("ramadan.begins_in_about","Ramadan begins in about {n} days").replace("{n}", num(days));
 
   el.hidden=false;
   document.getElementById('ram-t').textContent=txt;
   document.getElementById('ram-n').textContent =
-    "Subject to moon sighting" + (r.year?` · ${r.year}`:"");
+    t("ramadan.subject_to_moon_sighting","Subject to moon sighting") + (r.year?` · ${num(r.year)}`:"");
 }
 
 /* ---------------- reminders ----------------
@@ -3117,6 +3181,13 @@ function renderRamadan(){
    committee/imam asks for it.
 -------------------------------------------------------- */
 const MARK_MAWLID = false;
+
+/* The suhūr sentence is appended to four different reminders, so it is one
+   string rather than four — and the time inside it goes through num() like
+   every other time the app shows. */
+const suhoorNote = c => c.suhoor
+  ? " " + t("reminder.suhoor_ends","Suhūr ends {time}.").replace("{time}", num(hm12(c.suhoor)))
+  : "";
 
 const hIs = (c, day, month) => c.hDay===day && new RegExp(month,"i").test(c.hMonth);
 const tIs = (c, day, month) => c.tDay===day && new RegExp(month,"i").test(c.tMonth);
@@ -3180,19 +3251,21 @@ const REMINDERS = [
   ...CALENDAR_DAYS,
   /* --- heads-up for tomorrow: these need a decision tonight --- */
   { id:"ramadan-eve", ar:"رَمَضَان", t:"Ramadan begins tomorrow",
-    d:c=>`The first fast is tomorrow.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""} Taraweeh follows Isha jamāʿah.`,
+    d:c=>t("reminder.ramadan-eve.d","The first fast is tomorrow.") + suhoorNote(c)
+         + " " + t("reminder.ramadan-eve.d2","Taraweeh follows Isha jamāʿah."),
     when:c => /Ramadan/i.test(c.tMonth) && c.tDay===1 },
   { id:"arafah-eve", ar:"يَوْمُ عَرَفَة", t:"Day of ʿArafah is tomorrow",
-    d:c=>`The 9th of Dhul Hijjah falls tomorrow — a day of voluntary fasting.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    d:c=>t("reminder.arafah-eve.d","The 9th of Dhul Hijjah falls tomorrow — a day of voluntary fasting.") + suhoorNote(c),
     when:c => /Hijjah/i.test(c.tMonth) && c.tDay===9 },
   { id:"ashura-eve", ar:"يَوْمُ عَاشُورَاء", t:"ʿĀshūrāʾ fasting tomorrow",
-    d:c=>`Many fast the 9th and 10th of Muharram.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    d:c=>t("reminder.ashura-eve.d","Many fast the 9th and 10th of Muharram.") + suhoorNote(c),
     when:c => /Muharram/i.test(c.tMonth) && (c.tDay===9 || c.tDay===10) },
   { id:"beed-eve", ar:"الْأَيَّامُ الْبِيض", t:"Optional fasting tomorrow",
-    d:c=>`Tomorrow is one of the white days — the 13th, 14th and 15th of the Islamic month.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    d:c=>t("reminder.beed-eve.d","Tomorrow is one of the white days — the 13th, 14th and 15th of the Islamic month.") + suhoorNote(c),
     when:c => [13,14,15].includes(c.tDay) },
   { id:"monthu-eve", ar:"صِيَامُ الِاثْنَيْنِ وَالْخَمِيس", t:"Optional fasting tomorrow",
-    d:c=>`Tomorrow is ${c.tDow===1?"Monday":"Thursday"} — a day many keep a voluntary fast.${c.suhoor?` Suhūr ends ${hm12(c.suhoor)}.`:""}`,
+    d:c=>t("reminder.monthu-eve.d","Tomorrow is {day} — a day many keep a voluntary fast.")
+         .replace("{day}", fullDow(c.tDow===1?1:4)) + suhoorNote(c),
     when:c => c.tDow===1 || c.tDow===4 },
 
   /* --- expiring soon --- */
@@ -3245,8 +3318,8 @@ const REMINDERS = [
 
 let RM_LIST=[], RM_IDX=0;
 
-function minusMins(t, n){
-  const [h,m]=t.split(":").map(Number);
+function minusMins(hhmm, n){
+  const [h,m]=hhmm.split(":").map(Number);
   let v=h*60+m-n; if(v<0) v+=1440;
   return `${String(Math.floor(v/60)).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
 }
@@ -3292,8 +3365,9 @@ function renderReminder(){
   const r=RM_LIST[RM_IDX];
   el.hidden=false;
   document.getElementById('rm-ar').textContent=r.ar;
-  document.getElementById('rm-t').textContent=r.t;
-  document.getElementById('rm-d').textContent = typeof r.d==="function" ? r.d(c) : r.d;
+  document.getElementById('rm-t').textContent=t("reminder."+r.id+".t", r.t);
+  document.getElementById('rm-d').textContent =
+    typeof r.d==="function" ? r.d(c) : t("reminder."+r.id+".d", r.d);
   // nav only when there's more than one
   const nav=document.getElementById('rm-nav');
   nav.hidden = RM_LIST.length<2;
@@ -3346,24 +3420,29 @@ function monthDays(y, m){          // m: 0-11
 
 function renderMonth(){
   const y=M_MONTH.getFullYear(), m=M_MONTH.getMonth();
-  document.getElementById('m-title').textContent=`${FULL_MON[m]} ${y}`;
+  document.getElementById('m-title').textContent=`${fullMon(m)} ${num(y)}`;
   const rows=monthDays(y,m);
+  /* The column heads are abbreviated to fit five prayers across a phone, so
+     they get their own short keys rather than reusing the full prayer names —
+     a language whose word for Maghrib is longer would break the table. */
   const cols = M_MODE==="jamaat"
     ? [["fajr","Fajr"],["zuhr","Zuhr"],["asr","Asr"],["maghrib","Mag"],["isha","Isha"]]
     : [["fajr","Fajr"],["sunrise","Sun"],["zuhr","Zuhr"],["asr","Asr"],["isha","Isha"]];
-  const t=today0();
-  let html=`<table class="mt"><thead><tr><th style="text-align:left;padding-left:12px">Date</th>${
-    cols.map(c=>`<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;
+  const todayD=today0();
+  let html=`<table class="mt"><thead><tr><th style="text-align:left;padding-left:12px">${
+    t("month.date","Date")}</th>${
+    cols.map(c=>`<th>${t("month.col."+c[0], c[1])}</th>`).join("")}</tr></thead><tbody>`;
   rows.forEach(({dt,rec})=>{
     const src = M_MODE==="jamaat" ? rec.jamaat : rec.begins;
-    const cls=[dt.getDay()===5?"fri":"", sameDay(dt,t)?"today":""].filter(Boolean).join(" ");
-    html+=`<tr class="${cls}" data-d="${ymd(dt)}"><td class="d">${dt.getDate()}<small>${DOW[dt.getDay()]}</small></td>${
-      cols.map(c=>`<td>${src[c[0]]?hm12(src[c[0]]).replace(/ (am|pm)/,''):'—'}</td>`).join("")}</tr>`;
+    const cls=[dt.getDay()===5?"fri":"", sameDay(dt,todayD)?"today":""].filter(Boolean).join(" ");
+    html+=`<tr class="${cls}" data-d="${ymd(dt)}"><td class="d">${num(dt.getDate())}<small>${dow(dt.getDay())}</small></td>${
+      cols.map(c=>`<td>${src[c[0]]?num(hm12(src[c[0]]).replace(/\s+\S+$/,'')):'—'}</td>`).join("")}</tr>`;
   });
   html+=`</tbody></table><div class="mt-foot">${
-    M_MODE==="jamaat" ? "Congregation times. Fridays highlighted — tap any day for Jumuʿah times."
-                      : "Beginning times. Maghrib is prayed at its listed time."
-  }<br>Times shown in 12-hour format without am/pm, as on the printed timetable.</div>`;
+    M_MODE==="jamaat"
+      ? t("month.congregation_note","Congregation times. Fridays highlighted — tap any day for Jumuʿah times.")
+      : t("month.beginning_note","Beginning times. Maghrib is prayed at its listed time.")
+  }<br>${t("month.12_hour_note","Times shown in 12-hour format without am/pm, as on the printed timetable.")}</div>`;
   document.getElementById('m-body').innerHTML=html;
   document.getElementById('m-body').scrollTop=0;
   // stepping limits
@@ -3458,10 +3537,11 @@ function initNav(){
 }
 
 function endedState(){
-  document.getElementById('next-en').textContent="Timetable ended";
+  document.getElementById('next-en').textContent=t("times.timetable_ended","Timetable ended");
   document.getElementById('next-ar').textContent="";
   document.getElementById('count').innerHTML="—";
-  document.getElementById('subline').textContent="The loaded timetable has no further dates.";
+  document.getElementById('subline').textContent=
+    t("times.no_further_dates","The loaded timetable has no further dates.");
   document.getElementById('track').style.width='0%';
   status("This app's timetable has ended. Please update the app / check the masjid noticeboard for current times.");
 }
@@ -3489,7 +3569,8 @@ function tick(){
 
   const m=meta(nx.key);
   const friJum = nx.key==="zuhr" && (nx.tomorrow ? addDays(base,1) : base).getDay()===5;
-  document.getElementById('next-en').textContent = friJum ? "Jumuʿah" : m.en;
+  document.getElementById('next-en').textContent =
+    friJum ? t("prayer.jumuah","Jumuʿah") : t("prayer."+nx.key, m.en);
   document.getElementById('next-ar').textContent = friJum ? "الجمعة" : m.ar;
 
   const srcRec = nx.tomorrow ? nx.tomorrowRec : rec;
@@ -3497,19 +3578,22 @@ function tick(){
   const bt = srcRec.begins[nx.key];
 
   // the time itself leads
-  document.getElementById('bigtime').textContent = hm12(jt);
+  document.getElementById('bigtime').textContent = num(hm12(jt));
 
   // countdown is secondary — minutes precision is enough at a glance
   let diff=Math.max(0, Math.floor((nx.at-realNow)/1000));
   const hh=Math.floor(diff/3600), mn=Math.floor((diff%3600)/60), s=diff%60;
+  /* The countdown is the line most worshippers actually read. Each shape is
+     its own key so a language can put the number where its grammar wants it. */
   let cd;
-  if(hh>0)      cd=`in ${hh}h ${String(mn).padStart(2,'0')}m`;
-  else if(mn>0) cd=`in ${mn} min`;
-  else          cd=`in ${s}s`;
+  if(hh>0)      cd=t("count.hours_minutes","in {h}h {m}m").replace("{h}",num(hh)).replace("{m}",num(String(mn).padStart(2,'0')));
+  else if(mn>0) cd=t("count.minutes","in {m} min").replace("{m}",num(mn));
+  else          cd=t("count.seconds","in {s}s").replace("{s}",num(s));
   document.getElementById('count').textContent = cd;
 
   document.getElementById('subline').innerHTML =
-    `${bt?`Beginning time <b>${hm12(bt)}</b>`:''}${nx.tomorrow?' &middot; tomorrow':''}`;
+    `${bt?safeInline(t("times.beginning_time","Beginning time <b>{t}</b>")).replace("{t}",num(hm12(bt))):''}` +
+    `${nx.tomorrow?' &middot; '+t("date.tomorrow_lc","tomorrow"):''}`;
 
   // progress begins→jamaat for the upcoming prayer (today only)
   const beginsAt = (bt && !nx.tomorrow) ? atToday(base, bt) : null;
@@ -3528,13 +3612,13 @@ function tick(){
 
 
 /* ---------------- donate: copy helpers ---------------- */
-async function copyText(t){
+async function copyText(text){
   try{
-    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(t); return true; }
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; }
   }catch(e){}
   try{
     const ta=document.createElement('textarea');
-    ta.value=t; ta.setAttribute('readonly','');
+    ta.value=text; ta.setAttribute('readonly','');
     ta.style.cssText='position:absolute;left:-9999px';
     document.body.appendChild(ta); ta.select();
     const ok=document.execCommand('copy'); document.body.removeChild(ta);
@@ -3560,8 +3644,8 @@ function initDonate(){
       "Account number: 02320258"
     ].join("\n");
     const ok=await copyText(text);
-    all.textContent = ok ? "Copied" : "Couldn't copy — please copy manually";
-    setTimeout(()=>all.textContent="Copy all details", 2000);
+    all.textContent = ok ? "Copied" : t("donate.copy_failed","Couldn't copy — please copy manually");
+    setTimeout(()=>all.textContent=t("sheet.copy_all_details","Copy all details"), 2000);
   });
 }
 
@@ -3710,23 +3794,23 @@ const OneSignalManager = (() => {
              || (typeof window.matchMedia==="function"
                  && window.matchMedia("(display-mode: standalone)").matches);
     if(iOS && !standalone)
-      return "On iPhone, notifications only work once the app is added to your Home Screen. Tap Share, then “Add to Home Screen”, and open it from there.";
+      return t("notify.ios_add_to_home","On iPhone, notifications only work once the app is added to your Home Screen. Tap Share, then “Add to Home Screen”, and open it from there.");
     if(!("Notification" in window))
-      return "This browser doesn’t support notifications.";
+      return t("notify.browser_unsupported","This browser doesn’t support notifications.");
     // the same capability OneSignal's loader checks — fails on iOS below 16.4
     const pushCapable = (typeof PushSubscriptionOptions !== "undefined"
         && Object.prototype.hasOwnProperty.call(PushSubscriptionOptions.prototype, "applicationServerKey"))
       || (typeof window.safari !== "undefined" && window.safari.pushNotification);
     if(!pushCapable)
       return iOS
-        ? "This iPhone’s software is too old for notifications. They need iOS 16.4 or later — you can check in Settings → General → About."
-        : "This browser doesn’t support push notifications.";
+        ? t("notify.ios_too_old","This iPhone’s software is too old for notifications. They need iOS 16.4 or later — you can check in Settings → General → About.")
+        : t("notify.no_push_support","This browser doesn’t support push notifications.");
     if(!("serviceWorker" in navigator))
-      return "This browser doesn’t support the background service notifications need.";
+      return t("notify.no_sw_support","This browser doesn’t support the background service notifications need.");
     if(!window.isSecureContext)
-      return "Notifications need a secure (https) connection.";
+      return t("notify.needs_https","Notifications need a secure (https) connection.");
     if(Notification.permission==="denied")
-      return "Notifications are blocked for this site. You can allow them in your browser or iOS settings.";
+      return t("notify.blocked_for_site","Notifications are blocked for this site. You can allow them in your browser or iOS settings.");
     return null;
     }catch(e){
       console.warn("OneSignal capability check failed:", e);
@@ -3819,10 +3903,12 @@ const OneSignalManager = (() => {
   /* Why the SDK isn't usable — specific enough to act on */
   function loadingDiagnosis(){
     if(initError)
-      return "The notification service didn’t start on this device (" + initError + "). Close the app fully and open it again.";
+      return t("notify.service_didnt_start",
+        "The notification service didn’t start on this device ({why}). Close the app fully and open it again.")
+        .replace("{why}", initError);
     if(typeof window.OneSignal === "undefined" && !sdk)
-      return "Couldn’t load the notification service. A content blocker, VPN, or iCloud Private Relay may be blocking cdn.onesignal.com — try turning those off for this site, or switch between Wi-Fi and mobile data.";
-    return "Still connecting to the notification service — please wait a moment and tap again.";
+      return t("notify.couldnt_load_service","Couldn’t load the notification service. A content blocker, VPN, or iCloud Private Relay may be blocking cdn.onesignal.com — try turning those off for this site, or switch between Wi-Fi and mobile data.");
+    return t("notify.still_connecting","Still connecting to the notification service — please wait a moment and tap again.");
   }
 
   /* Waits (briefly) for the OneSignal ID to become available, since on a
@@ -3965,9 +4051,9 @@ async function syncAlertsUI(){
 
   if(on && btn.dataset.on!=="1"){
     btn.dataset.on="1";
-    btn.textContent="Notifications enabled on this device";
+    btn.textContent=t("notify.enabled_on_device","Notifications enabled on this device");
     document.getElementById('toggles').classList.add('unlocked');
-    document.getElementById('a-lead').textContent="Choose what you'd like to be told about.";
+    document.getElementById('a-lead').textContent=t("notify.choose_what","Choose what you'd like to be told about.");
   }
 }
 
@@ -4026,14 +4112,16 @@ function zkPriceUI(applyValue){
   const input=document.getElementById('zk-price');
   if(!el) return;
   if(LIVE.state==="loading"){
-    el.dataset.s="loading"; el.textContent="Fetching today’s price…"; return;
+    el.dataset.s="loading"; el.textContent=t("zakat.fetching_price","Fetching today’s price…"); return;
   }
   if(LIVE.state==="ok"){
     const p=LIVE[ZK_STD];
     el.dataset.s="ok";
-    el.innerHTML = `Live ${ZK_STD} price · £${p.toFixed(2)}/g · updated ${
-      LIVE.at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}
-      <button class="zk-refresh" id="zk-refresh">Refresh</button>`;
+    el.innerHTML = t("zakat.live_price","Live {metal} price · £{p}/g · updated {at}")
+      .replace("{metal}", t("zakat.metal."+ZK_STD, ZK_STD))
+      .replace("{p}", num(p.toFixed(2)))
+      .replace("{at}", num(LIVE.at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})))
+      + ` <button class="zk-refresh" id="zk-refresh">${t("zakat.refresh","Refresh")}</button>`;
     document.getElementById('zk-refresh').addEventListener('click',fetchMetalPrices);
     if(applyValue && !input.dataset.touched){
       input.value = p.toFixed(2);
@@ -4043,8 +4131,8 @@ function zkPriceUI(applyValue){
   }
   if(LIVE.state==="failed"){
     el.dataset.s="failed";
-    el.innerHTML = `Couldn’t fetch today’s price — please enter it below.
-      <button class="zk-refresh" id="zk-refresh">Try again</button>`;
+    el.innerHTML = t("zakat.price_fetch_failed","Couldn’t fetch today’s price — please enter it below.")
+      + ` <button class="zk-refresh" id="zk-refresh">${t("zakat.try_again","Try again")}</button>`;
     document.getElementById('zk-refresh').addEventListener('click',fetchMetalPrices);
   }
 }
@@ -4078,8 +4166,10 @@ function zkCalc(){
   // nisab line
   const nEl=document.getElementById('zk-nisab');
   nEl.textContent = price>0
-    ? `Nisab today: ${gbp(nisab)}  (${nisabG}g of ${ZK_STD} × ${gbp(price)})`
-    : "Enter today’s price to see the nisab";
+    ? t("zakat.nisab_today","Nisab today: {nisab}  ({g}g of {metal} × {price})")
+        .replace("{nisab}", num(gbp(nisab))).replace("{g}", num(nisabG))
+        .replace("{metal}", t("zakat.metal."+ZK_STD, ZK_STD)).replace("{price}", num(gbp(price)))
+    : t("zakat.enter_price_for_nisab","Enter today’s price to see the nisab");
 
   // gold and silver are weighed, so they need a price per gram for each metal.
   // The single price field applies to the chosen standard; the other metal is
@@ -4098,9 +4188,12 @@ function zkCalc(){
   const note=document.getElementById('zk-gsnote');
   if(missing.length){
     note.hidden=false;
-    note.innerHTML = `To value your ${missing.join(" and ")}, switch the nisab standard above to
-      <b>${missing[0]}</b> and enter that price — or add its value to the cash box.
-      Your ${missing.join(" and ")} is <b>not</b> counted yet.`;
+    const named = missing.map(x=>t("zakat.metal."+x, x)).join(" " + t("zakat.and","and") + " ");
+    note.innerHTML = safeInline(t("zakat.metal_not_counted",
+      "To value your {metals}, switch the nisab standard above to <b>{first}</b> and enter " +
+      "that price — or add its value to the cash box. Your {metals} is <b>not</b> counted yet."))
+      .split("{metals}").join(named)
+      .replace("{first}", t("zakat.metal."+missing[0], missing[0]));
   }else{
     note.hidden=true;
   }
@@ -4110,33 +4203,35 @@ function zkCalc(){
   const debts  = zkNum('zk-debts');
   const net    = Math.max(0, assets - debts);
 
-  document.getElementById('zk-total').textContent = gbp(assets);
-  document.getElementById('zk-less').textContent  = gbp(debts);
-  document.getElementById('zk-net').textContent   = gbp(net);
+  document.getElementById('zk-total').textContent = num(gbp(assets));
+  document.getElementById('zk-less').textContent  = num(gbp(debts));
+  document.getElementById('zk-net').textContent   = num(gbp(net));
 
   const verdict=document.getElementById('zk-verdict');
   const dueBox=document.getElementById('zk-due');
 
   if(price<=0){
-    verdict.textContent="Enter today’s metal price above to work out your nisab.";
+    verdict.textContent=t("zakat.enter_metal_price","Enter today’s metal price above to work out your nisab.");
     dueBox.hidden=true; return;
   }
   if(assets===0){
-    verdict.textContent="Enter what you own above.";
+    verdict.textContent=t("zakat.enter_what_you_own","Enter what you own above.");
     dueBox.hidden=true; return;
   }
   // compare in whole pence: floating point can make an exact-nisab amount
   // read as fractionally below it (87.48 × 80 = 6998.400000000001)
   const pence = x => Math.round(x*100);
   if(pence(net) < pence(nisab)){
-    verdict.innerHTML = `Your wealth is <b>below</b> the nisab of ${gbp(nisab)}, so zakat is
-      not due. You may still give sadaqah if you wish.`;
+    verdict.innerHTML = safeInline(t("zakat.below_nisab",
+      "Your wealth is <b>below</b> the nisab of {nisab}, so zakat is not due. " +
+      "You may still give sadaqah if you wish.")).replace("{nisab}", num(gbp(nisab)));
     dueBox.hidden=true; return;
   }
-  verdict.innerHTML = `Your wealth is <b>above</b> the nisab of ${gbp(nisab)}. Zakat is due if
-    you have held this much for a full lunar year.`;
+  verdict.innerHTML = safeInline(t("zakat.above_nisab",
+    "Your wealth is <b>above</b> the nisab of {nisab}. Zakat is due if you have held " +
+    "this much for a full lunar year.")).replace("{nisab}", num(gbp(nisab)));
   dueBox.hidden=false;
-  document.getElementById('zk-amount').textContent = gbp(net*ZAKAT_RATE);
+  document.getElementById('zk-amount').textContent = num(gbp(net*ZAKAT_RATE));
 }
 
 function initZakat(){
@@ -4209,9 +4304,9 @@ function vdPlay(v){
   p.hidden=false;
   document.getElementById('vd-frame').innerHTML =
     `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.id)}?autoplay=1&playsinline=1&rel=0"
-       title="${esc(v.t)}" allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+       title="${esc(t("video."+v.id+".t", v.t))}" allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
        allowfullscreen></iframe>`;
-  document.getElementById('vd-now').textContent=v.t;
+  document.getElementById('vd-now').textContent=t("video."+v.id+".t", v.t);
   document.querySelectorAll('.vd-item').forEach(b=>b.dataset.on = b.dataset.id===v.id ? "1":"0");
   document.querySelector('#vids .sh-body').scrollTop=0;
 }
@@ -4229,8 +4324,8 @@ function buildVideos(){
         <img src="https://i.ytimg.com/vi/${esc(v.id)}/mqdefault.jpg" alt="" loading="lazy">
       </span>
       <span class="vd-meta">
-        <span class="vd-t">${esc(v.t)}</span>
-        <span class="vd-d">${esc(v.d)}</span>
+        <span class="vd-t">${esc(t("video."+v.id+".t", v.t))}</span>
+        <span class="vd-d">${esc(t("video."+v.id+".d", v.d))}</span>
       </span>
     </button>`).join("");
   document.querySelectorAll('.vd-item').forEach(b=>{
@@ -4276,7 +4371,8 @@ function lvState(s, text){
   const on = (s==="playing");
   play.hidden=on; pause.hidden=!on;
   document.getElementById('lv-play')
-    .setAttribute('aria-label', on ? "Pause live stream" : "Play live stream");
+    .setAttribute('aria-label', on ? t("a11y.pause_live_stream","Pause live stream")
+                                  : t("a11y.play_live_stream","Play live stream"));
 }
 
 function ensureAudio(){
@@ -4284,10 +4380,10 @@ function ensureAudio(){
   AUDIO=new Audio();
   AUDIO.preload="none";
   AUDIO.crossOrigin=null;
-  AUDIO.addEventListener('playing',()=>lvState("playing","On air"));
+  AUDIO.addEventListener('playing',()=>lvState("playing",t("live.on_air","On air")));
   AUDIO.addEventListener('waiting',()=>lvState("loading","Buffering…"));
-  AUDIO.addEventListener('pause',  ()=>lvState("idle","Paused"));
-  AUDIO.addEventListener('error',  ()=>lvState("error","Stream unavailable"));
+  AUDIO.addEventListener('pause',  ()=>lvState("idle",t("live.paused","Paused")));
+  AUDIO.addEventListener('error',  ()=>lvState("error",t("live.unavailable","Stream unavailable")));
   AUDIO.addEventListener('stalled',()=>lvState("loading","Reconnecting…"));
   return AUDIO;
 }
@@ -4303,14 +4399,14 @@ async function lvToggle(){
     await a.play();
     if('mediaSession' in navigator){
       navigator.mediaSession.metadata=new MediaMetadata({
-        title:"Live from the masjid", artist:"Taiyabah Masjid",
+        title:t("live.from_the_masjid","Live from the masjid"), artist:t("app.name","Taiyabah Masjid"),
         artwork:[{src:"icon-512.png?v=2",sizes:"512x512",type:"image/png"}]
       });
       navigator.mediaSession.setActionHandler('play',()=>lvToggle());
       navigator.mediaSession.setActionHandler('pause',()=>{a.pause();});
     }
   }catch(e){
-    lvState("error","Couldn't start the stream");
+    lvState("error",t("live.couldnt_start","Couldn't start the stream"));
   }
 }
 
@@ -4333,15 +4429,17 @@ let rabbanasLoaded = false;
 function renderRabbanas(){
   const data = window.RABBANAS;
   if(!data){ document.getElementById('rb-loaderr').style.display='block'; return; }
-  document.getElementById('rb-count').textContent = data.length + " duʿās";
+  document.getElementById('rb-count').textContent =
+    t("rabbanas.n_duas","{n} duʿās").replace("{n}", num(data.length));
   document.getElementById('rb-list').innerHTML = data.map(r => `
     <div class="rb-item">
-      <span class="rb-n">${r.n}</span>
+      <span class="rb-n">${num(r.n)}</span>
       <div class="rb-body">
-        <div class="rb-ar arabic">${r.ar}</div>
-        <div class="rb-ref">${r.ref}</div>
+        <div class="rb-ar quranic">${arabicForDisplay(r.ar)}</div>
+        <div class="rb-ref">${esc(t("rabbana."+r.n+".ref", r.ref))}</div>
       </div>
     </div>`).join('');
+  retranslate();
 }
 
 function openRabbanas(){
@@ -4441,6 +4539,14 @@ function num(value){
   return String(value).replace(/[0-9]/g, d => set[+d]);
 }
 
+/* Inline markup a translation is allowed to carry. Anything else — a tag with
+   attributes, a script, an iframe, an event handler — is stripped to its text
+   rather than trusted. */
+const INLINE_OK = /^<\/?(b|i|em|strong|span|br)>$/i;
+function safeInline(html){
+  return String(html).replace(/<[^>]*>/g, tag => INLINE_OK.test(tag) ? tag : "");
+}
+
 /* Look up a string the app builds itself, rather than one sitting in the
    markup. The English is passed in as the fallback so a missing key shows
    real words instead of a key name. */
@@ -4454,6 +4560,36 @@ function t(key, english){
    seen, so every render calls this when it finishes. */
 function retranslate(){ applyLang(activeLang); }
 
+/* applyLang can only translate what carries a key. The timetable rows, the
+   dateline, the reminder card and the month table are BUILT by the script, so
+   switching language left them in whatever language they were drawn in — the
+   home screen, the one screen everybody sees, stayed English. These redraw
+   themselves instead.
+
+   Each renderer ends by calling retranslate(), which is applyLang again, so
+   the list only runs on the outermost call — otherwise a language switch
+   recurses until the stack gives out. */
+let langRefreshing = false;
+function refreshRenderedText(){
+  if(langRefreshing) return;
+  langRefreshing = true;
+  const open = id => document.getElementById(id)?.dataset.open === "1";
+  const jobs = [
+    () => { if(STATE) render(); },
+    () => { if(open("month")) renderMonth(); },
+    () => { if(open("vids")) buildVideos(); },
+    () => { if(open("athkar") && window.ATHKAR) renderAthkar(); },
+    () => { if(open("duas") && window.DUAS) renderDuaCategories(document.getElementById('du-search')?.value); },
+    () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
+    () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
+    () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
+    () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
+  ];
+  /* One screen failing to redraw must not stop the rest from being translated. */
+  for(const job of jobs){ try{ job(); }catch(e){ console.warn("re-render after language change:", e); } }
+  langRefreshing = false;
+}
+
 function applyLang(code){
   const pack = getPack(code);
   activeLang = code;
@@ -4465,7 +4601,39 @@ function applyLang(code){
     if(!el.dataset.i18nEn) el.dataset.i18nEn = el.textContent;
     const key = el.dataset.i18n;
     const val = activeStrings && activeStrings[key];
-    el.textContent = num(val || el.dataset.i18nEn);
+    /* An identifier is not a quantity. A postcode, phone number, email or web
+       address has to stay in Latin digits or it stops working: "Bolton BL1 8EH"
+       became "Bolton BL۱ ۸EH" in Urdu, which is not an address Royal Mail can
+       deliver to, and a dialled number in Urdu digits is not a number. */
+    el.textContent = el.hasAttribute('data-i18n-latin') ? (val || el.dataset.i18nEn)
+                                                        : num(val || el.dataset.i18nEn);
+  });
+
+  /* A sentence with a bold phrase inside it — "it adds <b>25p to every £1</b>
+     at no cost to you" — cannot be translated by replacing textContent, which
+     would flatten the markup away. These carry their translation as inline
+     markup instead, restricted to the tags below: the packs ship from our own
+     origin, but a translation file is still not a place from which arbitrary
+     HTML should reach the DOM. */
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    if(!el.dataset.i18nHtmlEn) el.dataset.i18nHtmlEn = el.innerHTML;
+    const val = activeStrings && activeStrings[el.dataset.i18nHtml];
+    el.innerHTML = num(safeInline(val || el.dataset.i18nHtmlEn));
+  });
+
+  /* Text that lives in an attribute rather than in the page: the search
+     placeholders, and every aria-label — which is the only text a worshipper
+     using a screen reader hears. An untranslated aria-label leaves a blind
+     Urdu speaker with an English app no matter what the screen says. */
+  document.querySelectorAll('[data-i18n-attr]').forEach(el=>{
+    for(const pair of el.dataset.i18nAttr.split(",")){
+      const [attr, key] = pair.split(":").map(x=>x.trim());
+      if(!attr || !key) continue;
+      const stash = "i18nAttr_" + attr.replace(/-/g,"_");
+      if(el.dataset[stash] === undefined) el.dataset[stash] = el.getAttribute(attr) || "";
+      const val = activeStrings && activeStrings[key];
+      el.setAttribute(attr, num(val || el.dataset[stash]));
+    }
   });
 
   /* Elements holding a number the app wrote — times, counts, distances. They
@@ -4479,6 +4647,8 @@ function applyLang(code){
   document.documentElement.setAttribute("lang", code);
   document.documentElement.setAttribute("dir", dir);
   langStore.set(LANG_KEY, code);
+
+  refreshRenderedText();
 }
 
 function renderLangList(){
@@ -4519,7 +4689,7 @@ async function selectLang(code, row){
     }catch(e){
       row.dataset.state = "download";
       renderLangList();
-      alert("Couldn't download that language pack. Please check your connection and try again.");
+      alert(t("lang.download_failed","Couldn't download that language pack. Please check your connection and try again."));
       return;
     }
   }
@@ -4587,25 +4757,32 @@ function renderSurahList(filter){
   const list = quranIndex.surahs.filter(su => {
     if(!q) return true;
     if(String(su.n) === q) return true;
-    return (su.nameEn + " " + su.meaning + " " + su.name).toLowerCase().includes(q);
+    return (su.nameEn + " " + su.meaning + " " + su.name + " " +
+            t("surah."+su.n+".name", su.nameEn) + " " +
+            t("surah."+su.n+".meaning", su.meaning)).toLowerCase().includes(q);
   });
 
   document.getElementById('qd-list').innerHTML = list.length
     ? list.map(su => `
       <button class="qd-srow" data-n="${su.n}">
-        <span class="qd-num">${su.n}</span>
+        <span class="qd-num">${num(su.n)}</span>
         <span class="qd-srow-t">
-          <span class="qd-srow-en">${su.nameEn}</span>
-          <span class="qd-srow-meta">${su.meaning} &middot; ${su.revealed} &middot; ${su.ayahs} āyāt</span>
+          <span class="qd-srow-en">${esc(t("surah."+su.n+".name", su.nameEn))}</span>
+          <span class="qd-srow-meta">${esc(t("surah."+su.n+".meaning", su.meaning))} &middot; ${
+            esc(revealedIn(su.revealed))} &middot; ${
+            esc(t("quran.n_ayat","{n} āyāt").replace("{n}", num(su.ayahs)))}</span>
         </span>
         <span class="qd-srow-ar quranic">${su.name}</span>
       </button>`).join('')
-    : `<p class="qd-empty">No sūrah matches that.</p>`;
+    : `<p class="qd-empty">${esc(t("quran.no_surah_matches","No sūrah matches that."))}</p>`;
 
   document.querySelectorAll('#qd-list .qd-srow').forEach(b =>
     b.addEventListener('click', () => openSurah(Number(b.dataset.n))));
   retranslate();
 }
+
+/* "Makkah" and "Madinah" appear against all 114 sūrahs; one key each. */
+const revealedIn = place => t("place."+String(place).toLowerCase(), place);
 
 async function openSurah(n){
   const read = document.getElementById('qd-read-view');
@@ -4613,14 +4790,15 @@ async function openSurah(n){
   read.hidden = false;
   document.getElementById('qd-back').hidden = false;
   document.querySelector('#quran .sh-body').scrollTop = 0;
-  document.getElementById('qd-ayahs').innerHTML = `<p class="qd-empty">Loading…</p>`;
+  document.getElementById('qd-ayahs').innerHTML = `<p class="qd-empty">${esc(t("common.loading","Loading…"))}</p>`;
 
   try{
     const d = await loadSurah(n);
     document.getElementById('qd-surah-ar').textContent = d.name;
     document.getElementById('qd-surah-en').textContent =
-      d.nameEn + ' — “' + d.meaning + '” · ' + d.revealed + ' · ' + d.ayahs + ' āyāt';
-    document.getElementById('qd-title').textContent = d.nameEn;
+      t("surah."+n+".name", d.nameEn) + ' — “' + t("surah."+n+".meaning", d.meaning) + '” · ' +
+      revealedIn(d.revealed) + ' · ' + t("quran.n_ayat","{n} āyāt").replace("{n}", num(d.ayahs));
+    document.getElementById('qd-title').textContent = t("surah."+n+".name", d.nameEn);
 
     /* Every sūrah opens with the basmala except at-Tawbah, and in al-Fātiḥah
        it is the first āyah rather than a heading — so it is shown separately
@@ -4629,14 +4807,15 @@ async function openSurah(n){
 
     document.getElementById('qd-ayahs').innerHTML = d.verses.map(v => `
       <div class="qd-ayah">
-        <div class="qd-ayah-ar quranic">${v.ar}<span class="qd-ayah-n">${v.n}</span></div>
+        <div class="qd-ayah-ar quranic">${arabicForDisplay(v.ar)}<span class="qd-ayah-n">${num(v.n)}</span></div>
         <div class="qd-ayah-en">${v.en}</div>
       </div>`).join('');
     document.getElementById('qd-read-credit').textContent =
-      'IndoPak script · translation: ' + d.translation;
+      t("quran.indopak_credit","IndoPak script · translation: {who}")
+        .replace("{who}", t("quran.translator", d.translation));
   }catch(e){
     document.getElementById('qd-ayahs').innerHTML =
-      `<p class="qd-empty">Couldn't load this sūrah. Check your connection and try again.</p>`;
+      `<p class="qd-empty">${esc(t("quran.surah_load_failed","Couldn't load this sūrah. Check your connection and try again."))}</p>`;
     console.warn('surah load failed:', e);
   }
 }
@@ -4645,7 +4824,7 @@ function showSurahList(){
   document.getElementById('qd-read-view').hidden = true;
   document.getElementById('qd-list-view').hidden = false;
   document.getElementById('qd-back').hidden = true;
-  document.getElementById('qd-title').textContent = "Qur'an";
+  document.getElementById('qd-title').textContent = t("quran.title","Qur'an");
   document.querySelector('#quran .sh-body').scrollTop = 0;
 }
 
@@ -4655,11 +4834,13 @@ async function openQuran(){
   showSurahList();
   if(quranIndex) return;
 
-  document.getElementById('qd-list').innerHTML = `<p class="qd-empty">Loading…</p>`;
+  document.getElementById('qd-list').innerHTML = `<p class="qd-empty">${esc(t("common.loading","Loading…"))}</p>`;
   try{
     await loadQuranIndex();
     document.getElementById('qd-credit').textContent =
-      quranIndex.script + ' · translation: ' + quranIndex.translation;
+      t("quran.script_credit","{script} · translation: {who}")
+        .replace("{script}", t("quran.script_name", quranIndex.script))
+        .replace("{who}", t("quran.translator", quranIndex.translation));
     renderSurahList(document.getElementById('qd-search').value);
   }catch(e){
     document.getElementById('qd-list').innerHTML = '';
@@ -4709,31 +4890,51 @@ function loadOnce(src, flagName){
 /* esc() is already defined above and does exactly this — reuse it rather than
    keep a second escaper that could drift from the first. */
 
+/* Qur'anic recitation marks — the sajda, rukūʿ, waqf and sakta signs, and the
+   disputed end-of-āyah mark (U+08D4–U+08E2). They are annotations printed
+   above the line, not letters or vowels, and no font available to this app
+   carries them: on a phone they render as empty boxes in the middle of a
+   verse, which reads as corruption of scripture rather than as a missing
+   glyph. Hidden here rather than removed from the data, so bundling a Qur'anic
+   font later is one line to undo and nothing has been lost in the meantime. */
+/* U+08E2 ARABIC DISPUTED END OF AYAH is an editorial marker, not a recitation
+   sign, and Google Fonts deliberately excludes it from the Arabic subset of
+   both Amiri and Noto Naskh Arabic — it renders as a tofu box on every device.
+   Every other waqf mark in the IndoPak text (U+08D4-U+08E1: rukuʿ, qif, waqfa,
+   sakta, sajda …) IS covered by Noto Naskh Arabic, which is first in the
+   .quranic stack, so those are left exactly as the mushaf has them. */
+const UNRENDERABLE_MARKS = /\u08E2/g;
+const arabicForDisplay = t => String(t).replace(UNRENDERABLE_MARKS, "");
+
 /* ---- athkār ---- */
 let akSection = 0;
 
 function renderAthkar(){
   const d = window.ATHKAR;
   if(!d){ document.getElementById('ak-body').innerHTML =
-    `<p class="qd-empty">Couldn't load the athkār. Check your connection and try again.</p>`; return; }
+    `<p class="qd-empty">${esc(t("athkar.load_failed","Couldn't load the athkār. Check your connection and try again."))}</p>`; return; }
 
-  document.getElementById('ak-note').textContent = d.reviewNote;
+  document.getElementById('ak-note').textContent = t("athkar.review_note", d.reviewNote);
   document.getElementById('ak-tabs').innerHTML = d.sections.map((sec,i) =>
-    `<button class="ak-tab${i===akSection?' on':''}" data-i="${i}">${esc(sec.title)}</button>`).join('');
+    `<button class="ak-tab${i===akSection?' on':''}" data-i="${i}">${
+      esc(t("athkar."+sec.id+".title", sec.title))}</button>`).join('');
   document.querySelectorAll('#ak-tabs .ak-tab').forEach(b =>
     b.addEventListener('click', () => { akSection = Number(b.dataset.i); renderAthkar();
       document.querySelector('#athkar .sh-body').scrollTop = 0; }));
 
   const sec = d.sections[akSection];
   document.getElementById('ak-body').innerHTML =
-    `<p class="ak-intro">${esc(sec.intro)}</p>` +
-    sec.items.map(it => `
+    `<p class="ak-intro">${esc(t("athkar."+sec.id+".intro", sec.intro))}</p>` +
+    sec.items.map((it,j) => {
+      const k = "athkar."+sec.id+"."+j;
+      return `
       <div class="wl-quote">
-        <p class="wl-ar2 quranic">${esc(it.ar)}</p>
-        <p class="wl-en2">&ldquo;${esc(it.en)}&rdquo;</p>
-        ${it.note ? `<p class="ak-extra">${esc(it.note)}</p>` : ""}
-        <p class="wl-src">${esc(it.times)} &middot; ${esc(it.src || it.source)}</p>
-      </div>`).join('');
+        <p class="wl-ar2 quranic">${esc(arabicForDisplay(it.ar))}</p>
+        <p class="wl-en2">&ldquo;${esc(t(k+".en", it.en))}&rdquo;</p>
+        ${it.note ? `<p class="ak-extra">${esc(t(k+".note", it.note))}</p>` : ""}
+        <p class="wl-src">${esc(t(k+".times", it.times))} &middot; ${
+          esc(t(k+".src", it.src || it.source))}</p>
+      </div>`; }).join('');
   retranslate();
 }
 
@@ -4750,23 +4951,52 @@ function closeAthkar(){
 }
 
 /* ---- duʿās ---- */
-function duaCard(it){
+function duaCard(it, key){
+  /* The transliteration is a pronunciation guide for the Arabic above it.
+     Urdu and Gujarati readers get one in their own script; an Arabic reader is
+     already reading the words, so the line is dropped rather than shown as a
+     duplicate of the duʿā itself. */
   return `
     <div class="wl-quote">
-      <p class="du-label">${esc(it.label)}</p>
-      <p class="wl-ar2 quranic">${esc(it.ar)}</p>
-      <p class="du-tr">${esc(it.tr)}</p>
-      <p class="wl-en2">&ldquo;${esc(it.en)}&rdquo;</p>
-      ${it.note ? `<p class="ak-extra">${esc(it.note)}</p>` : ""}
-      <p class="wl-src">${esc(it.src)}</p>
+      <p class="du-label">${esc(t(key+".label", it.label))}</p>
+      <p class="wl-ar2 quranic">${esc(arabicForDisplay(it.ar))}</p>
+      ${activeLang === "ar" ? "" : `<p class="du-tr">${esc(t(key+".tr", it.tr))}</p>`}
+      <p class="wl-en2">&ldquo;${esc(t(key+".en", it.en))}&rdquo;</p>
+      ${it.note ? `<p class="ak-extra">${esc(t(key+".note", it.note))}</p>` : ""}
+      <p class="wl-src">${esc(t(key+".src", it.src))}</p>
     </div>`;
 }
+
+/* One drawn mark per category, on the same 24-grid and stroke weight as the
+   icons already in the drawer, so the set reads as one family. Each says what
+   its category is about rather than decorating it: a sun rising for the day, a
+   mihrab arch for the masjid, an open hand for hardship. */
+const DUA_ICONS = {
+  day: '<path d="M12 3.5v2.2"/><path d="M5.6 6.1 7.2 7.7"/><path d="M18.4 6.1 16.8 7.7"/>' +
+       '<path d="M3 14h18"/><path d="M5.5 17.5h13"/><path d="M8 21h8"/>' +
+       '<path d="M8.2 14a3.8 3.8 0 0 1 7.6 0"/>',
+  food: '<path d="M7 3v6.2a2 2 0 0 0 4 0V3"/><path d="M9 9.2V21"/>' +
+        '<path d="M17.2 3c-1.6 0-2.9 2.1-2.9 4.7s1.3 4.7 2.9 4.7V21"/>',
+  masjid: '<path d="M5 20.5v-7a7 7 0 0 1 14 0v7"/><path d="M3.2 20.5h17.6"/>' +
+          '<path d="M12 6.5V4.2"/><circle cx="12" cy="3" r="1.1"/>' +
+          '<path d="M9.6 20.5v-3.6a2.4 2.4 0 0 1 4.8 0v3.6"/>',
+  hardship: '<path d="M12 20.5s-6.8-4.2-8.4-8.4A4.6 4.6 0 0 1 12 7.6a4.6 4.6 0 0 1 8.4 4.5' +
+            'C18.8 16.3 12 20.5 12 20.5Z"/><path d="M12 7.6v4.1"/>',
+  travel: '<path d="M4.5 20.5 9 3.5"/><path d="M19.5 20.5 15 3.5"/>' +
+          '<path d="M12 5.2v2"/><path d="M12 10.4v2.4"/><path d="M12 16v2.4"/>',
+  people: '<circle cx="8.4" cy="8.6" r="2.9"/><path d="M3.2 20a5.2 5.2 0 0 1 10.4 0"/>' +
+          '<circle cx="16.8" cy="10.2" r="2.3"/><path d="M14.2 20a4.4 4.4 0 0 1 6.6-3.8"/>',
+  weather: '<path d="M17.4 15.5a3.6 3.6 0 0 0-.7-7.1 5.2 5.2 0 0 0-9.9 1.6 3.4 3.4 0 0 0 .5 6.8"/>' +
+           '<path d="M8.6 18.4 7.8 20.8"/><path d="M12.2 18.4l-.8 2.4"/><path d="M15.8 18.4l-.8 2.4"/>',
+};
+const duaIcon = id => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DUA_ICONS[id] || ""}</svg>`;
 
 function renderDuaCategories(filter){
   const d = window.DUAS;
   if(!d){ document.getElementById('du-cats').innerHTML =
-    `<p class="qd-empty">Couldn't load the duʿās. Check your connection and try again.</p>`; return; }
-  document.getElementById('du-note').textContent = d.reviewNote;
+    `<p class="qd-empty">${esc(t("duas.load_failed","Couldn't load the duʿās. Check your connection and try again."))}</p>`; return; }
+  document.getElementById('du-note').textContent = t("duas.review_note", d.reviewNote);
 
   const q = (filter || "").trim().toLowerCase();
   if(q){
@@ -4774,24 +5004,31 @@ function renderDuaCategories(filter){
        not have to guess which heading it lives under. */
     const hits = [];
     for(const c of d.categories)
-      for(const it of c.items)
-        if((it.label+" "+it.en+" "+it.tr+" "+c.title).toLowerCase().includes(q)) hits.push(it);
+      c.items.forEach((it,j) => {
+        const k = "dua."+c.id+"."+j;
+        const hay = [it.label, it.en, it.tr, c.title,
+                     t(k+".label",it.label), t(k+".en",it.en), t(k+".tr",it.tr),
+                     t("dua."+c.id+".title", c.title)].join(" ").toLowerCase();
+        if(hay.includes(q)) hits.push({it, k});
+      });
     document.getElementById('du-cats').innerHTML = hits.length
-      ? `<p class="ak-intro">${hits.length} duʿā${hits.length===1?"":"s"} matching “${esc(filter)}”</p>`
-        + hits.map(duaCard).join('')
-      : `<p class="qd-empty">Nothing matches that.</p>`;
+      ? `<p class="ak-intro">${esc((hits.length===1
+              ? t("duas.n_matching_one", "{n} duʿā matching “{q}”")
+              : t("duas.n_matching",     "{n} duʿās matching “{q}”"))
+            .replace("{n}", num(hits.length)).replace("{q}", filter))}</p>`
+        + hits.map(h => duaCard(h.it, h.k)).join('')
+      : `<p class="qd-empty">${esc(t("duas.nothing_matches","Nothing matches that."))}</p>`;
     return;
   }
 
-  document.getElementById('du-cats').innerHTML = d.categories.map(c => `
-    <button class="qd-srow" data-cat="${esc(c.id)}">
-      <span class="qd-srow-t">
-        <span class="qd-srow-en">${esc(c.title)}</span>
-        <span class="qd-srow-meta">${c.items.length} duʿā${c.items.length===1?"":"s"}</span>
-      </span>
-      <span class="du-chev">&rsaquo;</span>
-    </button>`).join('');
-  document.querySelectorAll('#du-cats .qd-srow').forEach(b =>
+  document.getElementById('du-cats').innerHTML =
+    `<div class="du-grid">` + d.categories.map(c => `
+      <button class="du-tile" data-cat="${esc(c.id)}" aria-label="${esc(t("dua."+c.id+".title", c.title))}">
+        ${duaIcon(c.id)}
+        <span class="du-t">${esc(t("dua."+c.id+".title", c.title))}</span>
+        <span class="du-c">${num(c.items.length)}</span>
+      </button>`).join('') + `</div>`;
+  document.querySelectorAll('#du-cats .du-tile').forEach(b =>
     b.addEventListener('click', () => openDuaCategory(b.dataset.cat)));
   retranslate();
 }
@@ -4802,9 +5039,10 @@ function openDuaCategory(id){
   document.getElementById('du-list-view').hidden = true;
   document.getElementById('du-read-view').hidden = false;
   document.getElementById('du-back').hidden = false;
-  document.getElementById('du-title').textContent = c.title;
+  document.getElementById('du-title').textContent = t("dua."+c.id+".title", c.title);
   document.querySelector('#duas .sh-body').scrollTop = 0;
-  document.getElementById('du-items').innerHTML = c.items.map(duaCard).join('');
+  document.getElementById('du-items').innerHTML =
+    c.items.map((it,j) => duaCard(it, "dua."+c.id+"."+j)).join('');
   retranslate();
 }
 
@@ -4812,7 +5050,7 @@ function showDuaList(){
   document.getElementById('du-read-view').hidden = true;
   document.getElementById('du-list-view').hidden = false;
   document.getElementById('du-back').hidden = true;
-  document.getElementById('du-title').textContent = "Everyday Duʿās";
+  document.getElementById('du-title').textContent = t("duas.title","Everyday Duʿās");
   document.querySelector('#duas .sh-body').scrollTop = 0;
 }
 
@@ -5140,13 +5378,19 @@ function drawTicks(){
 function setQibla(lat,lon,fromLabel){
   const b=qiblaBearing(lat,lon), d=kmToKaaba(lat,lon);
   QIBLA=b;
-  const bt=`${b.toFixed(0)}°`;
-  document.getElementById('q-bearing').textContent=bt;
-  document.getElementById('q-b2').textContent=`${b.toFixed(1)}° true`;
-  document.getElementById('q-d2').textContent=`${Math.round(d).toLocaleString()} km`;
-  document.getElementById('q-from').textContent=fromLabel;
-  document.getElementById('q-src').textContent=fromLabel==="Your location"?"From your location":"From the masjid";
-  document.getElementById('q-sub').textContent=`from true north · ${Math.round(d).toLocaleString()} km to Makkah`;
+  const km=num(Math.round(d).toLocaleString("en-GB"));
+  const mine = fromLabel==="Your location";
+  document.getElementById('q-bearing').textContent=`${num(b.toFixed(0))}°`;
+  document.getElementById('q-b2').textContent=
+    t("qibla.degrees_true","{d}° true").replace("{d}", num(b.toFixed(1)));
+  document.getElementById('q-d2').textContent=t("qibla.km","{km} km").replace("{km}", km);
+  document.getElementById('q-from').textContent=
+    mine ? t("qibla.your_location","Your location") : fromLabel;
+  document.getElementById('q-src').textContent = mine
+    ? t("qibla.from_your_location","From your location")
+    : t("qibla.from_the_masjid","From the masjid");
+  document.getElementById('q-sub').textContent=
+    t("qibla.from_true_north","from true north · {km} km to Makkah").replace("{km}", km);
   renderCompass();
 }
 
@@ -5167,8 +5411,8 @@ function renderCompass(){
 
 function compassBlockers(){
   const out=[];
-  if(!window.isSecureContext) out.push("this page isn't on https");
-  if(window.self!==window.top) out.push("it's running inside a preview frame");
+  if(!window.isSecureContext) out.push(t("qibla.not_https","this page isn't on https"));
+  if(window.self!==window.top) out.push(t("qibla.in_preview_frame","it's running inside a preview frame"));
   return out;
 }
 
@@ -5179,8 +5423,10 @@ function startCompass(){
 
   const blockers=compassBlockers();
   if(blockers.length){
-    note.textContent="The compass can't run here because "+blockers.join(" and ")+
-      ". Open the app from its web address on your phone and it will work. The bearing above is correct either way.";
+    note.textContent=t("qibla.cant_run_here","The compass can't run here because {why}")
+      .replace("{why}", blockers.join(" " + t("qibla.and","and") + " "))+
+      t("qibla.open_from_web_address",
+        ". Open the app from its web address on your phone and it will work. The bearing above is correct either way.");
     return;
   }
 
@@ -5191,8 +5437,8 @@ function startCompass(){
     if(h===null) return;
     events++; HEADING=h; renderCompass();
     if(events===1){
-      btn.textContent="Compass on";
-      note.textContent="Hold the phone flat and turn until the gold marker is at the top. Compasses drift near metal — a figure-of-eight motion recalibrates.";
+      btn.textContent=t("qibla.compass_on","Compass on");
+      note.textContent=t("qibla.hold_flat","Hold the phone flat and turn until the gold marker is at the top. Compasses drift near metal — a figure-of-eight motion recalibrates.");
     }
   };
 
@@ -5200,13 +5446,13 @@ function startCompass(){
     window.addEventListener('deviceorientationabsolute', onOrient, true);
     window.addEventListener('deviceorientation', onOrient, true);
     btn.disabled=true;
-    btn.textContent="Starting compass…";
-    note.textContent="Move the phone slightly to wake the compass.";
+    btn.textContent=t("qibla.starting","Starting compass…");
+    note.textContent=t("qibla.move_to_wake","Move the phone slightly to wake the compass.");
     setTimeout(()=>{
       if(events===0){
         btn.disabled=false;
-        btn.textContent="Try the compass again";
-        note.textContent="No compass readings came through. This device may not have a magnetometer, or it needs calibrating — move it in a figure-of-eight. The bearing above works with any compass app.";
+        btn.textContent=t("qibla.try_again","Try the compass again");
+        note.textContent=t("qibla.no_readings","No compass readings came through. This device may not have a magnetometer, or it needs calibrating — move it in a figure-of-eight. The bearing above works with any compass app.");
       }
     }, 3000);
   };
@@ -5215,14 +5461,15 @@ function startCompass(){
   if(D && typeof D.requestPermission==="function"){
     D.requestPermission().then(r=>{
       if(r==="granted") attach();
-      else note.textContent="Compass access was declined. You can allow motion & orientation access in Settings → Safari, or use the bearing above with a compass app.";
+      else note.textContent=t("qibla.access_declined","Compass access was declined. You can allow motion & orientation access in Settings → Safari, or use the bearing above with a compass app.");
     }).catch(()=>{
-      note.textContent="This device wouldn't allow compass access — it usually needs the page opened directly over https. The bearing above still works with a compass app.";
+      note.textContent=t("qibla.access_blocked","This device wouldn't allow compass access — it usually needs the page opened directly over https. The bearing above still works with a compass app.");
     });
   }else if('ondeviceorientationabsolute' in window || 'ondeviceorientation' in window){
     attach();
   }else{
-    note.textContent="This device has no compass. Face "+Math.round(QIBLA)+"° using a compass app, or follow the mihrab in the masjid.";
+    note.textContent=t("qibla.no_compass","This device has no compass. Face {d}° using a compass app, or follow the mihrab in the masjid.")
+      .replace("{d}", num(Math.round(QIBLA)));
     btn.disabled=true;
   }
 }
@@ -5262,11 +5509,11 @@ function currentPrefs(){
 
 function summarise(p){
   const on=[];
-  if(p.jam) on.push(`Jamāʿah (${p.mins} min before)`);
-  if(p.jan) on.push("Janāzah");
-  if(p.ann) on.push("Announcements");
-  if(p.evt) on.push("Events");
-  return on.length ? on.join(" · ") : "No alerts selected";
+  if(p.jam) on.push(t("alerts.jamaah_mins_before","Jamāʿah ({n} min before)").replace("{n}", num(p.mins)));
+  if(p.jan) on.push(t("sheet.janazah","Janāzah"));
+  if(p.ann) on.push(t("alerts.announcements","Announcements"));
+  if(p.evt) on.push(t("alerts.events","Events"));
+  return on.length ? on.join(" · ") : t("alerts.none_selected","No alerts selected");
 }
 
 function showCollapsed(p){
@@ -5274,7 +5521,8 @@ function showCollapsed(p){
   document.getElementById('a-done').hidden=false;
   document.getElementById('a-summary').textContent=summarise(p);
   document.getElementById('a-done').querySelector('.dn-1').textContent =
-    (p.jam||p.jan||p.ann||p.evt) ? "Notifications on" : "Notifications off";
+    (p.jam||p.jan||p.ann||p.evt) ? t("alerts.notifications_on","Notifications on")
+                                 : t("alerts.notifications_off","Notifications off");
 }
 
 function showPanel(){
@@ -5451,7 +5699,7 @@ function initDiagnostics(){
     // make sure what gets sent is what they are looking at
     await runDiagnostics();
     const report = document.getElementById('diag-out').textContent || "";
-    if(!report.trim()){ out.textContent = "Nothing to send yet — open this panel first."; return; }
+    if(!report.trim()){ out.textContent = t("notify.nothing_to_send","Nothing to send yet — open this panel first."); return; }
 
     btn.disabled = true; btn.textContent = "Sending…";
     out.textContent = "";
@@ -5466,8 +5714,8 @@ function initDiagnostics(){
       });
       const data = await res.json().catch(()=>({}));
       if(!res.ok || !data.ok) throw new Error(data.error || ("the masjid's service returned " + res.status));
-      out.textContent = "Sent, thank you. Your reference is " + data.ref
-        + " — quote it if you get in touch.";
+      out.textContent = t("report.sent_reference","Sent, thank you. Your reference is ") + data.ref
+        + t("report.quote_it"," — quote it if you get in touch.");
       note.value = "";
     }catch(e){
       /* Offline or blocked. Don't strand them: the panel can be copied and
@@ -5525,10 +5773,10 @@ function initAlerts(){
 
   const unlock=()=>{
     btn.dataset.on="1";
-    btn.textContent="Notifications enabled on this device";
+    btn.textContent=t("notify.enabled_on_device","Notifications enabled on this device");
     toggles.classList.add('unlocked');
-    lead.textContent="Choose what you'd like to be told about.";
-    note.textContent="Delivery starts once the masjid's notification service is connected.";
+    lead.textContent=t("notify.choose_what","Choose what you'd like to be told about.");
+    note.textContent=t("notify.delivery_starts_once","Delivery starts once the masjid's notification service is connected.");
   };
 
   btn.addEventListener('click', async ()=>{
@@ -5539,7 +5787,7 @@ function initAlerts(){
 
     const label = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Just a moment…";
+    btn.textContent = t("notify.just_a_moment","Just a moment…");
 
     /* Whatever happens, the button comes back. Leaving it disabled on a wedged
        promise is what stranded people on "Just a moment…" with no way to try
@@ -5563,18 +5811,19 @@ function initAlerts(){
       note.textContent = OneSignalManager.loadingDiagnosis();
     }else if(res && res.reason==="declined"){
       note.textContent = OneSignalManager.blockedReason()
-        || "Notifications weren’t allowed. You can turn them on in Settings → Notifications.";
+        || t("notify.not_allowed","Notifications weren’t allowed. You can turn them on in Settings → Notifications.");
     }else if(res && res.reason==="noanswer"){
       /* No prompt appeared. If the SDK never started, that is the reason and
          tapping again will not help — say so instead of sending people round
          a loop of force-quitting the app. */
       note.textContent = OneSignalManager.isReady()
-        ? "iPhone didn’t show the permission prompt. Close the app fully (swipe it away), "
-          + "open it from the Home Screen again, and tap once more. If it still doesn’t "
-          + "appear, check Settings → Notifications → Taiyabah Masjid."
+        ? t("notify.iphone_no_prompt",
+            "iPhone didn’t show the permission prompt. Close the app fully (swipe it away), "
+            + "open it from the Home Screen again, and tap once more. If it still doesn’t "
+            + "appear, check Settings → Notifications → Taiyabah Masjid.")
         : OneSignalManager.loadingDiagnosis();
     }else{
-      note.textContent = "Couldn’t turn notifications on just now. Please check your connection and try again.";
+      note.textContent = t("notify.couldnt_turn_on","Couldn’t turn notifications on just now. Please check your connection and try again.");
     }
   });
 
