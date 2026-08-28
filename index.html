@@ -66,6 +66,15 @@
      Arabic first: the IndoPak edition draws on Arabic Extended-A as well as the
      main Arabic block, and a font that does not cover those blocks renders parts
      of scripture as empty boxes. Noto covers them; Amiri stays as the fallback. */
+  /* A run of Latin text inside an RTL page gets reordered by the bidi
+     algorithm: "Bolton BL1 8HD." came out with the full stop leading, and a
+     quoted English sentence had its closing quote thrown to the front. The
+     text that deliberately stays Latin — addresses, phone numbers, email and
+     web addresses, and the English names in the language picker — is isolated
+     so it reads in its own direction inside an Urdu or Arabic page. */
+  [data-i18n-latin], .sp-en { direction: ltr; unicode-bidi: isolate; }
+  :root[dir="rtl"] [data-i18n-latin], :root[dir="rtl"] .sp-en { text-align: right }
+
   /* Letter-spacing and small-caps tracking are a Latin typographic device. In
      Gujarati they push a conjunct apart into separate letters — "આગામી" was
      rendering as "આ ગા મી" — and in Arabic and Urdu they break the joins that
@@ -4498,10 +4507,12 @@ function isPackDownloaded(code){
 
 /* Fetch a pack by injecting a script tag — same approach as the Qur'an
    data, avoids any CORS/fetch quirks on GitHub Pages. */
-function downloadPack(code){
+function downloadPack(code, bust){
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = 'lang/' + code + '.js';
+    /* A refresh has to get past the service worker's copy as well as the
+       browser's, so it asks for a URL neither has seen. */
+    s.src = 'lang/' + code + '.js' + (bust ? '?v=' + Date.now() : '');
     s.onload = () => {
       const pack = window.LANG_PACK;
       if(!pack || pack.code !== code) return reject(new Error("pack mismatch"));
@@ -4512,6 +4523,26 @@ function downloadPack(code){
     s.onerror = () => reject(new Error("couldn't download"));
     document.head.appendChild(s);
   });
+}
+
+/* A pack was downloaded once and then cached in localStorage for ever. There
+   was no version on it and nothing ever asked for a newer one, so a phone that
+   picked Urdu in an early build kept that early pack: the navigation and the
+   digits were translated, and everything added since fell back to the English
+   in the markup. The app looked half-translated on exactly the devices that
+   had been using it longest.
+
+   So: the cached pack is still used immediately — it has to work offline and
+   without a wait — and a fresh copy is fetched in the background. If its
+   version differs, it replaces the cached one and the language is re-applied
+   in place. */
+function refreshPack(code){
+  if(code === "en") return;
+  const have = getPack(code);
+  downloadPack(code, true).then(fresh => {
+    if(fresh && have && fresh.version === have.version) return;   // already current
+    if(activeLang === code) applyLang(code);
+  }).catch(() => { /* offline, or the pack moved — the cached one still works */ });
 }
 
 function getPack(code){
@@ -4699,7 +4730,10 @@ async function selectLang(code, row){
 
 function initLanguage(){
   const saved = langStore.get(LANG_KEY);
-  if(saved && saved !== "en" && isPackDownloaded(saved)) applyLang(saved);
+  if(saved && saved !== "en" && isPackDownloaded(saved)){
+    applyLang(saved);
+    refreshPack(saved);           // in the background; the cached pack is already on screen
+  }
   else applyLang("en");
 }
 

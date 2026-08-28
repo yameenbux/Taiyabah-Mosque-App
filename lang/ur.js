@@ -16,6 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
+ "version": "99b7d0182c1e",
  "strings": {
   "nav.times": "اوقات",
   "nav.listen": "سماعت",

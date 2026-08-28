@@ -5,7 +5,7 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v94";
+const CACHE = "taiyabah-v95";
 const SHELL = ["./index.html", "./admin.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
 
 self.addEventListener("install", (e) => {
@@ -41,13 +41,32 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  /* Content the app fetches after launch — the Qur'an, the athkār and duʿās,
-     the language packs. None of it was ever put in the cache, so it was
-     re-fetched on every open and unavailable without a signal. Serve from
-     cache when it is there, otherwise fetch and keep a copy, so a sūrah read
-     once can be read again in the masjid basement with no bars. */
+  /* A language pack is the one piece of this content that changes: the Qur'an
+     does not, but a translation is corrected. Cache-first here meant a phone
+     that had the pack kept being handed the same old copy no matter how many
+     times the app asked for a newer one — so the app's background refresh
+     could never actually see new words. Network-first, falling back to the
+     cache, keeps it correct online and still works with no signal. */
   if (url.origin === self.location.origin &&
-      /^\/(quran|lang)\//.test(url.pathname) && /\.(json|js)$/.test(url.pathname)) {
+      /^\/lang\//.test(url.pathname) && /\.js$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(e.request).then((res) => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
+        return res;
+      }).catch(() => caches.match(e.request).then(hit => hit ||
+        /* a cache-busted ?v= URL was never cached; fall back to the plain one */
+        caches.match(url.origin + url.pathname)))
+    );
+    return;
+  }
+
+  /* Content the app fetches after launch — the Qur'an, the athkār and duʿās.
+     None of it was ever put in the cache, so it was re-fetched on every open
+     and unavailable without a signal. Serve from cache when it is there,
+     otherwise fetch and keep a copy, so a sūrah read once can be read again in
+     the masjid basement with no bars. */
+  if (url.origin === self.location.origin &&
+      /^\/quran\//.test(url.pathname) && /\.(json|js)$/.test(url.pathname)) {
     e.respondWith(
       caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => {
         if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }

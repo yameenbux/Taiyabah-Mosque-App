@@ -16,6 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
+ "version": "2a4f2c67143b",
  "strings": {
   "nav.times": "સમય",
   "nav.listen": "સાંભળો",

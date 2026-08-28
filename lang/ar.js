@@ -16,6 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
+ "version": "f6c67bb5d4d8",
  "strings": {
   "nav.times": "المواقيت",
   "nav.listen": "استماع",
