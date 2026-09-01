@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "85bf6f423ed5",
+ "version": "8decd553f4df",
  "strings": {
   "nav.times": "સમય",
   "nav.listen": "સાંભળો",
@@ -1221,7 +1221,6 @@ window.LANG_PACK = {
   "hallhire.included": "સામેલ",
   "hallhire.not_included": "સામેલ નથી",
   "portals.madrasah_portal": "મદરેસા પોર્ટલ",
-  "portals.venue_bookings_staff": "હોલ બુકિંગ · સ્ટાફ",
   "portals.madrasah_note": "સાઇન ઇન · રજિસ્ટર અને વિદ્યાર્થી રેકોર્ડ હજી તૈયાર થઈ રહ્યા છે"
  }
 };
