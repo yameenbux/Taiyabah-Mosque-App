@@ -104,6 +104,10 @@ for (const name of ["CALENDAR_DAYS", "REMINDERS"])
 
 for (const v of arrayOf("VIDEOS")) { add(`video.${v.id}.t`, v.t); add(`video.${v.id}.d`, v.d); }
 
+/* The hall's two hire sessions name their own key, so there is no literal for
+   the t("key", "English") scan to find. */
+for (const sn of arrayOf("BK_SESSIONS")) if (sn && sn.nameKey) add(sn.nameKey, sn.name);
+
 for (const [k, en] of [["fajr","Fajr"],["sunrise","Sun"],["zuhr","Zuhr"],["asr","Asr"],
                        ["maghrib","Mag"],["isha","Isha"]]) add(`month.col.${k}`, en);
 add("zakat.metal.gold", "gold");

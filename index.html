@@ -455,6 +455,93 @@
   .rb-ref{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
     margin-top:8px;text-align:right;direction:rtl}
 
+  /* A row that leaves the app says so: the chevron becomes an outward arrow,
+     so nobody taps expecting a sheet and lands in a browser tab. */
+  .dr-ext{flex:0 0 auto;font-size:13px;color:var(--gold-bright);opacity:.8}
+  .dr-note{display:block;font-size:11px;line-height:1.4;color:#9C8794;margin-top:3px;font-weight:400}
+  a.dr-row{text-decoration:none}
+
+  /* ---- hall booking ---- */
+  .bk-card{padding:14px}
+  .bk-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:12px}
+  .bk-legend>span{display:flex;align-items:center;gap:5px}
+  .bk-dot{width:9px;height:9px;border-radius:50%;display:block;flex:0 0 auto}
+  .bk-dot.free{background:#3F7D58}
+  .bk-dot.taken{background:var(--danger)}
+  .bk-dot.unknown{background:var(--line)}
+  .bk-cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .bk-cal-head h4{flex:1;text-align:center;font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600}
+  .bk-nav{width:34px;height:34px;flex:0 0 auto;border-radius:10px;font:inherit;font-size:18px;cursor:pointer;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+  .bk-nav:disabled{opacity:.35;cursor:default}
+  .bk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .bk-wd{text-align:center;font-size:10.5px;color:var(--muted);padding-bottom:4px}
+  .bk-day{aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--paper);
+    font:inherit;font-size:13px;color:var(--ink);cursor:pointer;display:grid;place-items:center;
+    position:relative;padding:0}
+  .bk-day[disabled]{opacity:.3;cursor:default}
+  .bk-day[data-state="free"]{border-color:#3F7D58}
+  .bk-day[data-state="taken"]{border-color:var(--danger);color:var(--muted)}
+  .bk-day[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff;font-weight:700}
+  .bk-day .bk-mark{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%}
+  .bk-day[data-state="free"] .bk-mark{background:#3F7D58}
+  .bk-day[data-state="taken"] .bk-mark{background:var(--danger)}
+  .bk-day[data-on="1"] .bk-mark{background:#fff}
+  .bk-horizon{font-size:11.5px;color:var(--muted);margin-top:10px;text-align:center}
+
+  .bk-panel{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+  .bk-when{font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600;margin-bottom:10px}
+  .bk-sessions{display:grid;gap:8px}
+  .bk-session{text-align:left;font:inherit;padding:12px 14px;border-radius:12px;cursor:pointer;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);display:flex;
+    align-items:center;gap:10px}
+  .bk-session[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .bk-session[disabled]{opacity:.55;cursor:default}
+  .bk-s-t{flex:1;min-width:0}
+  .bk-s-n{font-weight:700;font-size:14px}
+  .bk-s-w{font-size:12px;color:var(--muted);margin-top:2px}
+  .bk-session[data-on="1"] .bk-s-w{color:#EADFE6}
+  .bk-s-state{font-size:11px;letter-spacing:.06em;text-transform:uppercase;flex:0 0 auto}
+
+  .bk-choose{margin-top:14px}
+  .bk-clabel{display:block;font-size:12px;font-weight:700;color:var(--muted);
+    letter-spacing:.06em;text-transform:uppercase;margin:12px 0 7px}
+  .bk-opts{display:flex;gap:7px;flex-wrap:wrap}
+  .bk-opt{flex:1 1 auto;min-width:88px;font:inherit;font-size:13px;padding:10px 12px;border-radius:11px;
+    cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);text-align:center}
+  .bk-opt small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+  .bk-opt[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .bk-opt[data-on="1"] small{color:#EADFE6}
+  .bk-price{margin-top:12px;padding:11px 13px;border-radius:11px;background:rgba(198,162,76,.13);
+    border:1px solid rgba(198,162,76,.4);font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .bk-price b{font-size:16px}
+
+  .bk-agree{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:12.5px;
+    line-height:1.5;color:var(--ink);cursor:pointer}
+  .bk-agree input{margin-top:2px;flex:0 0 auto;width:17px;height:17px;accent-color:var(--brand-600)}
+
+  .bk-form{margin-top:14px;display:grid;gap:11px}
+  .bk-field label{display:block;font-size:12px;font-weight:700;color:var(--muted);
+    letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+  .bk-field input,.bk-field textarea{width:100%;box-sizing:border-box;font:inherit;font-size:15px;
+    padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink)}
+  .bk-field textarea{resize:vertical}
+  .bk-field[data-bad="1"] input,.bk-field[data-bad="1"] textarea{border-color:var(--danger)}
+  .bk-hint{display:block;font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:5px}
+  .bk-err{font-size:13px;line-height:1.55;color:var(--danger);background:rgba(155,44,44,.08);
+    border:1px solid rgba(155,44,44,.3);border-radius:11px;padding:10px 12px}
+  .bk-submit{font:inherit;font-size:15px;font-weight:700;padding:14px;border:0;border-radius:12px;
+    background:var(--brand-600);color:#fff;cursor:pointer;width:100%}
+  .bk-submit:disabled{opacity:.55;cursor:default}
+  .bk-done{margin-top:14px;padding:14px;border-radius:12px;background:var(--paper);
+    border:1px solid var(--line);font-size:13.5px;line-height:1.6;color:var(--ink)}
+  .bk-done h4{font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600;margin-bottom:8px}
+  .bk-done .bk-sum{display:flex;justify-content:space-between;gap:12px;padding:6px 0;
+    border-top:1px solid var(--line)}
+  .bk-done .bk-sum .k{color:var(--muted);font-size:12.5px}
+  .bk-done .bk-sum .v{font-weight:600;text-align:right}
+  .bk-done a{color:var(--brand-600);font-weight:700}
+
   /* ---- system preferences / language ---- */
   .sp-intro{font-size:13px;color:var(--muted);line-height:1.6;margin:0 4px 14px}
   .card.sp-list{padding:2px 14px}
@@ -1827,8 +1914,91 @@
             <p data-i18n="hallhire.taiyabah_centre_a_separate_building">Taiyabah Centre &mdash; a separate building owned by the masjid &mdash; offers
                three halls and two kitchens for hire, suitable for a range of community and
                family occasions.</p>
-            <p data-i18n="hallhire.for_availability_pricing_and_to">For availability, pricing and to discuss your requirements, please contact
-               the masjid&rsquo;s main office directly.</p>
+          </div>
+
+          <!-- ---------------- booking ----------------
+               The same two endpoints the website uses: availability is read
+               from the hall_availability view (confirmed bookings only), and a
+               request is inserted into hall_bookings. The anon key can do those
+               two things and nothing else — Row Level Security in Postgres is
+               the real access control, not anything on this screen. -->
+          <div class="sec-h"><h2 data-i18n="hallhire.book_the_hall">Book the hall</h2><span class="rule"></span></div>
+
+          <div class="card bk-card">
+            <div class="bk-legend" aria-hidden="true">
+              <span><i class="bk-dot free"></i><span data-i18n="hallhire.available">Available</span></span>
+              <span><i class="bk-dot taken"></i><span data-i18n="hallhire.taken">Taken</span></span>
+              <span><i class="bk-dot unknown"></i><span data-i18n="hallhire.not_known">Not known</span></span>
+            </div>
+
+            <div class="bk-cal-head">
+              <button class="bk-nav" id="bk-prev" aria-label="Previous month"
+                      data-i18n-attr="aria-label:a11y.previous_month">&lsaquo;</button>
+              <h4 id="bk-title">&mdash;</h4>
+              <button class="bk-nav" id="bk-next" aria-label="Next month"
+                      data-i18n-attr="aria-label:a11y.next_month">&rsaquo;</button>
+            </div>
+            <div class="bk-grid" id="bk-grid"></div>
+            <p class="bk-horizon" data-i18n="hallhire.bookings_up_to_12_months">Bookings can be made up to 12 months ahead.</p>
+
+            <div class="bk-panel" id="bk-panel" hidden>
+              <div class="bk-when" id="bk-when">&mdash;</div>
+              <div class="bk-sessions" id="bk-sessions"></div>
+
+              <div class="bk-choose" id="bk-choose" hidden>
+                <span class="bk-clabel" data-i18n="hallhire.which_hall">Which hall?</span>
+                <div class="bk-opts" id="bk-halls">
+                  <button type="button" class="bk-opt" data-hall="1">
+                    <span data-i18n="hallhire.hall_1">Hall 1</span><small data-i18n="hallhire.ground_floor">Ground floor</small></button>
+                  <button type="button" class="bk-opt" data-hall="2">
+                    <span data-i18n="hallhire.hall_2">Hall 2</span><small data-i18n="hallhire.ground_floor_2">Ground floor</small></button>
+                  <button type="button" class="bk-opt" data-hall="3">
+                    <span data-i18n="hallhire.hall_3">Hall 3</span><small data-i18n="hallhire.first_floor">1st floor</small></button>
+                </div>
+                <span class="bk-clabel" data-i18n="hallhire.kitchen">Kitchen?</span>
+                <div class="bk-opts" id="bk-kitchens">
+                  <button type="button" class="bk-opt" data-kitchen="yes" data-i18n="hallhire.including_kitchen">Including kitchen</button>
+                  <button type="button" class="bk-opt" data-kitchen="no" data-i18n="hallhire.without_kitchen">Without kitchen</button>
+                </div>
+                <span class="bk-clabel" data-i18n="hallhire.are_you_a_member">Are you a member of the masjid?</span>
+                <div class="bk-opts" id="bk-members">
+                  <button type="button" class="bk-opt" data-member="yes" data-i18n="hallhire.yes">Yes</button>
+                  <button type="button" class="bk-opt" data-member="no" data-i18n="hallhire.no">No</button>
+                </div>
+                <div class="bk-price" id="bk-price" hidden></div>
+              </div>
+
+              <label class="bk-agree" id="bk-agree-wrap" hidden>
+                <input type="checkbox" id="bk-agree">
+                <span data-i18n="hallhire.i_agree_to_the_terms">I have read and agree to the terms of hire, including use of the
+                  venue in accordance with Islamic rulings.</span>
+              </label>
+
+              <form class="bk-form" id="bk-form" novalidate hidden autocomplete="on">
+                <div class="bk-field">
+                  <label for="bk-first" data-i18n="hallhire.first_name">First name</label>
+                  <input type="text" id="bk-first" autocomplete="given-name">
+                </div>
+                <div class="bk-field">
+                  <label for="bk-last" data-i18n="hallhire.surname">Surname</label>
+                  <input type="text" id="bk-last" autocomplete="family-name">
+                </div>
+                <div class="bk-field">
+                  <label for="bk-addr" data-i18n="hallhire.address_label">Address</label>
+                  <textarea id="bk-addr" rows="2" autocomplete="street-address"></textarea>
+                </div>
+                <div class="bk-field">
+                  <label for="bk-phone" data-i18n="hallhire.contact_number">Contact number</label>
+                  <input type="tel" id="bk-phone" inputmode="tel" autocomplete="tel" data-i18n-latin>
+                  <span class="bk-hint" data-i18n="hallhire.phone_hint">The caretaker will call you before the day to arrange access,
+                    so this must be a number that reaches you.</span>
+                </div>
+                <div class="bk-err" id="bk-err" hidden></div>
+                <button type="submit" class="bk-submit" id="bk-submit" data-i18n="hallhire.request_this_slot">Request this slot</button>
+              </form>
+
+              <div class="bk-done" id="bk-done" hidden></div>
+            </div>
           </div>
 
           <a class="hh-call" href="tel:01204535997">
@@ -2344,12 +2514,17 @@
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t" data-i18n="marriage.application_form">Application form</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.parents_portal">Parents portal</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
-        </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.teachers_portal">Teachers portal</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
-        </button>
+        <!-- One portal serves parents, teaching staff and administrators, so it
+             replaces the two "coming soon" rows that used to stand for it. The
+             sign-in and roles work today; the registers and pupil records do
+             not, and the note says so rather than letting someone set up
+             two-step verification only to find an empty page. -->
+        <a class="dr-row" href="https://taiyabahwebsite.ysbdesigns.uk/portal/" target="_blank" rel="noopener">
+          <span class="dr-t">
+            <span data-i18n="portals.madrasah_portal">Madrasah Portal</span>
+            <small class="dr-note" data-i18n="portals.madrasah_note">Sign in &middot; registers and pupil records still being built</small>
+          </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
+        </a>
 
         <div class="dr-h" data-i18n="marriage.the_masjid">The masjid</div>
         <button class="dr-row" data-act="about">
@@ -2363,6 +2538,13 @@
         <button class="dr-row" data-act="hallhire">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></svg></span><span class="dr-t" data-i18n="marriage.hall_room_hire">Hall / Room Hire</span><span class="dr-ch">&rsaquo;</span>
         </button>
+        <!-- The staff portals live on the website, behind a password and a
+             two-step code. They open in the browser rather than being rebuilt
+             here: one sign-in, one place to maintain, and no authentication
+             code in a second codebase to keep in step. -->
+        <a class="dr-row" href="https://taiyabahwebsite.ysbdesigns.uk/venue/" target="_blank" rel="noopener">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v3M16 3v3"/><path d="M8.5 13.5h7M8.5 16.5h4"/></svg></span><span class="dr-t" data-i18n="portals.venue_bookings_staff">Venue Bookings &middot; staff</span><span class="dr-ext" aria-hidden="true">&#8599;</span>
+        </a>
         <button class="dr-row" data-act="marriagedeath">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7-4.4-7-9.6a4.4 4.4 0 0 1 7-3.6 4.4 4.4 0 0 1 7 3.6c0 5.2-7 9.6-7 9.6Z"/></svg></span><span class="dr-t" data-i18n="marriage.birth_marriage_death">Birth, Marriage &amp; Death</span><span class="dr-ch">&rsaquo;</span>
         </button>
@@ -4604,6 +4786,7 @@ function refreshRenderedText(){
     () => { if(open("athkar") && window.ATHKAR) renderAthkar(); },
     () => { if(open("duas") && window.DUAS) renderDuaCategories(document.getElementById('du-search')?.value); },
     () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
+    () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderSessions(); bkShowPrice(); } },
     () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
@@ -4932,6 +5115,345 @@ function loadOnce(src, flagName){
 const UNRENDERABLE_MARKS = /\u08E2/g;
 const arabicForDisplay = t => String(t).replace(UNRENDERABLE_MARKS, "");
 
+/* ---------------- hall booking ----------------
+   The same two endpoints the website uses, so the office works one queue:
+
+     GET  /rest/v1/hall_availability   dates and slots the office has CONFIRMED
+     POST /rest/v1/hall_bookings       a request, eight named columns
+
+   BOTH VALUES BELOW ARE SAFE TO PUBLISH. The anon key is designed to be
+   visible in the browser; Row Level Security in Postgres is what actually
+   protects the data. It can insert those eight columns and read the
+   availability view, and it cannot read a single booking back — which is why
+   the insert asks for nothing in return.
+
+   NEVER put the service_role key here. It bypasses RLS entirely.
+------------------------------------------------------------------ */
+const SUPA = {
+  url: "https://phenbhmobxwyvdeshvqw.supabase.co",
+  key: "sb_publishable_mOPuQKVP8WCTlBF2Qa1DVw_r_Tra5OO",
+};
+/* The Supabase dashboard shows the URL with /rest/v1/ on the end; pasting it
+   verbatim yields .../rest/v1/rest/v1/... and an error that says nothing
+   useful. Normalise so either form works. */
+const supaBase = () => String(SUPA.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+
+const BK_SESSIONS = [
+  { key:"morning", nameKey:"hallhire.morning", name:"Morning", from:"09:00", to:"16:00" },
+  { key:"evening", nameKey:"hallhire.evening", name:"Evening", from:"17:00", to:"23:00" },
+];
+/* The 16:00–17:00 gap is deliberate changeover time and is not bookable. */
+
+/* Prices the masjid has not yet confirmed — the website carries them as
+   placeholders too. They are shown as a guide and the screen says so, so that
+   nobody budgets on a figure the office has not agreed. */
+const BK_PRICING = {
+  member:    { morning: 100, evening: 120 },
+  nonmember: { morning: 150, evening: 180 },
+};
+
+const BK = {
+  taken: null,          // null = we do not know yet; never claim a date is free
+  month: null,          // first of the month on screen
+  date: null,           // chosen day
+  slot: null, hall: null, kitchen: null, member: null,
+  sent: false,
+};
+
+function bkIso(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0")
+       + "-" + String(d.getDate()).padStart(2,"0");
+}
+function bkMaxDate(){
+  const t = today0();
+  return new Date(t.getFullYear()+1, t.getMonth(), t.getDate());
+}
+
+/* Availability. Until this has loaded — and if it never loads — every day
+   stays "not known". The calendar must never say a date is free when it has
+   no way of knowing. */
+function bkLoadAvailability(){
+  const from = bkIso(today0());
+  return fetch(`${supaBase()}/rest/v1/hall_availability` +
+               `?select=booking_date,session_slot&booking_date=gte.${from}`, {
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key },
+  }).then(r => {
+    if(!r.ok) throw new Error("availability " + r.status);
+    return r.json();
+  }).then(rows => {
+    const map = {};
+    (rows || []).forEach(r => { map[r.booking_date + "|" + r.session_slot] = true; });
+    BK.taken = map;
+    bkRenderCal(); bkRenderSessions();
+  }).catch(e => {
+    console.warn("hall availability unavailable:", e);   // stays "not known"
+  });
+}
+
+/* The venue is let as a whole: one confirmed booking closes that session for
+   everybody, whichever hall it was. */
+function bkSlotFree(d, slotKey){
+  if(BK.taken === null) return null;
+  return !BK.taken[bkIso(d) + "|" + slotKey];
+}
+function bkDayState(d){
+  if(BK.taken === null) return "unknown";
+  const free = BK_SESSIONS.some(s => bkSlotFree(d, s.key));
+  return free ? "free" : "taken";
+}
+
+function bkRenderCal(){
+  const grid = document.getElementById("bk-grid");
+  if(!grid || !BK.month) return;
+  const y = BK.month.getFullYear(), m = BK.month.getMonth();
+  document.getElementById("bk-title").textContent = `${fullMon(m)} ${num(y)}`;
+
+  let html = "";
+  for(let i = 0; i < 7; i++) html += `<div class="bk-wd">${esc(dow(i))}</div>`;
+  const first = new Date(y, m, 1);
+  for(let i = 0; i < first.getDay(); i++) html += "<div></div>";
+
+  const min = today0(), max = bkMaxDate();
+  const days = new Date(y, m+1, 0).getDate();
+  for(let n = 1; n <= days; n++){
+    const d = new Date(y, m, n);
+    const past = d < min || d > max;
+    const state = past ? "" : bkDayState(d);
+    const on = BK.date && sameDay(d, BK.date) ? "1" : "0";
+    html += `<button class="bk-day" data-d="${bkIso(d)}" data-state="${state}" data-on="${on}"` +
+            `${past ? " disabled" : ""}>${num(n)}` +
+            `${state ? '<span class="bk-mark"></span>' : ""}</button>`;
+  }
+  grid.innerHTML = html;
+  grid.querySelectorAll(".bk-day:not([disabled])").forEach(b =>
+    b.addEventListener("click", () => bkPickDate(b.dataset.d)));
+
+  const prev = new Date(y, m-1, 1), next = new Date(y, m+1, 1);
+  document.getElementById("bk-prev").disabled = prev < new Date(min.getFullYear(), min.getMonth(), 1);
+  document.getElementById("bk-next").disabled = next > new Date(max.getFullYear(), max.getMonth(), 1);
+}
+
+function bkPickDate(iso){
+  const [y,m,d] = iso.split("-").map(Number);
+  BK.date = new Date(y, m-1, d);
+  BK.slot = null;
+  bkResetChoices();
+  document.getElementById("bk-panel").hidden = false;
+  bkRenderCal(); bkRenderSessions();
+}
+
+function bkResetChoices(){
+  BK.hall = BK.kitchen = BK.member = null;
+  BK.sent = false;
+  document.getElementById("bk-choose").hidden = true;
+  document.getElementById("bk-agree-wrap").hidden = true;
+  document.getElementById("bk-agree").checked = false;
+  document.getElementById("bk-form").hidden = true;
+  document.getElementById("bk-done").hidden = true;
+  document.getElementById("bk-price").hidden = true;
+  document.querySelectorAll("#bk-choose .bk-opt").forEach(b => b.dataset.on = "0");
+}
+
+function bkRenderSessions(){
+  const wrap = document.getElementById("bk-sessions");
+  if(!wrap || !BK.date) return;
+  document.getElementById("bk-when").textContent =
+    `${fullDow(BK.date.getDay())} ${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())}`;
+
+  wrap.innerHTML = BK_SESSIONS.map(sn => {
+    const free = bkSlotFree(BK.date, sn.key);
+    const label = free === null ? t("hallhire.not_known","Not known")
+                : free         ? t("hallhire.available","Available")
+                               : t("hallhire.taken","Taken");
+    const on = BK.slot === sn.key ? "1" : "0";
+    return `<button type="button" class="bk-session" data-slot="${sn.key}" data-on="${on}"` +
+           `${free === false ? " disabled" : ""}>
+      <span class="bk-s-t">
+        <span class="bk-s-n">${esc(t(sn.nameKey, sn.name))}</span>
+        <span class="bk-s-w">${esc(num(hm12(sn.from)))} &ndash; ${esc(num(hm12(sn.to)))}</span>
+      </span>
+      <span class="bk-s-state">${esc(label)}</span>
+    </button>`;
+  }).join("");
+
+  wrap.querySelectorAll(".bk-session:not([disabled])").forEach(b =>
+    b.addEventListener("click", () => {
+      BK.slot = b.dataset.slot;
+      bkResetChoices();
+      document.getElementById("bk-choose").hidden = false;
+      bkRenderSessions();
+    }));
+}
+
+function bkPrice(){
+  const band = BK_PRICING[BK.member === "yes" ? "member" : "nonmember"];
+  const amount = band && band[BK.slot];
+  return typeof amount === "number" ? amount : null;
+}
+function bkShowPrice(){
+  const box = document.getElementById("bk-price");
+  if(BK.member === null || !BK.slot){ box.hidden = true; return; }
+  const p = bkPrice();
+  box.hidden = false;
+  box.innerHTML = `<b>${esc(num("£" + p.toFixed(2)))}</b> ` +
+    esc(t("hallhire.price_guide","— a guide only. The office confirms the rate when it accepts your request."));
+}
+
+/* Everything is optional until it is not: the form only appears once a slot,
+   a hall, a kitchen answer and the terms are all settled. */
+function bkMaybeShowForm(){
+  const ready = BK.slot && BK.hall && BK.kitchen && BK.member !== null;
+  document.getElementById("bk-agree-wrap").hidden = !ready;
+  const agreed = document.getElementById("bk-agree").checked;
+  document.getElementById("bk-form").hidden = !(ready && agreed);
+}
+
+function bkValidate(){
+  const fields = [
+    ["bk-first", v => v.trim().length > 0],
+    ["bk-last",  v => v.trim().length > 0],
+    ["bk-addr",  v => v.trim().length > 5],
+    ["bk-phone", v => /^[\d\s+()-]{9,}$/.test(v.trim())],
+  ];
+  let ok = true;
+  for(const [id, test] of fields){
+    const el = document.getElementById(id);
+    const good = test(el.value);
+    el.closest(".bk-field").dataset.bad = good ? "0" : "1";
+    if(!good) ok = false;
+  }
+  return ok;
+}
+
+const BK_CALL_OFFICE = () =>
+  t("hallhire.call_office_fallback",
+    "We could not send your request just now, and nothing has been saved. " +
+    "Please call the masjid office and they will take your booking over the phone.") +
+  ' <a href="tel:01204535997" dir="ltr">01204 535 997</a>';
+
+function bkSubmit(e){
+  e.preventDefault();
+  if(BK.sent) return;
+  const err = document.getElementById("bk-err");
+  if(!bkValidate()){
+    err.hidden = false;
+    err.textContent = t("hallhire.check_the_form","Please check the highlighted boxes and try again.");
+    return;
+  }
+  err.hidden = true;
+
+  const btn = document.getElementById("bk-submit");
+  btn.disabled = true;
+  btn.textContent = t("hallhire.sending","Sending…");
+
+  /* A request that hangs must not leave the button disabled for ever. */
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+
+  fetch(`${supaBase()}/rest/v1/hall_bookings`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: {
+      apikey: SUPA.key,
+      Authorization: "Bearer " + SUPA.key,
+      "Content-Type": "application/json",
+      /* The key has no read privilege, so asking for the row back would fail
+         the whole request. Ask for nothing. */
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      booking_date: bkIso(BK.date),
+      session_slot: BK.slot,
+      hall:         BK.hall,
+      kitchen:      BK.kitchen === "yes",
+      first_name:   document.getElementById("bk-first").value.trim(),
+      last_name:    document.getElementById("bk-last").value.trim(),
+      address:      document.getElementById("bk-addr").value.trim(),
+      phone:        document.getElementById("bk-phone").value.trim(),
+    }),
+  }).then(res => {
+    clearTimeout(timer);
+    if(res.ok){ BK.sent = true; bkDone(null); return; }
+    return res.text().then(body => {
+      /* The rate-limit trigger speaks to the person directly; anything else
+         is ours to apologise for. */
+      if(body && body.indexOf("Too many booking requests") !== -1){
+        bkDone(t("hallhire.too_many_requests",
+          "We have already had several requests from this number today. " +
+          "Please call the office and they will help you directly.") +
+          ' <a href="tel:01204535997" dir="ltr">01204 535 997</a>');
+      }else{
+        console.warn("booking submit failed", res.status, body);
+        bkDone(BK_CALL_OFFICE());
+      }
+    });
+  }).catch(e => {
+    clearTimeout(timer);
+    console.warn("booking submit failed", e);
+    bkDone(BK_CALL_OFFICE());
+  }).then(() => {
+    btn.disabled = false;
+    btn.textContent = t("hallhire.request_this_slot","Request this slot");
+  });
+}
+
+function bkDone(problemHtml){
+  const box = document.getElementById("bk-done");
+  document.getElementById("bk-form").hidden = true;
+  document.getElementById("bk-agree-wrap").hidden = true;
+  document.getElementById("bk-choose").hidden = true;
+  document.getElementById("bk-sessions").innerHTML = "";
+  box.hidden = false;
+
+  if(problemHtml){
+    box.innerHTML = `<h4>${esc(t("hallhire.not_sent","Not sent"))}</h4><p>${safeInline(problemHtml)}</p>`;
+    return;
+  }
+  const sn = BK_SESSIONS.find(x => x.key === BK.slot) || {};
+  const row = (k, v) => `<div class="bk-sum"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+  box.innerHTML =
+    `<h4>${esc(t("hallhire.request_sent","Request sent"))}</h4>` +
+    `<p>${esc(t("hallhire.office_will_call",
+      "The office will call you to confirm. Nothing is booked until they do."))}</p>` +
+    row(t("hallhire.date_label","Date"),
+        `${fullDow(BK.date.getDay())} ${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())} ${num(BK.date.getFullYear())}`) +
+    row(t("hallhire.session","Session"),
+        `${t(sn.nameKey || "", sn.name || "")} · ${num(hm12(sn.from))} – ${num(hm12(sn.to))}`) +
+    row(t("hallhire.hall_label","Hall"), num(BK.hall)) +
+    row(t("hallhire.kitchen_label","Kitchen"),
+        BK.kitchen === "yes" ? t("hallhire.included","Included") : t("hallhire.not_included","Not included"));
+}
+
+function initBooking(){
+  const grid = document.getElementById("bk-grid");
+  if(!grid) return;
+  BK.month = (() => { const t0 = today0(); return new Date(t0.getFullYear(), t0.getMonth(), 1); })();
+
+  document.getElementById("bk-prev").addEventListener("click", () => {
+    BK.month = new Date(BK.month.getFullYear(), BK.month.getMonth()-1, 1); bkRenderCal(); });
+  document.getElementById("bk-next").addEventListener("click", () => {
+    BK.month = new Date(BK.month.getFullYear(), BK.month.getMonth()+1, 1); bkRenderCal(); });
+
+  const pick = (wrap, prop) =>
+    document.getElementById(wrap).addEventListener("click", e => {
+      const b = e.target.closest(".bk-opt");
+      if(!b) return;
+      BK[prop] = b.dataset[prop];
+      document.querySelectorAll(`#${wrap} .bk-opt`).forEach(x => x.dataset.on = x === b ? "1" : "0");
+      if(prop === "member") bkShowPrice();
+      bkMaybeShowForm();
+    });
+  pick("bk-halls", "hall");
+  pick("bk-kitchens", "kitchen");
+  pick("bk-members", "member");
+
+  document.getElementById("bk-agree").addEventListener("change", bkMaybeShowForm);
+  document.getElementById("bk-form").addEventListener("submit", bkSubmit);
+
+  bkRenderCal();
+  bkLoadAvailability();
+}
+
 /* ---- athkār ---- */
 let akSection = 0;
 
@@ -5158,12 +5680,16 @@ function openHallHire(){
   document.getElementById('hallhire').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#hallhire .sh-body').scrollTop=0;
+  /* Availability is re-read every time the sheet opens. A calendar cached
+     from this morning must not offer a slot the office has since confirmed. */
+  bkLoadAvailability();
 }
 function closeHallHire(){
   document.getElementById('hallhire').dataset.open="0";
   document.body.style.overflow="";
 }
 function initHallHire(){
+  initBooking();
   document.getElementById('hh-close').addEventListener('click',closeHallHire);
   document.getElementById('hh-scrim').addEventListener('click',closeHallHire);
   document.querySelector('#hallhire .hh-call').addEventListener('click',closeHallHire);
@@ -5312,6 +5838,12 @@ function initDrawer(){
   document.getElementById('dr-close').addEventListener('click',closeDrawer);
   document.getElementById('dr-scrim').addEventListener('click',closeDrawer);
   // in-app destinations
+  /* The portal rows are ordinary links, so they carry no data-act and the
+     handler below never sees them. Close the drawer behind them anyway —
+     coming back from the browser to a drawer still hanging open is jarring. */
+  document.querySelectorAll('a.dr-row').forEach(a=>
+    a.addEventListener('click', ()=>closeDrawer()));
+
   document.querySelectorAll('.dr-row[data-act]').forEach(b=>{
     b.addEventListener('click',()=>{
       const act=b.dataset.act;
