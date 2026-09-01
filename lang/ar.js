@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "592795947c6b",
+ "version": "713b94df2441",
  "strings": {
   "nav.times": "المواقيت",
   "nav.listen": "استماع",
@@ -1221,7 +1221,6 @@ window.LANG_PACK = {
   "hallhire.included": "مشمول",
   "hallhire.not_included": "غير مشمول",
   "portals.madrasah_portal": "بوابة المدرسة",
-  "portals.venue_bookings_staff": "حجوزات القاعة · للموظفين",
   "portals.madrasah_note": "تسجيل الدخول · السجلات وبيانات الطلاب قيد الإعداد"
  }
 };

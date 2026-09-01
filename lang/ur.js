@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "ff74c1e02db9",
+ "version": "8dd41218e83d",
  "strings": {
   "nav.times": "اوقات",
   "nav.listen": "سماعت",
@@ -1221,7 +1221,6 @@ window.LANG_PACK = {
   "hallhire.included": "شامل",
   "hallhire.not_included": "شامل نہیں",
   "portals.madrasah_portal": "مدرسہ پورٹل",
-  "portals.venue_bookings_staff": "ہال بکنگ · عملہ",
   "portals.madrasah_note": "سائن اِن · رجسٹر اور طلبہ کے ریکارڈ ابھی تیار ہو رہے ہیں"
  }
 };
