@@ -212,6 +212,48 @@ for (const f of ["index.html", "admin.html"]) {
   else ok(`${f} — no selector is overridden by a second copy of itself`);
 }
 
+/* ---- 3i. the donation links go somewhere that actually takes money ----
+ * A Stripe link in test mode is a complete, convincing checkout that collects
+ * nothing at all, and nothing on screen would tell anybody — not the donor,
+ * not the masjid, until the money never arrives. The old shop links are the
+ * other half of it: /product/ pages on a WordPress site the masjid has moved
+ * off. Both are invisible faults, so both are checked.
+ *
+ * The five links are the masjid's own, shared with the website. If a tier's
+ * link is ever changed, this is the check that will say so. */
+{
+  const DONATE = {
+    "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01": "Bronze £250",
+    "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02": "Silver £500",
+    "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03": "Gold £1,000",
+    "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04": "Platinum £5,000",
+    "https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05": "any other amount",
+  };
+  const src = existsSync("index.html") ? R("index.html") : "";
+  if (src) {
+    const found = [...src.matchAll(/https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]);
+    const uniq = [...new Set(found)];
+    const test = uniq.filter(u => u.includes("test_"));
+    if (test.length) fail(`donation link in Stripe TEST MODE — it takes no money and looks identical: ${test.join(", ")}`);
+
+    const missing = Object.keys(DONATE).filter(u => !uniq.includes(u));
+    const extra = uniq.filter(u => !(u in DONATE));
+    if (missing.length) fail(`donation link missing from index.html: ${missing.map(u => DONATE[u]).join(", ")}`);
+    if (extra.length) fail(`unrecognised Stripe link in index.html — check it is the masjid's: ${extra.join(", ")}`);
+
+    const old = [...src.matchAll(/https:\/\/(?:www\.)?taiyabahmasjid\.com\/product\/[^"']*/g)].map(m => m[0]);
+    if (old.length) fail(`donation still points at the old shop: ${[...new Set(old)].join(", ")}`);
+
+    /* Stripe cannot produce or store an HMRC declaration, so the app must not
+       promise Gift Aid on a card payment. */
+    if (/Gift\s*Aid/i.test(src.replace(/<!--[\s\S]*?-->/g, " ")))
+      fail("index.html promises Gift Aid, but the donation path is Stripe, which cannot produce a valid HMRC declaration");
+
+    if (!test.length && !missing.length && !extra.length && !old.length)
+      ok(`donations — all ${uniq.length} Stripe links present, live mode, no old shop links`);
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");

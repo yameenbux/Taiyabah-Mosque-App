@@ -325,25 +325,10 @@
   " keep",
   " keep"
  ],
- "sheet.donate_online": [
-  "آن لائن عطیہ دیں",
-  "ઑનલાઇન દાન આપો",
-  "تبرّع عبر الإنترنت"
- ],
  "sheet.card_apple_pay_google_pay": [
-  "کارڈ · Apple Pay · Google Pay · PayPal",
-  "કાર્ડ · Apple Pay · Google Pay · PayPal",
-  "بطاقة · Apple Pay · Google Pay · PayPal"
- ],
- "sheet.pledge_a_donor_tier": [
-  "عطیہ دہندگان کے درجے کا وعدہ کریں",
-  "દાતા શ્રેણીનું વચન આપો",
-  "تعهّد بفئة تبرّع"
- ],
- "sheet.pay_later": [
-  "بعد میں ادائیگی",
-  "પછીથી ચુકવણી",
-  "الدفع لاحقاً"
+  "کارڈ · Apple Pay · Google Pay",
+  "કાર્ડ · Apple Pay · Google Pay",
+  "بطاقة · Apple Pay · Google Pay"
  ],
  "sheet.bronze": [
   "کانسی",
@@ -409,5 +394,10 @@
   "تمام تفصیلات نقل کریں",
   "તમામ વિગતો કૉપિ કરો",
   "انسخ كل التفاصيل"
+ ],
+ "sheet.give_any_other_amount": [
+  "کوئی اور رقم دیں",
+  "બીજી કોઈ રકમ આપો",
+  "تبرّع بمبلغ آخر"
  ]
 }

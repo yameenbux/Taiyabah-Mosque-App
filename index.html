@@ -1400,28 +1400,39 @@
         </div>
       </div>
 
-      <div class="sec-h"><h2 data-i18n="sheet.give_now">Give now</h2><span class="rule"></span><span class="tag" data-i18n="sheet.apple_google_pay">Apple &amp; Google Pay</span></div>
-      <a class="donate-cta" href="https://donorbox.org/taiyabah-masjid-bolton-new-build-mosque-and-madrassah-project" target="_blank" rel="noopener">
-        <span class="dc-main" data-i18n="sheet.donate_online">Donate online</span>
-        <span class="dc-sub" data-i18n="sheet.card_apple_pay_google_pay">Card &middot; Apple Pay &middot; Google Pay &middot; PayPal</span>
-      </a>
-      <p class="dc-note" data-i18n-html="sheet.opens_the_masjids_secure_donation">Opens the masjid&rsquo;s secure donation page. If you are a UK taxpayer,
-        please add Gift Aid &mdash; it adds <b>25p to every £1</b> at no cost to you.</p>
+      <!-- ---------------- giving ----------------
+           The five Stripe Payment Links the masjid uses on the website. Stripe
+           hosts the checkout, so no card detail ever reaches this app and there
+           is no server code behind these — they are ordinary links.
 
-      <div class="sec-h"><h2 data-i18n="sheet.pledge_a_donor_tier">Pledge a donor tier</h2><span class="rule"></span><span class="tag" data-i18n="sheet.pay_later">Pay later</span></div>
+           A tier is charged straight away. It used to be worded as a pledge
+           settled later by bank transfer, which was true of the old shop links
+           and is not true of these.
+
+           There is deliberately no Gift Aid wording here. Stripe cannot produce
+           or store a valid HMRC declaration, so the promise came off rather
+           than being made and not kept — the same decision the website made.
+           The masjid can still claim on the bank transfers below, with a
+           declaration held at the office. -->
+      <div class="sec-h"><h2 data-i18n="sheet.give_now">Give now</h2><span class="rule"></span><span class="tag" data-i18n="sheet.apple_google_pay">Apple &amp; Google Pay</span></div>
       <div class="tiers">
-        <a class="tier t-bronze" href="https://www.taiyabahmasjid.com/product/bronze-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£250</span><span class="t-name" data-i18n="sheet.bronze">Bronze</span></a>
-        <a class="tier t-silver" href="https://www.taiyabahmasjid.com/product/silver-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£500</span><span class="t-name" data-i18n="sheet.silver">Silver</span></a>
-        <a class="tier t-gold" href="https://www.taiyabahmasjid.com/product/gold-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£1,000</span><span class="t-name" data-i18n="sheet.gold">Gold</span></a>
-        <a class="tier t-plat" href="https://www.taiyabahmasjid.com/product/platinum-donor/" target="_blank" rel="noopener">
-          <span class="t-amt">£5,000</span><span class="t-name" data-i18n="sheet.platinum">Platinum</span></a>
+        <a class="tier t-bronze" href="https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01" target="_blank" rel="noopener">
+          <span class="t-amt" data-i18n-num>£250</span><span class="t-name" data-i18n="sheet.bronze">Bronze</span></a>
+        <a class="tier t-silver" href="https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02" target="_blank" rel="noopener">
+          <span class="t-amt" data-i18n-num>£500</span><span class="t-name" data-i18n="sheet.silver">Silver</span></a>
+        <a class="tier t-gold" href="https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03" target="_blank" rel="noopener">
+          <span class="t-amt" data-i18n-num>£1,000</span><span class="t-name" data-i18n="sheet.gold">Gold</span></a>
+        <a class="tier t-plat" href="https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04" target="_blank" rel="noopener">
+          <span class="t-amt" data-i18n-num>£5,000</span><span class="t-name" data-i18n="sheet.platinum">Platinum</span></a>
       </div>
-      <p class="dc-note" data-i18n-html="sheet.a_pledge_is_a_commitment">A pledge is a commitment to give, settled afterwards by
-        <b>bank transfer or at the masjid office</b> &mdash; not paid by card at this stage.
-        You can pledge anonymously or publicly.</p>
+
+      <a class="donate-cta" href="https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05" target="_blank" rel="noopener">
+        <span class="dc-main" data-i18n="sheet.give_any_other_amount">Give any other amount</span>
+        <span class="dc-sub" data-i18n="sheet.card_apple_pay_google_pay">Card &middot; Apple Pay &middot; Google Pay</span>
+      </a>
+      <p class="dc-note" data-i18n="sheet.opens_the_masjids_secure_donation">Opens the masjid&rsquo;s secure donation page. Card payments carry a small
+        processing fee &mdash; a bank transfer below reaches the masjid in full, if that
+        suits you better.</p>
 
       <div class="sec-h"><h2 data-i18n="sheet.or_transfer_directly">Or transfer directly</h2><span class="rule"></span><span class="tag" data-i18n="sheet.tap_to_copy">Tap to copy</span></div>
       <div class="card bank" id="bank">
