@@ -4679,8 +4679,20 @@ const langStore = {
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
 };
 
+/* A pack is a quarter of a megabyte, and localStorage is the first thing a
+   phone gives up. It refuses the write when the origin is at its quota, in
+   Safari's private mode, and on iOS once a site has gone a week unopened.
+   set() swallows all of that — it has to, a failed write is not a reason to
+   stop the app — but getPack() then read the copy that was already there. So
+   a phone could download the right words, fail to keep them, quietly re-apply
+   the old ones, and do the same thing again every single launch: a refresh
+   that reported nothing and changed nothing. Holding the parsed pack in
+   memory as well means the words that were fetched are the words that get
+   used, whatever the phone did or didn't manage to store. */
+const packCache = Object.create(null);
+
 function isPackDownloaded(code){
-  return code === "en" || !!langStore.get(PACK_KEY(code));
+  return code === "en" || !!packCache[code] || !!langStore.get(PACK_KEY(code));
 }
 
 /* Fetch a pack by injecting a script tag — same approach as the Qur'an
@@ -4694,6 +4706,7 @@ function downloadPack(code, bust){
     s.onload = () => {
       const pack = window.LANG_PACK;
       if(!pack || pack.code !== code) return reject(new Error("pack mismatch"));
+      packCache[code] = pack;                        // authoritative for this session
       langStore.set(PACK_KEY(code), JSON.stringify(pack));
       window.LANG_PACK = null;
       resolve(pack);
@@ -4725,9 +4738,10 @@ function refreshPack(code){
 
 function getPack(code){
   if(code === "en") return null;
+  if(packCache[code]) return packCache[code];
   const raw = langStore.get(PACK_KEY(code));
   if(!raw) return null;
-  try{ return JSON.parse(raw); }catch(e){ return null; }
+  try{ return (packCache[code] = JSON.parse(raw)); }catch(e){ return null; }
 }
 
 /* Apply a language to the live DOM. Every translatable element carries
@@ -6488,9 +6502,37 @@ function boot(){
 }
 boot();
 
-/* service worker (deployment only; harmless if unsupported/sandboxed) */
+/* service worker (deployment only; harmless if unsupported/sandboxed)
+
+   An installed app is a long-lived thing. Its start_url is index.html, which
+   the worker serves from its own cache, so the code a phone runs is the code
+   that was current when that cache was written. Registering the worker and
+   then never speaking to it again meant a phone could sit a release behind
+   for as long as it was never fully restarted — which is how a phone ended up
+   showing half a translation: it was still running a build from before the
+   words existed, and the pack refresh that would have healed it was itself
+   part of the build it hadn't got.
+
+   The worker reloads its clients when a new one takes over (see sw.js). This
+   side's job is to make sure the browser actually goes and looks. */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  let swReg = null;
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(r=>{ swReg = r; r.update().catch(()=>{}); }).catch(()=>{});
+  });
+  /* A phone that is resumed rather than launched never navigates, so nothing
+     would otherwise ask for a newer worker, or for newer words. Checking when
+     the app comes back to the front covers that, throttled so that flicking
+     between apps doesn't turn into a stream of requests. */
+  let lastUpdateCheck = 0;
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState !== 'visible') return;
+    const now = Date.now();
+    if(now - lastUpdateCheck < 60000) return;
+    lastUpdateCheck = now;
+    if(swReg) swReg.update().catch(()=>{});
+    try{ refreshPack(activeLang); }catch(e){}
+  });
 }
 </script>
 

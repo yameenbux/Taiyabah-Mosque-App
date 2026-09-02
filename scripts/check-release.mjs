@@ -254,11 +254,47 @@ for (const f of ["index.html", "admin.html"]) {
   }
 }
 
-/* ---- 4. the service worker cache changed when the app did ---- */
+/* ---- 3j. a new build can actually reach an installed phone ----
+
+   Every one of these was missing at once, and the result was a phone that
+   had been running the app for months showing English where a translation
+   existed: it was serving index.html out of a cache nothing ever refilled,
+   from a worker nothing ever asked to update, with a pack that was only
+   re-checked at a launch the app never had. Each line below is one of the
+   ways that build got stuck; none of them announce themselves. ---- */
+{
+  const sw  = readFileSync("sw.js", "utf8");
+  const app = readFileSync("index.html", "utf8");
+  const missing = [];
+  if (!/new Request\([^)]*cache:\s*["']reload["']/.test(sw))
+    missing.push('sw.js installs the shell through the browser cache (no cache: "reload") — a new version can be filled with the old build');
+  if (!/clients\.matchAll\(\{\s*type:\s*["']window["']\s*\}\)[\s\S]{0,400}?\.navigate\(/.test(sw))
+    missing.push("sw.js activates without sending its windows back through the door — a phone stays a release behind until it is relaunched twice");
+  if (!/\.update\(\)/.test(app))
+    missing.push("index.html never calls registration.update() — a resumed app never asks whether there is a newer build");
+  if (!/visibilitychange/.test(app) || !/refreshPack\(activeLang\)/.test(app))
+    missing.push("index.html doesn't re-check the language pack when it comes back to the front");
+  if (!/packCache\[code\]/.test(app))
+    missing.push("index.html reads the pack back out of storage instead of using the one it just downloaded — a phone that can't store it re-applies the old words every launch");
+  if (missing.length) missing.forEach(fail);
+  else ok("update path — a new build and new words reach an installed phone without a reinstall");
+}
+
+/* ---- 4. the service worker cache changed when the app did ----
+   Shipping sw.js with the same CACHE name is the same as not shipping it:
+   the worker's bytes differ, so it installs, but it opens the cache that is
+   already there and hands back everything already in it. ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");
   if (changed.includes("index.html") && !changed.includes("sw.js"))
     fail("index.html changed but sw.js did not — installed devices will keep serving the cached old build");
+  if (changed.includes("sw.js")) {
+    const nameOf = t => (t.match(/const CACHE\s*=\s*["']([^"']+)["']/) || [])[1];
+    const was = nameOf(execSync("git show origin/main:sw.js", { encoding: "utf8" }));
+    const now = nameOf(readFileSync("sw.js", "utf8"));
+    if (was && now && was === now)
+      fail(`sw.js changed but its cache is still ${now} — the new worker will serve the old shell straight back`);
+  }
 } catch { /* no git range available (e.g. a shallow checkout); skip */ }
 
 /* ---- 5. everything parses ---- */
