@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "14976bbc3054",
+ "version": "3b1c16883318",
  "strings": {
   "nav.times": "المواقيت",
   "nav.listen": "استماع",
@@ -1253,7 +1253,6 @@ window.LANG_PACK = {
   "adm.term_dates_and_holidays": "مواعيد الفصول والعطلات",
   "adm.the_madrasah_follows_the_school": "تتبع المدرسة مواعيد الفصول الدراسية التي يوصي بها مجلس بولتون، لذا يُفضَّل ترتيب العطلات خارج أيام الدراسة قدر الإمكان.",
   "adm.if_you_must_travel_during": "إن اضطررت للسفر أثناء الفصل الدراسي، فاطلب من مكتب المدرسة نموذج غياب العطلة وأعده قبل ثلاثة أسابيع من سفرك. وبدونه يُعد الغياب غير مبرَّر. ولا تُقبل رسالة مكتوبة بخط اليد بديلاً عن النموذج.",
-  "adm.every_day_the_madrasah_is_closed": "كل يوم تُغلق فيه المدرسة هذا العام",
   "adm.holiday_planner": "مخطِّط العطلات",
   "adm.uniform_and_appearance": "الزي والمظهر",
   "adm.boys": "الأولاد",
@@ -1502,6 +1501,12 @@ window.LANG_PACK = {
   "nikah.saturday_11am": "السبت، 11:00 صباحاً",
   "nikah.before_a_wedding_meal": "قبل وليمة العرس",
   "nikah.im_flexible": "الوقت مرن بالنسبة لي",
-  "nikah.the_office_can_suggest": "يمكن للمكتب اقتراح وقت"
+  "nikah.the_office_can_suggest": "يمكن للمكتب اقتراح وقت",
+  "nikah.ring_the_office": "اتصل بالمكتب",
+  "nikah.5pm_to_7pm": "· من 5 إلى 7 مساءً",
+  "nikah.email_the_office": "راسل المكتب بالبريد",
+  "nikah.opens_your_email_app": "يفتح تطبيق بريدك والتفاصيل مُعبّأة",
+  "nikah.email_subject": "طلب موعد نكاح",
+  "nikah.youve_chosen": "لقد اخترت {when}، {slot}. اتصل بالمكتب أو راسله بالبريد لطلبه."
  }
 };

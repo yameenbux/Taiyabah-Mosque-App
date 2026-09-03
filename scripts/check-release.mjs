@@ -354,8 +354,23 @@ for (const f of ["index.html", "admin.html"]) {
   /* Treating an unreadable answer as "open" is the dangerous default. */
   if (!/catch\(\(\) => \{ clearTimeout\(timer\); NK\.open = false; return false; \}\)/.test(app))
     missing.push("nkProbe no longer fails closed — an offline phone would be shown a form that cannot send");
+  /* Withholding the form is right. Withholding it and leaving nothing to press
+     is not: the explanation first sat above the calendar, so a person scrolled
+     past it, chose a day and a prayer, and reached the bottom with no button
+     and no reason given. The note has to come after the picks, where the
+     button would be, and it has to carry a way to reach the office. */
+  const closed = app.indexOf('id="nk-closed"');
+  const clear  = app.indexOf('id="nk-clear"');
+  if (closed < 0 || clear < 0 || closed < clear)
+    missing.push("the phone-only note is not below the date and prayer picks — someone who chooses both reaches the bottom of the screen with nothing to press");
+  const block = app.slice(closed, closed + 3000);
+  if (!/href="tel:01204535997"/.test(block) || !/id="nk-email"/.test(block))
+    missing.push("the phone-only note offers no way to reach the office; it is a dead end");
+  if (!/function nkClosedSummary\(\)/.test(app) || !/mail\.href = "mailto:/.test(app))
+    missing.push("the office email no longer carries the chosen dates and prayer, so a person has to read them back off the screen");
+
   if (missing.length) missing.forEach(fail);
-  else ok("nikāḥ requests — the form is shown only when the server confirms it can receive one, and fails closed");
+  else ok("nikāḥ requests — gated on the server, failing closed, and never a dead end when closed");
 }
 
 /* ---- 4. the service worker cache changed when the app did ----
