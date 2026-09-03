@@ -7,7 +7,7 @@
 Bolton Central Islamic Society · Registered charity 1041569
 31a Draycott Street, Bolton BL1 8HD
 
-[**Open the app →**](https://yameenbux.github.io/Taiyabah-Mosque-App/)
+[**Open the app →**](https://taiyabahapp.ysbdesigns.uk)
 
 </div>
 
@@ -54,10 +54,15 @@ Progressive web app: no app store, no install friction, one URL.
   self-serviceable rather than a support conversation
 
 **Recite**
-- **Daily Athkar** — morning and evening remembrance, sourced and cited
-- **Qur'an** — Sūrah al-Fātiḥah with the official tajweed colour legend
+- **Qur'an** — the complete Mus-haf in IndoPak script: 114 sūrahs, 6,236 āyāt,
+  with the official tajweed colour legend. Split by sūrah and fetched only when
+  opened, then cached, so a sūrah read once can be read again in the masjid
+  basement with no bars
+- **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
+  before sleep, each sourced and cited
 - **Common Duas** — everyday supplications in a tile grid, each opening in place
-- **40 Rabbanā** — the forty short Qur'anic duʿās, numbered, in Indo-Pak script
+- **40 Rabbanā** — the forty short Qur'anic duʿās, numbered, in IndoPak script,
+  every one verified against the Qur'an text itself rather than transcribed
 
 **Qibla**
 - Great-circle bearing to the Kaʿbah with a live compass where supported,
@@ -78,50 +83,104 @@ Progressive web app: no app store, no install friction, one URL.
 - States plainly that it's a guide, not a ruling
 
 **Giving**
-- Online donation via Apple Pay, Google Pay, PayPal and card, with Gift Aid
+- Card, Apple Pay and Google Pay through the masjid's own **Stripe** payment
+  links, with Gift Aid — money reaches the charity directly, with no shop
+  platform in between
 - Donor tiers as **pledges**, settled afterwards by transfer or at the office
 - Bank details with tap-to-copy
 
+**The madrasah**
+- **Admissions & Fees** — everything asked of a family before they apply: the
+  fees, the class times, the 90% attendance the madrasah expects and what
+  happens below it, the uniform rule, and that applying is not the same as
+  having a place
+- **Holiday Planner** — whether the madrasah is open *today*, twelve month
+  grids that open on the month you are in, every closure of the 2026/27 year
+  with its length, and the Islamic dates beside them. Calculated dates are
+  labelled estimates; the madrasah's own closures are not, because they are fixed
+- **Madrasah Portal** — sign-in for parents, teachers and staff, on the
+  masjid's website
+
+**Life-stage services**
+- **Birth** — guidance for new arrivals, including circumcision referral
+- **Nikāḥ** — what the masjid provides, the standing advice to also register
+  the marriage civilly, and a date request: pick a day and the prayer it would
+  follow, with that day's own jamāʿah time shown beside it
+- **Islamic Will** — wasiyyah, the fixed shares, and where a solicitor is needed
+- **Funeral Services** — BCoM's out-of-hours number first, because that call has
+  to happen before anything else can, then everything the masjid itself
+  arranges: ghusl, kafn, janāzah, transport, the fridge, burial, catering and
+  the imams afterwards
+
+**Hall hire and education**
+- **Hall / Room Hire** — availability read live from the masjid's booking
+  system, a session chosen, and a request submitted from the app
+- **Education** — Arabic classes and the Ghusl workshop, for adults
+- **Imams' Advice** — appointments through the office
+
 **Community information**
 - Masjid history — established 1967, founders, the ulema who have led imaamat
-- Contact, hall hire at Taiyabah Centre, Imams' Advice
-- Birth (including circumcision referral), Marriage, Islamic Will, and Funerals
+- Contact details and directions
 
 **Settings**
-- **Language** — English, Urdu, Gujarati and Arabic. Packs download on demand,
-  cache offline, and switch the interface instantly, including right-to-left
+- **Language** — English, Urdu, Gujarati and Arabic. Every word, number and
+  date: 1,490 strings per language, digits in the reader's own numerals
+  (۰۱۲ / ٠١٢ / ૦૧૨), calendars mirrored right-to-left, and identifiers such as
+  postcodes and phone numbers deliberately left in Latin so they still work.
+  Packs download on demand, cache offline, and switch the interface instantly
 
 ## Repository structure
+
+The repository root **is** the public website — GitHub Pages serves it
+verbatim. Anything committed here is reachable by URL.
 
 ```
 ├── index.html                 The app. Self-contained — the whole year's
 │                               timetable is embedded, so prayer times need
 │                               no network request.
 ├── admin.html                  Password-gated notification compose screen.
-├── sw.js                       Service worker — offline shell, push handlers.
+├── sw.js                       Service worker — offline shell, push handlers,
+│                                and the update path (see below).
 ├── manifest.webmanifest         Home-screen install metadata.
 ├── logo-*.png, icon-*.png       Masjid logo and app icons.
 ├── LICENSE.md                   Ownership and usage terms.
 │
-├── .github/workflows/           Deploys the Worker automatically on push,
-│   └── deploy-worker.yml         so no local tooling is ever required.
+├── .github/workflows/
+│   ├── release-checks.yml       Runs scripts/check-release.mjs on every push.
+│   └── deploy-worker.yml        Deploys the Worker automatically on push,
+│                                 so no local tooling is ever required.
+│
+├── scripts/                     Build and verification. Node, no dependencies.
+│   ├── check-release.mjs         29 checks — the release gate. See below.
+│   ├── check-i18n.mjs            Measures translation coverage against the app.
+│   ├── i18n-keys.mjs             Extracts every translatable string there is.
+│   ├── build-lang.mjs            lang/src/*.json  →  lang/{ur,gu,ar}.js
+│   ├── fetch-quran.mjs           Builds quran/surah/ from the source text.
+│   └── verify-rabbanas.mjs       Checks the 40 Rabbanā against the Qur'an.
 │
 ├── push/onesignal/              OneSignal's own service workers, kept on a
-│                                 separate scope so they don't collide with sw.js.
+│   └── …                         separate scope so they don't collide with
+│                                  sw.js. Duplicated one level down because
+│                                  the dashboard still asks for the old path.
 │
 ├── worker/                      Notification backend — a Cloudflare Worker.
-│   ├── worker.js                 Holds the OneSignal REST key as a secret;
+│   ├── src/index.js              Holds the OneSignal REST key as a secret;
 │   ├── wrangler.toml              handles manual sends and the scheduled
 │   ├── hash-password.js            jamāʿah reminders.
 │   ├── REMINDERS.md               See README.md to deploy, REMINDERS.md for
 │   └── README.md                   how the automated reminders work.
 │
-├── lang/                        Language packs — fetched only when a user
-│   ├── ur.js  gu.js  ar.js       chooses that language, never on load.
+├── lang/                        Language packs.
+│   ├── src/*.json                The editable source — one file per area,
+│   │                              each key as [Urdu, Gujarati, Arabic].
+│   └── ur.js  gu.js  ar.js       Generated. Never edit these by hand.
 │
 ├── quran/                       Qur'anic content — lazy-loaded, so the main
-│   ├── fatiha-demo.js            app never pays for carrying it.
+│   ├── surah/001.js … 114.js     app never pays for carrying it.
+│   ├── athkar.js  duas.js
 │   └── rabbanas.js
+│
+├── portal/                      The madrasah portal, mirrored from the website.
 │
 └── data/                        Timetable pipeline — not served to users.
     ├── parse_timetable.py           Converts the masjid's published PDF into
@@ -129,6 +188,112 @@ Progressive web app: no app store, no install friction, one URL.
     └── VERIFICATION.md               Also read once a minute by the Worker's
                                        reminder scheduler.
 ```
+
+## Release checks
+
+`scripts/check-release.mjs` runs on every push and is the reason a mistake in
+this repository tends to be caught by a build rather than by somebody in the
+congregation. It is not a linter. Each check exists because something went
+wrong once, and each is written so that removing the behaviour it guards makes
+the build fail.
+
+There are **29**. Among them:
+
+| Check | What it caught |
+|---|---|
+| Qur'an complete | 114 sūrahs and 6,236 āyāt, every count against the canonical table |
+| 40 Rabbanā | each duʿā matched against the Qur'an text, not trusted as transcribed |
+| Translations | 1,490 strings in all three languages, nothing missing and nothing spare |
+| Latin identifiers | 22 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
+| Arabic marks | scripture on a font stack that actually has glyphs for the marks it ships |
+| CSS variables | every custom property used is defined — an undefined one silently drops the whole declaration |
+| Duplicate selectors | a second copy of a rule quietly overriding the first, which is how the 40 Rabbanā lost their padding |
+| Donations | all 5 Stripe links present, in live mode, with no old shop links surviving |
+| Update path | five behaviours that together let a new build and new words reach an installed phone without a reinstall |
+| Holiday planner | the prose ("180 teaching days, 36 weeks") re-derived from the closure dates beside it |
+| Nikāḥ requests | the form is shown only when the server confirms it can receive one, fails closed, and is never a dead end when closed |
+| Everything parses | index.html, admin.html, sw.js and the Worker |
+
+Run it locally with `node scripts/check-release.mjs`. It needs no dependencies.
+
+## Translations
+
+Four languages: English, Urdu, Gujarati and Arabic.
+
+**Never edit `lang/ur.js`, `lang/gu.js` or `lang/ar.js`.** They are generated.
+The source is `lang/src/*.json`, one file per area of the app, each entry a key
+and its three translations:
+
+```json
+"nikah.request_a_date": ["تاریخ کی درخواست", "તારીખની વિનંતી", "اطلب موعداً"]
+```
+
+```
+edit lang/src/*.json
+node scripts/build-lang.mjs      # regenerates the three packs
+node scripts/check-i18n.mjs      # every string on screen has a translation,
+                                 # and no translation exists for a string that
+                                 # is no longer on screen
+```
+
+`check-i18n.mjs` measures the packs **against the app**, not against each
+other. An earlier version compared the packs to themselves and reported 100%
+coverage while 406 strings were reaching the screen untranslated.
+
+Each pack carries a content hash as its version. The app caches the pack it has
+so it works offline, fetches a fresh copy in the background on every launch,
+and — this part matters — uses the copy it just downloaded rather than reading
+it back out of storage. A phone that cannot store the pack (at its quota, in
+private mode, or evicted by iOS after a week unopened) still shows the right
+words for as long as it is open.
+
+## Shared data with the website
+
+Hall bookings and nikāḥ requests are written to the same Supabase project the
+masjid's website uses, so a request made in the app lands in the same queue the
+office already works from. The app holds only the **publishable** key; Row
+Level Security in Postgres is the access control. The key can insert a booking
+and read the availability view, and can read no booking back.
+
+**The `service_role` key must never appear in this repository**, in
+`index.html`, or anywhere else a browser can reach it. It bypasses RLS entirely.
+
+Two features are built and waiting on database migrations in the website
+repository rather than on any change here:
+
+- **Nikāḥ date requests** — needs `db/010_nikah_requests.sql`. The app asks the
+  server whether that function exists each time the screen opens, so it turns
+  itself on the moment the migration is applied. Until then it shows the
+  calendar and offers to ring or email the office with the chosen date already
+  written out.
+- **Course registration** — needs `db/009_courses.sql`. Until then both courses
+  say registration opens shortly and send people to the office.
+
+Neither carries a hand-edited switch, deliberately: a boolean here and another
+on the website would be two things that must agree, with nothing making them.
+
+## Getting a new build onto an installed phone
+
+Worth understanding before changing anything, because it is subtle and it has
+bitten this app twice.
+
+The app's `start_url` is `index.html`, which the service worker serves from its
+own cache. So the code a phone runs is the code cached when that cache was
+written — not what is on the server. Three things make an update actually
+arrive:
+
+1. **`sw.js` must change, and its `CACHE` name must change with it.** A worker
+   with the same cache name opens the cache already there and hands back
+   everything already in it. The release check fails a push that edits
+   `index.html` without touching `sw.js`, and fails a `sw.js` whose cache name
+   did not move.
+2. The worker fills its cache **from the network** (`cache: "reload"`), not
+   through the browser's own copy, which may itself be stale.
+3. On replacing an older worker it **sends its windows back through the door**,
+   so the open app picks up the new build immediately rather than a launch later.
+
+Bump `CACHE` in `sw.js` with every user-visible change. It is one line and it
+is the difference between shipping and appearing to ship.
 
 ## Prayer time data
 
@@ -199,6 +364,16 @@ one that makes install instructions part of the feature.
 No build step, no framework, no dependencies for the app itself — edit
 `index.html` directly and commit. GitHub Pages deploys from `main`.
 
+Before pushing anything user-visible:
+
+```
+node scripts/check-release.mjs    # the release gate — 29 checks
+node scripts/check-i18n.mjs       # translation coverage
+```
+
+Both are plain Node with no dependencies, and both run in CI anyway. Running
+them first saves a red build.
+
 The compass, notifications and home-screen install all require HTTPS and won't
 work from a local file — test against the deployed URL.
 
@@ -214,19 +389,51 @@ the content, not applied uniformly.
 
 ## Roadmap
 
-- **App store release** — mid-October target. Requires wrapping the PWA,
-  an Apple Developer Organization account under BCIS, and Google Play's
-  mandatory 12-tester / 14-day period.
-- **Qur'an** — currently al-Fātiḥah with the tajweed legend. A full Mus-haf
-  needs a verified rules dataset integrated properly, not hand-marked.
-- **Translations** — the Urdu, Gujarati and Arabic packs cover navigation and
-  prayer names only, and **have not been reviewed by a native speaker**.
-- **Religious content review** — the Islamic Will, Marriage and 40 Rabbanā
-  pages, and the transcribed Arabic throughout, need the imam's sign-off
-  before wider release.
-- **Account ownership** — OneSignal, Cloudflare and GitHub are currently under
-  a personal account rather than the charity's.
+- **App store release** — requires wrapping the PWA, an Apple Developer
+  Organization account under BCIS, and Google Play's mandatory
+  12-tester / 14-day period.
+- **Nikāḥ requests and course registration** — built, and waiting on two
+  database migrations in the website repository. See *Shared data with the
+  website* above. Both need ICO registration, a documented lawful basis, a
+  retention period and a line in the privacy notice before they are applied.
+- **Madrasah applications** — the form lives on the website and stays
+  unreachable until the DPIA is done. The app publishes the fees, rules and
+  term dates, and says applications open soon rather than implying a form.
+- **Hall hire prices** — the member and non-member figures shown are the
+  website's placeholders and still need the committee's sign-off. The screen
+  says so.
+- **Account ownership** — OneSignal, Cloudflare, Stripe, Supabase and GitHub
+  are currently under a personal account rather than the charity's. This is the
+  most important item on this list.
+- **Two end-to-end tests, by a person** — a real donation through Stripe, and a
+  real hall booking, each confirmed as arriving where the office expects it.
+  Both paths are built and neither has been exercised with real money or a real
+  date. If the booking fails it will be CORS on the app's origin, which is a
+  setting in Supabase rather than a change here.
+- **Religious content review** — the translations carry the imam's approval.
+  The Islamic Will and Marriage guidance have not separately been signed off.
+  The 40 Rabbanā no longer need it: every one is now checked against the Qur'an
+  text on each build.
+- **Source attributions** — the citation line under each duʿā
+  (`ṢAḤĪḤ AL-BUKHĀRĪ`) is gold at 10.5px and measures 3.38:1 against its card,
+  below the 4.5:1 floor. The Arabic above it was fixed; this was left because
+  it was not what people reported.
 - **Vector logo** — current assets are upscaled from a small source image.
+- **Housekeeping** — `files.zip` at the repository root is a stale copy of
+  files that are already public individually. It is harmless but is served at
+  the site root and can go.
+
+### Done since the first release
+
+- The complete Qur'an, replacing the single-sūrah demo
+- Full translation into Urdu, Gujarati and Arabic — every string, number and
+  date, not only navigation — with the imam's approval confirmed
+- Donations moved to the masjid's own Stripe links
+- Hall booking, madrasah admissions and the holiday planner, the education
+  courses, the nikāḥ date request and funeral services, all brought across
+  from the website
+- The release-check suite, and the update path that gets a new build onto an
+  installed phone
 
 ## Ownership and credits
 
