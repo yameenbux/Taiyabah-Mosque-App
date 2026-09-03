@@ -18,7 +18,7 @@ const decode = s => s
   .replace(/&hellip;/g,"…").replace(/&mdash;/g,"—").replace(/&ndash;/g,"–")
   .replace(/&rsquo;/g,"’").replace(/&lsquo;/g,"‘").replace(/&ldquo;/g,"“")
   .replace(/&rdquo;/g,"”").replace(/&nbsp;/g," ").replace(/&times;/g,"×")
-  .replace(/&rsaquo;/g,"›").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(+n));
+  .replace(/&rsaquo;/g,"›").replace(/&pound;/g,"£").replace(/&deg;/g,"°").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(+n));
 
 const keys = {};                       // key -> English
 const add = (k, en) => { if (k && en != null && !(k in keys)) keys[k] = String(en).replace(/\s+/g," ").trim(); };
@@ -107,6 +107,18 @@ for (const v of arrayOf("VIDEOS")) { add(`video.${v.id}.t`, v.t); add(`video.${v
 /* The hall's two hire sessions name their own key, so there is no literal for
    the t("key", "English") scan to find. */
 for (const sn of arrayOf("BK_SESSIONS")) if (sn && sn.nameKey) add(sn.nameKey, sn.name);
+
+/* The madrasah's closures and the Islamic dates beside them. A parent reads
+   "Ramadhan Holidays" and "Eid al-Fitr" as much as they read the buttons, so
+   both lists are translated; adding a closure next year adds its keys here. */
+for (const c of arrayOf("MAD_CLOSURES")) {
+  add(`hol.c.${c.id}.n`, c.name);
+  if (c.note) add(`hol.c.${c.id}.d`, c.note);
+}
+for (const e of arrayOf("MAD_EVENTS")) {
+  add(`hol.e.${e.id}.n`, e.name);
+  add(`hol.e.${e.id}.d`, e.sub);
+}
 
 for (const [k, en] of [["fajr","Fajr"],["sunrise","Sun"],["zuhr","Zuhr"],["asr","Asr"],
                        ["maghrib","Mag"],["isha","Isha"]]) add(`month.col.${k}`, en);

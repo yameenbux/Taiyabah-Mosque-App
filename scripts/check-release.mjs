@@ -280,6 +280,59 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("update path — a new build and new words reach an installed phone without a reinstall");
 }
 
+/* ---- 3k. the holiday planner's prose still matches its dates ----
+
+   The screen tells a parent the madrasah teaches 180 days, 36 weeks, and that
+   the two long breaks are 33 and 40 days. Those are four sentences written by
+   hand next to a list of dates edited by hand, once a year, by different
+   people. Nothing makes them agree, and a parent who plans a trip around a
+   sentence that no longer matches the calendar beside it loses their child's
+   place over it. So the sentences are checked against the dates. ---- */
+{
+  const html = readFileSync("index.html", "utf8");
+  const grab = (name) => {
+    const m = html.match(new RegExp(`const ${name}\\s*=\\s*\\[`));
+    if (!m) return null;
+    let i = html.indexOf("[", m.index), depth = 0, end = i;
+    for (; end < html.length; end++) {
+      if (html[end] === "[") depth++;
+      else if (html[end] === "]") { depth--; if (!depth) break; }
+    }
+    return new Function(`return ${html.slice(i, end + 1)}`)();
+  };
+  const closures = grab("MAD_CLOSURES");
+  if (!closures) fail("the holiday planner's closure list is gone from index.html");
+  else {
+    const P = (v) => { const a = v.split("-"); return new Date(+a[0], +a[1] - 1, +a[2]); };
+    const len = (c) => Math.round((P(c.to) - P(c.from)) / 86400000) + 1;
+    const shut = new Set();
+    for (const c of closures) {
+      const d = P(c.from), e = P(c.to);
+      while (d <= e) { shut.add(d.toDateString()); d.setDate(d.getDate() + 1); }
+    }
+    let teach = 0;
+    const d = P("2026-09-01"), end = P("2027-08-31");
+    while (d <= end) {
+      const w = d.getDay();
+      if (w >= 1 && w <= 5 && !shut.has(d.toDateString())) teach++;
+      d.setDate(d.getDate() + 1);
+    }
+    const say = (en) => html.includes(en);
+    const wrong = [];
+    if (teach !== 180) wrong.push(`the dates give ${teach} teaching days, the screen says 180`);
+    if (teach % 5 || teach / 5 !== 36) wrong.push(`the dates give ${(teach/5).toFixed(1)} weeks, the screen says 36`);
+    const ram = closures.find(c => c.id === "ramadhan"), sum = closures.find(c => c.id === "endofyear");
+    if (ram && len(ram) !== 33) wrong.push(`the Ramadhan break is ${len(ram)} days, the screen says 33`);
+    if (sum && len(sum) !== 40) wrong.push(`the summer break is ${len(sum)} days, the screen says 40`);
+    if (!say("teaches 180 days this year") || !say("36 weeks"))
+      wrong.push("the planner's opening sentence no longer states 180 days over 36 weeks");
+    if (!say("Ramadhan (33 days)") || !say("summer (40 days)"))
+      wrong.push("the two-long-breaks sentence no longer states 33 and 40 days");
+    if (wrong.length) wrong.forEach(w => fail("holiday planner — " + w));
+    else ok(`holiday planner — ${teach} teaching days over ${teach/5} weeks, and the prose agrees with the dates`);
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is
