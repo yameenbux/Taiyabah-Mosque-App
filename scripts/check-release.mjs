@@ -333,6 +333,31 @@ for (const f of ["index.html", "admin.html"]) {
   }
 }
 
+/* ---- 3l. the nikāḥ form cannot appear before the office can receive it ----
+
+   The request writes to a Postgres function that is not applied yet. If the
+   form is ever shown without that being true, a family picks a date, fills in
+   their details, presses send on the most significant booking they will make
+   this year, and is handed an error. The app therefore asks the server whether
+   the function exists and gates the form on the answer — in two places, since
+   two different paths can reveal it. Both are checked, because losing either
+   one restores exactly that failure without anything looking wrong. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const missing = [];
+  if (!/function nkProbe\(\)/.test(app) || !/PGRST202/.test(app))
+    missing.push("nkProbe is gone — the app no longer asks whether the office can receive a request, so the form's state is a guess");
+  if (!/form\.hidden = !\(NK\.open && NK\.d1 && NK\.slot\)/.test(app))
+    missing.push("nkRenderPicks reveals the form on date+slot alone, without checking NK.open");
+  if (!/f\.hidden = !\(open && !NK\.sent && NK\.d1 && NK\.slot\)/.test(app))
+    missing.push("nkShow reveals the form without checking the server's answer");
+  /* Treating an unreadable answer as "open" is the dangerous default. */
+  if (!/catch\(\(\) => \{ clearTimeout\(timer\); NK\.open = false; return false; \}\)/.test(app))
+    missing.push("nkProbe no longer fails closed — an offline phone would be shown a form that cannot send");
+  if (missing.length) missing.forEach(fail);
+  else ok("nikāḥ requests — the form is shown only when the server confirms it can receive one, and fails closed");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

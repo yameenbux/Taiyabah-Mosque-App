@@ -108,6 +108,18 @@ for (const v of arrayOf("VIDEOS")) { add(`video.${v.id}.t`, v.t); add(`video.${v
    the t("key", "English") scan to find. */
 for (const sn of arrayOf("BK_SESSIONS")) if (sn && sn.nameKey) add(sn.nameKey, sn.name);
 
+/* The nikāḥ slots name their own keys the same way, and the two one-offs
+   beside them — the Saturday late morning and "I'm flexible" — are objects
+   rather than array entries, so they are read by name. */
+for (const sl of arrayOf("NK_SLOTS")) if (sl && sl.labelKey) add(sl.labelKey, sl.label);
+for (const name of ["NK_SATURDAY", "NK_FLEXIBLE"]) {
+  const m = script.match(new RegExp(`const ${name}\\s*=\\s*(\\{[\\s\\S]*?\\});`));
+  if (!m) continue;
+  const o = new Function(`return ${m[1]}`)();
+  if (o.labelKey) add(o.labelKey, o.label);
+  if (o.noteKey)  add(o.noteKey,  o.note);
+}
+
 /* The madrasah's closures and the Islamic dates beside them. A parent reads
    "Ramadhan Holidays" and "Eid al-Fitr" as much as they read the buttons, so
    both lists are translated; adding a closure next year adds its keys here. */

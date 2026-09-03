@@ -497,7 +497,10 @@
     align-items:center;gap:10px}
   .bk-session[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
   .bk-session[disabled]{opacity:.55;cursor:default}
-  .bk-s-t{flex:1;min-width:0}
+  /* A flex ITEM is not a flex container. These two spans ran together on one
+     line — "Morning9:00 am – 4:00 pm" — on the hall's sessions since they were
+     written, and the nikāḥ slots inherited it by reusing the class. */
+  .bk-s-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .bk-s-n{font-weight:700;font-size:14px}
   .bk-s-w{font-size:12px;color:var(--muted);margin-top:2px}
   .bk-session[data-on="1"] .bk-s-w{color:#EADFE6}
@@ -775,6 +778,57 @@
   .hp-est{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
     color:#8A6A18;background:rgba(198,162,76,.18);border-radius:5px;padding:1px 5px;margin-left:6px;
     vertical-align:1px}
+
+  /* ---- funeral services ----
+     The urgent box is first and is the loudest thing on the screen, because
+     someone opening this at 3am needs a phone number, not an introduction. */
+  .fs-urgent{margin-top:0;border-radius:16px;padding:17px 16px;color:#F3EFE3;
+    background:linear-gradient(180deg,#7A2A18,#5A1D10)}
+  .fs-urgent .u-lab{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:#F0C9A8;margin-bottom:7px}
+  .fs-urgent h4{font-family:"Fraunces",Georgia,serif;font-size:18px;font-weight:600}
+  .fs-urgent p{font-size:13px;line-height:1.65;color:#E6C8BA;margin-top:9px}
+  .fs-nums{display:grid;gap:8px;margin-top:14px}
+  .fs-num{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    text-decoration:none;padding:11px 13px;border-radius:12px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)}
+  .fs-num .who{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#EFD3C4}
+  .fs-num .no{font-size:16px;font-weight:700;color:#FFF;white-space:nowrap}
+  .fs-grid{display:grid;gap:10px}
+  .fs-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .fs-item .ic{flex:0 0 auto;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+    background:#F0E9ED;color:var(--brand-600)}
+  .fs-item .ic svg{width:19px;height:19px}
+  .fs-item h4{font-size:14.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;
+    gap:7px;flex-wrap:wrap}
+  .fs-item p{font-size:13px;line-height:1.6;color:var(--muted);margin-top:4px}
+  .fs-extra{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#8A6A18;
+    background:rgba(198,162,76,.18);border-radius:5px;padding:2px 6px;font-weight:700}
+
+  /* ---- nikah date request ----
+     The calendar, the slots and the form are the hall's, reused: two screens
+     that ask for a date should not look like two different apps. Only the
+     pieces the hall has no equivalent of are new. */
+  .nk-mode{display:flex;gap:7px;margin-top:12px}
+  .nk-mode button{flex:1;font:inherit;font-size:13px;padding:9px 10px;border-radius:11px;cursor:pointer;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+  .nk-mode button[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .nk-picks{margin-top:12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);
+    padding:2px 13px}
+  .nk-picks .nk-p{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    padding:10px 0;border-top:1px solid var(--line)}
+  .nk-picks .nk-p:first-child{border-top:none}
+  .nk-picks .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    flex:0 0 auto}
+  .nk-picks .v{font-size:13.5px;font-weight:600;color:var(--ink);text-align:right}
+  .nk-picks .v.empty{font-weight:400;color:var(--muted)}
+  .nk-clear{margin-top:10px;font:inherit;font-size:12.5px;padding:8px 12px;border-radius:10px;
+    cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--muted);width:100%}
+  .nk-notice{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:13px;
+    border-radius:12px;background:rgba(198,162,76,.13);border:1px solid rgba(198,162,76,.4);
+    font-size:12.5px;line-height:1.6;color:var(--ink)}
+  .nk-notice svg{flex:0 0 auto;width:18px;height:18px;color:#8A6A18;margin-top:1px}
 
   /* ---- birth page ---- */
   .bt-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#F3EFE3;
@@ -1934,7 +1988,7 @@
             <span class="dr-ch">&rsaquo;</span>
           </button>
 
-          <button class="md-row soon" disabled aria-disabled="true">
+          <button class="md-row" id="md-funeral">
             <span class="md-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path d="M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7l-8-4Z"/>
@@ -1945,7 +1999,7 @@
               <span class="md-t1" data-i18n="marriagedeath.funeral_service">Funeral Service</span>
               <span class="md-t2" data-i18n="marriagedeath.janazah_guidance_and_support">Janāzah guidance and support</span>
             </span>
-            <span class="soon-tag" data-i18n="marriagedeath.coming_soon">Coming soon</span>
+            <span class="dr-ch">&rsaquo;</span>
           </button>
 
           <p class="md-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
@@ -2107,6 +2161,101 @@
        app carries the same words for the same reason. Applications themselves
        are not open here, and this screen says so rather than implying a form
        exists somewhere in the app. -->
+
+  <!-- ================= FUNERAL SERVICES =================
+       Someone opens this at three in the morning. The first thing on the
+       screen is therefore a phone number and who to ring, not an
+       introduction — and BCoM comes before the masjid's own number, because
+       BCoM is genuinely the first call: they handle the registration and the
+       release, without which nothing else can start. -->
+  <div class="sheet" id="funeral" data-open="0" role="dialog" aria-modal="true" aria-label="Funeral Services" data-i18n-attr="aria-label:a11y.funeral_services">
+    <div class="scrim" id="fs-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="funeral.funeral_services">Funeral Services</h3>
+        <button class="sh-close" id="fs-close" data-i18n="funeral.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="wl-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="wl-ar arabic">الجَنَازَة</div>
+          <div class="wl-en" data-i18n="funeral.funeral_services_2">Funeral Services</div>
+          <p class="hh-sub" data-i18n="funeral.taiyabah_masjid_supports_families">Taiyabah Masjid supports families through every part of an Islamic funeral,
+             from the first phone call to the burial.</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="fs-urgent">
+            <span class="u-lab" data-i18n="funeral.if_someone_has_just_passed">If someone has just passed away</span>
+            <h4 data-i18n="funeral.ring_bcom_first">Ring BCoM first</h4>
+            <p data-i18n="funeral.bolton_council_of_mosques_runs">Bolton Council of Mosques runs the borough&rsquo;s Muslim funeral service and will
+               liaise with the council and the hospital on your behalf. They answer out of
+               hours. Once they are involved, the masjid will arrange everything set out
+               below.</p>
+            <div class="fs-nums">
+              <a class="fs-num" href="tel:01204363680">
+                <span class="who" data-i18n="funeral.bcom_office_hours">BCoM &middot; office hours</span>
+                <span class="no tnum" data-i18n-latin>01204 363 680</span></a>
+              <a class="fs-num" href="tel:01204392919">
+                <span class="who" data-i18n="funeral.bcom_out_of_hours">BCoM &middot; out of hours</span>
+                <span class="no tnum" data-i18n-latin>01204 392 919</span></a>
+              <a class="fs-num" href="tel:01204535997">
+                <span class="who" data-i18n="funeral.taiyabah_masjid_office">Taiyabah Masjid office</span>
+                <span class="no tnum" data-i18n-latin>01204 535 997</span></a>
+            </div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="funeral.what_the_masjid_provides">What the masjid provides</h2><span class="rule"></span></div>
+          <div class="card hh-card" style="margin-top:0">
+            <p data-i18n="funeral.everything_here_is_arranged_by">Everything here is arranged by the masjid. If you are unsure what is needed or in
+               what order, ring the office and someone will talk you through it.</p>
+          </div>
+          <div class="fs-grid" style="margin-top:12px">
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-4-7-11-7-11S5 11 5 15a7 7 0 0 0 7 7z"/></svg></span><div><h4><span data-i18n="funeral.ghusl_washing">Ghusl &mdash; washing</span></h4><p data-i18n="funeral.the_ritual_washing_of_the">The ritual washing of the deceased, carried out at the masjid according to Islamic practice.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c3-2 6-2 9 0s6 2 9 0"/><path d="M3 12c3-2 6-2 9 0s6 2 9 0"/><path d="M3 17c3-2 6-2 9 0s6 2 9 0"/></svg></span><div><h4><span data-i18n="funeral.kafn_shrouding">Kafn &mdash; shrouding</span></h4><p data-i18n="funeral.the_shroud_is_provided_and">The shroud is provided and the deceased is prepared in the proper manner.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V12a8 8 0 0 1 16 0v9"/><path d="M12 4a3 3 0 0 1 3 3c0 1.5-3 3-3 3s-3-1.5-3-3a3 3 0 0 1 3-3z"/><path d="M2 21h20"/><path d="M9 21v-4a3 3 0 0 1 6 0v4"/></svg></span><div><h4><span data-i18n="funeral.janazah_prayer">Janāzah prayer</span></h4><p data-i18n="funeral.the_funeral_prayer_is_held">The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="10" rx="2"/><path d="M16 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></span><div><h4><span data-i18n="funeral.transportation">Transportation</span></h4><p data-i18n="funeral.the_deceased_is_transported_between">The deceased is transported between the hospital, the masjid and the cemetery.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M4 11h16"/><path d="M8 6.5v2"/><path d="M8 14.5v2"/></svg></span><div><h4><span data-i18n="funeral.fridge_service">Fridge service</span></h4><p data-i18n="funeral.refrigerated_preservation_at_the_masjid">Refrigerated preservation at the masjid where there is a wait before the burial can take place.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 11l2 2 4-4"/><path d="M9 17h6"/></svg></span><div><h4><span data-i18n="funeral.burial_co_ordination">Burial co-ordination</span></h4><p data-i18n="funeral.the_masjid_arranges_the_burial">The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3"/><path d="M10 1v3"/><path d="M14 1v3"/></svg></span><div><h4><span data-i18n="funeral.feeding_kitchen">Feeding &amp; kitchen</span><span class="fs-extra" data-i18n="funeral.extra_cost">extra cost</span></h4><p data-i18n="funeral.catering_for_mourners_can_be">Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided.</p></div></div>
+            <div class="fs-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><div><h4><span data-i18n="funeral.bereavement_support">Bereavement support</span></h4><p data-i18n="funeral.the_imams_are_available_to">The imams are available to the family afterwards, for guidance and for the questions that come later.</p></div></div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="funeral.where_bcom_fits_in">Where BCoM fits in</h2><span class="rule"></span></div>
+          <div class="card hh-card" style="margin-top:0">
+            <p data-i18n="funeral.a_death_has_to_be">A death has to be registered, and the hospital or coroner has to release the
+               deceased, before a burial can go ahead. Bolton Council of Mosques handles that
+               side &mdash; liaising with the council and the hospital &mdash; which is why they
+               are the first call. The masjid then takes care of the ghusl, the kafn, the
+               janāzah and the burial itself.</p>
+            <p data-i18n="funeral.you_do_not_need_to">You do not need to work out who does what. Ring either number and you will be
+               pointed the right way.</p>
+          </div>
+
+          <div class="wl-advisory">
+            <div class="wl-adv-h" data-i18n="funeral.before_you_make_arrangements">Before you make arrangements</div>
+            <p data-i18n="funeral.please_check_with_the_office">Please check with the office before making arrangements. What can be provided
+               depends on the circumstances and on when the deceased is released. Nothing here
+               should be taken as confirmed for a particular funeral until the masjid has
+               spoken to you.</p>
+          </div>
+
+          <button class="hh-call" id="fs-to-will" type="button">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="funeral.wasiyyah_why_and_how">Wasiyyah &mdash; why and how to prepare one</span>
+              <span class="hh-call-v" data-i18n="funeral.importance_of_an_islamic_will">Importance of an Islamic Will</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="madmissions" data-open="0" role="dialog" aria-modal="true" aria-label="Madrasah admissions and fees" data-i18n-attr="aria-label:a11y.madrasah_admissions">
     <div class="scrim" id="ad-scrim"></div>
     <div class="panel">
@@ -2981,6 +3130,114 @@
 
           <p class="mg-note" data-i18n="marriage.specific_requirements_documentation_witnesses_">Specific requirements &mdash; documentation, witnesses, timings and
             any applicable fees &mdash; are best discussed directly with the office when you call.</p>
+
+          <!-- ---------------- request a date ----------------
+               A REQUEST, not a booking. Nothing on this calendar is coloured
+               by availability, and that is deliberate: the masjid does not
+               publish its nikāḥ diary, so painting days free would be
+               inventing information the app does not have. Every day inside
+               the horizon looks the same, because as far as the app knows,
+               it is.
+
+               Whether the form appears at all is asked of the server rather
+               than set by a constant here. The website carries the same
+               switch as a hand-edited boolean, which means the two can
+               disagree — and the day the masjid turns requests on, the app
+               would go on showing a phone number until somebody remembered
+               to flip it. nkProbe() asks Postgres whether the function
+               exists; the answer decides. -->
+          <div class="sec-h"><h2 data-i18n="nikah.request_a_date">Request a date</h2><span class="rule"></span></div>
+
+          <div class="card bk-card" id="nk-card">
+            <div class="nk-notice">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+              <span data-i18n-html="nikah.this_is_a_request_not"><b>This is a request, not a booking.</b> No date here is reserved, and nothing
+                on this calendar shows what the masjid already has in the diary. Choose the day
+                and prayer that would suit you, and the office will ring the person named on
+                the request to confirm whether it can be done, go through the details, and
+                take payment.</span>
+            </div>
+
+            <div class="bk-cal-head" style="margin-top:14px">
+              <button class="bk-nav" id="nk-prev" aria-label="Previous month"
+                      data-i18n-attr="aria-label:a11y.previous_month">&lsaquo;</button>
+              <h4 id="nk-title">&mdash;</h4>
+              <button class="bk-nav" id="nk-next" aria-label="Next month"
+                      data-i18n-attr="aria-label:a11y.next_month">&rsaquo;</button>
+            </div>
+            <div class="bk-grid" id="nk-grid"></div>
+            <p class="bk-horizon" data-i18n="nikah.two_weeks_notice_minimum">Two weeks&rsquo; notice minimum, and up to a year ahead.</p>
+
+            <!-- Shown while we do not yet know whether the office is taking
+                 requests, and left in place if it is not. -->
+            <div id="nk-closed">
+              <div class="ad-note">
+                <span class="lab" data-i18n="nikah.requests">Requests</span>
+                <h4 data-i18n="nikah.requests_by_phone_for_now">Requests are taken by phone for now</h4>
+                <p data-i18n="nikah.pick_a_date_above_so">Pick a date above so you know what to ask for, then ring the office. Sending a
+                   request from here will be possible shortly.</p>
+              </div>
+            </div>
+
+            <div class="bk-panel" id="nk-panel" hidden>
+              <div class="nk-mode">
+                <button type="button" id="nk-mode-1" data-on="1" data-i18n="nikah.1st_choice">1st choice</button>
+                <button type="button" id="nk-mode-2" data-i18n="nikah.2nd_choice">2nd choice</button>
+              </div>
+
+              <span class="bk-clabel" id="nk-slot-label" data-i18n="nikah.what_time_would_suit_you">What time would suit you?</span>
+              <div class="bk-sessions" id="nk-slots"></div>
+
+              <div class="nk-picks">
+                <div class="nk-p"><span class="k" data-i18n="nikah.1st_choice_2">1st choice</span><span class="v empty" id="nk-v1" data-i18n="nikah.not_chosen">Not chosen</span></div>
+                <div class="nk-p"><span class="k" data-i18n="nikah.2nd_choice_2">2nd choice</span><span class="v empty" id="nk-v2" data-i18n="nikah.optional">Optional</span></div>
+                <div class="nk-p"><span class="k" data-i18n="nikah.prayer">Prayer</span><span class="v empty" id="nk-vt" data-i18n="nikah.not_chosen_2">Not chosen</span></div>
+              </div>
+              <button type="button" class="nk-clear" id="nk-clear" data-i18n="nikah.start_again">Start again</button>
+
+              <form class="bk-form" id="nk-form" novalidate autocomplete="on" hidden>
+                <div class="bk-field">
+                  <label for="nk-name" data-i18n="nikah.your_name">Your name</label>
+                  <input type="text" id="nk-name" autocomplete="name">
+                </div>
+                <span class="bk-clabel" data-i18n="nikah.who_are_you">Who are you?</span>
+                <div class="bk-opts" id="nk-roles">
+                  <button type="button" class="bk-opt" data-role="groom" data-i18n="nikah.groom">Groom</button>
+                  <button type="button" class="bk-opt" data-role="bride" data-i18n="nikah.bride">Bride</button>
+                  <button type="button" class="bk-opt" data-role="family" data-i18n="nikah.family">Family</button>
+                  <button type="button" class="bk-opt" data-role="other" data-i18n="nikah.other">Other</button>
+                </div>
+                <div class="bk-field">
+                  <label for="nk-phone" data-i18n="nikah.contact_number">Contact number</label>
+                  <input type="tel" id="nk-phone" inputmode="tel" autocomplete="tel" data-i18n-latin>
+                  <span class="bk-hint" data-i18n="nikah.the_office_will_ring_this">The office will ring this number to confirm, so it must be one that reaches
+                    you.</span>
+                </div>
+                <div class="bk-field">
+                  <label for="nk-email" data-i18n="nikah.email">Email</label>
+                  <input type="email" id="nk-email" inputmode="email" autocomplete="email" data-i18n-latin>
+                </div>
+                <div class="bk-field">
+                  <label for="nk-guests" data-i18n="nikah.roughly_how_many_guests">Roughly how many guests <span style="text-transform:none;letter-spacing:0;font-weight:500" data-i18n="nikah.optional_2">(optional)</span></label>
+                  <input type="number" id="nk-guests" inputmode="numeric" min="0" max="2000">
+                </div>
+                <div class="bk-field">
+                  <label for="nk-notes" data-i18n="nikah.anything_we_should_know">Anything we should know <span style="text-transform:none;letter-spacing:0;font-weight:500" data-i18n="nikah.optional_3">(optional)</span></label>
+                  <textarea id="nk-notes" rows="2" maxlength="600"></textarea>
+                </div>
+                <label class="bk-agree" id="nk-agree-wrap">
+                  <input type="checkbox" id="nk-agree">
+                  <span data-i18n="nikah.i_understand_the_masjid_will">I understand the masjid will keep my name and contact details to deal with
+                    this request, and nothing else.</span>
+                </label>
+                <div class="bk-err" id="nk-err" hidden></div>
+                <button type="submit" class="bk-submit" id="nk-submit" data-i18n="nikah.send_my_request">Send my request</button>
+                <p class="bk-hint" style="text-align:center" data-i18n="nikah.nothing_is_sent_until_you">Nothing is sent until you press this.</p>
+              </form>
+
+              <div class="bk-done" id="nk-done" hidden></div>
+            </div>
+          </div>
 
           <p class="mg-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
@@ -5322,6 +5579,7 @@ function refreshRenderedText(){
     () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
     () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderSessions(); bkShowPrice(); } },
     () => { if(open("holidays")) renderHolidays(); },
+    () => { if(open("marriage") && NK.month){ nkRenderCal(); nkRenderSlots(); nkRenderPicks(); } },
     () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
@@ -6278,9 +6536,386 @@ function initMarriageDeath(){
     closeMarriageDeath();
     setTimeout(openMarriage,120);
   });
+  document.getElementById('md-funeral').addEventListener('click',()=>{
+    closeMarriageDeath();
+    setTimeout(openFuneral,120);
+  });
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('marriagedeath').dataset.open==="1") closeMarriageDeath();
   });
+}
+
+/* ---------------- funeral services ---------------- */
+function openFuneral(){
+  document.getElementById('funeral').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#funeral .sh-body').scrollTop=0;
+}
+function closeFuneral(){
+  document.getElementById('funeral').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initFuneral(){
+  document.getElementById('fs-close').addEventListener('click',closeFuneral);
+  document.getElementById('fs-scrim').addEventListener('click',closeFuneral);
+  document.getElementById('fs-to-will').addEventListener('click',()=>{
+    closeFuneral(); setTimeout(openWill,120);
+  });
+  /* Ringing somebody is the point of this screen; do not leave it hanging
+     open behind the call. */
+  document.querySelectorAll('#funeral .fs-num').forEach(a=>
+    a.addEventListener('click',closeFuneral));
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('funeral').dataset.open==="1") closeFuneral();
+  });
+}
+
+/* ---------------- nikāḥ date request ----------------
+   A REQUEST, not a booking: nothing here reserves anything, and no day is
+   painted free or taken because the masjid does not publish its nikāḥ diary.
+
+   A nikāḥ is nearly always held straight after a congregational prayer, so
+   the choice offered is the prayer rather than a clock time — and where the
+   app has that day in its own timetable it shows the jamāʿah time beside it,
+   so nobody is choosing "after Asr" without knowing when that is. Past the end
+   of the timetable the prayer is still offered and the time simply is not
+   claimed. The one regular exception is a Saturday late morning, before a
+   wedding meal that is a separate event; it appears only on Saturdays,
+   because that is the only day it happens. ------------------------------- */
+const NK_NOTICE_DAYS  = 14;     // the masjid needs a fortnight
+const NK_HORIZON_DAYS = 365;
+
+const NK_SLOTS = [
+  { key:"after_fajr",    labelKey:"nikah.after_fajr",    label:"After Fajr",    prayer:"fajr"    },
+  { key:"after_zuhr",    labelKey:"nikah.after_zuhr",    label:"After Zuhr",    prayer:"zuhr"    },
+  { key:"after_asr",     labelKey:"nikah.after_asr",     label:"After Asr",     prayer:"asr"     },
+  { key:"after_maghrib", labelKey:"nikah.after_maghrib", label:"After Maghrib", prayer:"maghrib" },
+  { key:"after_isha",    labelKey:"nikah.after_isha",    label:"After Isha",    prayer:"isha"    },
+];
+const NK_SATURDAY = { key:"saturday_11", labelKey:"nikah.saturday_11am", label:"Saturday, 11:00am",
+                      noteKey:"nikah.before_a_wedding_meal", note:"before a wedding meal" };
+const NK_FLEXIBLE = { key:"flexible", labelKey:"nikah.im_flexible", label:"I'm flexible",
+                      noteKey:"nikah.the_office_can_suggest", note:"the office can suggest a time" };
+
+const NK = {
+  open: null,        // null = not asked yet; true/false = the server's answer
+  month: null,
+  d1: null, d2: null,   // first and second choice dates
+  slot: null,
+  which: 1,             // which choice the calendar is currently setting
+  role: null,
+  sent: false,
+};
+
+function nkIso(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0")
+       + "-" + String(d.getDate()).padStart(2,"0");
+}
+function nkFirstAllowed(){
+  const d = nowLondon(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + NK_NOTICE_DAYS);
+  return d;
+}
+function nkLastAllowed(){
+  const d = nowLondon(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + NK_HORIZON_DAYS);
+  return d;
+}
+function nkPretty(d){
+  return fullDow(d.getDay()) + " " + num(d.getDate()) + " " + mon(d.getMonth()) + " " + num(d.getFullYear());
+}
+
+/* Is the office taking requests? The website answers this with a boolean
+   somebody edits by hand; we ask Postgres instead, so the two cannot drift.
+   An empty payload is a safe question: the function validates before it
+   writes, so it raises "Please choose a date" and stores nothing. A missing
+   function answers PGRST202, and anything we cannot interpret — offline, a
+   proxy, a 500 — is treated as closed, because sending someone into a form
+   that will fail is worse than sending them to the phone. */
+function nkProbe(){
+  if(NK.open !== null) return Promise.resolve(NK.open);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  return fetch(`${supaBase()}/rest/v1/rpc/request_nikah_date`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: {
+      apikey: SUPA.key,
+      Authorization: "Bearer " + SUPA.key,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ payload: {} }),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    /* 404 with PGRST202 is "no such function" — the migration is not applied.
+       A 400 from the function's own validation means it is there. */
+    NK.open = !(res.status === 404 || /PGRST202/.test(body));
+    return NK.open;
+  })).catch(() => { clearTimeout(timer); NK.open = false; return false; });
+}
+
+function nkRenderCal(){
+  const grid = document.getElementById("nk-grid");
+  if(!grid) return;
+  if(!NK.month){ const f = nkFirstAllowed(); NK.month = new Date(f.getFullYear(), f.getMonth(), 1); }
+
+  const y = NK.month.getFullYear(), m = NK.month.getMonth();
+  document.getElementById("nk-title").textContent = fullMon(m) + " " + num(y);
+
+  const first = nkFirstAllowed(), last = nkLastAllowed();
+  document.getElementById("nk-prev").disabled =
+    new Date(y, m, 1) <= new Date(first.getFullYear(), first.getMonth(), 1);
+  document.getElementById("nk-next").disabled =
+    new Date(y, m, 1) >= new Date(last.getFullYear(), last.getMonth(), 1);
+
+  let html = "";
+  for(const i of [1,2,3,4,5,6,0]) html += `<div class="bk-wd">${dow(i).slice(0,1)}</div>`;
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+  for(let i = 0; i < lead; i++) html += "<div></div>";
+  const days = new Date(y, m+1, 0).getDate();
+  for(let day = 1; day <= days; day++){
+    const d = new Date(y, m, day);
+    const usable = d >= first && d <= last;
+    const on = (NK.d1 && nkIso(NK.d1) === nkIso(d)) || (NK.d2 && nkIso(NK.d2) === nkIso(d));
+    html += `<button type="button" class="bk-day" data-day="${day}"`
+          + (usable ? "" : " disabled")
+          + (on ? ' data-on="1"' : "") + ">" + num(day) + "</button>";
+  }
+  grid.innerHTML = html;
+  grid.querySelectorAll(".bk-day:not([disabled])").forEach(b=>{
+    b.addEventListener("click", ()=> nkPickDate(new Date(y, m, +b.dataset.day)));
+  });
+}
+
+function nkPickDate(d){
+  if(NK.which === 1){
+    NK.d1 = d;
+    /* A second choice that is the same day as the first is not a second
+       choice. Clear it rather than sending the office the same date twice. */
+    if(NK.d2 && nkIso(NK.d2) === nkIso(d)) NK.d2 = null;
+    /* The Saturday slot only exists on a Saturday. */
+    if(NK.slot === NK_SATURDAY.key && d.getDay() !== 6) NK.slot = null;
+  } else {
+    if(NK.d1 && nkIso(NK.d1) === nkIso(d)) return;   // already the first choice
+    NK.d2 = d;
+  }
+  nkRenderCal();
+  nkRenderSlots();
+  nkRenderPicks();
+}
+
+/* The prayer times the app already has, for the day actually chosen. */
+function nkJamaat(d, prayer){
+  const rec = dayRec(d);
+  return rec && rec.jamaat ? rec.jamaat[prayer] || null : null;
+}
+
+function nkRenderSlots(){
+  const host = document.getElementById("nk-slots");
+  if(!host) return;
+  const d = NK.d1;
+  if(!d){ host.innerHTML = ""; return; }
+
+  const slots = NK_SLOTS.slice();
+  if(d.getDay() === 6) slots.splice(2, 0, NK_SATURDAY);   // sits after Fajr and Zuhr
+  slots.push(NK_FLEXIBLE);
+
+  host.innerHTML = slots.map(sl => {
+    const time = sl.prayer ? nkJamaat(d, sl.prayer) : null;
+    const sub  = time ? num(hm12(time))
+               : (sl.noteKey ? t(sl.noteKey, sl.note)
+               : t("nikah.time_confirmed_by_the_office", "time confirmed by the office"));
+    return `<button type="button" class="bk-session" data-slot="${sl.key}"`
+         + (NK.slot === sl.key ? ' data-on="1"' : "") + ">"
+         + `<span class="bk-s-t"><span class="bk-s-n">${esc(t(sl.labelKey, sl.label))}</span>`
+         + `<span class="bk-s-w">${esc(sub)}</span></span></button>`;
+  }).join("");
+
+  host.querySelectorAll(".bk-session").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      NK.slot = b.dataset.slot;
+      nkRenderSlots();
+      nkRenderPicks();
+    });
+  });
+}
+
+function nkRenderPicks(){
+  const set = (id, val, key, en) => {
+    const el = document.getElementById(id);
+    el.textContent = val || t(key, en);
+    el.classList.toggle("empty", !val);
+  };
+  set("nk-v1", NK.d1 ? nkPretty(NK.d1) : null, "nikah.not_chosen", "Not chosen");
+  set("nk-v2", NK.d2 ? nkPretty(NK.d2) : null, "nikah.optional", "Optional");
+  let slotText = null;
+  if(NK.slot){
+    const all = NK_SLOTS.concat([NK_SATURDAY, NK_FLEXIBLE]);
+    const sl = all.filter(x => x.key === NK.slot)[0];
+    if(sl){
+      const time = sl.prayer && NK.d1 ? nkJamaat(NK.d1, sl.prayer) : null;
+      slotText = t(sl.labelKey, sl.label) + (time ? " · " + num(hm12(time)) : "");
+    }
+  }
+  set("nk-vt", slotText, "nikah.not_chosen_2", "Not chosen");
+
+  /* The form only appears once there is something to send — and only if the
+     office is actually taking requests. */
+  const form = document.getElementById("nk-form");
+  if(form && !NK.sent) form.hidden = !(NK.open && NK.d1 && NK.slot);
+}
+
+function nkReset(){
+  NK.d1 = NK.d2 = NK.slot = null; NK.which = 1;
+  document.getElementById("nk-mode-1").dataset.on = "1";
+  delete document.getElementById("nk-mode-2").dataset.on;
+  nkRenderCal(); nkRenderSlots(); nkRenderPicks();
+}
+
+function nkValidate(){
+  const bad = id => { document.getElementById(id).parentElement.dataset.bad = "1"; };
+  ["nk-name","nk-phone","nk-email","nk-guests","nk-notes"].forEach(id=>{
+    delete document.getElementById(id).parentElement.dataset.bad;
+  });
+  let ok = true;
+  const v = id => document.getElementById(id).value.trim();
+  if(!v("nk-name")){ bad("nk-name"); ok = false; }
+  if(!v("nk-phone")){ bad("nk-phone"); ok = false; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v("nk-email"))){ bad("nk-email"); ok = false; }
+  if(!NK.role) ok = false;
+  if(!document.getElementById("nk-agree").checked) ok = false;
+  if(!NK.d1 || !NK.slot) ok = false;
+  return ok;
+}
+
+function nkSubmit(e){
+  e.preventDefault();
+  if(NK.sent) return;
+  const err = document.getElementById("nk-err");
+  if(!nkValidate()){
+    err.hidden = false;
+    err.textContent = t("nikah.check_the_form",
+      "Please fill in your name, number, a valid email, who you are, and tick the box.");
+    return;
+  }
+  err.hidden = true;
+
+  const btn = document.getElementById("nk-submit");
+  btn.disabled = true;
+  btn.textContent = t("nikah.sending", "Sending…");
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+
+  const slot = NK.slot;
+  const sl = NK_SLOTS.filter(x => x.key === slot)[0];
+  const guests = document.getElementById("nk-guests").value.trim();
+
+  fetch(`${supaBase()}/rest/v1/rpc/request_nikah_date`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: {
+      apikey: SUPA.key,
+      Authorization: "Bearer " + SUPA.key,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ payload: {
+      preferred_date:   nkIso(NK.d1),
+      alternative_date: NK.d2 ? nkIso(NK.d2) : null,
+      slot:             slot,
+      /* The jamāʿah clock time as published on the day they asked. Times move
+         through the year, and the office needs to know what the family were
+         actually looking at when they chose. */
+      preferred_time:   sl ? nkJamaat(NK.d1, sl.prayer) : null,
+      time_flexible:    slot === "flexible",
+      guests_estimate:  guests === "" ? null : Number(guests),
+      contact_name:     document.getElementById("nk-name").value.trim(),
+      contact_role:     NK.role,
+      contact_phone:    document.getElementById("nk-phone").value.trim(),
+      contact_email:    document.getElementById("nk-email").value.trim(),
+      notes:            document.getElementById("nk-notes").value.trim() || null,
+      privacy_accepted: true,
+    }}),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    if(res.ok){
+      NK.sent = true;
+      let ref = null;
+      try{ ref = JSON.parse(body).reference; }catch(e){}
+      nkDone(ref);
+      return;
+    }
+    /* The function speaks to the person directly — "we already have a request
+       from this email address for that date" — so where it does, say what it
+       said rather than a generic apology over the top of it. */
+    let msg = null;
+    try{ const j = JSON.parse(body); if(j && j.message && /^[A-Z]/.test(j.message)) msg = j.message; }catch(e){}
+    btn.disabled = false;
+    btn.textContent = t("nikah.send_my_request", "Send my request");
+    err.hidden = false;
+    err.textContent = msg || t("nikah.couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  })).catch(() => {
+    clearTimeout(timer);
+    btn.disabled = false;
+    btn.textContent = t("nikah.send_my_request", "Send my request");
+    err.hidden = false;
+    err.textContent = t("nikah.couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  });
+}
+
+function nkDone(ref){
+  document.getElementById("nk-form").hidden = true;
+  document.getElementById("nk-clear").hidden = true;
+  document.querySelector("#marriage .nk-mode").hidden = true;
+  const box = document.getElementById("nk-done");
+  const row = (k, v) => `<div class="bk-sum"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+  let html = `<h4>${esc(t("nikah.request_sent","Request sent"))}</h4>`
+           + `<p>${esc(t("nikah.the_office_will_ring_you",
+               "The office will ring you to confirm whether the date can be done, go through what is needed, and take payment. Nothing is booked until they have spoken to you."))}</p>`;
+  if(ref) html += row(t("nikah.reference","Reference"), ref);
+  html += row(t("nikah.1st_choice_2","1st choice"), nkPretty(NK.d1));
+  if(NK.d2) html += row(t("nikah.2nd_choice_2","2nd choice"), nkPretty(NK.d2));
+  box.innerHTML = html;
+  box.hidden = false;
+}
+
+/* Closed still shows the calendar, the prayer slots and the picks, so somebody
+   can work out exactly what to ask for before they ring. It is only the form
+   that is withheld — because that is the only part that would fail. */
+function nkShow(open){
+  document.getElementById("nk-closed").hidden = !!open;
+  document.getElementById("nk-panel").hidden = false;
+  const f = document.getElementById("nk-form");
+  if(f) f.hidden = !(open && !NK.sent && NK.d1 && NK.slot);
+}
+
+function initNikah(){
+  document.getElementById("nk-prev").addEventListener("click", ()=>{
+    NK.month = new Date(NK.month.getFullYear(), NK.month.getMonth()-1, 1); nkRenderCal();
+  });
+  document.getElementById("nk-next").addEventListener("click", ()=>{
+    NK.month = new Date(NK.month.getFullYear(), NK.month.getMonth()+1, 1); nkRenderCal();
+  });
+  const m1 = document.getElementById("nk-mode-1"), m2 = document.getElementById("nk-mode-2");
+  m1.addEventListener("click", ()=>{ NK.which = 1; m1.dataset.on = "1"; delete m2.dataset.on; });
+  m2.addEventListener("click", ()=>{
+    if(!NK.d1) return;                       // a second choice without a first is meaningless
+    NK.which = 2; m2.dataset.on = "1"; delete m1.dataset.on;
+  });
+  document.getElementById("nk-clear").addEventListener("click", nkReset);
+  document.getElementById("nk-roles").querySelectorAll(".bk-opt").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      NK.role = b.dataset.role;
+      document.getElementById("nk-roles").querySelectorAll(".bk-opt")
+        .forEach(x => x === b ? x.dataset.on = "1" : delete x.dataset.on);
+    });
+  });
+  document.getElementById("nk-form").addEventListener("submit", nkSubmit);
+  nkRenderCal();
+  nkRenderPicks();
+  nkShow(false);
 }
 
 /* ---------------- madrasah: admissions ---------------- */
@@ -6531,6 +7166,9 @@ function initEducation(){
 
 /* ---------------- marriage page ---------------- */
 function openMarriage(){
+  /* Asked the first time somebody opens this screen, not on every launch:
+     most people never come here, and the answer is cached once it arrives. */
+  nkProbe().then(nkShow);
   document.getElementById('marriage').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#marriage .sh-body').scrollTop=0;
@@ -6540,6 +7178,7 @@ function closeMarriage(){
   document.body.style.overflow="";
 }
 function initMarriage(){
+  initNikah();
   document.getElementById('mg-close').addEventListener('click',closeMarriage);
   document.getElementById('mg-scrim').addEventListener('click',closeMarriage);
   document.querySelector('#marriage .mg-call').addEventListener('click',closeMarriage);
@@ -7250,6 +7889,7 @@ function boot(){
   initBirth();
   initHallHire();
   initWill();
+  initFuneral();
   initAdmissions();
   initHolidays();
   initEducation();
