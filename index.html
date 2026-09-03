@@ -825,6 +825,12 @@
   .nk-picks .v.empty{font-weight:400;color:var(--muted)}
   .nk-clear{margin-top:10px;font:inherit;font-size:12.5px;padding:8px 12px;border-radius:10px;
     cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--muted);width:100%}
+  .nk-actions{display:grid;gap:8px;margin-top:14px}
+  .nk-act{display:flex;align-items:center;gap:10px;text-decoration:none;padding:12px 13px;
+    border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    color:#F3EFE3;font-size:14px;font-weight:600}
+  .nk-act svg{flex:0 0 auto;width:18px;height:18px}
+  .nk-act .sub{display:block;font-size:11.5px;font-weight:400;color:#CBB8C4;margin-top:2px}
   .nk-notice{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:13px;
     border-radius:12px;background:rgba(198,162,76,.13);border:1px solid rgba(198,162,76,.4);
     font-size:12.5px;line-height:1.6;color:var(--ink)}
@@ -3168,17 +3174,6 @@
             <div class="bk-grid" id="nk-grid"></div>
             <p class="bk-horizon" data-i18n="nikah.two_weeks_notice_minimum">Two weeks&rsquo; notice minimum, and up to a year ahead.</p>
 
-            <!-- Shown while we do not yet know whether the office is taking
-                 requests, and left in place if it is not. -->
-            <div id="nk-closed">
-              <div class="ad-note">
-                <span class="lab" data-i18n="nikah.requests">Requests</span>
-                <h4 data-i18n="nikah.requests_by_phone_for_now">Requests are taken by phone for now</h4>
-                <p data-i18n="nikah.pick_a_date_above_so">Pick a date above so you know what to ask for, then ring the office. Sending a
-                   request from here will be possible shortly.</p>
-              </div>
-            </div>
-
             <div class="bk-panel" id="nk-panel" hidden>
               <div class="nk-mode">
                 <button type="button" id="nk-mode-1" data-on="1" data-i18n="nikah.1st_choice">1st choice</button>
@@ -3194,6 +3189,36 @@
                 <div class="nk-p"><span class="k" data-i18n="nikah.prayer">Prayer</span><span class="v empty" id="nk-vt" data-i18n="nikah.not_chosen_2">Not chosen</span></div>
               </div>
               <button type="button" class="nk-clear" id="nk-clear" data-i18n="nikah.start_again">Start again</button>
+
+              <!-- Where the send button would be.
+
+                   This first sat above the calendar, which was the mistake:
+                   somebody scrolled past it, chose a day and a prayer, reached
+                   the bottom and found nothing to press. The explanation has to
+                   be where the action is missing, and it has to leave them
+                   something to do — so it carries what they chose and offers to
+                   put it in an email, rather than asking them to recite two
+                   dates and a prayer down the phone from memory. -->
+              <div id="nk-closed">
+                <div class="ad-note">
+                  <span class="lab" data-i18n="nikah.requests">Requests</span>
+                  <h4 data-i18n="nikah.requests_by_phone_for_now">Requests are taken by phone for now</h4>
+                  <p id="nk-closed-p" data-i18n="nikah.pick_a_date_above_so">Pick a date and a prayer above, and this will carry them across to the
+                     office for you.</p>
+                  <div class="nk-actions">
+                    <a class="nk-act" href="tel:01204535997">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+                      <span><span data-i18n="nikah.ring_the_office">Ring the office</span>
+                        <span class="sub"><span data-i18n-latin>01204 535 997</span> <span data-i18n="nikah.5pm_to_7pm">&middot; 5pm to 7pm</span></span></span>
+                    </a>
+                    <a class="nk-act" id="nk-email" href="mailto:info@taiyabahmasjid.com">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 6 9-6"/></svg>
+                      <span><span data-i18n="nikah.email_the_office">Email the office</span>
+                        <span class="sub" data-i18n="nikah.opens_your_email_app">Opens your email app with the details filled in</span></span>
+                    </a>
+                  </div>
+                </div>
+              </div>
 
               <form class="bk-form" id="nk-form" novalidate autocomplete="on" hidden>
                 <div class="bk-field">
@@ -6763,6 +6788,63 @@ function nkRenderPicks(){
      office is actually taking requests. */
   const form = document.getElementById("nk-form");
   if(form && !NK.sent) form.hidden = !(NK.open && NK.d1 && NK.slot);
+
+  nkClosedSummary();
+}
+
+/* While requests are phone-only, the choices someone just made are still worth
+   something: they are what the office needs to hear. Rather than leave them to
+   read two dates and a prayer back off the screen while the phone rings, the
+   email carries them. mailto is how the masjid already takes written enquiries,
+   so this adds no new place for personal data to sit — it goes to the office
+   inbox and no further. */
+function nkClosedSummary(){
+  const p = document.getElementById("nk-closed-p");
+  const mail = document.getElementById("nk-email");
+  if(!p || !mail) return;
+
+  if(!(NK.d1 && NK.slot)){
+    p.textContent = t("nikah.pick_a_date_above_so",
+      "Pick a date and a prayer above, and this will carry them across to the office for you.");
+    mail.href = "mailto:info@taiyabahmasjid.com?subject=" +
+      encodeURIComponent(t("nikah.email_subject","Nikah date request"));
+    return;
+  }
+
+  const all = NK_SLOTS.concat([NK_SATURDAY, NK_FLEXIBLE]);
+  const sl = all.filter(x => x.key === NK.slot)[0];
+  const time = sl && sl.prayer ? nkJamaat(NK.d1, sl.prayer) : null;
+  const slotLabel = sl ? t(sl.labelKey, sl.label) + (time ? " · " + num(hm12(time)) : "") : "";
+
+  p.textContent = t("nikah.youve_chosen", "You have chosen {when}, {slot}. Ring or email the office to ask for it.")
+    .replace("{when}", nkPretty(NK.d1))
+    .replace("{slot}", slotLabel);
+
+  /* Written out in English inside the message whatever the reader's language:
+     the office reads these, and a date in Gujarati digits is one more thing
+     for them to decode at the other end. */
+  const en = d => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]
+    + " " + d.getDate() + " "
+    + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]
+    + " " + d.getFullYear();
+  const enSlot = sl ? sl.label + (time ? " (" + hm12(time) + ")" : "") : "";
+
+  const lines = [
+    "I would like to request a date for a Nikah at Taiyabah Masjid.",
+    "",
+    "1st choice: " + en(NK.d1),
+    NK.d2 ? "2nd choice: " + en(NK.d2) : "2nd choice: —",
+    "Prayer: " + enSlot,
+    "",
+    "My name:",
+    "Contact number:",
+    "Roughly how many guests:",
+    "",
+    "I understand this is a request and not a booking.",
+  ];
+  mail.href = "mailto:info@taiyabahmasjid.com"
+    + "?subject=" + encodeURIComponent(t("nikah.email_subject","Nikah date request"))
+    + "&body="    + encodeURIComponent(lines.join("\n"));
 }
 
 function nkReset(){

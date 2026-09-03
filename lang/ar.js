@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "14976bbc3054",
+ "version": "51682ed33ff8",
  "strings": {
   "nav.times": "المواقيت",
   "nav.listen": "استماع",
@@ -1502,6 +1502,12 @@ window.LANG_PACK = {
   "nikah.saturday_11am": "السبت، 11:00 صباحاً",
   "nikah.before_a_wedding_meal": "قبل وليمة العرس",
   "nikah.im_flexible": "الوقت مرن بالنسبة لي",
-  "nikah.the_office_can_suggest": "يمكن للمكتب اقتراح وقت"
+  "nikah.the_office_can_suggest": "يمكن للمكتب اقتراح وقت",
+  "nikah.ring_the_office": "اتصل بالمكتب",
+  "nikah.5pm_to_7pm": "· من 5 إلى 7 مساءً",
+  "nikah.email_the_office": "راسل المكتب بالبريد",
+  "nikah.opens_your_email_app": "يفتح تطبيق بريدك والتفاصيل مُعبّأة",
+  "nikah.email_subject": "طلب موعد نكاح",
+  "nikah.youve_chosen": "لقد اخترت {when}، {slot}. اتصل بالمكتب أو راسله بالبريد لطلبه."
  }
 };

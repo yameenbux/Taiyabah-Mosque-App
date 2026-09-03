@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "8ff561ceca74",
+ "version": "a3128e46c5c6",
  "strings": {
   "nav.times": "સમય",
   "nav.listen": "સાંભળો",
@@ -1502,6 +1502,12 @@ window.LANG_PACK = {
   "nikah.saturday_11am": "શનિવાર, સવારે 11:00",
   "nikah.before_a_wedding_meal": "લગ્નભોજન પહેલાં",
   "nikah.im_flexible": "મને કોઈ પણ સમય ચાલશે",
-  "nikah.the_office_can_suggest": "ઑફિસ કોઈ સમય સૂચવી શકે"
+  "nikah.the_office_can_suggest": "ઑફિસ કોઈ સમય સૂચવી શકે",
+  "nikah.ring_the_office": "ઑફિસને ફોન કરો",
+  "nikah.5pm_to_7pm": "· સાંજે 5 થી 7",
+  "nikah.email_the_office": "ઑફિસને ઈમેલ કરો",
+  "nikah.opens_your_email_app": "તમારી ઈમેલ ઍપ ખૂલશે, વિગતો પહેલેથી ભરેલી",
+  "nikah.email_subject": "નિકાહ તારીખની વિનંતી",
+  "nikah.youve_chosen": "તમે {when}, {slot} પસંદ કર્યું છે. એ માગવા ઑફિસને ફોન કરો કે ઈમેલ કરો."
  }
 };

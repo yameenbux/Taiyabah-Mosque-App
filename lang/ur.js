@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "85cc359e5b5e",
+ "version": "03f8e6afa4ab",
  "strings": {
   "nav.times": "اوقات",
   "nav.listen": "سماعت",
@@ -1502,6 +1502,12 @@ window.LANG_PACK = {
   "nikah.saturday_11am": "ہفتہ، صبح 11:00",
   "nikah.before_a_wedding_meal": "ولیمے سے پہلے",
   "nikah.im_flexible": "مجھے کوئی وقت چل جائے گا",
-  "nikah.the_office_can_suggest": "دفتر کوئی وقت تجویز کر سکتا ہے"
+  "nikah.the_office_can_suggest": "دفتر کوئی وقت تجویز کر سکتا ہے",
+  "nikah.ring_the_office": "دفتر کو فون کریں",
+  "nikah.5pm_to_7pm": "· شام 5 سے 7 بجے",
+  "nikah.email_the_office": "دفتر کو ای میل کریں",
+  "nikah.opens_your_email_app": "آپ کی ای میل ایپ کھلے گی، تفصیلات پہلے سے بھری ہوئی",
+  "nikah.email_subject": "نکاح کی تاریخ کی درخواست",
+  "nikah.youve_chosen": "آپ نے {when}، {slot} چنا ہے۔ اسے مانگنے کے لیے دفتر کو فون یا ای میل کریں۔"
  }
 };
