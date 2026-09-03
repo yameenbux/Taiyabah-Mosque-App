@@ -706,6 +706,76 @@
   .hh-call-v{font-size:16px;font-weight:700;color:var(--ink)}
   .hh-foot{font-size:11px;color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
 
+  /* ---- admissions, holiday planner, courses ----
+     The website says all of this on three pages a phone has to pinch and pan
+     through. The pieces are the same; the shapes below are the phone's. */
+  .ad-note{margin-top:14px;border-radius:15px;padding:16px 15px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .ad-note .lab{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold-bright);margin-bottom:7px}
+  .ad-note h4{font-family:"Fraunces",Georgia,serif;font-size:15.5px;font-weight:600;line-height:1.45}
+  .ad-note p{font-size:13px;line-height:1.65;color:#CBB8C4;margin-top:8px}
+  .ad-note strong{color:#F3EFE3;font-weight:600}
+  .ad-rows{padding:2px 16px}
+  .ad-rows .ad-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:12px 0;border-top:1px solid var(--line)}
+  .ad-rows .ad-r:first-child{border-top:none}
+  .ad-rows .k{font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .ad-rows .v{font-size:15px;font-weight:700;color:var(--brand-600);white-space:nowrap}
+  .ad-dl{padding:2px 16px}
+  .ad-dl .ad-d{padding:12px 0;border-top:1px solid var(--line)}
+  .ad-dl .ad-d:first-child{border-top:none}
+  .ad-dl dt{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:5px}
+  .ad-dl dd{font-size:13.5px;line-height:1.65;color:var(--ink)}
+
+  .hp-today{display:flex;align-items:flex-start;gap:11px;padding:15px 14px;border-radius:15px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .hp-today .dot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;margin-top:5px;
+    background:var(--line)}
+  .hp-today.is-open .dot{background:#3F7D58}
+  .hp-today.is-shut .dot{background:var(--danger)}
+  .hp-today .t{display:block;font-size:14.5px;font-weight:700;color:var(--ink)}
+  .hp-today .d{display:block;font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:3px}
+
+  .hp-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);
+    margin:2px 2px 12px}
+  .hp-legend span{display:flex;align-items:center;gap:5px}
+  .hp-key{width:9px;height:9px;border-radius:3px;display:block;flex:0 0 auto;background:var(--card);
+    border:1px solid var(--line)}
+  .hp-key.k-shut{background:var(--danger);border-color:var(--danger)}
+  .hp-key.k-ev{background:var(--gold);border-color:var(--gold)}
+  .hp-key.k-today{background:var(--brand-600);border-color:var(--brand-600)}
+  /* Twelve grids down a phone is a lot of scrolling, so they swipe sideways
+     one month at a time and snap, the way a calendar is actually read. */
+  .hp-months{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;padding:2px 2px 6px;margin:0 -2px}
+  .hp-m{flex:0 0 82%;scroll-snap-align:center;background:var(--card);border:1px solid var(--line);
+    border-radius:15px;padding:13px 12px 14px;box-shadow:var(--shadow)}
+  .hp-m h4{font-family:"Fraunces",Georgia,serif;font-size:14px;font-weight:600;color:var(--ink);
+    text-align:center;margin-bottom:9px}
+  .hp-wd,.hp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .hp-wd span{text-align:center;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);padding-bottom:5px}
+  .hp-d{aspect-ratio:1;display:grid;place-items:center;border-radius:8px;font-size:11.5px;
+    color:var(--ink);background:var(--paper);border:1px solid transparent}
+  .hp-d.is-pad{visibility:hidden}
+  .hp-d.is-wknd{color:var(--muted)}
+  .hp-d.is-shut{background:rgba(180,83,47,.14);color:#8E4126;border-color:rgba(180,83,47,.3)}
+  .hp-d.is-ev{border-color:var(--gold);font-weight:700}
+  .hp-d.is-today{background:var(--brand-600);color:#F3EFE3;font-weight:700;border-color:var(--brand-600)}
+  .hp-list{padding:2px 16px}
+  .hp-r{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+  .hp-r:first-child{border-top:none}
+  .hp-r.is-past{opacity:.45}
+  .hp-r .n{flex:1;min-width:0;font-size:13.5px;line-height:1.45;color:var(--ink)}
+  .hp-r .n .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .hp-r .w{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+  .hp-r .len{flex:0 0 auto;font-size:11px;color:var(--muted);min-width:52px;text-align:right}
+  .hp-est{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+    color:#8A6A18;background:rgba(198,162,76,.18);border-radius:5px;padding:1px 5px;margin-left:6px;
+    vertical-align:1px}
+
   /* ---- birth page ---- */
   .bt-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#F3EFE3;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
@@ -2029,6 +2099,443 @@
     </div>
   </div>
 
+
+  <!-- ================= MADRASAH: ADMISSIONS & FEES =================
+       The website publishes all of this before anyone applies, deliberately:
+       a parent should be able to read what is expected of their child before
+       they commit to it, not discover the uniform rule on the doorstep. The
+       app carries the same words for the same reason. Applications themselves
+       are not open here, and this screen says so rather than implying a form
+       exists somewhere in the app. -->
+  <div class="sheet" id="madmissions" data-open="0" role="dialog" aria-modal="true" aria-label="Madrasah admissions and fees" data-i18n-attr="aria-label:a11y.madrasah_admissions">
+    <div class="scrim" id="ad-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="adm.admissions_fees">Admissions &amp; Fees</h3>
+        <button class="sh-close" id="ad-close" data-i18n="adm.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <span class="hh-ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M15 3.5v4h4"/><path d="M9 12.5h6M9 16h6"/></svg></span>
+          <div class="hh-en" data-i18n="adm.madrasah_admissions">Madrasah Admissions</div>
+          <p class="hh-sub" data-i18n="adm.fees_class_times_and_what">Fees, class times and what the madrasah asks of students and parents &mdash;
+             everything worth knowing before you apply.</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="ad-note">
+            <span class="lab" data-i18n="adm.applications">Applications</span>
+            <h4 data-i18n="adm.online_applications_open_soon">Online applications open soon</h4>
+            <p data-i18n="adm.you_will_be_able_to_apply">You will be able to apply for a place from here. Until that is live, please
+               ring the madrasah office to ask about places for this academic year.</p>
+            <p><strong data-i18n="adm.the_office_takes_admission_queries">The office takes admission queries between 5pm and 7pm.</strong></p>
+          </div>
+
+          <div class="card hh-card">
+            <p data-i18n="adm.the_madrasah_has_taught_the">The madrasah has taught the community&rsquo;s children since 1967, from age 4
+               through to Hifz and the Alimiyyah course. Everything below applies to every
+               student, and submitting an application means agreeing to it.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="adm.fees">Fees</h2><span class="rule"></span></div>
+          <div class="card ad-rows">
+            <div class="ad-r"><span class="k" data-i18n="adm.all_classes">All classes</span><span class="v" data-i18n="adm.10_per_week">&pound;10 / week</span></div>
+            <div class="ad-r"><span class="k" data-i18n="adm.hifz">Hifz</span><span class="v" data-i18n="adm.14_per_week">&pound;14 / week</span></div>
+            <div class="ad-r"><span class="k" data-i18n="adm.admission_fee_one_off">Admission fee &middot; one-off</span><span class="v" data-i18n="adm.20">&pound;20</span></div>
+          </div>
+          <div class="card hh-card">
+            <p data-i18n="adm.the_admission_fee_is_payable">The admission fee is payable once your child has been granted a place. Fees are
+               collected through the madrasah office or the parent portal, and are payable
+               whether or not your child attends. Fees are reviewed each year &mdash; please
+               confirm the current rate with the office when you apply.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="adm.class_times">Class times</h2><span class="rule"></span></div>
+          <div class="card ad-rows">
+            <div class="ad-r"><span class="k" data-i18n="adm.all_classes_monday_to_friday">All classes &middot; Monday to Friday</span><span class="v" data-i18n="adm.5_00_7_00pm">5:00&ndash;7:00pm</span></div>
+            <div class="ad-r"><span class="k" data-i18n="adm.hifz_monday_to_friday">Hifz &middot; Monday to Friday</span><span class="v" data-i18n="adm.5_00_7_30pm">5:00&ndash;7:30pm</span></div>
+            <div class="ad-r"><span class="k" data-i18n="adm.hifz_saturday">Hifz &middot; Saturday</span><span class="v" data-i18n="adm.9_00_11_00am">9:00&ndash;11:00am</span></div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="adm.attendance">Attendance</h2><span class="rule"></span></div>
+          <div class="card hh-card">
+            <p data-i18n="adm.attendance_is_taken_seriously">Attendance is taken seriously, because a class only works if the children in it
+               are there. The madrasah expects at least 90% attendance across the year, and a
+               child consistently below that by the end of a term will lose their place.</p>
+            <ul class="wl-ul">
+              <li data-i18n="adm.lateness_counts_towards_the_attendance">Lateness counts towards the attendance figure</li>
+              <li data-i18n="adm.ring_the_office_on_the_day">Ring the office on the day, between 5pm and 7pm</li>
+              <li data-i18n="adm.tell_us_if_your_child_will_be_late">Tell us if your child will be late, not only if absent</li>
+              <li data-i18n="adm.absence_not_reported_on_the_day">Absence not reported on the day is recorded as unauthorised</li>
+            </ul>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="adm.term_dates_and_holidays">Term dates and holidays</h2><span class="rule"></span></div>
+          <div class="card hh-card">
+            <p data-i18n="adm.the_madrasah_follows_the_school">The madrasah follows the school term dates recommended by Bolton Council, so
+               holidays should be arranged outside term time wherever possible.</p>
+            <p data-i18n="adm.if_you_must_travel_during">If you must travel during term, collect a Holiday Absence Form from the madrasah
+               office and return it three weeks before you travel. Without it, the absence is
+               unauthorised. A handwritten letter is not accepted in place of the form.</p>
+          </div>
+          <button class="hh-call" id="ad-to-holidays" type="button">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M8 13.5h2.2M13.8 13.5H16M8 17h2.2M13.8 17H16"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="adm.every_day_the_madrasah_is_closed">Every day the madrasah is closed this year</span>
+              <span class="hh-call-v" data-i18n="adm.holiday_planner">Holiday Planner</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+
+          <div class="sec-h"><h2 data-i18n="adm.uniform_and_appearance">Uniform and appearance</h2><span class="rule"></span></div>
+          <dl class="card ad-dl">
+            <div class="ad-d"><dt data-i18n="adm.boys">Boys</dt><dd data-i18n="adm.jubba_and_topi">Jubba and topi.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.girls">Girls</dt><dd data-i18n="adm.abaya_and_burkhi">Abaya and burkhi, long enough to cover the chest and hair.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.hair">Hair</dt><dd data-i18n="adm.a_haircut_acceptable_in_islam">A haircut acceptable in Islam. Mohicans, mullets and unblended number 0 or 1
+              back and sides are not permitted &mdash; the hair must be equal.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.high_vis">High-vis</dt><dd data-i18n="adm.compulsory_for_children_up_to">Compulsory for children up to Year 6 (ages 3&ndash;11) from November to March,
+              while it is dark during madrasah hours.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.if_not_followed">If not followed</dt><dd data-i18n="adm.children_arriving_without_the_correct">Children arriving without the correct uniform, or with an unacceptable
+              hairstyle, are sent home.</dd></div>
+          </dl>
+
+          <div class="sec-h"><h2 data-i18n="adm.day_to_day">Day to day</h2><span class="rule"></span></div>
+          <dl class="card ad-dl">
+            <div class="ad-d"><dt data-i18n="adm.toilet">Toilet</dt><dd data-i18n="adm.please_make_sure_your_child">Please make sure your child has been before leaving home. If there is an
+              accident during madrasah, you will be called to collect them.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.concerns">Concerns</dt><dd data-i18n="adm.raise_anything_with_the_office">Raise anything with the office manager rather than the teacher. It will be
+              handled confidentially.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.policies">Policies</dt><dd data-i18n="adm.students_and_parents_are_expected">Students and parents are expected to follow all current madrasah policies.
+              Copies are available from the office on request.</dd></div>
+            <div class="ad-d"><dt data-i18n="adm.proof_of_age">Proof of age</dt><dd data-i18n="adm.a_birth_certificate_valid_passport">A birth certificate, valid passport or ID card is needed once a place has
+              been confirmed.</dd></div>
+          </dl>
+
+          <div class="sec-h"><h2 data-i18n="adm.after_you_apply">After you apply</h2><span class="rule"></span></div>
+          <div class="card hh-card">
+            <p data-i18n="adm.submitting_an_application_does_not">Submitting an application does not mean your child has been granted a place.
+               Classes fill quickly, and where a class is already full, applicants are added to
+               a waiting list and contacted when a space comes up. Admission to Hifz is
+               additionally subject to the headteacher&rsquo;s approval.</p>
+            <p data-i18n="adm.you_will_need_a_working">You will need a working email address: it is how the office reaches you, and how
+               you will sign in to the parent portal once your child has a place.</p>
+          </div>
+
+          <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="adm.madrasah_office_5_7pm">Madrasah office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
+          <a class="hh-call" href="mailto:admin@taiyabahmasjid.com">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 6 9-6"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="adm.email_the_office">Email the office</span>
+              <span class="hh-call-v" data-i18n-latin>admin@taiyabahmasjid.com</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MADRASAH: HOLIDAY PLANNER =================
+       Two kinds of date, and they are not equally certain. The closures are
+       the madrasah's own decisions and are fixed. The Islamic dates are
+       calculated, and the real day is settled by sighting — so every one of
+       them is labelled an estimate rather than quietly presented as fact.
+       Both lists are edited in the block near renderHolidays(), once a year. -->
+  <div class="sheet" id="holidays" data-open="0" role="dialog" aria-modal="true" aria-label="Madrasah holiday planner" data-i18n-attr="aria-label:a11y.madrasah_holiday_planner">
+    <div class="scrim" id="hp-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="hol.holiday_planner">Holiday Planner</h3>
+        <button class="sh-close" id="hp-close" data-i18n="hol.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <span class="hh-ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M8 13.5h2.2M13.8 13.5H16M8 17h2.2M13.8 17H16"/></svg></span>
+          <div class="hh-en" data-i18n="hol.madrasah_2026_27">Madrasah &middot; 2026/27</div>
+          <p class="hh-sub" data-i18n="hol.every_day_the_madrasah_is">Every day the madrasah is closed this year, alongside the Islamic dates &mdash;
+             so you can plan a trip without it costing your child their attendance.</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="hp-today" id="hp-today">
+            <span class="dot" aria-hidden="true"></span>
+            <span><span class="t" id="hp-today-t">&mdash;</span><span class="d" id="hp-today-d">&nbsp;</span></span>
+          </div>
+
+          <div class="card hh-card">
+            <p data-i18n="hol.the_madrasah_teaches_180_days">The madrasah teaches 180 days this year &mdash; 36 weeks, Monday to Friday, 5pm
+               to 7pm. Hifz students also attend on Saturday mornings. Everything below applies
+               to every class.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="hol.the_year_at_a_glance">The year at a glance</h2><span class="rule"></span></div>
+          <div class="hp-legend">
+            <span><i class="hp-key"></i><span data-i18n="hol.madrasah_open">Madrasah open</span></span>
+            <span><i class="hp-key k-shut"></i><span data-i18n="hol.closed">Closed</span></span>
+            <span><i class="hp-key k-ev"></i><span data-i18n="hol.islamic_date">Islamic date</span></span>
+            <span><i class="hp-key k-today"></i><span data-i18n="hol.today">Today</span></span>
+          </div>
+          <div class="hp-months" id="hp-months"></div>
+
+          <div class="sec-h"><h2 data-i18n="hol.when_the_madrasah_is_closed">When the madrasah is closed</h2><span class="rule"></span></div>
+          <div class="card hp-list" id="hp-closures"></div>
+          <div class="card hh-card">
+            <p data-i18n="hol.the_two_long_breaks">The two long breaks &mdash; Ramadhan (33 days) and the summer (40 days) &mdash;
+               are when a family trip costs nothing in attendance. Everything else is a week
+               or less.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="hol.islamic_dates_this_year">Islamic dates this year</h2><span class="rule"></span></div>
+          <div class="card hp-list" id="hp-events"></div>
+          <div class="wl-advisory">
+            <div class="wl-adv-h" data-i18n="hol.these_dates_are_estimates">These dates are estimates</div>
+            <p data-i18n="hol.the_islamic_calendar_follows_the">The Islamic calendar follows the moon, so the exact day is confirmed by sighting
+               and can fall a day either side of what is shown here. These are calculated from
+               the Umm al-Qurā calendar and are shown so you can plan &mdash; the masjid
+               announces the confirmed date for Ramadhan and each Eid beforehand. The
+               madrasah&rsquo;s closure dates above are fixed and were set by the madrasah
+               itself.</p>
+          </div>
+
+          <div class="ad-note">
+            <span class="lab" data-i18n="hol.before_you_book">Before you book</span>
+            <h4 data-i18n="hol.term_time_travel_needs_a_form">Term-time travel needs a form, three weeks ahead</h4>
+            <p data-i18n-html="hol.the_madrasah_follows_boltons_term">The madrasah follows Bolton Council&rsquo;s term dates and expects holidays to be
+               taken outside them. If you must travel during term, collect a
+               <strong>Holiday Absence Form</strong> from the office and return it three weeks
+               before you go.</p>
+            <p data-i18n="hol.without_it_the_absence_is">Without it the absence is unauthorised, and it counts against the 90% your child
+               needs to keep their place. A handwritten letter is not accepted.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="hol.reporting_an_absence">Reporting an absence</h2><span class="rule"></span></div>
+          <div class="card hh-card">
+            <ul class="wl-ul">
+              <li data-i18n="hol.ring_the_office_on_the_day">Ring the office on the day, between 5pm and 7pm</li>
+              <li data-i18n="hol.tell_us_about_lateness_too">Tell us about lateness too, not only absence</li>
+              <li data-i18n="hol.unreported_absence_is_recorded_as">Unreported absence is recorded as unauthorised</li>
+              <li data-i18n="hol.below_90_by_the_end">Below 90% by the end of a term means losing the place</li>
+            </ul>
+          </div>
+
+          <button class="hh-call" id="hp-to-admissions" type="button">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M15 3.5v4h4"/><path d="M9 12.5h6M9 16h6"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="hol.fees_uniform_attendance">Fees, uniform, attendance</span>
+              <span class="hh-call-v" data-i18n="hol.admissions_guidelines">Admissions &amp; guidelines</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+
+          <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="adm.madrasah_office_5_7pm">Madrasah office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SERVICES: EDUCATION ================= -->
+  <div class="sheet" id="education" data-open="0" role="dialog" aria-modal="true" aria-label="Education" data-i18n-attr="aria-label:a11y.education">
+    <div class="scrim" id="ed-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="edu.education">Education</h3>
+        <button class="sh-close" id="ed-close" data-i18n="edu.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="md-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="md-en" data-i18n="edu.classes_for_adults">Classes for adults</div>
+          <p class="md-sub" data-i18n="edu.classes_and_workshops_at_the">Classes and workshops at the masjid for adults, alongside the
+             children&rsquo;s madrasah.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="card hh-card" style="margin-top:0">
+            <p data-i18n="edu.every_course_below_is_open">Every course below is open to adults aged 16 and over, taught at the masjid,
+               with men&rsquo;s and women&rsquo;s sessions run separately. Places are limited and
+               registration is required &mdash; you cannot simply turn up.</p>
+          </div>
+
+          <button class="md-row" id="ed-arabic">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5c2.5-1.6 5.2-1.6 7.5 0v13c-2.3-1.6-5-1.6-7.5 0-2.5-1.6-5.2-1.6-7.5 0v-13c2.3-1.6 5-1.6 7.5 0z"/><path d="M12 4.5v13"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="edu.arabic_classes">Arabic Classes</span>
+              <span class="md-t2" data-i18n="edu.one_evening_a_week_7">One evening a week &middot; 7&ndash;8pm &middot; 15 places</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+
+          <button class="md-row" id="ed-ghusl">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M12 7.5v5M9.5 10h5"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="edu.ghusl_workshop">Ghusl Workshop</span>
+              <span class="md-t2" data-i18n="edu.one_off_session_run_periodically">One-off session &middot; run periodically &middot; 15 places</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+
+          <button class="md-row soon" disabled aria-disabled="true">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="edu.more_courses">More courses</span>
+              <span class="md-t2" data-i18n="edu.tajweed_seerah_a_womens_circle">Tajweed, Seerah, a women&rsquo;s circle &mdash; tell the office what
+                you&rsquo;d like taught</span>
+            </span>
+            <span class="soon-tag" data-i18n="edu.coming_soon">Coming soon</span>
+          </button>
+
+          <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="edu.masjid_office_5_7pm">Masjid office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EDUCATION: ARABIC CLASSES ================= -->
+  <div class="sheet" id="eduarabic" data-open="0" role="dialog" aria-modal="true" aria-label="Arabic classes" data-i18n-attr="aria-label:a11y.arabic_classes">
+    <div class="scrim" id="ea-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="edu.arabic_classes">Arabic Classes</h3>
+        <button class="sh-close" id="ea-close" data-i18n="edu.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="hh-en arabic">العَرَبِيَّة</div>
+          <p class="hh-sub" data-i18n="edu.evening_arabic_for_adults">Evening Arabic for adults, taught at the masjid &mdash; from the alphabet
+             upward.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="card hh-facts">
+            <div class="hh-row"><span class="hh-k" data-i18n="edu.time">Time</span><span class="hh-v" style="font-size:20px" data-i18n="edu.7_8pm">7&ndash;8pm</span></div>
+            <div class="hh-row"><span class="hh-k" data-i18n="edu.places">Places</span><span class="hh-v">15</span></div>
+          </div>
+
+          <div class="ad-note">
+            <span class="lab" data-i18n="edu.registration">Registration</span>
+            <h4 data-i18n="edu.registration_opens_shortly">Registration opens shortly</h4>
+            <p data-i18n="edu.places_are_limited_to_fifteen">Places are limited to fifteen per class and go in the order people sign up.
+               Ring the office to put your name down in the meantime.</p>
+            <p><strong data-i18n="edu.the_office_takes_calls_between">The office takes calls between 5pm and 7pm.</strong></p>
+          </div>
+
+          <div class="card hh-card">
+            <p data-i18n="edu.the_aim_is_to_get">The aim is to get you reading and understanding the language of the Qur&rsquo;an,
+               not only reciting it. Classes start from the alphabet, so no previous study is
+               assumed &mdash; and they run after the madrasah finishes, when the building is
+               already open.</p>
+          </div>
+
+          <dl class="card ad-dl">
+            <div class="ad-d"><dt data-i18n="edu.when">When</dt><dd data-i18n="edu.one_evening_a_week_7_00">One evening a week, 7:00&ndash;8:00pm.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.who_for">Who for</dt><dd data-i18n="edu.adults_aged_16_and_over_mens">Adults aged 16 and over. Men&rsquo;s and women&rsquo;s classes are taught
+              separately.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.places_2">Places</dt><dd data-i18n="edu.fifteen_per_class_small_on">Fifteen per class. Small on purpose &mdash; a language class stops working
+              much beyond that.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.level">Level</dt><dd data-i18n="edu.complete_beginners_are_welcome">Complete beginners are welcome. Say roughly where you are when you register
+              and you will be placed accordingly.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.signing_up">Signing up</dt><dd data-i18n="edu.required_you_cannot_simply_turn">Required &mdash; you cannot simply turn up. Places go in the order they are
+              taken; after fifteen, the rest join a waiting list.</dd></div>
+          </dl>
+
+          <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="edu.masjid_office_5_7pm">Masjid office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EDUCATION: GHUSL WORKSHOP ================= -->
+  <div class="sheet" id="edughusl" data-open="0" role="dialog" aria-modal="true" aria-label="Ghusl workshop" data-i18n-attr="aria-label:a11y.ghusl_workshop">
+    <div class="scrim" id="eg-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="edu.ghusl_workshop">Ghusl Workshop</h3>
+        <button class="sh-close" id="eg-close" data-i18n="edu.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="hh-en arabic">الغُسْل</div>
+          <p class="hh-sub" data-i18n="edu.how_to_wash_and_prepare">How to wash and prepare a body for burial &mdash; a duty that falls on the
+             community, and one most people have never been shown.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="card hh-facts">
+            <div class="hh-row"><span class="hh-k" data-i18n="edu.format">Format</span><span class="hh-v" style="font-size:17px" data-i18n="edu.one_session">One session</span></div>
+            <div class="hh-row"><span class="hh-k" data-i18n="edu.places_3">Places</span><span class="hh-v">15</span></div>
+          </div>
+
+          <div class="ad-note">
+            <span class="lab" data-i18n="edu.registration_2">Registration</span>
+            <h4 data-i18n="edu.registration_opens_shortly_2">Registration opens shortly</h4>
+            <p data-i18n="edu.sessions_are_announced_when_they">Sessions are announced when they are scheduled. Ring the office to be told about
+               the next one.</p>
+            <p><strong data-i18n="edu.the_office_takes_calls_between_2">The office takes calls between 5pm and 7pm.</strong></p>
+          </div>
+
+          <div class="card hh-card">
+            <p data-i18n="edu.washing_the_body_of_someone">Washing the body of someone who has died is a farḍ kifāyah &mdash; an obligation
+               on the community as a whole rather than on any one person. As long as enough
+               people can do it, the duty is discharged for everyone. Where nobody can, it
+               falls on everyone.</p>
+            <p data-i18n="edu.in_practice_most_families_discover">In practice most families discover, in the worst week of their lives, that they
+               do not know how and do not know who to ask. This workshop exists so that fewer
+               families are in that position &mdash; and so that when it happens on your street,
+               someone nearby can step in.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="edu.what_the_workshop_covers">What the workshop covers</h2><span class="rule"></span></div>
+          <div class="card hh-card">
+            <ul class="wl-ul">
+              <li data-i18n="edu.what_happens_in_the_hours">What happens in the hours after a death, and who to ring first</li>
+              <li data-i18n="edu.what_is_needed_and_where">What is needed, and where the masjid keeps it</li>
+              <li data-i18n="edu.the_washing_itself_taken_through">The washing itself, taken through step by step</li>
+              <li data-i18n="edu.shrouding_the_kafan_and_how">Shrouding &mdash; the kafan, and how it is prepared</li>
+              <li data-i18n="edu.the_adab_of_it_modesty">The adab of it: modesty, gentleness, and holding your tongue afterwards</li>
+              <li data-i18n="edu.what_follows_janazah_prayer_and">What follows &mdash; janāzah prayer, and the burial</li>
+            </ul>
+            <p style="margin-top:11px" data-i18n="edu.it_is_taught_at_the">It is taught at the masjid, which has its own mortuary, so what you are shown is
+               what you would actually be doing in the room.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="edu.practical_details">Practical details</h2><span class="rule"></span></div>
+          <dl class="card ad-dl">
+            <div class="ad-d"><dt data-i18n="edu.who_for_2">Who for</dt><dd data-i18n="edu.adults_aged_16_and_over_sessions">Adults aged 16 and over. Men&rsquo;s and women&rsquo;s sessions are run
+              separately, because men wash men and women wash women.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.when_2">When</dt><dd data-i18n="edu.a_one_off_session_run">A one-off session, run periodically rather than to a fixed timetable. Register
+              and the office will tell you when the next one is.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.places_4">Places</dt><dd data-i18n="edu.fifteen_per_session_after_that">Fifteen per session. After that, names go on the list for the session
+              after.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.experience">Experience</dt><dd data-i18n="edu.none_expected_most_people_who">None expected. Most people who come have never done it. Those who have are
+              welcome too &mdash; the masjid needs more of you.</dd></div>
+            <div class="ad-d"><dt data-i18n="edu.cost">Cost</dt><dd data-i18n="edu.ring_the_office_to_confirm">Ring the office to confirm.</dd></div>
+          </dl>
+
+          <div class="wl-advisory">
+            <div class="wl-adv-h" data-i18n="edu.if_you_need_help_now">If you need help now</div>
+            <p data-i18n="edu.if_you_have_had_a">If you have had a bereavement and need help now, this is not the screen you want
+               &mdash; the masjid&rsquo;s funeral service is available around the clock. Ring the
+               office, or open Birth, Marriage &amp; Death from the menu.</p>
+          </div>
+
+          <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="edu.masjid_office_5_7pm">Masjid office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="sysprefs" data-open="0" role="dialog" aria-modal="true" aria-label="System Preferences" data-i18n-attr="aria-label:a11y.system_preferences">
     <div class="scrim" id="sp-scrim"></div>
     <div class="panel">
@@ -2514,8 +3021,17 @@
         </button>
 
         <div class="dr-h" data-i18n="marriage.madrasah">Madrasah</div>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.application_form">Application form</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+        <!-- The website publishes the fees, the uniform rule and the whole
+             holiday year before anyone applies, so a parent can read what is
+             being asked of their child first. These two rows are that, and
+             they replace the "Application form — coming soon" row: the form
+             itself is still not open, and the admissions screen says so
+             rather than the menu implying one exists. -->
+        <button class="dr-row" data-act="admissions">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M15 3.5v4h4"/><path d="M9 12.5h6M9 16h6"/></svg></span><span class="dr-t" data-i18n="adm.admissions_fees">Admissions &amp; Fees</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <button class="dr-row" data-act="holidays">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M8 13.5h2.2M13.8 13.5H16M8 17h2.2M13.8 17H16"/></svg></span><span class="dr-t" data-i18n="hol.holiday_planner">Holiday Planner</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <!-- One portal serves parents, teaching staff and administrators, so it
              replaces the two "coming soon" rows that used to stand for it. The
@@ -2547,8 +3063,8 @@
         <button class="dr-row" data-act="advice">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span><span class="dr-t" data-i18n="marriage.imams_advice">Imams&rsquo; Advice</span><span class="dr-ch">&rsaquo;</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.education">Education</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+        <button class="dr-row" data-act="education">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="dr-t" data-i18n="marriage.education">Education</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t" data-i18n="marriage.tours_visits">Tours &amp; Visits</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
@@ -4679,8 +5195,20 @@ const langStore = {
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
 };
 
+/* A pack is a quarter of a megabyte, and localStorage is the first thing a
+   phone gives up. It refuses the write when the origin is at its quota, in
+   Safari's private mode, and on iOS once a site has gone a week unopened.
+   set() swallows all of that — it has to, a failed write is not a reason to
+   stop the app — but getPack() then read the copy that was already there. So
+   a phone could download the right words, fail to keep them, quietly re-apply
+   the old ones, and do the same thing again every single launch: a refresh
+   that reported nothing and changed nothing. Holding the parsed pack in
+   memory as well means the words that were fetched are the words that get
+   used, whatever the phone did or didn't manage to store. */
+const packCache = Object.create(null);
+
 function isPackDownloaded(code){
-  return code === "en" || !!langStore.get(PACK_KEY(code));
+  return code === "en" || !!packCache[code] || !!langStore.get(PACK_KEY(code));
 }
 
 /* Fetch a pack by injecting a script tag — same approach as the Qur'an
@@ -4694,6 +5222,7 @@ function downloadPack(code, bust){
     s.onload = () => {
       const pack = window.LANG_PACK;
       if(!pack || pack.code !== code) return reject(new Error("pack mismatch"));
+      packCache[code] = pack;                        // authoritative for this session
       langStore.set(PACK_KEY(code), JSON.stringify(pack));
       window.LANG_PACK = null;
       resolve(pack);
@@ -4725,9 +5254,10 @@ function refreshPack(code){
 
 function getPack(code){
   if(code === "en") return null;
+  if(packCache[code]) return packCache[code];
   const raw = langStore.get(PACK_KEY(code));
   if(!raw) return null;
-  try{ return JSON.parse(raw); }catch(e){ return null; }
+  try{ return (packCache[code] = JSON.parse(raw)); }catch(e){ return null; }
 }
 
 /* Apply a language to the live DOM. Every translatable element carries
@@ -4791,6 +5321,7 @@ function refreshRenderedText(){
     () => { if(open("duas") && window.DUAS) renderDuaCategories(document.getElementById('du-search')?.value); },
     () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
     () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderSessions(); bkShowPrice(); } },
+    () => { if(open("holidays")) renderHolidays(); },
     () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
@@ -5752,6 +6283,252 @@ function initMarriageDeath(){
   });
 }
 
+/* ---------------- madrasah: admissions ---------------- */
+function openAdmissions(){
+  document.getElementById('madmissions').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#madmissions .sh-body').scrollTop=0;
+}
+function closeAdmissions(){
+  document.getElementById('madmissions').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initAdmissions(){
+  document.getElementById('ad-close').addEventListener('click',closeAdmissions);
+  document.getElementById('ad-scrim').addEventListener('click',closeAdmissions);
+  document.getElementById('ad-to-holidays').addEventListener('click',()=>{
+    closeAdmissions(); setTimeout(openHolidays,120);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('madmissions').dataset.open==="1") closeAdmissions();
+  });
+}
+
+/* ---------------- madrasah: holiday planner ----------------
+   Two kinds of date live here and they are not equally certain.
+
+   MAD_CLOSURES are the madrasah's own decisions, taken from its calendar.
+   They are fixed, and they are what a parent plans around.
+
+   MAD_EVENTS are calculated (Umm al-Qura). The real day is settled by moon
+   sighting and can land a day either side, so every one is labelled an
+   estimate rather than quietly presented as fact.
+
+   Both lists are edited here, once a year, and nothing else needs touching.
+   Each carries an id so its name and note can be translated: the words a
+   parent reads are as much a part of the language as the buttons around
+   them. -----------------------------------------------------------------*/
+const MAD_YEAR = { from:"2026-09-01", to:"2027-08-31" };
+
+const MAD_CLOSURES = [
+  { id:"insert",    name:"Insert Day",        note:"Teachers in \u2014 no students", from:"2026-09-01", to:"2026-09-01" },
+  { id:"autumnht",  name:"Half Term Break",   note:"",                               from:"2026-10-26", to:"2026-10-30" },
+  { id:"christmas", name:"End of Term Break", note:"Christmas and New Year",         from:"2026-12-21", to:"2027-01-01" },
+  { id:"ramadhan",  name:"Ramadhan Holidays", note:"Ramadhan and Eid al-Fitr",       from:"2027-02-08", to:"2027-03-12" },
+  { id:"springht",  name:"End of Term Break", note:"",                               from:"2027-03-26", to:"2027-04-02" },
+  { id:"eidadha",   name:"Eid al-Adha",       note:"Eid holidays",                   from:"2027-05-17", to:"2027-05-18" },
+  { id:"summerht",  name:"Summer Half Term",  note:"",                               from:"2027-05-31", to:"2027-06-04" },
+  { id:"endofyear", name:"End of Year",       note:"Summer holidays",                from:"2027-07-26", to:"2027-09-03" }
+];
+
+const MAD_EVENTS = [
+  { id:"mawlid",    name:"Mawlid an-Nabi \uFDFA", sub:"12 Rabi\u02BF al-Awwal", on:"2026-08-25" },
+  { id:"miraj",     name:"Laylat al-Mi\u02BFraj",  sub:"27 Rajab",            on:"2027-01-05" },
+  { id:"baraah",    name:"Laylat al-Bara\u02BEah", sub:"15 Sha\u02BFban",     on:"2027-01-23" },
+  { id:"ramadan1",  name:"Ramadhan begins",       sub:"1 Ramadhan",          on:"2027-02-08" },
+  { id:"lastten",   name:"Last ten nights begin", sub:"21 Ramadhan",         on:"2027-02-28" },
+  { id:"eidfitr",   name:"Eid al-Fitr",           sub:"1 Shawwal",           on:"2027-03-09" },
+  { id:"arafah",    name:"Day of Arafah",         sub:"9 Dhul Hijjah",       on:"2027-05-15" },
+  { id:"eidadha",   name:"Eid al-Adha",           sub:"10 Dhul Hijjah",      on:"2027-05-16" },
+  { id:"newyear",   name:"Islamic New Year",      sub:"1 Muharram 1449",     on:"2027-06-06" },
+  { id:"ashura",    name:"Day of \u02BFAshura",    sub:"10 Muharram",         on:"2027-06-15" }
+];
+
+function madIso(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function madParse(v){ const a = v.split("-"); return new Date(+a[0], +a[1]-1, +a[2]); }
+function madPretty(v){ const d = madParse(v); return num(d.getDate()) + " " + mon(d.getMonth()) + " " + num(d.getFullYear()); }
+function madName(c){ return t("hol.c." + c.id + ".n", c.name); }
+function madEvName(e){ return t("hol.e." + e.id + ".n", e.name); }
+
+/* One lookup per day beats scanning the closure list 365 times. */
+function madDayMaps(){
+  const shut = {}, evt = {};
+  MAD_CLOSURES.forEach(c=>{
+    const d = madParse(c.from), end = madParse(c.to);
+    while(d <= end){ shut[madIso(d)] = c; d.setDate(d.getDate()+1); }
+  });
+  MAD_EVENTS.forEach(e=>{ (evt[e.on] = evt[e.on] || []).push(e); });
+  return { shut, evt };
+}
+
+function renderHolidays(){
+  const host = document.getElementById('hp-months');
+  if(!host) return;
+  const { shut, evt } = madDayMaps();
+  const todayISO = madIso(nowLondon());
+
+  /* ---- is the madrasah open today? ---- */
+  const box = document.getElementById('hp-today'),
+        tt  = document.getElementById('hp-today-t'),
+        td  = document.getElementById('hp-today-d');
+  box.classList.remove("is-open","is-shut");
+  const wd = nowLondon().getDay(), why = shut[todayISO];
+  if(why){
+    box.classList.add("is-shut");
+    tt.textContent = t("hol.madrasah_is_closed_today","Madrasah is closed today");
+    td.textContent = madName(why) + " \u2014 " +
+      t("hol.until","until") + " " + madPretty(why.to) + ".";
+  } else if(wd === 0){
+    box.classList.add("is-shut");
+    tt.textContent = t("hol.no_classes_today","No classes today");
+    td.textContent = t("hol.the_madrasah_teaches_monday_to",
+      "The madrasah teaches Monday to Friday. Hifz students also attend on Saturday mornings.");
+  } else if(wd === 6){
+    box.classList.add("is-open");
+    tt.textContent = t("hol.hifz_only_today","Hifz only today");
+    td.textContent = num(t("hol.saturday_is_a_hifz_morning",
+      "Saturday is a Hifz morning, 9:00\u201311:00am. All other classes are Monday to Friday."));
+  } else {
+    box.classList.add("is-open");
+    tt.textContent = t("hol.madrasah_is_open_today","Madrasah is open today");
+    td.textContent = num(t("hol.classes_run_5_00_7_00pm",
+      "Classes run 5:00\u20137:00pm. Hifz runs until 7:30pm."));
+  }
+
+  /* ---- twelve month grids ---- */
+  const from = madParse(MAD_YEAR.from), to = madParse(MAD_YEAR.to);
+  const cur = new Date(from.getFullYear(), from.getMonth(), 1);
+  let html = "", todayCard = -1, card = 0;
+  while(cur <= to){
+    const y = cur.getFullYear(), m = cur.getMonth();
+    const days = new Date(y, m+1, 0).getDate();
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7;              // Monday-first
+    html += '<div class="hp-m"><h4>' + fullMon(m) + " " + num(y) + "</h4>" +
+            '<div class="hp-wd">' +
+            [1,2,3,4,5,6,0].map(i => "<span>" + dow(i).slice(0,1) + "</span>").join("") +
+            '</div><div class="hp-grid">';
+    for(let i = 0; i < lead; i++) html += '<div class="hp-d is-pad">0</div>';
+    for(let day = 1; day <= days; day++){
+      const key = y + "-" + String(m+1).padStart(2,"0") + "-" + String(day).padStart(2,"0");
+      const dw = new Date(y, m, day).getDay();
+      let cls = "hp-d", title = [];
+      if(dw === 0 || dw === 6) cls += " is-wknd";
+      if(shut[key]){ cls += " is-shut"; title.push(madName(shut[key])); }
+      if(evt[key]){ cls += " is-ev"; title.push(evt[key].map(madEvName).join(" \u00B7 ")); }
+      if(key === todayISO){ cls += " is-today"; todayCard = card; }
+      html += '<div class="' + cls + '"' +
+              (title.length ? ' title="' + esc(title.join(" \u00B7 ")) + '"' : "") +
+              ">" + num(day) + "</div>";
+    }
+    html += "</div></div>";
+    cur.setMonth(cur.getMonth() + 1); card++;
+  }
+  host.innerHTML = html;
+  /* Open on the month the reader is actually in, not on last September. */
+  if(todayCard > 0){
+    const el = host.children[todayCard];
+    if(el) host.scrollLeft = el.offsetLeft - host.offsetLeft - 8;
+  }
+
+  /* ---- the two lists ---- */
+  const row = (name, sub, when, len, past, est) =>
+    '<div class="hp-r' + (past ? " is-past" : "") + '">' +
+      '<span class="n">' + esc(name) +
+        (est ? '<span class="hp-est">' + esc(t("hol.est","est.")) + "</span>" : "") +
+        (sub ? '<span class="sub">' + esc(sub) + "</span>" : "") + "</span>" +
+      '<span class="w">' + esc(when) + "</span>" +
+      '<span class="len">' + esc(len) + "</span></div>";
+
+  document.getElementById('hp-closures').innerHTML = MAD_CLOSURES.map(c=>{
+    const n = Math.round((madParse(c.to) - madParse(c.from)) / 86400000) + 1;
+    return row(madName(c),
+               c.note ? t("hol.c." + c.id + ".d", c.note) : "",
+               madPretty(c.from) + (c.from === c.to ? "" : " \u2013 " + madPretty(c.to)),
+               num(n) + " " + (n === 1 ? t("hol.day","day") : t("hol.days","days")),
+               todayISO > c.to, false);
+  }).join("");
+
+  document.getElementById('hp-events').innerHTML = MAD_EVENTS.map(e=>
+    row(madEvName(e),
+        num(t("hol.e." + e.id + ".d", e.sub)),
+        madPretty(e.on),
+        fullDow(madParse(e.on).getDay()),
+        todayISO > e.on, true)
+  ).join("");
+}
+
+function openHolidays(){
+  renderHolidays();
+  document.getElementById('holidays').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#holidays .sh-body').scrollTop=0;
+}
+function closeHolidays(){
+  document.getElementById('holidays').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initHolidays(){
+  document.getElementById('hp-close').addEventListener('click',closeHolidays);
+  document.getElementById('hp-scrim').addEventListener('click',closeHolidays);
+  document.getElementById('hp-to-admissions').addEventListener('click',()=>{
+    closeHolidays(); setTimeout(openAdmissions,120);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('holidays').dataset.open==="1") closeHolidays();
+  });
+}
+
+/* ---------------- services: education ---------------- */
+function openEducation(){
+  document.getElementById('education').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#education .sh-body').scrollTop=0;
+}
+function closeEducation(){
+  document.getElementById('education').dataset.open="0";
+  document.body.style.overflow="";
+}
+function openEduArabic(){
+  document.getElementById('eduarabic').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#eduarabic .sh-body').scrollTop=0;
+}
+function closeEduArabic(){
+  document.getElementById('eduarabic').dataset.open="0";
+  document.body.style.overflow="";
+}
+function openEduGhusl(){
+  document.getElementById('edughusl').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#edughusl .sh-body').scrollTop=0;
+}
+function closeEduGhusl(){
+  document.getElementById('edughusl').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initEducation(){
+  document.getElementById('ed-close').addEventListener('click',closeEducation);
+  document.getElementById('ed-scrim').addEventListener('click',closeEducation);
+  document.getElementById('ea-close').addEventListener('click',closeEduArabic);
+  document.getElementById('ea-scrim').addEventListener('click',closeEduArabic);
+  document.getElementById('eg-close').addEventListener('click',closeEduGhusl);
+  document.getElementById('eg-scrim').addEventListener('click',closeEduGhusl);
+  document.getElementById('ed-arabic').addEventListener('click',()=>{
+    closeEducation(); setTimeout(openEduArabic,120);
+  });
+  document.getElementById('ed-ghusl').addEventListener('click',()=>{
+    closeEducation(); setTimeout(openEduGhusl,120);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=="Escape") return;
+    if(document.getElementById('edughusl').dataset.open==="1") return closeEduGhusl();
+    if(document.getElementById('eduarabic').dataset.open==="1") return closeEduArabic();
+    if(document.getElementById('education').dataset.open==="1") closeEducation();
+  });
+}
+
 /* ---------------- marriage page ---------------- */
 function openMarriage(){
   document.getElementById('marriage').dataset.open="1";
@@ -5864,6 +6641,9 @@ function initDrawer(){
       if(act==="live"){ switchTab("live"); }
       if(act==="vids"){ setTimeout(openVids,120); }
       if(act==="zakat"){ setTimeout(openZakat,120); }
+      if(act==="admissions"){ setTimeout(openAdmissions,120); }
+      if(act==="holidays"){ setTimeout(openHolidays,120); }
+      if(act==="education"){ setTimeout(openEducation,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -6470,6 +7250,9 @@ function boot(){
   initBirth();
   initHallHire();
   initWill();
+  initAdmissions();
+  initHolidays();
+  initEducation();
   initRecite();
   initQuranDemo();
   initSysPrefs();
@@ -6488,9 +7271,37 @@ function boot(){
 }
 boot();
 
-/* service worker (deployment only; harmless if unsupported/sandboxed) */
+/* service worker (deployment only; harmless if unsupported/sandboxed)
+
+   An installed app is a long-lived thing. Its start_url is index.html, which
+   the worker serves from its own cache, so the code a phone runs is the code
+   that was current when that cache was written. Registering the worker and
+   then never speaking to it again meant a phone could sit a release behind
+   for as long as it was never fully restarted — which is how a phone ended up
+   showing half a translation: it was still running a build from before the
+   words existed, and the pack refresh that would have healed it was itself
+   part of the build it hadn't got.
+
+   The worker reloads its clients when a new one takes over (see sw.js). This
+   side's job is to make sure the browser actually goes and looks. */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  let swReg = null;
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(r=>{ swReg = r; r.update().catch(()=>{}); }).catch(()=>{});
+  });
+  /* A phone that is resumed rather than launched never navigates, so nothing
+     would otherwise ask for a newer worker, or for newer words. Checking when
+     the app comes back to the front covers that, throttled so that flicking
+     between apps doesn't turn into a stream of requests. */
+  let lastUpdateCheck = 0;
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState !== 'visible') return;
+    const now = Date.now();
+    if(now - lastUpdateCheck < 60000) return;
+    lastUpdateCheck = now;
+    if(swReg) swReg.update().catch(()=>{});
+    try{ refreshPack(activeLang); }catch(e){}
+  });
 }
 </script>
 

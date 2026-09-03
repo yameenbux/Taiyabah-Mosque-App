@@ -5,19 +5,47 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v99";
+const CACHE = "taiyabah-v101";
 const SHELL = ["./index.html", "./admin.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
 
+/* addAll goes through the browser's ordinary HTTP cache, and GitHub Pages
+   serves index.html with a lifetime on it. So a worker built to deliver a new
+   release could fill its brand-new cache from the browser's copy of the old
+   one, and hand out yesterday's app under today's version number. Asking for
+   each shell file with cache: "reload" makes the install go to the network. */
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  const fresh = SHELL.map((u) => new Request(u, { cache: "reload" }));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
+/* Taking over is not the same as being used.
+
+   The app launches straight at index.html, which is served from this cache,
+   so the page a phone is looking at was built from whatever was cached last
+   time. A new worker installing in the background would write a fresh copy
+   and claim the tab — but the tab carries on running the old page it already
+   loaded, and only picks up the new one on the launch after. A phone that is
+   resumed rather than relaunched never gets even that. That is a whole
+   release late at best, and indefinitely late at worst: the phones showing an
+   English word where a Gujarati one should be are running a build from before
+   that word had a translation.
+
+   So when this worker replaces an older one — and only then, which is what
+   the presence of a stale cache tells us — it sends its windows back through
+   the door. They come straight out of the cache this worker has just filled,
+   so it costs a blink, and it happens at most once per release. */
 self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    const stale = keys.filter((k) => k !== CACHE);
+    await Promise.all(stale.map((k) => caches.delete(k)));
+    await self.clients.claim();
+    if (!stale.length) return;                 // first install: nothing to replace
+    const windows = await self.clients.matchAll({ type: "window" });
+    for (const c of windows) {
+      try { await c.navigate(c.url); } catch (_) { /* not navigable; next launch gets it */ }
+    }
+  })());
 });
 
 self.addEventListener("fetch", (e) => {
