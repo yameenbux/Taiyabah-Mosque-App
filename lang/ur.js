@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "03f8e6afa4ab",
+ "version": "f0443556e6de",
  "strings": {
   "nav.times": "اوقات",
   "nav.listen": "سماعت",
@@ -1253,7 +1253,6 @@ window.LANG_PACK = {
   "adm.term_dates_and_holidays": "سہ ماہی کی تاریخیں اور تعطیلات",
   "adm.the_madrasah_follows_the_school": "مدرسہ بولٹن کونسل کی تجویز کردہ اسکول سہ ماہی تاریخوں کی پیروی کرتا ہے، اس لیے تعطیلات جہاں تک ممکن ہو سہ ماہی کے باہر رکھی جائیں۔",
   "adm.if_you_must_travel_during": "اگر سہ ماہی کے دوران سفر ناگزیر ہو تو مدرسہ کے دفتر سے چھٹی کی غیر حاضری کا فارم لیں اور سفر سے تین ہفتے پہلے جمع کرا دیں۔ اس کے بغیر غیر حاضری بلا اجازت شمار ہوگی۔ فارم کی جگہ ہاتھ سے لکھا خط قبول نہیں کیا جاتا۔",
-  "adm.every_day_the_madrasah_is_closed": "اس سال مدرسہ جن جن دنوں بند رہے گا",
   "adm.holiday_planner": "تعطیلات کا منصوبہ",
   "adm.uniform_and_appearance": "یونیفارم اور وضع قطع",
   "adm.boys": "لڑکے",

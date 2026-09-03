@@ -698,9 +698,14 @@
   .hh-card{padding:16px;margin-top:12px}
   .hh-card p{font-size:14px;line-height:1.65;color:var(--ink)}
   .hh-card p+p{margin-top:11px}
-  .hh-call{display:flex;align-items:center;gap:13px;text-decoration:none;margin-top:14px;
+  /* Some of these rows are links and some are buttons. A button sizes to its
+     content, so the ones that are buttons only looked full-width while they
+     happened to carry a long line of text — shorten the text and the row
+     shrinks away from the cards it sits between. */
+  .hh-call{display:flex;width:100%;align-items:center;gap:13px;text-decoration:none;margin-top:14px;
     padding:15px 14px;border-radius:15px;background:var(--card);
-    border:1px solid var(--line);box-shadow:var(--shadow)}
+    border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;font:inherit;color:inherit;
+    cursor:pointer}
   .hh-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
     background:#F0E9ED;color:var(--brand-600)}
   .hh-call-ico svg{width:19px;height:19px}
@@ -2338,8 +2343,12 @@
           </div>
           <button class="hh-call" id="ad-to-holidays" type="button">
             <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M8 13.5h2.2M13.8 13.5H16M8 17h2.2M13.8 17H16"/></svg></span>
+            <!-- No eyebrow above this one. "Every day the madrasah is closed
+                 this year" is a fair description of what the planner lists, but
+                 set in small caps above the title it reads as a statement that
+                 the madrasah is shut every day — which is the opposite of what
+                 the screen is for. The title alone says enough. -->
             <span class="hh-call-t">
-              <span class="hh-call-k" data-i18n="adm.every_day_the_madrasah_is_closed">Every day the madrasah is closed this year</span>
               <span class="hh-call-v" data-i18n="adm.holiday_planner">Holiday Planner</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>

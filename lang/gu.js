@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "a3128e46c5c6",
+ "version": "2dba0c11910f",
  "strings": {
   "nav.times": "સમય",
   "nav.listen": "સાંભળો",
@@ -1253,7 +1253,6 @@ window.LANG_PACK = {
   "adm.term_dates_and_holidays": "સત્રની તારીખો અને રજાઓ",
   "adm.the_madrasah_follows_the_school": "મદરેસા બોલ્ટન કાઉન્સિલે સૂચવેલી શાળા સત્રની તારીખો પાળે છે, તેથી રજાઓ બને ત્યાં સુધી સત્રની બહાર ગોઠવવી.",
   "adm.if_you_must_travel_during": "જો સત્ર દરમિયાન મુસાફરી કરવી જ પડે, તો મદરેસાની ઑફિસમાંથી રજા-ગેરહાજરી ફોર્મ લો અને મુસાફરીના ત્રણ અઠવાડિયાં પહેલાં પરત કરો. તેના વગર ગેરહાજરી બિનઅધિકૃત ગણાશે. ફોર્મના બદલે હાથે લખેલો પત્ર સ્વીકારાતો નથી.",
-  "adm.every_day_the_madrasah_is_closed": "આ વર્ષે મદરેસા જે જે દિવસે બંધ રહેશે",
   "adm.holiday_planner": "રજા આયોજક",
   "adm.uniform_and_appearance": "ગણવેશ અને દેખાવ",
   "adm.boys": "છોકરાઓ",
