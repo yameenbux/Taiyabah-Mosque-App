@@ -627,7 +627,13 @@
   .wl-quote{margin:14px 0 0;padding:15px 16px;border-radius:14px;
     background:rgba(198,162,76,.09);border:1px solid rgba(198,162,76,.28)}
   .ab-wrap .wl-quote:first-of-type{margin-top:0}
-  .wl-ar2{font-size:16px;line-height:2;color:#8A6A18;direction:rtl;text-align:right}
+  /* Scripture, set solid black. This was #8A6A18 — gold on a pale gold card,
+     which measured 4.2:1 against its background: under the 4.5:1 floor, and
+     harder still at this size, where the ḥarakāt are a couple of pixels each.
+     Every other place the app sets scripture — the Qur'an reader, the forty
+     Rabbanā — was already dark; this was the one that was not, and it is the
+     one people said they could not read. */
+  .wl-ar2{font-size:16px;line-height:2;color:#000;direction:rtl;text-align:right}
   .wl-en2{font-family:"Fraunces",Georgia,serif;font-size:14.5px;line-height:1.55;color:var(--ink);margin-top:9px}
   .wl-src{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#9A7A1E;margin-top:9px}
   .wl-card{padding:16px}
