@@ -1,3 +1,25 @@
 node_modules/
 package-lock.json
 package.json
+
+# MCP server config — written by `claude mcp add -s project` and by the
+# 21st.dev CLI, and can carry an API key in a plaintext header
+.mcp.json
+
+# credentials. An app pulling prayer times or a calendar needs a key,
+# so this matters here more than most.
+.env
+.env.*
+*.pem
+*.key
+secrets.json
+
+# local Claude Code state, specific to one machine
+.claude/settings.local.json
+
+# tool logs, written into whatever directory the CLI is run from
+vibe-session.log
+
+# OS noise
+.DS_Store
+Thumbs.db
