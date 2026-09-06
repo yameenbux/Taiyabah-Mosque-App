@@ -373,6 +373,49 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("nikāḥ requests — gated on the server, failing closed, and never a dead end when closed");
 }
 
+/* ---- 3m. the 13-line mushaf is licensed before it ships ----
+   The Qur'an's text is nobody's copyright, but a printed edition is a
+   different thing: its calligraphy is an artistic work and, here, its
+   typographical arrangement carries 25 years under CDPA s.15. The pages most
+   easily found online are scans of somebody's edition, uploaded by a stranger
+   with no rights to give. A masjid redistributing those from its own app is a
+   long way from one person downloading a PDF.
+
+   So the app treats a pack with no stated source and licence as not installed
+   at all, and this check makes sure that gate is still there — and that the
+   development fixture, which is real Qur'anic text at arbitrary line breaks
+   and must never be read from, has not been committed by accident. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+
+  if (!/if\(!m \|\| !\(m\.pages > 0\) \|\| !m\.source \|\| !m\.licence\) throw new Error/.test(app))
+    bad.push("loadMushafMeta no longer refuses a pack with no source and licence — an unlicensed mushaf could ship and render");
+  if (!/MUSHAF\.state = "missing"/.test(app))
+    bad.push("the mushaf no longer falls back to the not-installed state, so a missing pack would leave a blank page");
+  if (!/id="mu-missing"/.test(app) || !/id="mu-to-translation"/.test(app))
+    bad.push("the not-installed state is gone or offers no way onward — that is a dead end");
+
+  const dir = "quran/mushaf/indopak13";
+  if (existsSync(dir + "/index.json")) {
+    let meta = null;
+    try { meta = JSON.parse(readFileSync(dir + "/index.json", "utf8")); }
+    catch (e) { bad.push("the mushaf pack's index.json does not parse"); }
+    if (meta) {
+      if (!meta.source)  bad.push("the mushaf pack names no source");
+      if (!meta.licence) bad.push("the mushaf pack states no licence");
+      if (!(meta.pages > 0)) bad.push("the mushaf pack declares no page count");
+      /* the dev fixture labels itself; it must never reach a phone */
+      const label = JSON.stringify(meta);
+      if (/TEST FIXTURE|dev harness|not for distribution/i.test(label))
+        bad.push("the development fixture has been committed — its line breaks are arbitrary and it must never be read from");
+    }
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok("13-line mushaf — refuses to render a pack that names no source and licence, and says so rather than showing a blank page");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

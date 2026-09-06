@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "b5fbc36432a8",
+ "version": "d6e06e7962a7",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -599,7 +599,6 @@ window.LANG_PACK = {
   "qibla.access_declined": "હોકાયંત્રની ઍક્સેસ નકારવામાં આવી. તમે Settings → Safari માં ગતિ અને દિશાની પરવાનગી આપી શકો છો, અથવા ઉપર આપેલી દિશા કોઈ હોકાયંત્ર એપ સાથે વાપરો.",
   "qibla.access_blocked": "આ ઉપકરણે હોકાયંત્રની ઍક્સેસ આપી નહીં — સામાન્ય રીતે તેના માટે પેજ સીધું https પર ખૂલવું જરૂરી છે. ઉપર આપેલી દિશા કોઈ હોકાયંત્ર એપ સાથે હજી પણ કામ કરે છે.",
   "qibla.no_compass": "આ ઉપકરણમાં હોકાયંત્ર નથી. કોઈ હોકાયંત્ર એપની મદદથી {d}° તરફ મુખ કરો, અથવા મસ્જિદમાં મિહરાબને અનુસરો.",
-  "quran.title": "કુરઆન",
   "quran.n_ayat": "{n} આયતો",
   "quran.no_surah_matches": "તેની સાથે કોઈ સૂરહ મળી નહીં.",
   "quran.indopak_credit": "ઇન્ડોપાક લિપિ · અનુવાદ: {who}",
@@ -1547,6 +1546,23 @@ window.LANG_PACK = {
   "member.at_the_office_by_transfer": "ઑફિસમાં, બૅન્ક ટ્રાન્સફરથી, કે કાર્ડથી — વિગતો દાન સ્ક્રીન પર છે.",
   "member.masjid_office_5_7pm": "મસ્જિદ ઑફિસ · સાંજે 5–7",
   "a11y.notices": "સૂચનાઓ",
-  "a11y.membership": "સભ્યપદ"
+  "a11y.membership": "સભ્યપદ",
+  "quran.how_would_you_like_to_read": "તમે કઈ રીતે વાંચવા માંગો છો?",
+  "quran.english_translation": "અંગ્રેજી અનુવાદ",
+  "quran.all_114_s_rahs_with_an_english": "બધી ૧૧૪ સૂરહ, અરબીની સાથે અંગ્રેજી",
+  "quran.13_line_qur_an": "તેર લીટીનું કુરઆન",
+  "quran.the_familiar_indo_pak_page": "જાણીતું ઇન્ડો-પાક પાનું, તેર લીટી, હિફ્ઝ માટે",
+  "quran.back_to_the_qur_an": "← કુરઆન",
+  "mushaf.not_installed_yet": "હજી ઇન્સ્ટોલ થયું નથી",
+  "mushaf.the_reader_is_ready": "વાંચનાર તૈયાર છે, પણ મુસ્હફનાં પાનાં હજી ઍપમાં ઉમેરાયાં નથી. એ પરવાનગીવાળી આવૃત્તિ છે, તેથી ઇન્ટરનેટ પરથી નકલ કરવાને બદલે વિચારીને ઉમેરવામાં આવે છે.",
+  "mushaf.in_the_meantime_the_english": "તે દરમિયાન અંગ્રેજી અનુવાદમાં આખું કુરઆન છે.",
+  "mushaf.open_the_translation_instead": "તેના બદલે અનુવાદ ખોલો",
+  "mushaf.previous": "પાછલું",
+  "mushaf.next": "આગળનું",
+  "mushaf.s_rah": "સૂરહ",
+  "mushaf.juz": "પારો",
+  "mushaf.page": "પાનું",
+  "mushaf.couldn_t_load_this_page": "આ પાનું લોડ થઈ શક્યું નથી. તમારું કનેક્શન તપાસીને ફરી પ્રયાસ કરો.",
+  "mushaf.credit": "{name} · {source}"
  }
 };

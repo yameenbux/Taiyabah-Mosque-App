@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "35c8a350aa80",
+ "version": "8ebd1f3bb048",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -599,7 +599,6 @@ window.LANG_PACK = {
   "qibla.access_declined": "قطب نما تک رسائی سے انکار کر دیا گیا۔ آپ Settings ← Safari میں حرکت اور سمت کی اجازت دے سکتے ہیں، یا اوپر دی گئی سمت کسی قطب نما ایپ کے ساتھ استعمال کریں۔",
   "qibla.access_blocked": "اس آلے نے قطب نما تک رسائی نہیں دی — عام طور پر اس کے لیے صفحہ براہِ راست https پر کھلنا ضروری ہے۔ اوپر دی گئی سمت کسی قطب نما ایپ کے ساتھ اب بھی کام کرتی ہے۔",
   "qibla.no_compass": "اس آلے میں قطب نما نہیں ہے۔ کسی قطب نما ایپ کی مدد سے {d}° کا رخ کریں، یا مسجد میں محراب کی پیروی کریں۔",
-  "quran.title": "قرآن",
   "quran.n_ayat": "{n} آیات",
   "quran.no_surah_matches": "اس سے کوئی سورہ نہیں ملی۔",
   "quran.indopak_credit": "اِنڈوپاک رسم الخط · ترجمہ: {who}",
@@ -1547,6 +1546,23 @@ window.LANG_PACK = {
   "member.at_the_office_by_transfer": "دفتر میں، بینک ٹرانسفر سے، یا کارڈ سے — تفصیلات عطیہ کی اسکرین پر ہیں۔",
   "member.masjid_office_5_7pm": "مسجد کا دفتر · شام 5 تا 7",
   "a11y.notices": "اطلاعات",
-  "a11y.membership": "ممبرشپ"
+  "a11y.membership": "ممبرشپ",
+  "quran.how_would_you_like_to_read": "آپ کس طرح پڑھنا چاہیں گے؟",
+  "quran.english_translation": "انگریزی ترجمہ",
+  "quran.all_114_s_rahs_with_an_english": "تمام ۱۱۴ سورتیں، عربی کے ساتھ انگریزی ترجمہ",
+  "quran.13_line_qur_an": "تیرہ سطری قرآن",
+  "quran.the_familiar_indo_pak_page": "مانوس ہند و پاک صفحہ، تیرہ سطریں، حفظ کے لیے",
+  "quran.back_to_the_qur_an": "← قرآن",
+  "mushaf.not_installed_yet": "ابھی نصب نہیں ہوا",
+  "mushaf.the_reader_is_ready": "پڑھنے کا صفحہ تیار ہے، لیکن مصحف کے صفحات ابھی ایپ میں شامل نہیں کیے گئے۔ یہ ایک اجازت یافتہ اشاعت ہے، اس لیے اسے انٹرنیٹ سے نقل کرنے کے بجائے سوچ سمجھ کر شامل کیا جاتا ہے۔",
+  "mushaf.in_the_meantime_the_english": "اس دوران انگریزی ترجمے میں پورا قرآن موجود ہے۔",
+  "mushaf.open_the_translation_instead": "اس کے بجائے ترجمہ کھولیں",
+  "mushaf.previous": "پچھلا",
+  "mushaf.next": "اگلا",
+  "mushaf.s_rah": "سورت",
+  "mushaf.juz": "پارہ",
+  "mushaf.page": "صفحہ",
+  "mushaf.couldn_t_load_this_page": "یہ صفحہ نہیں کھل سکا۔ اپنا انٹرنیٹ دیکھ کر دوبارہ کوشش کریں۔",
+  "mushaf.credit": "{name} · {source}"
  }
 };
