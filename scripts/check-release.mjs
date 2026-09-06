@@ -409,6 +409,33 @@ for (const f of ["index.html", "admin.html"]) {
       const label = JSON.stringify(meta);
       if (/TEST FIXTURE|dev harness|not for distribution/i.test(label))
         bad.push("the development fixture has been committed — its line breaks are arbitrary and it must never be read from");
+
+      /* The sūrah mapping was read off the printed page headers one page at a
+         time, because no reliable way to infer it existed. A wrong entry sends
+         someone to the wrong sūrah, which is worse than having no jump at all,
+         so its shape is checked on every release. */
+      const sp = meta.surahPage;
+      if (sp) {
+        const keys = Object.keys(sp).map(Number).sort((a, b) => a - b);
+        if (keys.length !== 114 || keys[0] !== 1 || keys[113] !== 114)
+          bad.push(`the sūrah mapping does not cover 1-114 (has ${keys.length})`);
+        let prev = 0, back = 0, oob = 0;
+        for (const k of keys) {
+          const v = sp[k];
+          if (!(v >= 1 && v <= meta.pages)) oob++;
+          if (v < prev) back++;
+          prev = v;
+        }
+        if (oob) bad.push(`${oob} sūrah(s) point outside the mushaf's ${meta.pages} pages`);
+        if (back) bad.push(`${back} sūrah(s) start earlier than the one before — the mapping is out of order`);
+        /* the juz table was derived separately, from the PDFs' own page counts,
+           so where the two must agree they are a real cross-check */
+        const jp = meta.juzPage || {};
+        for (const [juz, surah] of [["15", 17], ["30", 78]]) {
+          if (jp[juz] && sp[surah] && jp[juz] !== sp[surah])
+            bad.push(`juz ${juz} starts at page ${jp[juz]} but sūrah ${surah}, which opens it, is mapped to ${sp[surah]}`);
+        }
+      }
     }
   }
 

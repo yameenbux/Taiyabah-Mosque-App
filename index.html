@@ -6402,8 +6402,13 @@ function fitMushafLines(){
 }
 
 function mushafAt(list, page){
-  let hit = null;
-  for(const row of list){ if(row.page <= page) hit = row; else break; }
+  let hit = null, i = -1;
+  for(let k = 0; k < list.length; k++){
+    if(list[k].page <= page){ hit = list[k]; i = k; } else break;
+  }
+  /* Towards the end, several short sūrahs begin on one page. Name the first of
+     them — that is where you start reading — rather than the last. */
+  while(hit && i > 0 && list[i - 1].page === hit.page){ i--; hit = list[i]; }
   return hit;
 }
 
