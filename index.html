@@ -1137,6 +1137,41 @@
   .tab[data-on="1"]{color:var(--brand-600)}
   .tab:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
 
+  /* ---- 13-line mushaf ----
+     The page is the unit here, not the scroll: thirteen lines, sized to fit
+     the width they are given, the way the printed page does it. */
+  .mu-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 0}
+  .mu-nav{flex:0 0 auto;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+    padding:8px 12px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);color:var(--brand-600)}
+  .mu-nav[disabled]{opacity:.4;cursor:default}
+  .mu-where{flex:1;min-width:0;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+    padding:8px 10px;border-radius:10px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);text-align:center;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mu-jump{display:flex;gap:8px;padding:10px 14px 0}
+  .mu-f{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
+    font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .mu-f select,.mu-f input{width:100%;min-width:0;font:inherit;font-size:13px;color:var(--ink);
+    padding:7px 8px;border-radius:9px;border:1px solid var(--line);background:var(--card)}
+
+  .mu-page{margin:12px 14px 0;padding:18px 14px;border-radius:15px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:2px;
+    direction:rtl;touch-action:pan-y}
+  /* Every line gets the same box whatever it holds, so the thirteen stay
+     evenly spaced even where one is a sūrah heading rather than text. */
+  .mu-line{min-height:2.05em;display:flex;align-items:center;justify-content:center;
+    font-family:"Mushaf Indopak","Noto Naskh Arabic",serif;
+    font-size:var(--mu-size,21px);line-height:2.05;color:var(--ink);
+    text-align:center;white-space:nowrap}
+  .mu-line.mu-just{justify-content:space-between}
+  .mu-line.mu-head{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--brand-600);
+    border-block:1px solid var(--line);margin-block:2px}
+  .mu-line.mu-bism{color:var(--brand-600)}
+  .mu-err{margin:12px 14px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
+
   /* ---- qibla ---- */
   .qcard{padding:20px 16px 16px;text-align:center}
   .dial{position:relative;width:min(74vw,270px);aspect-ratio:1;margin:2px auto 4px}
@@ -2924,6 +2959,32 @@
       </div>
       <div class="sh-body">
 
+        <!-- Which Qur'an. The tile used to open straight onto the list of 114;
+             the mushaf gave it a second thing to be, so the sheet asks first. -->
+        <div id="qd-mode-view">
+          <section class="wl-hero">
+            <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+            <div class="wl-ar">القرآن الكريم</div>
+            <div class="wl-en" data-i18n="quran.how_would_you_like_to_read">How would you like to read?</div>
+          </section>
+          <div class="ab-wrap">
+            <button class="md-row" id="qd-go-translation">
+              <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z"/><path d="M12 6.5v11.8"/></svg></span>
+              <span class="md-t">
+                <span class="md-t1" data-i18n="quran.english_translation">English Translation</span>
+                <span class="md-t2" data-i18n="quran.all_114_s_rahs_with_an_english">All 114 sūrahs, with the English beside the Arabic</span>
+              </span><span class="dr-ch">&rsaquo;</span>
+            </button>
+            <button class="md-row" id="qd-go-mushaf">
+              <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M7.6 8h8.8M7.6 11h8.8M7.6 14h8.8M7.6 17h5.4"/></svg></span>
+              <span class="md-t">
+                <span class="md-t1" data-i18n="quran.13_line_qur_an">13-Line Qur'an</span>
+                <span class="md-t2" data-i18n="quran.the_familiar_indo_pak_page">The familiar Indo-Pak page, thirteen lines, for ḥifẓ</span>
+              </span><span class="dr-ch">&rsaquo;</span>
+            </button>
+          </div>
+        </div>
+
         <!-- the list of 114 -->
         <div id="qd-list-view">
           <section class="wl-hero">
@@ -2951,6 +3012,50 @@
             <p class="qd-bism quranic" id="qd-bism" hidden>بِسۡمِ اللّٰهِ الرَّحۡمٰنِ الرَّحِيۡمِ</p>
             <div id="qd-ayahs"></div>
             <p class="wl-foot" id="qd-read-credit"></p>
+          </div>
+        </div>
+
+        <!-- the 13-line mushaf -->
+        <div id="qd-mushaf-view" hidden>
+
+          <!-- Shown when the page data has not been installed. The reader is
+               built; the mushaf itself is a licensed asset that has to be
+               added deliberately, so this says so rather than showing a
+               blank page. -->
+          <div class="ab-wrap" id="mu-missing" hidden>
+            <section class="wl-hero">
+              <div class="wl-ar">١٣</div>
+              <div class="wl-en" data-i18n="mushaf.not_installed_yet">Not installed yet</div>
+            </section>
+            <p class="ak-intro" data-i18n="mushaf.the_reader_is_ready">The reader is ready, but the mushaf pages have not been added to the app yet. They are a licensed edition, so they are added deliberately rather than copied from the internet.</p>
+            <p class="ak-intro" data-i18n="mushaf.in_the_meantime_the_english">In the meantime, the English Translation has the full Qur'an.</p>
+            <button class="md-row" id="mu-to-translation">
+              <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z"/><path d="M12 6.5v11.8"/></svg></span>
+              <span class="md-t">
+                <span class="md-t1" data-i18n="quran.english_translation">English Translation</span>
+                <span class="md-t2" data-i18n="mushaf.open_the_translation_instead">Open the translation instead</span>
+              </span><span class="dr-ch">&rsaquo;</span>
+            </button>
+          </div>
+
+          <div id="mu-reader" hidden>
+            <div class="mu-bar">
+              <button class="mu-nav" id="mu-prev" data-i18n="mushaf.previous">Previous</button>
+              <button class="mu-where" id="mu-where"><span id="mu-where-t">&hellip;</span></button>
+              <button class="mu-nav" id="mu-next" data-i18n="mushaf.next">Next</button>
+            </div>
+
+            <div class="mu-jump" id="mu-jump" hidden>
+              <label class="mu-f"><span data-i18n="mushaf.s_rah">Sūrah</span>
+                <select id="mu-j-surah"></select></label>
+              <label class="mu-f"><span data-i18n="mushaf.juz">Juz</span>
+                <select id="mu-j-juz"></select></label>
+              <label class="mu-f"><span data-i18n="mushaf.page">Page</span>
+                <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
+            </div>
+
+            <div class="mu-page" id="mu-page" aria-live="polite"></div>
+            <p class="wl-foot" id="mu-credit"></p>
           </div>
         </div>
 
@@ -6002,11 +6107,10 @@ function renderSurahList(filter){
 const revealedIn = place => t("place."+String(place).toLowerCase(), place);
 
 async function openSurah(n){
-  const read = document.getElementById('qd-read-view');
-  document.getElementById('qd-list-view').hidden = true;
-  read.hidden = false;
-  document.getElementById('qd-back').hidden = false;
-  document.querySelector('#quran .sh-body').scrollTop = 0;
+  /* Goes through quranView so the sheet's idea of which pane is open stays
+     true — set by hand, Back and Escape thought we were still on the list and
+     jumped past it to the chooser. */
+  quranView("read");
   document.getElementById('qd-ayahs').innerHTML = `<p class="qd-empty">${esc(t("common.loading","Loading…"))}</p>`;
 
   try{
@@ -6037,25 +6141,43 @@ async function openSurah(n){
   }
 }
 
-function showSurahList(){
-  document.getElementById('qd-read-view').hidden = true;
-  document.getElementById('qd-list-view').hidden = false;
-  document.getElementById('qd-back').hidden = true;
-  document.getElementById('qd-title').textContent = t("quran.title","Qur'an");
+/* The sheet has four panes now — the chooser, the list of 114, one sūrah, and
+   the mushaf. One function decides which is showing and what Back means, so it
+   cannot end up with two open at once or a Back button that lies. */
+let QURAN_VIEW = "modes";
+const QURAN_PANES = { modes:"qd-mode-view", list:"qd-list-view",
+                      read:"qd-read-view", mushaf:"qd-mushaf-view" };
+
+function quranView(name){
+  for(const k in QURAN_PANES) document.getElementById(QURAN_PANES[k]).hidden = (k !== name);
+  const back = document.getElementById('qd-back');
+  back.hidden = (name === "modes");
+  /* Back leaves the chooser one step away from wherever you are, so its label
+     has to say where it actually goes. The key is swapped with the text so a
+     later language change re-translates the right one. */
+  back.setAttribute("data-i18n", (name === "read") ? "quran.surahs" : "quran.back_to_the_qur_an");
+  back.textContent = (name === "read")
+    ? t("quran.surahs", "\u2190 S\u016brahs")
+    : t("quran.back_to_the_qur_an", "\u2190 Qur'an");
+  QURAN_VIEW = name;
   document.querySelector('#quran .sh-body').scrollTop = 0;
 }
 
-async function openQuran(){
-  document.getElementById('quran').dataset.open="1";
-  document.body.style.overflow="hidden";
-  showSurahList();
-  if(quranIndex) return;
+function showSurahList(){ quranView("list"); }
 
-  document.getElementById('qd-list').innerHTML = `<p class="qd-empty">${esc(t("common.loading","Loading…"))}</p>`;
+function quranBack(){
+  /* one sūrah steps back to the list; everything else steps back to the chooser */
+  quranView(QURAN_VIEW === "read" ? "list" : "modes");
+}
+
+async function openTranslation(){
+  quranView("list");
+  if(quranIndex){ renderSurahList(document.getElementById('qd-search').value); return; }
+  document.getElementById('qd-list').innerHTML = `<p class="qd-empty">${esc(t("common.loading","Loading\u2026"))}</p>`;
   try{
     await loadQuranIndex();
     document.getElementById('qd-credit').textContent =
-      t("quran.script_credit","{script} · translation: {who}")
+      t("quran.script_credit","{script} \u00b7 translation: {who}")
         .replace("{script}", t("quran.script_name", quranIndex.script))
         .replace("{who}", t("quran.translator", quranIndex.translation));
     renderSurahList(document.getElementById('qd-search').value);
@@ -6065,6 +6187,231 @@ async function openQuran(){
     console.warn('quran index failed:', e);
   }
 }
+
+/* ---------------- the 13-line mushaf ----------------
+
+   Not scans. The pages are rebuilt from text plus the printed edition's own
+   line breaks, and drawn in an Indo-Pak Nastaliq face — so a page is a few
+   kilobytes instead of a hundred, stays sharp at any zoom, and carries no
+   copyright in somebody's photograph of a book.
+
+   The pack is a licensed asset and is added deliberately; when it is absent
+   the reader says so instead of showing an empty page. */
+const MUSHAF = { id:"indopak13", meta:null, state:null, page:1,
+                 pages:new Map(), sur:[], juz:[] };
+const MU_LAST_PAGE = "mushaf.lastPage";
+
+async function loadMushafMeta(){
+  if(MUSHAF.state) return MUSHAF.state;
+  try{
+    const res = await fetch(`quran/mushaf/${MUSHAF.id}/index.json`);
+    if(!res.ok) throw new Error("meta " + res.status);
+    const m = await res.json();
+    /* A pack without provenance is not installed as far as the app is
+       concerned — it is how we keep an unlicensed mushaf from quietly
+       shipping. */
+    if(!m || !(m.pages > 0) || !m.source || !m.licence) throw new Error("pack incomplete");
+    MUSHAF.meta = m;
+    MUSHAF.sur = Object.keys(m.surahPage || {})
+      .map(k => ({ n:+k, page:+m.surahPage[k] })).sort((a,b) => a.page - b.page || a.n - b.n);
+    MUSHAF.juz = Object.keys(m.juzPage || {})
+      .map(k => ({ n:+k, page:+m.juzPage[k] })).sort((a,b) => a.page - b.page || a.n - b.n);
+    if(m.font && m.font.url) installMushafFont(m.font);
+    MUSHAF.state = "ready";
+  }catch(e){
+    MUSHAF.state = "missing";
+  }
+  return MUSHAF.state;
+}
+
+/* The face ships with the pack rather than the app, so it is declared once the
+   pack says which one it is. The URL comes from our own committed file; the
+   quote check is only so a malformed pack cannot break out of the rule. */
+function installMushafFont(font){
+  if(document.getElementById('mu-font')) return;
+  const url = String(font.url || "");
+  if(!url || /["'\\)]/.test(url)) return;
+  const st = document.createElement('style');
+  st.id = 'mu-font';
+  st.textContent = `@font-face{font-family:"Mushaf Indopak";src:url("${url}") format("woff2");font-display:swap}`;
+  document.head.appendChild(st);
+}
+
+async function loadMushafPage(n){
+  if(MUSHAF.pages.has(n)) return MUSHAF.pages.get(n);
+  const res = await fetch(`quran/mushaf/${MUSHAF.id}/p/${n}.json`);
+  if(!res.ok) throw new Error("page " + n + " " + res.status);
+  const data = await res.json();
+  MUSHAF.pages.set(n, data);
+  return data;
+}
+
+function renderMushafPage(data){
+  const host = document.getElementById('mu-page');
+  host.innerHTML = "";
+  const lines = (data && data.lines) || [];
+  for(const line of lines){
+    const el = document.createElement('div');
+    const words = line.words || (line.text ? [line.text] : []);
+    if(line.type === "surah"){
+      el.className = "mu-line mu-head";
+      const su = quranIndex && quranIndex.surahs.find(x => x.n === +line.surah);
+      el.textContent = su ? (su.nameEn || su.name) : t("mushaf.s_rah","S\u016brah") + " " + num(line.surah);
+    }else{
+      el.className = "mu-line" + (line.type === "bism" ? " mu-bism" : "")
+                   + (line.justify && words.length > 1 ? " mu-just" : "");
+      if(line.justify && words.length > 1){
+        for(const w of words){
+          const sp = document.createElement('span');
+          sp.textContent = w;
+          el.appendChild(sp);
+        }
+      }else{
+        el.textContent = words.join(" ");
+      }
+    }
+    host.appendChild(el);
+  }
+  scheduleMushafFit();
+}
+
+/* An Arabic face is only downloaded once something needs it, so the first page
+   is measured in the fallback — which is wider, and got fitted a third too
+   small and stayed there. Fit now, then fit again when the font has landed;
+   document.fonts.ready is a fresh promise while loads are outstanding. */
+function scheduleMushafFit(){
+  fitMushafLines();
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(() => fitMushafLines()).catch(() => {});
+  }
+}
+
+/* The printed page fits its thirteen lines to a fixed width; a phone is
+   narrower, and narrower by a different amount on every phone. A line that
+   wrapped would become a fourteenth line, which is exactly what this mushaf
+   exists not to do — so the page is scaled down until its widest line fits. */
+function fitMushafLines(){
+  const host = document.getElementById('mu-page');
+  if(!host || host.hidden) return;
+  const avail = host.clientWidth - 28;
+  if(avail <= 0) return;
+  host.style.setProperty('--mu-size', '21px');
+  let widest = 0;
+  for(const el of host.children) widest = Math.max(widest, el.scrollWidth);
+  if(widest > avail){
+    const size = Math.max(11, Math.floor(21 * (avail / widest) * 10) / 10);
+    host.style.setProperty('--mu-size', size + 'px');
+  }
+}
+
+function mushafAt(list, page){
+  let hit = null;
+  for(const row of list){ if(row.page <= page) hit = row; else break; }
+  return hit;
+}
+
+function updateMushafWhere(){
+  const su = mushafAt(MUSHAF.sur, MUSHAF.page);
+  const jz = mushafAt(MUSHAF.juz, MUSHAF.page);
+  const bits = [];
+  if(su){
+    const rec = quranIndex && quranIndex.surahs.find(x => x.n === su.n);
+    bits.push(rec ? (rec.nameEn || rec.name) : t("mushaf.s_rah","S\u016brah") + " " + num(su.n));
+  }
+  if(jz) bits.push(t("mushaf.juz","Juz") + " " + num(jz.n));
+  bits.push(t("mushaf.page","Page") + " " + num(MUSHAF.page));
+  document.getElementById('mu-where-t').textContent = bits.join(" \u00b7 ");
+}
+
+async function showMushafPage(n){
+  const total = MUSHAF.meta.pages;
+  n = Math.min(total, Math.max(1, Math.round(+n) || 1));
+  MUSHAF.page = n;
+  prefStore.set(MU_LAST_PAGE, n);
+  document.getElementById('mu-prev').disabled = (n <= 1);
+  document.getElementById('mu-next').disabled = (n >= total);
+  document.getElementById('mu-j-page').value = n;
+  updateMushafWhere();
+  try{
+    renderMushafPage(await loadMushafPage(n));
+  }catch(e){
+    document.getElementById('mu-page').innerHTML =
+      `<p class="mu-err">${esc(t("mushaf.couldn_t_load_this_page",
+        "Couldn't load this page. Check your connection and try again."))}</p>`;
+  }
+}
+
+function fillMushafJump(){
+  const sSel = document.getElementById('mu-j-surah');
+  const jSel = document.getElementById('mu-j-juz');
+  if(sSel.options.length) return;
+  for(const row of MUSHAF.sur){
+    const rec = quranIndex && quranIndex.surahs.find(x => x.n === row.n);
+    const o = document.createElement('option');
+    o.value = row.page;
+    o.textContent = num(row.n) + ". " + (rec ? (rec.nameEn || rec.name) : "");
+    sSel.appendChild(o);
+  }
+  for(const row of MUSHAF.juz){
+    const o = document.createElement('option');
+    o.value = row.page;
+    o.textContent = t("mushaf.juz","Juz") + " " + num(row.n);
+    jSel.appendChild(o);
+  }
+  document.getElementById('mu-j-page').max = MUSHAF.meta.pages;
+}
+
+async function openMushaf(){
+  quranView("mushaf");
+  const state = await loadMushafMeta();
+  document.getElementById('mu-missing').hidden = (state === "ready");
+  document.getElementById('mu-reader').hidden  = (state !== "ready");
+  if(state !== "ready") return;
+  /* the sūrah names come from the translation's index; the mushaf reads
+     without them, so a failure here is not worth blocking the page for */
+  if(!quranIndex){ try{ await loadQuranIndex(); }catch(e){} }
+  fillMushafJump();
+  document.getElementById('mu-credit').textContent =
+    t("mushaf.credit","{name} \u00b7 {source}")
+      .replace("{name}", MUSHAF.meta.name || "")
+      .replace("{source}", MUSHAF.meta.source || "");
+  await showMushafPage(prefStore.get(MU_LAST_PAGE, 1));
+}
+
+/* A mushaf turns right-to-left, so dragging the page to the right brings the
+   next one — the opposite way round from an English book. */
+/* The sheet animates open, so the page can be measured while it is still
+   narrower than it ends up — and a page fitted to that width stays too small
+   for good. Watching the box re-fits at every width it passes through, which
+   also covers rotating the phone and the font arriving late. */
+function initMushafFit(){
+  const host = document.getElementById('mu-page');
+  if(typeof ResizeObserver === "function"){
+    new ResizeObserver(() => fitMushafLines()).observe(host);
+  }
+}
+
+function initMushafSwipe(){
+  const el = document.getElementById('mu-page');
+  let x0 = null, y0 = null;
+  el.addEventListener('touchstart', e => {
+    const p0 = e.changedTouches[0]; x0 = p0.clientX; y0 = p0.clientY;
+  }, {passive:true});
+  el.addEventListener('touchend', e => {
+    if(x0 === null) return;
+    const p1 = e.changedTouches[0], dx = p1.clientX - x0, dy = p1.clientY - y0;
+    x0 = null;
+    if(Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+    showMushafPage(MUSHAF.page + (dx > 0 ? 1 : -1));
+  }, {passive:true});
+}
+
+
+function openQuran(){
+  document.getElementById('quran').dataset.open="1";
+  document.body.style.overflow="hidden";
+  quranView("modes");
+}
 function closeQuran(){
   document.getElementById('quran').dataset.open="0";
   document.body.style.overflow="";
@@ -6073,15 +6420,28 @@ function initQuranDemo(){
   document.getElementById('qd-close').addEventListener('click',closeQuran);
   document.getElementById('qd-scrim').addEventListener('click',closeQuran);
   document.getElementById('rc-quran').addEventListener('click',openQuran);
-  document.getElementById('qd-back').addEventListener('click',showSurahList);
+  document.getElementById('qd-back').addEventListener('click',quranBack);
+  document.getElementById('qd-go-translation').addEventListener('click',openTranslation);
+  document.getElementById('qd-go-mushaf').addEventListener('click',openMushaf);
+  document.getElementById('mu-to-translation').addEventListener('click',openTranslation);
+  document.getElementById('mu-prev').addEventListener('click',()=>showMushafPage(MUSHAF.page-1));
+  document.getElementById('mu-next').addEventListener('click',()=>showMushafPage(MUSHAF.page+1));
+  document.getElementById('mu-where').addEventListener('click',()=>{
+    const j=document.getElementById('mu-jump'); j.hidden=!j.hidden;
+  });
+  document.getElementById('mu-j-surah').addEventListener('change',e=>showMushafPage(e.target.value));
+  document.getElementById('mu-j-juz').addEventListener('change',e=>showMushafPage(e.target.value));
+  document.getElementById('mu-j-page').addEventListener('change',e=>showMushafPage(e.target.value));
+  initMushafSwipe();
+  initMushafFit();
   document.getElementById('qd-search').addEventListener('input', e => {
     if(quranIndex) renderSurahList(e.target.value);
   });
   document.addEventListener('keydown',e=>{
     if(e.key!=="Escape" || document.getElementById('quran').dataset.open!=="1") return;
-    // step back to the list first, so Escape doesn't lose your place outright
-    if(!document.getElementById('qd-read-view').hidden) showSurahList();
-    else closeQuran();
+    // step back a pane at a time, so Escape doesn't lose your place outright
+    if(QURAN_VIEW === "modes") closeQuran();
+    else quranBack();
   });
 }
 

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "a50bc0d8b15f",
+ "version": "702afb3acba1",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -599,7 +599,6 @@ window.LANG_PACK = {
   "qibla.access_declined": "رُفض الوصول إلى البوصلة. يمكنك السماح بالحركة والاتجاه من Settings ← Safari، أو استخدام الاتجاه أعلاه مع تطبيق بوصلة.",
   "qibla.access_blocked": "لم يسمح هذا الجهاز بالوصول إلى البوصلة — وعادةً يلزم فتح الصفحة مباشرة عبر https. والاتجاه أعلاه يظل صالحًا مع تطبيق بوصلة.",
   "qibla.no_compass": "لا توجد بوصلة في هذا الجهاز. توجّه نحو {d}° بتطبيق بوصلة، أو اتّبع المحراب في المسجد.",
-  "quran.title": "القرآن",
   "quran.n_ayat": "{n} آية",
   "quran.no_surah_matches": "لا توجد سورة مطابقة.",
   "quran.indopak_credit": "الرسم الهندي الباكستاني · الترجمة: {who}",
@@ -1547,6 +1546,23 @@ window.LANG_PACK = {
   "member.at_the_office_by_transfer": "في المكتب، أو بحوالة بنكية، أو بالبطاقة — والتفاصيل في شاشة التبرّع.",
   "member.masjid_office_5_7pm": "مكتب المسجد · 5–7 مساءً",
   "a11y.notices": "الإشعارات",
-  "a11y.membership": "العضوية"
+  "a11y.membership": "العضوية",
+  "quran.how_would_you_like_to_read": "كيف تودّ أن تقرأ؟",
+  "quran.english_translation": "الترجمة الإنجليزية",
+  "quran.all_114_s_rahs_with_an_english": "جميع السور الـ١١٤، مع الإنجليزية بجانب العربية",
+  "quran.13_line_qur_an": "المصحف ذو الثلاثة عشر سطرًا",
+  "quran.the_familiar_indo_pak_page": "الصفحة الهندية الباكستانية المألوفة، ثلاثة عشر سطرًا، للحفظ",
+  "quran.back_to_the_qur_an": "← القرآن",
+  "mushaf.not_installed_yet": "لم يُثبَّت بعد",
+  "mushaf.the_reader_is_ready": "القارئ جاهز، لكن صفحات المصحف لم تُضَف إلى التطبيق بعد. وهي طبعة مرخَّصة، لذلك تُضاف عن قصد لا نقلًا من الإنترنت.",
+  "mushaf.in_the_meantime_the_english": "وفي هذه الأثناء، الترجمة الإنجليزية تحتوي القرآن كاملًا.",
+  "mushaf.open_the_translation_instead": "افتح الترجمة بدلًا من ذلك",
+  "mushaf.previous": "السابق",
+  "mushaf.next": "التالي",
+  "mushaf.s_rah": "سورة",
+  "mushaf.juz": "جزء",
+  "mushaf.page": "صفحة",
+  "mushaf.couldn_t_load_this_page": "تعذّر تحميل هذه الصفحة. تحقّق من اتصالك وحاول مرة أخرى.",
+  "mushaf.credit": "{name} · {source}"
  }
 };
