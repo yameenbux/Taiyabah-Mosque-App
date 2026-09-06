@@ -790,6 +790,68 @@
     color:#8A6A18;background:rgba(198,162,76,.18);border-radius:5px;padding:1px 5px;margin-left:6px;
     vertical-align:1px}
 
+  /* ---- home: today's five prayers at a glance ----
+     The committee's redesign put all five above the fold; this is that, in
+     the app's own card and pill language rather than a generic strip. */
+  .pstrip{display:grid;grid-template-columns:repeat(5,1fr);overflow:hidden;padding:0}
+  .pcol{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 2px 11px;
+    border-right:1px solid var(--line);min-width:0}
+  .pcol:last-child{border-right:none}
+  .pcol[data-next="1"]{background:rgba(119,33,87,.07)}
+  .pcol .p-ic{color:var(--gold);display:block}
+  .pcol .p-ic svg{width:19px;height:19px}
+  .pcol .p-n{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;
+    line-height:1.2;overflow-wrap:anywhere}
+  .pcol .p-b{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .pcol .p-j{font-size:11px;color:var(--brand-600);font-weight:600;white-space:nowrap;
+    background:rgba(119,33,87,.09);border-radius:6px;padding:2px 6px;margin-top:2px}
+  .striplink{display:flex;justify-content:flex-end;margin-top:8px}
+  .striplink button{font:inherit;font-size:11.5px;font-weight:700;color:var(--brand-600);
+    background:none;border:0;cursor:pointer;padding:2px}
+
+  /* ---- home: listen banner ---- */
+  .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
+    background:linear-gradient(100deg,var(--brand-800),var(--brand-600));color:#F3EFE3;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;border:0;font:inherit;cursor:pointer;
+    text-align:left}
+  .lbanner .ring{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+    background:rgba(198,162,76,.2);border:1px solid rgba(198,162,76,.45);color:var(--gold-bright)}
+  .lbanner .ring svg{width:19px;height:19px}
+  .lbanner .lt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .lbanner .l1{font-size:13px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+  .lbanner .l2{font-size:11.5px;color:#CBB8C4}
+  .lbanner .ch{color:var(--gold-bright);font-size:19px}
+  .lbanner .wave{position:absolute;right:52px;bottom:0;display:flex;align-items:flex-end;gap:2.5px;
+    height:26px;opacity:.4;pointer-events:none}
+  .lbanner .wave i{width:2.5px;background:var(--gold-bright);border-radius:2px;display:block}
+
+  /* ---- home: the services grid ----
+     Nine destinations that used to be reachable only from the menu. The label
+     wraps and the tile grows with it, because "Funeral Services" in Urdu is
+     جنازہ کی خدمات and a fixed height would clip it. */
+  .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:15px;
+    padding:15px 6px 13px;display:flex;flex-direction:column;align-items:center;gap:8px;
+    box-shadow:var(--shadow);font:inherit;color:var(--ink);cursor:pointer;text-decoration:none}
+  .tile:active{background:#F4EEF1}
+  .tile .t-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;
+    background:rgba(119,33,87,.08);color:var(--brand-600)}
+  .tile .t-ic svg{width:20px;height:20px}
+  .tile .t-l{font-size:11.5px;font-weight:600;line-height:1.3;text-align:center;color:var(--ink);
+    overflow-wrap:anywhere}
+  .tile .t-soon{font-size:9px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+    color:#8A6A18;background:rgba(198,162,76,.2);border-radius:5px;padding:2px 5px}
+
+  /* ---- notices ---- */
+  .nt-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;
+    padding:44px 22px;border-radius:16px;background:var(--card);border:1px solid var(--line);
+    box-shadow:var(--shadow);margin-top:14px}
+  .nt-empty .ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(119,33,87,.08);color:var(--brand-600)}
+  .nt-empty .ic svg{width:27px;height:27px}
+  .nt-empty h3{font-family:"Fraunces",Georgia,serif;font-size:18px;font-weight:600}
+  .nt-empty p{font-size:13.5px;line-height:1.65;color:var(--muted);max-width:34ch}
+
   /* ---- funeral services ----
      The urgent box is first and is the loudest thing on the screen, because
      someone opening this at 3am needs a phone number, not an introduction. */
@@ -1012,12 +1074,13 @@
     padding:13px;border-radius:12px}
 
   /* ---- menu button + drawer ---- */
-  .menubtn{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border-radius:11px;cursor:pointer;
+  /* The burger's shape, kept for the bell that replaced it in the header. */
+  .bellbtn{margin-left:auto;flex:0 0 auto;width:40px;height:40px;border-radius:11px;cursor:pointer;
     border:1px solid rgba(198,162,76,.3);background:rgba(198,162,76,.10);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0}
-  .menubtn span{display:block;width:17px;height:2px;border-radius:2px;background:var(--gold-bright)}
-  .menubtn span:nth-child(2){width:13px;align-self:center;margin-right:4px}
-  .menubtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    display:grid;place-items:center;padding:0;color:var(--gold-bright)}
+  .bellbtn svg{width:19px;height:19px}
+  .bellbtn:active{background:rgba(198,162,76,.2)}
+  .bellbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
   .drawer{position:fixed;inset:0;z-index:60;display:none}
   .drawer[data-open="1"]{display:block}
@@ -1245,12 +1308,15 @@
     <div class="brand">
       <p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p>
     </div>
-    <button class="menubtn" id="menubtn" aria-label="More" data-i18n-attr="aria-label:a11y.more">
-      <span></span><span></span><span></span>
+    <!-- The burger is gone: everything it held is now behind the More tab,
+         so the menu has one entrance instead of two. The bell is the new
+         one — somewhere to go and read an announcement you swiped away. -->
+    <button class="bellbtn" id="bellbtn" aria-label="Notices" data-i18n-attr="aria-label:a11y.notices">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
     </button>
   </div>
 
-  <main id="tab-times">
+  <main id="tab-home">
   <section class="hero">
     <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
     <div class="salam">
@@ -1311,6 +1377,43 @@
     </div>
   </div>
 
+
+  <div class="wrap">
+    <div class="sec-h"><h2 data-i18n="home.today">Today</h2><span class="rule"></span><span class="tag" data-i18n="home.beginning_jamaah">Beginning &amp; jam&#257;&#703;ah</span></div>
+    <div class="card pstrip" id="pstrip"></div>
+    <div class="striplink"><button type="button" id="go-timetable" data-i18n="home.full_timetable">Full timetable &rsaquo;</button></div>
+
+    <div class="sec-h"><h2 data-i18n="home.listen">Listen</h2><span class="rule"></span></div>
+    <button class="lbanner" id="go-listen" type="button">
+      <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg></span>
+      <span class="lt"><span class="l1" data-i18n="home.listen_live">Listen live</span>
+        <span class="l2" data-i18n="home.tune_in_to_taiyabah">Tune in to Taiyabah Masjid</span></span>
+      <span class="ch" aria-hidden="true">&rsaquo;</span>
+      <span class="wave" aria-hidden="true"><i style="height:7px"></i><i style="height:13px"></i><i style="height:20px"></i><i style="height:11px"></i><i style="height:25px"></i><i style="height:16px"></i><i style="height:9px"></i><i style="height:22px"></i><i style="height:14px"></i><i style="height:6px"></i><i style="height:18px"></i><i style="height:11px"></i><i style="height:24px"></i><i style="height:8px"></i></span>
+    </button>
+
+    <div class="sec-h"><h2 data-i18n="home.services">Services</h2><span class="rule"></span></div>
+    <div class="tgrid">
+        <button class="tile" data-tile="quran"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z"/><path d="M12 6.5v11.8"/></svg></span><span class="t-l" data-i18n="tiles.holy_quran">Holy Qur&rsquo;an</span></button>
+        <button class="tile" data-tile="athkar"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6.2"/><path d="M12 16.2v3.4"/><circle cx="12" cy="20.8" r="1.3"/></svg></span><span class="t-l" data-i18n="tiles.daily_adhkar">Daily Adhk&#257;r</span></button>
+        <button class="tile" data-tile="qibla"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z"/></svg></span><span class="t-l" data-i18n="tiles.qibla">Qibla</span></button>
+        <button class="tile" data-tile="madrasah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="t-l" data-i18n="tiles.madrasah">Madrasah</span></button>
+        <button class="tile" data-tile="nikah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="5.4"/><circle cx="15" cy="14" r="5.4"/></svg></span><span class="t-l" data-i18n="tiles.nikah_services">Nik&#257;&#7717; Services</span></button>
+        <button class="tile" data-tile="funeral"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6"/><path d="M3.5 20.5h17"/><path d="M12 9.4v5.2M9.8 11.6h4.4"/></svg></span><span class="t-l" data-i18n="tiles.funeral_services">Funeral Services</span></button>
+        <button class="tile" data-tile="hallhire"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></svg></span><span class="t-l" data-i18n="tiles.hall_booking">Hall Booking</span></button>
+        <button class="tile" data-tile="donate"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.9 20.2S5 15.9 5 10.7a4.4 4.4 0 0 1 6.9-3.6 4.4 4.4 0 0 1 6.9 3.6c0 5.2-6.9 9.5-6.9 9.5Z"/></svg></span><span class="t-l" data-i18n="tiles.donate">Donate</span></button>
+        <button class="tile" data-tile="whatsapp"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5 4.9 16a8 8 0 1 1 3.1 3.1l-4.5 1.4Z"/><path d="M9.2 9.1c.3 1.6 1.4 3.4 2.9 4.4l1.1-.9 2.1.7-.2 1.6c-2 .4-4-.8-5.4-2.2s-2.6-3.4-2.2-5.4l1.6-.2.7 2.1-.6 1"/></svg></span><span class="t-l" data-i18n="tiles.join_whatsapp">Join WhatsApp</span></button>
+    </div>
+
+    <footer>
+      <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+      <div class="charity"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></div>
+      <div class="credit"><span data-i18n="sheet.app_built_by">App built by</span> <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener" data-i18n="sheet.yameen_bux">Yameen Bux</a></div>
+    </footer>
+  </div>
+  </main>
+
+  <main id="tab-times" hidden>
   <nav class="datenav" aria-label="Choose a date" data-i18n-attr="aria-label:a11y.choose_a_date">
     <button class="navbtn" id="prev" aria-label="Previous day" data-i18n-attr="aria-label:a11y.previous_day">&#8249;</button>
     <button class="daypick" id="daypick">
@@ -1355,6 +1458,24 @@
       <div class="credit"><span data-i18n="sheet.app_built_by">App built by</span> <a href="https://www.linkedin.com/in/yameenbux" target="_blank" rel="noopener" data-i18n="sheet.yameen_bux">Yameen Bux</a></div>
     </footer>
   </div>
+  </main>
+
+  <main id="tab-notices" hidden>
+    <div class="wrap">
+      <div class="sec-h" style="margin-top:18px"><h2 data-i18n="notices.notices">Notices</h2><span class="rule"></span></div>
+      <!-- Real, but not yet: a notification the masjid sends is delivered and
+           then gone, and nothing keeps it. Somewhere to store announcements
+           has to exist before this can list them, so it says so plainly
+           rather than showing an empty list that looks broken. -->
+      <div class="nt-empty">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+        <h3 data-i18n="notices.coming_soon">Coming soon</h3>
+        <p data-i18n="notices.this_is_where_announcements">This is where the masjid&rsquo;s announcements will be kept, so a message you
+           miss or swipe away can still be read. Until it is switched on, alerts
+           arrive as notifications only.</p>
+        <p data-i18n="notices.turn_on_notifications_in_settings">You can choose which alerts you receive under Notifications in the menu.</p>
+      </div>
+    </div>
   </main>
 
   <main id="tab-qibla" hidden>
@@ -2185,6 +2306,52 @@
        introduction — and BCoM comes before the masjid's own number, because
        BCoM is genuinely the first call: they handle the registration and the
        release, without which nothing else can start. -->
+  <div class="sheet" id="membership" data-open="0" role="dialog" aria-modal="true" aria-label="Membership" data-i18n-attr="aria-label:a11y.membership">
+    <div class="scrim" id="mb-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="member.membership">Membership</h3>
+        <button class="sh-close" id="mb-close" data-i18n="member.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <span class="hh-ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18"/><path d="M7 14h4"/></svg></span>
+          <div class="hh-en" data-i18n="member.masjid_membership">Masjid Membership</div>
+          <p class="hh-sub" data-i18n="member.check_whether_this_years_fee">Check whether this year&rsquo;s fee is paid, and when the next one is due.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="ad-note">
+            <span class="lab" data-i18n="member.membership_2">Membership</span>
+            <h4 data-i18n="member.checking_online_comes_soon">Checking online comes soon</h4>
+            <p data-i18n="member.you_will_be_able_to_sign_in">You will be able to sign in here and see whether this year&rsquo;s fee has been
+               received and the date the next one falls due. Until that is connected, the
+               office holds the record and can tell you in a moment.</p>
+            <p><strong data-i18n="member.the_office_takes_calls">The office takes calls between 5pm and 7pm.</strong></p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="member.what_membership_covers">What it will show</h2><span class="rule"></span></div>
+          <dl class="card ad-dl">
+            <div class="ad-d"><dt data-i18n="member.this_year">This year</dt><dd data-i18n="member.whether_the_fee_has_been">Whether the fee has been received, and the date it was paid.</dd></div>
+            <div class="ad-d"><dt data-i18n="member.next_due">Next due</dt><dd data-i18n="member.the_date_the_next_years">The date the next year&rsquo;s fee falls due, so it does not come as a surprise.</dd></div>
+            <div class="ad-d"><dt data-i18n="member.how_to_pay">How to pay</dt><dd data-i18n="member.at_the_office_by_transfer">At the office, by bank transfer, or by card &mdash; the details are on the Donate screen.</dd></div>
+          </dl>
+
+          <a class="hh-call" href="tel:01204535997">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="member.masjid_office_5_7pm">Masjid office &middot; 5pm&ndash;7pm</span>
+              <span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="funeral" data-open="0" role="dialog" aria-modal="true" aria-label="Funeral Services" data-i18n-attr="aria-label:a11y.funeral_services">
     <div class="scrim" id="fs-scrim"></div>
     <div class="panel">
@@ -3346,6 +3513,12 @@
         <button class="dr-row" data-act="about">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="8.1" r="1" fill="currentColor" stroke="none"/></svg></span><span class="dr-t" data-i18n="menu.about">About us</span><span class="dr-ch">&rsaquo;</span>
         </button>
+        <button class="dr-row" data-act="membership">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18"/><path d="M7 14h4"/></svg></span><span class="dr-t" data-i18n="member.membership">Membership</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <a class="dr-row" href="https://maps.apple.com/?q=Taiyabah+Masjid+Draycott+Street+Bolton+BL1+8HD" target="_blank" rel="noopener">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="dr-t" data-i18n="menu.location">Find us</span><span class="dr-ext" aria-hidden="true">&#8599;</span>
+        </a>
         <button class="dr-row" data-act="contact">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="dr-t" data-i18n="menu.contact">Contact us</span><span class="dr-ch">&rsaquo;</span>
         </button>
@@ -3401,24 +3574,24 @@
   </div>
 
 <nav class="tabbar" role="tablist">
-    <button class="tab" data-tab="times" data-on="1" role="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-      <span data-i18n="nav.times">Times</span>
+    <button class="tab" data-tab="home" data-on="1" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-9.5Z"/><path d="M9.5 21v-6h5v6"/></svg>
+      <span data-i18n="nav.home">Home</span>
     </button>
-    <button class="tab" data-tab="live" role="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg>
-      <span data-i18n="nav.listen">Listen</span>
+    <button class="tab" data-tab="times" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span data-i18n="nav.prayer_times">Prayer Times</span>
     </button>
-    <button class="tab" data-tab="recite" role="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 5.2c2.8-1.3 5.6-1.3 8 .2v14c-2.4-1.5-5.2-1.5-8-.2V5.2Z"/>
-        <path d="M20 5.2c-2.8-1.3-5.6-1.3-8 .2v14c2.4-1.5 5.2-1.5 8-.2V5.2Z"/>
-      </svg>
-      <span data-i18n="nav.recite">Recite</span>
+    <button class="tab" data-tab="notices" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/></svg>
+      <span data-i18n="nav.notices">Notices</span>
     </button>
-    <button class="tab" data-tab="donate" role="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-5h4v5"/><path d="M12 2v3"/></svg>
-      <span data-i18n="nav.donate">Donate</span>
+    <!-- Not a pane, and deliberately not id="tab-more": every id of that shape
+         in here is a pane. It opens the same drawer the burger used to, which
+         is why the burger could come out of the header — one menu, one way in. -->
+    <button class="tab" id="nav-more" role="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      <span data-i18n="nav.more">More</span>
     </button>
   </nav>
 
@@ -4103,6 +4276,7 @@ function render(){
   renderReminder();
   if(sameDay(VIEW, today0())){ renderTodayHero(); tick(); }
   else { renderDayView(rec); markRows(rec, VIEW, null); }
+  renderStrip();
 }
 
 function goto(d){
@@ -5620,6 +5794,7 @@ function refreshRenderedText(){
     () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderSessions(); bkShowPrice(); } },
     () => { if(open("holidays")) renderHolidays(); },
     () => { if(open("marriage") && NK.month){ nkRenderCal(); nkRenderSlots(); nkRenderPicks(); } },
+    () => { if(STATE) renderStrip(); },
     () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
@@ -6585,6 +6760,119 @@ function initMarriageDeath(){
   });
 }
 
+/* ---------------- home: today's five prayers ----------------
+   The same five rows the timetable shows, compressed to a strip so the whole
+   day is above the fold. Built from the record rather than read back out of
+   the table, so it is right on a day the table is not showing. On a Friday
+   the Zuhr column is announced as Jumuʿah, matching everywhere else. -------*/
+const STRIP_ICONS = {
+  fajr:    '<circle cx="12" cy="14" r="3.4"/><path d="M12 6.6V4.4M6.9 8.9 5.4 7.4M17.1 8.9l1.5-1.5M3.6 14h2.2M18.2 14h2.2"/>',
+  zuhr:    '<circle cx="12" cy="12" r="4"/><path d="M12 3.6v2M12 18.4v2M5.6 5.6 7 7M17 17l1.4 1.4M3.6 12h2M18.4 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/>',
+  asr:     '<circle cx="12" cy="13.5" r="3.6"/><path d="M12 6.2v2M4.4 13.5h2M17.6 13.5h2M6.6 8.1 8 9.5M17.4 8.1 16 9.5"/>',
+  maghrib: '<path d="M4 17.5h16"/><circle cx="12" cy="13" r="3.4"/><path d="M12 5.6v2.2M6.4 9.4 7.9 10.9M17.6 9.4 16.1 10.9"/>',
+  isha:    '<path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.7 7.7 0 1 0 10.1 10.1Z"/>',
+};
+
+/* The strip has a fifth of the screen per prayer, so the meridiem is dropped:
+   Fajr is not going to be mistaken for the afternoon. Stripping it off hm12()
+   with a regex only worked in English — in Urdu it left "۴:۴۵ صبح" — so the
+   time is built without one in the first place. */
+function hmShort(t){
+  const [h, m] = t.split(":").map(Number);
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return num(h12 + ":" + String(m).padStart(2, "0"));
+}
+
+function renderStrip(){
+  const host = document.getElementById("pstrip");
+  if(!host) return;
+  const rec = dayRec(today0());
+  if(!rec){ host.innerHTML = ""; return; }
+
+  const now = nowLondon();
+  const isFriday = today0().getDay() === 5;
+  let nextKey = null;
+  for(const k of JAMAAT_ORDER){
+    if(atToday(today0(), rec.jamaat[k]) > now){ nextKey = k; break; }
+  }
+
+  host.innerHTML = JAMAAT_ORDER.map(k => {
+    const jumuah = isFriday && k === "zuhr";
+    const label  = jumuah ? t("prayer.jumuah", "Jumuʿah")
+                          : t("prayer." + k, PRAYERS.filter(x => x.key === k)[0].en);
+    const begin  = rec.begins[k], jam = rec.jamaat[k];
+    return `<div class="pcol"${k === nextKey ? ' data-next="1"' : ""}>`
+         + `<span class="p-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" `
+         + `stroke="currentColor" stroke-width="1.6" stroke-linecap="round" `
+         + `stroke-linejoin="round">${STRIP_ICONS[k]}</svg></span>`
+         + `<span class="p-n">${esc(label)}</span>`
+         + `<span class="p-b tnum">${begin ? esc(hmShort(begin)) : "&mdash;"}</span>`
+         + `<span class="p-j tnum">${jam ? esc(hmShort(jam)) : "&mdash;"}</span>`
+         + `</div>`;
+  }).join("");
+}
+
+/* ---------------- home: the services grid ----------------
+   Every tile goes somewhere that already exists. WhatsApp is the exception:
+   the masjid's group link is not known here, so rather than ship a dead
+   button the tile says "coming soon" until WHATSAPP_URL is filled in. */
+const WHATSAPP_URL = "";
+
+const TILE_ACTIONS = {
+  quran:    () => openQuran(),
+  athkar:   () => openAthkar(),
+  qibla:    () => { switchTab("qibla"); drawTicks(); },
+  madrasah: () => openAdmissions(),
+  nikah:    () => openMarriage(),
+  funeral:  () => openFuneral(),
+  hallhire: () => openHallHire(),
+  donate:   () => switchTab("donate"),
+  whatsapp: () => { if(WHATSAPP_URL) window.open(WHATSAPP_URL, "_blank", "noopener"); },
+};
+
+function initHome(){
+  document.getElementById("go-timetable").addEventListener("click", () => switchTab("times"));
+  document.getElementById("go-listen").addEventListener("click", () => switchTab("live"));
+  document.getElementById("bellbtn").addEventListener("click", () => switchTab("notices"));
+
+  const wa = document.querySelector('.tile[data-tile="whatsapp"]');
+  if(wa && !WHATSAPP_URL){
+    wa.disabled = true;
+    wa.insertAdjacentHTML("beforeend",
+      `<span class="t-soon" data-i18n="tiles.coming_soon">Coming soon</span>`);
+  }
+  document.querySelectorAll(".tile[data-tile]").forEach(b => {
+    b.addEventListener("click", () => {
+      const go = TILE_ACTIONS[b.dataset.tile];
+      if(go) setTimeout(go, 60);
+    });
+  });
+  renderStrip();
+}
+
+/* ---------------- membership ----------------
+   Real, and not yet connected: checking whether this year's fee is paid means
+   looking a person up, and there is nowhere to look them up. The screen says
+   what it will do and hands over the office number, rather than asking for a
+   membership number it cannot answer. */
+function openMembership(){
+  document.getElementById('membership').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#membership .sh-body').scrollTop=0;
+}
+function closeMembership(){
+  document.getElementById('membership').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initMembership(){
+  document.getElementById('mb-close').addEventListener('click',closeMembership);
+  document.getElementById('mb-scrim').addEventListener('click',closeMembership);
+  document.querySelector('#membership .hh-call').addEventListener('click',closeMembership);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('membership').dataset.open==="1") closeMembership();
+  });
+}
+
 /* ---------------- funeral services ---------------- */
 function openFuneral(){
   document.getElementById('funeral').dataset.open="1";
@@ -7345,13 +7633,12 @@ function closeDrawer(){
 }
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.dataset.on = t.dataset.tab===name ? "1":"0");
-  ["times","live","recite","alerts","donate","qibla"].forEach(n=>{
+  ["home","times","notices","live","recite","alerts","donate","qibla"].forEach(n=>{
     document.getElementById("tab-"+n).hidden = (n!==name);
   });
   window.scrollTo({top:0,behavior:"instant"});
 }
 function initDrawer(){
-  document.getElementById('menubtn').addEventListener('click',openDrawer);
   document.getElementById('dr-close').addEventListener('click',closeDrawer);
   document.getElementById('dr-scrim').addEventListener('click',closeDrawer);
   // in-app destinations
@@ -7380,6 +7667,7 @@ function initDrawer(){
       if(act==="admissions"){ setTimeout(openAdmissions,120); }
       if(act==="holidays"){ setTimeout(openHolidays,120); }
       if(act==="education"){ setTimeout(openEducation,120); }
+      if(act==="membership"){ setTimeout(openMembership,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -7404,11 +7692,18 @@ function initDrawer(){
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>b.addEventListener('click',()=>{
+    /* More is a doorway rather than a destination: it opens the drawer and
+       leaves whichever tab you were on still selected underneath. */
+    if(b.id==="nav-more"){ openDrawer(); return; }
     const name=b.dataset.tab;
     tabs.forEach(t=>t.dataset.on = t===b ? "1" : "0");
-    ["times","live","recite","alerts","donate","qibla"].forEach(n=>{
+    ["home","times","notices","live","recite","alerts","donate","qibla"].forEach(n=>{
       document.getElementById("tab-"+n).hidden = (n!==name);
     });
+    /* Home is always "now". Browsing to another date happens on Prayer Times,
+       and coming back to Home should not leave you staring at a countdown to
+       a jamāʿah three days away. */
+    if(name==="home" && VIEW && +VIEW !== +today0()){ VIEW = today0(); render(); }
     if(name==="alerts") showAlertsBlockedHint();
     window.scrollTo({top:0,behavior:"instant"});
     if(name==="qibla") drawTicks();
@@ -7979,6 +8274,8 @@ function boot(){
   OneSignalManager.init();
   initTabs();
   initDrawer();
+  initHome();
+  initMembership();
   initAbout();
   initContact();
   initMarriage();

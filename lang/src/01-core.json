@@ -1,25 +1,5 @@
 {
  "_note": "key: [Urdu, Gujarati, Arabic]. \" keep\" means show the English as-is — proper nouns, bank details, names.",
- "nav.times": [
-  "اوقات",
-  "સમય",
-  "المواقيت"
- ],
- "nav.listen": [
-  "سماعت",
-  "સાંભળો",
-  "استماع"
- ],
- "nav.recite": [
-  "تلاوت",
-  "પઠન",
-  "تلاوة"
- ],
- "nav.donate": [
-  "عطیہ",
-  "દાન",
-  "تبرع"
- ],
  "menu.settings": [
   "ترتیبات",
   "સેટિંગ્સ",
