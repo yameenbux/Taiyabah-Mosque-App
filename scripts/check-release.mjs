@@ -437,38 +437,48 @@ for (const f of ["index.html", "admin.html"]) {
         }
       }
 
-      /* Reading sideways shows half a page at a time, cut at a row the printing
-         left blank between two lines. A cut in the wrong place slices a line of
-         the Qur'an in half, so the table's shape is checked here: one entry per
-         page, each either 0 (shown whole) or a row well inside the printed
-         area, and the halves it makes must overlap rather than leave a gap. */
-      const sl = meta.split;
-      if (!sl) bad.push("the mushaf pack carries no split table, so reading sideways has nowhere to cut");
+      /* Reading sideways cuts a window out of the page in the shape of the
+         screen, so it fills it edge to edge. The window's edges land on rows
+         the printing left blank between two lines, measured off the pages
+         themselves — a wrong row slices a line of the Qur'an in half, so the
+         table's shape is checked on every release. */
+      const geo = meta.geometry;
+      if (!geo) bad.push("the mushaf pack carries no line geometry, so reading sideways has nowhere to cut");
       else {
-        const { top, bottom, bleed, cut } = sl;
-        if (!Array.isArray(cut) || cut.length !== meta.pages)
-          bad.push(`the split table has ${Array.isArray(cut) ? cut.length : "no"} entries for ${meta.pages} pages`);
+        if (!(geo.left >= 0 && geo.right > geo.left && geo.right < meta.width))
+          bad.push(`the printed frame is recorded at x ${geo.left}-${geo.right}, which is not inside the page's ${meta.width}`);
+        if (!Array.isArray(geo.page) || geo.page.length !== meta.pages)
+          bad.push(`the line geometry has ${Array.isArray(geo.page) ? geo.page.length : "no"} entries for ${meta.pages} pages`);
         else {
-          const lo = top + 200, hi = bottom - 200;      // a cut outside this is not a middle
-          const off = cut.filter(c => c !== 0 && !(c >= lo && c <= hi)).length;
-          if (off) bad.push(`${off} page(s) are cut outside rows ${lo}-${hi}, which would not be a half`);
-          if (!(bleed > 0))
-            bad.push("the split carries no bleed, so a mark crossing the cut would be sliced by both halves");
-          if (!(top >= 0 && bottom > top && bottom <= meta.height))
-            bad.push(`the split's ink bounds ${top}-${bottom} do not sit inside the page's ${meta.height} rows`);
-          const whole = cut.filter(c => c === 0).length;
+          let shape = 0, order = 0, thin = 0, whole = 0;
+          for (const row of geo.page) {
+            if (row === null) { whole++; continue; }
+            if (!Array.isArray(row) || row.length < 7) { shape++; continue; }
+            const [top, bottom, ...gaps] = row;
+            if (!(top >= 0 && bottom > top && bottom <= meta.height)) { shape++; continue; }
+            if (bottom - top < 900) thin++;
+            let prev = top;
+            for (const g of gaps) { if (!(g > prev && g < bottom)) { order++; break; } prev = g; }
+          }
+          if (shape) bad.push(`${shape} page(s) of line geometry are the wrong shape`);
+          if (order) bad.push(`${order} page(s) have blank rows out of order or outside their frame — a window would cut mid-line`);
+          if (thin)  bad.push(`${thin} page(s) record a frame too short to hold 13 lines`);
           if (whole > meta.pages / 20)
-            bad.push(`${whole} pages have no cut — that is too many to be ornamental openings alone`);
+            bad.push(`${whole} pages have no line geometry — too many to be ornamental openings alone`);
         }
       }
     }
   }
 
-  /* Sideways is only worth having because it shows less of the page, larger. If
-     the halves stop being used the feature quietly becomes a worse portrait, so
-     the two pieces that make it bigger are checked for directly. */
-  if (!/function mushafSplit\(/.test(app) || !/MUSHAF\.half/.test(app))
-    bad.push("the sideways reader no longer splits the page, so it would show the whole page smaller than portrait does");
+  /* Sideways is only worth having because it shows less of the page, larger and
+     filling the screen. If either half of that goes, it quietly becomes a worse
+     upright view, so both are checked for directly. */
+  if (!/function mushafWindows\(/.test(app) || !/MUSHAF\.band/.test(app))
+    bad.push("the sideways reader no longer cuts a window out of the page, so it would show the whole page smaller than upright does");
+  if (!/win\.style\.width\s*=\s*W \+ "px";\s*\n\s*win\.style\.height\s*=\s*H \+ "px";/.test(app))
+    bad.push("the sideways window is no longer the size of the screen, so the page would sit in bands of white again");
+  if (!/const winX = Math\.max\(0, Math\.min\(g\.left/.test(app))
+    bad.push("the sideways window no longer crops to the block of writing, so the printed margin would show as white down both sides");
   if (!/rotate\(\$\{turn \? 90 : 0\}deg\)/.test(app))
     bad.push("the sideways reader no longer turns the page in software, so it would do nothing for a phone with rotation lock on");
 
