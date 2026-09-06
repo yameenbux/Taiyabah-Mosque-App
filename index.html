@@ -1181,8 +1181,10 @@
   /* filled once a page is kept, so the state is visible at a glance */
   .mu-bm[data-set="1"]{color:var(--brand-600);border-color:var(--brand-600)}
   .mu-bm[data-set="1"] svg path{fill:currentColor}
-  .mu-bmrow{margin:10px 14px 0;padding:9px 10px;border-radius:11px;
+  .mu-bmrow{margin:10px 0 0;padding:9px 8px 6px;border-radius:11px;
     background:var(--paper);border:1px solid var(--line)}
+  /* however many are saved, the panel stays a panel and the list scrolls */
+  #mu-bm-list{max-height:196px;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .mu-bm-h{font-size:calc(10px * var(--ts));letter-spacing:.06em;text-transform:uppercase;
     color:var(--muted);font-weight:600;margin:0 4px 6px}
   .mu-bm-item{display:flex;align-items:center;gap:6px}
@@ -1197,7 +1199,15 @@
   .mu-bm-x{flex:0 0 auto;font:inherit;font-size:calc(15px * var(--ts));line-height:1;
     cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
     background:var(--card);color:var(--muted)}
-  .mu-jump{display:flex;gap:8px;padding:10px 14px 0}
+  /* The jump controls and saved pages used to sit in the flow, so opening them
+     pushed the mushaf down the screen — and the more pages someone saved, the
+     further it went. They hang off the bar now and float over the page, which
+     never moves. */
+  .mu-head{position:relative;z-index:6}
+  .mu-panel{position:absolute;left:10px;right:10px;top:100%;margin-top:6px;
+    padding:10px;border-radius:14px;background:var(--card);
+    border:1px solid var(--line);box-shadow:0 14px 30px -10px rgba(60,11,42,.32)}
+  .mu-jrow{display:flex;gap:8px}
   .mu-f{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
     font-size:calc(10px * var(--ts));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .mu-f select,.mu-f input{width:100%;min-width:0;font:inherit;font-size:calc(13px * var(--ts));color:var(--ink);
@@ -3112,6 +3122,7 @@
           </div>
 
           <div id="mu-reader" hidden>
+            <div class="mu-head">
             <div class="mu-bar">
               <button class="mu-nav" id="mu-prev" data-i18n="mushaf.previous">Previous</button>
               <button class="mu-where" id="mu-where"><span id="mu-where-t">&hellip;</span></button>
@@ -3121,18 +3132,21 @@
               </button>
             </div>
 
-            <div class="mu-jump" id="mu-jump" hidden>
-              <label class="mu-f"><span data-i18n="mushaf.s_rah">Sūrah</span>
-                <select id="mu-j-surah"></select></label>
-              <label class="mu-f"><span data-i18n="mushaf.juz">Juz</span>
-                <select id="mu-j-juz"></select></label>
-              <label class="mu-f"><span data-i18n="mushaf.page">Page</span>
-                <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
-            </div>
+            <div class="mu-panel" id="mu-jump" hidden>
+              <div class="mu-jrow">
+                <label class="mu-f"><span data-i18n="mushaf.s_rah">Sūrah</span>
+                  <select id="mu-j-surah"></select></label>
+                <label class="mu-f"><span data-i18n="mushaf.juz">Juz</span>
+                  <select id="mu-j-juz"></select></label>
+                <label class="mu-f"><span data-i18n="mushaf.page">Page</span>
+                  <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
+              </div>
 
-            <div class="mu-bmrow" id="mu-bmrow" hidden>
-              <div class="mu-bm-h" data-i18n="mushaf.saved_pages">Saved pages</div>
-              <div id="mu-bm-list"></div>
+              <div class="mu-bmrow" id="mu-bmrow" hidden>
+                <div class="mu-bm-h" data-i18n="mushaf.saved_pages">Saved pages</div>
+                <div id="mu-bm-list"></div>
+              </div>
+            </div>
             </div>
 
             <div class="mu-page" id="mu-page" aria-live="polite"></div>
@@ -6729,72 +6743,100 @@ function muZoomTo(scale, cx, cy){
 
 function initMushafGestures(){
   const el = document.getElementById('mu-page');
-  let mode = null;                 // "swipe" | "pan" | "pinch"
-  let x0=0, y0=0, sx=0, sy=0, d0=0, s0=1, lastTap=0;
+  let mode = null;                       // "swipe" | "pan" | "pinch"
+  let x0=0, y0=0, sx=0, sy=0;            // where a drag began, and the offset then
+  let d0=0, s0=1, mx0=0, my0=0, cx=0, cy=0;   // pinch: spread, scale, midpoint, page centre
+  let lastTap = 0;
 
   const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   const mid  = t => [(t[0].clientX + t[1].clientX)/2, (t[0].clientY + t[1].clientY)/2];
 
-  el.addEventListener('touchstart', e => {
-    if(e.touches.length === 2){
-      mode = "pinch"; d0 = dist(e.touches); s0 = MU_ZOOM.scale;
-      const m = mid(e.touches); x0 = m[0]; y0 = m[1];
+  /* Where the page's centre sits with no transform applied. The transform does
+     not move the layout box, so this is fixed for as long as the gesture runs
+     and the pinch maths can be expressed against it. */
+  function centre(){
+    const img = el.querySelector('img.mu-img');
+    const r = el.getBoundingClientRect();
+    if(!img) return [r.left + r.width/2, r.top + r.height/2];
+    return [r.left + img.offsetLeft + img.clientWidth/2,
+            r.top  + img.offsetTop  + img.clientHeight/2];
+  }
+
+  /* Every change in how many fingers are down starts a fresh gesture from
+     wherever the page currently is. Without this, lifting one finger after a
+     pinch left the handler still in "pinch" while one finger remained, and the
+     page could not be dragged at all until every finger came off — which is
+     exactly how people zoom and then move around. */
+  function seed(touches){
+    if(touches.length >= 2){
+      mode = "pinch";
+      d0 = dist(touches); s0 = MU_ZOOM.scale;
+      const m = mid(touches); mx0 = m[0]; my0 = m[1];
       sx = MU_ZOOM.x; sy = MU_ZOOM.y;
+      const c = centre(); cx = c[0]; cy = c[1];
       return;
     }
-    if(e.touches.length === 1){
-      const t = e.touches[0];
-      x0 = t.clientX; y0 = t.clientY; sx = MU_ZOOM.x; sy = MU_ZOOM.y;
+    if(touches.length === 1){
+      x0 = touches[0].clientX; y0 = touches[0].clientY;
+      sx = MU_ZOOM.x; sy = MU_ZOOM.y;
       mode = MU_ZOOM.scale > 1.01 ? "pan" : "swipe";
+      return;
     }
-  }, {passive:true});
+    mode = null;
+  }
+
+  el.addEventListener('touchstart', e => seed(e.touches), {passive:true});
 
   el.addEventListener('touchmove', e => {
-    if(mode === "pinch" && e.touches.length === 2){
+    if(mode === "pinch" && e.touches.length >= 2){
       e.preventDefault();
       const m = mid(e.touches);
-      MU_ZOOM.x = sx + (m[0] - x0);
-      MU_ZOOM.y = sy + (m[1] - y0);
-      muZoomTo(s0 * (dist(e.touches) / d0), m[0], m[1]);
+      const s = Math.min(MU_ZOOM.max, Math.max(MU_ZOOM.min, s0 * (dist(e.touches) / d0)));
+      /* keep whatever was between the fingers between them, and let the page
+         follow the fingers as they move — one step, so nothing compounds */
+      const ux = mx0 - (cx + sx), uy = my0 - (cy + sy);
+      MU_ZOOM.scale = s;
+      MU_ZOOM.x = m[0] - cx - ux * (s / s0);
+      MU_ZOOM.y = m[1] - cy - uy * (s / s0);
+      muApplyZoom();
       return;
     }
     if(mode === "pan" && e.touches.length === 1){
       e.preventDefault();
-      const t = e.touches[0];
-      MU_ZOOM.x = sx + (t.clientX - x0);
-      MU_ZOOM.y = sy + (t.clientY - y0);
+      MU_ZOOM.x = sx + (e.touches[0].clientX - x0);
+      MU_ZOOM.y = sy + (e.touches[0].clientY - y0);
       muApplyZoom();
     }
   }, {passive:false});
 
   el.addEventListener('touchend', e => {
-    if(mode === "swipe" && e.changedTouches.length){
-      const t = e.changedTouches[0];
+    const t = e.changedTouches[0];
+    if(mode === "swipe" && t){
       const dx = t.clientX - x0, dy = t.clientY - y0;
       /* a mushaf turns right-to-left, so dragging right brings the next page */
       if(Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy)){
         showMushafPage(MUSHAF.page + (dx > 0 ? 1 : -1));
-        mode = null; lastTap = 0; return;
+        lastTap = 0; mode = null; return;
       }
-      /* a tap that went nowhere — a second one within 300ms zooms */
       if(Math.abs(dx) < 12 && Math.abs(dy) < 12){
         const now = Date.now();
         if(now - lastTap < 300){ muZoomTo(2.5, t.clientX, t.clientY); lastTap = 0; }
         else lastTap = now;
-        mode = null; return;
       }
-    }
-    if(mode === "pan" && e.changedTouches.length){
-      const t = e.changedTouches[0];
+    }else if(mode === "pan" && t){
       if(Math.abs(t.clientX - x0) < 12 && Math.abs(t.clientY - y0) < 12){
         const now = Date.now();
         if(now - lastTap < 300){ muResetZoom(); lastTap = 0; }
         else lastTap = now;
       }
     }
-    if(e.touches.length === 0) mode = null;
+    /* fingers may remain — carry on from what is still down */
+    seed(e.touches);
   }, {passive:true});
+
+  el.addEventListener('touchcancel', () => { mode = null; }, {passive:true});
 }
+
 
 
 
@@ -6826,6 +6868,10 @@ function initQuranDemo(){
   document.getElementById('mu-bm').addEventListener('click',toggleMushafBookmark);
 
   initMushafGestures();
+  document.getElementById('mu-page').addEventListener('pointerdown',()=>{
+    const j=document.getElementById('mu-jump');
+    if(!j.hidden) j.hidden = true;
+  });
   initMushafFit();
   document.getElementById('qd-search').addEventListener('input', e => {
     if(quranIndex) renderSurahList(e.target.value);
