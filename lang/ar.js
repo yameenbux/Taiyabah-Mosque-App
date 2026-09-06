@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "702afb3acba1",
+ "version": "c0927c814e61",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -1563,6 +1563,15 @@ window.LANG_PACK = {
   "mushaf.juz": "جزء",
   "mushaf.page": "صفحة",
   "mushaf.couldn_t_load_this_page": "تعذّر تحميل هذه الصفحة. تحقّق من اتصالك وحاول مرة أخرى.",
-  "mushaf.credit": "{name} · {source}"
+  "mushaf.credit": "{name} · {source}",
+  "sysprefs.text_size": "حجم النص",
+  "sysprefs.pick_the_size_that_reads": "اختر الحجم الأسهل في القراءة. يُطبَّق على التطبيق كلّه.",
+  "sysprefs.the_quick_brown_sample": "بِسْمِ الله — هكذا سيبدو التطبيق.",
+  "a11y.text_size": "حجم النص",
+  "sysprefs.small": "صغير",
+  "sysprefs.medium": "متوسط",
+  "sysprefs.large": "كبير",
+  "sysprefs.extra_large": "كبير جدًا",
+  "sysprefs.display_language": "العرض واللغة"
  }
 };
