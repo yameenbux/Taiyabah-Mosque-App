@@ -8862,6 +8862,42 @@ function initDrawer(){
 }
 
 /* ---------------- tabs ---------------- */
+/* ---------------- keeping the tab bar on the floor ----------------
+
+   The bar is a plain fixed element sitting on the bottom of the screen, and
+   nothing in here moves it. WebKit does: it anchors a fixed element to the
+   visual viewport, and once the keyboard has been up it can leave the bar where
+   the viewport used to end and never put it back — stranded part-way up the
+   screen, over the page, until something else forces a layout. It came back
+   from a phone 278pt above the bottom, which is the height of the keyboard that
+   had just closed.
+
+   Taking it out of the layout for a single frame is enough to make the browser
+   work out where the bottom of the screen is again. No arithmetic of our own:
+   guessing at the offset would be a second thing able to put it in the wrong
+   place. */
+function repinTabbar(){
+  const bar = document.querySelector('.tabbar');
+  if(!bar) return;
+  bar.style.display = "none";
+  void bar.offsetHeight;                 // the read is the point: it forces the layout
+  bar.style.display = "";
+}
+
+function initTabbarPin(){
+  /* The keyboard opening and closing, the browser's own bars, and a rotation
+     all arrive here. */
+  if(window.visualViewport) visualViewport.addEventListener('resize', repinTabbar);
+  /* An older iOS does not always resize anything when the keyboard goes, so the
+     field losing focus is the other signal that it has gone. */
+  addEventListener('focusout', e => {
+    const t = e.target;
+    if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) setTimeout(repinTabbar, 60);
+  }, true);
+  addEventListener('orientationchange', () => setTimeout(repinTabbar, 150));
+  addEventListener('pageshow', repinTabbar);      // and coming back from the background
+}
+
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>b.addEventListener('click',()=>{
@@ -9446,6 +9482,7 @@ function boot(){
   initFridayCall();
   OneSignalManager.init();
   initTabs();
+  initTabbarPin();
   initDrawer();
   initHome();
   initMembership();

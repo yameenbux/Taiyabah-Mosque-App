@@ -457,6 +457,28 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("13-line mushaf — refuses to render a pack that names no source and licence, and says so rather than showing a blank page");
 }
 
+/* ---- 3n. the tab bar can find the bottom of the screen again ----
+   A phone came back with the bar stranded 278pt up the screen, over the page:
+   WebKit had anchored it to where the visual viewport ended while the keyboard
+   was up and never put it back. Nothing in the app moves the bar, so nothing in
+   the app was going to move it back either — it takes the bar out of the layout
+   for a frame when the viewport changes, which makes the browser work it out
+   again. Losing that would bring the stranded bar back. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  if (!/function repinTabbar\(/.test(app))
+    bad.push("repinTabbar is gone — a bar stranded up the screen by the keyboard would stay there");
+  if (!/visualViewport\.addEventListener\('resize', repinTabbar\)/.test(app))
+    bad.push("nothing listens for the viewport changing, which is when the bar is left behind");
+  if (!/addEventListener\('focusout'/.test(app))
+    bad.push("nothing listens for a field losing focus — the other moment the keyboard goes away");
+  if (!/initTabbarPin\(\);/.test(app))
+    bad.push("initTabbarPin is never called, so none of it is wired up");
+  if (bad.length) bad.forEach(fail);
+  else ok("tab bar — recovers its place on the screen after the keyboard has been up");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is
