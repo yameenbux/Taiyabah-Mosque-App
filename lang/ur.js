@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "c31ae346f664",
+ "version": "0f3a3c48dc71",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -1563,7 +1563,6 @@ window.LANG_PACK = {
   "mushaf.juz": "پارہ",
   "mushaf.page": "صفحہ",
   "mushaf.couldn_t_load_this_page": "یہ صفحہ نہیں کھل سکا۔ اپنا انٹرنیٹ دیکھ کر دوبارہ کوشش کریں۔",
-  "mushaf.credit": "{name} · {source}",
   "sysprefs.text_size": "عبارت کا سائز",
   "sysprefs.pick_the_size_that_reads": "وہ سائز چنیں جو سب سے آسانی سے پڑھا جائے۔ یہ پوری ایپ پر لاگو ہوگا۔",
   "sysprefs.the_quick_brown_sample": "بِسْمِ اللہ — ایپ اس طرح پڑھی جائے گی۔",

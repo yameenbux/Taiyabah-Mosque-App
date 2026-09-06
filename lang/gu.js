@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "7d2c58c3f810",
+ "version": "0269ed2b0008",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -1563,7 +1563,6 @@ window.LANG_PACK = {
   "mushaf.juz": "પારો",
   "mushaf.page": "પાનું",
   "mushaf.couldn_t_load_this_page": "આ પાનું લોડ થઈ શક્યું નથી. તમારું કનેક્શન તપાસીને ફરી પ્રયાસ કરો.",
-  "mushaf.credit": "{name} · {source}",
   "sysprefs.text_size": "લખાણનું કદ",
   "sysprefs.pick_the_size_that_reads": "જે કદ સૌથી સહેલાઈથી વંચાય તે પસંદ કરો. તે આખી ઍપમાં લાગુ થશે.",
   "sysprefs.the_quick_brown_sample": "બિસ્મિલ્લાહ — ઍપ આ રીતે વંચાશે.",

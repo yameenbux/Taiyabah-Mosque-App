@@ -1193,7 +1193,15 @@
     border-block:1px solid var(--line);margin-block:2px}
   .mu-line.mu-bism{color:var(--brand-600)}
   /* a scanned page brings its own margins and border, so the card adds none */
-  .mu-page.mu-scan{padding:0;overflow:hidden;background:#fff}
+  /* A scanned page is the whole point of this screen, so it gets the full
+     width: no card, no rounding, no side margin. The page is taller than it is
+     wide, so width is what limits it on a phone — this is as large as it goes
+     without cropping. */
+  /* The page is taller than it is wide, so on a phone its width is what limits
+     it: full-bleed is as large as it goes without cropping. The height left
+     under it is the page's own proportions, not wasted space. */
+  .mu-page.mu-scan{margin:0;padding:0;overflow:hidden;background:#fff;
+    border:0;border-inline:0;border-radius:0;box-shadow:none}
   .mu-img{display:block;width:100%;height:auto}
   .mu-err{margin:12px 14px 0;font-size:calc(12.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.6}
 
@@ -3093,7 +3101,6 @@
             </div>
 
             <div class="mu-page" id="mu-page" aria-live="polite"></div>
-            <p class="wl-foot" id="mu-credit"></p>
           </div>
         </div>
 
@@ -6513,10 +6520,9 @@ async function openMushaf(){
      without them, so a failure here is not worth blocking the page for */
   if(!quranIndex){ try{ await loadQuranIndex(); }catch(e){} }
   fillMushafJump();
-  document.getElementById('mu-credit').textContent =
-    t("mushaf.credit","{name} \u00b7 {source}")
-      .replace("{name}", MUSHAF.meta.name || "")
-      .replace("{source}", MUSHAF.meta.source || "");
+  /* The edition and its provenance are recorded in the pack, and the release
+     check will not let one ship without them — but they are not printed under
+     the page: the mushaf should have the screen to itself. */
   await showMushafPage(prefStore.get(MU_LAST_PAGE, 1));
 }
 
