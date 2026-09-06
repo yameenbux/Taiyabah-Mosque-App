@@ -1184,7 +1184,10 @@
   /* Saving a page used to be silent apart from the ribbon filling in, so there
      was nothing to say where the page had gone or how to get back to it. The
      bar carries the count now, and saving says so once and offers the way in. */
-  .mu-savedbar{display:flex;justify-content:center;padding:5px 14px 0}
+  .mu-optrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:5px 10px 0}
+  .mu-opt{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
+    line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
+    border:1px solid var(--line);background:var(--card);color:var(--ink)}
   .mu-saved{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
     line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
     border:1px solid var(--brand-600);background:var(--card);color:var(--brand-600)}
@@ -1254,6 +1257,31 @@
      under it is the page's own proportions, not wasted space. */
   .mu-page.mu-scan{margin:0;padding:0;overflow:hidden;background:#fff;
     border:0;border-inline:0;border-radius:0;box-shadow:none}
+  /* ---- reading sideways ----
+     A fixed sheet of its own, over everything: the point is the whole screen.
+     The stage is the screen with its sides swapped and turned a quarter turn
+     when the phone is upright, so the reader turns the phone rather than their
+     head, and the bar floats over the page instead of taking height from it —
+     height is exactly what makes the text bigger here. */
+  #mu-land{position:fixed;inset:0;z-index:80;background:#fff;overflow:hidden;
+    touch-action:none;-webkit-user-select:none;user-select:none}
+  .ml-stage{position:absolute;left:50%;top:50%;transform-origin:center center}
+  .ml-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden}
+  .ml-win img{display:block}
+  .ml-bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;
+    padding:8px 12px;background:rgba(60,11,42,.92);color:#fff;
+    transition:opacity .18s ease}
+  .ml-bar[data-off="1"]{opacity:0;pointer-events:none}
+  .ml-btn{flex:0 0 auto;font:inherit;font-size:calc(12px * var(--ts));font-weight:700;cursor:pointer;
+    padding:6px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.55);
+    background:transparent;color:#fff}
+  .ml-btn[disabled]{opacity:.4;cursor:default}
+  .ml-bm{display:grid;place-items:center;padding:6px 8px}
+  .ml-bm svg{width:18px;height:18px}
+  .ml-bm[data-set="1"]{background:#fff;color:var(--brand-700);border-color:#fff}
+  .ml-bm[data-set="1"] svg path{fill:currentColor}
+  .ml-where{flex:1;min-width:0;text-align:center;font-size:calc(12px * var(--ts));font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mu-img{display:block;width:100%;height:auto;
     transform-origin:center center;will-change:transform}
   .mu-err{margin:12px 14px 0;font-size:calc(12.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.6}
@@ -3148,8 +3176,9 @@
               </button>
             </div>
 
-            <div class="mu-savedbar" id="mu-savedbar" hidden>
-              <button class="mu-saved" id="mu-saved"></button>
+            <div class="mu-optrow">
+              <button class="mu-opt" id="mu-orient" data-i18n="mushaf.horizontal">Horizontal</button>
+              <button class="mu-saved" id="mu-saved" hidden></button>
             </div>
 
             <div class="mu-panel" id="mu-jump" hidden>
@@ -3796,6 +3825,28 @@
       </div>
     </aside>
   </div>
+
+<!-- The 13-line page is proportionally wider than a phone, so the short edge of
+     the screen sets its size whichever way the phone is held: turning it over
+     alone changes nothing. What does change it is showing half a page at a
+     time — six or seven lines filling the width of a sideways screen, about
+     half again as large. The stage is rotated in software when the phone is
+     upright, so this works with rotation lock on, which is how most people
+     read. -->
+<div id="mu-land" hidden>
+  <div class="ml-stage" id="ml-stage">
+    <div class="ml-win" id="ml-win"><img id="ml-img" alt=""></div>
+    <div class="ml-bar" id="ml-bar">
+      <button class="ml-btn" id="ml-exit" data-i18n="mushaf.vertical">Vertical</button>
+      <button class="ml-btn" id="ml-prev" data-i18n="mushaf.previous">Previous</button>
+      <span class="ml-where" id="ml-where">&hellip;</span>
+      <button class="ml-btn" id="ml-next" data-i18n="mushaf.next">Next</button>
+      <button class="ml-btn ml-bm" id="ml-bm" aria-label="Bookmark" data-i18n-attr="aria-label:a11y.bookmark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="home" data-on="1" role="tab">
@@ -6379,8 +6430,9 @@ async function openTranslation(){
 
    The pack is a licensed asset and is added deliberately; when it is absent
    the reader says so instead of showing an empty page. */
-const MUSHAF = { id:"indopak13", meta:null, state:null, page:1,
+const MUSHAF = { id:"indopak13", meta:null, state:null, page:1, half:0,
                  pages:new Map(), sur:[], juz:[] };
+const MU_ORIENT = "mushaf.orient";            // "v" upright, "h" sideways
 const MU_LAST_PAGE = "mushaf.lastPage";
 /* Separate from the last page read. The mushaf already reopens where you left
    off; a bookmark is a page you chose to keep — a daily wird, or where the
@@ -6546,10 +6598,11 @@ function renderMushafImage(n){
   }
 }
 
-async function showMushafPage(n){
+async function showMushafPage(n, half){
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, Math.round(+n) || 1));
   MUSHAF.page = n;
+  MUSHAF.half = half | 0;      // any jump lands at the top of the page unless told otherwise
   prefStore.set(MU_LAST_PAGE, n);
   document.getElementById('mu-prev').disabled = (n <= 1);
   document.getElementById('mu-next').disabled = (n >= total);
@@ -6563,6 +6616,7 @@ async function showMushafPage(n){
   if(jzNow && jSel.options.length) jSel.value = String(jzNow.page);
   updateMushafWhere();
   renderMushafBookmarks();
+  renderMushafLandscape();
   hideMushafToast();   // a note about the page you have just left is only clutter
   if(MUSHAF.meta.kind === "image"){ renderMushafImage(n); return; }
   try{
@@ -6659,7 +6713,7 @@ function renderMushafBookmarks(){
 
   wrap.hidden = !list.length;
   const hint = document.getElementById('mu-saved');
-  document.getElementById('mu-savedbar').hidden = !list.length;
+  hint.hidden = !list.length;
   if(list.length) hint.textContent = (list.length === 1
     ? t("mushaf.n_saved_page_tap_to_view",  "{n} saved page \u00b7 tap to view")
     : t("mushaf.n_saved_pages_tap_to_view", "{n} saved pages \u00b7 tap to view")
@@ -6723,6 +6777,7 @@ async function openMushaf(){
      check will not let one ship without them — but they are not printed under
      the page: the mushaf should have the screen to itself. */
   await showMushafPage(prefStore.get(MU_LAST_PAGE, 1));
+  if(prefStore.get(MU_ORIENT, "v") === "h") openMushafLandscape();
 }
 
 /* A mushaf turns right-to-left, so dragging the page to the right brings the
@@ -6736,6 +6791,163 @@ function initMushafFit(){
   if(typeof ResizeObserver === "function"){
     new ResizeObserver(() => fitMushafLines()).observe(host);
   }
+}
+
+/* ---- reading sideways ----
+
+   Turning the phone over cannot by itself make this mushaf bigger: the page is
+   1091 x 1499, proportionally wider than any phone screen, so the short edge of
+   the screen decides the size whichever way it is held — 0.36x either way, to
+   the pixel. Showing half a page is what makes it bigger. Six or seven lines
+   across a sideways screen come out about half again as large, which is the
+   whole reason this exists.
+
+   Each page is cut at a row the printing left blank between two lines, listed
+   in the pack because it differs page by page; both halves carry a little bleed
+   past that row so nothing is ever sliced. Eight ornamental pages have no gap to
+   cut and are shown whole. */
+
+function mushafSplit(n){
+  const sp = MUSHAF.meta && MUSHAF.meta.split;
+  if(!sp || !Array.isArray(sp.cut)) return null;
+  const cut = sp.cut[n - 1] | 0;
+  if(!cut) return null;                       // ornamental: no gap to cut through
+  const b = sp.bleed | 0;
+  return { top:[sp.top, cut + b], bottom:[cut - b, sp.bottom] };
+}
+
+function mushafLandscapeOpen(){
+  return !document.getElementById('mu-land').hidden;
+}
+
+function openMushafLandscape(){
+  prefStore.set(MU_ORIENT, "h");
+  document.getElementById('mu-land').hidden = false;
+  renderMushafLandscape();
+  showMushafLandscapeBar(7000);      // long enough to notice the way back out
+}
+
+function closeMushafLandscape(){
+  prefStore.set(MU_ORIENT, "v");
+  document.getElementById('mu-land').hidden = true;
+  MUSHAF.half = 0;
+}
+
+/* The stage is the screen with its two sides swapped and turned a quarter turn,
+   but only while the phone is upright — held sideways with rotation unlocked
+   the screen is already the right way round, and turning it again would put the
+   text on its ear. */
+function layoutMushafLandscape(){
+  const st = document.getElementById('ml-stage');
+  const win = document.getElementById('ml-win');
+  const img = document.getElementById('ml-img');
+  const m = MUSHAF.meta;
+  if(!st || !m) return;
+  const turn = innerHeight > innerWidth;
+  const W = turn ? innerHeight : innerWidth;
+  const H = turn ? innerWidth  : innerHeight;
+  st.style.width  = W + "px";
+  st.style.height = H + "px";
+  st.style.transform = `translate(-50%, -50%) rotate(${turn ? 90 : 0}deg)`;
+
+  const sp = mushafSplit(MUSHAF.page);
+  const band = !sp ? [0, m.height] : (MUSHAF.half === 1 ? sp.bottom : sp.top);
+  const bandH = band[1] - band[0];
+  const scale = Math.min(H / bandH, W / m.width);
+  win.style.width  = Math.round(m.width * scale) + "px";
+  win.style.height = Math.round(bandH * scale) + "px";
+  img.style.width  = Math.round(m.width * scale) + "px";
+  img.style.marginTop = Math.round(-band[0] * scale) + "px";
+}
+
+function renderMushafLandscape(){
+  if(!mushafLandscapeOpen()) return;
+  const img = document.getElementById('ml-img');
+  const url = mushafPageUrl(MUSHAF.page);
+  if(img.getAttribute('src') !== url) img.setAttribute('src', url);
+  if(!mushafSplit(MUSHAF.page)) MUSHAF.half = 0;      // shown whole, so there is only one
+  layoutMushafLandscape();
+  const where = document.getElementById('ml-where');
+  if(where) where.textContent = document.getElementById('mu-where-t').textContent;
+  const bm = document.getElementById('ml-bm');
+  if(bm) bm.dataset.set = mushafBookmarks().includes(MUSHAF.page) ? "1" : "0";
+  const first = MUSHAF.page <= 1 && MUSHAF.half === 0;
+  const last  = MUSHAF.page >= MUSHAF.meta.pages && (MUSHAF.half === 1 || !mushafSplit(MUSHAF.page));
+  document.getElementById('ml-prev').disabled = first;
+  document.getElementById('ml-next').disabled = last;
+}
+
+/* One step is half a page, and the halves run on into the next page, so reading
+   forward is one gesture repeated rather than two different ones. */
+function stepMushafLandscape(d){
+  let page = MUSHAF.page, half = MUSHAF.half;
+  const halves = n => mushafSplit(n) ? 2 : 1;
+  half += d;
+  if(half >= halves(page)){
+    if(page >= MUSHAF.meta.pages) return;
+    page++; half = 0;
+  }else if(half < 0){
+    if(page <= 1) return;
+    page--; half = halves(page) - 1;
+  }
+  if(page !== MUSHAF.page) showMushafPage(page, half);   // renders both views
+  else { MUSHAF.half = half; renderMushafLandscape(); }
+}
+
+/* The bar sits over the page rather than beside it, so it costs no height; it
+   shows itself when you arrive and whenever you tap, and gets out of the way
+   again while you read. */
+let ML_BAR_T = 0;
+function showMushafLandscapeBar(ms){
+  const bar = document.getElementById('ml-bar');
+  if(!bar) return;
+  bar.dataset.off = "0";
+  clearTimeout(ML_BAR_T);
+  ML_BAR_T = setTimeout(() => { bar.dataset.off = "1"; }, ms || 4000);
+}
+
+function initMushafLandscape(){
+  const el = document.getElementById('mu-land');
+  document.getElementById('mu-orient').addEventListener('click', openMushafLandscape);
+  document.getElementById('ml-exit').addEventListener('click', closeMushafLandscape);
+  const withBar = fn => () => { fn(); showMushafLandscapeBar(); };
+  document.getElementById('ml-prev').addEventListener('click', withBar(() => stepMushafLandscape(-1)));
+  document.getElementById('ml-next').addEventListener('click', withBar(() => stepMushafLandscape(1)));
+  document.getElementById('ml-bm').addEventListener('click', withBar(() => {
+    toggleMushafBookmark(); renderMushafLandscape();
+  }));
+  addEventListener('resize', () => { if(mushafLandscapeOpen()) layoutMushafLandscape(); });
+  addEventListener('orientationchange', () => {
+    if(mushafLandscapeOpen()) setTimeout(layoutMushafLandscape, 120);
+  });
+
+  /* A drag along the reader's own left-to-right, which is down the screen while
+     the stage is turned. Dragging the way the pages of a mushaf go — right, as
+     the reader sees it — brings the next half. */
+  let x0 = 0, y0 = 0, live = false;
+  el.addEventListener('touchstart', e => {
+    if(e.touches.length !== 1){ live = false; return; }
+    live = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, {passive:true});
+  el.addEventListener('touchend', e => {
+    if(!live) return;
+    live = false;
+    const t = e.changedTouches[0];
+    if(!t) return;
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    const turned = innerHeight > innerWidth;
+    const along = turned ? dy : dx;             // the reader's own horizontal
+    const across = turned ? dx : dy;
+    if(Math.abs(along) >= 48 && Math.abs(along) > Math.abs(across)){
+      stepMushafLandscape(along > 0 ? 1 : -1);
+      return;
+    }
+    if(Math.abs(dx) < 12 && Math.abs(dy) < 12 && !t.target.closest('.ml-bar')){
+      const bar = document.getElementById('ml-bar');
+      if(bar.dataset.off === "1") showMushafLandscapeBar();
+      else { clearTimeout(ML_BAR_T); bar.dataset.off = "1"; }
+    }
+  }, {passive:true});
 }
 
 /* ---- gestures on the page ----
@@ -6910,6 +7122,9 @@ function openQuran(){
   quranView("modes");
 }
 function closeQuran(){
+  /* Hidden, not switched back: whether they read sideways is their setting, and
+     closing the Qur'an is not them changing their mind about it. */
+  document.getElementById('mu-land').hidden = true;
   document.getElementById('quran').dataset.open="0";
   document.body.style.overflow="";
 }
@@ -6939,6 +7154,7 @@ function initQuranDemo(){
   document.getElementById('mu-bm').addEventListener('click',toggleMushafBookmark);
 
   initMushafGestures();
+  initMushafLandscape();
   document.getElementById('mu-page').addEventListener('pointerdown',()=>{
     hideMushafToast();
     const j=document.getElementById('mu-jump');
@@ -6951,7 +7167,8 @@ function initQuranDemo(){
   document.addEventListener('keydown',e=>{
     if(e.key!=="Escape" || document.getElementById('quran').dataset.open!=="1") return;
     // step back a pane at a time, so Escape doesn't lose your place outright
-    if(QURAN_VIEW === "modes") closeQuran();
+    if(mushafLandscapeOpen()) closeMushafLandscape();
+    else if(QURAN_VIEW === "modes") closeQuran();
     else quranBack();
   });
 }

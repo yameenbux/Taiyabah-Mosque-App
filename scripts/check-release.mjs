@@ -436,8 +436,41 @@ for (const f of ["index.html", "admin.html"]) {
             bad.push(`juz ${juz} starts at page ${jp[juz]} but sūrah ${surah}, which opens it, is mapped to ${sp[surah]}`);
         }
       }
+
+      /* Reading sideways shows half a page at a time, cut at a row the printing
+         left blank between two lines. A cut in the wrong place slices a line of
+         the Qur'an in half, so the table's shape is checked here: one entry per
+         page, each either 0 (shown whole) or a row well inside the printed
+         area, and the halves it makes must overlap rather than leave a gap. */
+      const sl = meta.split;
+      if (!sl) bad.push("the mushaf pack carries no split table, so reading sideways has nowhere to cut");
+      else {
+        const { top, bottom, bleed, cut } = sl;
+        if (!Array.isArray(cut) || cut.length !== meta.pages)
+          bad.push(`the split table has ${Array.isArray(cut) ? cut.length : "no"} entries for ${meta.pages} pages`);
+        else {
+          const lo = top + 200, hi = bottom - 200;      // a cut outside this is not a middle
+          const off = cut.filter(c => c !== 0 && !(c >= lo && c <= hi)).length;
+          if (off) bad.push(`${off} page(s) are cut outside rows ${lo}-${hi}, which would not be a half`);
+          if (!(bleed > 0))
+            bad.push("the split carries no bleed, so a mark crossing the cut would be sliced by both halves");
+          if (!(top >= 0 && bottom > top && bottom <= meta.height))
+            bad.push(`the split's ink bounds ${top}-${bottom} do not sit inside the page's ${meta.height} rows`);
+          const whole = cut.filter(c => c === 0).length;
+          if (whole > meta.pages / 20)
+            bad.push(`${whole} pages have no cut — that is too many to be ornamental openings alone`);
+        }
+      }
     }
   }
+
+  /* Sideways is only worth having because it shows less of the page, larger. If
+     the halves stop being used the feature quietly becomes a worse portrait, so
+     the two pieces that make it bigger are checked for directly. */
+  if (!/function mushafSplit\(/.test(app) || !/MUSHAF\.half/.test(app))
+    bad.push("the sideways reader no longer splits the page, so it would show the whole page smaller than portrait does");
+  if (!/rotate\(\$\{turn \? 90 : 0\}deg\)/.test(app))
+    bad.push("the sideways reader no longer turns the page in software, so it would do nothing for a phone with rotation lock on");
 
   if (bad.length) bad.forEach(fail);
   else ok("13-line mushaf — refuses to render a pack that names no source and licence, and says so rather than showing a blank page");

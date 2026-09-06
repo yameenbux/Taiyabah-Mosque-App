@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "9fc72246eeab",
+ "version": "35d7916f0f85",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -1573,6 +1573,8 @@ window.LANG_PACK = {
   "mushaf.removed_from_your_saved": "محفوظ صفحات سے ہٹا دیا گیا",
   "mushaf.n_saved_page_tap_to_view": "{n} محفوظ صفحہ · دیکھنے کے لیے دبائیں",
   "mushaf.n_saved_pages_tap_to_view": "{n} محفوظ صفحات · دیکھنے کے لیے دبائیں",
+  "mushaf.horizontal": "افقی",
+  "mushaf.vertical": "عمودی",
   "sysprefs.text_size": "عبارت کا سائز",
   "sysprefs.pick_the_size_that_reads": "وہ سائز چنیں جو سب سے آسانی سے پڑھا جائے۔ یہ پوری ایپ پر لاگو ہوگا۔",
   "sysprefs.the_quick_brown_sample": "بِسْمِ اللہ — ایپ اس طرح پڑھی جائے گی۔",

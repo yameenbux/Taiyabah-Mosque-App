@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "2324da9fc504",
+ "version": "a6801533da06",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -1573,6 +1573,8 @@ window.LANG_PACK = {
   "mushaf.removed_from_your_saved": "أُزيلت من صفحاتك المحفوظة",
   "mushaf.n_saved_page_tap_to_view": "{n} صفحة محفوظة · اضغط للعرض",
   "mushaf.n_saved_pages_tap_to_view": "{n} صفحات محفوظة · اضغط للعرض",
+  "mushaf.horizontal": "أفقي",
+  "mushaf.vertical": "عمودي",
   "sysprefs.text_size": "حجم النص",
   "sysprefs.pick_the_size_that_reads": "اختر الحجم الأسهل في القراءة. يُطبَّق على التطبيق كلّه.",
   "sysprefs.the_quick_brown_sample": "بِسْمِ الله — هكذا سيبدو التطبيق.",
