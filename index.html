@@ -6430,7 +6430,7 @@ async function openTranslation(){
 
    The pack is a licensed asset and is added deliberately; when it is absent
    the reader says so instead of showing an empty page. */
-const MUSHAF = { id:"indopak13", meta:null, state:null, page:1, half:0,
+const MUSHAF = { id:"indopak13", meta:null, state:null, page:1, band:0,
                  pages:new Map(), sur:[], juz:[] };
 const MU_ORIENT = "mushaf.orient";            // "v" upright, "h" sideways
 const MU_LAST_PAGE = "mushaf.lastPage";
@@ -6598,11 +6598,11 @@ function renderMushafImage(n){
   }
 }
 
-async function showMushafPage(n, half){
+async function showMushafPage(n, band){
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, Math.round(+n) || 1));
   MUSHAF.page = n;
-  MUSHAF.half = half | 0;      // any jump lands at the top of the page unless told otherwise
+  MUSHAF.band = band | 0;      // any jump lands at the top of the page unless told otherwise
   prefStore.set(MU_LAST_PAGE, n);
   document.getElementById('mu-prev').disabled = (n <= 1);
   document.getElementById('mu-next').disabled = (n >= total);
@@ -6807,13 +6807,48 @@ function initMushafFit(){
    past that row so nothing is ever sliced. Eight ornamental pages have no gap to
    cut and are shown whole. */
 
-function mushafSplit(n){
-  const sp = MUSHAF.meta && MUSHAF.meta.split;
-  if(!sp || !Array.isArray(sp.cut)) return null;
-  const cut = sp.cut[n - 1] | 0;
-  if(!cut) return null;                       // ornamental: no gap to cut through
-  const b = sp.bleed | 0;
-  return { top:[sp.top, cut + b], bottom:[cut - b, sp.bottom] };
+/* The window cut out of the page is exactly the shape of the screen, so it
+   fills it corner to corner with no bands of white anywhere. Its width is the
+   printed frame — everything outside that is margin — and its height follows
+   from the screen's proportions, which is what decides how many lines fit: four
+   or five on a phone. Each window starts on a row the printing left blank, so
+   it opens on a whole line; the line it ends part-way through is the first
+   whole line of the next one. */
+function mushafWindows(n){
+  const g = MUSHAF.meta && MUSHAF.meta.geometry;
+  const row = g && Array.isArray(g.page) && g.page[n - 1];
+  if(!row) return null;                       // a page with no lines to divide
+  const st = document.getElementById('ml-stage');
+  const W = parseFloat(st.style.width), H = parseFloat(st.style.height);
+  if(!(W > 0 && H > 0)) return null;
+  const top = row[0], bottom = row[1], gaps = row.slice(2);
+  const winW = Math.min(MUSHAF.meta.width, g.right - g.left + 1);
+  const winH = Math.round(winW * H / W);
+  if(winH >= bottom - top) return null;       // the whole page already fits the screen
+  /* A window may not hang off the picture, or there would be white below it —
+     which is the whole thing this is meant to avoid. */
+  const maxTop = Math.max(0, MUSHAF.meta.height - winH);
+  const tops = [];
+  let start = Math.min(top, maxTop);
+  for(let guard = 0; guard < 40; guard++){
+    tops.push(start);
+    if(start + winH >= bottom) break;
+    /* the next window opens at the last blank row this one reaches, so nothing
+       is skipped and every window starts on a whole line */
+    let next = 0;
+    for(const r of gaps) if(r > start && r <= start + winH) next = r;
+    if(!next || next <= start) next = start + winH;   // nothing blank to land on: step anyway
+    if(next > maxTop){
+      /* the last one: as low as the picture allows while still reaching the
+         final line, and still starting on a blank row */
+      let last = 0;
+      for(const r of gaps) if(r >= bottom - winH && r <= maxTop) last = r;
+      tops.push(last || Math.min(Math.max(0, bottom - winH), maxTop));
+      break;
+    }
+    start = next;
+  }
+  return { x: Math.round((MUSHAF.meta.width - winW) / 2), w: winW, h: winH, tops };
 }
 
 function mushafLandscapeOpen(){
@@ -6830,7 +6865,7 @@ function openMushafLandscape(){
 function closeMushafLandscape(){
   prefStore.set(MU_ORIENT, "v");
   document.getElementById('mu-land').hidden = true;
-  MUSHAF.half = 0;
+  MUSHAF.band = 0;
 }
 
 /* The stage is the screen with its two sides swapped and turned a quarter turn,
@@ -6850,14 +6885,26 @@ function layoutMushafLandscape(){
   st.style.height = H + "px";
   st.style.transform = `translate(-50%, -50%) rotate(${turn ? 90 : 0}deg)`;
 
-  const sp = mushafSplit(MUSHAF.page);
-  const band = !sp ? [0, m.height] : (MUSHAF.half === 1 ? sp.bottom : sp.top);
-  const bandH = band[1] - band[0];
-  const scale = Math.min(H / bandH, W / m.width);
-  win.style.width  = Math.round(m.width * scale) + "px";
-  win.style.height = Math.round(bandH * scale) + "px";
+  const wins = mushafWindows(MUSHAF.page);
+  if(!wins){
+    /* nothing to divide — a page that is one picture. It is shown whole, which
+       the screen's shape leaves smaller than upright; there is no honest way
+       around that on a page with no lines to cut between. */
+    const scale = Math.min(H / m.height, W / m.width);
+    win.style.width  = Math.round(m.width  * scale) + "px";
+    win.style.height = Math.round(m.height * scale) + "px";
+    img.style.width  = Math.round(m.width  * scale) + "px";
+    img.style.marginLeft = "0px";
+    img.style.marginTop  = "0px";
+    return;
+  }
+  MUSHAF.band = Math.min(MUSHAF.band, wins.tops.length - 1);
+  const scale = W / wins.w;               // the same as H / wins.h, by construction
+  win.style.width  = W + "px";
+  win.style.height = H + "px";
   img.style.width  = Math.round(m.width * scale) + "px";
-  img.style.marginTop = Math.round(-band[0] * scale) + "px";
+  img.style.marginLeft = Math.round(-wins.x * scale) + "px";
+  img.style.marginTop  = Math.round(-wins.tops[MUSHAF.band] * scale) + "px";
 }
 
 function renderMushafLandscape(){
@@ -6865,33 +6912,35 @@ function renderMushafLandscape(){
   const img = document.getElementById('ml-img');
   const url = mushafPageUrl(MUSHAF.page);
   if(img.getAttribute('src') !== url) img.setAttribute('src', url);
-  if(!mushafSplit(MUSHAF.page)) MUSHAF.half = 0;      // shown whole, so there is only one
   layoutMushafLandscape();
   const where = document.getElementById('ml-where');
   if(where) where.textContent = document.getElementById('mu-where-t').textContent;
   const bm = document.getElementById('ml-bm');
   if(bm) bm.dataset.set = mushafBookmarks().includes(MUSHAF.page) ? "1" : "0";
-  const first = MUSHAF.page <= 1 && MUSHAF.half === 0;
-  const last  = MUSHAF.page >= MUSHAF.meta.pages && (MUSHAF.half === 1 || !mushafSplit(MUSHAF.page));
+  const first = MUSHAF.page <= 1 && MUSHAF.band === 0;
+  const last  = MUSHAF.page >= MUSHAF.meta.pages && MUSHAF.band >= mushafBandCount(MUSHAF.page) - 1;
   document.getElementById('ml-prev').disabled = first;
   document.getElementById('ml-next').disabled = last;
 }
 
 /* One step is half a page, and the halves run on into the next page, so reading
    forward is one gesture repeated rather than two different ones. */
+function mushafBandCount(n){
+  const w = mushafWindows(n);
+  return w ? w.tops.length : 1;
+}
+
 function stepMushafLandscape(d){
-  let page = MUSHAF.page, half = MUSHAF.half;
-  const halves = n => mushafSplit(n) ? 2 : 1;
-  half += d;
-  if(half >= halves(page)){
+  let page = MUSHAF.page, band = MUSHAF.band + d;
+  if(band >= mushafBandCount(page)){
     if(page >= MUSHAF.meta.pages) return;
-    page++; half = 0;
-  }else if(half < 0){
+    page++; band = 0;
+  }else if(band < 0){
     if(page <= 1) return;
-    page--; half = halves(page) - 1;
+    page--; band = mushafBandCount(page) - 1;
   }
-  if(page !== MUSHAF.page) showMushafPage(page, half);   // renders both views
-  else { MUSHAF.half = half; renderMushafLandscape(); }
+  if(page !== MUSHAF.page) showMushafPage(page, band);   // renders both views
+  else { MUSHAF.band = band; renderMushafLandscape(); }
 }
 
 /* The bar sits over the page rather than beside it, so it costs no height; it
