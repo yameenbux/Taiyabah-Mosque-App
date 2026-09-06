@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "f46cca2211ab",
+ "version": "0eb7bb3cf99d",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -1573,6 +1573,8 @@ window.LANG_PACK = {
   "mushaf.removed_from_your_saved": "સાચવેલાં પાનાંમાંથી કાઢી નાખ્યું",
   "mushaf.n_saved_page_tap_to_view": "{n} સાચવેલું પાનું · જોવા માટે દબાવો",
   "mushaf.n_saved_pages_tap_to_view": "{n} સાચવેલાં પાનાં · જોવા માટે દબાવો",
+  "mushaf.horizontal": "આડું",
+  "mushaf.vertical": "ઊભું",
   "sysprefs.text_size": "લખાણનું કદ",
   "sysprefs.pick_the_size_that_reads": "જે કદ સૌથી સહેલાઈથી વંચાય તે પસંદ કરો. તે આખી ઍપમાં લાગુ થશે.",
   "sysprefs.the_quick_brown_sample": "બિસ્મિલ્લાહ — ઍપ આ રીતે વંચાશે.",
