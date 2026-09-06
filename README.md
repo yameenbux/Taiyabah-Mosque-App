@@ -25,6 +25,15 @@ Progressive web app: no app store, no install friction, one URL.
 
 ## Features
 
+**Home**
+- The app opens on a home screen rather than the timetable: the next jamāʿah
+  and its countdown, today's five prayers, the day's reminder, a link to the
+  broadcast, and a grid of the services people actually come looking for
+- Four tabs — Home, Prayer Times, Notices and More. "More" opens the full menu
+  in place rather than navigating away from where you are
+- Notices is a real tab, deliberately showing a "coming soon" state until the
+  Supabase side of it exists
+
 **Prayer times**
 - Beginning and jamāʿah times for all five prayers, from the masjid's own
   published timetable — never calculated, never sourced elsewhere
@@ -54,10 +63,16 @@ Progressive web app: no app store, no install friction, one URL.
   self-serviceable rather than a support conversation
 
 **Recite**
-- **Qur'an** — the complete Mus-haf in IndoPak script: 114 sūrahs, 6,236 āyāt,
-  with the official tajweed colour legend. Split by sūrah and fetched only when
-  opened, then cached, so a sūrah read once can be read again in the masjid
-  basement with no bars
+- **Qur'an** — two ways to read, chosen on opening:
+  - **English Translation** — the complete Mus-haf in IndoPak script: 114
+    sūrahs, 6,236 āyāt, with the official tajweed colour legend. Split by sūrah
+    and fetched only when opened, then cached, so a sūrah read once can be read
+    again in the masjid basement with no bars
+  - **13-Line Qur'an** — the familiar Indo-Pak page for ḥifẓ, all 848 of them.
+    Jump by sūrah, juz or page number; it remembers where you were. Pages are
+    lossless grayscale WebP at about 78 KB each, fetched one at a time with the
+    neighbours prefetched, so turning a page is instant and the app carries
+    none of it until asked
 - **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
   before sleep, each sourced and cited
 - **Common Duas** — everyday supplications in a tile grid, each opening in place
@@ -118,13 +133,22 @@ Progressive web app: no app store, no install friction, one URL.
 - **Education** — Arabic classes and the Ghusl workshop, for adults
 - **Imams' Advice** — appointments through the office
 
+**Membership**
+- In the More menu: what membership is and when this year's fee falls due.
+  Not yet wired to the committee's members list, so it cannot yet tell an
+  individual whether *they* have paid
+
 **Community information**
 - Masjid history — established 1967, founders, the ulema who have led imaamat
 - Contact details and directions
 
 **Settings**
+- **Text size** — four steps, from the original size up to 42% larger, with a
+  live sample. The default is 12% larger than the app shipped with, because the
+  community said it made them squint. One variable scales every font size in
+  the app, so nothing is left behind
 - **Language** — English, Urdu, Gujarati and Arabic. Every word, number and
-  date: 1,490 strings per language, digits in the reader's own numerals
+  date: 1,555 strings per language, digits in the reader's own numerals
   (۰۱۲ / ٠١٢ / ૦૧૨), calendars mirrored right-to-left, and identifiers such as
   postcodes and phone numbers deliberately left in Latin so they still work.
   Packs download on demand, cache offline, and switch the interface instantly
@@ -151,11 +175,11 @@ verbatim. Anything committed here is reachable by URL.
 │                                 so no local tooling is ever required.
 │
 ├── scripts/                     Build and verification. Node, no dependencies.
-│   ├── check-release.mjs         29 checks — the release gate. See below.
+│   ├── check-release.mjs         30 checks — the release gate. See below.
 │   ├── check-i18n.mjs            Measures translation coverage against the app.
 │   ├── i18n-keys.mjs             Extracts every translatable string there is.
 │   ├── build-lang.mjs            lang/src/*.json  →  lang/{ur,gu,ar}.js
-│   ├── fetch-quran.mjs           Builds quran/surah/ from the source text.
+│   ├── fetch-quran.mjs           Builds quran/surahs/ from the source text.
 │   └── verify-rabbanas.mjs       Checks the 40 Rabbanā against the Qur'an.
 │
 ├── push/onesignal/              OneSignal's own service workers, kept on a
@@ -176,7 +200,11 @@ verbatim. Anything committed here is reachable by URL.
 │   └── ur.js  gu.js  ar.js       Generated. Never edit these by hand.
 │
 ├── quran/                       Qur'anic content — lazy-loaded, so the main
-│   ├── surah/001.js … 114.js     app never pays for carrying it.
+│   ├── surahs/index.json          app never pays for carrying it.
+│   │   └── 1.json … 114.json
+│   ├── mushaf/indopak13/         The 13-line mushaf: 848 page images and an
+│   │   ├── index.json             index carrying its source, licence, and the
+│   │   └── p/1.webp … 848.webp    page each sūrah and juz begins on.
 │   ├── athkar.js  duas.js
 │   └── rabbanas.js
 │
@@ -197,14 +225,14 @@ congregation. It is not a linter. Each check exists because something went
 wrong once, and each is written so that removing the behaviour it guards makes
 the build fail.
 
-There are **29**. Among them:
+There are **30**. Among them:
 
 | Check | What it caught |
 |---|---|
 | Qur'an complete | 114 sūrahs and 6,236 āyāt, every count against the canonical table |
 | 40 Rabbanā | each duʿā matched against the Qur'an text, not trusted as transcribed |
-| Translations | 1,490 strings in all three languages, nothing missing and nothing spare |
-| Latin identifiers | 22 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
+| Translations | 1,555 strings in all three languages, nothing missing and nothing spare |
+| Latin identifiers | 23 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
 | Arabic marks | scripture on a font stack that actually has glyphs for the marks it ships |
 | CSS variables | every custom property used is defined — an undefined one silently drops the whole declaration |
 | Duplicate selectors | a second copy of a rule quietly overriding the first, which is how the 40 Rabbanā lost their padding |
@@ -212,6 +240,7 @@ There are **29**. Among them:
 | Update path | five behaviours that together let a new build and new words reach an installed phone without a reinstall |
 | Holiday planner | the prose ("180 teaching days, 36 weeks") re-derived from the closure dates beside it |
 | Nikāḥ requests | the form is shown only when the server confirms it can receive one, fails closed, and is never a dead end when closed |
+| 13-line mushaf | a page pack that names no source and licence is treated as not installed, and the sūrah mapping is held to 114 entries in order, cross-checked against the juz table |
 | Everything parses | index.html, admin.html, sw.js and the Worker |
 
 Run it locally with `node scripts/check-release.mjs`. It needs no dependencies.
@@ -367,7 +396,7 @@ No build step, no framework, no dependencies for the app itself — edit
 Before pushing anything user-visible:
 
 ```
-node scripts/check-release.mjs    # the release gate — 29 checks
+node scripts/check-release.mjs    # the release gate — 30 checks
 node scripts/check-i18n.mjs       # translation coverage
 ```
 
@@ -389,9 +418,24 @@ the content, not applied uniformly.
 
 ## Roadmap
 
-- **App store release** — requires wrapping the PWA, an Apple Developer
-  Organization account under BCIS, and Google Play's mandatory
-  12-tester / 14-day period.
+- **App store release** — more than wrapping the PWA. In rough order of how
+  long each takes to clear:
+  - A **D-U-N-S number** for the charity, needed before an Apple Developer
+    Organization account can even be opened. This is usually what delays a
+    launch, not the code, so it should start first.
+  - **Apple's nonprofit approval.** Their rules say an app that is not an
+    approved nonprofit may not collect charitable funds in-app at all — it must
+    be free and send people out to the browser. Approval also requires offering
+    Apple Pay. The Stripe links already open externally, which is the right
+    shape, but a wrapped app must hand off to the system browser rather than an
+    in-app web view.
+  - **Evidence of rights to third-party content.** Both stores can ask. That
+    covers the 13-line mushaf and anything obtained from a streaming provider.
+  - **Push rebuilt on the native SDKs.** The OneSignal *web* SDK does not work
+    inside a wrapper; the reminder logic survives, the plumbing under it does not.
+  - **Background audio declared natively** — an audio background mode on iOS, a
+    foreground service on Android.
+  - Google Play's mandatory 12-tester / 14-day period.
 - **Nikāḥ requests and course registration** — built, and waiting on two
   database migrations in the website repository. See *Shared data with the
   website* above. Both need ICO registration, a documented lawful basis, a
@@ -399,6 +443,13 @@ the content, not applied uniformly.
 - **Madrasah applications** — the form lives on the website and stays
   unreachable until the DPIA is done. The app publishes the fees, rules and
   term dates, and says applications open soon rather than implying a form.
+- **Live audio archive** — the masjid broadcasts through eMasjid Live, which
+  also keeps past recordings; the app's player streams live audio only. Playing
+  either inside our own app needs their agreement, since the stream and the
+  archive sit on their infrastructure. Asked and awaiting an answer. What we
+  need from them: a direct HTTPS stream URL, a feed listing the masjid's
+  recordings with playable HTTPS links, and permission in writing — the last
+  because the app stores can ask us to evidence it.
 - **Hall hire prices** — the member and non-member figures shown are the
   website's placeholders and still need the committee's sign-off. The screen
   says so.
@@ -415,8 +466,8 @@ the content, not applied uniformly.
   The 40 Rabbanā no longer need it: every one is now checked against the Qur'an
   text on each build.
 - **Source attributions** — the citation line under each duʿā
-  (`ṢAḤĪḤ AL-BUKHĀRĪ`) is gold at 10.5px and measures 3.38:1 against its card,
-  below the 4.5:1 floor. The Arabic above it was fixed; this was left because
+  (`ṢAḤĪḤ AL-BUKHĀRĪ`) is gold and measures 3.38:1 against its card, below the
+  4.5:1 floor. A larger text size does not fix it; the ratio is the colour. The Arabic above it was fixed; this was left because
   it was not what people reported.
 - **Vector logo** — current assets are upscaled from a small source image.
 - **Housekeeping** — `files.zip` at the repository root is a stale copy of
@@ -425,6 +476,14 @@ the content, not applied uniformly.
 
 ### Done since the first release
 
+- A home screen: the app opens on the next jamāʿah and the day's times rather
+  than the timetable browser, with four tabs and the services as a grid
+- The **13-line Indo-Pak mushaf** — all 848 pages, navigable by sūrah, juz or
+  page. The sūrah mapping was read off the printed page headers one page at a
+  time, because six attempts to derive it from the scans were not reliable
+  enough to trust; it is cross-checked against the juz table on every build
+- **Adjustable text size**, and a larger default, after feedback that the app
+  made people squint
 - The complete Qur'an, replacing the single-sūrah demo
 - Full translation into Urdu, Gujarati and Arabic — every string, number and
   date, not only navigation — with the imam's approval confirmed
