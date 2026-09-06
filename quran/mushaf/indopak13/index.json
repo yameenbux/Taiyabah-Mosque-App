@@ -159,9 +159,9 @@
   "114": 848
  },
  "geometry": {
-  "note": "Geometry for reading sideways, measured off the pages themselves. left/right are the printed frame's vertical rules; each page entry is [frameTop, frameBottom, ...rows the printing left blank between one line and the next], and null means a page with no lines to divide, shown whole.",
-  "left": 89,
-  "right": 997,
+  "note": "Geometry for reading sideways, measured off the pages themselves. left and right bound the block of writing — outside them is the printed frame and its margin, which a sideways window crops so the lines reach both edges of the screen. Each page entry is [frameTop, frameBottom, ...rows the printing left blank between one line and the next], and null means a page with no lines to divide, shown whole.",
+  "left": 113,
+  "right": 972,
   "page": [
    null,
    null,

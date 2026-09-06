@@ -6808,12 +6808,13 @@ function initMushafFit(){
    cut and are shown whole. */
 
 /* The window cut out of the page is exactly the shape of the screen, so it
-   fills it corner to corner with no bands of white anywhere. Its width is the
-   printed frame — everything outside that is margin — and its height follows
-   from the screen's proportions, which is what decides how many lines fit: four
-   or five on a phone. Each window starts on a row the printing left blank, so
-   it opens on a whole line; the line it ends part-way through is the first
-   whole line of the next one. */
+   fills it corner to corner with no white anywhere. Its width is the block of
+   writing itself — the printed frame and the paper margin around it are cropped
+   away, so the lines run to both edges — and its height follows from the
+   screen's proportions, which is what decides how many lines fit: four on a
+   phone. Each window starts on a row the printing left blank, so it opens on a
+   whole line; the line it ends part-way through is the first whole line of the
+   next one. */
 function mushafWindows(n){
   const g = MUSHAF.meta && MUSHAF.meta.geometry;
   const row = g && Array.isArray(g.page) && g.page[n - 1];
@@ -6823,32 +6824,48 @@ function mushafWindows(n){
   if(!(W > 0 && H > 0)) return null;
   const top = row[0], bottom = row[1], gaps = row.slice(2);
   const winW = Math.min(MUSHAF.meta.width, g.right - g.left + 1);
+  const winX = Math.max(0, Math.min(g.left, MUSHAF.meta.width - winW));
   const winH = Math.round(winW * H / W);
   if(winH >= bottom - top) return null;       // the whole page already fits the screen
   /* A window may not hang off the picture, or there would be white below it —
      which is the whole thing this is meant to avoid. */
   const maxTop = Math.max(0, MUSHAF.meta.height - winH);
+  const contentH = bottom - top;
+  const count = Math.max(1, Math.ceil(contentH / winH));
+  const step = count > 1 ? (contentH - winH) / (count - 1) : 0;
+
+  /* Spread evenly and then let each one settle on the nearest blank row, rather
+     than stepping a full window at a time and leaving the last one on top of
+     the one before it. Every window opens on a whole line, each shows about
+     three new ones, and the last ends on the last line of the page. */
+  /* Where the last line's foot is: the printing's own bottom rule sits lower
+     than the writing, and aiming the last window at the rule rather than the
+     line pushes it down for nothing. */
+  const pitch = gaps.length > 1 ? (gaps[gaps.length - 1] - gaps[0]) / (gaps.length - 1) : winH;
+  const foot = Math.min(bottom, Math.round(gaps[gaps.length - 1] + pitch));
+
   const tops = [];
-  let start = Math.min(top, maxTop);
-  for(let guard = 0; guard < 40; guard++){
-    tops.push(start);
-    if(start + winH >= bottom) break;
-    /* the next window opens at the last blank row this one reaches, so nothing
-       is skipped and every window starts on a whole line */
-    let next = 0;
-    for(const r of gaps) if(r > start && r <= start + winH) next = r;
-    if(!next || next <= start) next = start + winH;   // nothing blank to land on: step anyway
-    if(next > maxTop){
-      /* the last one: as low as the picture allows while still reaching the
-         final line, and still starting on a blank row */
-      let last = 0;
-      for(const r of gaps) if(r >= bottom - winH && r <= maxTop) last = r;
-      tops.push(last || Math.min(Math.max(0, bottom - winH), maxTop));
-      break;
+  let prev = -1e9;
+  for(let i = 0; i < count; i++){
+    const ideal = Math.min(top + Math.round(step * i), maxTop);
+    if(i === 0){ tops.push(Math.min(top, maxTop)); prev = tops[0]; continue; }
+    const lowest = (i === count - 1) ? foot - winH : -1e9;   // the last one has to reach the last line
+    const highest = Math.min(maxTop, prev + winH);           // and none of them may skip what came before
+    let pick = null, dist = Infinity;
+    for(const r of gaps){
+      if(r < lowest || r > highest || r <= prev) continue;
+      const d = Math.abs(r - ideal);
+      if(d < dist){ dist = d; pick = r; }
     }
-    start = next;
+    /* No blank row in range only happens where the printing leaves none — then
+       the window starts part-way down a line, which is the line the window
+       before it has already shown whole. Losing the foot of the last line
+       would be the worse of the two. */
+    if(pick === null) pick = Math.max(0, Math.min(highest, Math.max(lowest, ideal)));
+    if(pick > prev){ tops.push(pick); prev = pick; }
   }
-  return { x: Math.round((MUSHAF.meta.width - winW) / 2), w: winW, h: winH, tops };
+
+  return { x: winX, w: winW, h: winH, tops };
 }
 
 function mushafLandscapeOpen(){

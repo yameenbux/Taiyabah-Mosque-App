@@ -477,6 +477,8 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push("the sideways reader no longer cuts a window out of the page, so it would show the whole page smaller than upright does");
   if (!/win\.style\.width\s*=\s*W \+ "px";\s*\n\s*win\.style\.height\s*=\s*H \+ "px";/.test(app))
     bad.push("the sideways window is no longer the size of the screen, so the page would sit in bands of white again");
+  if (!/const winX = Math\.max\(0, Math\.min\(g\.left/.test(app))
+    bad.push("the sideways window no longer crops to the block of writing, so the printed margin would show as white down both sides");
   if (!/rotate\(\$\{turn \? 90 : 0\}deg\)/.test(app))
     bad.push("the sideways reader no longer turns the page in software, so it would do nothing for a phone with rotation lock on");
 
