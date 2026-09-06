@@ -1219,7 +1219,8 @@
      under it is the page's own proportions, not wasted space. */
   .mu-page.mu-scan{margin:0;padding:0;overflow:hidden;background:#fff;
     border:0;border-inline:0;border-radius:0;box-shadow:none}
-  .mu-img{display:block;width:100%;height:auto}
+  .mu-img{display:block;width:100%;height:auto;
+    transform-origin:center center;will-change:transform}
   .mu-err{margin:12px 14px 0;font-size:calc(12.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.6}
 
   /* ---- qibla ---- */
@@ -6490,6 +6491,7 @@ function renderMushafImage(n){
   };
   img.alt = t("mushaf.page","Page") + " " + num(n);
   img.src = mushafPageUrl(n);
+  muResetZoom();                       // a new page starts at fit, not where the last one was left
   for(const m of [n + 1, n - 1]){
     if(m >= 1 && m <= MUSHAF.meta.pages){ const pre = new Image(); pre.src = mushafPageUrl(m); }
   }
@@ -6607,20 +6609,142 @@ function initMushafFit(){
   }
 }
 
-function initMushafSwipe(){
+/* ---- gestures on the page ----
+
+   The page can only be as wide as the screen, so the way to read it larger is
+   to magnify it. Pinch, drag to move around, double-tap to go in and back out.
+
+   All three live in one place because they compete for the same touches: a
+   one-finger drag turns the page at fit and moves the page once magnified, and
+   a second finger always means zoom. Turning the page is deliberately
+   unavailable while magnified — a drag there is a pan, and a swipe that
+   sometimes turned and sometimes panned would be worse than one that never
+   does. Double-tap gets you back. */
+const MU_ZOOM = { scale:1, x:0, y:0, min:1, max:4 };
+
+function muApplyZoom(){
+  const img = document.querySelector('#mu-page img.mu-img');
+  const host = document.getElementById('mu-page');
+  if(!img) return;
+  const z = MU_ZOOM;
+  const zoomed = z.scale > 1.01;
+
+  /* At fit the window is the page's own height and the space beneath it is
+     just the page's proportions. Magnified there is more to look at than the
+     window shows, so it grows to whatever the sheet has left — measured rather
+     than guessed at, since the header and bar differ with the text size. */
+  const body = document.querySelector('#quran .sh-body');
+  if(zoomed && body){
+    const avail = body.getBoundingClientRect().bottom - host.getBoundingClientRect().top;
+    host.style.height = Math.max(240, Math.round(avail)) + "px";
+  }else{
+    host.style.height = "";
+  }
+
+  /* Never let the page be dragged away from under the reader. The limit is
+     the scaled page against the window, so panning stops at the page's own
+     edge rather than carrying on into white. */
+  const winW = host.clientWidth || img.clientWidth;
+  const winH = host.clientHeight || img.clientHeight;
+  const maxX = Math.max(0, (img.clientWidth  * z.scale - winW) / 2);
+  const maxY = Math.max(0, (img.clientHeight * z.scale - winH) / 2);
+  z.x = Math.min(maxX, Math.max(-maxX, z.x));
+  z.y = Math.min(maxY, Math.max(-maxY, z.y));
+  img.style.transform = `translate(${z.x}px, ${z.y}px) scale(${z.scale})`;
+  /* at fit the sheet keeps its own scrolling; magnified, every touch is ours */
+  host.style.touchAction = zoomed ? "none" : "pan-y";
+}
+
+function muResetZoom(){
+  MU_ZOOM.scale = 1; MU_ZOOM.x = 0; MU_ZOOM.y = 0;
+  muApplyZoom();
+}
+
+function muZoomTo(scale, cx, cy){
+  const img = document.querySelector('#mu-page img.mu-img');
+  if(!img) return;
+  const r = img.getBoundingClientRect();
+  const prev = MU_ZOOM.scale;
+  const next = Math.min(MU_ZOOM.max, Math.max(MU_ZOOM.min, scale));
+  /* keep whatever was under the fingers under them afterwards */
+  const ox = (cx === undefined) ? 0 : cx - (r.left + r.width / 2);
+  const oy = (cy === undefined) ? 0 : cy - (r.top + r.height / 2);
+  const k = next / prev;
+  MU_ZOOM.x = (MU_ZOOM.x - ox) * k + ox;
+  MU_ZOOM.y = (MU_ZOOM.y - oy) * k + oy;
+  MU_ZOOM.scale = next;
+  muApplyZoom();
+}
+
+function initMushafGestures(){
   const el = document.getElementById('mu-page');
-  let x0 = null, y0 = null;
+  let mode = null;                 // "swipe" | "pan" | "pinch"
+  let x0=0, y0=0, sx=0, sy=0, d0=0, s0=1, lastTap=0;
+
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const mid  = t => [(t[0].clientX + t[1].clientX)/2, (t[0].clientY + t[1].clientY)/2];
+
   el.addEventListener('touchstart', e => {
-    const p0 = e.changedTouches[0]; x0 = p0.clientX; y0 = p0.clientY;
+    if(e.touches.length === 2){
+      mode = "pinch"; d0 = dist(e.touches); s0 = MU_ZOOM.scale;
+      const m = mid(e.touches); x0 = m[0]; y0 = m[1];
+      sx = MU_ZOOM.x; sy = MU_ZOOM.y;
+      return;
+    }
+    if(e.touches.length === 1){
+      const t = e.touches[0];
+      x0 = t.clientX; y0 = t.clientY; sx = MU_ZOOM.x; sy = MU_ZOOM.y;
+      mode = MU_ZOOM.scale > 1.01 ? "pan" : "swipe";
+    }
   }, {passive:true});
+
+  el.addEventListener('touchmove', e => {
+    if(mode === "pinch" && e.touches.length === 2){
+      e.preventDefault();
+      const m = mid(e.touches);
+      MU_ZOOM.x = sx + (m[0] - x0);
+      MU_ZOOM.y = sy + (m[1] - y0);
+      muZoomTo(s0 * (dist(e.touches) / d0), m[0], m[1]);
+      return;
+    }
+    if(mode === "pan" && e.touches.length === 1){
+      e.preventDefault();
+      const t = e.touches[0];
+      MU_ZOOM.x = sx + (t.clientX - x0);
+      MU_ZOOM.y = sy + (t.clientY - y0);
+      muApplyZoom();
+    }
+  }, {passive:false});
+
   el.addEventListener('touchend', e => {
-    if(x0 === null) return;
-    const p1 = e.changedTouches[0], dx = p1.clientX - x0, dy = p1.clientY - y0;
-    x0 = null;
-    if(Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
-    showMushafPage(MUSHAF.page + (dx > 0 ? 1 : -1));
+    if(mode === "swipe" && e.changedTouches.length){
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0, dy = t.clientY - y0;
+      /* a mushaf turns right-to-left, so dragging right brings the next page */
+      if(Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy)){
+        showMushafPage(MUSHAF.page + (dx > 0 ? 1 : -1));
+        mode = null; lastTap = 0; return;
+      }
+      /* a tap that went nowhere — a second one within 300ms zooms */
+      if(Math.abs(dx) < 12 && Math.abs(dy) < 12){
+        const now = Date.now();
+        if(now - lastTap < 300){ muZoomTo(2.5, t.clientX, t.clientY); lastTap = 0; }
+        else lastTap = now;
+        mode = null; return;
+      }
+    }
+    if(mode === "pan" && e.changedTouches.length){
+      const t = e.changedTouches[0];
+      if(Math.abs(t.clientX - x0) < 12 && Math.abs(t.clientY - y0) < 12){
+        const now = Date.now();
+        if(now - lastTap < 300){ muResetZoom(); lastTap = 0; }
+        else lastTap = now;
+      }
+    }
+    if(e.touches.length === 0) mode = null;
   }, {passive:true});
 }
+
 
 
 function openQuran(){
@@ -6650,7 +6774,7 @@ function initQuranDemo(){
   document.getElementById('mu-j-page').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-bm').addEventListener('click',toggleMushafBookmark);
   document.getElementById('mu-bm-clear').addEventListener('click',clearMushafBookmark);
-  initMushafSwipe();
+  initMushafGestures();
   initMushafFit();
   document.getElementById('qd-search').addEventListener('input', e => {
     if(quranIndex) renderSurahList(e.target.value);
