@@ -458,6 +458,18 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push("the sideways reader offers no way into the favourites, so a page kept there could not be returned to without leaving it");
   if (/mushaf\.saved_pages|View saved pages/.test(app))
     bad.push("the mushaf still calls them saved pages somewhere — one name for one thing");
+  /* These were one thing once, and collapsing them again would take the
+     everyday bookmark away from people who use nothing else. The bookmark is
+     one page and lives on the bar; favourites are a list and are added from
+     the list. */
+  if (!/const MU_MARK = "mushaf\.mark"/.test(app) || !/function toggleMushafMark\(/.test(app))
+    bad.push("the mushaf has no bookmark of its own again — favourites are not a substitute for where you are up to");
+  if (!/'mu-bm'\)\.addEventListener\('click',toggleMushafMark\)/.test(app))
+    bad.push("the ribbon on the bar is no longer the bookmark");
+  if (!/id="mu-fav-add"/.test(app) || !/id="ml-fav-add"/.test(app))
+    bad.push("favourites cannot be added from the list, so nothing adds them now the ribbon is the bookmark");
+  if (!/id="mu-mark"/.test(app) || !/id="ml-mark"/.test(app))
+    bad.push("nothing offers the way back to the bookmark, which is the whole point of having one");
 
   if (bad.length) bad.forEach(fail);
   else ok("13-line mushaf — refuses to render a pack that names no source and licence, and says so rather than showing a blank page");

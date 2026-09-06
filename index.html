@@ -1188,6 +1188,14 @@
   .mu-opt{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
     line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
     border:1px solid var(--line);background:var(--card);color:var(--ink)}
+  /* The bookmark is the everyday one, so it is the one that carries the brand's
+     colour where the reader's eye already goes. */
+  .mu-mark{display:inline-flex;align-items:center;gap:5px;
+    border-color:var(--brand-600);color:var(--brand-600)}
+  .mu-mark svg{width:calc(12px * var(--ts));height:calc(12px * var(--ts));flex:0 0 auto}
+  .mu-fav-add{width:100%;font:inherit;font-size:calc(12px * var(--ts));font-weight:700;cursor:pointer;
+    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--brand-600);
+    background:transparent;color:var(--brand-600)}
   .mu-saved{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
     line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
     border:1px solid var(--brand-600);background:var(--card);color:var(--brand-600)}
@@ -1303,6 +1311,12 @@
     padding:6px 9px;border-radius:9px;border:1px solid var(--line);
     background:var(--card);color:var(--muted)}
   .ml-fav-none{font-size:calc(12px * var(--ts));color:var(--muted);margin:2px}
+  .ml-mark{width:100%;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;cursor:pointer;
+    text-align:left;margin:0 0 10px;padding:8px 10px;border-radius:10px;
+    border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+  .ml-fav-add{width:100%;font:inherit;font-size:calc(12px * var(--ts));font-weight:700;cursor:pointer;
+    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--brand-600);
+    background:transparent;color:var(--brand-600)}
   .ml-where{flex:1;min-width:0;text-align:center;font-size:calc(12px * var(--ts));font-weight:600;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mu-img{display:block;width:100%;height:auto;
@@ -3194,13 +3208,14 @@
               <button class="mu-nav" id="mu-prev" data-i18n="mushaf.previous">Previous</button>
               <button class="mu-where" id="mu-where"><span id="mu-where-t">&hellip;</span></button>
               <button class="mu-nav" id="mu-next" data-i18n="mushaf.next">Next</button>
-              <button class="mu-bm" id="mu-bm" aria-label="Favourite" data-i18n-attr="aria-label:a11y.favourite">
+              <button class="mu-bm" id="mu-bm" aria-label="Bookmark this page" data-i18n-attr="aria-label:a11y.bookmark_this_page">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></svg>
               </button>
             </div>
 
             <div class="mu-optrow">
               <button class="mu-opt" id="mu-orient" data-i18n="mushaf.horizontal">Horizontal</button>
+              <button class="mu-opt mu-mark" id="mu-mark" hidden></button>
               <button class="mu-saved" id="mu-saved" hidden></button>
             </div>
 
@@ -3214,8 +3229,9 @@
                   <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
               </div>
 
-              <div class="mu-bmrow" id="mu-bmrow" hidden>
+              <div class="mu-bmrow" id="mu-bmrow">
                 <div class="mu-bm-h" data-i18n="mushaf.favourites">Favourites</div>
+                <button class="mu-fav-add" id="mu-fav-add"></button>
                 <div id="mu-bm-list"></div>
               </div>
             </div>
@@ -3867,13 +3883,15 @@
       <button class="ml-btn" id="ml-prev" data-i18n="mushaf.previous">Previous</button>
       <span class="ml-where" id="ml-where">&hellip;</span>
       <button class="ml-btn" id="ml-next" data-i18n="mushaf.next">Next</button>
-      <button class="ml-btn ml-bm" id="ml-bm" aria-label="Favourite" data-i18n-attr="aria-label:a11y.favourite">
+      <button class="ml-btn ml-bm" id="ml-bm" aria-label="Bookmark this page" data-i18n-attr="aria-label:a11y.bookmark_this_page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></svg>
       </button>
     </div>
 
     <div class="ml-favs" id="ml-favs" hidden>
+      <button class="ml-mark" id="ml-mark" hidden></button>
       <div class="ml-fav-h" data-i18n="mushaf.favourites">Favourites</div>
+      <button class="ml-fav-add" id="ml-fav-add"></button>
       <div class="ml-fav-list" id="ml-fav-list"></div>
       <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_favourites_yet" hidden>Nothing kept yet. The ribbon on the right keeps the page you are on.</p>
     </div>
@@ -6466,11 +6484,19 @@ const MUSHAF = { id:"indopak13", meta:null, state:null, page:1,
                  pages:new Map(), sur:[], juz:[] };
 const MU_ORIENT = "mushaf.orient";            // "v" upright, "h" sideways
 const MU_LAST_PAGE = "mushaf.lastPage";
-/* Separate from the last page read. The mushaf already reopens where you left
-   off; a bookmark is a page you chose to keep — a daily wird, or where the
-   ḥalqah is up to — which the next page you turn to must not overwrite. */
-const MU_BOOKMARK  = "mushaf.bookmark";       // the old single value, read once then retired
-const MU_BOOKMARKS = "mushaf.bookmarks";
+/* Two different things, and the difference matters.
+
+   The bookmark is where you are up to: one of it, moved whenever you stop
+   reading, and the thing most people touch every day. The mushaf does reopen
+   on the last page you had open, but that is not the same promise — look up an
+   āyah for someone, or hand the phone over, and the last page open is no longer
+   where you were reading. The bookmark is only ever where you put it.
+
+   Favourites are places you keep on purpose: Yāsīn, al-Kahf, a wird. There are
+   as many as you like and they do not move. */
+const MU_MARK = "mushaf.mark";
+const MU_BOOKMARK  = "mushaf.bookmark";       // the oldest single value, read once then retired
+const MU_FAVOURITES = "mushaf.bookmarks";    // the key is older than the name; the pages inside are the favourites
 
 async function loadMushafMeta(){
   if(MUSHAF.state) return MUSHAF.state;
@@ -6646,7 +6672,7 @@ async function showMushafPage(n){
   if(suNow && sSel.options.length) sSel.value = String(suNow.page);
   if(jzNow && jSel.options.length) jSel.value = String(jzNow.page);
   updateMushafWhere();
-  renderMushafBookmarks();
+  renderMushafPlaces();
   renderMushafLandscape();
   hideMushafToast();   // a note about the page you have just left is only clutter
   if(MUSHAF.meta.kind === "image"){ renderMushafImage(n); return; }
@@ -6659,8 +6685,8 @@ async function showMushafPage(n){
   }
 }
 
-function mushafBookmarks(){
-  const v = prefStore.get(MU_BOOKMARKS, null);
+function mushafFavourites(){
+  const v = prefStore.get(MU_FAVOURITES, null);
   if(Array.isArray(v)) return v.filter(n => Number.isInteger(n) && n >= 1).sort((x, y) => x - y);
   /* carried over from when only one page could be kept, so nobody who had
      saved one loses it */
@@ -6668,23 +6694,44 @@ function mushafBookmarks(){
   return (Number.isInteger(one) && one >= 1) ? [one] : [];
 }
 
-function setMushafBookmarks(list){
-  prefStore.set(MU_BOOKMARKS, list.slice().sort((a, b) => a - b));
+function setMushafFavourites(list){
+  prefStore.set(MU_FAVOURITES, list.slice().sort((a, b) => a - b));
   prefStore.set(MU_BOOKMARK, 0);          // the old single value is spent
 }
 
-/* The button only ever adds or removes the page you are on — with several
-   kept, "go to the saved page" has no single answer, so travelling is the
-   list's job and the button stays one unambiguous thing. */
-function toggleMushafBookmark(){
-  const list = mushafBookmarks();
+const MU_RIBBON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+                  '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></svg>';
+
+function mushafMark(){
+  const n = prefStore.get(MU_MARK, 0);
+  return (Number.isInteger(n) && n >= 1) ? n : 0;
+}
+
+/* One bookmark, so putting it here is also how you move it: there is nothing to
+   choose between and nothing to tidy up. Putting it where it already is takes
+   it away again. */
+function toggleMushafMark(){
+  const had = mushafMark();
+  const here = had === MUSHAF.page;
+  prefStore.set(MU_MARK, here ? 0 : MUSHAF.page);
+  renderMushafPlaces();
+  if(mushafLandscapeOpen()) markMushafLandscape();
+  mushafToast(here ? t("mushaf.bookmark_taken_away", "Bookmark taken off this page")
+                   : t("mushaf.bookmark_put_here",   "Bookmark put on this page"), false);
+}
+
+/* Favourites are added and dropped from the list itself, so that the one button
+   on the bar can be the bookmark — the everyday one — and mean only that. */
+function toggleMushafFavourite(){
+  const list = mushafFavourites();
   const i = list.indexOf(MUSHAF.page);
   const saving = i < 0;
   if(saving) list.push(MUSHAF.page); else list.splice(i, 1);
-  setMushafBookmarks(list);
-  renderMushafBookmarks();
-  /* With the panel open the list is already on screen changing in front of
-     you, so it says it itself and a note over the top would only be in the way. */
+  setMushafFavourites(list);
+  renderMushafPlaces();
+  if(mushafLandscapeOpen()){ markMushafLandscape(); renderMushafFavs(); return; }
+  /* With the list already on screen it says it itself, and a note over the top
+     would only be in the way. */
   if(!document.getElementById('mu-jump').hidden) return;
   mushafToast(saving ? t("mushaf.added_to_favourites", "Added to your favourites")
                      : t("mushaf.removed_from_favourites", "Removed from your favourites"), saving);
@@ -6715,14 +6762,14 @@ function showMushafPanel(open){
   if(open) hideMushafToast();
 }
 
-function removeMushafBookmark(n){
-  setMushafBookmarks(mushafBookmarks().filter(x => x !== n));
-  renderMushafBookmarks();
+function removeMushafFavourite(n){
+  setMushafFavourites(mushafFavourites().filter(x => x !== n));
+  renderMushafPlaces();
 }
 
 /* A page number alone is hard to recognise, so each saved page is named by the
    sūrah it falls in — that is what someone is actually looking for. */
-function mushafBookmarkLabel(n, compact){
+function mushafPlaceLabel(n, compact){
   const su = mushafAt(MUSHAF.sur, n);
   const rec = su && quranIndex && quranIndex.surahs.find(x => x.n === su.n);
   const name = rec ? (rec.nameEn || rec.name)
@@ -6730,26 +6777,53 @@ function mushafBookmarkLabel(n, compact){
   /* Sideways they sit in columns, and "Page" spelled out is what pushes the
      number itself off the end of the chip. */
   const page = compact ? num(n) : t("mushaf.page", "Page") + " " + num(n);
-  return name ? name + " \u00b7 " + page : page;
+  /* "Bookmark · Yunus · 293" is one dot too many, so a label that is going
+     inside another one runs the two together. */
+  const join = compact === "flat" ? " " : " \u00b7 ";
+  return name ? name + join + page : page;
 }
 
-function renderMushafBookmarks(){
+function renderMushafPlaces(){
   const btn = document.getElementById('mu-bm');
   const wrap = document.getElementById('mu-bmrow');
   if(!btn || !wrap) return;
-  const list = mushafBookmarks();
-  const here = list.includes(MUSHAF.page);
-  btn.dataset.set = here ? "1" : "0";
-  btn.setAttribute("aria-label", here
-    ? t("a11y.remove_from_favourites", "Remove this page from your favourites")
-    : t("a11y.add_to_favourites", "Add this page to your favourites"));
 
-  wrap.hidden = !list.length;
+  /* The ribbon on the bar is the bookmark, and only the bookmark. */
+  const mark = mushafMark();
+  const onMark = mark === MUSHAF.page;
+  btn.dataset.set = onMark ? "1" : "0";
+  btn.setAttribute("aria-label", onMark
+    ? t("a11y.take_the_bookmark_off", "Take the bookmark off this page")
+    : t("a11y.bookmark_this_page", "Put your bookmark on this page"));
+
+  /* The way back to it, which is the whole point of having one. It stays out of
+     the way while you are standing on it. */
+  const pill = document.getElementById('mu-mark');
+  pill.hidden = !mark || onMark;
+  if(mark && !onMark){
+    /* The same ribbon that put it there, rather than the word: it ties the two
+       together, and the word was what pushed this row onto a second line. */
+    pill.innerHTML = MU_RIBBON;
+    const sp = document.createElement('span');
+    sp.textContent = mushafPlaceLabel(mark, "flat");
+    pill.appendChild(sp);
+    pill.setAttribute("aria-label", t("a11y.go_to_your_bookmark", "Go to your bookmark"));
+  }
+
+  const list = mushafFavourites();
+  const here = list.includes(MUSHAF.page);
+  const add = document.getElementById('mu-fav-add');
+  add.textContent = here ? t("mushaf.remove_this_page", "Remove this page from favourites")
+                         : t("mushaf.add_this_page",    "Add this page to favourites");
+
   const hint = document.getElementById('mu-saved');
   hint.hidden = !list.length;
+  /* It sits next to the bookmark now, and two pills that plainly are controls
+     do not each need telling you to tap them — which is what was pushing the
+     row onto a second line. */
   if(list.length) hint.textContent = (list.length === 1
-    ? t("mushaf.n_favourite_tap_to_view",  "{n} favourite \u00b7 tap to view")
-    : t("mushaf.n_favourites_tap_to_view", "{n} favourites \u00b7 tap to view")
+    ? t("mushaf.n_favourite",  "{n} favourite")
+    : t("mushaf.n_favourites", "{n} favourites")
   ).replace("{n}", num(list.length));
 
   const host = document.getElementById('mu-bm-list');
@@ -6759,13 +6833,13 @@ function renderMushafBookmarks(){
     row.className = "mu-bm-item" + (n === MUSHAF.page ? " is-here" : "");
     const go = document.createElement('button');
     go.className = "mu-bm-go";
-    go.textContent = mushafBookmarkLabel(n);
+    go.textContent = mushafPlaceLabel(n);
     go.addEventListener('click', () => showMushafPage(n));
     const rm = document.createElement('button');
     rm.className = "mu-bm-x";
     rm.textContent = "\u00d7";
     rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
-    rm.addEventListener('click', () => removeMushafBookmark(n));
+    rm.addEventListener('click', () => removeMushafFavourite(n));
     row.append(go, rm);
     host.appendChild(row);
   }
@@ -6935,8 +7009,12 @@ function mushafScrollBy(d){
     prefStore.set(MU_LAST_PAGE, MUSHAF.page);
     mushafLandscapeSrc();
     updateMushafWhere();
-    renderMushafBookmarks();
+    renderMushafPlaces();
     markMushafLandscape();
+    /* "Add this page" and the way back to the bookmark both name the page you
+       are on, so scrolling onto another one while the list is open has to
+       re-read them. */
+    if(mushafFavsOpen()) renderMushafFavs();
   }
   applyMushafScroll();
 }
@@ -6947,7 +7025,7 @@ function markMushafLandscape(){
   const where = document.getElementById('ml-where');
   if(where) where.textContent = document.getElementById('mu-where-t').textContent;
   const bm = document.getElementById('ml-bm');
-  if(bm) bm.dataset.set = mushafBookmarks().includes(MUSHAF.page) ? "1" : "0";
+  if(bm) bm.dataset.set = mushafMark() === MUSHAF.page ? "1" : "0";
   const prev = document.getElementById('ml-prev'), next = document.getElementById('ml-next');
   if(prev) prev.disabled = MUSHAF.page <= 1;
   if(next) next.disabled = MUSHAF.page >= MUSHAF.meta.pages;
@@ -6987,8 +7065,9 @@ function goMushafLandscapePage(n){
   prefStore.set(MU_LAST_PAGE, n);
   mushafLandscapeSrc();
   updateMushafWhere();
-  renderMushafBookmarks();
+  renderMushafPlaces();
   markMushafLandscape();
+  if(mushafFavsOpen()) renderMushafFavs();
   applyMushafScroll();
 }
 
@@ -7019,7 +7098,20 @@ function renderMushafFavs(){
   const host = document.getElementById('ml-fav-list');
   const none = document.getElementById('ml-fav-none');
   if(!host) return;
-  const list = mushafBookmarks();
+
+  /* The bookmark rides at the top of the same panel: sideways there is nowhere
+     else to put the way back to it, and it belongs with the other places. */
+  const mark = mushafMark();
+  const markBtn = document.getElementById('ml-mark');
+  markBtn.hidden = !mark || mark === MUSHAF.page;
+  if(!markBtn.hidden)
+    markBtn.textContent = t("mushaf.bookmark_at", "Bookmark \u00b7 {p}").replace("{p}", mushafPlaceLabel(mark, "flat"));
+
+  const list = mushafFavourites();
+  const addBtn = document.getElementById('ml-fav-add');
+  addBtn.textContent = list.includes(MUSHAF.page)
+    ? t("mushaf.remove_this_page", "Remove this page from favourites")
+    : t("mushaf.add_this_page",    "Add this page to favourites");
   none.hidden = !!list.length;
   host.innerHTML = "";
   for(const n of list){
@@ -7027,14 +7119,14 @@ function renderMushafFavs(){
     row.className = "ml-fav-item" + (n === MUSHAF.page ? " is-here" : "");
     const go = document.createElement('button');
     go.className = "ml-fav-go";
-    go.textContent = mushafBookmarkLabel(n, true);
+    go.textContent = mushafPlaceLabel(n, true);
     go.addEventListener('click', () => { goMushafLandscapePage(n); closeMushafFavs(); });
     const rm = document.createElement('button');
     rm.className = "ml-fav-x";
     rm.textContent = "\u00d7";
     rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
     rm.addEventListener('click', () => {
-      removeMushafBookmark(n); markMushafLandscape(); renderMushafFavs();
+      removeMushafFavourite(n); markMushafLandscape(); renderMushafFavs();
     });
     row.append(go, rm);
     host.appendChild(row);
@@ -7060,9 +7152,11 @@ function initMushafLandscape(){
   document.getElementById('ml-exit').addEventListener('click', closeMushafLandscape);
   document.getElementById('ml-prev').addEventListener('click', withBar(() => goMushafLandscapePage(MUSHAF.page - 1)));
   document.getElementById('ml-next').addEventListener('click', withBar(() => goMushafLandscapePage(MUSHAF.page + 1)));
-  document.getElementById('ml-bm').addEventListener('click', withBar(() => {
-    toggleMushafBookmark(); markMushafLandscape();
-    if(mushafFavsOpen()) renderMushafFavs();
+  document.getElementById('ml-bm').addEventListener('click', withBar(toggleMushafMark));
+  document.getElementById('ml-fav-add').addEventListener('click', withBar(toggleMushafFavourite));
+  document.getElementById('ml-mark').addEventListener('click', withBar(() => {
+    const n = mushafMark();
+    if(n){ goMushafLandscapePage(n); closeMushafFavs(); }
   }));
   document.getElementById('ml-fav').addEventListener('click', withBar(toggleMushafFavs));
   addEventListener('resize', () => { if(mushafLandscapeOpen()) layoutMushafLandscape(); });
@@ -7321,7 +7415,11 @@ function initQuranDemo(){
   document.getElementById('mu-j-surah').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-j-juz').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-j-page').addEventListener('change',e=>showMushafPage(e.target.value));
-  document.getElementById('mu-bm').addEventListener('click',toggleMushafBookmark);
+  document.getElementById('mu-bm').addEventListener('click',toggleMushafMark);
+  document.getElementById('mu-mark').addEventListener('click',()=>{
+    const n = mushafMark(); if(n) showMushafPage(n);
+  });
+  document.getElementById('mu-fav-add').addEventListener('click',toggleMushafFavourite);
 
   initMushafGestures();
   initMushafLandscape();
