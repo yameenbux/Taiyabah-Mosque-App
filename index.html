@@ -1170,6 +1170,9 @@
     text-transform:uppercase;color:var(--brand-600);
     border-block:1px solid var(--line);margin-block:2px}
   .mu-line.mu-bism{color:var(--brand-600)}
+  /* a scanned page brings its own margins and border, so the card adds none */
+  .mu-page.mu-scan{padding:0;overflow:hidden;background:#fff}
+  .mu-img{display:block;width:100%;height:auto}
   .mu-err{margin:12px 14px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
 
   /* ---- qibla ---- */
@@ -6292,7 +6295,7 @@ function scheduleMushafFit(){
    exists not to do — so the page is scaled down until its widest line fits. */
 function fitMushafLines(){
   const host = document.getElementById('mu-page');
-  if(!host || host.hidden) return;
+  if(!host || host.hidden || host.classList.contains('mu-scan')) return;
   const avail = host.clientWidth - 28;
   if(avail <= 0) return;
   host.style.setProperty('--mu-size', '21px');
@@ -6317,10 +6320,40 @@ function updateMushafWhere(){
   if(su){
     const rec = quranIndex && quranIndex.surahs.find(x => x.n === su.n);
     bits.push(rec ? (rec.nameEn || rec.name) : t("mushaf.s_rah","S\u016brah") + " " + num(su.n));
-  }
+  }  // omitted entirely when the pack has no sūrah mapping
   if(jz) bits.push(t("mushaf.juz","Juz") + " " + num(jz.n));
   bits.push(t("mushaf.page","Page") + " " + num(MUSHAF.page));
   document.getElementById('mu-where-t').textContent = bits.join(" \u00b7 ");
+}
+
+function mushafPageUrl(n){
+  return `quran/mushaf/${MUSHAF.id}/p/${n}.${MUSHAF.meta.ext || "webp"}`;
+}
+
+/* A scanned pack is one picture per page. The same <img> is reused rather than
+   rebuilt, so turning a page does not flash white between the two, and the
+   neighbours are fetched in the background so the turn itself is instant. */
+function renderMushafImage(n){
+  const host = document.getElementById('mu-page');
+  host.classList.add('mu-scan');
+  let img = host.querySelector('img.mu-img');
+  if(!img){
+    host.innerHTML = "";
+    img = document.createElement('img');
+    img.className = "mu-img";
+    img.decoding = "async";
+    host.appendChild(img);
+  }
+  img.onerror = () => {
+    host.classList.remove('mu-scan');
+    host.innerHTML = `<p class="mu-err">${esc(t("mushaf.couldn_t_load_this_page",
+      "Couldn't load this page. Check your connection and try again."))}</p>`;
+  };
+  img.alt = t("mushaf.page","Page") + " " + num(n);
+  img.src = mushafPageUrl(n);
+  for(const m of [n + 1, n - 1]){
+    if(m >= 1 && m <= MUSHAF.meta.pages){ const pre = new Image(); pre.src = mushafPageUrl(m); }
+  }
 }
 
 async function showMushafPage(n){
@@ -6332,6 +6365,7 @@ async function showMushafPage(n){
   document.getElementById('mu-next').disabled = (n >= total);
   document.getElementById('mu-j-page').value = n;
   updateMushafWhere();
+  if(MUSHAF.meta.kind === "image"){ renderMushafImage(n); return; }
   try{
     renderMushafPage(await loadMushafPage(n));
   }catch(e){
@@ -6344,6 +6378,11 @@ async function showMushafPage(n){
 function fillMushafJump(){
   const sSel = document.getElementById('mu-j-surah');
   const jSel = document.getElementById('mu-j-juz');
+  /* A scanned pack knows its juz exactly but not where each sūrah begins —
+     that is edition-specific and this one carries no contents page. Rather
+     than offer an empty dropdown, the sūrah field is dropped until a mapping
+     exists that has actually been checked against the printed copy. */
+  sSel.closest('.mu-f').hidden = !MUSHAF.sur.length;
   if(sSel.options.length) return;
   for(const row of MUSHAF.sur){
     const rec = quranIndex && quranIndex.surahs.find(x => x.n === row.n);
