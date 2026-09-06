@@ -452,6 +452,12 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push("the sideways page no longer keeps air down both sides");
   if (!/rotate\(\$\{turn \? 90 : 0\}deg\)/.test(app))
     bad.push("the sideways reader no longer turns the page in software, so it would do nothing for a phone with rotation lock on");
+  /* Favourites are only useful if you can reach them from wherever you are
+     reading; sideways they were unreachable until this was added. */
+  if (!/function renderMushafFavs\(/.test(app) || !/id="ml-fav"/.test(app))
+    bad.push("the sideways reader offers no way into the favourites, so a page kept there could not be returned to without leaving it");
+  if (/mushaf\.saved_pages|View saved pages/.test(app))
+    bad.push("the mushaf still calls them saved pages somewhere — one name for one thing");
 
   if (bad.length) bad.forEach(fail);
   else ok("13-line mushaf — refuses to render a pack that names no source and licence, and says so rather than showing a blank page");
