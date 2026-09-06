@@ -1265,9 +1265,11 @@
      height is exactly what makes the text bigger here. */
   #mu-land{position:fixed;inset:0;z-index:80;background:#fff;overflow:hidden;
     touch-action:none;-webkit-user-select:none;user-select:none}
-  .ml-stage{position:absolute;left:50%;top:50%;transform-origin:center center}
-  .ml-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden}
-  .ml-win img{display:block}
+  .ml-stage{position:absolute;left:50%;top:50%;transform-origin:center center;overflow:hidden}
+  /* One long strip of pages that slides under the screen, rather than a picture
+     that jumps a screenful at a time. */
+  .ml-scroll{position:absolute;top:0;will-change:transform}
+  .ml-pg{position:absolute;left:0;display:block;background:#fff}
   .ml-bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;
     padding:8px 12px;background:rgba(60,11,42,.92);color:#fff;
     transition:opacity .18s ease}
@@ -3835,7 +3837,9 @@
      read. -->
 <div id="mu-land" hidden>
   <div class="ml-stage" id="ml-stage">
-    <div class="ml-win" id="ml-win"><img id="ml-img" alt=""></div>
+    <div class="ml-scroll" id="ml-scroll">
+      <img class="ml-pg" id="ml-p0" alt=""><img class="ml-pg" id="ml-p1" alt=""><img class="ml-pg" id="ml-p2" alt="">
+    </div>
     <div class="ml-bar" id="ml-bar">
       <button class="ml-btn" id="ml-exit" data-i18n="mushaf.vertical">Vertical</button>
       <button class="ml-btn" id="ml-prev" data-i18n="mushaf.previous">Previous</button>
@@ -6430,7 +6434,7 @@ async function openTranslation(){
 
    The pack is a licensed asset and is added deliberately; when it is absent
    the reader says so instead of showing an empty page. */
-const MUSHAF = { id:"indopak13", meta:null, state:null, page:1, band:0,
+const MUSHAF = { id:"indopak13", meta:null, state:null, page:1,
                  pages:new Map(), sur:[], juz:[] };
 const MU_ORIENT = "mushaf.orient";            // "v" upright, "h" sideways
 const MU_LAST_PAGE = "mushaf.lastPage";
@@ -6598,11 +6602,10 @@ function renderMushafImage(n){
   }
 }
 
-async function showMushafPage(n, band){
+async function showMushafPage(n){
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, Math.round(+n) || 1));
   MUSHAF.page = n;
-  MUSHAF.band = band | 0;      // any jump lands at the top of the page unless told otherwise
   prefStore.set(MU_LAST_PAGE, n);
   document.getElementById('mu-prev').disabled = (n <= 1);
   document.getElementById('mu-next').disabled = (n >= total);
@@ -6807,66 +6810,14 @@ function initMushafFit(){
    past that row so nothing is ever sliced. Eight ornamental pages have no gap to
    cut and are shown whole. */
 
-/* The window cut out of the page is exactly the shape of the screen, so it
-   fills it corner to corner with no white anywhere. Its width is the block of
-   writing itself — the printed frame and the paper margin around it are cropped
-   away, so the lines run to both edges — and its height follows from the
-   screen's proportions, which is what decides how many lines fit: four on a
-   phone. Each window starts on a row the printing left blank, so it opens on a
-   whole line; the line it ends part-way through is the first whole line of the
-   next one. */
-function mushafWindows(n){
-  const g = MUSHAF.meta && MUSHAF.meta.geometry;
-  const row = g && Array.isArray(g.page) && g.page[n - 1];
-  if(!row) return null;                       // a page with no lines to divide
-  const st = document.getElementById('ml-stage');
-  const W = parseFloat(st.style.width), H = parseFloat(st.style.height);
-  if(!(W > 0 && H > 0)) return null;
-  const top = row[0], bottom = row[1], gaps = row.slice(2);
-  const winW = Math.min(MUSHAF.meta.width, g.right - g.left + 1);
-  const winX = Math.max(0, Math.min(g.left, MUSHAF.meta.width - winW));
-  const winH = Math.round(winW * H / W);
-  if(winH >= bottom - top) return null;       // the whole page already fits the screen
-  /* A window may not hang off the picture, or there would be white below it —
-     which is the whole thing this is meant to avoid. */
-  const maxTop = Math.max(0, MUSHAF.meta.height - winH);
-  const contentH = bottom - top;
-  const count = Math.max(1, Math.ceil(contentH / winH));
-  const step = count > 1 ? (contentH - winH) / (count - 1) : 0;
-
-  /* Spread evenly and then let each one settle on the nearest blank row, rather
-     than stepping a full window at a time and leaving the last one on top of
-     the one before it. Every window opens on a whole line, each shows about
-     three new ones, and the last ends on the last line of the page. */
-  /* Where the last line's foot is: the printing's own bottom rule sits lower
-     than the writing, and aiming the last window at the rule rather than the
-     line pushes it down for nothing. */
-  const pitch = gaps.length > 1 ? (gaps[gaps.length - 1] - gaps[0]) / (gaps.length - 1) : winH;
-  const foot = Math.min(bottom, Math.round(gaps[gaps.length - 1] + pitch));
-
-  const tops = [];
-  let prev = -1e9;
-  for(let i = 0; i < count; i++){
-    const ideal = Math.min(top + Math.round(step * i), maxTop);
-    if(i === 0){ tops.push(Math.min(top, maxTop)); prev = tops[0]; continue; }
-    const lowest = (i === count - 1) ? foot - winH : -1e9;   // the last one has to reach the last line
-    const highest = Math.min(maxTop, prev + winH);           // and none of them may skip what came before
-    let pick = null, dist = Infinity;
-    for(const r of gaps){
-      if(r < lowest || r > highest || r <= prev) continue;
-      const d = Math.abs(r - ideal);
-      if(d < dist){ dist = d; pick = r; }
-    }
-    /* No blank row in range only happens where the printing leaves none — then
-       the window starts part-way down a line, which is the line the window
-       before it has already shown whole. Losing the foot of the last line
-       would be the worse of the two. */
-    if(pick === null) pick = Math.max(0, Math.min(highest, Math.max(lowest, ideal)));
-    if(pick > prev){ tops.push(pick); prev = pick; }
-  }
-
-  return { x: winX, w: winW, h: winH, tops };
-}
+/* The page is shown whole, with air down both sides, and slides under the
+   screen as one long strip: three page pictures stacked, the one you are on
+   with its neighbours above and below, so reading carries on past the foot of
+   a page without stopping. Turning the phone over cannot by itself make this
+   mushaf bigger — the page is proportionally wider than any phone, so the short
+   edge decides the size whichever way it is held — but sideways the long edge
+   takes the width of the page, which is what makes it larger. */
+const MU_LAND = { off:0, scale:1, ph:0, W:0, H:0, vel:0, raf:0 };
 
 function mushafLandscapeOpen(){
   return !document.getElementById('mu-land').hidden;
@@ -6875,6 +6826,7 @@ function mushafLandscapeOpen(){
 function openMushafLandscape(){
   prefStore.set(MU_ORIENT, "h");
   document.getElementById('mu-land').hidden = false;
+  MU_LAND.off = 0;
   renderMushafLandscape();
   showMushafLandscapeBar(7000);      // long enough to notice the way back out
 }
@@ -6882,7 +6834,8 @@ function openMushafLandscape(){
 function closeMushafLandscape(){
   prefStore.set(MU_ORIENT, "v");
   document.getElementById('mu-land').hidden = true;
-  MUSHAF.band = 0;
+  stopMushafGlide();
+  showMushafPage(MUSHAF.page);       // the upright reader picks up where this left off
 }
 
 /* The stage is the screen with its two sides swapped and turned a quarter turn,
@@ -6891,8 +6844,7 @@ function closeMushafLandscape(){
    text on its ear. */
 function layoutMushafLandscape(){
   const st = document.getElementById('ml-stage');
-  const win = document.getElementById('ml-win');
-  const img = document.getElementById('ml-img');
+  const sc = document.getElementById('ml-scroll');
   const m = MUSHAF.meta;
   if(!st || !m) return;
   const turn = innerHeight > innerWidth;
@@ -6902,62 +6854,111 @@ function layoutMushafLandscape(){
   st.style.height = H + "px";
   st.style.transform = `translate(-50%, -50%) rotate(${turn ? 90 : 0}deg)`;
 
-  const wins = mushafWindows(MUSHAF.page);
-  if(!wins){
-    /* nothing to divide — a page that is one picture. It is shown whole, which
-       the screen's shape leaves smaller than upright; there is no honest way
-       around that on a page with no lines to cut between. */
-    const scale = Math.min(H / m.height, W / m.width);
-    win.style.width  = Math.round(m.width  * scale) + "px";
-    win.style.height = Math.round(m.height * scale) + "px";
-    img.style.width  = Math.round(m.width  * scale) + "px";
-    img.style.marginLeft = "0px";
-    img.style.marginTop  = "0px";
-    return;
+  /* Air down both sides. The page carries its own printed margin as well, and
+     between them the writing is not pressed against the edge of the screen. */
+  const pad = Math.max(8, Math.round(W * 0.025));
+  const pw = W - pad * 2;
+  MU_LAND.scale = pw / m.width;
+  MU_LAND.ph = Math.round(m.height * MU_LAND.scale);
+  MU_LAND.W = W; MU_LAND.H = H;
+  sc.style.left  = pad + "px";
+  sc.style.width = Math.round(pw) + "px";
+  const imgs = sc.querySelectorAll('.ml-pg');
+  for(let i = 0; i < imgs.length; i++){
+    imgs[i].style.width = Math.round(pw) + "px";
+    imgs[i].style.top = ((i - 1) * MU_LAND.ph) + "px";
   }
-  MUSHAF.band = Math.min(MUSHAF.band, wins.tops.length - 1);
-  const scale = W / wins.w;               // the same as H / wins.h, by construction
-  win.style.width  = W + "px";
-  win.style.height = H + "px";
-  img.style.width  = Math.round(m.width * scale) + "px";
-  img.style.marginLeft = Math.round(-wins.x * scale) + "px";
-  img.style.marginTop  = Math.round(-wins.tops[MUSHAF.band] * scale) + "px";
+  mushafScrollBy(0);                 // re-clamp against the new size
 }
 
-function renderMushafLandscape(){
-  if(!mushafLandscapeOpen()) return;
-  const img = document.getElementById('ml-img');
-  const url = mushafPageUrl(MUSHAF.page);
-  if(img.getAttribute('src') !== url) img.setAttribute('src', url);
-  layoutMushafLandscape();
+function mushafLandscapeSrc(){
+  const sc = document.getElementById('ml-scroll');
+  const imgs = sc.querySelectorAll('.ml-pg');
+  const total = MUSHAF.meta.pages;
+  for(let i = 0; i < imgs.length; i++){
+    const n = MUSHAF.page + i - 1;
+    if(n < 1 || n > total){ imgs[i].removeAttribute('src'); imgs[i].hidden = true; continue; }
+    imgs[i].hidden = false;
+    const url = mushafPageUrl(n);
+    if(imgs[i].getAttribute('src') !== url) imgs[i].setAttribute('src', url);
+  }
+}
+
+function applyMushafScroll(){
+  document.getElementById('ml-scroll').style.transform = `translateY(${-Math.round(MU_LAND.off)}px)`;
+}
+
+/* Scrolling past the foot of a page carries on into the next one: the strip is
+   re-anchored on the new page and the offset moves back by a page, so nothing
+   jumps under the reader's eye. */
+function mushafScrollBy(d){
+  const ph = MU_LAND.ph, total = MUSHAF.meta.pages;
+  if(!ph) return;
+  MU_LAND.off += d;
+  let moved = false;
+  while(MU_LAND.off >= ph && MUSHAF.page < total){ MU_LAND.off -= ph; MUSHAF.page++; moved = true; }
+  while(MU_LAND.off < 0 && MUSHAF.page > 1){ MU_LAND.off += ph; MUSHAF.page--; moved = true; }
+  if(MUSHAF.page <= 1)     MU_LAND.off = Math.max(0, MU_LAND.off);
+  if(MUSHAF.page >= total) MU_LAND.off = Math.min(MU_LAND.off, Math.max(0, ph - MU_LAND.H));
+  if(moved){
+    prefStore.set(MU_LAST_PAGE, MUSHAF.page);
+    mushafLandscapeSrc();
+    updateMushafWhere();
+    renderMushafBookmarks();
+    markMushafLandscape();
+  }
+  applyMushafScroll();
+}
+
+/* What the bar says about where you are, kept out of the scroll itself so the
+   scroll does no more work than moving the strip. */
+function markMushafLandscape(){
   const where = document.getElementById('ml-where');
   if(where) where.textContent = document.getElementById('mu-where-t').textContent;
   const bm = document.getElementById('ml-bm');
   if(bm) bm.dataset.set = mushafBookmarks().includes(MUSHAF.page) ? "1" : "0";
-  const first = MUSHAF.page <= 1 && MUSHAF.band === 0;
-  const last  = MUSHAF.page >= MUSHAF.meta.pages && MUSHAF.band >= mushafBandCount(MUSHAF.page) - 1;
-  document.getElementById('ml-prev').disabled = first;
-  document.getElementById('ml-next').disabled = last;
+  const prev = document.getElementById('ml-prev'), next = document.getElementById('ml-next');
+  if(prev) prev.disabled = MUSHAF.page <= 1;
+  if(next) next.disabled = MUSHAF.page >= MUSHAF.meta.pages;
 }
 
-/* One step is half a page, and the halves run on into the next page, so reading
-   forward is one gesture repeated rather than two different ones. */
-function mushafBandCount(n){
-  const w = mushafWindows(n);
-  return w ? w.tops.length : 1;
+function renderMushafLandscape(){
+  if(!mushafLandscapeOpen()) return;
+  MU_LAND.off = 0;                   // a jump lands at the top of the page it names
+  mushafLandscapeSrc();
+  layoutMushafLandscape();
+  markMushafLandscape();
 }
 
-function stepMushafLandscape(d){
-  let page = MUSHAF.page, band = MUSHAF.band + d;
-  if(band >= mushafBandCount(page)){
-    if(page >= MUSHAF.meta.pages) return;
-    page++; band = 0;
-  }else if(band < 0){
-    if(page <= 1) return;
-    page--; band = mushafBandCount(page) - 1;
-  }
-  if(page !== MUSHAF.page) showMushafPage(page, band);   // renders both views
-  else { MUSHAF.band = band; renderMushafLandscape(); }
+/* A flick keeps going and slows down, the way a page of anything else does. */
+function stopMushafGlide(){
+  if(MU_LAND.raf) cancelAnimationFrame(MU_LAND.raf);
+  MU_LAND.raf = 0; MU_LAND.vel = 0;
+}
+
+function mushafGlide(){
+  MU_LAND.raf = 0;
+  if(Math.abs(MU_LAND.vel) < 0.05) return;
+  const wasOff = MU_LAND.off, wasPage = MUSHAF.page;
+  mushafScrollBy(MU_LAND.vel * 16);
+  /* run up against the first or last page and there is nowhere left to go */
+  if(MUSHAF.page === wasPage && Math.abs(MU_LAND.off - wasOff) < 0.5){ MU_LAND.vel = 0; return; }
+  MU_LAND.vel *= 0.94;
+  MU_LAND.raf = requestAnimationFrame(mushafGlide);
+}
+
+function goMushafLandscapePage(n){
+  const total = MUSHAF.meta.pages;
+  n = Math.min(total, Math.max(1, n));
+  stopMushafGlide();
+  MUSHAF.page = n;
+  MU_LAND.off = 0;
+  prefStore.set(MU_LAST_PAGE, n);
+  mushafLandscapeSrc();
+  updateMushafWhere();
+  renderMushafBookmarks();
+  markMushafLandscape();
+  applyMushafScroll();
 }
 
 /* The bar sits over the page rather than beside it, so it costs no height; it
@@ -6974,46 +6975,64 @@ function showMushafLandscapeBar(ms){
 
 function initMushafLandscape(){
   const el = document.getElementById('mu-land');
+  const withBar = fn => () => { fn(); showMushafLandscapeBar(); };
   document.getElementById('mu-orient').addEventListener('click', openMushafLandscape);
   document.getElementById('ml-exit').addEventListener('click', closeMushafLandscape);
-  const withBar = fn => () => { fn(); showMushafLandscapeBar(); };
-  document.getElementById('ml-prev').addEventListener('click', withBar(() => stepMushafLandscape(-1)));
-  document.getElementById('ml-next').addEventListener('click', withBar(() => stepMushafLandscape(1)));
+  document.getElementById('ml-prev').addEventListener('click', withBar(() => goMushafLandscapePage(MUSHAF.page - 1)));
+  document.getElementById('ml-next').addEventListener('click', withBar(() => goMushafLandscapePage(MUSHAF.page + 1)));
   document.getElementById('ml-bm').addEventListener('click', withBar(() => {
-    toggleMushafBookmark(); renderMushafLandscape();
+    toggleMushafBookmark(); markMushafLandscape();
   }));
   addEventListener('resize', () => { if(mushafLandscapeOpen()) layoutMushafLandscape(); });
   addEventListener('orientationchange', () => {
     if(mushafLandscapeOpen()) setTimeout(layoutMushafLandscape, 120);
   });
 
-  /* A drag along the reader's own left-to-right, which is down the screen while
-     the stage is turned. Dragging the way the pages of a mushaf go — right, as
-     the reader sees it — brings the next half. */
-  let x0 = 0, y0 = 0, live = false;
+  /* The reader's own up and down is across the screen while the stage is
+     turned, so the drag is read along that axis and the strip follows the
+     finger. */
+  let live = false, x0 = 0, y0 = 0, lastAlong = 0, lastT = 0, moved = 0;
+  const alongOf = (x, y) => (innerHeight > innerWidth) ? -x : y;
   el.addEventListener('touchstart', e => {
     if(e.touches.length !== 1){ live = false; return; }
-    live = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    stopMushafGlide();
+    live = true; moved = 0;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    lastAlong = alongOf(x0, y0); lastT = e.timeStamp || Date.now();
   }, {passive:true});
+
+  el.addEventListener('touchmove', e => {
+    if(!live || e.touches.length !== 1) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const along = alongOf(t.clientX, t.clientY);
+    const now = e.timeStamp || Date.now();
+    const d = along - lastAlong;
+    moved += Math.abs(d);
+    mushafScrollBy(-d);                       // the page follows the finger
+    /* Two moves can share a millisecond, and dividing by that gap unguarded
+       either throws the speed away or sends it to infinity. */
+    MU_LAND.vel = Math.max(-4, Math.min(4, -d / Math.max(1, now - lastT)));
+    lastAlong = along; lastT = now;
+  }, {passive:false});
+
   el.addEventListener('touchend', e => {
     if(!live) return;
     live = false;
     const t = e.changedTouches[0];
-    if(!t) return;
-    const dx = t.clientX - x0, dy = t.clientY - y0;
-    const turned = innerHeight > innerWidth;
-    const along = turned ? dy : dx;             // the reader's own horizontal
-    const across = turned ? dx : dy;
-    if(Math.abs(along) >= 48 && Math.abs(along) > Math.abs(across)){
-      stepMushafLandscape(along > 0 ? 1 : -1);
-      return;
-    }
-    if(Math.abs(dx) < 12 && Math.abs(dy) < 12 && !t.target.closest('.ml-bar')){
+    if(t && moved < 8 && Math.abs(t.clientX - x0) < 12 && Math.abs(t.clientY - y0) < 12
+       && !t.target.closest('.ml-bar')){
       const bar = document.getElementById('ml-bar');
       if(bar.dataset.off === "1") showMushafLandscapeBar();
       else { clearTimeout(ML_BAR_T); bar.dataset.off = "1"; }
+      return;
     }
+    const idle = (e.timeStamp || Date.now()) - lastT;
+    if(Math.abs(MU_LAND.vel) > 0.15 && idle < 90) mushafGlide();
+    else MU_LAND.vel = 0;
   }, {passive:true});
+
+  el.addEventListener('touchcancel', () => { live = false; stopMushafGlide(); }, {passive:true});
 }
 
 /* ---- gestures on the page ----

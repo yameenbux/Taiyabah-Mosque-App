@@ -437,48 +437,19 @@ for (const f of ["index.html", "admin.html"]) {
         }
       }
 
-      /* Reading sideways cuts a window out of the page in the shape of the
-         screen, so it fills it edge to edge. The window's edges land on rows
-         the printing left blank between two lines, measured off the pages
-         themselves — a wrong row slices a line of the Qur'an in half, so the
-         table's shape is checked on every release. */
-      const geo = meta.geometry;
-      if (!geo) bad.push("the mushaf pack carries no line geometry, so reading sideways has nowhere to cut");
-      else {
-        if (!(geo.left >= 0 && geo.right > geo.left && geo.right < meta.width))
-          bad.push(`the printed frame is recorded at x ${geo.left}-${geo.right}, which is not inside the page's ${meta.width}`);
-        if (!Array.isArray(geo.page) || geo.page.length !== meta.pages)
-          bad.push(`the line geometry has ${Array.isArray(geo.page) ? geo.page.length : "no"} entries for ${meta.pages} pages`);
-        else {
-          let shape = 0, order = 0, thin = 0, whole = 0;
-          for (const row of geo.page) {
-            if (row === null) { whole++; continue; }
-            if (!Array.isArray(row) || row.length < 7) { shape++; continue; }
-            const [top, bottom, ...gaps] = row;
-            if (!(top >= 0 && bottom > top && bottom <= meta.height)) { shape++; continue; }
-            if (bottom - top < 900) thin++;
-            let prev = top;
-            for (const g of gaps) { if (!(g > prev && g < bottom)) { order++; break; } prev = g; }
-          }
-          if (shape) bad.push(`${shape} page(s) of line geometry are the wrong shape`);
-          if (order) bad.push(`${order} page(s) have blank rows out of order or outside their frame — a window would cut mid-line`);
-          if (thin)  bad.push(`${thin} page(s) record a frame too short to hold 13 lines`);
-          if (whole > meta.pages / 20)
-            bad.push(`${whole} pages have no line geometry — too many to be ornamental openings alone`);
-        }
-      }
     }
   }
 
-  /* Sideways is only worth having because it shows less of the page, larger and
-     filling the screen. If either half of that goes, it quietly becomes a worse
-     upright view, so both are checked for directly. */
-  if (!/function mushafWindows\(/.test(app) || !/MUSHAF\.band/.test(app))
-    bad.push("the sideways reader no longer cuts a window out of the page, so it would show the whole page smaller than upright does");
-  if (!/win\.style\.width\s*=\s*W \+ "px";\s*\n\s*win\.style\.height\s*=\s*H \+ "px";/.test(app))
-    bad.push("the sideways window is no longer the size of the screen, so the page would sit in bands of white again");
-  if (!/const winX = Math\.max\(0, Math\.min\(g\.left/.test(app))
-    bad.push("the sideways window no longer crops to the block of writing, so the printed margin would show as white down both sides");
+  /* Sideways is worth having because the long edge of the screen takes the
+     width of the page, which is what makes the writing larger, and because the
+     page scrolls rather than jumping a screenful at a time. Both have been
+     asked for by name, so both are checked for directly. */
+  if (!/function mushafScrollBy\(/.test(app) || !/requestAnimationFrame\(mushafGlide\)/.test(app))
+    bad.push("the sideways reader no longer scrolls the page, so it would be back to stepping through it a screenful at a time");
+  if (!/while\(MU_LAND\.off >= ph && MUSHAF\.page < total\)/.test(app))
+    bad.push("scrolling no longer carries on into the next page, so reading would stop dead at the foot of every page");
+  if (!/const pad = Math\.max\(8, Math\.round\(W \* 0\.025\)\)/.test(app))
+    bad.push("the sideways page no longer keeps air down both sides");
   if (!/rotate\(\$\{turn \? 90 : 0\}deg\)/.test(app))
     bad.push("the sideways reader no longer turns the page in software, so it would do nothing for a phone with rotation lock on");
 
