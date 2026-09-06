@@ -1181,6 +1181,22 @@
   /* filled once a page is kept, so the state is visible at a glance */
   .mu-bm[data-set="1"]{color:var(--brand-600);border-color:var(--brand-600)}
   .mu-bm[data-set="1"] svg path{fill:currentColor}
+  /* Saving a page used to be silent apart from the ribbon filling in, so there
+     was nothing to say where the page had gone or how to get back to it. The
+     bar carries the count now, and saving says so once and offers the way in. */
+  .mu-savedbar{display:flex;justify-content:center;padding:5px 14px 0}
+  .mu-saved{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
+    line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
+    border:1px solid var(--brand-600);background:var(--card);color:var(--brand-600)}
+  /* Floats off the bar like the panel does, so a confirmation never moves the
+     page underneath it. */
+  .mu-toast{position:absolute;left:10px;right:10px;top:100%;margin-top:6px;z-index:7;
+    display:flex;align-items:center;gap:8px;padding:9px 8px 9px 11px;border-radius:12px;
+    background:var(--brand-600);color:#fff;font-size:calc(12px * var(--ts));font-weight:600;
+    box-shadow:0 14px 30px -10px rgba(60,11,42,.36)}
+  .mu-toast-a{margin-inline-start:auto;flex:0 0 auto;font:inherit;font-weight:700;cursor:pointer;
+    padding:6px 9px;border-radius:9px;border:1px solid rgba(255,255,255,.6);
+    background:transparent;color:#fff;white-space:nowrap}
   .mu-bmrow{margin:10px 0 0;padding:9px 8px 6px;border-radius:11px;
     background:var(--paper);border:1px solid var(--line)}
   /* however many are saved, the panel stays a panel and the list scrolls */
@@ -3132,6 +3148,10 @@
               </button>
             </div>
 
+            <div class="mu-savedbar" id="mu-savedbar" hidden>
+              <button class="mu-saved" id="mu-saved"></button>
+            </div>
+
             <div class="mu-panel" id="mu-jump" hidden>
               <div class="mu-jrow">
                 <label class="mu-f"><span data-i18n="mushaf.s_rah">Sūrah</span>
@@ -3146,6 +3166,11 @@
                 <div class="mu-bm-h" data-i18n="mushaf.saved_pages">Saved pages</div>
                 <div id="mu-bm-list"></div>
               </div>
+            </div>
+
+            <div class="mu-toast" id="mu-toast" role="status" hidden>
+              <span id="mu-toast-t"></span>
+              <button class="mu-toast-a" id="mu-toast-a" data-i18n="mushaf.view_saved_pages">View saved pages</button>
             </div>
             </div>
 
@@ -6538,6 +6563,7 @@ async function showMushafPage(n){
   if(jzNow && jSel.options.length) jSel.value = String(jzNow.page);
   updateMushafWhere();
   renderMushafBookmarks();
+  hideMushafToast();   // a note about the page you have just left is only clutter
   if(MUSHAF.meta.kind === "image"){ renderMushafImage(n); return; }
   try{
     renderMushafPage(await loadMushafPage(n));
@@ -6568,9 +6594,40 @@ function setMushafBookmarks(list){
 function toggleMushafBookmark(){
   const list = mushafBookmarks();
   const i = list.indexOf(MUSHAF.page);
-  if(i >= 0) list.splice(i, 1); else list.push(MUSHAF.page);
+  const saving = i < 0;
+  if(saving) list.push(MUSHAF.page); else list.splice(i, 1);
   setMushafBookmarks(list);
   renderMushafBookmarks();
+  /* With the panel open the list is already on screen changing in front of
+     you, so it says it itself and a note over the top would only be in the way. */
+  if(!document.getElementById('mu-jump').hidden) return;
+  mushafToast(saving ? t("mushaf.page_saved", "Page saved")
+                     : t("mushaf.removed_from_your_saved", "Removed from your saved pages"), saving);
+}
+
+/* A ribbon filling in is not an answer to "where did that go?". Saving says so
+   in words and offers the way through to the list; the note floats off the bar
+   like the panel does, so nothing underneath it moves. */
+let MU_TOAST_T = 0;
+function mushafToast(msg, withAction){
+  const el = document.getElementById('mu-toast');
+  if(!el) return;
+  document.getElementById('mu-toast-t').textContent = msg;
+  document.getElementById('mu-toast-a').hidden = !withAction;
+  el.hidden = false;
+  clearTimeout(MU_TOAST_T);
+  MU_TOAST_T = setTimeout(hideMushafToast, 5000);
+}
+
+function hideMushafToast(){
+  clearTimeout(MU_TOAST_T);
+  const el = document.getElementById('mu-toast');
+  if(el) el.hidden = true;
+}
+
+function showMushafPanel(open){
+  document.getElementById('mu-jump').hidden = !open;
+  if(open) hideMushafToast();
 }
 
 function removeMushafBookmark(n){
@@ -6601,6 +6658,13 @@ function renderMushafBookmarks(){
     : t("a11y.save_this_page", "Save this page"));
 
   wrap.hidden = !list.length;
+  const hint = document.getElementById('mu-saved');
+  document.getElementById('mu-savedbar').hidden = !list.length;
+  if(list.length) hint.textContent = (list.length === 1
+    ? t("mushaf.n_saved_page_tap_to_view",  "{n} saved page \u00b7 tap to view")
+    : t("mushaf.n_saved_pages_tap_to_view", "{n} saved pages \u00b7 tap to view")
+  ).replace("{n}", num(list.length));
+
   const host = document.getElementById('mu-bm-list');
   host.innerHTML = "";
   for(const n of list){
@@ -6860,7 +6924,14 @@ function initQuranDemo(){
   document.getElementById('mu-prev').addEventListener('click',()=>showMushafPage(MUSHAF.page-1));
   document.getElementById('mu-next').addEventListener('click',()=>showMushafPage(MUSHAF.page+1));
   document.getElementById('mu-where').addEventListener('click',()=>{
-    const j=document.getElementById('mu-jump'); j.hidden=!j.hidden;
+    showMushafPanel(document.getElementById('mu-jump').hidden);
+  });
+  document.getElementById('mu-saved').addEventListener('click',()=>{
+    showMushafPanel(document.getElementById('mu-jump').hidden);
+  });
+  document.getElementById('mu-toast-a').addEventListener('click',()=>showMushafPanel(true));
+  document.getElementById('mu-toast').addEventListener('click',e=>{
+    if(!e.target.closest('#mu-toast-a')) hideMushafToast();
   });
   document.getElementById('mu-j-surah').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-j-juz').addEventListener('change',e=>showMushafPage(e.target.value));
@@ -6869,6 +6940,7 @@ function initQuranDemo(){
 
   initMushafGestures();
   document.getElementById('mu-page').addEventListener('pointerdown',()=>{
+    hideMushafToast();
     const j=document.getElementById('mu-jump');
     if(!j.hidden) j.hidden = true;
   });
