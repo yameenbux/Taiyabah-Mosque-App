@@ -1163,14 +1163,31 @@
      The page is the unit here, not the scroll: thirteen lines, sized to fit
      the width they are given, the way the printed page does it. */
   .mu-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 0}
-  .mu-nav{flex:0 0 auto;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:600;cursor:pointer;
-    padding:8px 12px;border-radius:10px;border:1px solid var(--line);
+  .mu-nav{flex:0 0 auto;font:inherit;font-size:calc(12px * var(--ts));font-weight:600;cursor:pointer;
+    padding:8px 9px;border-radius:10px;border:1px solid var(--line);
     background:var(--card);color:var(--brand-600)}
   .mu-nav[disabled]{opacity:.4;cursor:default}
-  .mu-where{flex:1;min-width:0;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:600;cursor:pointer;
-    padding:8px 10px;border-radius:10px;border:1px solid var(--line);
+  /* The bookmark button took enough width to truncate this to "Juz 26 · P…".
+     Two lines are better than an ellipsis: the sūrah, juz and page are the
+     whole point of the label. */
+  .mu-where{flex:1;min-width:0;font:inherit;font-size:calc(12px * var(--ts));font-weight:600;cursor:pointer;
+    padding:7px 8px;border-radius:10px;border:1px solid var(--line);
     background:var(--paper);color:var(--ink);text-align:center;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    white-space:normal;line-height:1.3}
+  .mu-bm{flex:0 0 auto;cursor:pointer;padding:8px 9px;border-radius:10px;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);
+    display:grid;place-items:center}
+  .mu-bm svg{width:19px;height:19px}
+  /* filled once a page is kept, so the state is visible at a glance */
+  .mu-bm[data-set="1"]{color:var(--brand-600);border-color:var(--brand-600)}
+  .mu-bm[data-set="1"] svg path{fill:currentColor}
+  .mu-bmrow{display:flex;align-items:center;gap:10px;margin:10px 14px 0;
+    padding:9px 12px;border-radius:11px;background:var(--paper);
+    border:1px solid var(--line);font-size:calc(12.5px * var(--ts));color:var(--ink)}
+  .mu-bmrow span{flex:1;min-width:0}
+  .mu-bm-clear{flex:0 0 auto;font:inherit;font-size:calc(12px * var(--ts));font-weight:600;
+    cursor:pointer;padding:5px 10px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--brand-600)}
   .mu-jump{display:flex;gap:8px;padding:10px 14px 0}
   .mu-f{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
     font-size:calc(10px * var(--ts));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -3089,6 +3106,9 @@
               <button class="mu-nav" id="mu-prev" data-i18n="mushaf.previous">Previous</button>
               <button class="mu-where" id="mu-where"><span id="mu-where-t">&hellip;</span></button>
               <button class="mu-nav" id="mu-next" data-i18n="mushaf.next">Next</button>
+              <button class="mu-bm" id="mu-bm" aria-label="Bookmark" data-i18n-attr="aria-label:a11y.bookmark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></svg>
+              </button>
             </div>
 
             <div class="mu-jump" id="mu-jump" hidden>
@@ -3098,6 +3118,11 @@
                 <select id="mu-j-juz"></select></label>
               <label class="mu-f"><span data-i18n="mushaf.page">Page</span>
                 <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
+            </div>
+
+            <div class="mu-bmrow" id="mu-bmrow" hidden>
+              <span id="mu-bm-t"></span>
+              <button class="mu-bm-clear" id="mu-bm-clear" data-i18n="mushaf.remove_bookmark">Remove</button>
             </div>
 
             <div class="mu-page" id="mu-page" aria-live="polite"></div>
@@ -6308,6 +6333,10 @@ async function openTranslation(){
 const MUSHAF = { id:"indopak13", meta:null, state:null, page:1,
                  pages:new Map(), sur:[], juz:[] };
 const MU_LAST_PAGE = "mushaf.lastPage";
+/* Separate from the last page read. The mushaf already reopens where you left
+   off; a bookmark is a page you chose to keep — a daily wird, or where the
+   ḥalqah is up to — which the next page you turn to must not overwrite. */
+const MU_BOOKMARK = "mushaf.bookmark";
 
 async function loadMushafMeta(){
   if(MUSHAF.state) return MUSHAF.state;
@@ -6475,6 +6504,7 @@ async function showMushafPage(n){
   document.getElementById('mu-next').disabled = (n >= total);
   document.getElementById('mu-j-page').value = n;
   updateMushafWhere();
+  renderMushafBookmark();
   if(MUSHAF.meta.kind === "image"){ renderMushafImage(n); return; }
   try{
     renderMushafPage(await loadMushafPage(n));
@@ -6483,6 +6513,44 @@ async function showMushafPage(n){
       `<p class="mu-err">${esc(t("mushaf.couldn_t_load_this_page",
         "Couldn't load this page. Check your connection and try again."))}</p>`;
   }
+}
+
+function mushafBookmark(){
+  const n = prefStore.get(MU_BOOKMARK, 0);
+  return (Number.isInteger(n) && n >= 1) ? n : 0;
+}
+
+/* One button, and what it does depends on where you are, so it is never a
+   no-op: away from a kept page it takes you there, on it it lets it go, and
+   with none kept it keeps this one. The label says which, every time. */
+function renderMushafBookmark(){
+  const b = document.getElementById('mu-bm');
+  const row = document.getElementById('mu-bmrow');
+  if(!b) return;
+  const mark = mushafBookmark();
+  const here = mark && mark === MUSHAF.page;
+  b.dataset.set = mark ? "1" : "0";
+  b.setAttribute("aria-label",
+    !mark ? t("a11y.save_this_page", "Save this page")
+    : here ? t("a11y.remove_bookmark", "Remove bookmark")
+           : t("a11y.go_to_your_saved_page", "Go to your saved page"));
+  row.hidden = !mark;
+  if(mark){
+    document.getElementById('mu-bm-t').textContent =
+      t("mushaf.saved_page", "Saved: page {n}").replace("{n}", num(mark));
+  }
+}
+
+function toggleMushafBookmark(){
+  const mark = mushafBookmark();
+  if(!mark){ prefStore.set(MU_BOOKMARK, MUSHAF.page); renderMushafBookmark(); return; }
+  if(mark === MUSHAF.page){ prefStore.set(MU_BOOKMARK, 0); renderMushafBookmark(); return; }
+  showMushafPage(mark);
+}
+
+function clearMushafBookmark(){
+  prefStore.set(MU_BOOKMARK, 0);
+  renderMushafBookmark();
 }
 
 function fillMushafJump(){
@@ -6580,6 +6648,8 @@ function initQuranDemo(){
   document.getElementById('mu-j-surah').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-j-juz').addEventListener('change',e=>showMushafPage(e.target.value));
   document.getElementById('mu-j-page').addEventListener('change',e=>showMushafPage(e.target.value));
+  document.getElementById('mu-bm').addEventListener('click',toggleMushafBookmark);
+  document.getElementById('mu-bm-clear').addEventListener('click',clearMushafBookmark);
   initMushafSwipe();
   initMushafFit();
   document.getElementById('qd-search').addEventListener('input', e => {
