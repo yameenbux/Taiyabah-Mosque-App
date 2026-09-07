@@ -520,6 +520,22 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("zakat nisab — the metal price survives a provider going down, and says so when it is standing on an older figure");
 }
 
+/* ---- 3p. every row in the menu that goes somewhere has its icon ----
+   The Madrasah Portal was added as a link rather than copied from a button
+   beside it, and went out without one: a blank where every other row has a
+   glyph, which reads as something half-finished. The rows still to come are
+   marked "soon" and deliberately bare; every other one is checked. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const rows = [...app.matchAll(/<(a|button) class="dr-row([^"]*)"[^>]*>([\s\S]*?)<\/\1>/g)];
+  const bare = rows
+    .filter(m => !/\bsoon\b/.test(m[2]) && !m[3].includes("dr-ico"))
+    .map(m => (m[3].match(/data-i18n="([^"]+)"/) || [,"?"])[1]);
+  if (!rows.length) fail("no menu rows found to check — the markup has moved");
+  else if (bare.length) fail(`${bare.length} menu row(s) have no icon: ${bare.join(", ")}`);
+  else ok(`menu — all ${rows.length} rows carry an icon, bar the ones marked coming soon`);
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is
