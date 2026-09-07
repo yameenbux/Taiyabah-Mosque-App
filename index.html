@@ -412,6 +412,9 @@
   .zk-live[data-s="idle"]{display:none}
   .zk-live[data-s="loading"]{color:var(--muted)}
   .zk-live[data-s="failed"]{background:var(--danger-bg,#FBF0EB);color:#7C3A20}
+  /* A price from earlier is worth having and worth marking as earlier: told
+     apart from today's, but not dressed up as a failure. */
+  .zk-live[data-s="stale"]{background:#FBF6E7;color:#7A5C13}
   .zk-refresh{margin-left:auto;cursor:pointer;font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;
     color:inherit;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);
     border-radius:999px;padding:4px 10px}
@@ -3795,7 +3798,7 @@
              not, and the note says so rather than letting someone set up
              two-step verification only to find an empty page. -->
         <a class="dr-row" href="https://taiyabahwebsite.ysbdesigns.uk/portal/" target="_blank" rel="noopener">
-          <span class="dr-t">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5"/><path d="M10 8.4 13.6 12 10 15.6"/><path d="M13.6 12H4.5"/></svg></span><span class="dr-t">
             <span data-i18n="portals.madrasah_portal">Madrasah Portal</span>
             <small class="dr-note" data-i18n="portals.madrasah_note">Sign in &middot; registers and pupil records still being built</small>
           </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
@@ -5566,8 +5569,15 @@ async function syncAlertsUI(){
    to enter the price themselves. The calculator works either way.
 --------------------------------------------------- */
 const TROY_OZ_G = 31.1034768;
-const SANE = { gold:[500,20000], silver:[3,500], fx:[0.4,1.6] };   // USD/oz, USD→GBP
-let LIVE = { gold:null, silver:null, at:null, state:"idle" };
+/* Ranges wide enough for years of movement and narrow enough to catch a
+   provider that has changed its units or started answering with an error page
+   that happens to parse as a number. */
+const SANE = { goldOz:[500,20000], silverOz:[3,500], fx:[0.4,1.6],
+               goldG:[15,700], silverG:[0.05,20] };
+const ZK_LAST = "zakat.lastPrice";           // the last figures that passed those checks
+const ZK_LAST_FX = "zakat.lastRate";         // and the last USD→GBP rate
+const ZK_LAST_MAX_DAYS = 7;
+let LIVE = { gold:null, silver:null, at:null, state:"idle", stale:false };
 
 async function fetchJSON(url, ms=6000){
   const c=new AbortController();
@@ -5580,28 +5590,108 @@ async function fetchJSON(url, ms=6000){
 }
 const inRange=(v,[lo,hi])=> typeof v==="number" && isFinite(v) && v>=lo && v<=hi;
 
-async function fetchMetalPrices(){
-  LIVE.state="loading"; zkPriceUI();
-  try{
-    const [g,s,fx] = await Promise.all([
-      fetchJSON("https://api.gold-api.com/price/XAU"),
-      fetchJSON("https://api.gold-api.com/price/XAG"),
-      fetchJSON("https://api.frankfurter.app/latest?from=USD&to=GBP")
-    ]);
-    const goldUsd   = g && Number(g.price);
-    const silverUsd = s && Number(s.price);
-    const rate      = fx && fx.rates && Number(fx.rates.GBP);
-
-    if(!inRange(goldUsd,SANE.gold) || !inRange(silverUsd,SANE.silver) || !inRange(rate,SANE.fx))
-      throw new Error("implausible values");
-
-    LIVE.gold   = (goldUsd   / TROY_OZ_G) * rate;    // £ per gram
-    LIVE.silver = (silverUsd / TROY_OZ_G) * rate;
-    LIVE.at     = new Date();
-    LIVE.state  = "ok";
-  }catch(e){
-    LIVE.state="failed";
+/* Try each in turn and take the first answer that survives its range check. A
+   provider that has gone away, changed shape, or started returning nonsense is
+   simply skipped: the check is what makes it safe to keep spares we cannot
+   verify from here. */
+async function firstSane(sources, range){
+  for(const src of sources){
+    try{
+      const v = Number(src.pick(await fetchJSON(src.url)));
+      if(inRange(v, range)) return v;
+    }catch(e){ /* next one */ }
   }
+  return null;
+}
+
+const FX_SOURCES = [
+  { url:"https://api.frankfurter.app/latest?from=USD&to=GBP", pick:d => d && d.rates && d.rates.GBP },
+  { url:"https://api.frankfurter.dev/v1/latest?base=USD&symbols=GBP", pick:d => d && d.rates && d.rates.GBP },
+  { url:"https://open.er-api.com/v6/latest/USD", pick:d => d && d.rates && d.rates.GBP },
+  { url:"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json",
+    pick:d => d && d.usd && d.usd.gbp }
+];
+const GOLD_SOURCES = [
+  { url:"https://api.gold-api.com/price/XAU", pick:d => d && d.price }
+];
+const SILVER_SOURCES = [
+  { url:"https://api.gold-api.com/price/XAG", pick:d => d && d.price }
+];
+
+/* Both metals in one call and already in pounds, so it needs no exchange rate
+   at all — worth trying first, and worth having when the rate is what is
+   missing. */
+async function fetchGbpQuotes(){
+  try{
+    const d = await fetchJSON("https://data-asg.goldprice.org/dbXRates/GBP");
+    const it = d && d.items && d.items[0];
+    if(!it) return null;
+    const gold = Number(it.xauPrice) / TROY_OZ_G, silver = Number(it.xagPrice) / TROY_OZ_G;
+    if(inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)) return { gold, silver };
+  }catch(e){ /* fall through to the dollar route */ }
+  return null;
+}
+
+function rememberPrices(){
+  try{ prefStore.set(ZK_LAST, { gold:LIVE.gold, silver:LIVE.silver, at:LIVE.at.getTime() }); }catch(e){}
+}
+
+/* A nisab from this morning is still a nisab. Only when there is nothing at all
+   is the reader asked to type a price in. */
+function lastGoodPrices(){
+  const v = prefStore.get(ZK_LAST, null);
+  if(!v || !inRange(Number(v.gold), SANE.goldG) || !inRange(Number(v.silver), SANE.silverG)) return null;
+  const at = new Date(Number(v.at) || 0);
+  if(!(at.getTime() > 0)) return null;
+  if((Date.now() - at.getTime()) > ZK_LAST_MAX_DAYS * 864e5) return null;   // too old to stand for today
+  return { gold:Number(v.gold), silver:Number(v.silver), at };
+}
+
+/* The three figures used to be asked for together, so the exchange rate going
+   missing threw away two metal prices that had arrived perfectly well. They are
+   asked for separately now, each with spares, and a good answer from last time
+   stands in rather than nothing. */
+async function fetchMetalPrices(){
+  LIVE.state="loading"; LIVE.stale=false; zkPriceUI();
+
+  const direct = await fetchGbpQuotes();
+  if(direct){
+    LIVE.gold = direct.gold; LIVE.silver = direct.silver;
+    LIVE.at = new Date(); LIVE.state = "ok";
+    rememberPrices(); zkPriceUI(true); return;
+  }
+
+  const [goldOz, silverOz, freshRate] = await Promise.all([
+    firstSane(GOLD_SOURCES,   SANE.goldOz),
+    firstSane(SILVER_SOURCES, SANE.silverOz),
+    firstSane(FX_SOURCES,     SANE.fx)
+  ]);
+  if(freshRate) try{ prefStore.set(ZK_LAST_FX, { rate:freshRate, at:Date.now() }); }catch(e){}
+  /* The rate is the piece most likely to be missing, and the piece that matters
+     least: pounds and dollars move by about a percent in a week, where the
+     metal itself can do that in a day. So a rate from the last few days is
+     allowed to convert today's price rather than throwing it away. */
+  const rate = freshRate || (() => {
+    const v = prefStore.get(ZK_LAST_FX, null);
+    if(!v || !inRange(Number(v.rate), SANE.fx)) return null;
+    return (Date.now() - Number(v.at)) <= 7 * 864e5 ? Number(v.rate) : null;
+  })();
+  if(goldOz && silverOz && rate){
+    const gold = (goldOz / TROY_OZ_G) * rate, silver = (silverOz / TROY_OZ_G) * rate;
+    if(inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)){
+      LIVE.gold = gold; LIVE.silver = silver;
+      LIVE.at = new Date(); LIVE.state = "ok";
+      rememberPrices(); zkPriceUI(true); return;
+    }
+  }
+
+  const last = lastGoodPrices();
+  if(last){
+    LIVE.gold = last.gold; LIVE.silver = last.silver;
+    LIVE.at = last.at; LIVE.state = "ok"; LIVE.stale = true;
+    zkPriceUI(true); return;
+  }
+  LIVE.state = "failed";
   zkPriceUI(true);
 }
 
@@ -5615,11 +5705,17 @@ function zkPriceUI(applyValue){
   }
   if(LIVE.state==="ok"){
     const p=LIVE[ZK_STD];
-    el.dataset.s="ok";
-    el.innerHTML = t("zakat.live_price","Live {metal} price · £{p}/g · updated {at}")
+    const when = LIVE.at.toLocaleString("en-GB",
+      LIVE.stale && (Date.now() - LIVE.at.getTime()) > 864e5
+        ? {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"}
+        : {hour:"2-digit", minute:"2-digit"});
+    el.dataset.s = LIVE.stale ? "stale" : "ok";
+    el.innerHTML = (LIVE.stale
+        ? t("zakat.last_known_price", "Last known {metal} price · £{p}/g · from {at}")
+        : t("zakat.live_price",       "Live {metal} price · £{p}/g · updated {at}"))
       .replace("{metal}", t("zakat.metal."+ZK_STD, ZK_STD))
       .replace("{p}", num(p.toFixed(2)))
-      .replace("{at}", num(LIVE.at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})))
+      .replace("{at}", num(when))
       + ` <button class="zk-refresh" id="zk-refresh">${t("zakat.refresh","Refresh")}</button>`;
     document.getElementById('zk-refresh').addEventListener('click',fetchMetalPrices);
     if(applyValue && !input.dataset.touched){
