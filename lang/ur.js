@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "32251ed9068b",
+ "version": "82ede85bc1e4",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -641,6 +641,7 @@ window.LANG_PACK = {
   "lang.download_failed": "وہ زبان کا پیکج ڈاؤن لوڈ نہیں ہو سکا۔ اپنا انٹرنیٹ دیکھ کر دوبارہ کوشش کریں۔",
   "quran.script_name": "اِنڈوپاک (کنگ فہد کمپلیکس نستعلیق، یونیکوڈ)",
   "quran.translator": "عبداللہ یوسف علی",
+  "zakat.last_known_price": "آخری معلوم {metal} قیمت · £{p}/گرام · {at} کی",
   "video.gC7H_60vPFU.t": "نئی تعمیر کی تازہ اطلاع ۲۰۲۶",
   "video.gC7H_60vPFU.d": "نئی تعمیر",
   "video.N7wFXynmLHM.t": "طیبہ مسجد — ہماری کہانی",

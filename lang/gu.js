@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "315e6375a665",
+ "version": "67042ef35212",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -641,6 +641,7 @@ window.LANG_PACK = {
   "lang.download_failed": "તે ભાષા પૅક ડાઉનલોડ થઈ શક્યું નહીં. તમારું ઇન્ટરનેટ તપાસીને ફરી પ્રયાસ કરો.",
   "quran.script_name": "ઇન્ડોપાક (કિંગ ફહદ કૉમ્પ્લેક્સ નસ્તાલીક, યુનિકોડ)",
   "quran.translator": "અબ્દુલ્લાહ યુસુફ અલી",
+  "zakat.last_known_price": "છેલ્લી જાણીતી {metal} કિંમત · £{p}/ગ્રામ · {at}ની",
   "video.gC7H_60vPFU.t": "નવા બાંધકામની અપડેટ ૨૦૨૬",
   "video.gC7H_60vPFU.d": "નવું બાંધકામ",
   "video.N7wFXynmLHM.t": "તૈયબા મસ્જિદ — અમારી કહાણી",

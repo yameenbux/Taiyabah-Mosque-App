@@ -497,6 +497,29 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("tab bar — recovers its place on the screen after the keyboard has been up");
 }
 
+/* ---- 3o. the nisab does not rest on one website staying up ----
+   A phone came back with "Couldn't fetch today's price": all three figures
+   were asked for together, so whichever one was missing took the other two
+   down with it, and a price from that morning was thrown away rather than
+   offered. Each figure has spares now, and a good answer from earlier stands
+   in — with the check that a figure is plausible before it is used, which is
+   what makes a spare we cannot reach from here safe to keep. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  const fx = (app.match(/const FX_SOURCES = \[([\s\S]*?)\];/) || [])[1] || "";
+  if ((fx.match(/url:/g) || []).length < 2)
+    bad.push("the exchange rate has no spare source — one website going down would take the nisab with it");
+  if (!/function lastGoodPrices\(/.test(app) || !/ZK_LAST_MAX_DAYS/.test(app))
+    bad.push("a price that worked earlier is no longer kept, so a moment's outage leaves the reader with nothing");
+  if (!/inRange\(v, range\)/.test(app))
+    bad.push("firstSane no longer range-checks what a provider returns — a wrong nisab is worse than no nisab");
+  if (/Promise\.all\(\[\s*fetchJSON\("https:\/\/api\.gold-api/.test(app))
+    bad.push("the three figures are asked for together again, so any one of them can take the other two down");
+  if (bad.length) bad.forEach(fail);
+  else ok("zakat nisab — the metal price survives a provider going down, and says so when it is standing on an older figure");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

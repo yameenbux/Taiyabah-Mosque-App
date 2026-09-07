@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "f4ec73da7044",
+ "version": "11813c27295f",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -641,6 +641,7 @@ window.LANG_PACK = {
   "lang.download_failed": "تعذّر تنزيل حزمة اللغة. تحقّق من اتصالك ثم أعد المحاولة.",
   "quran.script_name": "الرسم الهندي الباكستاني (مجمع الملك فهد، نستعليق، يونيكود)",
   "quran.translator": "عبد الله يوسف علي",
+  "zakat.last_known_price": "آخر سعر معروف لـ{metal} · £{p}/غرام · من {at}",
   "video.gC7H_60vPFU.t": "مستجدات البناء الجديد ٢٠٢٦",
   "video.gC7H_60vPFU.d": "البناء الجديد",
   "video.N7wFXynmLHM.t": "مسجد طيبة — قصتنا",
