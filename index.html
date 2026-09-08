@@ -981,6 +981,10 @@
     cursor:pointer;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
     border-radius:15px;padding:14px;margin-top:12px}
   .md-row:first-of-type{margin-top:0}
+  /* One of these rows is a link out rather than a button, and arrived underlined
+     in the browser's blue-ish default. It is the same row as the others. */
+  a.md-row{text-decoration:none;color:inherit}
+  a.md-row .md-t1,a.md-row .md-t2{text-decoration:none}
   .md-row:active:not(.soon){background:#F1F7F3}
   .md-row.soon{cursor:default}
   .md-ico{flex:0 0 auto;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
@@ -3256,6 +3260,56 @@
   <!-- Restored: the button and the code for this page were both present, but
        the dialog itself had gone missing from the markup, so tapping "40
        Rabbanā" threw on a null element and did nothing. -->
+  <!-- The tile went straight to Admissions & Fees, which is one of four things
+       the madrasah has in here. It asks now. -->
+  <div class="sheet" id="madrasah" data-open="0" role="dialog" aria-modal="true" aria-label="Madrasah" data-i18n-attr="aria-label:a11y.madrasah">
+    <div class="scrim" id="mdr-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="madrasah.madrasah">Madrasah</h3>
+        <button class="sh-close" id="mdr-close" data-i18n="adm.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="wl-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="wl-ar">مَدْرَسَة</div>
+          <div class="wl-en" data-i18n="madrasah.teaching_the_community_s_children">Teaching the community’s children</div>
+        </section>
+        <div class="ab-wrap">
+          <button class="md-row" id="mdr-go-admissions">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M14 3.5V8h5"/><path d="M8.8 12.5h6.4M8.8 15.6h4.4"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="madrasah.admissions_fees">Admissions &amp; Fees</span>
+              <span class="md-t2" data-i18n="madrasah.fees_class_times_and_attendance">Fees, class times and attendance</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="mdr-go-holidays">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8.5 3.5v3M15.5 3.5v3"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="madrasah.holiday_planner">Holiday Planner</span>
+              <span class="md-t2" data-i18n="madrasah.term_dates_and_closures">Term dates and closures</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <a class="md-row" id="mdr-go-portal" href="https://taiyabahwebsite.ysbdesigns.uk/portal/" target="_blank" rel="noopener">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5"/><path d="M10 8.4 13.6 12 10 15.6"/><path d="M13.6 12H4.5"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="portals.madrasah_portal">Madrasah Portal</span>
+              <span class="md-t2" data-i18n="madrasah.sign_in_registers_still_being_built">Sign in · registers and pupil records still being built</span>
+            </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
+          </a>
+          <button class="md-row" id="mdr-go-education">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.2 21 8.6l-9 4.4-9-4.4 9-4.4Z"/><path d="M6.6 10.6v4.9c0 1.6 2.4 2.9 5.4 2.9s5.4-1.3 5.4-2.9v-4.9"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="madrasah.what_is_taught">What is taught</span>
+              <span class="md-t2" data-i18n="madrasah.the_classes_and_what_they_cover">The classes and what they cover</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+        </div>
+        <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana Duas" data-i18n-attr="aria-label:a11y.40_rabbana_duas">
     <div class="scrim" id="rb-scrim"></div>
     <div class="panel">
@@ -3284,6 +3338,7 @@
     <div class="scrim" id="ak-scrim"></div>
     <div class="panel">
       <div class="sh-top">
+        <button class="sh-back" id="ak-back" hidden data-i18n="athkar.back_to_athkar">&larr; Athkār</button>
         <h3 style="text-align:left" data-i18n="athkar.daily_athkar">Daily Athkār</h3>
         <button class="sh-close" id="ak-close" data-i18n="athkar.done">Done</button>
       </div>
@@ -3293,7 +3348,50 @@
           <div class="wl-ar">أَذْكَار</div>
           <div class="wl-en" data-i18n="athkar.morning_evening_and_after_salah">Morning, evening and after ṣalāh</div>
         </section>
-        <div class="ab-wrap">
+        <!-- The tile used to land straight on the morning athkār, with the
+             other sets behind tabs nobody had been told about. It asks first
+             now, the way the Qur'an tile does — and the duʿās that live in
+             their own sheets are offered from the same list, since a reader
+             looking for a duʿā does not know or care which file it is in. -->
+        <div class="ab-wrap" id="ak-mode-view">
+          <button class="md-row" id="ak-go-0">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M18.2 5.8l-1.6 1.6M7.4 16.6l-1.6 1.6"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.morning_evening">Morning &amp; Evening</span>
+              <span class="md-t2" data-i18n="athkar.after_fajr_and_after_asr">Once after Fajr and once after ʿAṣr</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="ak-go-1">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 20.5v-7a7.5 7.5 0 0 1 15 0v7"/><path d="M3.5 20.5h17"/><path d="M12 6V3.4"/><circle cx="12" cy="2.6" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.after_every_salah">After Every Ṣalāh</span>
+              <span class="md-t2" data-i18n="athkar.the_words_said_after_each">The words said after each prayer</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="ak-go-2">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.2 8.2 0 0 1 9.5 4 8.4 8.4 0 1 0 20 14.5Z"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.before_sleep">Before Sleep</span>
+              <span class="md-t2" data-i18n="athkar.what_to_say_on_going_to_bed">What to say on going to bed</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="ak-go-duas">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 20.4c-1.6-1.1-2.6-2.9-2.6-4.9V9.1c0-.7.6-1.3 1.3-1.3.7 0 1.3.6 1.3 1.3v3"/><path d="M15.6 20.4c1.6-1.1 2.6-2.9 2.6-4.9V9.1c0-.7-.6-1.3-1.3-1.3-.7 0-1.3.6-1.3 1.3v3"/><path d="M11 12V4.9c0-.7.6-1.3 1.3-1.3.7 0 1.3.6 1.3 1.3V12"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.everyday_du_as">Everyday Duʿās</span>
+              <span class="md-t2" data-i18n="athkar.waking_eating_travelling_worry_rain">Waking, eating, travelling, worry, rain</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="ak-go-rabbanas">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z"/><path d="M12 6.5v11.8"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.du_as_from_the_qur_an">Duʿās from the Qur'an</span>
+              <span class="md-t2" data-i18n="athkar.the_forty_rabbana_du_as">The forty Rabbanā duʿās</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+        </div>
+
+        <div class="ab-wrap" id="ak-read-view" hidden>
           <div class="ak-tabs" id="ak-tabs"></div>
           <div id="ak-body"><p class="qd-empty" data-i18n="athkar.loading">Loading…</p></div>
           <div class="wl-advisory">
@@ -7946,12 +8044,36 @@ function renderAthkar(){
   retranslate();
 }
 
+/* Which of the five the reader picked, so Escape and the back arrow step out
+   to the list rather than closing the sheet from underneath them. */
+let AK_VIEW = "modes";
+
+function akShowModes(){
+  AK_VIEW = "modes";
+  document.getElementById('ak-mode-view').hidden = false;
+  document.getElementById('ak-read-view').hidden = true;
+  document.getElementById('ak-back').hidden = true;
+  document.querySelector('#athkar .sh-body').scrollTop = 0;
+}
+
+async function akOpenSection(i){
+  AK_VIEW = "section";
+  akSection = i;
+  document.getElementById('ak-mode-view').hidden = true;
+  document.getElementById('ak-read-view').hidden = false;
+  document.getElementById('ak-back').hidden = false;
+  document.querySelector('#athkar .sh-body').scrollTop = 0;
+  await loadOnce('quran/athkar.js', 'ATHKAR_LOADED');
+  renderAthkar();
+}
+
 async function openAthkar(){
   document.getElementById('athkar').dataset.open="1";
   document.body.style.overflow="hidden";
-  document.querySelector('#athkar .sh-body').scrollTop=0;
+  akShowModes();
+  /* fetched now rather than when a set is picked, so the wait happens while
+     the reader is still choosing */
   await loadOnce('quran/athkar.js', 'ATHKAR_LOADED');
-  renderAthkar();
 }
 function closeAthkar(){
   document.getElementById('athkar').dataset.open="0";
@@ -8076,6 +8198,17 @@ function closeDuas(){
 
 function initRecite(){
   document.getElementById('ak-close').addEventListener('click',closeAthkar);
+  document.getElementById('ak-back').addEventListener('click', akShowModes);
+  document.getElementById('ak-go-0').addEventListener('click', () => akOpenSection(0));
+  document.getElementById('ak-go-1').addEventListener('click', () => akOpenSection(1));
+  document.getElementById('ak-go-2').addEventListener('click', () => akOpenSection(2));
+  /* These two live in sheets of their own; the athkār sheet steps aside. */
+  document.getElementById('ak-go-duas').addEventListener('click', () => {
+    closeAthkar(); setTimeout(openDuas, 120);
+  });
+  document.getElementById('ak-go-rabbanas').addEventListener('click', () => {
+    closeAthkar(); setTimeout(openRabbanas, 120);
+  });
   document.getElementById('ak-scrim').addEventListener('click',closeAthkar);
   document.getElementById('du-close').addEventListener('click',closeDuas);
   document.getElementById('du-scrim').addEventListener('click',closeDuas);
@@ -8088,7 +8221,11 @@ function initRecite(){
 
   document.addEventListener('keydown',e=>{
     if(e.key!=="Escape") return;
-    if(document.getElementById('athkar').dataset.open==="1"){ closeAthkar(); return; }
+    if(document.getElementById('athkar').dataset.open==="1"){
+      /* out to the list first, the way the back arrow goes */
+      if(AK_VIEW === "section"){ akShowModes(); return; }
+      closeAthkar(); return;
+    }
     if(document.getElementById('duas').dataset.open==="1"){
       // step back to the categories before closing outright
       if(!document.getElementById('du-read-view').hidden) showDuaList();
@@ -8274,7 +8411,7 @@ const TILE_ACTIONS = {
   quran:    () => openQuran(),
   athkar:   () => openAthkar(),
   qibla:    () => { switchTab("qibla"); drawTicks(); },
-  madrasah: () => openAdmissions(),
+  madrasah: () => openMadrasah(),
   nikah:    () => openMarriage(),
   funeral:  () => openFuneral(),
   hallhire: () => openHallHire(),
@@ -8765,6 +8902,32 @@ function closeAdmissions(){
   document.getElementById('madmissions').dataset.open="0";
   document.body.style.overflow="";
 }
+function openMadrasah(){
+  document.getElementById('madrasah').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#madrasah .sh-body').scrollTop=0;
+}
+function closeMadrasah(){
+  document.getElementById('madrasah').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initMadrasah(){
+  document.getElementById('mdr-close').addEventListener('click',closeMadrasah);
+  document.getElementById('mdr-scrim').addEventListener('click',closeMadrasah);
+  /* Each one is a sheet of its own, so this one steps aside rather than
+     stacking a second sheet on top of it. */
+  const go = fn => () => { closeMadrasah(); setTimeout(fn, 120); };
+  document.getElementById('mdr-go-admissions').addEventListener('click', go(openAdmissions));
+  document.getElementById('mdr-go-holidays').addEventListener('click', go(openHolidays));
+  document.getElementById('mdr-go-education').addEventListener('click', go(openEducation));
+  /* the portal is an ordinary link out; close behind it so coming back from
+     the browser does not land on a sheet left hanging open */
+  document.getElementById('mdr-go-portal').addEventListener('click', ()=>closeMadrasah());
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('madrasah').dataset.open==="1") closeMadrasah();
+  });
+}
+
 function initAdmissions(){
   document.getElementById('ad-close').addEventListener('click',closeAdmissions);
   document.getElementById('ad-scrim').addEventListener('click',closeAdmissions);
@@ -9773,6 +9936,7 @@ function boot(){
   initHallHire();
   initWill();
   initFuneral();
+  initMadrasah();
   initAdmissions();
   initHolidays();
   initEducation();
