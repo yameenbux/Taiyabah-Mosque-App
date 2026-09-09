@@ -561,6 +561,41 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("tile menus — Daily Adhkār and Madrasah both offer their choices, and every row leads somewhere");
 }
 
+/* ---- 3r. the hall says the same thing here as it does on the website ----
+   The app quoted £100–£180 for a hire the masjid has never priced, while the
+   website's own booking summary shows "£—" and sends people to the office.
+   Two numbers for one hall is worse than none, and the invented one was the
+   one a family would have budgeted around. The calendar had the matching
+   fault: it collapsed a day with one session already gone into the same green
+   as an empty one, so "one slot left" — the fact worth knowing before you tap
+   — never reached the screen. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+
+  const bk = (app.match(/function bkShowPrice\(\)[\s\S]*?\n\}/) || [""])[0];
+  if (!bk) bad.push("the hire fee box has gone — a booking screen has to say what happens about money");
+  if (/\bBK_PRICING\b/.test(app))
+    bad.push("BK_PRICING is back: the app would quote a hire rate the masjid does not publish");
+  if (/£\s*\$\{|toFixed\(2\)/.test(bk))
+    bad.push("bkShowPrice is computing a figure again — the office quotes the fee, not this screen");
+  if (!/hallhire\.estimated_fee/.test(bk) || !/hallhire\.fee_placeholder/.test(bk))
+    bad.push("the fee box no longer says the office confirms the fee, so an empty £— reads as free");
+
+  const day = (app.match(/function bkDayState\(d\)[\s\S]*?\n\}/) || [""])[0];
+  for (const state of ["unknown", "taken", "limited", "free"])
+    if (!new RegExp(`return "${state}"`).test(day))
+      bad.push(`bkDayState can never return "${state}", so that day is drawn as something it is not`);
+  for (const key of ["both_slots_free", "one_slot_left", "fully_booked", "not_published"])
+    if (!app.includes(`hallhire.${key}`))
+      bad.push(`the calendar legend has lost "${key}", so a colour on it stands for nothing`);
+  if (!/\.bk-dot\.limited\{/.test(app) || !/\.bk-day\[data-state="limited"\]\{/.test(app))
+    bad.push('"one slot left" has no colour of its own, so it is drawn as though it were free');
+
+  if (bad.length) bad.forEach(fail);
+  else ok("hall hire — no invented price, and the calendar tells one slot left from a free day, as the website does");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

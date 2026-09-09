@@ -474,6 +474,7 @@
   .bk-legend>span{display:flex;align-items:center;gap:5px}
   .bk-dot{width:9px;height:9px;border-radius:50%;display:block;flex:0 0 auto}
   .bk-dot.free{background:#3F7D58}
+  .bk-dot.limited{background:var(--gold)}
   .bk-dot.taken{background:var(--danger)}
   .bk-dot.unknown{background:var(--line)}
   .bk-cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -488,10 +489,12 @@
     position:relative;padding:0}
   .bk-day[disabled]{opacity:.3;cursor:default}
   .bk-day[data-state="free"]{border-color:#3F7D58}
+  .bk-day[data-state="limited"]{border-color:var(--gold)}
   .bk-day[data-state="taken"]{border-color:var(--danger);color:var(--muted)}
   .bk-day[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff;font-weight:700}
   .bk-day .bk-mark{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%}
   .bk-day[data-state="free"] .bk-mark{background:#3F7D58}
+  .bk-day[data-state="limited"] .bk-mark{background:var(--gold)}
   .bk-day[data-state="taken"] .bk-mark{background:var(--danger)}
   .bk-day[data-on="1"] .bk-mark{background:#fff}
   .bk-horizon{font-size:calc(11.5px * var(--ts));color:var(--muted);margin-top:10px;text-align:center}
@@ -524,7 +527,11 @@
   .bk-opt[data-on="1"] small{color:#EADFE6}
   .bk-price{margin-top:12px;padding:11px 13px;border-radius:11px;background:rgba(198,162,76,.13);
     border:1px solid rgba(198,162,76,.4);font-size:calc(13.5px * var(--ts));line-height:1.5;color:var(--ink)}
-  .bk-price b{font-size:calc(16px * var(--ts))}
+  .bk-price .k{display:block;font-size:calc(11px * var(--ts));letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted)}
+  .bk-price b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(20px * var(--ts));
+    font-weight:600;margin:2px 0 3px}
+  .bk-price .n{display:block;font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.45}
 
   .bk-agree{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:calc(12.5px * var(--ts));
     line-height:1.5;color:var(--ink);cursor:pointer}
@@ -538,6 +545,7 @@
   .bk-field textarea{resize:vertical}
   .bk-field[data-bad="1"] input,.bk-field[data-bad="1"] textarea{border-color:var(--danger)}
   .bk-hint{display:block;font-size:calc(11.5px * var(--ts));color:var(--muted);line-height:1.5;margin-top:5px}
+  .bk-clabel + .bk-hint{margin:-2px 0 8px}
   .bk-err{font-size:calc(13px * var(--ts));line-height:1.55;color:var(--danger);background:rgba(155,44,44,.08);
     border:1px solid rgba(155,44,44,.3);border-radius:11px;padding:10px 12px}
   .bk-submit{font:inherit;font-size:calc(15px * var(--ts));font-weight:700;padding:14px;border:0;border-radius:12px;
@@ -743,6 +751,7 @@
   .hh-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .hh-call-v{font-size:calc(16px * var(--ts));font-weight:700;color:var(--ink);
     overflow-wrap:anywhere}
+  .hh-note{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.7;margin:14px 4px 0}
   .hh-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
 
   /* ---- admissions, holiday planner, courses ----
@@ -2403,9 +2412,10 @@
 
           <div class="card bk-card">
             <div class="bk-legend" aria-hidden="true">
-              <span><i class="bk-dot free"></i><span data-i18n="hallhire.available">Available</span></span>
-              <span><i class="bk-dot taken"></i><span data-i18n="hallhire.taken">Taken</span></span>
-              <span><i class="bk-dot unknown"></i><span data-i18n="hallhire.not_known">Not known</span></span>
+              <span><i class="bk-dot free"></i><span data-i18n="hallhire.both_slots_free">Both slots free</span></span>
+              <span><i class="bk-dot limited"></i><span data-i18n="hallhire.one_slot_left">One slot left</span></span>
+              <span><i class="bk-dot taken"></i><span data-i18n="hallhire.fully_booked">Fully booked</span></span>
+              <span><i class="bk-dot unknown"></i><span data-i18n="hallhire.not_published">Not published</span></span>
             </div>
 
             <div class="bk-cal-head">
@@ -2417,6 +2427,8 @@
             </div>
             <div class="bk-grid" id="bk-grid"></div>
             <p class="bk-horizon" data-i18n="hallhire.bookings_up_to_12_months">Bookings can be made up to 12 months ahead.</p>
+            <p class="bk-horizon" data-i18n="hallhire.slot_changeover">Each hall is hired by the slot. The hour between four and
+              five is kept clear for changeover.</p>
 
             <div class="bk-panel" id="bk-panel" hidden>
               <div class="bk-when" id="bk-when">&mdash;</div>
@@ -2438,6 +2450,7 @@
                   <button type="button" class="bk-opt" data-kitchen="no" data-i18n="hallhire.without_kitchen">Without kitchen</button>
                 </div>
                 <span class="bk-clabel" data-i18n="hallhire.are_you_a_member">Are you a member of the masjid?</span>
+                <p class="bk-hint" data-i18n="hallhire.so_office_confirms_rate">So the office can confirm the right rate.</p>
                 <div class="bk-opts" id="bk-members">
                   <button type="button" class="bk-opt" data-member="yes" data-i18n="hallhire.yes">Yes</button>
                   <button type="button" class="bk-opt" data-member="no" data-i18n="hallhire.no">No</button>
@@ -2477,6 +2490,9 @@
               <div class="bk-done" id="bk-done" hidden></div>
             </div>
           </div>
+
+          <p class="hh-note" data-i18n="hallhire.for_pricing_ring_office">For pricing, or to discuss anything the calendar does not cover,
+             the office is the quickest route.</p>
 
           <a class="hh-call" href="tel:01204535997">
             <span class="hh-call-ico" aria-hidden="true">
@@ -7722,14 +7738,6 @@ const BK_SESSIONS = [
 ];
 /* The 16:00–17:00 gap is deliberate changeover time and is not bookable. */
 
-/* Prices the masjid has not yet confirmed — the website carries them as
-   placeholders too. They are shown as a guide and the screen says so, so that
-   nobody budgets on a figure the office has not agreed. */
-const BK_PRICING = {
-  member:    { morning: 100, evening: 120 },
-  nonmember: { morning: 150, evening: 180 },
-};
-
 const BK = {
   taken: null,          // null = we do not know yet; never claim a date is free
   month: null,          // first of the month on screen
@@ -7774,10 +7782,15 @@ function bkSlotFree(d, slotKey){
   if(BK.taken === null) return null;
   return !BK.taken[bkIso(d) + "|" + slotKey];
 }
+/* Four states, the same four the website's calendar shows. A day with one
+   session already gone used to look exactly like an empty one; it doesn't
+   now, because "one slot left" is the thing worth knowing before you tap. */
 function bkDayState(d){
   if(BK.taken === null) return "unknown";
-  const free = BK_SESSIONS.some(s => bkSlotFree(d, s.key));
-  return free ? "free" : "taken";
+  const free = BK_SESSIONS.map(s => bkSlotFree(d, s.key));
+  if(free.every(f => f === false)) return "taken";
+  if(free.some(f => f === false))  return "limited";
+  return "free";
 }
 
 function bkRenderCal(){
@@ -7840,9 +7853,9 @@ function bkRenderSessions(){
 
   wrap.innerHTML = BK_SESSIONS.map(sn => {
     const free = bkSlotFree(BK.date, sn.key);
-    const label = free === null ? t("hallhire.not_known","Not known")
+    const label = free === null ? t("hallhire.not_published","Not published")
                 : free         ? t("hallhire.available","Available")
-                               : t("hallhire.taken","Taken");
+                               : t("hallhire.booked","Booked");
     const on = BK.slot === sn.key ? "1" : "0";
     return `<button type="button" class="bk-session" data-slot="${sn.key}" data-on="${on}"` +
            `${free === false ? " disabled" : ""}>
@@ -7859,22 +7872,24 @@ function bkRenderSessions(){
       BK.slot = b.dataset.slot;
       bkResetChoices();
       document.getElementById("bk-choose").hidden = false;
+      bkShowPrice();
       bkRenderSessions();
     }));
 }
 
-function bkPrice(){
-  const band = BK_PRICING[BK.member === "yes" ? "member" : "nonmember"];
-  const amount = band && band[BK.slot];
-  return typeof amount === "number" ? amount : null;
-}
+/* The masjid publishes no hire rate — not here and not on the website, which
+   shows the same empty figure. An invented number would be the one thing on
+   this screen a person actually planned around, so there isn't one: the fee
+   comes from the office, on the phone, and the box says only that. */
 function bkShowPrice(){
   const box = document.getElementById("bk-price");
-  if(BK.member === null || !BK.slot){ box.hidden = true; return; }
-  const p = bkPrice();
+  if(!BK.slot){ box.hidden = true; return; }
   box.hidden = false;
-  box.innerHTML = `<b>${esc(num("£" + p.toFixed(2)))}</b> ` +
-    esc(t("hallhire.price_guide","— a guide only. The office confirms the rate when it accepts your request."));
+  box.innerHTML =
+    `<span class="k">${esc(t("hallhire.estimated_fee","Estimated fee"))}</span>` +
+    `<b dir="ltr">£&mdash;</b>` +
+    `<span class="n">${esc(t("hallhire.fee_placeholder",
+      "The office confirms the fee when it calls you."))}</span>`;
 }
 
 /* Everything is optional until it is not: the form only appears once a slot,
@@ -7991,8 +8006,9 @@ function bkDone(problemHtml){
   const row = (k, v) => `<div class="bk-sum"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
   box.innerHTML =
     `<h4>${esc(t("hallhire.request_sent","Request sent"))}</h4>` +
-    `<p>${esc(t("hallhire.office_will_call",
-      "The office will call you to confirm. Nothing is booked until they do."))}</p>` +
+    `<p>${esc(t("hallhire.office_will_call_fee",
+      "Nothing has been paid and this date is not held yet — the office will " +
+      "call you to confirm the date, the fee and how to pay."))}</p>` +
     row(t("hallhire.date_label","Date"),
         `${fullDow(BK.date.getDay())} ${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())} ${num(BK.date.getFullYear())}`) +
     row(t("hallhire.session","Session"),
@@ -8018,7 +8034,6 @@ function initBooking(){
       if(!b) return;
       BK[prop] = b.dataset[prop];
       document.querySelectorAll(`#${wrap} .bk-opt`).forEach(x => x.dataset.on = x === b ? "1" : "0");
-      if(prop === "member") bkShowPrice();
       bkMaybeShowForm();
     });
   pick("bk-halls", "hall");
