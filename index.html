@@ -981,6 +981,10 @@
     cursor:pointer;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
     border-radius:15px;padding:14px;margin-top:12px}
   .md-row:first-of-type{margin-top:0}
+  .ad-apply{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin:10px 0 12px;padding:11px 13px;border-radius:11px;text-decoration:none;
+    font-weight:700;font-size:calc(13px * var(--ts));
+    background:var(--brand-600);color:#fff}
   /* One of these rows is a link out rather than a button, and arrived underlined
      in the browser's blue-ish default. It is the same row as the others. */
   a.md-row{text-decoration:none;color:inherit}
@@ -2659,11 +2663,20 @@
 
         <div class="ab-wrap">
 
+          <!-- The form went live on the website while this still said it was
+               coming. It carries the year's classes, its date-of-birth windows
+               and its closing date, which is why none of them are repeated
+               here: one place to update, and no chance of the app advertising
+               a deadline that has passed. -->
           <div class="ad-note">
             <span class="lab" data-i18n="adm.applications">Applications</span>
-            <h4 data-i18n="adm.online_applications_open_soon">Online applications open soon</h4>
-            <p data-i18n="adm.you_will_be_able_to_apply">You will be able to apply for a place from here. Until that is live, please
-               ring the madrasah office to ask about places for this academic year.</p>
+            <h4 data-i18n="adm.apply_for_a_place">Apply for a place</h4>
+            <p data-i18n="adm.the_form_asks_for_your_child">The form asks for your child's details and the class you are applying for, and
+               shows which classes are open and when applications close.</p>
+            <a class="ad-apply" id="ad-apply" href="https://taiyabahwebsite.ysbdesigns.uk/apply/" target="_blank" rel="noopener">
+              <span data-i18n="adm.open_the_application_form">Open the application form</span>
+              <span class="dr-ext" aria-hidden="true">&#8599;</span>
+            </a>
             <p><strong data-i18n="adm.the_office_takes_admission_queries">The office takes admission queries between 5pm and 7pm.</strong></p>
           </div>
 
@@ -3283,6 +3296,13 @@
               <span class="md-t2" data-i18n="madrasah.fees_class_times_and_attendance">Fees, class times and attendance</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
+          <a class="md-row" id="mdr-go-apply" href="https://taiyabahwebsite.ysbdesigns.uk/apply/" target="_blank" rel="noopener">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8.5L19 8v5.5"/><path d="M14 3.5V8h5"/><path d="M8.8 12.2h3.4M8.8 8.9h3"/><path d="m15.6 20.4-3 .6.6-3 5-5a1.7 1.7 0 0 1 2.4 2.4l-5 5Z"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="madrasah.apply_for_a_place">Apply for a place</span>
+              <span class="md-t2" data-i18n="madrasah.the_admission_form_for_this_year">The admission form for this year's classes</span>
+            </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
+          </a>
           <button class="md-row" id="mdr-go-holidays">
             <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8.5 3.5v3M15.5 3.5v3"/></svg></span>
             <span class="md-t">
@@ -8923,6 +8943,7 @@ function initMadrasah(){
   /* the portal is an ordinary link out; close behind it so coming back from
      the browser does not land on a sheet left hanging open */
   document.getElementById('mdr-go-portal').addEventListener('click', ()=>closeMadrasah());
+  document.getElementById('mdr-go-apply').addEventListener('click', ()=>closeMadrasah());
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('madrasah').dataset.open==="1") closeMadrasah();
   });
