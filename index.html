@@ -471,10 +471,10 @@
   /* ---- hall booking ---- */
   .bk-card{padding:14px}
   .bk-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:calc(11.5px * var(--ts));color:var(--muted);margin-bottom:12px}
+  .bk-opts + .bk-legend{margin-top:14px}
   .bk-legend>span{display:flex;align-items:center;gap:5px}
   .bk-dot{width:9px;height:9px;border-radius:50%;display:block;flex:0 0 auto}
   .bk-dot.free{background:#3F7D58}
-  .bk-dot.limited{background:var(--gold)}
   .bk-dot.taken{background:var(--danger)}
   .bk-dot.unknown{background:var(--line)}
   .bk-cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -488,13 +488,12 @@
     font:inherit;font-size:calc(13px * var(--ts));color:var(--ink);cursor:pointer;display:grid;place-items:center;
     position:relative;padding:0}
   .bk-day[disabled]{opacity:.3;cursor:default}
+  .bk-day[data-state="unoffered"]{opacity:.45;border-style:dashed}
   .bk-day[data-state="free"]{border-color:#3F7D58}
-  .bk-day[data-state="limited"]{border-color:var(--gold)}
   .bk-day[data-state="taken"]{border-color:var(--danger);color:var(--muted)}
   .bk-day[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff;font-weight:700}
   .bk-day .bk-mark{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%}
   .bk-day[data-state="free"] .bk-mark{background:#3F7D58}
-  .bk-day[data-state="limited"] .bk-mark{background:var(--gold)}
   .bk-day[data-state="taken"] .bk-mark{background:var(--danger)}
   .bk-day[data-on="1"] .bk-mark{background:#fff}
   .bk-horizon{font-size:calc(11.5px * var(--ts));color:var(--muted);margin-top:10px;text-align:center}
@@ -525,13 +524,47 @@
   .bk-opt small{display:block;font-size:calc(10.5px * var(--ts));color:var(--muted);margin-top:2px}
   .bk-opt[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
   .bk-opt[data-on="1"] small{color:#EADFE6}
-  .bk-price{margin-top:12px;padding:11px 13px;border-radius:11px;background:rgba(198,162,76,.13);
-    border:1px solid rgba(198,162,76,.4);font-size:calc(13.5px * var(--ts));line-height:1.5;color:var(--ink)}
-  .bk-price .k{display:block;font-size:calc(11px * var(--ts));letter-spacing:.06em;
-    text-transform:uppercase;color:var(--muted)}
-  .bk-price b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(20px * var(--ts));
-    font-weight:600;margin:2px 0 3px}
-  .bk-price .n{display:block;font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.45}
+  /* Paying the deposit is the whole point of the screen, so it is said once
+     at the top and again on the button, and nowhere in between. */
+  .bk-notice{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;padding:12px 13px;
+    border-radius:12px;background:rgba(198,162,76,.13);border:1px solid rgba(198,162,76,.4);
+    font-size:calc(13px * var(--ts));line-height:1.6;color:var(--ink)}
+  .bk-notice-ico{flex:0 0 auto;width:19px;height:19px;color:var(--gold);margin-top:1px}
+  .bk-notice-ico svg{width:100%;height:100%}
+  .bk-sub{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.6;margin:-4px 0 10px}
+  .bk-msg{margin-top:10px;padding:11px 13px;border-radius:11px;background:var(--paper);
+    border:1px solid var(--line);font-size:calc(12.5px * var(--ts));line-height:1.6}
+  .bk-act{flex:0 0 auto;font:inherit;font-size:calc(13px * var(--ts));font-weight:700;padding:9px 16px;
+    border-radius:10px;cursor:pointer;border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+  .bk-act:disabled{opacity:.4;cursor:default}
+  .bk-form-head{display:flex;flex-direction:column;gap:2px;padding-bottom:10px;margin-bottom:4px;
+    border-bottom:1px solid var(--line)}
+  .bk-fh-t{font-weight:700;font-size:calc(13.5px * var(--ts))}
+  .bk-fh-w{font-size:calc(12px * var(--ts));color:var(--muted)}
+  .bk-back{margin-top:8px;width:100%;font:inherit;font-size:calc(13px * var(--ts));padding:10px;
+    border-radius:11px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
+  .bk-done .bk-pay{display:block;margin-top:12px;padding:13px;border-radius:12px;text-align:center;
+    text-decoration:none;font-weight:700;font-size:calc(15px * var(--ts));
+    background:var(--brand-600);color:#fff}
+  .bk-hold{margin-top:8px;font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.55}
+  .bk-tel{color:var(--brand-600);font-weight:700;white-space:nowrap}
+
+  /* The rate card, printed as the masjid prints it. */
+  .bk-rates{padding:14px}
+  .bk-rate-eff{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.6;margin-bottom:4px}
+  .bk-rate-when{display:block;font-size:calc(11px * var(--ts));font-weight:700;color:var(--muted);
+    letter-spacing:.08em;text-transform:uppercase;margin:16px 0 4px}
+  .bk-rate-line{display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+    padding:8px 0;border-bottom:1px solid var(--line);font-size:calc(13.5px * var(--ts))}
+  .bk-rate-line:last-of-type{border-bottom:0}
+  .bk-rate-line .p{font-weight:700;flex:0 0 auto}
+  .bk-rate-note{font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.65;margin-top:9px}
+  .bk-terms{padding:14px}
+  .bk-term + .bk-term{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}
+  .bk-term b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(14.5px * var(--ts));
+    font-weight:600;margin-bottom:5px}
+  .bk-term p{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.7}
+  .bk-term p + p{margin-top:7px}
 
   .bk-agree{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:calc(12.5px * var(--ts));
     line-height:1.5;color:var(--ink);cursor:pointer}
@@ -2403,18 +2436,54 @@
           </div>
 
           <!-- ---------------- booking ----------------
-               The same two endpoints the website uses: availability is read
-               from the hall_availability view (confirmed bookings only), and a
-               request is inserted into hall_bookings. The anon key can do those
-               two things and nothing else — Row Level Security in Postgres is
-               the real access control, not anything on this screen. -->
+               The masjid lets the Centre BY THE DAY. There is no morning slot
+               and no evening slot, and what somebody chooses is HOW MANY halls
+               — the kitchen and the cleaning come with every hall band, and
+               kitchen-only hire is its own product at its own rate.
+
+               Paying the £100 deposit is what books the date. The database
+               holds it for thirty minutes while the payment goes through, so
+               two families cannot both be sent to Stripe for one Saturday.
+               Everything here goes through request_hall_booking(); the anon
+               key can call that and read the availability view, and nothing
+               else — Row Level Security in Postgres is the real access
+               control, not anything on this screen.
+
+               There is no membership question. The masjid charges one rate, so
+               the answer would decide nothing, and the app has no business
+               asking anybody about their religious affiliation to hire a room. -->
           <div class="sec-h"><h2 data-i18n="hallhire.book_the_hall">Book the hall</h2><span class="rule"></span></div>
 
+          <div class="bk-notice">
+            <span class="bk-notice-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+            </span>
+            <span data-i18n-html="hallhire.deposit_books_the_date"><b>Paying the &pound;100 deposit books the date.</b> Choose your day, fill in
+              the short form and pay &mdash; the date is yours as soon as the deposit goes
+              through, with nobody to wait for. It is held for you for thirty minutes
+              while you pay.</span>
+          </div>
+
           <div class="card bk-card">
+            <span class="bk-clabel" data-i18n="hallhire.what_do_you_need">What do you need?</span>
+            <!-- How many halls, not which one. One hall is Monday to Thursday
+                 only: the price list has no weekend rate for it, so those days
+                 are closed off rather than taking a booking the masjid does
+                 not sell. The database refuses it too. -->
+            <div class="bk-opts" id="bk-hire">
+              <button type="button" class="bk-opt" data-hire="halls" data-count="1">
+                <span data-i18n="hallhire.one_hall">1 hall</span><small data-i18n="hallhire.mon_thu_only">Mon&ndash;Thu only</small></button>
+              <button type="button" class="bk-opt" data-hire="halls" data-count="2">
+                <span data-i18n="hallhire.two_halls">2 halls</span><small data-i18n="hallhire.kitchen_included">Kitchen included</small></button>
+              <button type="button" class="bk-opt" data-hire="halls" data-count="3">
+                <span data-i18n="hallhire.three_halls">3 halls</span><small data-i18n="hallhire.kitchen_included_2">Kitchen included</small></button>
+              <button type="button" class="bk-opt" data-hire="kitchen_only">
+                <span data-i18n="hallhire.kitchen_only">Kitchen only</span><small data-i18n="hallhire.no_halls">No halls</small></button>
+            </div>
+
             <div class="bk-legend" aria-hidden="true">
-              <span><i class="bk-dot free"></i><span data-i18n="hallhire.both_slots_free">Both slots free</span></span>
-              <span><i class="bk-dot limited"></i><span data-i18n="hallhire.one_slot_left">One slot left</span></span>
-              <span><i class="bk-dot taken"></i><span data-i18n="hallhire.fully_booked">Fully booked</span></span>
+              <span><i class="bk-dot free"></i><span data-i18n="hallhire.available">Available</span></span>
+              <span><i class="bk-dot taken"></i><span data-i18n="hallhire.booked">Booked</span></span>
               <span><i class="bk-dot unknown"></i><span data-i18n="hallhire.not_published">Not published</span></span>
             </div>
 
@@ -2427,44 +2496,28 @@
             </div>
             <div class="bk-grid" id="bk-grid"></div>
             <p class="bk-horizon" data-i18n="hallhire.bookings_up_to_12_months">Bookings can be made up to 12 months ahead.</p>
-            <p class="bk-horizon" data-i18n="hallhire.slot_changeover">Each hall is hired by the slot. The hour between four and
-              five is kept clear for changeover.</p>
+            <p class="bk-horizon" data-i18n="hallhire.hire_is_whole_day">Every hall booking includes the kitchen and the cleaning. Hire is
+              for the whole day.</p>
 
             <div class="bk-panel" id="bk-panel" hidden>
               <div class="bk-when" id="bk-when">&mdash;</div>
-              <div class="bk-sessions" id="bk-sessions"></div>
+              <p class="bk-sub" id="bk-sub"></p>
 
-              <div class="bk-choose" id="bk-choose" hidden>
-                <span class="bk-clabel" data-i18n="hallhire.which_hall">Which hall?</span>
-                <div class="bk-opts" id="bk-halls">
-                  <button type="button" class="bk-opt" data-hall="1">
-                    <span data-i18n="hallhire.hall_1">Hall 1</span><small data-i18n="hallhire.ground_floor">Ground floor</small></button>
-                  <button type="button" class="bk-opt" data-hall="2">
-                    <span data-i18n="hallhire.hall_2">Hall 2</span><small data-i18n="hallhire.ground_floor_2">Ground floor</small></button>
-                  <button type="button" class="bk-opt" data-hall="3">
-                    <span data-i18n="hallhire.hall_3">Hall 3</span><small data-i18n="hallhire.first_floor">1st floor</small></button>
-                </div>
-                <span class="bk-clabel" data-i18n="hallhire.kitchen">Kitchen?</span>
-                <div class="bk-opts" id="bk-kitchens">
-                  <button type="button" class="bk-opt" data-kitchen="yes" data-i18n="hallhire.including_kitchen">Including kitchen</button>
-                  <button type="button" class="bk-opt" data-kitchen="no" data-i18n="hallhire.without_kitchen">Without kitchen</button>
-                </div>
-                <span class="bk-clabel" data-i18n="hallhire.are_you_a_member">Are you a member of the masjid?</span>
-                <p class="bk-hint" data-i18n="hallhire.so_office_confirms_rate">So the office can confirm the right rate.</p>
-                <div class="bk-opts" id="bk-members">
-                  <button type="button" class="bk-opt" data-member="yes" data-i18n="hallhire.yes">Yes</button>
-                  <button type="button" class="bk-opt" data-member="no" data-i18n="hallhire.no">No</button>
-                </div>
-                <div class="bk-price" id="bk-price" hidden></div>
-              </div>
+              <div class="bk-sessions" id="bk-sessions"></div>
+              <div class="bk-msg" id="bk-msg" hidden></div>
 
               <label class="bk-agree" id="bk-agree-wrap" hidden>
                 <input type="checkbox" id="bk-agree">
-                <span data-i18n="hallhire.i_agree_to_the_terms">I have read and agree to the terms of hire, including use of the
+                <span data-i18n-html="hallhire.i_agree_to_the_terms_2">I have read and agree to the
+                  <a href="#bk-terms" id="bk-terms-link">terms of hire</a>, including use of the
                   venue in accordance with Islamic rulings.</span>
               </label>
 
               <form class="bk-form" id="bk-form" novalidate hidden autocomplete="on">
+                <div class="bk-form-head">
+                  <span class="bk-fh-t" id="bk-fh-what">&mdash;</span>
+                  <span class="bk-fh-w" id="bk-fh-when">&mdash;</span>
+                </div>
                 <div class="bk-field">
                   <label for="bk-first" data-i18n="hallhire.first_name">First name</label>
                   <input type="text" id="bk-first" autocomplete="given-name">
@@ -2484,23 +2537,159 @@
                     so this must be a number that reaches you.</span>
                 </div>
                 <div class="bk-err" id="bk-err" hidden></div>
-                <button type="submit" class="bk-submit" id="bk-submit" data-i18n="hallhire.request_this_slot">Request this slot</button>
+                <button type="submit" class="bk-submit" id="bk-submit" data-i18n="hallhire.continue_to_deposit">Continue to the deposit</button>
+                <button type="button" class="bk-back" id="bk-back" data-i18n="hallhire.change">Change</button>
               </form>
 
               <div class="bk-done" id="bk-done" hidden></div>
             </div>
           </div>
 
-          <p class="hh-note" data-i18n="hallhire.for_pricing_ring_office">For pricing, or to discuss anything the calendar does not cover,
-             the office is the quickest route.</p>
+          <!-- ---------------- the charges ----------------
+               The masjid's published rate card, printed as the masjid prints
+               it. The app does NOT total it up: whether the utensils were used
+               and how many people ate are not things a phone can know, and a
+               figure on screen that turns out to be wrong is worse than no
+               figure. The office quotes. -->
+          <div class="sec-h"><h2 data-i18n="hallhire.charges">Charges</h2><span class="rule"></span></div>
+
+          <div class="card bk-rates">
+            <p class="bk-rate-eff" data-i18n="hallhire.hire_is_whole_day_2">Every hall booking includes the kitchen and the cleaning. Hire is
+              for the whole day.</p>
+
+            <span class="bk-rate-when" data-i18n="hallhire.monday_to_thursday">Monday &ndash; Thursday</span>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.one_hall_2">1 hall</span><span class="p tnum" data-i18n-num>&pound;350</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.two_halls_2">2 halls</span><span class="p tnum" data-i18n-num>&pound;500</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.three_halls_2">3 halls</span><span class="p tnum" data-i18n-num>&pound;600</span></div>
+
+            <span class="bk-rate-when" data-i18n="hallhire.friday_saturday_sunday">Friday, Saturday &amp; Sunday</span>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.two_halls_3">2 halls</span><span class="p tnum" data-i18n-num>&pound;600</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.three_halls_3">3 halls</span><span class="p tnum" data-i18n-num>&pound;700</span></div>
+            <p class="bk-rate-note" data-i18n="hallhire.no_one_hall_rate_weekend">There is no one-hall rate at the weekend.</p>
+
+            <span class="bk-rate-when" data-i18n="hallhire.kitchen_on_its_own">Kitchen on its own</span>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.kitchen_hire">Kitchen hire</span><span class="p tnum" data-i18n-num>&pound;125</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.utility_charge">Utility charge</span><span class="p tnum" data-i18n="hallhire.per_person_45p">45p per person</span></div>
+
+            <span class="bk-rate-when" data-i18n="hallhire.if_they_apply">If they apply</span>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.utensils_only_if_used">Utensils, only if used</span><span class="p tnum" data-i18n-num>&pound;100</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.utility_charge_if_you_cook">Utility charge, if you cook in the kitchen</span><span class="p tnum" data-i18n="hallhire.per_person_45p_2">45p per person</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="hallhire.damage_to_the_venue">Damage to the venue</span><span class="p tnum" data-i18n-num>&pound;100</span></div>
+
+            <p class="bk-rate-note" data-i18n-html="hallhire.deposit_paid_online"><strong>&pound;100 deposit, paid online when you book.</strong> That is what
+              reserves the date &mdash; nothing else holds it. It is not refundable if you
+              cancel, but it is refunded in full if the masjid cannot give you the date.</p>
+            <!-- A sort code in Urdu digits cannot be typed into a banking app.
+                 These live in their own elements, outside the translated prose,
+                 the same way the donation details do. -->
+            <p class="bk-rate-note" data-i18n-html="hallhire.balance_due_30_days">The <strong>balance</strong> is due 30 days before your booking date and
+              is paid at the office: cash, or bank transfer to <strong>Bolton Central Islamic
+              Society</strong>.</p>
+            <div class="bk-rate-line"><span class="n" data-i18n="sheet.sort_code">Sort code</span><span class="p tnum" data-i18n-latin>30-99-50</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="sheet.account_number">Account number</span><span class="p tnum" data-i18n-latin>59286668</span></div>
+          </div>
+
+          <!-- ---------------- terms of hire ----------------
+               The checkbox above asks people to agree to these. Until now the
+               app had the checkbox and not the terms, which is a signature on
+               a blank page. -->
+          <div class="sec-h" id="bk-terms"><h2 data-i18n="hallhire.terms_of_hire">Terms of hire</h2><span class="rule"></span></div>
+
+          <div class="card bk-terms">
+            <div class="bk-term"><b data-i18n="hallhire.t1_h">Use in accordance with Islamic rulings</b>
+              <p data-i18n="hallhire.t1_p">Any hire agreement is subject to the venue being used in accordance
+                with Islamic rulings. This includes, but is not limited to, no music being played
+                on the premises. Agreeing to this is a condition of booking.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t2_h">Deposit and balance</b>
+              <p data-i18n-html="hallhire.t2_p1">A <strong>&pound;100 deposit</strong> reserves your date. <strong>The date is
+                not held until the deposit is paid, and the deposit is paid online when you
+                book.</strong> Nothing else holds a date.</p>
+              <p data-i18n-html="hallhire.t2_p2">The <strong>full balance is due 30 days before</strong> your booking date,
+                and is paid at the office in cash or by bank transfer. It is not a fixed amount
+                &mdash; it depends on how many halls you take, the day of the week, and whether the
+                utensils or the utility charge apply &mdash; so the office confirms the figure when
+                it calls you.</p>
+              <p data-i18n-html="hallhire.t2_p3">The deposit is <strong>not refundable if you cancel</strong>. It <strong>is
+                refunded in full</strong> if the masjid cannot give you the date &mdash; if we decline
+                the booking, or if two payments reach us for the same day. You will not be left
+                out of pocket for something that was not your doing.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t3_h">Cleaning is included, and we do it</b>
+              <p data-i18n="hallhire.t3_p">Cleaning is included in the hire charge and is carried out by Taiyabah
+                Centre cleaners only. Please do not arrange your own cleaners. You are still
+                responsible for taking away anything you brought in, and for leaving the venue in
+                a reasonable state.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t4_h">Utensils and the utility charge</b>
+              <p data-i18n-html="hallhire.t4_p">If you use the masjid&rsquo;s utensils, a charge of <strong>&pound;100</strong>
+                applies. If you cook your own food in the kitchen, a utility charge of
+                <strong>45p per person</strong> applies. Neither is charged unless it applies to your
+                booking &mdash; the office confirms the final figure when it calls you.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t5_h">Access on the day</b>
+              <p data-i18n="hallhire.t5_p">A caretaker will be in touch before the day of your booking to arrange
+                access to the venue. Please make sure the contact details you give us are ones you
+                can be reached on.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t6_h">How far ahead you can book</b>
+              <p data-i18n="hallhire.t6_p">Bookings can be made up to 12 months in advance. Dates beyond that are
+                not available to book and cannot be provisionally held.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t7_h">Cancelling or moving your booking</b>
+              <p data-i18n-html="hallhire.t7_p1">The <strong>&pound;100 deposit is not refundable if you cancel</strong>,
+                including if you cancel the same day you booked. Anything you have paid beyond the
+                deposit is refunded if you cancel <strong>more than 30 days before</strong> your
+                booked date. Inside 30 days the balance is not refundable &mdash; but we will move
+                your booking to another date instead, once, subject to what is free. Ring the
+                office as early as you can: the sooner we know, the more likely we can offer the
+                date you want.</p>
+              <p data-i18n-html="hallhire.t7_p2">If <strong>the masjid</strong> cancels or cannot honour your date,
+                everything you have paid is refunded in full, deposit included.</p></div>
+
+            <div class="bk-term"><b data-i18n="hallhire.t8_h">Damage to the venue</b>
+              <p data-i18n-html="hallhire.t8_p">The person named on the booking is responsible for the condition the
+                venue is left in, including anything done by their guests. Where damage has been
+                caused, a charge of <strong>&pound;100</strong> applies. This is separate from the
+                cleaning and waste-removal charges above.</p></div>
+          </div>
+
+          <!-- ---------------- who to ring ---------------- -->
+          <div class="sec-h"><h2 data-i18n="hallhire.hall_bookings">Hall bookings</h2><span class="rule"></span></div>
+          <p class="hh-note" data-i18n="hallhire.ring_the_office_or_team">Ring the office, or any of the booking team directly.</p>
 
           <a class="hh-call" href="tel:01204535997">
-            <span class="hh-call-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
-            </span>
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
             <span class="hh-call-t">
               <span class="hh-call-k" data-i18n="hallhire.call_the_main_office">Call the main office</span>
               <span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span>
+            </span>
+            <span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <a class="hh-call" href="tel:07951795465">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n-latin>Rafiq I Patel</span>
+              <span class="hh-call-v tnum" data-i18n-latin>07951 795465</span>
+            </span>
+            <span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <a class="hh-call" href="tel:07909973776">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n-latin>Mustaq Adam</span>
+              <span class="hh-call-v tnum" data-i18n-latin>07909 973776</span>
+            </span>
+            <span class="dr-ch">&rsaquo;</span>
+          </a>
+
+          <a class="hh-call" href="tel:07729297676">
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n-latin>Alibhai Khotiwala</span>
+              <span class="hh-call-v tnum" data-i18n-latin>07729 297676</span>
             </span>
             <span class="dr-ch">&rsaquo;</span>
           </a>
@@ -6346,7 +6535,7 @@ function refreshRenderedText(){
     () => { if(open("athkar") && window.ATHKAR) renderAthkar(); },
     () => { if(open("duas") && window.DUAS) renderDuaCategories(document.getElementById('du-search')?.value); },
     () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
-    () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderSessions(); bkShowPrice(); } },
+    () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderDay(); } },
     () => { if(open("holidays")) renderHolidays(); },
     () => { if(open("marriage") && NK.month){ nkRenderCal(); nkRenderSlots(); nkRenderPicks(); } },
     () => { if(STATE) renderStrip(); },
@@ -7732,17 +7921,35 @@ const SUPA = {
    useful. Normalise so either form works. */
 const supaBase = () => String(SUPA.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
 
-const BK_SESSIONS = [
-  { key:"morning", nameKey:"hallhire.morning", name:"Morning", from:"09:00", to:"16:00" },
-  { key:"evening", nameKey:"hallhire.evening", name:"Evening", from:"17:00", to:"23:00" },
-];
-/* The 16:00–17:00 gap is deliberate changeover time and is not bookable. */
+/* ---------------------------------------------------------------------------
+   Hall hire.
+
+   The venue is let BY THE DAY. There is no morning slot and no evening slot,
+   and what somebody chooses is HOW MANY halls — the kitchen and the cleaning
+   come with every hall band, and kitchen-only hire is its own product.
+
+   Nothing here works out a fee. The published charges have variables a phone
+   cannot know — whether the utensils were used, how many people ate — so the
+   app shows the masjid's rate card as printed and the office quotes the actual
+   figure. A number on screen that turns out to be wrong is worse than none.
+
+   Paying the £100 deposit is what books the date. request_hall_booking() takes
+   a lock on the day, refuses it if somebody else is already in checkout, holds
+   it for thirty minutes and hands back a reference; that reference goes to
+   Stripe as client_reference_id so the webhook can match the payment to the
+   booking it paid for. A plain insert could do none of that.
+--------------------------------------------------------------------------- */
+
+/* The masjid's Stripe Payment Link for the £100 Astley Hall deposit. A hosted
+   checkout — no card details ever touch this app. */
+const BK_DEPOSIT_LINK = "https://book.stripe.com/3cIdR9cHOfyo5Jk7xcf3a06";
 
 const BK = {
   taken: null,          // null = we do not know yet; never claim a date is free
   month: null,          // first of the month on screen
   date: null,           // chosen day
-  slot: null, hall: null, kitchen: null, member: null,
+  hire: null,           // {type:"halls",count:1..3} or {type:"kitchen_only"}
+  agreed: false,
   sent: false,
 };
 
@@ -7754,43 +7961,61 @@ function bkMaxDate(){
   const t = today0();
   return new Date(t.getFullYear()+1, t.getMonth(), t.getDate());
 }
+function bkLongDate(d){
+  return `${fullDow(d.getDay())} ${num(d.getDate())} ${fullMon(d.getMonth())} ${num(d.getFullYear())}`;
+}
 
-/* Availability. Until this has loaded — and if it never loads — every day
-   stays "not known". The calendar must never say a date is free when it has
-   no way of knowing. */
+/* Friday, Saturday and Sunday have no one-hall rate on the price list, so the
+   masjid does not sell that booking. The database refuses it too (migration
+   014) — this is the courtesy, not the control. */
+function bkIsWeekendRate(d){ const g = d.getDay(); return g === 5 || g === 6 || g === 0; }
+function bkOfferedOn(d){
+  if(!BK.hire || BK.hire.type !== "halls") return true;
+  return !(BK.hire.count === 1 && bkIsWeekendRate(d));
+}
+
+function bkHireLabel(){
+  if(!BK.hire) return "";
+  if(BK.hire.type === "kitchen_only") return t("hallhire.kitchen_only","Kitchen only");
+  return BK.hire.count === 1 ? t("hallhire.one_hall","1 hall")
+       : BK.hire.count === 2 ? t("hallhire.two_halls","2 halls")
+                             : t("hallhire.three_halls","3 halls");
+}
+function bkHireLong(){
+  if(!BK.hire) return "";
+  if(BK.hire.type === "kitchen_only") return t("hallhire.kitchen_only","Kitchen only");
+  return bkHireLabel() + t("hallhire.kitchen_and_cleaning_included", ", kitchen and cleaning included");
+}
+
+/* Availability. The view holds nothing but the dates of bookings that are
+   confirmed, paid, or held while somebody is in checkout — one row per date,
+   because the whole venue goes at once. Until this has loaded, and if it never
+   loads, every day stays "not published": the calendar must never say a date
+   is free when it has no way of knowing. */
 function bkLoadAvailability(){
-  const from = bkIso(today0());
-  return fetch(`${supaBase()}/rest/v1/hall_availability` +
-               `?select=booking_date,session_slot&booking_date=gte.${from}`, {
+  return fetch(`${supaBase()}/rest/v1/hall_availability?select=booking_date`, {
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key },
   }).then(r => {
     if(!r.ok) throw new Error("availability " + r.status);
     return r.json();
   }).then(rows => {
     const map = {};
-    (rows || []).forEach(r => { map[r.booking_date + "|" + r.session_slot] = true; });
+    (rows || []).forEach(r => { map[r.booking_date] = true; });
     BK.taken = map;
-    bkRenderCal(); bkRenderSessions();
+    bkRenderCal(); bkRenderDay();
   }).catch(e => {
-    console.warn("hall availability unavailable:", e);   // stays "not known"
+    console.warn("hall availability unavailable:", e);   // stays "not published"
   });
 }
 
-/* The venue is let as a whole: one confirmed booking closes that session for
-   everybody, whichever hall it was. */
-function bkSlotFree(d, slotKey){
+function bkDayFree(d){
   if(BK.taken === null) return null;
-  return !BK.taken[bkIso(d) + "|" + slotKey];
+  return !BK.taken[bkIso(d)];
 }
-/* Four states, the same four the website's calendar shows. A day with one
-   session already gone used to look exactly like an empty one; it doesn't
-   now, because "one slot left" is the thing worth knowing before you tap. */
 function bkDayState(d){
-  if(BK.taken === null) return "unknown";
-  const free = BK_SESSIONS.map(s => bkSlotFree(d, s.key));
-  if(free.every(f => f === false)) return "taken";
-  if(free.some(f => f === false))  return "limited";
-  return "free";
+  const free = bkDayFree(d);
+  if(free === null) return "unknown";
+  return free ? "free" : "taken";
 }
 
 function bkRenderCal(){
@@ -7809,11 +8034,15 @@ function bkRenderCal(){
   for(let n = 1; n <= days; n++){
     const d = new Date(y, m, n);
     const past = d < min || d > max;
-    const state = past ? "" : bkDayState(d);
+    /* Not "booked" — the masjid simply does not sell one hall at the weekend,
+       and saying so is more use than greying the day out mutely. */
+    const unoffered = !past && !bkOfferedOn(d);
+    const state = past ? "" : unoffered ? "unoffered" : bkDayState(d);
     const on = BK.date && sameDay(d, BK.date) ? "1" : "0";
+    const title = unoffered ? ` title="${esc(t("hallhire.one_hall_mon_thu_only","One hall is Monday to Thursday only"))}"` : "";
     html += `<button class="bk-day" data-d="${bkIso(d)}" data-state="${state}" data-on="${on}"` +
-            `${past ? " disabled" : ""}>${num(n)}` +
-            `${state ? '<span class="bk-mark"></span>' : ""}</button>`;
+            `${past || unoffered ? " disabled" : ""}${title}>${num(n)}` +
+            `${state && state !== "unoffered" ? '<span class="bk-mark"></span>' : ""}</button>`;
   }
   grid.innerHTML = html;
   grid.querySelectorAll(".bk-day:not([disabled])").forEach(b =>
@@ -7827,86 +8056,109 @@ function bkRenderCal(){
 function bkPickDate(iso){
   const [y,m,d] = iso.split("-").map(Number);
   BK.date = new Date(y, m-1, d);
-  BK.slot = null;
-  bkResetChoices();
-  document.getElementById("bk-panel").hidden = false;
-  bkRenderCal(); bkRenderSessions();
-}
-
-function bkResetChoices(){
-  BK.hall = BK.kitchen = BK.member = null;
   BK.sent = false;
-  document.getElementById("bk-choose").hidden = true;
-  document.getElementById("bk-agree-wrap").hidden = true;
-  document.getElementById("bk-agree").checked = false;
-  document.getElementById("bk-form").hidden = true;
-  document.getElementById("bk-done").hidden = true;
-  document.getElementById("bk-price").hidden = true;
-  document.querySelectorAll("#bk-choose .bk-opt").forEach(b => b.dataset.on = "0");
+  bkShowView("day");
+  document.getElementById("bk-panel").hidden = false;
+  bkRenderCal(); bkRenderDay();
 }
 
-function bkRenderSessions(){
+/* One of three things is on screen at a time: the day and its button, the
+   form, or what happened. */
+function bkShowView(which){
+  document.getElementById("bk-sessions").hidden   = which !== "day";
+  document.getElementById("bk-agree-wrap").hidden = which !== "day";
+  document.getElementById("bk-when").hidden       = which === "done";
+  document.getElementById("bk-sub").hidden        = which !== "day";
+  document.getElementById("bk-form").hidden       = which !== "form";
+  document.getElementById("bk-done").hidden       = which !== "done";
+  if(which !== "day") document.getElementById("bk-msg").hidden = true;
+}
+
+function bkRenderDay(){
   const wrap = document.getElementById("bk-sessions");
   if(!wrap || !BK.date) return;
-  document.getElementById("bk-when").textContent =
-    `${fullDow(BK.date.getDay())} ${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())}`;
+  document.getElementById("bk-when").textContent = bkLongDate(BK.date);
 
-  wrap.innerHTML = BK_SESSIONS.map(sn => {
-    const free = bkSlotFree(BK.date, sn.key);
-    const label = free === null ? t("hallhire.not_published","Not published")
-                : free         ? t("hallhire.available","Available")
-                               : t("hallhire.booked","Booked");
-    const on = BK.slot === sn.key ? "1" : "0";
-    return `<button type="button" class="bk-session" data-slot="${sn.key}" data-on="${on}"` +
-           `${free === false ? " disabled" : ""}>
+  const free = bkDayFree(BK.date);
+  const sub = document.getElementById("bk-sub");
+  sub.textContent =
+    !BK.hire            ? t("hallhire.choose_what_you_need_first",
+                            "Choose what you need — halls, or the kitchen on its own — to book this date.")
+  : !bkOfferedOn(BK.date) ? t("hallhire.one_hall_mon_thu_explain",
+                            "One hall is only available Monday to Thursday. On Friday, Saturday and Sunday the smallest booking is two halls.")
+  : free === null       ? t("hallhire.could_not_check",
+                            "We could not check availability just now. The office can confirm on the phone.")
+  : bkHireLong() + t("hallhire.hire_is_for_the_whole_day", ". Hire is for the whole day.");
+
+  const state = free === true  ? t("hallhire.available","Available")
+              : free === false ? t("hallhire.booked","Booked")
+                               : t("hallhire.not_published","Not published");
+  /* "Book" rather than "Request": the deposit confirms the date outright and
+     nobody in the office agrees it afterwards, so calling it a request would
+     understate what the button starts. "Ask" stays for a date we cannot see. */
+  const act = free === true  ? t("hallhire.book","Book")
+            : free === false ? t("hallhire.booked","Booked")
+                             : t("hallhire.ask","Ask");
+  const blocked = free === false ||
+                  (free === true && (!BK.agreed || !BK.hire || !bkOfferedOn(BK.date)));
+
+  wrap.innerHTML =
+    `<div class="bk-session" data-on="0">
       <span class="bk-s-t">
-        <span class="bk-s-n">${esc(t(sn.nameKey, sn.name))}</span>
-        <span class="bk-s-w">${esc(num(hm12(sn.from)))} &ndash; ${esc(num(hm12(sn.to)))}</span>
+        <span class="bk-s-n">${esc(t("hallhire.whole_day","Whole day"))}</span>
+        <span class="bk-s-w">${esc(state)}</span>
       </span>
-      <span class="bk-s-state">${esc(label)}</span>
-    </button>`;
-  }).join("");
+      <button type="button" class="bk-act" id="bk-act"${blocked ? " disabled" : ""}>${esc(act)}</button>
+    </div>`;
 
-  wrap.querySelectorAll(".bk-session:not([disabled])").forEach(b =>
-    b.addEventListener("click", () => {
-      BK.slot = b.dataset.slot;
-      bkResetChoices();
-      document.getElementById("bk-choose").hidden = false;
-      bkShowPrice();
-      bkRenderSessions();
-    }));
+  document.getElementById("bk-act").addEventListener("click", () => {
+    if(free === true) bkOpenForm(); else bkSayWhy(free);
+  });
 }
 
-/* The masjid publishes no hire rate — not here and not on the website, which
-   shows the same empty figure. An invented number would be the one thing on
-   this screen a person actually planned around, so there isn't one: the fee
-   comes from the office, on the phone, and the box says only that. */
-function bkShowPrice(){
-  const box = document.getElementById("bk-price");
-  if(!BK.slot){ box.hidden = true; return; }
+/* Reached when a date cannot be booked from here. Already taken and "we could
+   not check" are very different situations for the person reading it. */
+const BK_OFFICE_LINK = ' <a class="bk-tel" href="tel:01204535997" dir="ltr">01204 535 997</a>';
+
+function bkSayWhy(free){
+  const box = document.getElementById("bk-msg");
+  const when = `${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())}`;
   box.hidden = false;
-  box.innerHTML =
-    `<span class="k">${esc(t("hallhire.estimated_fee","Estimated fee"))}</span>` +
-    `<b dir="ltr">£&mdash;</b>` +
-    `<span class="n">${esc(t("hallhire.fee_placeholder",
-      "The office confirms the fee when it calls you."))}</span>`;
+  box.innerHTML = esc(
+    (free === false
+      ? t("hallhire.already_booked_on",
+          "The venue is already booked on {when}. The office may be able to suggest another date.")
+      : t("hallhire.could_not_check_date",
+          "We could not check whether {when} is free, so nothing has been booked. Please call the office and they will check for you.")
+    ).replace("{when}", when)) + BK_OFFICE_LINK;
 }
 
-/* Everything is optional until it is not: the form only appears once a slot,
-   a hall, a kitchen answer and the terms are all settled. */
-function bkMaybeShowForm(){
-  const ready = BK.slot && BK.hall && BK.kitchen && BK.member !== null;
-  document.getElementById("bk-agree-wrap").hidden = !ready;
-  const agreed = document.getElementById("bk-agree").checked;
-  document.getElementById("bk-form").hidden = !(ready && agreed);
+function bkOpenForm(){
+  document.getElementById("bk-fh-what").textContent = bkHireLong();
+  document.getElementById("bk-fh-when").textContent =
+    bkLongDate(BK.date) + t("hallhire.dot_whole_day", " · whole day");
+  document.getElementById("bk-err").hidden = true;
+  document.querySelectorAll("#bk-form .bk-field").forEach(f => f.dataset.bad = "0");
+  bkShowView("form");
+  document.getElementById("bk-first").focus();
+}
+
+/* Deliberately permissive: accepts spaces, dashes and +44, and only rejects
+   what cannot be a UK number. A booking form is the wrong place to argue with
+   somebody about their own phone number. */
+function bkValidPhone(v){
+  let digits = String(v).replace(/[^0-9+]/g, "");
+  if(digits.indexOf("+44") === 0) digits = "0" + digits.slice(3);
+  digits = digits.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 11 && digits.charAt(0) === "0";
 }
 
 function bkValidate(){
   const fields = [
-    ["bk-first", v => v.trim().length > 0],
-    ["bk-last",  v => v.trim().length > 0],
-    ["bk-addr",  v => v.trim().length > 5],
-    ["bk-phone", v => /^[\d\s+()-]{9,}$/.test(v.trim())],
+    ["bk-first", v => v.trim().length > 1],
+    ["bk-last",  v => v.trim().length > 1],
+    ["bk-addr",  v => v.trim().length > 7],
+    ["bk-phone", v => bkValidPhone(v)],
   ];
   let ok = true;
   for(const [id, test] of fields){
@@ -7921,8 +8173,7 @@ function bkValidate(){
 const BK_CALL_OFFICE = () =>
   t("hallhire.call_office_fallback",
     "We could not send your request just now, and nothing has been saved. " +
-    "Please call the masjid office and they will take your booking over the phone.") +
-  ' <a href="tel:01204535997" dir="ltr">01204 535 997</a>';
+    "Please call the masjid office and they will take your booking over the phone.");
 
 function bkSubmit(e){
   e.preventDefault();
@@ -7933,48 +8184,63 @@ function bkSubmit(e){
     err.textContent = t("hallhire.check_the_form","Please check the highlighted boxes and try again.");
     return;
   }
+  if(!BK.hire || !BK.date || !bkOfferedOn(BK.date)) return;
   err.hidden = true;
 
   const btn = document.getElementById("bk-submit");
+  const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = t("hallhire.sending","Sending…");
 
   /* A request that hangs must not leave the button disabled for ever. */
+  let timedOut = false;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 12000);
+  const timer = setTimeout(() => { timedOut = true; ctrl.abort(); }, 12000);
 
-  fetch(`${supaBase()}/rest/v1/hall_bookings`, {
+  /* Through request_hall_booking() rather than an insert: the function is what
+     takes the lock and the thirty-minute hold, and what refuses the second
+     person while the first is paying. What is sent is the date, what is being
+     hired, and how to reach them. Nothing else — no membership answer, and no
+     price, because this screen does not work one out. */
+  fetch(`${supaBase()}/rest/v1/rpc/request_hall_booking`, {
     method: "POST",
     signal: ctrl.signal,
     headers: {
       apikey: SUPA.key,
       Authorization: "Bearer " + SUPA.key,
       "Content-Type": "application/json",
-      /* The key has no read privilege, so asking for the row back would fail
-         the whole request. Ask for nothing. */
-      Prefer: "return=minimal",
     },
-    body: JSON.stringify({
+    body: JSON.stringify({ payload: {
       booking_date: bkIso(BK.date),
-      session_slot: BK.slot,
-      hall:         BK.hall,
-      kitchen:      BK.kitchen === "yes",
+      hire_type:    BK.hire.type,
+      halls_count:  BK.hire.type === "halls" ? BK.hire.count : null,
       first_name:   document.getElementById("bk-first").value.trim(),
       last_name:    document.getElementById("bk-last").value.trim(),
       address:      document.getElementById("bk-addr").value.trim(),
       phone:        document.getElementById("bk-phone").value.trim(),
-    }),
+    }}),
   }).then(res => {
     clearTimeout(timer);
-    if(res.ok){ BK.sent = true; bkDone(null); return; }
     return res.text().then(body => {
-      /* The rate-limit trigger speaks to the person directly; anything else
-         is ours to apologise for. */
-      if(body && body.indexOf("Too many booking requests") !== -1){
+      if(res.ok){
+        let out = {};
+        try{ out = JSON.parse(body) || {}; }catch(e){}
+        BK.sent = true;
+        bkDone(null, out.reference, out.held_until);
+        /* Somebody else's hold may have appeared while this form was open. */
+        BK.taken = null; bkLoadAvailability();
+        return;
+      }
+      /* Two messages the reader can act on, and one apology. */
+      if(body && body.indexOf("no longer available") !== -1){
+        bkDone(t("hallhire.someone_started_booking",
+          "Somebody started booking that date while you were filling this in, so we " +
+          "have not taken your request. Please pick another day, or ring the office."));
+        BK.taken = null; bkLoadAvailability();
+      }else if(body && body.indexOf("Too many booking requests") !== -1){
         bkDone(t("hallhire.too_many_requests",
           "We have already had several requests from this number today. " +
-          "Please call the office and they will help you directly.") +
-          ' <a href="tel:01204535997" dir="ltr">01204 535 997</a>');
+          "Please call the office and they will help you directly."));
       }else{
         console.warn("booking submit failed", res.status, body);
         bkDone(BK_CALL_OFFICE());
@@ -7983,39 +8249,51 @@ function bkSubmit(e){
   }).catch(e => {
     clearTimeout(timer);
     console.warn("booking submit failed", e);
-    bkDone(BK_CALL_OFFICE());
+    bkDone(timedOut
+      ? t("hallhire.took_too_long",
+          "That took too long and we could not tell whether it went through. " +
+          "Nothing has been paid. Please call the office to be sure.")
+      : BK_CALL_OFFICE());
   }).then(() => {
     btn.disabled = false;
-    btn.textContent = t("hallhire.request_this_slot","Request this slot");
+    btn.textContent = label;
   });
 }
 
-function bkDone(problemHtml){
+/* The reference and the hold come back from request_hall_booking(). When the
+   request never reached the database there is neither, and the pay button is
+   left off: a payment with nothing behind it is money somebody has to chase
+   and refund. */
+function bkDone(problem, ref, heldUntil){
   const box = document.getElementById("bk-done");
-  document.getElementById("bk-form").hidden = true;
-  document.getElementById("bk-agree-wrap").hidden = true;
-  document.getElementById("bk-choose").hidden = true;
-  document.getElementById("bk-sessions").innerHTML = "";
-  box.hidden = false;
+  bkShowView("done");
 
-  if(problemHtml){
-    box.innerHTML = `<h4>${esc(t("hallhire.not_sent","Not sent"))}</h4><p>${safeInline(problemHtml)}</p>`;
+  if(problem || !ref){
+    box.innerHTML = `<h4>${esc(t("hallhire.not_sent","Not sent"))}</h4>` +
+                    `<p>${esc(problem || BK_CALL_OFFICE())}${BK_OFFICE_LINK}</p>`;
     return;
   }
-  const sn = BK_SESSIONS.find(x => x.key === BK.slot) || {};
+
   const row = (k, v) => `<div class="bk-sum"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+  const until = heldUntil ? new Date(heldUntil) : null;
+  const hold = until && !isNaN(until)
+    ? t("hallhire.held_until", "This date is held for you until {time}. After that somebody else can book it.")
+        .replace("{time}", num(hm12(String(until.getHours()).padStart(2,"0") + ":" +
+                                    String(until.getMinutes()).padStart(2,"0"))))
+    : t("hallhire.held_a_short_while", "The date is held for a short while so you can pay.");
+
   box.innerHTML =
-    `<h4>${esc(t("hallhire.request_sent","Request sent"))}</h4>` +
-    `<p>${esc(t("hallhire.office_will_call_fee",
-      "Nothing has been paid and this date is not held yet — the office will " +
-      "call you to confirm the date, the fee and how to pay."))}</p>` +
-    row(t("hallhire.date_label","Date"),
-        `${fullDow(BK.date.getDay())} ${num(BK.date.getDate())} ${fullMon(BK.date.getMonth())} ${num(BK.date.getFullYear())}`) +
-    row(t("hallhire.session","Session"),
-        `${t(sn.nameKey || "", sn.name || "")} · ${num(hm12(sn.from))} – ${num(hm12(sn.to))}`) +
-    row(t("hallhire.hall_label","Hall"), num(BK.hall)) +
-    row(t("hallhire.kitchen_label","Kitchen"),
-        BK.kitchen === "yes" ? t("hallhire.included","Included") : t("hallhire.not_included","Not included"));
+    `<h4>${esc(t("hallhire.almost_there","Almost there"))}</h4>` +
+    `<p>${esc(t("hallhire.pay_deposit_to_book",
+      "Your date is not booked until the £100 deposit is paid. Pay it now and the date is yours."))}</p>` +
+    row(t("hallhire.reference","Reference"), ref) +
+    row(t("hallhire.date_label","Date"), bkLongDate(BK.date)) +
+    row(t("hallhire.hiring","Hiring"), bkHireLong()) +
+    `<a class="bk-pay" id="bk-pay" target="_blank" rel="noopener"` +
+    ` href="${esc(BK_DEPOSIT_LINK + (BK_DEPOSIT_LINK.indexOf("?") === -1 ? "?" : "&") +
+                  "client_reference_id=" + encodeURIComponent(ref))}">` +
+    `${esc(t("hallhire.pay_the_deposit","Pay the £100 deposit"))}</a>` +
+    `<p class="bk-hold">${esc(hold)}</p>`;
 }
 
 function initBooking(){
@@ -8028,20 +8306,31 @@ function initBooking(){
   document.getElementById("bk-next").addEventListener("click", () => {
     BK.month = new Date(BK.month.getFullYear(), BK.month.getMonth()+1, 1); bkRenderCal(); });
 
-  const pick = (wrap, prop) =>
-    document.getElementById(wrap).addEventListener("click", e => {
-      const b = e.target.closest(".bk-opt");
-      if(!b) return;
-      BK[prop] = b.dataset[prop];
-      document.querySelectorAll(`#${wrap} .bk-opt`).forEach(x => x.dataset.on = x === b ? "1" : "0");
-      bkMaybeShowForm();
-    });
-  pick("bk-halls", "hall");
-  pick("bk-kitchens", "kitchen");
-  pick("bk-members", "member");
+  document.getElementById("bk-hire").addEventListener("click", e => {
+    const b = e.target.closest(".bk-opt");
+    if(!b) return;
+    BK.hire = b.dataset.hire === "kitchen_only"
+      ? { type:"kitchen_only" }
+      : { type:"halls", count: Number(b.dataset.count) };
+    document.querySelectorAll("#bk-hire .bk-opt").forEach(x => x.dataset.on = x === b ? "1" : "0");
+    /* A day that is fine for three halls may not be sold for one. */
+    if(BK.date && !bkOfferedOn(BK.date)){
+      BK.date = null;
+      document.getElementById("bk-panel").hidden = true;
+    }
+    bkRenderCal(); bkRenderDay();
+  });
 
-  document.getElementById("bk-agree").addEventListener("change", bkMaybeShowForm);
+  document.getElementById("bk-agree").addEventListener("change", e => {
+    BK.agreed = e.target.checked;
+    bkRenderDay();
+  });
+  document.getElementById("bk-back").addEventListener("click", () => bkShowView("day"));
   document.getElementById("bk-form").addEventListener("submit", bkSubmit);
+  document.getElementById("bk-terms-link").addEventListener("click", e => {
+    e.preventDefault();
+    document.getElementById("bk-terms").scrollIntoView({ behavior:"smooth", block:"start" });
+  });
 
   bkRenderCal();
   bkLoadAvailability();

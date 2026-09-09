@@ -562,38 +562,69 @@ for (const f of ["index.html", "admin.html"]) {
 }
 
 /* ---- 3r. the hall says the same thing here as it does on the website ----
-   The app quoted £100–£180 for a hire the masjid has never priced, while the
-   website's own booking summary shows "£—" and sends people to the office.
-   Two numbers for one hall is worse than none, and the invented one was the
-   one a family would have budgeted around. The calendar had the matching
-   fault: it collapsed a day with one session already gone into the same green
-   as an empty one, so "one slot left" — the fact worth knowing before you tap
-   — never reached the screen. ---- */
+   The app and the website are one hall, one diary and one price list, and the
+   app has been wrong about all three at different times: it invented a rate
+   the masjid never charged, and it kept a morning/evening split months after
+   the masjid moved to whole-day hire.
+
+   What has to hold:
+     - the app quotes no total. The published charges depend on whether the
+       utensils were used and how many people ate, which a phone cannot know;
+       the rate card is printed as printed and the office quotes the figure.
+     - a booking goes through request_hall_booking(), not an insert. The
+       function is what takes the lock and the thirty-minute hold; an insert
+       let two families both be sent to Stripe for one Saturday.
+     - the deposit link carries client_reference_id, or Stripe takes £100 and
+       nobody knows whose it is.
+     - one hall is Monday to Thursday. There is no weekend rate for it, so the
+       app must not sell it.
+     - the terms the checkbox asks people to agree to are actually on screen.
+     - nobody is asked their religious affiliation to hire a room. ---- */
 {
   const app = readFileSync("index.html", "utf8");
   const bad = [];
 
-  const bk = (app.match(/function bkShowPrice\(\)[\s\S]*?\n\}/) || [""])[0];
-  if (!bk) bad.push("the hire fee box has gone — a booking screen has to say what happens about money");
-  if (/\bBK_PRICING\b/.test(app))
-    bad.push("BK_PRICING is back: the app would quote a hire rate the masjid does not publish");
-  if (/£\s*\$\{|toFixed\(2\)/.test(bk))
-    bad.push("bkShowPrice is computing a figure again — the office quotes the fee, not this screen");
-  if (!/hallhire\.estimated_fee/.test(bk) || !/hallhire\.fee_placeholder/.test(bk))
-    bad.push("the fee box no longer says the office confirms the fee, so an empty £— reads as free");
+  if (/\bBK_PRICING\b/.test(app) || /\bbkPrice\s*\(/.test(app))
+    bad.push("the app is working out a hire fee again — the office quotes it, this screen does not");
+  if (/\bBK_SESSIONS\b/.test(app) || /\bbkSlotFree\b/.test(app))
+    bad.push("the morning/evening split is back — the masjid lets the venue by the day");
+  if (/data-member=|BK\.member/.test(app))
+    bad.push("the membership question is back on the hire form: it decides nothing, and nobody should be asked their religion to book a room");
 
-  const day = (app.match(/function bkDayState\(d\)[\s\S]*?\n\}/) || [""])[0];
-  for (const state of ["unknown", "taken", "limited", "free"])
-    if (!new RegExp(`return "${state}"`).test(day))
-      bad.push(`bkDayState can never return "${state}", so that day is drawn as something it is not`);
-  for (const key of ["both_slots_free", "one_slot_left", "fully_booked", "not_published"])
-    if (!app.includes(`hallhire.${key}`))
-      bad.push(`the calendar legend has lost "${key}", so a colour on it stands for nothing`);
-  if (!/\.bk-dot\.limited\{/.test(app) || !/\.bk-day\[data-state="limited"\]\{/.test(app))
-    bad.push('"one slot left" has no colour of its own, so it is drawn as though it were free');
+  const submit = (app.match(/function bkSubmit\(e\)[\s\S]*?\n\}/) || [""])[0];
+  if (!/rpc\/request_hall_booking/.test(submit))
+    bad.push("the booking no longer goes through request_hall_booking() — nothing would take the hold, and two people could pay for one date");
+  if (!/hire_type/.test(submit) || !/halls_count/.test(submit))
+    bad.push("the request does not say what is being hired, so the office cannot price it");
+
+  const done = (app.match(/function bkDone\([\s\S]*?\n\}/) || [""])[0];
+  if (!/client_reference_id/.test(done))
+    bad.push("the deposit link has lost client_reference_id — Stripe would take £100 that matches no booking");
+  if (!/if\(problem \|\| !ref\)/.test(done))
+    bad.push("a pay button could be offered for a booking that never reached the database");
+
+  if (!/function bkOfferedOn/.test(app) || !/count === 1 && bkIsWeekendRate/.test(app))
+    bad.push("one hall is being offered at the weekend, which the masjid does not sell and the database refuses");
+
+  for (const [what, needle] of [
+    ["the £350 / £500 / £600 weekday rates", /&pound;350[\s\S]{0,600}&pound;500[\s\S]{0,600}&pound;600/],
+    ["the £600 / £700 weekend rates",        /&pound;600[\s\S]{0,400}&pound;700/],
+    ["the £125 kitchen-only rate",           /&pound;125/],
+    ["the 45p per person utility charge",    /45p per person/],
+    ["the £100 deposit",                     /deposit_paid_online/],
+    ["the terms of hire",                    /hallhire\.t8_h/],
+  ]) if (!needle.test(app)) bad.push(`the hall screen has lost ${what}, which the website publishes`);
+
+  if (!/id="bk-terms"/.test(app) || !/id="bk-terms-link"/.test(app))
+    bad.push("the agreement checkbox links to terms that are not on the screen — a signature on a blank page");
+
+  /* .bk-done a is purple, and it out-specifies a bare .bk-pay: the button came
+     out as a solid purple block with its label invisible on it. */
+  if (!/\.bk-done \.bk-pay\{/.test(app))
+    bad.push("the deposit button is styled below .bk-done a, so its label would be purple on purple");
 
   if (bad.length) bad.forEach(fail);
-  else ok("hall hire — no invented price, and the calendar tells one slot left from a free day, as the website does");
+  else ok("hall hire — whole-day booking, the masjid's own rate card, the deposit that holds the date, and the terms behind the checkbox");
 }
 
 /* ---- 4. the service worker cache changed when the app did ----
