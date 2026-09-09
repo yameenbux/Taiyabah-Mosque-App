@@ -725,6 +725,42 @@ for (const f of ["index.html", "admin.html"]) {
   }
 }
 
+/* ---- 3u. Android can prove the app owns the domain ----
+   A Trusted Web Activity shows the site with no browser address bar only if
+   /.well-known/assetlinks.json on the domain names the app's signing
+   certificate. Get it wrong and the app still runs, but with a browser bar
+   pinned across the top, which reads to everybody as broken.
+
+   The trap is GitHub Pages: it runs Jekyll, and Jekyll skips any directory
+   whose name begins with a dot. Without a .nojekyll file at the root, the
+   assetlinks file is simply never published, and nothing anywhere says so.
+   That is the failure this check exists for. ---- */
+{
+  const links = ".well-known/assetlinks.json";
+  if (!existsSync(links)) {
+    /* Nothing to verify yet — the file arrives with the Android build. */
+  } else if (!existsSync(".nojekyll")) {
+    fail(".well-known/assetlinks.json exists but .nojekyll does not — GitHub Pages will not serve a dot-directory, so Android link verification silently fails and the app shows a browser bar");
+  } else {
+    let doc = null;
+    try { doc = JSON.parse(readFileSync(links, "utf8")); } catch (e) { doc = undefined; }
+    const entry = Array.isArray(doc) ? doc[0] : null;
+    const target = entry && entry.target;
+    const prints = (target && target.sha256_cert_fingerprints) || [];
+    if (doc === undefined) fail("assetlinks.json is not valid JSON — Android will reject it outright");
+    else if (!target || target.namespace !== "android_app" || !target.package_name)
+      fail("assetlinks.json does not name an android_app package");
+    else if (!prints.length)
+      fail("assetlinks.json lists no signing certificate, so it verifies nothing");
+    else if (prints.some(p => /^REPLACE_/.test(p)))
+      ok("Android asset links — structure and .nojekyll in place; the signing fingerprint is still a placeholder, to be filled from Play App Signing");
+    else if (!prints.every(p => /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/i.test(p)))
+      fail("a signing fingerprint in assetlinks.json is not 32 colon-separated hex bytes — Android will not match it");
+    else
+      ok(`Android asset links — ${target.package_name} verified against ${prints.length} signing certificate(s), and .nojekyll lets Pages serve them`);
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

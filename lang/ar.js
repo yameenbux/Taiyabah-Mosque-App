@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "555ca730d66d",
+ "version": "d9bb5d41d20a",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -53,6 +53,9 @@ window.LANG_PACK = {
   "times.prayer": "الصلاة",
   "times.firstJumuah": "الجمعة الأولى",
   "times.secondJumuah": "الجمعة الثانية",
+  "privacy.privacy_notice": "إشعار الخصوصية",
+  "privacy.read_the_privacy_notice": "اقرأ إشعار الخصوصية",
+  "privacy.hall_details_kept": "يحتفظ المسجد بهذه البيانات لترتيب حجزك ولحساباته. <a href=\"./privacy.html\" target=\"_blank\" rel=\"noopener\">اقرأ إشعار الخصوصية</a>.",
   "vids.videos_bayaans": "مقاطع الفيديو والبيانات",
   "vids.done": "تم",
   "vids.see_the_full_channel_on": "شاهد القناة كاملة على يوتيوب ›",

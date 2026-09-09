@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "291acca6ca9e",
+ "version": "394a6e2c0e68",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -53,6 +53,9 @@ window.LANG_PACK = {
   "times.prayer": "نماز",
   "times.firstJumuah": "پہلا جمعہ",
   "times.secondJumuah": "دوسرا جمعہ",
+  "privacy.privacy_notice": "پرائیویسی نوٹس",
+  "privacy.read_the_privacy_notice": "پرائیویسی نوٹس پڑھیے",
+  "privacy.hall_details_kept": "مسجد یہ تفصیلات آپ کی بکنگ کا انتظام کرنے اور اپنے حسابات کے لیے رکھتی ہے۔ <a href=\"./privacy.html\" target=\"_blank\" rel=\"noopener\">پرائیویسی نوٹس پڑھیے</a>۔",
   "vids.videos_bayaans": "ویڈیوز اور بیانات",
   "vids.done": "ہو گیا",
   "vids.see_the_full_channel_on": "مکمل چینل یوٹیوب پر دیکھیں ›",

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "814e665c487f",
+ "version": "06a250f843b6",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -53,6 +53,9 @@ window.LANG_PACK = {
   "times.prayer": "નમાઝ",
   "times.firstJumuah": "પ્રથમ જુમ્આ",
   "times.secondJumuah": "બીજી જુમ્આ",
+  "privacy.privacy_notice": "ગોપનીયતા સૂચના",
+  "privacy.read_the_privacy_notice": "ગોપનીયતા સૂચના વાંચો",
+  "privacy.hall_details_kept": "મસ્જિદ આ વિગતો તમારું બુકિંગ ગોઠવવા અને પોતાના હિસાબ માટે રાખે છે. <a href=\"./privacy.html\" target=\"_blank\" rel=\"noopener\">ગોપનીયતા સૂચના વાંચો</a>.",
   "vids.videos_bayaans": "વિડિયો અને બયાન",
   "vids.done": "થઈ ગયું",
   "vids.see_the_full_channel_on": "સંપૂર્ણ ચેનલ યુટ્યુબ પર જુઓ ›",

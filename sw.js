@@ -5,8 +5,8 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v132";
-const SHELL = ["./index.html", "./admin.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
+const CACHE = "taiyabah-v133";
+const SHELL = ["./index.html", "./admin.html", "./privacy.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=2", "./icon-512.png?v=2", "./apple-touch-icon.png?v=2"];
 
 /* addAll goes through the browser's ordinary HTTP cache, and GitHub Pages
    serves index.html with a lifetime on it. So a worker built to deliver a new
