@@ -229,24 +229,52 @@ for (const f of ["index.html", "admin.html"]) {
     "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04": "Platinum £5,000",
     "https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05": "any other amount",
   };
+  /* Money the masjid is owed, not money it is given. These are Payment Links
+     for SERVICES, and the distinction is not bookkeeping pedantry: a hall
+     deposit or a nikāḥ fee put through a donation link is misstated in the
+     charity's accounts and would carry a Gift Aid claim it is not entitled to.
+     They are listed separately here so that nobody can quietly move one set
+     into the other. */
+  const SERVICE = {
+    "https://book.stripe.com/3cIdR9cHOfyo5Jk7xcf3a06": "hall deposit £100",
+    "https://buy.stripe.com/5kQ6oHfU02LC0p05p4f3a07":  "nik\u0101\u1E25 fee, member £100",
+    "https://buy.stripe.com/28EcN58ry85W1t4cRwf3a08":  "nik\u0101\u1E25 fee, non-member £200",
+  };
   const src = existsSync("index.html") ? R("index.html") : "";
   if (src) {
-    const found = [...src.matchAll(/https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]);
+    /* book.stripe.com as well as buy.stripe.com: the hall deposit is on the
+       other host, and a test-mode link there would ship just as invisibly. */
+    const found = [...src.matchAll(/https:\/\/(?:buy|book)\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]);
     const uniq = [...new Set(found)];
     const test = uniq.filter(u => u.includes("test_"));
-    if (test.length) fail(`donation link in Stripe TEST MODE — it takes no money and looks identical: ${test.join(", ")}`);
+    if (test.length) fail(`Stripe link in TEST MODE — it takes no money and looks identical: ${test.join(", ")}`);
 
     const missing = Object.keys(DONATE).filter(u => !uniq.includes(u));
-    const extra = uniq.filter(u => !(u in DONATE));
+    const gone = Object.keys(SERVICE).filter(u => !uniq.includes(u));
+    const extra = uniq.filter(u => !(u in DONATE) && !(u in SERVICE));
     if (missing.length) fail(`donation link missing from index.html: ${missing.map(u => DONATE[u]).join(", ")}`);
+    if (gone.length) fail(`payment link missing from index.html: ${gone.map(u => SERVICE[u]).join(", ")}`);
     if (extra.length) fail(`unrecognised Stripe link in index.html — check it is the masjid's: ${extra.join(", ")}`);
+
+    /* A service payment must never be offered as a donation, or the other way
+       about. Checked by where the link sits, not by what it is called. */
+    const donateArea = (src.match(/<div class="tiers">[\s\S]*?\n\s*<\/div>/) || [""])[0];
+    if (!/buy\.stripe\.com/.test(donateArea))
+      fail("the donations tier block could not be found, so nothing is checking that a fee has not been put among the gifts");
+    for (const u of Object.keys(SERVICE))
+      if (donateArea.includes(u))
+        fail(`${SERVICE[u]} is on the donations screen — a fee is not a gift, and Gift Aid would be claimed on it wrongly`);
 
     const old = [...src.matchAll(/https:\/\/(?:www\.)?taiyabahmasjid\.com\/product\/[^"']*/g)].map(m => m[0]);
     if (old.length) fail(`donation still points at the old shop: ${[...new Set(old)].join(", ")}`);
 
     /* Stripe cannot produce or store an HMRC declaration, so the app must not
        promise Gift Aid on a card payment. */
-    if (/Gift\s*Aid/i.test(src.replace(/<!--[\s\S]*?-->/g, " ")))
+    /* Comments explain why the app avoids Gift Aid; only what reaches a screen
+       counts as a promise, so strip HTML and JS comments alike before looking. */
+    const onScreen = src.replace(/<!--[\s\S]*?-->/g, " ")
+                        .replace(/\/\*[\s\S]*?\*\//g, " ");
+    if (/Gift\s*Aid/i.test(onScreen))
       fail("index.html promises Gift Aid, but the donation path is Stripe, which cannot produce a valid HMRC declaration");
 
     if (!test.length && !missing.length && !extra.length && !old.length)
@@ -625,6 +653,76 @@ for (const f of ["index.html", "admin.html"]) {
 
   if (bad.length) bad.forEach(fail);
   else ok("hall hire — whole-day booking, the masjid's own rate card, the deposit that holds the date, and the terms behind the checkbox");
+}
+
+/* ---- 3s. paying the nikāḥ fee is paying, not booking ----
+   The hall calendar can sell a date outright because the app can see what is
+   free. A nikāḥ cannot: the masjid does not publish that diary, so neither the
+   app nor the website knows whether a day is available, and a payment must
+   never be allowed to agree one. Migration 018 says the same thing in SQL and
+   carries a warning against anybody "making it consistent with the hall".
+
+   What has to hold:
+     - the pay box says, in its own words, that the office rings first.
+     - a payment carries client_reference_id. It is the only thing tying the
+       money to a request; without it Stripe takes £100 and nobody knows whose.
+     - the reference is checked before anybody is sent to Stripe, so a typo
+       does not pay against a reference that cannot be matched.
+     - the box stays hidden unless both Payment Links exist. A pay button that
+       goes nowhere is worse than no pay button.
+     - the nikāḥ calendar still shows no availability at all. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+
+  const pay = (app.match(/function initNikahPay\(\)[\s\S]*?\n\}/) || [""])[0];
+  if (!pay) bad.push("the nikāḥ fee can no longer be paid in the app");
+  if (!/NK_PAY_LINKS\.member \|\| !NK_PAY_LINKS\.non_member\) return/.test(pay))
+    bad.push("the pay box would show with a missing Payment Link — a pay button that goes nowhere");
+  if (!/"client_reference_id=" \+ encodeURIComponent/.test(pay))
+    bad.push("a nikāḥ payment carries no reference — Stripe would take the money and nobody could match it");
+  if (!/\^NK-\\d\{2\}-\\d\{4\}\$/.test(pay))
+    bad.push("the reference is not checked before checkout, so a typo pays against nothing");
+  if (!/nikah\.once_the_office_has_rung/.test(app))
+    bad.push("the pay box no longer says the office rings first, so paying reads as booking");
+  for (const k of ["nikah.the_nikah_fee", "nikah.members_of_the_masjid", "nikah.non_members"])
+    if (!app.includes(k)) bad.push(`the published nikāḥ rate has lost "${k}"`);
+
+  /* 010 has a test that fails if availability colouring ever appears on the
+     nikāḥ calendar. The app must not invent it either. */
+  const cal = (app.match(/function nkRenderCal\(\)[\s\S]*?\n\}/) || [""])[0];
+  if (/data-state=|nkDayState|hall_availability/.test(cal))
+    bad.push("the nikāḥ calendar is colouring days by availability — the masjid does not publish that diary, so it would be invented");
+
+  if (bad.length) bad.forEach(fail);
+  else ok("nikāḥ fee — the published rate, payable online against a checked reference, and paying still does not book a date");
+}
+
+/* ---- 3t. the language packs on disk are the ones the source would build ----
+   check-i18n reads lang/src/*.json. The app reads lang/ur.js. Edit the source,
+   forget to run build-lang, and every check passes while phones download a
+   pack that is missing the strings just written — which is exactly how two new
+   lines sat in English on an otherwise Urdu screen while the coverage check
+   reported everything present. ---- */
+{
+  const built = ["ur", "gu", "ar"].map(c => `lang/${c}.js`).filter(existsSync);
+  if (!built.length) fail("no language packs are built — every reader gets English");
+  else {
+    const before = built.map(f => readFileSync(f, "utf8"));
+    try {
+      execSync("node scripts/build-lang.mjs", { stdio: "pipe" });
+      const stale = built.filter((f, i) => readFileSync(f, "utf8") !== before[i]);
+      /* Put back exactly what was there, so the check reports and never edits. */
+      built.forEach((f, i) => writeFileSync(f, before[i]));
+      if (stale.length)
+        fail(`${stale.join(", ")} ${stale.length === 1 ? "is" : "are"} behind lang/src — ` +
+             "run node scripts/build-lang.mjs, or phones download a pack missing the newest strings");
+      else ok(`language packs — all ${built.length} match what lang/src would build`);
+    } catch (e) {
+      built.forEach((f, i) => writeFileSync(f, before[i]));
+      fail("scripts/build-lang.mjs will not run: " + String(e.stderr || e).split("\n")[0]);
+    }
+  }
 }
 
 /* ---- 4. the service worker cache changed when the app did ----

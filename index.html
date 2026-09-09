@@ -559,6 +559,13 @@
   .bk-rate-line:last-of-type{border-bottom:0}
   .bk-rate-line .p{font-weight:700;flex:0 0 auto}
   .bk-rate-note{font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.65;margin-top:9px}
+  .nk-pay{padding:14px}
+  .nk-pay h4{font-family:"Fraunces",Georgia,serif;font-size:calc(16px * var(--ts));font-weight:600}
+  .np-when{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.65;margin:5px 0 12px}
+  .np-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+  .np-btn{flex:1 1 150px;font:inherit;font-size:calc(13.5px * var(--ts));font-weight:700;padding:12px 10px;
+    border-radius:11px;cursor:pointer;border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+  .np-btn.np-alt{background:var(--paper);color:var(--brand-600)}
   .bk-terms{padding:14px}
   .bk-term + .bk-term{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}
   .bk-term b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(14.5px * var(--ts));
@@ -3917,10 +3924,66 @@
                around property and inheritance, should the need ever arise.</p>
           </div>
 
+          <!-- ---------------- the fee ----------------
+               A published rate card, so it is stated openly rather than sitting
+               behind a question. Nobody has to tell the app whether they belong
+               to this masjid in order to read what it costs. -->
+          <div class="sec-h"><h2 data-i18n="nikah.the_nikah_fee">The nikāḥ fee</h2><span class="rule"></span></div>
+
+          <div class="card bk-rates">
+            <p class="bk-rate-eff" data-i18n="nikah.same_whatever_the_day">The same whatever the day and whatever the time.</p>
+            <div class="bk-rate-line"><span class="n" data-i18n="nikah.members_of_the_masjid">Members of the masjid</span><span class="p tnum" data-i18n-num>&pound;100</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="nikah.non_members">Non-members</span><span class="p tnum" data-i18n-num>&pound;200</span></div>
+            <p class="bk-rate-note" data-i18n-html="nikah.pay_in_cash_or_transfer">Pay in cash at the masjid office, by bank transfer to
+              <strong>Bolton Central Islamic Society</strong>, or online below.</p>
+            <div class="bk-rate-line"><span class="n" data-i18n="sheet.sort_code">Sort code</span><span class="p tnum" data-i18n-latin>30-99-50</span></div>
+            <div class="bk-rate-line"><span class="n" data-i18n="sheet.account_number">Account number</span><span class="p tnum" data-i18n-latin>59286668</span></div>
+          </div>
+
+          <!-- ---------------- paying online ----------------
+               A way to PAY, not a way to BOOK, and the difference is the whole
+               point. The hall calendar can sell a date outright because the app
+               can see what is free. This cannot: the masjid does not publish its
+               nikāḥ diary, so neither the app nor the website knows whether any
+               given day is available, and paying must not be allowed to agree
+               one. The office rings, agrees the date, and the family pays here
+               instead of coming in with cash. mark_nikah_fee_paid() leaves the
+               request's status alone for the same reason.
+
+               Two rates, and the app has no way to know which applies, so the
+               family picks and the office checks on the call. That question is
+               fine to ask here and was rightly taken off the hall form: a hall
+               hirer may be of any faith or none, and asking them about mosque
+               membership is asking about their religion. Somebody requesting a
+               nikāḥ has already told us far more than the answer would.
+
+               Hidden entirely unless both Payment Links are set. A pay button
+               that goes nowhere is worse than no pay button, and the cash and
+               transfer details above stand on their own. -->
+          <div class="card nk-pay" id="nk-pay" hidden>
+            <h4 data-i18n="nikah.pay_the_fee_online">Pay the fee online</h4>
+            <p class="np-when" data-i18n-html="nikah.once_the_office_has_rung"><strong>Once the office has rung you and agreed your
+              date.</strong> Paying does not book a date on its own &mdash; the masjid confirms what
+              it can do first.</p>
+            <div class="bk-field">
+              <label for="nk-pay-ref" data-i18n="nikah.your_reference">Your reference</label>
+              <input type="text" id="nk-pay-ref" placeholder="NK-26-0001" autocomplete="off"
+                     spellcheck="false" maxlength="11" data-i18n-latin>
+            </div>
+            <div class="np-btns">
+              <button type="button" class="np-btn" data-nkpay="member" data-i18n="nikah.member_pay_100">Member &mdash; pay &pound;100</button>
+              <button type="button" class="np-btn np-alt" data-nkpay="non_member" data-i18n="nikah.non_member_pay_200">Non-member &mdash; pay &pound;200</button>
+            </div>
+            <div class="bk-err" id="nk-pay-err" hidden></div>
+            <p class="bk-rate-note" data-i18n="nikah.your_reference_is_on_the">Your reference is on the confirmation you were given when you
+              sent your request, and the office can read it out. Pick the rate that applies to
+              you &mdash; the office checks it, and will tell you if anything is owed or owed back.</p>
+          </div>
+
           <div class="card mg-card">
-            <p data-i18n="marriage.requirements_such_as_documentation_witnesses">Requirements such as documentation, witnesses, available dates and any
-               applicable fees vary and are best confirmed directly with the masjid. To
-               discuss your circumstances or arrange a booking, please get in touch.</p>
+            <p data-i18n="marriage.requirements_such_as_documentation_witnesses">Requirements such as documentation, witnesses and available dates
+               are best confirmed directly with the masjid. To discuss your circumstances or
+               arrange a booking, please get in touch.</p>
           </div>
 
           <a class="mg-call" href="tel:01204535997">
@@ -3934,8 +3997,8 @@
             <span class="dr-ch">&rsaquo;</span>
           </a>
 
-          <p class="mg-note" data-i18n="marriage.specific_requirements_documentation_witnesses_">Specific requirements &mdash; documentation, witnesses, timings and
-            any applicable fees &mdash; are best discussed directly with the office when you call.</p>
+          <p class="mg-note" data-i18n="marriage.specific_requirements_documentation_witnesses_">Specific requirements &mdash; documentation, witnesses and timings
+            &mdash; are best discussed directly with the office when you call.</p>
 
           <!-- ---------------- request a date ----------------
                A REQUEST, not a booking. Nothing on this calendar is coloured
@@ -9189,6 +9252,78 @@ function nkShow(open){
   if(f) f.hidden = !(open && !NK.sent && NK.d1 && NK.slot);
 }
 
+/* ---------------------------------------------------------------------------
+   Paying the nikāḥ fee online.
+
+   The masjid's Stripe Payment Links, set up as payments for SERVICES rather
+   than donations: a nikāḥ fee is not a gift, and putting it through a donation
+   link misstates it in the charity's accounts and risks a Gift Aid problem.
+--------------------------------------------------------------------------- */
+const NK_PAY_LINKS = {
+  member:     "https://buy.stripe.com/5kQ6oHfU02LC0p05p4f3a07",   // £100
+  non_member: "https://buy.stripe.com/28EcN58ry85W1t4cRwf3a08",   // £200
+};
+
+/* The app writes every number on screen in the reader's own digits, so
+   somebody reading their reference back in Urdu may well type it in Urdu.
+   Take those as readily as Latin rather than refusing something that is
+   plainly right. */
+function nkLatinDigits(v){
+  let out = String(v);
+  for(const set of Object.values(DIGITS))
+    out = out.replace(new RegExp("[" + set + "]", "g"), d => String(set.indexOf(d)));
+  return out;
+}
+
+/* Typed without the dashes more often than with them. Put them back. */
+function nkTidyRef(v){
+  let out = nkLatinDigits(v).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if(/^NK\d/.test(out))        out = "NK-" + out.slice(2);
+  if(/^NK-\d{2}\d/.test(out))  out = out.slice(0, 5) + "-" + out.slice(5);
+  return out.slice(0, 11);
+}
+
+function initNikahPay(){
+  const box = document.getElementById("nk-pay");
+  if(!box) return;
+  if(!NK_PAY_LINKS.member || !NK_PAY_LINKS.non_member) return;   // stays hidden
+  box.hidden = false;
+
+  const ref = document.getElementById("nk-pay-ref");
+  const err = document.getElementById("nk-pay-err");
+  const problem = msg => { err.hidden = false; err.textContent = msg; ref.focus(); };
+
+  ref.addEventListener("input", function(){
+    err.hidden = true;
+    this.value = nkTidyRef(this.value);
+  });
+
+  box.addEventListener("click", e => {
+    const btn = e.target.closest("[data-nkpay]");
+    if(!btn) return;
+
+    const v = nkTidyRef(ref.value);
+    if(!v) return problem(t("nikah.enter_your_reference_first",
+      "Please enter your reference first, so the masjid knows whose fee this is. " +
+      "It looks like NK-26-0001."));
+    /* Checked here only so a typo does not send money against a reference that
+       cannot be matched. The database checks it again properly, and records an
+       unmatched payment rather than swallowing it. */
+    if(!/^NK-\d{2}-\d{4}$/.test(v)) return problem(t("nikah.that_is_not_a_reference",
+      "That does not look like a nikāḥ reference. It is four digits after the year, " +
+      "like NK-26-0001. The office can read yours out if you cannot find it."));
+
+    const link = NK_PAY_LINKS[btn.dataset.nkpay];
+    if(!link) return problem(t("nikah.that_option_unavailable",
+      "That payment option is not available just now. Please ring the office."));
+
+    /* client_reference_id is the only thing tying this payment to a request.
+       Without it Stripe takes the money and nobody knows whose it is. */
+    window.open(link + (link.indexOf("?") === -1 ? "?" : "&") +
+                "client_reference_id=" + encodeURIComponent(v), "_blank", "noopener");
+  });
+}
+
 function initNikah(){
   document.getElementById("nk-prev").addEventListener("click", ()=>{
     NK.month = new Date(NK.month.getFullYear(), NK.month.getMonth()-1, 1); nkRenderCal();
@@ -9196,6 +9331,7 @@ function initNikah(){
   document.getElementById("nk-next").addEventListener("click", ()=>{
     NK.month = new Date(NK.month.getFullYear(), NK.month.getMonth()+1, 1); nkRenderCal();
   });
+  initNikahPay();
   const m1 = document.getElementById("nk-mode-1"), m2 = document.getElementById("nk-mode-2");
   m1.addEventListener("click", ()=>{ NK.which = 1; m1.dataset.on = "1"; delete m2.dataset.on; });
   m2.addEventListener("click", ()=>{
