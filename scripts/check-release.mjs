@@ -536,6 +536,31 @@ for (const f of ["index.html", "admin.html"]) {
   else ok(`menu — all ${rows.length} rows carry an icon, bar the ones marked coming soon`);
 }
 
+/* ---- 3q. a tile that stands for several things asks which ----
+   Daily Adhkār opened on the morning athkār with the other sets behind tabs
+   nobody had been told about, and Madrasah opened on Admissions & Fees as
+   though the holiday planner and the portal were not there. Each row on those
+   two menus has to lead somewhere: a menu row wired to nothing is worse than
+   no menu. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  for (const [name, view] of [["Daily Adhkār", "ak-mode-view"], ["Madrasah", "madrasah"]]) {
+    const m = app.match(new RegExp(`id="${view}"[\\s\\S]*?<\\/div>\\s*\\n\\s*<\\/div>`));
+    const ids = [...(m ? m[0] : "").matchAll(/<(?:button|a) class="md-row"[^>]*id="([^"]+)"/g)].map(x => x[1]);
+    if (ids.length < 3) { bad.push(`the ${name} menu has ${ids.length} row(s) — it is meant to offer a choice`); continue; }
+    for (const id of ids) {
+      const wired = new RegExp(`'${id}'\\)\\.addEventListener`).test(app);
+      const link  = new RegExp(`id="${id}"[^>]*href="https?:`).test(app);
+      if (!wired && !link) bad.push(`${name}: the "${id}" row goes nowhere`);
+    }
+  }
+  if (!/a\.md-row\{text-decoration:none/.test(app))
+    bad.push("a menu row that is a link would come out underlined and a different colour from the rows beside it");
+  if (bad.length) bad.forEach(fail);
+  else ok("tile menus — Daily Adhkār and Madrasah both offer their choices, and every row leads somewhere");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is
