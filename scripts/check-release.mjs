@@ -894,7 +894,19 @@ for (const f of ["index.html", "admin.html"]) {
     /* A notice that fails to save must not leave its poster behind. */
     if (!/deletePoster/.test(w))
       bad.push("a failed notice would leave its uploaded poster in the bucket for ever, with nothing pointing at it");
+    /* Every subscriber today is Safari web push, which will not draw the
+       poster in the banner. The tap is the only way to the picture, so it must
+       land on the notice itself rather than on the tab. */
+    if (!/#notice=\$\{id\}/.test(w))
+      bad.push("the notice notification does not deep-link to the notice it is about — on Safari web push the banner carries no poster, so a tap that lands on the home screen loses the picture entirely");
   }
+
+  /* ...and the app has to act on that link. It had no hash handling at all
+     when notices shipped, so #notices in the notification did nothing. */
+  if (!/ntOpenFromHash/.test(app))
+    bad.push("the app ignores the #notice= link a notification arrives with, so tapping one opens the home screen instead of the poster");
+  if (!/addEventListener\("hashchange", ntOpenFromHash\)/.test(app))
+    bad.push("the app only reads #notice= at startup — a notification tapped while the app is already open changes the hash without reloading, and would be ignored");
 
   /* The service key must never be committed, anywhere. Comments are stripped
      first: the files carry warnings that say "never put the service_role key

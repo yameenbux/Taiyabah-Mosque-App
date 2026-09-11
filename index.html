@@ -8542,6 +8542,37 @@ function loadNotices(){
   });
 }
 
+/* ---- arriving from a notification ----
+
+   A notice notification carries #notice=<id>. Tapping it used to land on the
+   home screen, leaving the poster the message was about two taps away and
+   undiscovered — the app had no hash handling at all, so even plain #notices
+   did nothing.
+
+   On Safari web push — which is every subscriber today, the app being a PWA
+   rather than a wrapped native app — the poster cannot be drawn inside the
+   notification banner itself. So the next best thing is that one tap opens it
+   full screen. */
+function ntOpenFromHash(){
+  const h = location.hash || "";
+  const m = /^#notice=([0-9a-f-]{16,40})$/i.exec(h);
+  if(!m && h !== "#notices") return;
+
+  switchTab("notices");
+  if(!m) return;
+
+  const id = m[1];
+  /* loadNotices() resolves whether it reached the network or fell back to the
+     saved copy, so the poster opens either way if we already hold that notice. */
+  Promise.resolve(loadNotices()).then(() => {
+    const n = (NT.items || []).find(x => x.id === id);
+    if(!n) return;                       // withdrawn, or expired since sending
+    const card = document.querySelector(`#nt-list .nt-shot[data-img="${CSS.escape(n.image_url || "")}"]`);
+    if(card) card.scrollIntoView({ block: "center", behavior: "instant" });
+    if(n.image_url) ntShowPoster(n.image_url);
+  });
+}
+
 function initNotices(){
   const v = document.getElementById("nt-viewer");
   if(!v) return;
@@ -8549,6 +8580,10 @@ function initNotices(){
   v.addEventListener("click", e => { if(e.target === v) ntHidePoster(); });
   addEventListener("keydown", e => { if(e.key === "Escape" && !v.hidden) ntHidePoster(); });
   renderNotices();
+  ntOpenFromHash();
+  /* A notification tapped while the app is already open changes the hash
+     without reloading, so the load-time call alone would miss it. */
+  addEventListener("hashchange", ntOpenFromHash);
 }
 
 /* ---- athkār ---- */
