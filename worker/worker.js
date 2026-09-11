@@ -427,14 +427,20 @@ async function deletePoster(env, url) {
 
 /* The same targeting as any other send, plus the poster. Each platform names
    the field differently and ignores the others, so all three go every time. */
-async function sendNotice(env, { topic, title, body, imageUrl }) {
+async function sendNotice(env, { topic, title, body, imageUrl, id }) {
   const t = TOPICS[topic];
+  /* Deep link to the notice itself, not just the tab. Safari web push — which
+     is every subscriber while the app is a PWA rather than a wrapped native
+     app — will not draw the poster in the banner, so the tap has to do it:
+     the app opens that notice and puts the poster on screen. */
   const payload = {
     app_id: env.ONESIGNAL_APP_ID,
     headings: { en: title },
     contents: { en: body },
     filters: anyOfFilter(prefValues(t.idx)),
-    url: "https://taiyabahapp.ysbdesigns.uk/#notices",
+    url: id
+      ? `https://taiyabahapp.ysbdesigns.uk/#notice=${id}`
+      : "https://taiyabahapp.ysbdesigns.uk/#notices",
   };
   if (imageUrl) {
     payload.big_picture = imageUrl;                 // Android
@@ -909,7 +915,10 @@ async function handle(request, env) {
         return json({ error: "Could not save the notice: " + row.error }, 502, ch);
       }
 
-      const sent = await sendNotice(env, { topic, title, body: push, imageUrl });
+      const sent = await sendNotice(env, {
+        topic, title, body: push, imageUrl,
+        id: row.data && row.data.id,
+      });
       return json({ ok: true, notice: row.data, sent }, 200, ch);
     }
 
