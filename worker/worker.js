@@ -361,7 +361,7 @@ async function uploadPoster(env, dataUrl) {
 
   const ext = m[1] === "image/png" ? "png" : m[1] === "image/webp" ? "webp" : "jpg";
   const name = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
-  const base = String(env.SUPABASE_URL).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+  const base = supaBaseUrl(env);
 
   const res = await fetch(`${base}/storage/v1/object/notices/${name}`, {
     method: "POST",
@@ -377,21 +377,52 @@ async function uploadPoster(env, dataUrl) {
   return { url: `${base}/storage/v1/object/public/notices/${name}` };
 }
 
-async function supaInsert(env, table, row) {
-  const base = String(env.SUPABASE_URL).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
-  const res = await fetch(`${base}/rest/v1/${table}`, {
+const supaBaseUrl = (env) =>
+  String(env.SUPABASE_URL).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+
+/* Notices are written through publish_notice(), never by inserting into the
+   table. The service key holds no table privileges in this project — not on
+   notices, not on hall_bookings, not on anything — and the first send from
+   the office failed with 42501 because this code assumed otherwise. Bypassing
+   RLS is not the same as being granted INSERT.
+
+   That lockdown is the website's pattern rather than an oversight, and it is
+   the right one: this key sits in an internet-facing Worker, so the less it
+   can do the better. db/002_publish_notice.sql gives it exactly one verb. */
+async function supaRpc(env, fn, args) {
+  const res = await fetch(`${supaBaseUrl(env)}/rest/v1/rpc/${fn}`, {
     method: "POST",
     headers: {
       apikey: env.SUPABASE_SERVICE_KEY,
       Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
       "Content-Type": "application/json",
-      Prefer: "return=representation",
     },
-    body: JSON.stringify(row),
+    body: JSON.stringify(args),
   });
   const txt = await res.text();
   if (!res.ok) return { error: `${res.status} ${txt.slice(0, 200)}` };
-  try { return { data: JSON.parse(txt)[0] }; } catch { return { data: null }; }
+  try {
+    const parsed = JSON.parse(txt);
+    return { data: Array.isArray(parsed) ? parsed[0] : parsed };
+  } catch { return { data: null }; }
+}
+
+/* If the notice cannot be saved, the poster that was uploaded a moment ago is
+   litter nobody will ever look at. Best effort — a failed cleanup must not
+   turn one error into two. */
+async function deletePoster(env, url) {
+  if (!url) return;
+  const name = url.split("/object/public/notices/")[1];
+  if (!name) return;
+  try {
+    await fetch(`${supaBaseUrl(env)}/storage/v1/object/notices/${name}`, {
+      method: "DELETE",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      },
+    });
+  } catch { /* the notice failing is the thing worth reporting, not this */ }
 }
 
 /* The same targeting as any other send, plus the poster. Each platform names
@@ -826,7 +857,8 @@ async function handle(request, env) {
        never a notice nobody can find: the poster is uploaded, the notice is
        written, and only then is the notification sent. If the send fails the
        notice still exists and can be pushed again; if the write fails nothing
-       was announced, which is the right way round.
+       was announced and the poster is deleted again, which is the right way
+       round.
 
        `image` is a data URL from the office's file picker. It goes to Supabase
        Storage on the service key — the app's publishable key can neither write
@@ -865,12 +897,17 @@ async function handle(request, env) {
          date is the masjid's to retire by hand. */
       const expires = eventAt ? new Date(eventAt.getTime() + 36 * 3600e3) : null;
 
-      const row = await supaInsert(env, "notices", {
-        topic, title, body: text, image_url: imageUrl, ...dims,
-        event_at: eventAt ? eventAt.toISOString() : null,
-        expires_at: expires ? expires.toISOString() : null,
+      const row = await supaRpc(env, "publish_notice", {
+        payload: {
+          topic, title, body: text, image_url: imageUrl, ...dims,
+          event_at: eventAt ? eventAt.toISOString() : null,
+          expires_at: expires ? expires.toISOString() : null,
+        },
       });
-      if (row.error) return json({ error: "Could not save the notice: " + row.error }, 502, ch);
+      if (row.error) {
+        await deletePoster(env, imageUrl);
+        return json({ error: "Could not save the notice: " + row.error }, 502, ch);
+      }
 
       const sent = await sendNotice(env, { topic, title, body: push, imageUrl });
       return json({ ok: true, notice: row.data, sent }, 200, ch);

@@ -817,12 +817,33 @@ for (const f of ["index.html", "admin.html"]) {
    The app ships its publishable Supabase key in plain sight. Anything that key
    can write, anyone who opens the app can write, and a masjid's announcements
    board is a bad thing to leave open. So the app reads a VIEW and the Worker
-   writes the TABLE on the service key. This checks the two never swap. ---- */
+   writes through a FUNCTION on the service key. This checks the two never swap.
+
+   The write path is the part that was wrong in the first release. The Worker
+   inserted straight into the table, on the reasoning that the service key
+   bypasses Row Level Security — which it does, and which is not the same as
+   being granted INSERT. It holds no table privileges anywhere in this project,
+   so the first send from the office died with 42501 and the office got a
+   notification with nothing behind it.
+
+   The tempting fix is `grant insert on public.notices to service_role`. That
+   key sits in an internet-facing Worker; a grant widens it from "can do
+   nothing" to "can write a table", and the next table added inherits the same
+   assumption. So this check also fails that fix. ---- */
 {
   const app = readFileSync("index.html", "utf8");
   const w = existsSync("worker/worker.js") ? readFileSync("worker/worker.js", "utf8") : "";
   const sql = existsSync("db/001_notices.sql") ? readFileSync("db/001_notices.sql", "utf8") : "";
+  const fn  = existsSync("db/002_publish_notice.sql") ? readFileSync("db/002_publish_notice.sql", "utf8") : "";
   const bad = [];
+
+  /* These migrations explain themselves at length, and the explanations quote
+     the very things being checked for — "security definer", and the grant that
+     must never be made. Match the SQL, not the prose about it. A check that
+     passes because of a comment is worse than no check. */
+  const stripSql = t => t.replace(/--[^\n]*/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ");
+  const sqlCode = stripSql(sql);
+  const fnCode  = stripSql(fn);
 
   if (!/notices_live/.test(app))
     bad.push("the app no longer reads notices_live, so the Notices tab shows nothing");
@@ -834,13 +855,28 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push("the app appears to write to notices with the publishable key — anyone who opens the app could then post an announcement");
 
   if (sql) {
-    if (!/alter table public\.notices enable row level security/.test(sql))
+    if (!/alter table public\.notices enable row level security/.test(sqlCode))
       bad.push("Row Level Security is not enabled on notices, so the public key could read and write the raw table");
-    if (!/revoke all on public\.notices from anon/.test(sql))
+    if (!/revoke all on public\.notices from anon/.test(sqlCode))
       bad.push("the notices table is not revoked from the anon role");
-    if (!/grant select on public\.notices_live to anon/.test(sql))
+    if (!/grant select on public\.notices_live to anon/.test(sqlCode))
       bad.push("notices_live is not readable by the app's key, so the tab would always be empty");
+    /* The fix that must never be taken. */
+    if (/grant[^;]*\b(insert|update|delete|all)\b[^;]*on\s+public\.notices\b[^;]*to[^;]*service_role/i.test(sqlCode))
+      bad.push("the migration grants the service key write access to the notices table — publish_notice() exists so that key can publish a notice and nothing else; a grant hands an internet-facing Worker the whole table");
   } else bad.push("db/001_notices.sql is missing — nothing documents how the notices table is meant to be set up");
+
+  /* The one privilege the Worker has, and the guards that keep it to one. */
+  if (fn) {
+    if (!/security definer/i.test(fnCode))
+      bad.push("publish_notice is not security definer, so it runs as the caller — which holds no privileges on notices and cannot write");
+    if (!/set\s+search_path\s*=/i.test(fnCode))
+      bad.push("publish_notice does not pin its search_path — a security definer function without one can be redirected through a schema someone else controls");
+    if (!/revoke all on function public\.publish_notice\(jsonb\) from public/i.test(fnCode))
+      bad.push("EXECUTE on publish_notice is not revoked from PUBLIC — Postgres grants it by default, which would make it callable with the key that ships inside the app");
+    if (!/grant execute on function public\.publish_notice\(jsonb\) to service_role/i.test(fnCode))
+      bad.push("publish_notice is not executable by service_role, so the Worker cannot save a notice");
+  } else bad.push("db/002_publish_notice.sql is missing — without it the service key has no way to write a notice at all");
 
   if (w) {
     if (!/SUPABASE_SERVICE_KEY/.test(w))
@@ -851,6 +887,13 @@ for (const f of ["index.html", "admin.html"]) {
     for (const field of ["big_picture", "ios_attachments", "chrome_web_image"])
       if (!w.includes(field))
         bad.push(`a poster would not reach one platform: ${field} is missing from the send`);
+    if (!/rpc\/\$\{fn\}|rpc\/publish_notice/.test(w) || !/"publish_notice"/.test(w))
+      bad.push("the Worker does not save the notice through publish_notice() — the service key holds no INSERT on the table, so this fails with 42501 after the poster has already been uploaded");
+    if (/\/rest\/v1\/notices\b/.test(w))
+      bad.push("the Worker is writing the notices table directly again — that is the 42501 that broke the first send");
+    /* A notice that fails to save must not leave its poster behind. */
+    if (!/deletePoster/.test(w))
+      bad.push("a failed notice would leave its uploaded poster in the bucket for ever, with nothing pointing at it");
   }
 
   /* The service key must never be committed, anywhere. Comments are stripped
@@ -871,7 +914,7 @@ for (const f of ["index.html", "admin.html"]) {
   }
 
   if (bad.length) bad.forEach(fail);
-  else ok("notices — the app reads the public view, the Worker writes the table on a secret key, and a poster reaches all three platforms");
+  else ok("notices — the app reads the public view, the Worker writes through publish_notice() on a key with no table privileges of its own, and a poster reaches all three platforms");
 }
 
 /* ---- 4. the service worker cache changed when the app did ----
