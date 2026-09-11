@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "394a6e2c0e68",
+ "version": "d7313c41a329",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -544,6 +544,9 @@ window.LANG_PACK = {
   "reminder.kursi.d": "ہر فرض نماز کے بعد پڑھی جاتی ہے۔",
   "reminder.iqamah.t": "جماعت سے پہلے دعا",
   "reminder.iqamah.d": "اذان اور اقامت کے درمیان کا وقت دعا کا وقت ہے۔",
+  "sheet.surah_al_kahf": "سورۃ الکہف",
+  "alerts.surah_al_kahf": "سورۃ الکہف",
+  "sheet.friday_morning_reminder": "جمعہ کی صبح، اسے پڑھنے کی یاد دہانی",
   "sheet.app_built_by": "ایپ بنائی گئی",
   "sheet.remind_me": "مجھے یاد دلائیں",
   "sheet.before_jamaah": "جماعت سے پہلے",

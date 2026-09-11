@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "d9bb5d41d20a",
+ "version": "4ac539d12b54",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -544,6 +544,9 @@ window.LANG_PACK = {
   "reminder.kursi.d": "تُقرأ بعد كل صلاة مكتوبة.",
   "reminder.iqamah.t": "الدعاء قبل الجماعة",
   "reminder.iqamah.d": "ما بين الأذان والإقامة وقت للدعاء.",
+  "sheet.surah_al_kahf": "سورة الكهف",
+  "alerts.surah_al_kahf": "سورة الكهف",
+  "sheet.friday_morning_reminder": "صباح الجمعة، تذكير بقراءتها",
   "sheet.app_built_by": "تطوير التطبيق",
   "sheet.remind_me": "ذكّرني",
   "sheet.before_jamaah": "قبل الجماعة",

@@ -1816,6 +1816,10 @@
           <div class="txt"><div class="t" data-i18n="sheet.events_talks">Events &amp; talks</div><div class="d" data-i18n="sheet.bayaans_classes_community_events">Bayaans, classes, community events</div></div>
           <label class="switch"><input type="checkbox" id="tg-evt"><span class="sl"></span></label>
         </div>
+        <div class="tg">
+          <div class="txt"><div class="t" data-i18n="sheet.surah_al_kahf">Sūrah al-Kahf</div><div class="d" data-i18n="sheet.friday_morning_reminder">Friday morning, a reminder to read it</div></div>
+          <label class="switch"><input type="checkbox" checked id="tg-kahf"><span class="sl"></span></label>
+        </div>
         <button class="save" id="a-save" data-i18n="sheet.save">Save</button>
       </div>
       <p class="wirednote" id="wirednote"></p>
@@ -9996,6 +10000,7 @@ function currentPrefs(){
     jan:document.getElementById('tg-jan').checked,
     ann:document.getElementById('tg-ann').checked,
     evt:document.getElementById('tg-evt').checked,
+    kahf:document.getElementById('tg-kahf').checked,
   };
 }
 
@@ -10005,6 +10010,7 @@ function summarise(p){
   if(p.jan) on.push(t("sheet.janazah","Janāzah"));
   if(p.ann) on.push(t("alerts.announcements","Announcements"));
   if(p.evt) on.push(t("alerts.events","Events"));
+  if(p.kahf === undefined || p.kahf) on.push(t("alerts.surah_al_kahf","Sūrah al-Kahf"));
   return on.length ? on.join(" · ") : t("alerts.none_selected","No alerts selected");
 }
 
@@ -10027,6 +10033,7 @@ function applyPrefs(p){
   document.getElementById('tg-jan').checked=p.jan;
   document.getElementById('tg-ann').checked=p.ann;
   document.getElementById('tg-evt').checked=p.evt;
+  document.getElementById('tg-kahf').checked = p.kahf === undefined ? true : p.kahf;
   document.getElementById('mins').value=p.mins;
   document.getElementById('mins').disabled=!p.jam;
 }
@@ -10059,12 +10066,13 @@ function pushTopicTags(p){
     jamaah_mins:   String(q.mins),
     janazah:       q.jan ? "1" : "0",
     announcements: q.ann ? "1" : "0",
-    events:        q.evt ? "1" : "0"
+    events:        q.evt ? "1" : "0",
+    kahf:          q.kahf ? "1" : "0"
   };
   const key = JSON.stringify(tags);
   if(key === lastSentTags){
     lastTagResult = "already stored, nothing to change " + key;
-    if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
+    if(!(q.jam||q.jan||q.ann||q.evt||q.kahf)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
     return;
   }
   lastTagResult = "queued…";

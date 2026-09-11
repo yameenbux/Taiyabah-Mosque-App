@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "06a250f843b6",
+ "version": "b63d376f79c6",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -544,6 +544,9 @@ window.LANG_PACK = {
   "reminder.kursi.d": "દરેક ફર્ઝ નમાઝ પછી પઢવામાં આવે છે.",
   "reminder.iqamah.t": "જમાઅત પહેલાં દુઆ",
   "reminder.iqamah.d": "અઝાન અને ઇકામત વચ્ચેનો સમય દુઆનો સમય છે.",
+  "sheet.surah_al_kahf": "સૂરહ અલ-કહફ",
+  "alerts.surah_al_kahf": "સૂરહ અલ-કહફ",
+  "sheet.friday_morning_reminder": "શુક્રવારે સવારે, તે વાંચવાની યાદ",
   "sheet.app_built_by": "એપ બનાવી",
   "sheet.remind_me": "મને યાદ કરાવો",
   "sheet.before_jamaah": "જમાઅત પહેલાં",
