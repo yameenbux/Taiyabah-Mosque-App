@@ -500,6 +500,11 @@ async function handle(request, env) {
           restKey: !!env.ONESIGNAL_REST_API_KEY,
           passwordHash: !!env.ADMIN_PASSWORD_HASH,
           sessionSecret: !!env.SESSION_SECRET,
+          /* Notices need Supabase as well. Reported here so "the poster
+             didn't send" can be answered by looking, rather than by guessing
+             which of two secrets never got added. Names only — never values. */
+          supabaseUrl: !!env.SUPABASE_URL,
+          supabaseKey: !!env.SUPABASE_SERVICE_KEY,
           allowedOrigin: env.ALLOWED_ORIGIN || null,
         },
         yourOrigin: request.headers.get("Origin") || null,

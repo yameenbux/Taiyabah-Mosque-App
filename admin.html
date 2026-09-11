@@ -528,6 +528,14 @@ async function checkService(){
       "  session secret   : " + !!c.sessionSecret,
       "  allowed origin   : " + (c.allowedOrigin || "not set"),
       "",
+      "  Notices (posters and the app's Notices tab):",
+      "  Supabase URL set : " + !!c.supabaseUrl,
+      "  Supabase key set : " + !!c.supabaseKey,
+      (c.supabaseUrl && c.supabaseKey
+        ? "  → notices are configured."
+        : "  → notices are NOT configured: sending will save nothing and the\n" +
+          "    Notices tab stays empty. Add the missing secret in Cloudflare."),
+      "",
       "The app id must match the one in the OneSignal dashboard. If it doesn't,",
       "sends go to a different app — which has no subscribers, so nothing arrives.",
     ].join("\n"));
