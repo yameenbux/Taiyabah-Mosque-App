@@ -926,6 +926,30 @@
   .nt-empty h3{font-family:"Fraunces",Georgia,serif;font-size:calc(18px * var(--ts));font-weight:600}
   .nt-empty p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);max-width:34ch}
 
+  .nt-list{display:grid;gap:12px;margin-top:14px}
+  .nt-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);overflow:hidden}
+  /* The poster is the point of an event notice, so it leads. Height is capped
+     rather than fixed: a portrait poster keeps its shape instead of being
+     squashed into a banner, and a wide one does not swallow the screen. */
+  .nt-shot{display:block;width:100%;border:0;padding:0;background:var(--paper);cursor:zoom-in}
+  .nt-shot img{display:block;width:100%;max-height:46vh;object-fit:contain;background:#1B1119}
+  .nt-body{padding:14px 15px 15px}
+  .nt-when{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+    font-size:calc(11px * var(--ts));letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .nt-topic{padding:2px 7px;border-radius:3px;background:rgba(119,33,87,.09);color:var(--brand-600);font-weight:700}
+  .nt-card h3{font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
+    font-weight:600;line-height:1.25;margin:7px 0 5px}
+  .nt-card p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);white-space:pre-wrap}
+  .nt-stale{font-size:calc(12px * var(--ts));color:var(--muted);text-align:center;margin-top:12px}
+
+  .nt-viewer{position:fixed;inset:0;z-index:90;background:#140C11;
+    display:grid;place-items:center;padding:14px}
+  .nt-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px}
+  .nt-v-close{position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px;
+    width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;
+    background:rgba(255,255,255,.16);color:#fff;font-size:26px;line-height:1}
+
   /* ---- funeral services ----
      The urgent box is first and is the loudest thing on the screen, because
      someone opening this at 3am needs a phone number, not an introduction. */
@@ -1716,16 +1740,16 @@
   <main id="tab-notices" hidden>
     <div class="wrap">
       <div class="sec-h" style="margin-top:18px"><h2 data-i18n="notices.notices">Notices</h2><span class="rule"></span></div>
-      <!-- Real, but not yet: a notification the masjid sends is delivered and
-           then gone, and nothing keeps it. Somewhere to store announcements
-           has to exist before this can list them, so it says so plainly
-           rather than showing an empty list that looks broken. -->
-      <div class="nt-empty">
+      <!-- A notification is delivered and then gone: somebody driving, or who
+           swiped it away, or who installed the app the next day, had no way
+           back to it. These are the same announcements, kept. -->
+      <div class="nt-list" id="nt-list"></div>
+
+      <div class="nt-empty" id="nt-empty" hidden>
         <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
-        <h3 data-i18n="notices.coming_soon">Coming soon</h3>
-        <p data-i18n="notices.this_is_where_announcements">This is where the masjid&rsquo;s announcements will be kept, so a message you
-           miss or swipe away can still be read. Until it is switched on, alerts
-           arrive as notifications only.</p>
+        <h3 id="nt-empty-h" data-i18n="notices.nothing_just_now">Nothing just now</h3>
+        <p id="nt-empty-p" data-i18n="notices.announcements_will_appear">Announcements from the masjid will appear here and stay, so a
+           message you miss or swipe away can still be read.</p>
         <p data-i18n="notices.turn_on_notifications_in_settings">You can choose which alerts you receive under Notifications in the menu.</p>
       </div>
     </div>
@@ -4139,6 +4163,14 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Full poster. A masjid poster is portrait and dense with detail, so it
+       gets the whole screen rather than a thumbnail somebody has to squint at. -->
+  <div class="nt-viewer" id="nt-viewer" hidden>
+    <button class="nt-v-close" id="nt-v-close" aria-label="Close"
+            data-i18n-attr="aria-label:a11y.close">&times;</button>
+    <img id="nt-v-img" alt="">
   </div>
 
   <div class="drawer" id="drawer" data-open="0" role="dialog" aria-modal="true" aria-label="More" data-i18n-attr="aria-label:a11y.more">
@@ -6615,6 +6647,7 @@ function refreshRenderedText(){
     () => { if(STATE) renderStrip(); },
     () => { if(open("quran") && quranIndex) renderSurahList(document.getElementById('qd-search')?.value); },
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
+    () => { if(typeof renderNotices === "function") renderNotices(); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
   ];
   /* One screen failing to redraw must not stop the rest from being translated. */
@@ -8410,6 +8443,114 @@ function initBooking(){
   bkLoadAvailability();
 }
 
+/* ================= notices =================
+
+   The masjid's announcements, kept after the notification that carried them
+   has gone. Read from notices_live with the publishable key — the same key,
+   the same project and the same Row Level Security as the hall diary.
+
+   The last good list is kept on the device, so opening this on the bus shows
+   what was there rather than an error. A cached list says so when it is being
+   shown because the network failed; it does not pretend to be current.
+--------------------------------------------------------------------------- */
+const NT_CACHE = "notices.cache";
+const NT = { items: null, stale: false, loaded: false };
+
+function ntFmtWhen(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return "";
+  return `${fullDow(d.getDay())} ${num(d.getDate())} ${fullMon(d.getMonth())} ${num(d.getFullYear())}`;
+}
+
+function ntTopicLabel(k){
+  return k === "events"   ? t("alerts.events","Events")
+       : k === "janazah"  ? t("sheet.janazah","Janāzah")
+       : k === "kahf"     ? t("alerts.surah_al_kahf","Sūrah al-Kahf")
+                          : t("alerts.announcements","Announcements");
+}
+
+function renderNotices(){
+  const list  = document.getElementById("nt-list");
+  const empty = document.getElementById("nt-empty");
+  if(!list) return;
+
+  const items = NT.items || [];
+  empty.hidden = items.length > 0;
+  if(!items.length){ list.innerHTML = ""; return; }
+
+  list.innerHTML = items.map(n => {
+    const when = n.event_at ? ntFmtWhen(n.event_at) : ntFmtWhen(n.created_at);
+    /* width/height on the image so the card does not jump as posters load. */
+    const shot = n.image_url
+      ? `<button type="button" class="nt-shot" data-img="${esc(n.image_url)}"
+           aria-label="${esc(t("notices.view_poster","View the poster"))}">
+           <img src="${esc(n.image_url)}" alt="${esc(n.title)}" loading="lazy"
+                ${n.image_w ? `width="${n.image_w}"` : ""} ${n.image_h ? `height="${n.image_h}"` : ""}>
+         </button>`
+      : "";
+    return `<article class="nt-card">${shot}
+      <div class="nt-body">
+        <div class="nt-when"><span class="nt-topic">${esc(ntTopicLabel(n.topic))}</span><span>${esc(when)}</span></div>
+        <h3>${esc(n.title)}</h3>
+        <p>${esc(n.body)}</p>
+      </div></article>`;
+  }).join("") +
+  (NT.stale ? `<p class="nt-stale">${esc(t("notices.showing_saved_copy",
+      "Showing the copy saved on this phone — we could not reach the masjid just now."))}</p>` : "");
+
+  list.querySelectorAll(".nt-shot").forEach(b =>
+    b.addEventListener("click", () => ntShowPoster(b.dataset.img)));
+}
+
+function ntShowPoster(url){
+  const v = document.getElementById("nt-viewer");
+  document.getElementById("nt-v-img").src = url;
+  v.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function ntHidePoster(){
+  document.getElementById("nt-viewer").hidden = true;
+  document.getElementById("nt-v-img").src = "";
+  document.body.style.overflow = "";
+}
+
+function loadNotices(){
+  /* Show whatever was kept first, so the tab is never blank while the network
+     decides. If the fetch succeeds it replaces this a moment later. */
+  if(NT.items === null){
+    const cached = prefStore.get(NT_CACHE, null);
+    if(Array.isArray(cached)){ NT.items = cached; NT.stale = true; renderNotices(); }
+  }
+
+  return fetch(`${supaBase()}/rest/v1/notices_live?select=*`, {
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key },
+  }).then(r => {
+    if(!r.ok) throw new Error("notices " + r.status);
+    return r.json();
+  }).then(rows => {
+    NT.items = Array.isArray(rows) ? rows : [];
+    NT.stale = false; NT.loaded = true;
+    /* Keep a bounded copy: enough to be useful offline, not enough to fill
+       a phone with posters nobody asked to download. */
+    try{ prefStore.set(NT_CACHE, NT.items.slice(0, 20)); }catch(e){}
+    renderNotices();
+  }).catch(e => {
+    console.warn("notices unavailable:", e);
+    if(NT.items === null) NT.items = [];
+    NT.stale = NT.items.length > 0;
+    renderNotices();
+  });
+}
+
+function initNotices(){
+  const v = document.getElementById("nt-viewer");
+  if(!v) return;
+  document.getElementById("nt-v-close").addEventListener("click", ntHidePoster);
+  v.addEventListener("click", e => { if(e.target === v) ntHidePoster(); });
+  addEventListener("keydown", e => { if(e.key === "Escape" && !v.hidden) ntHidePoster(); });
+  renderNotices();
+}
+
 /* ---- athkār ---- */
 let akSection = 0;
 
@@ -9724,6 +9865,7 @@ function switchTab(name){
     document.getElementById("tab-"+n).hidden = (n!==name);
   });
   window.scrollTo({top:0,behavior:"instant"});
+  if(name === "notices") loadNotices();
 }
 function initDrawer(){
   document.getElementById('dr-close').addEventListener('click',closeDrawer);
@@ -10401,6 +10543,8 @@ function boot(){
   OneSignalManager.init();
   initTabs();
   initTabbarPin();
+  initNotices();
+  loadNotices();
   initDrawer();
   initHome();
   initMembership();

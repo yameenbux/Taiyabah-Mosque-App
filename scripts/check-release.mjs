@@ -809,6 +809,71 @@ for (const f of ["index.html", "admin.html"]) {
   }
 }
 
+/* ---- 3w. a notice is kept, and the poster bucket is not writable by the app ----
+   The Notices tab said "coming soon" for a year because a push is delivered and
+   then gone. Now it keeps them — which means the app reads a table, and the
+   office writes one, and those must not be the same key.
+
+   The app ships its publishable Supabase key in plain sight. Anything that key
+   can write, anyone who opens the app can write, and a masjid's announcements
+   board is a bad thing to leave open. So the app reads a VIEW and the Worker
+   writes the TABLE on the service key. This checks the two never swap. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const w = existsSync("worker/worker.js") ? readFileSync("worker/worker.js", "utf8") : "";
+  const sql = existsSync("db/001_notices.sql") ? readFileSync("db/001_notices.sql", "utf8") : "";
+  const bad = [];
+
+  if (!/notices_live/.test(app))
+    bad.push("the app no longer reads notices_live, so the Notices tab shows nothing");
+  if (/rest\/v1\/notices\?/.test(app) || /from\("notices"\)/.test(app))
+    bad.push("the app is reading the notices TABLE rather than the notices_live view — the view is what decides which columns the public gets");
+  /* The publishable key must never appear on a write to notices. */
+  const writes = [...app.matchAll(/method:\s*"(POST|PATCH|PUT|DELETE)"[\s\S]{0,400}?notices/g)];
+  if (writes.length)
+    bad.push("the app appears to write to notices with the publishable key — anyone who opens the app could then post an announcement");
+
+  if (sql) {
+    if (!/alter table public\.notices enable row level security/.test(sql))
+      bad.push("Row Level Security is not enabled on notices, so the public key could read and write the raw table");
+    if (!/revoke all on public\.notices from anon/.test(sql))
+      bad.push("the notices table is not revoked from the anon role");
+    if (!/grant select on public\.notices_live to anon/.test(sql))
+      bad.push("notices_live is not readable by the app's key, so the tab would always be empty");
+  } else bad.push("db/001_notices.sql is missing — nothing documents how the notices table is meant to be set up");
+
+  if (w) {
+    if (!/SUPABASE_SERVICE_KEY/.test(w))
+      bad.push("the Worker has no service key for notices, so nothing can write one");
+    if (!/env\.SUPABASE_SERVICE_KEY\)\s*\n?\s*return json\(\{ error: "Notices are not configured/.test(w)
+        && !/!env\.SUPABASE_URL \|\| !env\.SUPABASE_SERVICE_KEY/.test(w))
+      bad.push("the Worker does not check the notices configuration before using it, so a missing secret fails obscurely");
+    for (const field of ["big_picture", "ios_attachments", "chrome_web_image"])
+      if (!w.includes(field))
+        bad.push(`a poster would not reach one platform: ${field} is missing from the send`);
+  }
+
+  /* The service key must never be committed, anywhere. Comments are stripped
+     first: the files carry warnings that say "never put the service_role key
+     here", and a check that fires on its own warning teaches people to ignore
+     it. Only a value that looks like a real key counts. */
+  for (const f of ["index.html", "admin.html", "worker/wrangler.toml"]) {
+    if (!existsSync(f)) continue;
+    const code = readFileSync(f, "utf8")
+      .replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/^\s*(\/\/|#).*$/gm, " ");
+    const leak = /sb_secret_[A-Za-z0-9_-]{10,}/.test(code)
+              || /["'`]eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/.test(code)
+              || /SUPABASE_SERVICE_KEY\s*[:=]\s*["'`][^"'`\s]{12,}/.test(code);
+    if (leak)
+      bad.push(`${f} looks like it carries a Supabase service key — that key bypasses every access rule and must live only in Cloudflare's secret store`);
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok("notices — the app reads the public view, the Worker writes the table on a secret key, and a poster reaches all three platforms");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

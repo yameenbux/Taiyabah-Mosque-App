@@ -63,6 +63,14 @@
   input:focus,textarea:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
   .fieldrow{margin-bottom:14px}
   .counter{font-size:11.5px;color:var(--muted);text-align:right;margin-top:5px}
+  .opt{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+  .posterwrap{position:relative;margin-top:9px;border-radius:10px;overflow:hidden;
+    border:1px solid var(--line);background:#140C11}
+  .posterwrap img{display:block;width:100%;max-height:260px;object-fit:contain}
+  .posterx{position:absolute;top:8px;right:8px;border:0;border-radius:8px;cursor:pointer;
+    padding:6px 10px;font:inherit;font-size:12px;background:rgba(0,0,0,.62);color:#fff}
+  .cropnote{margin-top:8px;font-size:11.5px;line-height:1.55;color:var(--muted);
+    border-left:2px solid var(--gold,#C6A24C);padding-left:9px}
   .counter.over{color:var(--danger);font-weight:600}
 
   /* topic picker */
@@ -238,8 +246,32 @@
       </div>
       <div class="fieldrow" style="margin-bottom:4px">
         <label class="fl" for="msg">Message</label>
-        <textarea id="msg" maxlength="220" placeholder="Janāzah salah for the late [name] will be held after Zuhr jamāʿah today."></textarea>
-        <div class="counter" id="c-msg">0 / 120 shown on a locked phone</div>
+        <textarea id="msg" maxlength="2000" placeholder="Janāzah salah for the late [name] will be held after Zuhr jamāʿah today."></textarea>
+        <div class="counter" id="c-msg">0 characters &middot; the first 120 show on a locked phone</div>
+      </div>
+
+      <!-- A notice outlives the notification that carried it: it is kept in the
+           app's Notices tab so somebody who was driving can still read it.
+           The poster is optional — a timetable change does not need one. -->
+      <div class="fieldrow" style="margin-bottom:4px">
+        <label class="fl" for="poster">Poster <span class="opt">optional</span></label>
+        <input type="file" id="poster" accept="image/jpeg,image/png,image/webp">
+        <div class="counter" id="c-poster">No poster. The notice will be text only.</div>
+        <div class="posterwrap" id="posterwrap" hidden>
+          <img id="posterimg" alt="Poster preview">
+          <button type="button" class="posterx" id="posterx">Remove</button>
+        </div>
+        <div class="cropnote" id="cropnote" hidden>
+          A portrait poster is shown whole in the app, but Android crops the
+          middle of it in the notification itself. That is expected — people tap
+          through to see all of it.
+        </div>
+      </div>
+
+      <div class="fieldrow" style="margin-bottom:0">
+        <label class="fl" for="eventat">Event date <span class="opt">optional</span></label>
+        <input type="datetime-local" id="eventat">
+        <div class="counter">Set this for a bayaan or a class, and the notice retires itself a day after. Leave it blank for an announcement that has no date.</div>
       </div>
     </div>
 
@@ -367,9 +399,13 @@ function update(){
   $("p-msg").textContent = m || "Your message will appear here.";
   const ct=$("c-title"), cm=$("c-msg");
   ct.textContent=`${t.length} / 40 shown on a locked phone`;
-  cm.textContent=`${m.length} / 120 shown on a locked phone`;
+  /* The whole message is kept in Notices; only the opening reaches a locked
+     screen, so going past 120 is a fact rather than a fault. Say which. */
+  cm.textContent = m.length > 120
+    ? `${m.length} characters · the first 120 show on a locked phone, the rest in Notices`
+    : `${m.length} characters · the first 120 show on a locked phone`;
   ct.classList.toggle("over", t.length>40);
-  cm.classList.toggle("over", m.length>120);
+  cm.classList.toggle("over", false);
   $("send").disabled = !(t && m);
   updateGuard();
 }
@@ -561,6 +597,42 @@ $("diagtoggle").addEventListener("click", ()=>{
 $("diag-go").addEventListener("click", checkDevice);
 $("diag-health").addEventListener("click", checkService);
 
+/* The poster travels as a data URL. It is read once here, kept in memory, and
+   posted with the notice — no separate upload step for the office to get wrong,
+   and nothing left half-uploaded if they change their mind. */
+let posterData = null, posterDims = {};
+$("poster").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  posterData = null; posterDims = {};
+  $("posterwrap").hidden = true; $("cropnote").hidden = true;
+  if(!f){ $("c-poster").textContent = "No poster. The notice will be text only."; return; }
+  if(f.size > 5 * 1024 * 1024){
+    $("c-poster").textContent = `That file is ${(f.size/1048576).toFixed(1)} MB — the limit is 5 MB. Please shrink it.`;
+    e.target.value = ""; return;
+  }
+  const r = new FileReader();
+  r.onload = () => {
+    posterData = r.result;
+    const img = new Image();
+    img.onload = () => {
+      posterDims = { w: img.naturalWidth, h: img.naturalHeight };
+      $("posterimg").src = posterData;
+      $("posterwrap").hidden = false;
+      $("cropnote").hidden = img.naturalHeight <= img.naturalWidth;   // only portrait crops badly
+      $("c-poster").textContent =
+        `${img.naturalWidth} × ${img.naturalHeight}, ${(f.size/1024).toFixed(0)} KB`;
+    };
+    img.src = posterData;
+  };
+  r.readAsDataURL(f);
+});
+$("posterx").addEventListener("click", () => {
+  posterData = null; posterDims = {};
+  $("poster").value = "";
+  $("posterwrap").hidden = true; $("cropnote").hidden = true;
+  $("c-poster").textContent = "No poster. The notice will be text only.";
+});
+
 $("send").addEventListener("click", async ()=>{
   const inp=topicInput();
   const title=titleEl.value.trim(), msg=msgEl.value.trim();
@@ -570,8 +642,18 @@ $("send").addEventListener("click", async ()=>{
   const btn=$("send");
   btn.disabled=true; btn.textContent="Sending…";
   try{
-    const r = await api("/api/send", { topic: inp.value, title, body: msg });
-    if(r.recipients===0){
+    /* Everything the office sends is now kept in the app's Notices tab, so it
+       goes through /api/notice — which saves it first and pushes second. */
+    const res = await api("/api/notice", {
+      topic: inp.value, title, body: msg,
+      image: posterData || undefined,
+      image_w: posterDims.w, image_h: posterDims.h,
+      event_at: $("eventat").value || undefined,
+    });
+    const r = { ...(res.sent || {}), id: res.notice && res.notice.id };
+    if(res.sent && res.sent.sent === false){
+      toast("Saved to Notices, but the push failed: " + (res.sent.error || "unknown"));
+    }else if(r.recipients===0){
       // OneSignal accepted it, but the filter matched nobody
       toast("Sent, but 0 devices matched — nobody has this category switched on yet.");
     }else{

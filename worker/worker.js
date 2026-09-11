@@ -349,6 +349,79 @@ async function runKahfReminder(env) {
   });
 }
 
+/* A data URL in, a public HTTPS URL out. Supabase Storage is addressed
+   directly rather than through a client library, because a Worker should not
+   carry one for three lines of REST. */
+async function uploadPoster(env, dataUrl) {
+  const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
+  if (!m) return { error: "The poster must be a JPEG, PNG or WebP image." };
+
+  const bytes = Uint8Array.from(atob(m[2]), c => c.charCodeAt(0));
+  if (bytes.length > 5 * 1024 * 1024) return { error: "The poster is over 5 MB. Please shrink it first." };
+
+  const ext = m[1] === "image/png" ? "png" : m[1] === "image/webp" ? "webp" : "jpg";
+  const name = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+  const base = String(env.SUPABASE_URL).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+
+  const res = await fetch(`${base}/storage/v1/object/notices/${name}`, {
+    method: "POST",
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      "Content-Type": m[1],
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+    body: bytes,
+  });
+  if (!res.ok) return { error: `Poster upload failed (${res.status})` };
+  return { url: `${base}/storage/v1/object/public/notices/${name}` };
+}
+
+async function supaInsert(env, table, row) {
+  const base = String(env.SUPABASE_URL).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+  const res = await fetch(`${base}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(row),
+  });
+  const txt = await res.text();
+  if (!res.ok) return { error: `${res.status} ${txt.slice(0, 200)}` };
+  try { return { data: JSON.parse(txt)[0] }; } catch { return { data: null }; }
+}
+
+/* The same targeting as any other send, plus the poster. Each platform names
+   the field differently and ignores the others, so all three go every time. */
+async function sendNotice(env, { topic, title, body, imageUrl }) {
+  const t = TOPICS[topic];
+  const payload = {
+    app_id: env.ONESIGNAL_APP_ID,
+    headings: { en: title },
+    contents: { en: body },
+    filters: anyOfFilter(prefValues(t.idx)),
+    url: "https://taiyabahapp.ysbdesigns.uk/#notices",
+  };
+  if (imageUrl) {
+    payload.big_picture = imageUrl;                 // Android
+    payload.ios_attachments = { poster: imageUrl }; // iOS
+    payload.chrome_web_image = imageUrl;            // web push
+  }
+  const res = await fetch("https://api.onesignal.com/notifications", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.errors) {
+    return { sent: false, error: Array.isArray(data.errors) ? data.errors.join(", ") : `OneSignal ${res.status}` };
+  }
+  return { sent: true, recipients: data.recipients ?? 0 };
+}
+
 async function runJamaahReminders(env) {
   const { date, hm } = londonNow();
   const results = [];
@@ -739,6 +812,63 @@ async function handle(request, env) {
           id: s.id, type: s.type, enabled: s.enabled,
         })),
       }, 200, ch);
+    }
+
+    /* ------------------------------------------------------------------
+       POST /api/notice  { topic, title, body, image?, event_at? }
+
+       One call does three things, in an order chosen so a half-done notice is
+       never a notice nobody can find: the poster is uploaded, the notice is
+       written, and only then is the notification sent. If the send fails the
+       notice still exists and can be pushed again; if the write fails nothing
+       was announced, which is the right way round.
+
+       `image` is a data URL from the office's file picker. It goes to Supabase
+       Storage on the service key — the app's publishable key can neither write
+       there nor insert here, because it ships in plain sight.
+    ------------------------------------------------------------------ */
+    if (url.pathname === "/api/notice" && request.method === "POST") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+      if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY)
+        return json({ error: "Notices are not configured: the Worker has no Supabase service key." }, 501, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const topic = TOPICS[body.topic] ? body.topic : "announcements";
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      const text  = typeof body.body  === "string" ? body.body.trim()  : "";
+      if (!title || title.length > 70)   return json({ error: "Title must be 1–70 characters" }, 400, ch);
+      if (!text  || text.length  > 2000) return json({ error: "Message must be 1–2000 characters" }, 400, ch);
+
+      /* A push shows about two lines. The notice keeps the whole thing; the
+         notification gets a readable opening rather than a wall cut mid-word. */
+      const push = text.length > 180 ? text.slice(0, 177).replace(/\s+\S*$/, "") + "…" : text;
+
+      let imageUrl = null, dims = {};
+      if (typeof body.image === "string" && body.image.startsWith("data:")) {
+        const up = await uploadPoster(env, body.image);
+        if (up.error) return json({ error: up.error }, 400, ch);
+        imageUrl = up.url;
+        dims = { image_w: body.image_w || null, image_h: body.image_h || null };
+      }
+
+      const eventAt = body.event_at ? new Date(body.event_at) : null;
+      if (eventAt && isNaN(eventAt)) return json({ error: "That event date could not be read" }, 400, ch);
+      /* An event stops being news the day after it happens. A notice with no
+         date is the masjid's to retire by hand. */
+      const expires = eventAt ? new Date(eventAt.getTime() + 36 * 3600e3) : null;
+
+      const row = await supaInsert(env, "notices", {
+        topic, title, body: text, image_url: imageUrl, ...dims,
+        event_at: eventAt ? eventAt.toISOString() : null,
+        expires_at: expires ? expires.toISOString() : null,
+      });
+      if (row.error) return json({ error: "Could not save the notice: " + row.error }, 502, ch);
+
+      const sent = await sendNotice(env, { topic, title, body: push, imageUrl });
+      return json({ ok: true, notice: row.data, sent }, 200, ch);
     }
 
     if (url.pathname === "/api/test-reminders" && request.method === "POST") {
