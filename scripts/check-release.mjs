@@ -725,6 +725,90 @@ for (const f of ["index.html", "admin.html"]) {
   }
 }
 
+/* ---- 3u. Android can prove the app owns the domain ----
+   A Trusted Web Activity shows the site with no browser address bar only if
+   /.well-known/assetlinks.json on the domain names the app's signing
+   certificate. Get it wrong and the app still runs, but with a browser bar
+   pinned across the top, which reads to everybody as broken.
+
+   The trap is GitHub Pages: it runs Jekyll, and Jekyll skips any directory
+   whose name begins with a dot. Without a .nojekyll file at the root, the
+   assetlinks file is simply never published, and nothing anywhere says so.
+   That is the failure this check exists for. ---- */
+{
+  const links = ".well-known/assetlinks.json";
+  if (!existsSync(links)) {
+    /* Nothing to verify yet — the file arrives with the Android build. */
+  } else if (!existsSync(".nojekyll")) {
+    fail(".well-known/assetlinks.json exists but .nojekyll does not — GitHub Pages will not serve a dot-directory, so Android link verification silently fails and the app shows a browser bar");
+  } else {
+    let doc = null;
+    try { doc = JSON.parse(readFileSync(links, "utf8")); } catch (e) { doc = undefined; }
+    const entry = Array.isArray(doc) ? doc[0] : null;
+    const target = entry && entry.target;
+    const prints = (target && target.sha256_cert_fingerprints) || [];
+    if (doc === undefined) fail("assetlinks.json is not valid JSON — Android will reject it outright");
+    else if (!target || target.namespace !== "android_app" || !target.package_name)
+      fail("assetlinks.json does not name an android_app package");
+    else if (!prints.length)
+      fail("assetlinks.json lists no signing certificate, so it verifies nothing");
+    else if (prints.some(p => /^REPLACE_/.test(p)))
+      ok("Android asset links — structure and .nojekyll in place; the signing fingerprint is still a placeholder, to be filled from Play App Signing");
+    else if (!prints.every(p => /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/i.test(p)))
+      fail("a signing fingerprint in assetlinks.json is not 32 colon-separated hex bytes — Android will not match it");
+    else
+      ok(`Android asset links — ${target.package_name} verified against ${prints.length} signing certificate(s), and .nojekyll lets Pages serve them`);
+  }
+}
+
+/* ---- 3v. notification preferences are positional and append-only ----
+   Every subscriber's preferences live in ONE OneSignal tag, because the plan
+   has too few tag slots to key them per category. The value is a run of flags
+   read back BY POSITION. So inserting a category in the middle, or reordering
+   two, silently rewrites what everybody asked for: announcements start
+   arriving as janāzah alerts, people who opted out of events start getting
+   them, and nothing looks wrong anywhere — not in the console, not in the app,
+   not in a test that only checks the new category works.
+
+   This check pins the order. Appending is fine and needs the list below
+   extended; anything else is a fault. It also holds the app and the Worker to
+   the same names, since the app posts them and the Worker packs them. ---- */
+{
+  const BASELINE = ["jamaah", "janazah", "announcements", "events", "kahf"];
+  const w = existsSync("worker/worker.js") ? readFileSync("worker/worker.js", "utf8") : "";
+  const m = w.match(/const PREF_ORDER\s*=\s*\[([^\]]*)\]/);
+  if (!m) fail("PREF_ORDER has gone from the Worker — nothing decides what each preference flag means");
+  else {
+    const order = [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]);
+    const bad = [];
+    BASELINE.forEach((name, i) => {
+      if (order[i] !== name)
+        bad.push(`preference ${i} should be "${name}" and is "${order[i] ?? "missing"}" — every stored value is read by position, so this silently rewrites what subscribers asked for`);
+    });
+    if (order.length < BASELINE.length)
+      bad.push(`PREF_ORDER lost ${BASELINE.length - order.length} preference(s); removing one shifts every flag after it`);
+
+    /* The app posts these names to /api/set-my-tags and the Worker packs them.
+       A name in one and not the other means the answer is never stored. */
+    const app = readFileSync("index.html", "utf8");
+    const payload = (app.match(/function pushTopicTags\(p\)\{[\s\S]*?\n\}/) || [""])[0];
+    for (const name of order) {
+      if (!new RegExp(`\\b${name}\\s*:`).test(payload))
+        bad.push(`the app never sends "${name}", so that preference is stored as off for everybody`);
+      if (!new RegExp(`\\b${name}\\s*:\\s*bit\\(body\\.${name}\\)`).test(w) && name !== "jamaah_mins")
+        bad.push(`the Worker never reads "${name}" from the app's request`);
+    }
+
+    /* Widening the flags leaves older values in the wild; they have to keep
+       matching, or the categories people already rely on stop arriving. */
+    if (!/LEGACY_FLAGS/.test(w))
+      bad.push("nothing keeps the older, narrower preference values matching — existing subscribers would stop receiving janāzah and announcement alerts");
+
+    if (bad.length) bad.forEach(fail);
+    else ok(`notification preferences — ${order.length} flags, in the order subscribers' stored values expect, and the app and Worker agree on every name`);
+  }
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is

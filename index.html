@@ -1816,6 +1816,10 @@
           <div class="txt"><div class="t" data-i18n="sheet.events_talks">Events &amp; talks</div><div class="d" data-i18n="sheet.bayaans_classes_community_events">Bayaans, classes, community events</div></div>
           <label class="switch"><input type="checkbox" id="tg-evt"><span class="sl"></span></label>
         </div>
+        <div class="tg">
+          <div class="txt"><div class="t" data-i18n="sheet.surah_al_kahf">Sūrah al-Kahf</div><div class="d" data-i18n="sheet.friday_morning_reminder">Friday morning, a reminder to read it</div></div>
+          <label class="switch"><input type="checkbox" checked id="tg-kahf"><span class="sl"></span></label>
+        </div>
         <button class="save" id="a-save" data-i18n="sheet.save">Save</button>
       </div>
       <p class="wirednote" id="wirednote"></p>
@@ -2543,6 +2547,8 @@
                   <span class="bk-hint" data-i18n="hallhire.phone_hint">The caretaker will call you before the day to arrange access,
                     so this must be a number that reaches you.</span>
                 </div>
+                <p class="bk-hint" data-i18n-html="privacy.hall_details_kept">The masjid keeps these details to arrange your booking and for its
+                  accounts. <a href="./privacy.html" target="_blank" rel="noopener">Read the privacy notice</a>.</p>
                 <div class="bk-err" id="bk-err" hidden></div>
                 <button type="submit" class="bk-submit" id="bk-submit" data-i18n="hallhire.continue_to_deposit">Continue to the deposit</button>
                 <button type="button" class="bk-back" id="bk-back" data-i18n="hallhire.change">Change</button>
@@ -4118,6 +4124,8 @@
                   <span data-i18n="nikah.i_understand_the_masjid_will">I understand the masjid will keep my name and contact details to deal with
                     this request, and nothing else.</span>
                 </label>
+                <p class="bk-hint"><a href="./privacy.html" target="_blank" rel="noopener"
+                   data-i18n="privacy.read_the_privacy_notice">Read the privacy notice</a></p>
                 <div class="bk-err" id="nk-err" hidden></div>
                 <button type="submit" class="bk-submit" id="nk-submit" data-i18n="nikah.send_my_request">Send my request</button>
                 <p class="bk-hint" style="text-align:center" data-i18n="nikah.nothing_is_sent_until_you">Nothing is sent until you press this.</p>
@@ -4225,6 +4233,9 @@
         <button class="dr-row" data-act="alerts">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><span class="dr-t" data-i18n="menu.notifications">Notifications</span><span class="dr-ch">&rsaquo;</span>
         </button>
+        <a class="dr-row" href="./privacy.html" target="_blank" rel="noopener">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.5-3 8-7.5 9.5-4.5-1.5-7.5-5-7.5-9.5V6L12 3Z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/></svg></span><span class="dr-t" data-i18n="privacy.privacy_notice">Privacy notice</span><span class="dr-ch">&rsaquo;</span>
+        </a>
         <button class="dr-row" data-act="sysprefs">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z"/></svg></span><span class="dr-t" data-i18n="marriage.system_preferences">System Preferences</span><span class="dr-ch">&rsaquo;</span>
         </button>
@@ -9195,7 +9206,7 @@ function nkSubmit(e){
       contact_phone:    document.getElementById("nk-phone").value.trim(),
       contact_email:    document.getElementById("nk-email").value.trim(),
       notes:            document.getElementById("nk-notes").value.trim() || null,
-      privacy_accepted: true,
+      privacy_accepted: document.getElementById("nk-agree").checked,
     }}),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
@@ -9989,6 +10000,7 @@ function currentPrefs(){
     jan:document.getElementById('tg-jan').checked,
     ann:document.getElementById('tg-ann').checked,
     evt:document.getElementById('tg-evt').checked,
+    kahf:document.getElementById('tg-kahf').checked,
   };
 }
 
@@ -9998,6 +10010,7 @@ function summarise(p){
   if(p.jan) on.push(t("sheet.janazah","Janāzah"));
   if(p.ann) on.push(t("alerts.announcements","Announcements"));
   if(p.evt) on.push(t("alerts.events","Events"));
+  if(p.kahf === undefined || p.kahf) on.push(t("alerts.surah_al_kahf","Sūrah al-Kahf"));
   return on.length ? on.join(" · ") : t("alerts.none_selected","No alerts selected");
 }
 
@@ -10020,6 +10033,7 @@ function applyPrefs(p){
   document.getElementById('tg-jan').checked=p.jan;
   document.getElementById('tg-ann').checked=p.ann;
   document.getElementById('tg-evt').checked=p.evt;
+  document.getElementById('tg-kahf').checked = p.kahf === undefined ? true : p.kahf;
   document.getElementById('mins').value=p.mins;
   document.getElementById('mins').disabled=!p.jam;
 }
@@ -10052,12 +10066,13 @@ function pushTopicTags(p){
     jamaah_mins:   String(q.mins),
     janazah:       q.jan ? "1" : "0",
     announcements: q.ann ? "1" : "0",
-    events:        q.evt ? "1" : "0"
+    events:        q.evt ? "1" : "0",
+    kahf:          q.kahf ? "1" : "0"
   };
   const key = JSON.stringify(tags);
   if(key === lastSentTags){
     lastTagResult = "already stored, nothing to change " + key;
-    if(!(q.jam||q.jan||q.ann||q.evt)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
+    if(!(q.jam||q.jan||q.ann||q.evt||q.kahf)) OneSignalManager.optOut().catch(e=>console.warn("optOut:",e));
     return;
   }
   lastTagResult = "queued…";

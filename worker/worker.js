@@ -37,16 +37,27 @@ const REPORT_TTL_SECONDS = 60 * 60 * 24 * 60;   // two months
    So all preferences live in ONE tag: four flags in a fixed order, then the
    reminder minutes zero padded.
 
-     p = "110110"  ->  jamaah on, janazah on, announcements off, events on,
-                       remind 10 minutes before
+     p = "1101010"  ->  jamaah on, janazah on, announcements off, events on,
+                        Sūrah al-Kahf on, remind 10 minutes before
 
-   Forty-eight values exist. Tag filters only test a value for equality, so
-   targeting a category means listing every value in which its flag is set and
-   OR-ing them — 24 for a category, 8 for a reminder at a given offset. Verbose
-   to send, but it holds within a one-tag plan, which nothing keyed per
-   category can do. */
+   Tag filters only test a value for equality, so targeting a category means
+   listing every value in which its flag is set and OR-ing them. Verbose to
+   send, but it holds within a one-tag plan, which nothing keyed per category
+   can do.
+
+   PREF_ORDER IS POSITIONAL AND APPEND-ONLY. Every subscriber's stored value is
+   read back by position, so inserting or reordering a name silently rewrites
+   what everybody asked for — announcements would start arriving as janāzah
+   alerts, and nothing would look wrong anywhere. Add to the end, never the
+   middle. A release check enforces this.
+
+   Widths: values written before Sūrah al-Kahf was added carry four flags, and
+   those phones keep them until the app next writes its preferences. So the
+   four original categories are targeted at BOTH widths, and al-Kahf only at
+   the new one — a four-flag value holds no al-Kahf preference to honour. */
 const PREF_TAG = "p";
-const PREF_ORDER = ["jamaah", "janazah", "announcements", "events"];
+const PREF_ORDER = ["jamaah", "janazah", "announcements", "events", "kahf"];
+const LEGACY_FLAGS = 4;          // the width in the wild before al-Kahf
 const PREF_MINUTES = ["05", "10", "15"];
 
 /* Tags from older builds, cleared on write so they stop occupying slots a
@@ -60,10 +71,12 @@ function encodePrefs(t) {
 }
 
 function decodePrefs(v) {
-  if (typeof v !== "string" || !/^[01]{4}(05|10|15)$/.test(v)) return null;
+  if (typeof v !== "string" || !/^[01]{4,5}(05|10|15)$/.test(v)) return null;
+  const flags = v.slice(0, v.length - 2);
   const out = {};
-  PREF_ORDER.forEach((k, i) => { out[k] = v[i]; });
-  out.jamaah_mins = String(parseInt(v.slice(4), 10));
+  // A narrower value simply predates the flags on the end; they read as off.
+  PREF_ORDER.forEach((k, i) => { out[k] = flags[i] === "1" ? "1" : "0"; });
+  out.jamaah_mins = String(parseInt(v.slice(-2), 10));
   return out;
 }
 
@@ -72,12 +85,18 @@ function decodePrefs(v) {
 function prefValues(index, mins) {
   const want = mins == null ? null : pad2(mins);
   const out = [];
-  for (let bits = 0; bits < 16; bits++) {
-    const flags = [0, 1, 2, 3].map(i => (bits >> (3 - i)) & 1);
-    if (flags[index] !== 1) continue;
-    for (const m of PREF_MINUTES) {
-      if (want && m !== want) continue;
-      out.push(flags.join("") + m);
+  // Both widths for a category that existed before al-Kahf; only the new width
+  // for al-Kahf itself, since a four-flag value never carried that answer.
+  const widths = index < LEGACY_FLAGS ? [LEGACY_FLAGS, PREF_ORDER.length] : [PREF_ORDER.length];
+  for (const width of widths) {
+    for (let bits = 0; bits < (1 << width); bits++) {
+      const flags = [];
+      for (let i = 0; i < width; i++) flags.push((bits >> (width - 1 - i)) & 1);
+      if (flags[index] !== 1) continue;
+      for (const m of PREF_MINUTES) {
+        if (want && m !== want) continue;
+        out.push(flags.join("") + m);
+      }
     }
   }
   return out;
@@ -99,6 +118,7 @@ const TOPICS = {
   jamaah:        { idx: 0, label: "Jamāʿah reminders" },
   announcements: { idx: 2, label: "Announcements" },
   events:        { idx: 3, label: "Events & talks" },
+  kahf:          { idx: 4, label: "Sūrah al-Kahf" },
 };
 
 /* ---------------- helpers ---------------- */
@@ -197,6 +217,7 @@ export default {
      each subscriber's own preference — and sends if so. */
   async scheduled(_event, env, ctx) {
     ctx.waitUntil(runJamaahReminders(env));
+    ctx.waitUntil(runKahfReminder(env));
   },
 };
 
@@ -225,7 +246,7 @@ function minusMinutes(hm, n) {
   return `${String(Math.floor(v / 60)).padStart(2, "0")}:${String(v % 60).padStart(2, "0")}`;
 }
 
-async function sendReminder(env, { key, tagMins, title, body }) {
+async function sendReminder(env, { key, idx = 0, tagMins, title, body }) {
   const already = await env.SENT_KV.get(key);
   if (already) return { skipped: true };
 
@@ -233,8 +254,16 @@ async function sendReminder(env, { key, tagMins, title, body }) {
   // now" alert has no offset — it goes to everyone who has jamāʿah
   // reminders switched on, since that preference is about how much warning
   // they want, not whether they want to know it has started.
-  // jamaah switched on, and this exact offset chosen
-  const filters = anyOfFilter(prefValues(0, tagMins == null ? null : tagMins));
+  // the chosen topic switched on, and — for jamāʿah — this exact offset
+  const values = prefValues(idx, tagMins == null ? null : tagMins);
+  /* Every value has to be listed separately because tag filters only test
+     equality, and the list grew when al-Kahf widened the encoding. If this
+     ever gets long enough for OneSignal to refuse it, the send fails loudly
+     here rather than quietly reaching nobody. */
+  if (values.length > 120) {
+    return { sent: false, error: `filter too large: ${values.length} values` };
+  }
+  const filters = anyOfFilter(values);
 
   const res = await fetch("https://api.onesignal.com/notifications", {
     method: "POST",
@@ -286,6 +315,38 @@ async function timetableMatchesApp(rec, date) {
   } catch (e) {
     return { ok: true, note: "check failed, proceeding: " + e.message };
   }
+}
+
+/* ================= Sūrah al-Kahf, Friday =================
+
+   The window for reciting al-Kahf runs from Maghrib on Thursday to Maghrib on
+   Friday. A single reminder on Friday morning sits well inside it and still
+   leaves the whole day; an evening one would reach people with an hour left.
+
+   Nothing here reads the timetable. Tying it to Fajr would be neater, but Fajr
+   is before five in midsummer and a notification then is an unkindness, not a
+   reminder. A fixed civil time is the honest choice. */
+const KAHF_LOCAL_TIME = "09:00";
+const KAHF_TOPIC_IDX = PREF_ORDER.indexOf("kahf");
+
+function londonWeekday() {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London", weekday: "long",
+  }).format(new Date());
+}
+
+async function runKahfReminder(env) {
+  const { date, hm } = londonNow();
+  if (londonWeekday() !== "Friday") return { skipped: "not Friday" };
+  if (hm !== KAHF_LOCAL_TIME) return { skipped: `not ${KAHF_LOCAL_TIME}` };
+
+  return sendReminder(env, {
+    key: `kahf:${date}`,
+    idx: KAHF_TOPIC_IDX,
+    tagMins: null,                       // nothing to offset against
+    title: "Sūrah al-Kahf",
+    body: "It is Jumuʿah. Whoever reads Sūrah al-Kahf today has a light between this Friday and the next.",
+  });
 }
 
 async function runJamaahReminders(env) {
@@ -467,6 +528,7 @@ async function handle(request, env) {
         janazah:       bit(body.janazah),
         announcements: bit(body.announcements),
         events:        bit(body.events),
+        kahf:          bit(body.kahf),
       };
 
       /* Stored as one tag, not five — see the note on PREF_TAG. The app still
