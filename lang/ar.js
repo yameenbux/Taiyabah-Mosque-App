@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "ffd404fc77cf",
+ "version": "08d4bc2df748",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -1647,6 +1647,8 @@ window.LANG_PACK = {
   "notices.announcements_will_appear": "ستظهر إعلانات المسجد هنا وتبقى، حتى تُقرأ الرسالة التي فاتتك أو أزلتها.",
   "notices.view_poster": "اعرض الملصق",
   "notices.showing_saved_copy": "تُعرض النسخة المحفوظة على هذا الهاتف — إذ تعذّر الوصول إلى المسجد الآن.",
+  "notices.new": "جديد",
+  "notices.something_new": "هناك جديد",
   "quran.how_would_you_like_to_read": "كيف تودّ أن تقرأ؟",
   "quran.english_translation": "الترجمة الإنجليزية",
   "quran.all_114_s_rahs_with_an_english": "جميع السور الـ١١٤، مع الإنجليزية بجانب العربية",

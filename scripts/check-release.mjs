@@ -908,6 +908,27 @@ for (const f of ["index.html", "admin.html"]) {
   if (!/addEventListener\("hashchange", ntOpenFromHash\)/.test(app))
     bad.push("the app only reads #notice= at startup — a notification tapped while the app is already open changes the hash without reloading, and would be ignored");
 
+  /* The unread dot, and the thing that broke it.
+
+     The tab bar's click handler used to repeat switchTab's body rather than
+     call it. The two drifted: the notices refresh was added to switchTab, so
+     tapping the Notices tab never reloaded them — and later the unread dot
+     never cleared, because the code that clears it lives there too. Nothing
+     failed loudly; the tab simply showed yesterday's list under a red dot.
+     One way into a tab, enforced here. */
+  if (!/switchTab\(name\);/.test(app))
+    bad.push("the tab bar no longer goes through switchTab — a second copy of that logic drifts from the first, which is how tapping Notices stopped refreshing them");
+  for (const [re, why] of [
+    [/data-new/,      "the unread dot has no state to show — a notice nobody saw looks identical to one everybody read"],
+    [/ntUpdateDot/,   "nothing sets the unread dot"],
+    [/ntMarkAllSeen/, "nothing clears the unread dot, so it would burn permanently once lit"],
+    [/NT_SEEN/,       "what this phone has already seen is not recorded, so the dot cannot mean anything"],
+  ]) if (!re.test(app)) bad.push(why);
+  /* Which notices a person has read is theirs. It is kept on the phone and
+     must never be sent anywhere. */
+  if (/(body|payload)[\s\S]{0,120}NT_SEEN|NT_SEEN[\s\S]{0,120}fetch\(/.test(app))
+    bad.push("what this phone has read appears to be leaving it — that belongs on the device and nowhere else");
+
   /* The service key must never be committed, anywhere. Comments are stripped
      first: the files carry warnings that say "never put the service_role key
      here", and a check that fires on its own warning teaches people to ignore
