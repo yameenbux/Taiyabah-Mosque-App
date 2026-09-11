@@ -941,6 +941,9 @@
   .nt-card h3{font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
     font-weight:600;line-height:1.25;margin:7px 0 5px}
   .nt-card p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);white-space:pre-wrap}
+  .nt-new{flex:0 0 auto;background:var(--danger);color:#fff;border-radius:999px;
+    padding:2px 7px;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:.04em;
+    text-transform:uppercase}
   .nt-stale{font-size:calc(12px * var(--ts));color:var(--muted);text-align:center;margin-top:12px}
 
   .nt-viewer{position:fixed;inset:0;z-index:90;background:#140C11;
@@ -1236,8 +1239,14 @@
     background:rgba(252,250,243,.96);backdrop-filter:blur(12px);
     border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0)}
-  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font:inherit;
-    border:none;background:none;color:var(--muted);padding:9px 4px 8px}
+  .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
+    font:inherit;border:none;background:none;color:var(--muted);padding:9px 4px 8px}
+  /* Something has been announced that this phone has not looked at yet. The
+     ring is the tab bar's own colour, so the dot reads as a dot at any text
+     size rather than smudging into the icon behind it. */
+  .tab[data-new="1"]::after{content:"";position:absolute;top:7px;left:50%;margin-left:6px;
+    width:9px;height:9px;border-radius:50%;background:var(--danger);
+    box-shadow:0 0 0 2px rgba(252,250,243,.96)}
   .tab svg{width:22px;height:22px}
   .tab span{font-size:calc(10.5px * var(--ts));font-weight:600;letter-spacing:.02em}
   .tab[data-on="1"]{color:var(--brand-600)}
@@ -8454,7 +8463,60 @@ function initBooking(){
    shown because the network failed; it does not pretend to be current.
 --------------------------------------------------------------------------- */
 const NT_CACHE = "notices.cache";
-const NT = { items: null, stale: false, loaded: false };
+/* Which notices this phone has already been shown. Ids only, and only ever on
+   this device — the masjid is not told who has read what, and there is nothing
+   to tell it with. */
+const NT_SEEN  = "notices.seen";
+const NT = { items: null, stale: false, loaded: false, newIds: [], pending: null };
+
+const ntIds = () => (NT.items || []).map(n => n.id).filter(Boolean);
+
+function ntUnseenIds(){
+  const seen = prefStore.get(NT_SEEN, null);
+  if(seen === null) return [];              // first run — see ntAfterLoad
+  return ntIds().filter(id => !seen.includes(id));
+}
+
+/* The dot means one thing only: something has been announced since you last
+   opened this tab. An indicator that cries wolf gets ignored, so it is set
+   from the notices actually held, and cleared the moment they are shown. */
+function ntUpdateDot(){
+  const tab = document.querySelector('.tab[data-tab="notices"]');
+  if(!tab) return;
+  const n = ntUnseenIds().length;
+  tab.dataset.new = n ? "1" : "0";
+  /* A dot is invisible to a screen reader. Say it instead. */
+  const label = t("nav.notices", "Notices");
+  tab.setAttribute("aria-label", n ? label + " — " + t("notices.something_new", "something new") : label);
+}
+
+function ntMarkAllSeen(){
+  /* Keep the ids of what is live now. Anything retired falls out of the list
+     on its own, so this cannot grow without bound. */
+  try{ prefStore.set(NT_SEEN, ntIds().slice(0, 200)); }catch(e){}
+  ntUpdateDot();
+}
+
+/* A phone that has just installed the app has not "missed" the notices that
+   were already there — it has never been offered them. Baselining on the
+   first successful load keeps the dot meaning "new since you last looked". */
+function ntAfterLoad(fromNetwork){
+  if(fromNetwork && prefStore.get(NT_SEEN, null) === null) ntMarkAllSeen();
+  else ntUpdateDot();
+}
+
+/* Opening the tab: show which ones are new, then mark them read. The pills
+   are worked out before the marking, or opening the tab would hide the very
+   thing the dot was pointing at. */
+function ntEnterTab(){
+  NT.newIds = ntUnseenIds();
+  renderNotices();
+  return Promise.resolve(loadNotices()).then(() => {
+    for(const id of ntUnseenIds()) if(!NT.newIds.includes(id)) NT.newIds.push(id);
+    renderNotices();
+    ntMarkAllSeen();
+  });
+}
 
 function ntFmtWhen(iso){
   const d = new Date(iso);
@@ -8490,7 +8552,9 @@ function renderNotices(){
       : "";
     return `<article class="nt-card">${shot}
       <div class="nt-body">
-        <div class="nt-when"><span class="nt-topic">${esc(ntTopicLabel(n.topic))}</span><span>${esc(when)}</span></div>
+        <div class="nt-when">${NT.newIds.includes(n.id)
+            ? `<span class="nt-new">${esc(t("notices.new", "New"))}</span>` : ""
+          }<span class="nt-topic">${esc(ntTopicLabel(n.topic))}</span><span>${esc(when)}</span></div>
         <h3>${esc(n.title)}</h3>
         <p>${esc(n.body)}</p>
       </div></article>`;
@@ -8519,7 +8583,7 @@ function loadNotices(){
      decides. If the fetch succeeds it replaces this a moment later. */
   if(NT.items === null){
     const cached = prefStore.get(NT_CACHE, null);
-    if(Array.isArray(cached)){ NT.items = cached; NT.stale = true; renderNotices(); }
+    if(Array.isArray(cached)){ NT.items = cached; NT.stale = true; renderNotices(); ntAfterLoad(false); }
   }
 
   return fetch(`${supaBase()}/rest/v1/notices_live?select=*`, {
@@ -8534,11 +8598,13 @@ function loadNotices(){
        a phone with posters nobody asked to download. */
     try{ prefStore.set(NT_CACHE, NT.items.slice(0, 20)); }catch(e){}
     renderNotices();
+    ntAfterLoad(true);
   }).catch(e => {
     console.warn("notices unavailable:", e);
     if(NT.items === null) NT.items = [];
     NT.stale = NT.items.length > 0;
     renderNotices();
+    ntAfterLoad(false);
   });
 }
 
@@ -8562,9 +8628,9 @@ function ntOpenFromHash(){
   if(!m) return;
 
   const id = m[1];
-  /* loadNotices() resolves whether it reached the network or fell back to the
-     saved copy, so the poster opens either way if we already hold that notice. */
-  Promise.resolve(loadNotices()).then(() => {
+  /* switchTab has already started the load; waiting on that rather than calling
+     it again keeps this to one request and one render. */
+  Promise.resolve(NT.pending).then(() => {
     const n = (NT.items || []).find(x => x.id === id);
     if(!n) return;                       // withdrawn, or expired since sending
     const card = document.querySelector(`#nt-list .nt-shot[data-img="${CSS.escape(n.image_url || "")}"]`);
@@ -9900,7 +9966,7 @@ function switchTab(name){
     document.getElementById("tab-"+n).hidden = (n!==name);
   });
   window.scrollTo({top:0,behavior:"instant"});
-  if(name === "notices") loadNotices();
+  if(name === "notices") NT.pending = ntEnterTab();
 }
 function initDrawer(){
   document.getElementById('dr-close').addEventListener('click',closeDrawer);
@@ -9996,16 +10062,17 @@ function initTabs(){
        leaves whichever tab you were on still selected underneath. */
     if(b.id==="nav-more"){ openDrawer(); return; }
     const name=b.dataset.tab;
-    tabs.forEach(t=>t.dataset.on = t===b ? "1" : "0");
-    ["home","times","notices","live","recite","alerts","donate","qibla"].forEach(n=>{
-      document.getElementById("tab-"+n).hidden = (n!==name);
-    });
+    /* One way into a tab. This handler used to repeat switchTab's body instead
+       of calling it, and the two drifted: the notices refresh was added to
+       switchTab, so tapping the Notices tab never reloaded them — only the
+       drawer and a notification link did. Two things that must agree, with
+       nothing making them agree. */
+    switchTab(name);
     /* Home is always "now". Browsing to another date happens on Prayer Times,
        and coming back to Home should not leave you staring at a countdown to
        a jamāʿah three days away. */
     if(name==="home" && VIEW && +VIEW !== +today0()){ VIEW = today0(); render(); }
     if(name==="alerts") showAlertsBlockedHint();
-    window.scrollTo({top:0,behavior:"instant"});
     if(name==="qibla") drawTicks();
   }));
 }

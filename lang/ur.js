@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "afb0dbbf2957",
+ "version": "11dceb0f0547",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -1647,6 +1647,8 @@ window.LANG_PACK = {
   "notices.announcements_will_appear": "مسجد کے اعلانات یہاں آئیں گے اور محفوظ رہیں گے، تاکہ جو پیغام آپ سے رہ جائے یا ہٹ جائے وہ پھر بھی پڑھا جا سکے۔",
   "notices.view_poster": "پوسٹر دیکھیں",
   "notices.showing_saved_copy": "اس فون میں محفوظ نقل دکھائی جا رہی ہے — ہم اس وقت مسجد تک نہیں پہنچ سکے۔",
+  "notices.new": "نیا",
+  "notices.something_new": "کچھ نیا ہے",
   "quran.how_would_you_like_to_read": "آپ کس طرح پڑھنا چاہیں گے؟",
   "quran.english_translation": "انگریزی ترجمہ",
   "quran.all_114_s_rahs_with_an_english": "تمام ۱۱۴ سورتیں، عربی کے ساتھ انگریزی ترجمہ",

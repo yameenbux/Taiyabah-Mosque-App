@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "eef2faf1ad62",
+ "version": "513c4809dbaf",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -1647,6 +1647,8 @@ window.LANG_PACK = {
   "notices.announcements_will_appear": "મસ્જિદની જાહેરાતો અહીં આવશે અને રહેશે, જેથી તમારાથી છૂટી ગયેલો કે હટી ગયેલો સંદેશ પણ વાંચી શકાય.",
   "notices.view_poster": "પોસ્ટર જુઓ",
   "notices.showing_saved_copy": "આ ફોનમાં સાચવેલી નકલ બતાવાય છે — અમે અત્યારે મસ્જિદ સુધી પહોંચી શક્યા નથી.",
+  "notices.new": "નવું",
+  "notices.something_new": "કંઈક નવું છે",
   "quran.how_would_you_like_to_read": "તમે કઈ રીતે વાંચવા માંગો છો?",
   "quran.english_translation": "અંગ્રેજી અનુવાદ",
   "quran.all_114_s_rahs_with_an_english": "બધી ૧૧૪ સૂરહ, અરબીની સાથે અંગ્રેજી",
