@@ -1253,27 +1253,37 @@
   .tab:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
 
   /* ---- Ṣaḥīḥ al-Bukhārī ----
-     A reference is read in long runs, so the Arabic gets the same scripture
-     stack and generous leading as the duʿās, and the number sits in the
-     margin where a printed edition would put it. */
+     Books read like the drawer rows elsewhere in the app so the list feels
+     familiar; the hadith themselves get the scripture stack and generous
+     leading the duʿās use, because they are read in long runs. */
   .hd-bar{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
   .hd-jump{display:flex;align-items:center;gap:8px}
   .hd-jump label{font-size:calc(12.5px * var(--ts));font-weight:600;color:var(--muted)}
-  .hd-jump input{flex:0 1 110px;font:inherit;font-size:calc(14px * var(--ts));
+  .hd-jump input{flex:0 1 100px;font:inherit;font-size:calc(14px * var(--ts));
     padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
-  .hd-jump button,.hd-pager button{font:inherit;font-size:calc(13px * var(--ts));font-weight:600;cursor:pointer;
+  .hd-jump button{font:inherit;font-size:calc(13px * var(--ts));font-weight:600;cursor:pointer;
     padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--brand-600)}
-  .hd-jump button:disabled,.hd-pager button:disabled{opacity:.45;cursor:default}
+  .hd-sub{font-size:calc(12.5px * var(--ts));color:var(--muted);margin:-4px 0 12px}
+
+  .hd-book{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
+    cursor:pointer;background:none;border:0;border-bottom:1px solid var(--line);padding:13px 2px;color:var(--ink)}
+  .hd-book:last-child{border-bottom:0}
+  .hd-bn{flex:0 0 2.2em;font-size:calc(12px * var(--ts));font-weight:700;color:var(--brand-600);
+    text-align:right;font-variant-numeric:tabular-nums}
+  .hd-bt{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;min-width:0}
+  .hd-bname{font-size:calc(14.5px * var(--ts));font-weight:600}
+  .hd-bcount{font-size:calc(12px * var(--ts));color:var(--muted)}
+
   .hd-item{border-bottom:1px solid var(--line);padding:15px 0}
   .hd-item:last-child{border-bottom:0}
-  .hd-n{display:inline-block;min-width:2.6em;font-size:calc(11.5px * var(--ts));font-weight:700;
-    letter-spacing:.04em;color:var(--brand-600);margin-bottom:6px}
+  .hd-meta{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:7px}
+  .hd-n{font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.04em;color:var(--brand-600)}
+  .hd-i{font-size:calc(11.5px * var(--ts));color:var(--muted)}
   .hd-ar{font-size:calc(19px * var(--ts));line-height:2.15;text-align:right;direction:rtl;color:var(--ink)}
-  .hd-pager{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 4px}
-  .hd-pager span{font-size:calc(12.5px * var(--ts));color:var(--muted)}
-  .hd-hit{width:100%;text-align:right;direction:rtl;font:inherit;cursor:pointer;background:none;
-    border:0;border-bottom:1px solid var(--line);padding:13px 0;color:var(--ink);display:block}
-  .hd-hit .hd-n{display:block;text-align:left;direction:ltr}
+  .hd-hit{width:100%;font:inherit;cursor:pointer;background:none;border:0;
+    border-bottom:1px solid var(--line);padding:13px 0;color:var(--ink);display:block;text-align:right}
+  .hd-hit .hd-meta{direction:ltr;text-align:left}
+  .hd-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
   .bk-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
 
   /* ---- 13-line mushaf ----
@@ -3644,15 +3654,16 @@
   </div>
 
 
-  <!-- Ṣaḥīḥ al-Bukhārī — a reference, not a reader. Arabic only, and the
-       screen says so rather than letting somebody assume a translation is
-       coming. The data is third-party open data under the ODbL: its
-       attribution is shown at the foot, not buried in a file. -->
+  <!-- Ṣaḥīḥ al-Bukhārī — browsable, because a flat list of 7,580 numbered
+       paragraphs is a database dump with a scrollbar, not a book. Opens on
+       the 97 kutub; a book opens its own hadith; the number people cite is
+       shown beside the position within the book. Arabic only, and the screen
+       says so rather than letting anyone assume a translation is coming. -->
   <div class="sheet" id="bukhari" data-open="0" role="dialog" aria-modal="true" aria-label="Sahih al-Bukhari" data-i18n-attr="aria-label:a11y.sahih_al_bukhari">
     <div class="scrim" id="hd-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <button class="sh-back" id="hd-back" hidden data-i18n="bukhari.back">&larr; Back</button>
+        <button class="sh-back" id="hd-back" hidden data-i18n="bukhari.all_books">&larr; All books</button>
         <h3 style="text-align:left" id="hd-title" data-i18n="bukhari.title">Ṣaḥīḥ al-Bukhārī</h3>
         <button class="sh-close" id="hd-close" data-i18n="duas.done">Done</button>
       </div>
@@ -3663,18 +3674,14 @@
                    autocapitalize="off" autocorrect="off" aria-label="Search the Arabic text"
                    data-i18n-attr="placeholder:a11y.search_the_arabic,aria-label:a11y.search_the_arabic_text">
             <div class="hd-jump">
-              <label for="hd-num" data-i18n="bukhari.go_to">Go to</label>
+              <label for="hd-num" data-i18n="bukhari.go_to">Go to hadith</label>
               <input id="hd-num" type="number" min="1" inputmode="numeric" aria-label="Hadith number"
                      data-i18n-attr="aria-label:a11y.hadith_number">
               <button id="hd-go" data-i18n="bukhari.go">Go</button>
             </div>
           </div>
+          <p class="hd-sub" id="hd-sub" hidden></p>
           <div id="hd-list"><p class="qd-empty" data-i18n="bukhari.loading">Loading…</p></div>
-          <div class="hd-pager" id="hd-pager" hidden>
-            <button id="hd-prev" data-i18n="bukhari.previous">‹ Previous</button>
-            <span id="hd-range" class="tnum"></span>
-            <button id="hd-next" data-i18n="bukhari.next">Next ›</button>
-          </div>
           <div class="wl-advisory">
             <div class="wl-adv-h" data-i18n="bukhari.arabic_only">Arabic only</div>
             <p data-i18n="bukhari.no_translation_note">No English translation is included. The Arabic belongs to nobody and is free to reproduce; the widely circulated English translations are modern works still in copyright, so none is shipped here.</p>
@@ -8662,96 +8669,129 @@ function initNotices(){
 
 /* ================= Ṣaḥīḥ al-Bukhārī =================
 
-   7,008 hadith is far too much to carry in the app, so it lives in
-   quran/hadith/bukhari/ as 71 chunks of 100 and one chunk is fetched at a
-   time — the same shape as the mushaf's page packs.
+   Three views in one sheet: the 97 books, one book's hadith, and search
+   results. The first version had none of them — it opened on hadith 1 and
+   offered "next 100", which is not how anybody reads a book.
 
-   The data is third-party open data under the ODbL. Two consequences are
-   visible rather than buried: the attribution is printed at the foot of the
-   screen, and the pack is treated as NOT INSTALLED unless its index names a
-   source and a licence. A reference whose provenance we cannot state is one
-   the masjid could not defend if an app store asked. */
+   Each book is its own file, so opening one fetches that book and nothing
+   else. The numbering is the standard one to 7563, the number people cite
+   and the number sunnah.com uses, so a reference here matches a reference
+   anywhere else. Shown beside it is the position within the book, because
+   "Book 23, hadith 4" is how a person finds their place again.
+
+   Arabic only, and no commentary. Both are stated on screen rather than
+   left for the reader to discover. */
 const HD_BASE = "quran/hadith/bukhari";
 const HD_POS  = "bukhari.pos";
-const HD = { meta: null, chunk: null, page: 1, cache: new Map(), index: null, hits: null };
+const HD = { meta: null, books: null, book: null, cache: new Map(), index: null };
 
-function hdNum(n){ return num(String(n)); }
+const hdNum = n => num(String(n));
 
-async function hdLoadMeta(){
+async function hdMeta(){
   if(HD.meta !== null) return HD.meta;
   try{
     const r = await fetch(`${HD_BASE}/index.json`);
     if(!r.ok) throw new Error("index " + r.status);
     const m = await r.json();
-    /* Same rule the mushaf follows: no source and licence, no pack. */
     if(!m.source || !m.licence) throw new Error("pack names no source or licence");
     HD.meta = m;
   }catch(e){ console.warn("bukhari pack unavailable:", e); HD.meta = false; }
   return HD.meta;
 }
 
-async function hdChunk(page){
-  if(HD.cache.has(page)) return HD.cache.get(page);
-  const r = await fetch(`${HD_BASE}/c/${page}.json`);
-  if(!r.ok) throw new Error("chunk " + r.status);
+async function hdBooks(){
+  if(HD.books) return HD.books;
+  const r = await fetch(`${HD_BASE}/books.json`);
+  if(!r.ok) throw new Error("books " + r.status);
+  HD.books = await r.json();
+  return HD.books;
+}
+
+async function hdBook(n){
+  if(HD.cache.has(n)) return HD.cache.get(n);
+  const r = await fetch(`${HD_BASE}/b/${n}.json`);
+  if(!r.ok) throw new Error("book " + r.status);
   const data = await r.json();
-  /* Keep a few chunks so paging back and forth is instant, but not so many
-     that a long session holds the whole book in memory. */
-  if(HD.cache.size > 6) HD.cache.delete(HD.cache.keys().next().value);
-  HD.cache.set(page, data);
+  /* A few books either side of the one being read stay in memory; the whole
+     collection does not. */
+  if(HD.cache.size > 4) HD.cache.delete(HD.cache.keys().next().value);
+  HD.cache.set(n, data);
   return data;
 }
 
-function hdRenderItems(items){
-  return items.map(h =>
-    `<article class="hd-item"><span class="hd-n tnum">${esc(hdNum(h.n))}</span>
-       <p class="hd-ar quranic">${esc(h.ar)}</p></article>`).join("");
+function hdFail(key, fallback){
+  document.getElementById("hd-list").innerHTML =
+    `<p class="qd-empty">${esc(t(key, fallback))}</p>`;
 }
 
-async function hdShowPage(page, focusN){
-  const m = await hdLoadMeta();
-  const list = document.getElementById("hd-list");
-  if(!m){
-    document.getElementById("hd-pager").hidden = true;
-    list.innerHTML = `<p class="qd-empty">${esc(t("bukhari.not_installed",
-      "The Ṣaḥīḥ al-Bukhārī text is not installed in this build."))}</p>`;
-    return;
-  }
-  HD.page = Math.min(Math.max(1, page), m.chunks);
-  try{
-    const items = await hdChunk(HD.page);
-    list.innerHTML = hdRenderItems(items);
-    const from = (HD.page - 1) * m.perChunk + 1, to = from + items.length - 1;
-    document.getElementById("hd-range").textContent =
-      t("bukhari.n_to_m", "{a}–{b} of {c}")
-        .replace("{a}", hdNum(from)).replace("{b}", hdNum(to)).replace("{c}", hdNum(m.count));
-    document.getElementById("hd-pager").hidden = false;
-    document.getElementById("hd-prev").disabled = HD.page === 1;
-    document.getElementById("hd-next").disabled = HD.page === m.chunks;
-    prefStore.set(HD_POS, HD.page);
-    const body = document.getElementById("hd-body");
-    if(focusN){
-      const el = list.children[focusN - from];
-      if(el) el.scrollIntoView({ block: "start", behavior: "instant" });
-    } else body.scrollTop = 0;
-  }catch(e){
-    console.warn("bukhari chunk failed:", e);
-    list.innerHTML = `<p class="qd-empty">${esc(t("bukhari.chunk_failed",
-      "Couldn't load that part. Check your connection and try again."))}</p>`;
-  }
-}
-
-async function hdGoTo(n){
-  const m = await hdLoadMeta();
-  if(!m || !n || n < 1 || n > m.count) return;
-  document.getElementById("hd-search").value = "";
+/* ---- the 97 books ---- */
+async function hdShowBooks(){
+  HD.book = null;
   document.getElementById("hd-back").hidden = true;
-  await hdShowPage(Math.ceil(n / m.perChunk), n);
+  document.getElementById("hd-sub").hidden = true;
+  document.getElementById("hd-title").textContent = t("bukhari.title", "Ṣaḥīḥ al-Bukhārī");
+  document.getElementById("hd-search").value = "";
+  const m = await hdMeta();
+  if(!m) return hdFail("bukhari.not_installed", "The Ṣaḥīḥ al-Bukhārī text is not installed in this build.");
+  let books;
+  try{ books = await hdBooks(); }
+  catch(e){ return hdFail("bukhari.chunk_failed", "Couldn't load that part. Check your connection and try again."); }
+
+  document.getElementById("hd-list").innerHTML = books.map(b => `
+    <button class="hd-book" data-book="${b.n}">
+      <span class="hd-bn tnum">${esc(hdNum(b.n))}</span>
+      <span class="hd-bt"><span class="hd-bname">${esc(b.name)}</span>
+        <span class="hd-bcount">${esc(t("bukhari.n_hadith", "{n} hadith").replace("{n}", hdNum(b.count)))}</span></span>
+      <span class="dr-ch">&rsaquo;</span>
+    </button>`).join("");
+  document.querySelectorAll("#hd-list .hd-book").forEach(b =>
+    b.addEventListener("click", () => hdShowBook(Number(b.dataset.book))));
+  document.getElementById("hd-body").scrollTop = 0;
+  prefStore.set(HD_POS, 0);
 }
 
-/* The search index is a separate file and is fetched only when somebody
-   actually searches — most people never will, and it is the largest single
-   thing in the pack. */
+/* ---- one book ---- */
+async function hdShowBook(n, focus){
+  const books = await hdBooks().catch(() => []);
+  const meta = books.find(b => b.n === n);
+  HD.book = n;
+  document.getElementById("hd-back").hidden = false;
+  document.getElementById("hd-title").textContent = meta ? meta.name : t("bukhari.title", "Ṣaḥīḥ al-Bukhārī");
+  document.getElementById("hd-search").value = "";
+  let list;
+  try{ list = await hdBook(n); }
+  catch(e){ return hdFail("bukhari.chunk_failed", "Couldn't load that part. Check your connection and try again."); }
+
+  const sub = document.getElementById("hd-sub");
+  sub.hidden = false;
+  sub.textContent = t("bukhari.book_n_of_m", "Book {n} · {c} hadith")
+    .replace("{n}", hdNum(n)).replace("{c}", hdNum(list.length));
+
+  document.getElementById("hd-list").innerHTML = list.map(h => `
+    <article class="hd-item" id="hd-h${h.n}">
+      <div class="hd-meta">
+        <span class="hd-n tnum">${esc(t("bukhari.hadith_n", "Hadith {n}").replace("{n}", hdNum(h.n)))}</span>
+        <span class="hd-i tnum">${esc(t("bukhari.n_in_book", "{i} in this book").replace("{i}", hdNum(h.i)))}</span>
+      </div>
+      <p class="hd-ar quranic">${esc(h.ar)}</p>
+    </article>`).join("");
+  prefStore.set(HD_POS, n);
+  const target = focus && document.getElementById("hd-h" + focus);
+  if(target) target.scrollIntoView({ block: "start", behavior: "instant" });
+  else document.getElementById("hd-body").scrollTop = 0;
+}
+
+/* ---- jump to a cited number ---- */
+async function hdGoTo(n){
+  const m = await hdMeta();
+  if(!m || !n || n < 1 || n > m.highest) return;
+  const books = await hdBooks().catch(() => []);
+  const b = books.find(x => n >= x.first && n <= x.last);
+  if(!b) return hdFail("bukhari.no_such_hadith", "There is no hadith with that number.");
+  await hdShowBook(b.n, n);
+}
+
+/* ---- search ---- */
 async function hdSearchIndex(){
   if(HD.index) return HD.index;
   const r = await fetch(`${HD_BASE}/search.json`);
@@ -8761,56 +8801,58 @@ async function hdSearchIndex(){
 }
 
 async function hdSearch(q){
-  const list = document.getElementById("hd-list");
   const term = hdSearchable(q);
-  if(term.length < 2){ document.getElementById("hd-back").hidden = true; return hdShowPage(HD.page); }
-  const m = await hdLoadMeta();
+  if(term.length < 2) return HD.book ? hdShowBook(HD.book) : hdShowBooks();
+  const m = await hdMeta();
   if(!m) return;
-  list.innerHTML = `<p class="qd-empty">${esc(t("bukhari.searching","Searching…"))}</p>`;
-  document.getElementById("hd-pager").hidden = true;
-  let idx;
-  try{ idx = await hdSearchIndex(); }
-  catch(e){
-    list.innerHTML = `<p class="qd-empty">${esc(t("bukhari.search_unavailable",
-      "Search needs a connection the first time. Try again when you are online."))}</p>`;
-    return;
-  }
-  const hits = [];
-  for(let i = 0; i < idx.length && hits.length < 200; i++){
-    const at = idx[i].indexOf(term);
-    if(at < 0) continue;
-    const from = Math.max(0, at - 40), to = Math.min(idx[i].length, at + term.length + 40);
-    hits.push({ n: i + 1, before: idx[i].slice(from, at), hit: idx[i].slice(at, at + term.length),
-                after: idx[i].slice(at + term.length, to) });
-  }
-  HD.hits = hits;
+  document.getElementById("hd-sub").hidden = true;
   document.getElementById("hd-back").hidden = false;
-  if(!hits.length){
-    list.innerHTML = `<p class="qd-empty">${esc(t("bukhari.nothing_matches","Nothing matches that."))}</p>`;
-    return;
+  hdFail("bukhari.searching", "Searching…");
+  let idx, books;
+  try{ [idx, books] = await Promise.all([hdSearchIndex(), hdBooks()]); }
+  catch(e){ return hdFail("bukhari.search_unavailable",
+    "Search needs a connection the first time. Try again when you are online."); }
+
+  const name = {}; books.forEach(b => { name[b.n] = b.name; });
+  const hits = [];
+  for(const [n, b, text] of idx){
+    if(hits.length >= 200) break;
+    const at = text.indexOf(term);
+    if(at < 0) continue;
+    hits.push({ n, b,
+      before: text.slice(Math.max(0, at - 38), at),
+      hit:    text.slice(at, at + term.length),
+      after:  text.slice(at + term.length, at + term.length + 38) });
   }
-  list.innerHTML =
-    `<p class="ak-intro">${esc((hits.length === 1
-        ? t("bukhari.n_matching_one", "{n} hadith matching")
-        : t("bukhari.n_matching", "{n} hadith matching")).replace("{n}", hdNum(hits.length)))}${
-        hits.length >= 200 ? esc(t("bukhari.first_200", " — showing the first 200")) : ""}</p>` +
+  if(!hits.length) return hdFail("bukhari.nothing_matches", "Nothing matches that.");
+
+  document.getElementById("hd-list").innerHTML =
+    `<p class="ak-intro">${esc(t("bukhari.n_matching", "{n} hadith matching").replace("{n}", hdNum(hits.length)))}${
+      hits.length >= 200 ? esc(t("bukhari.first_200", " — showing the first 200")) : ""}</p>` +
     hits.map(h => `<button class="hd-hit" data-n="${h.n}">
-        <span class="hd-n tnum">${esc(hdNum(h.n))}</span>
+        <span class="hd-meta"><span class="hd-n tnum">${esc(t("bukhari.hadith_n","Hadith {n}").replace("{n}", hdNum(h.n)))}</span>
+        <span class="hd-i">${esc(name[h.b] || "")}</span></span>
         <span class="hd-ar quranic">…${esc(h.before)}<em>${esc(h.hit)}</em>${esc(h.after)}…</span>
       </button>`).join("");
   document.getElementById("hd-body").scrollTop = 0;
-  list.querySelectorAll(".hd-hit").forEach(b =>
+  document.querySelectorAll("#hd-list .hd-hit").forEach(b =>
     b.addEventListener("click", () => hdGoTo(Number(b.dataset.n))));
 }
 
-/* Must match scripts/build-bukhari.mjs — the index was stripped the same way,
-   so a query has to be stripped identically or nothing will ever match. */
+/* Must match scripts/build-bukhari.mjs exactly. Written as checked ranges
+   rather than a guessed class: [ؚ-ٰ] looks like "the diacritics" and
+   quietly swallows every Arabic letter instead. */
 function hdSearchable(s){
+  /* Ranges as explicit escapes, never as literal characters. Written
+     literally, this class has been silently corrupted in transit more than
+     once, and the corruption is invisible: the app quietly stops matching
+     the index it is searching. A release check now compares this function
+     against the index the builder produced, on a real hadith. */
   return String(s)
-    .replace(/[ؐ-ًؚ-ٰٟۖ-ۭ࣓-ࣿـ]/gu, "")
-    .replace(/[آأإٱ]/gu, "ا")
-    .replace(/ة/gu, "ه")
-    .replace(/ى/gu, "ي")
+    .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF\u0640]/gu, "")          // harakat, Qurʼanic marks, tatweel
+    .replace(/[\u0622\u0623\u0625\u0671]/gu, "\u0627")     // alif variants -> alif
+    .replace(/\u0629/gu, "\u0647")            // ta marbuta -> ha
+    .replace(/\u0649/gu, "\u064A")            // alif maqsura -> ya
     .replace(/\s+/gu, " ")
     .trim();
 }
@@ -8818,13 +8860,13 @@ function hdSearchable(s){
 async function openBukhari(){
   document.getElementById("bukhari").dataset.open = "1";
   document.body.style.overflow = "hidden";
-  const m = await hdLoadMeta();
+  const m = await hdMeta();
   if(m){
-    document.getElementById("hd-num").max = m.count;
-    /* ODbL: say where it came from, on the screen, every time. */
+    document.getElementById("hd-num").max = m.highest;
     document.getElementById("hd-attr").textContent = m.attribution || "";
   }
-  await hdShowPage(prefStore.get(HD_POS, 1));
+  const last = prefStore.get(HD_POS, 0);
+  if(last) await hdShowBook(last); else await hdShowBooks();
 }
 function closeBukhari(){
   document.getElementById("bukhari").dataset.open = "0";
@@ -8836,17 +8878,11 @@ function initBukhari(){
   if(!sheet) return;
   document.getElementById("hd-close").addEventListener("click", closeBukhari);
   document.getElementById("hd-scrim").addEventListener("click", closeBukhari);
-  document.getElementById("hd-prev").addEventListener("click", () => hdShowPage(HD.page - 1));
-  document.getElementById("hd-next").addEventListener("click", () => hdShowPage(HD.page + 1));
+  document.getElementById("hd-back").addEventListener("click", hdShowBooks);
   document.getElementById("hd-go").addEventListener("click",
     () => hdGoTo(Number(document.getElementById("hd-num").value)));
   document.getElementById("hd-num").addEventListener("keydown",
     e => { if(e.key === "Enter") hdGoTo(Number(e.target.value)); });
-  document.getElementById("hd-back").addEventListener("click", () => {
-    document.getElementById("hd-search").value = "";
-    document.getElementById("hd-back").hidden = true;
-    hdShowPage(HD.page);
-  });
   let timer = null;
   document.getElementById("hd-search").addEventListener("input", e => {
     clearTimeout(timer);

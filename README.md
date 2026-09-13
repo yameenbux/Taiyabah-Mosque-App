@@ -80,11 +80,13 @@ Progressive web app: no app store, no install friction, one URL.
     lossless grayscale WebP at about 78 KB each, fetched one at a time with the
     neighbours prefetched, so turning a page is instant and the app carries
     none of it until asked
-- **Ṣaḥīḥ al-Bukhārī** — the complete Arabic text, all 7,008 hadith, with
-  search that works without typing diacritics and a jump-to-number box.
-  Fetched a hundred at a time and cached as you read, so it costs nothing
-  until it is opened and works offline afterwards. **Arabic only, and the
-  screen says so** — see *Third-party data* below for why
+- **Ṣaḥīḥ al-Bukhārī** — browsable by its **97 books**, each named, opening
+  on the list rather than on hadith 1. Every hadith shows the number people
+  cite (the standard numbering to 7,563) alongside its place within its book.
+  Jump to a cited number, or search the Arabic without typing diacritics.
+  A book is fetched when it is opened and cached, so it costs nothing until
+  used and works offline afterwards. **Arabic only, and no commentary** —
+  the screen says both; see *Third-party data* below for why
 - **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
   before sleep, each sourced and cited
 - **Common Duas** — everyday supplications in a tile grid, each opening in place
@@ -294,7 +296,8 @@ There are **29**, reporting 42 separate confirmations. Among them:
 | Notification preferences | the five preference flags are in the order subscribers' already-stored values expect, and the app and Worker agree on every name. Reordering them would silently rewrite everybody's settings |
 | Notices | the app reads the public view and nothing else, the Worker writes on a secret key that is not in this repository, and a poster reaches all three platforms |
 | Android asset links | the file is structured correctly and reachable — the fingerprint is still a placeholder, and the check says so rather than passing quietly |
-| Ṣaḥīḥ al-Bukhārī | the pack names its source and licence, carries the ODbL notice beside the data, holds exactly 7,008 hadith, and the app both refuses an unlicensed pack and prints the attribution on screen |
+| Ṣaḥīḥ al-Bukhārī | the pack names its source and licence, carries the notice beside the data, numbers to 7,563 across 97 named books with every book file present, and the app refuses an unlicensed pack, browses by book, and prints the provenance on screen |
+| Arabic normalisation | the app's search normaliser is run against the index the builder produced, on a real hadith from the pack — a character class written literally has been corrupted in transit three times, and the failure is silent: every query matches everything, or nothing |
 | Shared element ids | the hadith reader and the hall booking cannot claim the same `id` — they collided on four, and `getElementById` takes the first, which broke both screens at once |
 | Reachability | every home tile is wired to something, and no panel exists that nothing can open — Ṣaḥīḥ al-Bukhārī shipped into a "Recite" screen the app had no route to, and a test that called the open function directly never noticed |
 | Everything parses | index.html, admin.html, sw.js and the Worker |
@@ -307,15 +310,23 @@ Most of this repository is original work under one licence. Two things are not,
 and the distinction matters more than it looks — both app stores can ask to see
 the right to ship content, and "it was on GitHub" is not an answer.
 
-**Ṣaḥīḥ al-Bukhārī** is Arabic text from the [Open Hadith Data
-project](https://github.com/mhashim6/Open-Hadith-Data), used under the **Open
-Database License 1.0**, its contents under the **Database Contents License
-1.0**. That licence travels with the data: `quran/hadith/bukhari/LICENCE.txt`
-sits beside it, the attribution is printed on the screen rather than buried,
-and a release check fails the build if either goes missing.
+**Ṣaḥīḥ al-Bukhārī** is Arabic text and book structure from
+[hadith-api](https://github.com/fawazahmed0/hadith-api) (edition
+`ara-bukhari`), released under **The Unlicense** — an outright dedication to
+the public domain. Nothing must be attributed as a condition and nothing must
+be passed on. `quran/hadith/bukhari/LICENCE.txt` records it anyway, and the
+provenance is printed on screen, because where a text came from is worth
+knowing even when no licence compels it.
 
-Anyone redistributing this pack, or a database derived from it, must offer it
-under the ODbL too, and must credit the Open Hadith Data project.
+This replaced an earlier ODbL pack that had no book structure at all.
+
+**No commentary is included.** Ibn Ḥajar's Fatḥ al-Bārī is available in that
+earlier source but keyed to its own 1–7,008 numbering. Carrying it across
+means matching the two editions by text, and they do not match: an exact
+full-text comparison aligns 22.7%, and positional windows align none at all.
+Attaching commentary on a fuzzy match would put the wrong scholar's words
+under the wrong hadith, so it waits for a source keyed to the standard
+numbering.
 
 **No English translation is shipped, deliberately.** The Arabic is 9th-century
 and belongs to nobody. Every English hadith dataset found was either scraped
