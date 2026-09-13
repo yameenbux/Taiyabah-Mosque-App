@@ -10254,7 +10254,7 @@ function closeDrawer(){
 }
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.dataset.on = t.dataset.tab===name ? "1":"0");
-  ["home","times","notices","live","recite","alerts","donate","qibla"].forEach(n=>{
+  ["home","times","notices","live","alerts","donate","qibla"].forEach(n=>{
     document.getElementById("tab-"+n).hidden = (n!==name);
   });
   window.scrollTo({top:0,behavior:"instant"});
