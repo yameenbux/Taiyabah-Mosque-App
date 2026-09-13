@@ -1074,8 +1074,35 @@ for (const f of ["index.html", "admin.html"]) {
     if (n > 1) bad.push(`id="${id}" appears ${n} times — the hall booking and the hadith reader are fighting over it, and only the first will ever be found`);
   }
 
+  /* ---- and somebody has to be able to GET there ----
+
+     This is the one that was missed. The reader was added to the "Recite"
+     panel, which nothing in the app can open — no tab carries data-tab
+     "recite", nothing calls switchTab("recite"), no drawer row points at it.
+     The feature was complete, deployed, and unreachable.
+
+     The browser test passed because it called openBukhari() directly, which
+     is not a route a person has. A screen is not shipped until something a
+     finger can land on opens it. */
+  const tiles = [...app.matchAll(/class="tile" data-tile="([a-z]+)"/g)].map(m => m[1]);
+  const actions = (app.match(/const TILE_ACTIONS = \{[\s\S]*?\n\};/) || [""])[0];
+  for (const tile of tiles)
+    if (!new RegExp(`\\b${tile}:\\s*\\(\\)`).test(actions))
+      bad.push(`the home tile "${tile}" is tappable and wired to nothing — it will look broken`);
+  if (!tiles.includes("bukhari"))
+    bad.push("Ṣaḥīḥ al-Bukhārī has no home tile, so there is no way into it from the app");
+
+  /* Any panel nothing can open is dead weight and a trap for the next
+     person adding a feature to it. */
+  const panels = [...app.matchAll(/<main id="tab-([a-z]+)"/g)].map(m => m[1]);
+  for (const panel of panels) {
+    const reachable = new RegExp(`data-tab="${panel}"|switchTab\\("${panel}"\\)`).test(app);
+    if (!reachable)
+      bad.push(`the "${panel}" panel cannot be opened from anywhere in the app — nothing carries data-tab="${panel}" and nothing calls switchTab("${panel}")`);
+  }
+
   if (bad.length) bad.forEach(fail);
-  else ok("Ṣaḥīḥ al-Bukhārī — 7008 hadith, source and licence named, attribution on screen, and no id shared with the hall booking");
+  else ok(`Ṣaḥīḥ al-Bukhārī — 7008 hadith, licensed and attributed, reachable from the home screen, and all ${tiles.length} tiles wired`);
 }
 
 /* ---- 4. the service worker cache changed when the app did ----

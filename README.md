@@ -296,6 +296,7 @@ There are **29**, reporting 42 separate confirmations. Among them:
 | Android asset links | the file is structured correctly and reachable — the fingerprint is still a placeholder, and the check says so rather than passing quietly |
 | Ṣaḥīḥ al-Bukhārī | the pack names its source and licence, carries the ODbL notice beside the data, holds exactly 7,008 hadith, and the app both refuses an unlicensed pack and prints the attribution on screen |
 | Shared element ids | the hadith reader and the hall booking cannot claim the same `id` — they collided on four, and `getElementById` takes the first, which broke both screens at once |
+| Reachability | every home tile is wired to something, and no panel exists that nothing can open — Ṣaḥīḥ al-Bukhārī shipped into a "Recite" screen the app had no route to, and a test that called the open function directly never noticed |
 | Everything parses | index.html, admin.html, sw.js and the Worker |
 
 Run it locally with `node scripts/check-release.mjs`. It needs no dependencies.
