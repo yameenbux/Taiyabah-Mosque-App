@@ -297,6 +297,7 @@ There are **29**, reporting 42 separate confirmations. Among them:
 | Notices | the app reads the public view and nothing else, the Worker writes on a secret key that is not in this repository, and a poster reaches all three platforms |
 | Android asset links | the file is structured correctly and reachable — the fingerprint is still a placeholder, and the check says so rather than passing quietly |
 | Ṣaḥīḥ al-Bukhārī | the pack names its source and licence, carries the notice beside the data, numbers to 7,563 across 97 named books with every book file present, and the app refuses an unlicensed pack, browses by book, and prints the provenance on screen |
+| Bundled translations | no English translation may appear in the hadith pack unless the pack's `LICENCE.txt` records permission for it — every complete English Bukhārī is in copyright, and a dataset claiming otherwise does not own it |
 | Arabic normalisation | the app's search normaliser is run against the index the builder produced, on a real hadith from the pack — a character class written literally has been corrupted in transit three times, and the failure is silent: every query matches everything, or nothing |
 | Shared element ids | the hadith reader and the hall booking cannot claim the same `id` — they collided on four, and `getElementById` takes the first, which broke both screens at once |
 | Reachability | every home tile is wired to something, and no panel exists that nothing can open — Ṣaḥīḥ al-Bukhārī shipped into a "Recite" screen the app had no route to, and a test that called the open function directly never noticed |
@@ -319,6 +320,22 @@ provenance is printed on screen, because where a text came from is worth
 knowing even when no licence compels it.
 
 This replaced an earlier ODbL pack that had no book structure at all.
+
+**The English is linked, not bundled.** Every complete English Bukhārī in
+circulation is a modern work still in copyright — the one carried by every open
+dataset is Muhsin Khan's, published by Darussalam, whatever licence the dataset
+attaches to it. A repository cannot give away rights it never held.
+
+So each hadith links out to its English on sunnah.com, by number. **Linking is
+not copying**: no licence to hold, nothing to evidence if a store asks, and the
+app never claims a translation as its own. It needs a connection; the Arabic
+does not.
+
+To bundle a translation properly — offline, beside the Arabic — the masjid
+needs written permission. Two letters ready to send are in
+[`store/PERMISSION-LETTERS.md`](store/PERMISSION-LETTERS.md). A release check
+fails the build if a translation is ever bundled without that permission being
+recorded in the pack's `LICENCE.txt`.
 
 **No commentary is included.** Ibn Ḥajar's Fatḥ al-Bārī is available in that
 earlier source but keyed to its own 1–7,008 numbering. Carrying it across
