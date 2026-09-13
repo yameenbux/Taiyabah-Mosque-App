@@ -1010,6 +1010,74 @@ for (const f of ["index.html", "admin.html"]) {
   else ok(`duʿās — ${cats.length} categories pinned against a translation shift, and the Qurʼanic ones verified against quran/surahs/`);
 }
 
+/* ---- 3y. the Bukhārī text is licensed before it ships ----
+
+   The hadith text is NOT ours. It is third-party open data under the ODbL,
+   and that licence only holds if the attribution travels with it. An app
+   store can ask to see the right to ship this; "it was on GitHub" is not an
+   answer, and neither is a licence file nobody can find.
+
+   So: the pack must name its source and its licence, must carry the licence
+   text beside the data, and the app must both refuse to render a pack that
+   names neither AND print the attribution on screen rather than burying it.
+
+   The count is pinned too. A reference whose numbering silently changes
+   length is worse than no reference — somebody citing hadith 5,000 today
+   would be citing a different one tomorrow.                                */
+{
+  const PACK = "quran/hadith/bukhari";
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  if (!existsSync(`${PACK}/index.json`)) {
+    bad.push("the Bukhārī pack is missing — run node scripts/build-bukhari.mjs");
+  } else {
+    let meta = null;
+    try { meta = JSON.parse(readFileSync(`${PACK}/index.json`, "utf8")); }
+    catch (e) { bad.push("the Bukhārī index.json does not parse: " + e.message); }
+
+    if (meta) {
+      if (!meta.source)      bad.push("the Bukhārī pack names no source — it cannot be shipped without saying where the text came from");
+      if (!meta.licence)     bad.push("the Bukhārī pack names no licence — this text is third-party open data, not ours");
+      if (!meta.attribution) bad.push("the Bukhārī pack carries no attribution line, which the ODbL requires to travel with the data");
+      if (meta.count !== 7008)
+        bad.push(`the Bukhārī pack holds ${meta.count} hadith, expected 7008 — a reference whose numbering changes length breaks every citation made from it`);
+      /* Every chunk the index promises must actually be there. */
+      const missing = [];
+      for (let i = 1; i <= (meta.chunks || 0); i++)
+        if (!existsSync(`${PACK}/c/${i}.json`)) missing.push(i);
+      if (missing.length)
+        bad.push(`the Bukhārī pack is missing ${missing.length} of ${meta.chunks} chunks (first: ${missing[0]})`);
+      if (!existsSync(`${PACK}/search.json`))
+        bad.push("the Bukhārī search index is missing, so search would fail on a device with no connection to rebuild it");
+    }
+    if (!existsSync(`${PACK}/LICENCE.txt`))
+      bad.push("the Bukhārī pack has no LICENCE.txt beside the data — the ODbL notice has to travel with it");
+    else {
+      const lic = readFileSync(`${PACK}/LICENCE.txt`, "utf8");
+      if (!/opendatacommons\.org\/licenses\/odbl/i.test(lic))
+        bad.push("the Bukhārī LICENCE.txt does not point at the ODbL it is shipped under");
+      if (!/Open Hadith Data/i.test(lic))
+        bad.push("the Bukhārī LICENCE.txt does not credit the Open Hadith Data project it came from");
+    }
+  }
+
+  /* The app side: refuse an unlicensed pack, and show the credit. */
+  if (!/pack names no source or licence/.test(app))
+    bad.push("the app no longer refuses a Bukhārī pack that names no source and licence — it would render text the masjid cannot evidence rights to");
+  if (!/hd-attr/.test(app) || !/m\.attribution/.test(app))
+    bad.push("the app does not print the Bukhārī attribution on screen, which is the ODbL condition for using it");
+  /* The reader must not reuse the hall booking's element ids. They collided
+     once: bk-title, bk-prev, bk-next and bk-back existed twice, and
+     getElementById takes the first, which broke both screens at once. */
+  for (const id of ["bk-title", "bk-prev", "bk-next", "bk-back", "bk-list", "bk-search"]) {
+    const n = (app.match(new RegExp(`id="${id}"`, "g")) || []).length;
+    if (n > 1) bad.push(`id="${id}" appears ${n} times — the hall booking and the hadith reader are fighting over it, and only the first will ever be found`);
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok("Ṣaḥīḥ al-Bukhārī — 7008 hadith, source and licence named, attribution on screen, and no id shared with the hall booking");
+}
+
 /* ---- 4. the service worker cache changed when the app did ----
    Shipping sw.js with the same CACHE name is the same as not shipping it:
    the worker's bytes differ, so it installs, but it opens the cache that is
