@@ -1087,6 +1087,25 @@ for (const f of ["index.html", "admin.html"]) {
   /* The whole point of the rebuild: it must open on the books. */
   if (!/hdShowBooks/.test(app) || !/books\.json/.test(app))
     bad.push("the Bukhārī reader no longer browses by book — a flat list of 7,580 numbered paragraphs is not a readable Bukhārī");
+
+  /* The English is linked, not bundled, and that has to stay true in both
+     directions: the link must be there, and no bundled translation may
+     quietly appear beside the Arabic without the permission to match.
+
+     Every complete English Bukhārī in circulation is in copyright. A dataset
+     claiming otherwise does not own it. If one is ever added, the permission
+     goes in LICENCE.txt first and this check gets updated deliberately. */
+  if (!/https:\/\/sunnah\.com\/bukhari:/.test(app) || !/hd-en/.test(app))
+    bad.push("the Bukhārī reader no longer offers the English — the Arabic is linked to its translation by number, and without that link a non-Arabic reader gets nothing");
+  {
+    const lic = existsSync(`${PACK}/LICENCE.txt`) ? readFileSync(`${PACK}/LICENCE.txt`, "utf8") : "";
+    const granted = /PERMISSION GRANTED/i.test(lic);
+    const bundled = existsSync(`${PACK}/en`) ||
+      (existsSync(`${PACK}/b/1.json`) && /"en"\s*:/.test(readFileSync(`${PACK}/b/1.json`, "utf8")));
+    if (bundled && !granted)
+      bad.push("an English translation has been bundled into the Bukhārī pack, but LICENCE.txt records no permission for it. " +
+               "Every complete English Bukhārī is in copyright; see store/PERMISSION-LETTERS.md before shipping one.");
+  }
   /* The search normaliser destroys Arabic if its ranges are wrong, and the
      failure is silent: every query matches everything, or nothing.
 

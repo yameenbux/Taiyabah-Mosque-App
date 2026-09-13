@@ -1284,6 +1284,9 @@
     border-bottom:1px solid var(--line);padding:13px 0;color:var(--ink);display:block;text-align:right}
   .hd-hit .hd-meta{direction:ltr;text-align:left}
   .hd-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
+  .hd-en{display:inline-block;margin-top:9px;font-size:calc(12.5px * var(--ts));font-weight:600;
+    color:var(--brand-600);text-decoration:none}
+  .hd-en:hover{text-decoration:underline}
   .bk-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
 
   /* ---- 13-line mushaf ----
@@ -3683,8 +3686,8 @@
           <p class="hd-sub" id="hd-sub" hidden></p>
           <div id="hd-list"><p class="qd-empty" data-i18n="bukhari.loading">Loading…</p></div>
           <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="bukhari.arabic_only">Arabic only</div>
-            <p data-i18n="bukhari.no_translation_note">No English translation is included. The Arabic belongs to nobody and is free to reproduce; the widely circulated English translations are modern works still in copyright, so none is shipped here.</p>
+            <div class="wl-adv-h" data-i18n="bukhari.arabic_only">Arabic here, English on sunnah.com</div>
+            <p data-i18n="bukhari.no_translation_note">The Arabic is 9th-century and free to reproduce. Every complete English translation in circulation is a modern work still in copyright, so rather than copy one, each hadith links out to its English on sunnah.com. That needs a connection; the Arabic does not.</p>
           </div>
           <p class="wl-foot" id="hd-attr"></p>
         </div>
@@ -8682,6 +8685,23 @@ function initNotices(){
    Arabic only, and no commentary. Both are stated on screen rather than
    left for the reader to discover. */
 const HD_BASE = "quran/hadith/bukhari";
+
+/* THE ENGLISH IS LINKED, NOT BUNDLED.
+
+   Every complete English Bukhārī in circulation is a modern work still in
+   copyright — the one in every open dataset is Muhsin Khan's, published by
+   Darussalam. Datasets carrying it under a permissive licence do not own it
+   and cannot give it away, so shipping it would put the masjid's name on a
+   copy nobody granted.
+
+   Linking is not copying. The app knows the hadith number, and the numbering
+   here is the one sunnah.com uses, so a link lands on the right hadith with
+   its English — no licence to hold, nothing to evidence if a store asks.
+
+   If the masjid obtains written permission (see store/PERMISSION-LETTERS.md)
+   the translation can be bundled properly and read offline. Until then this
+   is honest about what it is: a pointer to somebody else's work. */
+const HD_EN_BASE = "https://sunnah.com/bukhari:";
 const HD_POS  = "bukhari.pos";
 const HD = { meta: null, books: null, book: null, cache: new Map(), index: null };
 
@@ -8774,6 +8794,8 @@ async function hdShowBook(n, focus){
         <span class="hd-i tnum">${esc(t("bukhari.n_in_book", "{i} in this book").replace("{i}", hdNum(h.i)))}</span>
       </div>
       <p class="hd-ar quranic">${esc(h.ar)}</p>
+      <a class="hd-en" href="${HD_EN_BASE}${h.n}" target="_blank" rel="noopener noreferrer"
+         >${esc(t("bukhari.read_english", "Read the English"))} &rsaquo;</a>
     </article>`).join("");
   prefStore.set(HD_POS, n);
   const target = focus && document.getElementById("hd-h" + focus);
