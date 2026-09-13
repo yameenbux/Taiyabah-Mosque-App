@@ -216,5 +216,89 @@ window.DUAS = {
         src: "Sunan Abī Dāwūd · Ibn Mājah" },
     ]},
 
+    /* From the Qurʼan — the supplications the prophets made, in the words the
+       Qurʼan gives them. Distinct from the 40 Rabbanā, which are the plural
+       رَبَّنَا duʿās; these are the singular ones.
+
+       NO TRANSLITERATION, deliberately. The Adhkār does the same with its
+       Qurʼanic passages: inventing a pronunciation guide for scripture adds
+       a layer nobody verified. The renderer omits the line when it is absent.
+
+       The Arabic is NOT typed. It is lifted word-for-word out of the verified
+       sūrah files by scripts/build-quran-duas.mjs and held there by
+       scripts/verify-quran-duas.mjs. Never hand-edit the ar: lines — change
+       the span in the builder and regenerate. */
+    { id: "quran", title: "From the Qurʼan", icon: "quran", items: [
+      { label: "The duʿā of Yūnus",
+        ar: "لَا٘ اِلٰهَ اِلَّا٘ اَنۡتَ سُبۡحٰنَكَ اِنِّيۡ كُنۡتُ مِنَ الظّٰلِمِيۡنَ",
+        en: "There is no god but You. Glory be to You. I have surely been among the wrongdoers.",
+        src: "Sūrah al-Anbiyā' 21:87" },
+      { label: "Before studying",
+        ar: "رَبِّ زِدۡنِيۡ عِلۡمًا",
+        en: "My Lord, increase me in knowledge.",
+        src: "Sūrah Ṭā Hā 20:114" },
+      { label: "Before speaking",
+        ar: "رَبِّ اشۡرَحۡ لِيۡ صَدۡرِيۡ وَيَسِّرۡ لِيۡ٘ اَمۡرِيۡ",
+        en: "My Lord, expand my breast for me, and make my task easy for me.",
+        src: "Sūrah Ṭā Hā 20:25–26" },
+      { label: "To be steadfast in prayer",
+        ar: "رَبِّ اجۡعَلۡنِيۡ مُقِيۡمَ الصَّلٰوةِ وَمِنۡ ذُرِّيَّتِيۡ",
+        en: "My Lord, make me one who establishes prayer, and my offspring too.",
+        src: "Sūrah Ibrāhīm 14:40" },
+      { label: "For righteous children",
+        ar: "رَبِّ هَبۡ لِيۡ مِنَ الصّٰلِحِيۡنَ",
+        en: "My Lord, grant me one of the righteous.",
+        src: "Sūrah aṣ-Ṣāffāt 37:100" },
+      { label: "When childless",
+        ar: "رَبِّ لَا تَذَرۡنِيۡ فَرۡدًا وَّاَنۡتَ خَيۡرُ الۡوٰرِثِيۡنَ",
+        en: "My Lord, do not leave me alone, and You are the best of inheritors.",
+        src: "Sūrah al-Anbiyā' 21:89" },
+      { label: "Forgiveness for one's parents",
+        ar: "رَبِّ اغۡفِرۡ لِيۡ وَلِوَالِدَيَّ",
+        en: "My Lord, forgive me and my parents.",
+        src: "Sūrah Nūḥ 71:28" },
+      { label: "Asking for mercy",
+        ar: "رَبِّ اغۡفِرۡ وَارۡحَمۡ وَاَنۡتَ خَيۡرُ الرّٰحِمِيۡنَ",
+        en: "My Lord, forgive and have mercy, for You are the best of those who show mercy.",
+        src: "Sūrah al-Mu'minūn 23:118" },
+      { label: "When afraid",
+        ar: "حَسۡبُنَا اللّٰهُ وَنِعۡمَ الۡوَكِيۡلُ",
+        en: "Allah is sufficient for us, and He is the best disposer of affairs.",
+        src: "Sūrah Āl ʿImrān 3:173" },
+      { label: "Placing your trust",
+        ar: "حَسۡبِيَ اللّٰهُ لَا٘ اِلٰهَ اِلَّا هُوَ عَلَيۡهِ تَوَكَّلۡتُ وَهُوَ رَبُّ الۡعَرۡشِ الۡعَظِيۡمِ",
+        en: "Allah is sufficient for me. There is no god but He. In Him I place my trust, and He is the Lord of the Mighty Throne.",
+        src: "Sūrah at-Tawbah 9:129" },
+      { label: "Setting out with sincerity",
+        ar: "رَبِّ اَدۡخِلۡنِيۡ مُدۡخَلَ صِدۡقٍ وَّاَخۡرِجۡنِيۡ مُخۡرَجَ صِدۡقٍ وَّاجۡعَلۡ لِّيۡ مِنۡ لَّدُنۡكَ سُلۡطٰنًا نَّصِيۡرًا",
+        en: "My Lord, cause me to enter by a truthful entrance and to leave by a truthful exit, and grant me from Yourself a helping authority.",
+        src: "Sūrah al-Isrā' 17:80" },
+      { label: "In illness",
+        ar: "اَنِّيۡ مَسَّنِيَ الضُّرُّ وَاَنۡتَ اَرۡحَمُ الرّٰحِمِيۡنَ",
+        en: "Affliction has touched me, and You are the most merciful of those who show mercy.",
+        src: "Sūrah al-Anbiyā' 21:83" },
+      { label: "For wisdom and good company",
+        ar: "رَبِّ هَبۡ لِيۡ حُكۡمًا وَّاَلۡحِقۡنِيۡ بِالصّٰلِحِيۡنَ",
+        en: "My Lord, grant me wisdom and join me with the righteous.",
+        src: "Sūrah ash-Shuʿarā' 26:83" },
+      { label: "When in need",
+        ar: "رَبِّ اِنِّيۡ لِمَا٘ اَنۡزَلۡتَ اِلَيَّ مِنۡ خَيۡرٍ فَقِيۡرٌ",
+        en: "My Lord, I am in need of whatever good You send down to me.",
+        src: "Sūrah al-Qaṣaṣ 28:24" },
+      { label: "For yourself and your family",
+        ar: "رَبِّ اغۡفِرۡ لِيۡ وَلِاَخِيۡ وَاَدۡخِلۡنَا فِيۡ رَحۡمَتِكَ وَاَنۡتَ اَرۡحَمُ الرّٰحِمِيۡنَ",
+        en: "My Lord, forgive me and my brother, and admit us into Your mercy, for You are the most merciful of those who show mercy.",
+        src: "Sūrah al-Aʿrāf 7:151" },
+      { label: "For Paradise",
+        ar: "وَاجۡعَلۡنِيۡ مِنۡ وَّرَثَةِ جَنَّةِ النَّعِيۡمِ",
+        en: "And make me among the inheritors of the Garden of Delight.",
+        src: "Sūrah ash-Shuʿarā' 26:85" },
+      { label: "Gratitude, and for one's children",
+        ar: "رَبِّ اَوۡزِعۡنِيۡ٘ اَنۡ اَشۡكُرَ نِعۡمَتَكَ الَّتِيۡ٘ اَنۡعَمۡتَ عَلَيَّ وَعَلٰي وَالِدَيَّ وَاَنۡ اَعۡمَلَ صَالِحًا تَرۡضٰىهُ وَاَصۡلِحۡ لِيۡ فِيۡ ذُرِّيَّتِيۡ اِنِّيۡ تُبۡتُ اِلَيۡكَ وَاِنِّيۡ مِنَ الۡمُسۡلِمِيۡنَ",
+        en: "My Lord, enable me to be grateful for Your favour which You have bestowed upon me and upon my parents, and to do righteous deeds that please You, and make my offspring righteous for me. I turn to You in repentance, and I am of those who submit.",
+        src: "Sūrah al-Aḥqāf 46:15" },
+    ]},
+
+
   ],
 };
