@@ -969,7 +969,8 @@ for (const f of ["index.html", "admin.html"]) {
 {
   const EXPECTED = {
     day:        "7b1ad11d5aed",
-    food:       "dd0bb18abd7f",
+    food:       "5b7dcfb507c1",
+    ramadan:    "6c06a11116a1",
     masjid:     "fe0a3a59173f",
     hardship:   "5a5867dfe48a",
     health:     "e58edd0af597",

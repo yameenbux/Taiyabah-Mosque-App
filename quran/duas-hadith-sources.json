@@ -195,6 +195,108 @@
    },
    "src": "Ṣaḥīḥ Muslim",
    "sha": "e3a5ef5bd194c82c"
+  },
+  {
+   "cat": "food",
+   "label": "Over food or drink you are given",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3730,
+      95,
+      101
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "ed25bf1bebf6ea9c"
+  },
+  {
+   "cat": "food",
+   "label": "After drinking milk",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3730,
+      107,
+      112
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "3e90eba5f5b105c6"
+  },
+  {
+   "cat": "food",
+   "label": "For the household that fed you",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3854,
+      37,
+      45
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "e66a7ccb5b2b8ba6"
+  },
+  {
+   "cat": "ramadan",
+   "label": "On sighting the new moon",
+   "ref": {
+    "editionSpans": [
+     [
+      "tirmidhi",
+      3451,
+      43,
+      52
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Jāmiʿ al-Tirmidhī",
+   "sha": "dfacda3002f82dd4"
+  },
+  {
+   "cat": "ramadan",
+   "label": "When someone picks a fight while you are fasting",
+   "ref": {
+    "editionSpans": [
+     [
+      "bukhari",
+      1894,
+      42,
+      43
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ al-Bukhārī",
+   "sha": "9053d4a982eec5de"
+  },
+  {
+   "cat": "ramadan",
+   "label": "On Laylat al-Qadr",
+   "ref": {
+    "editionSpans": [
+     [
+      "ibnmajah",
+      3850,
+      33,
+      39
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Ibn Mājah",
+   "sha": "f8b8f765386d060f"
   }
  ]
 }

@@ -89,7 +89,7 @@ Progressive web app: no app store, no install friction, one URL.
   the screen says both; see *Third-party data* below for why
 - **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
   before sleep, each sourced and cited
-- **Common Duas** — 64 everyday supplications in a tile grid across 11 headings,
+- **Common Duas** — 70 everyday supplications in a tile grid across 12 headings,
   each opening in place. The ones that come from hadith are not transcribed
   either: they are lifted word-for-word out of the Arabic of the six books, by
   collection, hadith number and word span (`scripts/build-hadith-duas.mjs`)
@@ -289,7 +289,7 @@ There are **29**, reporting 42 separate confirmations. Among them:
 | Qur'an complete | 114 sūrahs and 6,236 āyāt, every count against the canonical table |
 | 40 Rabbanā | each duʿā matched against the Qur'an text, not trusted as transcribed |
 | Duʿās | every category pinned so a duʿā cannot be inserted mid-list and slide three languages of translation onto the wrong Arabic; the Qur'anic ones checked against `quran/surahs/`, the hadith ones against the text they were lifted from, and none repeating another |
-| Translations | 1,788 strings in all three languages, nothing missing and nothing spare |
+| Translations | 1,818 strings in all three languages, nothing missing and nothing spare |
 | Language packs | `lang/*.js` still matches what `lang/src` would build — twice now, a translation was edited and the generated pack was not rebuilt, leaving English on an Urdu screen |
 | Latin identifiers | 23 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
 | Arabic marks | scripture on a font stack that actually has glyphs for the marks it ships |
@@ -339,10 +339,17 @@ a hash of the extracted Arabic. A clean clone can therefore still prove the
 Arabic in the app is the Arabic that was lifted, and with the editions present
 `scripts/verify-hadith-duas.mjs` re-extracts and compares byte for byte.
 
-Three duʿās that a reader might expect are deliberately absent. Two — the one
-for sleeplessness, and the one on undressing — are not in the six books or are
-flagged by the collector himself as weakly transmitted. The third was already
-in the app as one of the forty Rabbanā, and the duplicate check caught it.
+Several duʿās a reader might expect are deliberately absent, each for a reason
+the sources gave rather than one we chose:
+
+- the duʿā for sleeplessness, and the one said over Zam Zam, are in none of the
+  six books
+- the one on undressing is Jāmiʿ al-Tirmidhī 606, where Tirmidhī writes that
+  its chain is not strong
+- the duʿās tied to the first, second and last ten days of Ramaḍān rest on a
+  narration graded *munkar*, not on the six books
+- "For a blessed family" (25:74) was already in the app as one of the forty
+  Rabbanā, and the duplicate check caught it after a hand search had missed it
 
 **The English is linked, not bundled.** Every complete English Bukhārī in
 circulation is a modern work still in copyright — the one carried by every open
