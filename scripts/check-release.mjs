@@ -1027,6 +1027,57 @@ for (const f of ["index.html", "admin.html"]) {
   else ok(`duʿās — ${cats.length} categories pinned against a translation shift, the Qurʼanic ones verified against quran/surahs/, the hadith ones against the text they were lifted from`);
 }
 
+/* ---- 3z. nothing reaches for an element that is not there ----
+
+   switchTab() hides every pane and shows one, by walking a hard-coded list of
+   names and calling getElementById on each. A dead Qurʼan panel was removed
+   from the markup and its name was left in that list, so the call returned
+   null, setting .hidden threw, and the loop died in the middle — after hiding
+   the pane you were on and before showing the one you asked for.
+
+   The tabs after the dead name in that list were Alerts, Donate and Qibla.
+   All three went blank. Donate is how the masjid is funded, and it stayed
+   that way for three releases, because no check looked and no test opened it.
+
+   Two things are checked here, because the same mistake has two shapes:
+
+     the tab list      must name exactly the tab- panes in the markup, in
+                       both directions — a pane added and not listed never
+                       hides, a pane removed and still listed throws
+
+     every literal id  passed to getElementById must exist in the markup, or
+                       be created by the script itself (st.id = "mu-font").
+                       Comments are stripped first: an id mentioned in prose
+                       is not an id in the document.                          */
+{
+  const html = readFileSync("index.html", "utf8");
+  const markup = html.replace(/<!--[\s\S]*?-->/g, "");
+  const bad = [];
+
+  const panes = [...new Set([...markup.matchAll(/id="tab-([a-z]+)"/g)].map(m => m[1]))].sort();
+  const m = html.match(/\[([^\]]*)\]\.forEach\(n\s*=>\s*\{\s*\n\s*document\.getElementById\("tab-"\s*\+\s*n\)/);
+  if (!m) bad.push("could not find the tab list switchTab() walks — has it been rewritten? this check needs updating");
+  else {
+    const listed = m[1].split(",").map(x => x.trim().replace(/^["']|["']$/g, "")).filter(Boolean).sort();
+    for (const n of listed) if (!panes.includes(n))
+      bad.push(`switchTab() lists the tab "${n}" but there is no <… id="tab-${n}"> — getElementById returns null and setting .hidden throws, ` +
+               `which stops the loop and leaves every tab after it in the list unreachable`);
+    for (const n of panes) if (!listed.includes(n))
+      bad.push(`there is a pane id="tab-${n}" that switchTab() does not list, so it is never hidden when another tab is opened`);
+  }
+
+  /* ids the script creates for itself count as present. */
+  const made = new Set([...html.matchAll(/\.id\s*=\s*["']([^"']+)["']/g)].map(x => x[1]));
+  const present = new Set([...markup.matchAll(/\bid="([^"]+)"/g)].map(x => x[1]));
+  const dangling = [...new Set([...html.matchAll(/getElementById\(\s*["']([^"']+)["']\s*\)/g)].map(x => x[1]))]
+    .filter(id => !present.has(id) && !made.has(id));
+  for (const id of dangling)
+    bad.push(`getElementById("${id}") — no element with that id exists in index.html`);
+
+  if (bad.length) bad.forEach(fail);
+  else ok(`element references — ${panes.length} tab panes all listed in switchTab() and nothing reaches for an id that is not there`);
+}
+
 /* ---- 3y. the Bukhārī text is licensed before it ships ----
 
    The hadith text is NOT ours. It is third-party open data under the ODbL,
