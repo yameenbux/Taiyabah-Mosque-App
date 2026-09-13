@@ -89,7 +89,10 @@ Progressive web app: no app store, no install friction, one URL.
   the screen says both; see *Third-party data* below for why
 - **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
   before sleep, each sourced and cited
-- **Common Duas** — everyday supplications in a tile grid, each opening in place
+- **Common Duas** — 64 everyday supplications in a tile grid across 11 headings,
+  each opening in place. The ones that come from hadith are not transcribed
+  either: they are lifted word-for-word out of the Arabic of the six books, by
+  collection, hadith number and word span (`scripts/build-hadith-duas.mjs`)
 - **40 Rabbanā** — the forty short Qur'anic duʿās, numbered, in IndoPak script,
   every one verified against the Qur'an text itself rather than transcribed
 
@@ -208,7 +211,12 @@ verbatim. Anything committed here is reachable by URL.
 │   ├── i18n-keys.mjs             Extracts every translatable string there is.
 │   ├── build-lang.mjs            lang/src/*.json  →  lang/{ur,gu,ar}.js
 │   ├── fetch-quran.mjs           Builds quran/surahs/ from the source text.
-│   └── verify-rabbanas.mjs       Checks the 40 Rabbanā against the Qur'an.
+│   ├── verify-rabbanas.mjs       Checks the 40 Rabbanā against the Qur'an.
+│   ├── build-quran-duas.mjs      Lifts the Qur'anic duʿās out of quran/surahs/
+│   ├── verify-quran-duas.mjs      by word span, and holds them to it after.
+│   ├── build-hadith-duas.mjs     The same for the duʿās that come from hadith,
+│   ├── verify-hadith-duas.mjs     out of the public-domain Arabic editions.
+│   └── build-bukhari.mjs         Builds quran/hadith/bukhari/ — 97 books.
 │
 ├── push/onesignal/              OneSignal's own service workers, kept on a
 │   └── …                         separate scope so they don't collide with
@@ -280,7 +288,8 @@ There are **29**, reporting 42 separate confirmations. Among them:
 |---|---|
 | Qur'an complete | 114 sūrahs and 6,236 āyāt, every count against the canonical table |
 | 40 Rabbanā | each duʿā matched against the Qur'an text, not trusted as transcribed |
-| Translations | 1,672 strings in all three languages, nothing missing and nothing spare |
+| Duʿās | every category pinned so a duʿā cannot be inserted mid-list and slide three languages of translation onto the wrong Arabic; the Qur'anic ones checked against `quran/surahs/`, the hadith ones against the text they were lifted from, and none repeating another |
+| Translations | 1,788 strings in all three languages, nothing missing and nothing spare |
 | Language packs | `lang/*.js` still matches what `lang/src` would build — twice now, a translation was edited and the generated pack was not rebuilt, leaving English on an Urdu screen |
 | Latin identifiers | 23 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
 | Arabic marks | scripture on a font stack that actually has glyphs for the marks it ships |
@@ -320,6 +329,20 @@ provenance is printed on screen, because where a text came from is worth
 knowing even when no licence compels it.
 
 This replaced an earlier ODbL pack that had no book structure at all.
+
+The same editions — `ara-muslim`, `ara-abudawud` and the rest, all public
+domain — are also where the hadith duʿās come from. They are not committed:
+they are ~44 MB and the app needs only a dozen short passages out of them. So
+`scripts/build-hadith-duas.mjs` lifts each duʿā by collection, hadith number
+and word span, and writes `quran/duas-hadith-sources.json` — the citation and
+a hash of the extracted Arabic. A clean clone can therefore still prove the
+Arabic in the app is the Arabic that was lifted, and with the editions present
+`scripts/verify-hadith-duas.mjs` re-extracts and compares byte for byte.
+
+Three duʿās that a reader might expect are deliberately absent. Two — the one
+for sleeplessness, and the one on undressing — are not in the six books or are
+flagged by the collector himself as weakly transmitted. The third was already
+in the app as one of the forty Rabbanā, and the duplicate check caught it.
 
 **The English is linked, not bundled.** Every complete English Bukhārī in
 circulation is a modern work still in copyright — the one carried by every open

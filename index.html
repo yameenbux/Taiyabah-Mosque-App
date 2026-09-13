@@ -3631,7 +3631,7 @@
             <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 20.4c-1.6-1.1-2.6-2.9-2.6-4.9V9.1c0-.7.6-1.3 1.3-1.3.7 0 1.3.6 1.3 1.3v3"/><path d="M15.6 20.4c1.6-1.1 2.6-2.9 2.6-4.9V9.1c0-.7-.6-1.3-1.3-1.3-.7 0-1.3.6-1.3 1.3v3"/><path d="M11 12V4.9c0-.7.6-1.3 1.3-1.3.7 0 1.3.6 1.3 1.3V12"/></svg></span>
             <span class="md-t">
               <span class="md-t1" data-i18n="athkar.everyday_du_as">Everyday Duʿās</span>
-              <span class="md-t2" data-i18n="athkar.waking_eating_travelling_worry_rain">Waking, eating, travelling, worry, rain</span>
+              <span class="md-t2" data-i18n="athkar.waking_eating_travelling_worry_rain">Waking, eating, travelling, health, marriage, loss</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
           <button class="md-row" id="ak-go-rabbanas">
@@ -9030,6 +9030,16 @@ const DUA_ICONS = {
           '<path d="M12 5.2v2"/><path d="M12 10.4v2.4"/><path d="M12 16v2.4"/>',
   people: '<circle cx="8.4" cy="8.6" r="2.9"/><path d="M3.2 20a5.2 5.2 0 0 1 10.4 0"/>' +
           '<circle cx="16.8" cy="10.2" r="2.3"/><path d="M14.2 20a4.4 4.4 0 0 1 6.6-3.8"/>',
+  /* A pulse trace. Kept clear of hardship's heart, which is a different
+     thing: that one is grief, this one is the body. */
+  health: '<path d="M3.2 12.2h3.6l1.9-4.6 3.1 9.2 2.3-6 1.4 1.4h5.3"/>',
+  /* Two rings, overlapping. */
+  marriage: '<circle cx="9.5" cy="14.2" r="5"/><circle cx="14.5" cy="14.2" r="5"/>' +
+            '<path d="M9.5 5.2 12 7.6l2.5-2.4"/>',
+  /* A grave marker on open ground, with grass either side so it does not
+     read as the masjid dome. */
+  death: '<path d="M8 20.3v-7.8a4 4 0 0 1 8 0v7.8"/><path d="M3.4 20.3h17.2"/>' +
+         '<path d="M5.6 20.3c0-1.3.8-2.2 1.8-2.2"/><path d="M18.4 20.3c0-1.3-.8-2.2-1.8-2.2"/>',
   weather: '<path d="M17.4 15.5a3.6 3.6 0 0 0-.7-7.1 5.2 5.2 0 0 0-9.9 1.6 3.4 3.4 0 0 0 .5 6.8"/>' +
            '<path d="M8.6 18.4 7.8 20.8"/><path d="M12.2 18.4l-.8 2.4"/><path d="M15.8 18.4l-.8 2.4"/>',
 };

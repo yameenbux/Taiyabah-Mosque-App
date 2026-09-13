@@ -1,0 +1,200 @@
+{
+ "note": "Provenance for the duʿās lifted out of primary text. Written by scripts/build-hadith-duas.mjs; checked by scripts/verify-hadith-duas.mjs and by the release check, which compares quran/duas.js against these hashes.",
+ "source": "hadith-api (fawazahmed0), ara-* editions — The Unlicense (public domain)",
+ "sourceUrl": "https://github.com/fawazahmed0/hadith-api",
+ "duas": [
+  {
+   "cat": "hardship",
+   "label": "When something frightens you",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3893,
+      32,
+      44
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "9b9c82557be00c92"
+  },
+  {
+   "cat": "health",
+   "label": "When you feel pain",
+   "ref": {
+    "editionSpans": [
+     [
+      "muslim",
+      5737,
+      61,
+      62
+     ],
+     [
+      "muslim",
+      5737,
+      69,
+      76
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ Muslim",
+   "sha": "3dfc0550eee98b64"
+  },
+  {
+   "cat": "health",
+   "label": "Praying over someone who is ill",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3883,
+      98,
+      112
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "efc984dab828ff78"
+  },
+  {
+   "cat": "health",
+   "label": "For health and well-being",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      5090,
+      40,
+      55
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "fe058dd6557f4b4c"
+  },
+  {
+   "cat": "marriage",
+   "label": "Congratulating a newly-married couple",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      2130,
+      34,
+      42
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "77e0485196091736"
+  },
+  {
+   "cat": "marriage",
+   "label": "When you marry",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      2160,
+      46,
+      62
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "183368b279711e34"
+  },
+  {
+   "cat": "marriage",
+   "label": "Before a husband and wife come together",
+   "ref": {
+    "editionSpans": [
+     [
+      "bukhari",
+      141,
+      37,
+      45
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ al-Bukhārī",
+   "sha": "801bf18cef0a0f13"
+  },
+  {
+   "cat": "marriage",
+   "label": "Seeking Allah's protection for your children",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      4737,
+      33,
+      44
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "10a19758ffe78ab0"
+  },
+  {
+   "cat": "death",
+   "label": "When you hear bad news or suffer a loss",
+   "ref": {
+    "editionSpans": [
+     [
+      "muslim",
+      2126,
+      55,
+      67
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ Muslim",
+   "sha": "139e2dc18b3d5416"
+  },
+  {
+   "cat": "death",
+   "label": "For someone who has died",
+   "ref": {
+    "editionSpans": [
+     [
+      "muslim",
+      2232,
+      43,
+      89
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ Muslim",
+   "sha": "705030e9ea7d2bab"
+  },
+  {
+   "cat": "death",
+   "label": "When visiting the graveyard",
+   "ref": {
+    "editionSpans": [
+     [
+      "muslim",
+      2257,
+      59,
+      75
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ Muslim",
+   "sha": "e3a5ef5bd194c82c"
+  }
+ ]
+}

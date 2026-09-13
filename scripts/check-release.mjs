@@ -971,9 +971,12 @@ for (const f of ["index.html", "admin.html"]) {
     day:        "7b1ad11d5aed",
     food:       "dd0bb18abd7f",
     masjid:     "fe0a3a59173f",
-    hardship:   "23f8db657c88",
+    hardship:   "5a5867dfe48a",
+    health:     "e58edd0af597",
     travel:     "f3b1790925d1",
     people:     "311aa48e6938",
+    marriage:   "9904fff4304e",
+    death:      "2db0cfda4e9c",
     weather:    "e5da9f87c298",
     quran:      "78c7b96c15fa",
   };
@@ -1006,8 +1009,21 @@ for (const f of ["index.html", "admin.html"]) {
              (String(out).split("FAIL")[1] || "run node scripts/verify-quran-duas.mjs").trim().slice(0, 200));
   }
 
+  /* …and the hadith ones really are the hadith. The source editions are not
+     committed, so on a clean clone this compares the Arabic in duas.js
+     against the hashes recorded when it was lifted; with the editions
+     present it re-extracts and compares byte for byte. It also catches a
+     duʿā that repeats one already in the app. */
+  try {
+    execFileSync("node", ["scripts/verify-hadith-duas.mjs"], { stdio: "pipe" });
+  } catch (e) {
+    const out = (e.stdout || "") + (e.stderr || "");
+    bad.push("the hadith duʿās no longer match the text they were lifted from — " +
+             (String(out).split("FAIL")[1] || "run node scripts/verify-hadith-duas.mjs").trim().slice(0, 200));
+  }
+
   if (bad.length) bad.forEach(fail);
-  else ok(`duʿās — ${cats.length} categories pinned against a translation shift, and the Qurʼanic ones verified against quran/surahs/`);
+  else ok(`duʿās — ${cats.length} categories pinned against a translation shift, the Qurʼanic ones verified against quran/surahs/, the hadith ones against the text they were lifted from`);
 }
 
 /* ---- 3y. the Bukhārī text is licensed before it ships ----
