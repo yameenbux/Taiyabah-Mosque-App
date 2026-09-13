@@ -968,16 +968,16 @@ for (const f of ["index.html", "admin.html"]) {
    Qurʼan" category to the text in quran/surahs/ letter for letter.           */
 {
   const EXPECTED = {
-    day:        "7b1ad11d5aed",
+    day:        "f8a40f94c180",
     food:       "5b7dcfb507c1",
-    ramadan:    "6c06a11116a1",
+    ramadan:    "88ddd5566049",
     masjid:     "fe0a3a59173f",
     hardship:   "5a5867dfe48a",
     health:     "e58edd0af597",
     travel:     "f3b1790925d1",
-    people:     "311aa48e6938",
+    people:     "45d6ce46ca07",
     marriage:   "9904fff4304e",
-    death:      "2db0cfda4e9c",
+    death:      "82ab941489e4",
     weather:    "e5da9f87c298",
     quran:      "78c7b96c15fa",
   };

@@ -297,6 +297,115 @@
    },
    "src": "Sunan Ibn Mājah",
    "sha": "f8b8f765386d060f"
+  },
+  {
+   "cat": "day",
+   "label": "When you take your clothes off",
+   "ref": {
+    "editionSpans": [
+     [
+      "tirmidhi",
+      606,
+      58,
+      59
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Jāmiʿ al-Tirmidhī",
+   "sha": "e04227e76e93073d",
+   "sameAs": "Before eating"
+  },
+  {
+   "cat": "day",
+   "label": "Putting on a garment for the first time",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      4020,
+      37,
+      56
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "2caa5b97e97b1894"
+  },
+  {
+   "cat": "people",
+   "label": "For someone wearing new clothes",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      4020,
+      76,
+      79
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "98ad8eca2b8c8a11"
+  },
+  {
+   "cat": "ramadan",
+   "label": "Asking as you break your fast",
+   "ref": {
+    "editionSpans": [
+     [
+      "ibnmajah",
+      1753,
+      62,
+      72
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Ibn Mājah",
+   "sha": "e084b11f90257dad"
+  },
+  {
+   "cat": "death",
+   "label": "Comforting someone bereaved",
+   "ref": {
+    "editionSpans": [
+     [
+      "muslim",
+      2135,
+      52,
+      63
+     ],
+     [
+      "muslim",
+      2135,
+      65,
+      66
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Ṣaḥīḥ Muslim",
+   "sha": "55295cb622dfca05"
+  },
+  {
+   "cat": "death",
+   "label": "At the graveside after burial",
+   "ref": {
+    "editionSpans": [
+     [
+      "abudawud",
+      3221,
+      37,
+      44
+     ]
+    ],
+    "note": "[collection, hadith number IN THIS EDITION, first word, last word]"
+   },
+   "src": "Sunan Abī Dāwūd",
+   "sha": "c5e941d7fcb498a0"
   }
  ]
 }

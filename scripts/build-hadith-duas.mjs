@@ -142,6 +142,37 @@ export const DUAS = [
     en:"O Allah, You are most forgiving, and You love to forgive, so forgive me.",
     span:["ibnmajah", 3850, 33, 39],
     note:"ʿĀ'ishah asked what to say if she found Laylat al-Qadr. Jāmiʿ al-Tirmidhī records the same duʿā with “ʿafuwwun karīm”." },
+
+  /* ---- more of the same ground, asked for a second time ---- */
+  { cat:"day", label:"When you take your clothes off",
+    tr:"Bismillāh",
+    en:"In the name of Allah.",
+    span:["tirmidhi", 606, 58, 59],
+    dup:"Before eating",
+    note:"The same two words that open a meal, said here for a different moment. Tirmidhī records it and notes himself that the chain is not strong." },
+  { cat:"day", label:"Putting on a garment for the first time",
+    tr:"Allāhumma lakal-ḥamdu Anta kasawtanīh, as'aluka min khayrihi wa khayri mā ṣuniʿa lah, wa aʿūdhu bika min sharrihi wa sharri mā ṣuniʿa lah",
+    en:"O Allah, all praise is Yours — You have clothed me with this. I ask You for its good and the good of what it was made for, and I seek refuge in You from its harm and the harm of what it was made for.",
+    span:["abudawud", 4020, 37, 56] },
+  { cat:"people", label:"For someone wearing new clothes",
+    tr:"Tublī wa yukhlifullāhu taʿālā",
+    en:"May you wear it out, and may Allah give you another in its place.",
+    span:["abudawud", 4020, 76, 79],
+    note:"What the Companions said to one another on seeing a new garment." },
+  { cat:"ramadan", label:"Asking as you break your fast",
+    tr:"Allāhumma innī as'aluka bi-raḥmatikal-latī wasiʿat kulla shay'in an taghfira lī",
+    en:"O Allah, I ask You, by Your mercy that encompasses all things, to forgive me.",
+    span:["ibnmajah", 1753, 62, 72],
+    note:"ʿAbdullāh ibn ʿAmr said this at ifṭār. In the same report: the fasting person has a duʿā at breaking the fast that is not turned away." },
+  { cat:"death", label:"Comforting someone bereaved",
+    tr:"Inna lillāhi mā akhadha wa lahu mā aʿṭā, wa kullu shay'in ʿindahu bi-ajalin musammā — fal-taṣbir wal-taḥtasib",
+    en:"To Allah belongs what He has taken, and to Him belongs what He has given, and everything with Him has an appointed term. So be patient, and seek the reward.",
+    span:[["muslim", 2135, 52, 63], ["muslim", 2135, 65, 66]] },
+  { cat:"death", label:"At the graveside after burial",
+    tr:"Istaghfirū li-akhīkum wa salū lahut-tathbīt, fa-innahul-āna yus'al",
+    en:"Ask forgiveness for your brother, and ask that he be made firm — for he is being questioned now.",
+    span:["abudawud", 3221, 37, 44],
+    note:"Not a set formula. The Prophet ﷺ would stand at the grave once the burial was done and tell those present to do this." },
 ];
 
 /* Editorial marks in this edition: the bidi controls that fence a quotation,
@@ -221,12 +252,16 @@ if ((process.argv[1] || "").endsWith("build-hadith-duas.mjs")) {
     if (d.tr) console.log(`        tr: "${esc(d.tr)}",`);
     console.log(`        en: "${esc(d.en)}",`);
     if (d.note) console.log(`        note: "${esc(d.note)}",`);
+    /* A duʿā whose words another entry already carries, kept because the
+       occasion is a different one. Marked so the duplicate check can tell a
+       deliberate repeat from an accident. */
+    if (d.dup) console.log(`        sameAs: "${esc(d.dup)}",`);
     console.log(`        src: "${esc(srcOf(d))}" },`);
     record.push({
       cat: d.cat, label: d.label,
       ref: { editionSpans: spansOf(d),
                        note: "[collection, hadith number IN THIS EDITION, first word, last word]" },
-      src: srcOf(d), sha: sha(ar),
+      src: srcOf(d), sha: sha(ar), ...(d.dup ? { sameAs: d.dup } : {}),
     });
   }
   writeFileSync(OUT, JSON.stringify({

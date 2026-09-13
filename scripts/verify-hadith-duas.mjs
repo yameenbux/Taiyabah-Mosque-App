@@ -46,14 +46,31 @@ for (const r of rec.duas) {
 if (rec.duas.length !== DUAS.length)
   fail.push(`the builder has ${DUAS.length} duʿās but ${rec.duas.length} are recorded — re-run scripts/build-hadith-duas.mjs`);
 
-/* 3. None of them duplicates a duʿā that was already in the app. */
+/* 3. None of them duplicates a duʿā that was already in the app.
+
+   One repeat is deliberate: "Bismillāh" opens a meal and is also what is said
+   on undressing. Two words, two occasions. An entry may therefore carry
+   `sameAs`, naming the duʿā it repeats — which makes the repeat a decision
+   somebody wrote down rather than a mistake nobody noticed. Anything else
+   that collides is still a failure. */
 const seen = new Map();
+let deliberate = 0;
 for (const c of app.categories) for (const it of c.items) {
-  const key = it.ar.replace(/[ً-ْٰـ]/gu, "").replace(/\s+/gu, " ").trim();
-  if (seen.has(key)) fail.push(`duplicate duʿā: "${it.label}" repeats "${seen.get(key)}"`);
-  else seen.set(key, it.label);
+  const key = it.ar.replace(/[\u064B-\u0652\u0670\u0640]/gu, "").replace(/\s+/gu, " ").trim();
+  const first = seen.get(key);
+  if (!first) { seen.set(key, it); continue; }
+  /* The marker may sit on either one: which of the pair the file lists first
+     is an ordering detail, not a statement about which repeats which. */
+  if (it.sameAs === first.label || first.sameAs === it.label) { deliberate++; continue; }
+  fail.push(it.sameAs
+    ? `"${it.label}" says it repeats "${it.sameAs}", but the duʿā it actually repeats is "${first.label}"`
+    : `duplicate duʿā: "${it.label}" repeats "${first.label}" — if that is intended, give one of them sameAs: "${first.label}"`);
 }
-if (!fail.length) ok(`no duʿā duplicates another (${seen.size} distinct)`);
+for (const c of app.categories) for (const it of c.items)
+  if (it.sameAs && !app.categories.some(x => x.items.some(y => y.label === it.sameAs)))
+    fail.push(`"${it.label}" carries sameAs: "${it.sameAs}", which is not a duʿā in the app`);
+if (!fail.length) ok(`no duʿā duplicates another (${seen.size} distinct` +
+  (deliberate ? `, ${deliberate} marked as a deliberate repeat` : "") + ")");
 
 /* 4. With the source present, re-extract and compare byte for byte. */
 const needed = [...new Set(DUAS.map(d => spansOf(d)[0][0]))];
