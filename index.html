@@ -8725,12 +8725,16 @@ function duaCard(it, key){
   /* The transliteration is a pronunciation guide for the Arabic above it.
      Urdu and Gujarati readers get one in their own script; an Arabic reader is
      already reading the words, so the line is dropped rather than shown as a
-     duplicate of the duʿā itself. */
+     duplicate of the duʿā itself.
+
+     The Qurʼanic duʿās carry none at all — the Adhkār treats its Qurʼanic
+     passages the same way. Inventing a pronunciation guide for scripture adds
+     a layer nobody has verified, so the line is simply absent. */
   return `
     <div class="wl-quote">
       <p class="du-label">${esc(t(key+".label", it.label))}</p>
       <p class="wl-ar2 quranic">${esc(arabicForDisplay(it.ar))}</p>
-      ${activeLang === "ar" ? "" : `<p class="du-tr">${esc(t(key+".tr", it.tr))}</p>`}
+      ${(!it.tr || activeLang === "ar") ? "" : `<p class="du-tr">${esc(t(key+".tr", it.tr))}</p>`}
       <p class="wl-en2">&ldquo;${esc(t(key+".en", it.en))}&rdquo;</p>
       ${it.note ? `<p class="ak-extra">${esc(t(key+".note", it.note))}</p>` : ""}
       <p class="wl-src">${esc(t(key+".src", it.src))}</p>
@@ -8742,6 +8746,12 @@ function duaCard(it, key){
    its category is about rather than decorating it: a sun rising for the day, a
    mihrab arch for the masjid, an open hand for hardship. */
 const DUA_ICONS = {
+  /* An open mus-haf: two leaves either side of the gutter, on the same
+     24-grid and stroke weight as the rest of the set. */
+  quran: '<path d="M12 6.4v13"/><path d="M12 6.4C10.3 5 8.1 4.3 5.4 4.3A1.4 1.4 0 0 0 4 5.7v11.1' +
+         'a1.4 1.4 0 0 0 1.4 1.4c2.7 0 4.9.7 6.6 2.1"/>' +
+         '<path d="M12 6.4c1.7-1.4 3.9-2.1 6.6-2.1A1.4 1.4 0 0 1 20 5.7v11.1' +
+         'a1.4 1.4 0 0 1-1.4 1.4c-2.7 0-4.9.7-6.6 2.1"/>',
   day: '<path d="M12 3.5v2.2"/><path d="M5.6 6.1 7.2 7.7"/><path d="M18.4 6.1 16.8 7.7"/>' +
        '<path d="M3 14h18"/><path d="M5.5 17.5h13"/><path d="M8 21h8"/>' +
        '<path d="M8.2 14a3.8 3.8 0 0 1 7.6 0"/>',

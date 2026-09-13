@@ -14,7 +14,8 @@
  * files alone. Run this before shipping: `node scripts/check-release.mjs`.
  */
 import { readFileSync, existsSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 const R = (p) => readFileSync(p, "utf8");
 const problems = [];
@@ -948,6 +949,65 @@ for (const f of ["index.html", "admin.html"]) {
 
   if (bad.length) bad.forEach(fail);
   else ok("notices — the app reads the public view, the Worker writes through publish_notice() on a key with no table privileges of its own, and a poster reaches all three platforms");
+}
+
+/* ---- 3x. the duʿā translations still line up with the duʿās ----
+
+   Every duʿā's Urdu, Gujarati and Arabic is keyed by its POSITION in its
+   category: dua.day.0.label, dua.day.1.label, and so on. Insert a duʿā into
+   the middle of a category and nothing breaks loudly — every translation after
+   it slides up by one, and the app calmly shows the wrong meaning under the
+   wrong Arabic, in three languages, on a screen people use to worship.
+
+   So each category is fingerprinted by its labels in order. Appending to the
+   end changes only that category's fingerprint and is a one-line update here.
+   Inserting or reordering also changes it — and that is the point: it cannot
+   happen quietly.
+
+   The same check also runs the Qurʼanic verifier, which holds the "From the
+   Qurʼan" category to the text in quran/surahs/ letter for letter.           */
+{
+  const EXPECTED = {
+    day:        "7b1ad11d5aed",
+    food:       "dd0bb18abd7f",
+    masjid:     "fe0a3a59173f",
+    hardship:   "23f8db657c88",
+    travel:     "f3b1790925d1",
+    people:     "311aa48e6938",
+    weather:    "e5da9f87c298",
+    quran:      "78c7b96c15fa",
+  };
+  const bad = [];
+  const w = {};
+  try { new Function("window", readFileSync("quran/duas.js", "utf8"))(w); }
+  catch (e) { bad.push("quran/duas.js does not parse: " + e.message); }
+
+  const cats = (w.DUAS && w.DUAS.categories) || [];
+  if (!cats.length) bad.push("quran/duas.js defines no duʿā categories");
+
+  for (const c of cats) {
+    const fp = createHash("sha256").update(c.items.map(i => i.label).join(" ")).digest("hex").slice(0, 12);
+    if (!(c.id in EXPECTED))
+      bad.push(`the duʿā category "${c.id}" is new — add its fingerprint (${fp}) to check 3x so its translations are pinned too`);
+    else if (EXPECTED[c.id] !== fp)
+      bad.push(`the duʿās in "${c.id}" have changed order or content. If you APPENDED, update its fingerprint to ${fp}. `
+             + `If you inserted or reordered, stop: dua.${c.id}.<n> translation keys are positional, and every translation `
+             + `after the insertion point now describes the wrong duʿā in Urdu, Gujarati and Arabic.`);
+  }
+  for (const id of Object.keys(EXPECTED))
+    if (!cats.some(c => c.id === id)) bad.push(`the duʿā category "${id}" has gone`);
+
+  /* …and the Qurʼanic ones really are the Qurʼan. */
+  try {
+    execFileSync("node", ["scripts/verify-quran-duas.mjs"], { stdio: "pipe" });
+  } catch (e) {
+    const out = (e.stdout || "") + (e.stderr || "");
+    bad.push("the Qurʼanic duʿās no longer match the verified Qurʼan — " +
+             (String(out).split("FAIL")[1] || "run node scripts/verify-quran-duas.mjs").trim().slice(0, 200));
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok(`duʿās — ${cats.length} categories pinned against a translation shift, and the Qurʼanic ones verified against quran/surahs/`);
 }
 
 /* ---- 4. the service worker cache changed when the app did ----
