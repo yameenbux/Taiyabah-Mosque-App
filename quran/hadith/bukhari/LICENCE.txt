@@ -1,0 +1,25 @@
+Ṣaḥīḥ al-Bukhārī — Arabic text
+==============================
+
+This data is NOT covered by the Taiyabah Masjid app's own licence. It is
+third-party open data, included under its own terms.
+
+Source      Open Hadith Data
+            https://github.com/mhashim6/Open-Hadith-Data
+
+Licence     Open Database License (ODbL) v1.0  — the database
+            https://opendatacommons.org/licenses/odbl/1-0/
+            Database Contents License (DbCL) v1.0 — the contents
+            https://opendatacommons.org/licenses/dbcl/1-0/
+
+What that means for anyone reusing this pack:
+
+  * Attribute the Open Hadith Data project.
+  * If you distribute this database, or a database derived from it, it must
+    be offered under the ODbL as well.
+  * Do not lock it up behind a technical measure that stops others
+    exercising these rights.
+
+The Arabic hadith text itself is a 9th-century work and belongs to nobody.
+No English translation is included: no openly licensed one was found, and
+the widely circulated ones are modern works still in copyright.

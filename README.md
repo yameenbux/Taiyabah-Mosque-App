@@ -80,6 +80,11 @@ Progressive web app: no app store, no install friction, one URL.
     lossless grayscale WebP at about 78 KB each, fetched one at a time with the
     neighbours prefetched, so turning a page is instant and the app carries
     none of it until asked
+- **Ṣaḥīḥ al-Bukhārī** — the complete Arabic text, all 7,008 hadith, with
+  search that works without typing diacritics and a jump-to-number box.
+  Fetched a hundred at a time and cached as you read, so it costs nothing
+  until it is opened and works offline afterwards. **Arabic only, and the
+  screen says so** — see *Third-party data* below for why
 - **Daily Athkar** — morning and evening remembrance, after every ṣalāh and
   before sleep, each sourced and cited
 - **Common Duas** — everyday supplications in a tile grid, each opening in place
@@ -196,7 +201,7 @@ verbatim. Anything committed here is reachable by URL.
 │                                 so no local tooling is ever required.
 │
 ├── scripts/                     Build and verification. Node, no dependencies.
-│   ├── check-release.mjs         27 checks — the release gate. See below.
+│   ├── check-release.mjs         29 checks — the release gate. See below.
 │   ├── check-i18n.mjs            Measures translation coverage against the app.
 │   ├── i18n-keys.mjs             Extracts every translatable string there is.
 │   ├── build-lang.mjs            lang/src/*.json  →  lang/{ur,gu,ar}.js
@@ -235,6 +240,12 @@ verbatim. Anything committed here is reachable by URL.
 │   │                              each key as [Urdu, Gujarati, Arabic].
 │   └── ur.js  gu.js  ar.js       Generated. Never edit these by hand.
 │
+├── quran/hadith/bukhari/        Ṣaḥīḥ al-Bukhārī, Arabic. Third-party open
+│   ├── index.json                data under the ODbL — it carries its own
+│   ├── LICENCE.txt               LICENCE.txt and is NOT covered by this
+│   ├── search.json               repository's code licence. Built by
+│   └── c/1.json … c/71.json      scripts/build-bukhari.mjs.
+│
 ├── quran/                       Qur'anic content — lazy-loaded, so the main
 │   ├── surahs/index.json          app never pays for carrying it.
 │   │   └── 1.json … 114.json
@@ -261,7 +272,7 @@ congregation. It is not a linter. Each check exists because something went
 wrong once, and each is written so that removing the behaviour it guards makes
 the build fail.
 
-There are **27**, reporting 40 separate confirmations. Among them:
+There are **29**, reporting 42 separate confirmations. Among them:
 
 | Check | What it caught |
 |---|---|
@@ -283,9 +294,41 @@ There are **27**, reporting 40 separate confirmations. Among them:
 | Notification preferences | the five preference flags are in the order subscribers' already-stored values expect, and the app and Worker agree on every name. Reordering them would silently rewrite everybody's settings |
 | Notices | the app reads the public view and nothing else, the Worker writes on a secret key that is not in this repository, and a poster reaches all three platforms |
 | Android asset links | the file is structured correctly and reachable — the fingerprint is still a placeholder, and the check says so rather than passing quietly |
+| Ṣaḥīḥ al-Bukhārī | the pack names its source and licence, carries the ODbL notice beside the data, holds exactly 7,008 hadith, and the app both refuses an unlicensed pack and prints the attribution on screen |
+| Shared element ids | the hadith reader and the hall booking cannot claim the same `id` — they collided on four, and `getElementById` takes the first, which broke both screens at once |
 | Everything parses | index.html, admin.html, sw.js and the Worker |
 
 Run it locally with `node scripts/check-release.mjs`. It needs no dependencies.
+
+## Third-party data
+
+Most of this repository is original work under one licence. Two things are not,
+and the distinction matters more than it looks — both app stores can ask to see
+the right to ship content, and "it was on GitHub" is not an answer.
+
+**Ṣaḥīḥ al-Bukhārī** is Arabic text from the [Open Hadith Data
+project](https://github.com/mhashim6/Open-Hadith-Data), used under the **Open
+Database License 1.0**, its contents under the **Database Contents License
+1.0**. That licence travels with the data: `quran/hadith/bukhari/LICENCE.txt`
+sits beside it, the attribution is printed on the screen rather than buried,
+and a release check fails the build if either goes missing.
+
+Anyone redistributing this pack, or a database derived from it, must offer it
+under the ODbL too, and must credit the Open Hadith Data project.
+
+**No English translation is shipped, deliberately.** The Arabic is 9th-century
+and belongs to nobody. Every English hadith dataset found was either scraped
+from a site whose translation is in copyright, or asserted "public domain" over
+a 20th-century translation that plainly is not — most commonly the Muhsin Khan
+translation, which is a modern copyrighted work. A repository cannot license
+what it never owned, and an MIT file sitting next to scraped text changes
+nothing. So the app ships the Arabic, says on screen that it is Arabic only,
+and explains why.
+
+> **`LICENSE.md` is missing.** Every source file header says "See LICENSE.md"
+> and no such file exists. The ownership terms are written out under *Ownership
+> and credits* below, but they are not in the file the code points at. That
+> needs fixing before a store submission.
 
 ## Translations
 
@@ -505,7 +548,7 @@ No build step, no framework, no dependencies for the app itself — edit
 Before pushing anything user-visible:
 
 ```
-node scripts/check-release.mjs    # the release gate — 27 checks
+node scripts/check-release.mjs    # the release gate — 29 checks
 node scripts/check-i18n.mjs       # translation coverage
 ```
 

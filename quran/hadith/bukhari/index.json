@@ -1,0 +1,17 @@
+{
+ "id": "bukhari",
+ "name": "Ṣaḥīḥ al-Bukhārī",
+ "nameAr": "صحيح البخاري",
+ "kind": "text",
+ "language": "ar",
+ "count": 7008,
+ "perChunk": 100,
+ "chunks": 71,
+ "source": "Open Hadith Data (mhashim6/Open-Hadith-Data)",
+ "sourceUrl": "https://github.com/mhashim6/Open-Hadith-Data",
+ "licence": "Open Database License 1.0; contents under Database Contents License 1.0",
+ "licenceUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+ "attribution": "Arabic text from the Open Hadith Data project, used under the Open Database License 1.0.",
+ "prepared": "Hadith text with tashkīl, narrator-highlight marks removed, numbering 1–7008. Ibn Ḥajar's Fatḥ al-Bārī commentary in the source is deliberately not included.",
+ "arabicOnly": true
+}
