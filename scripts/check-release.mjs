@@ -1039,14 +1039,28 @@ for (const f of ["index.html", "admin.html"]) {
       if (!meta.source)      bad.push("the Bukhārī pack names no source — it cannot be shipped without saying where the text came from");
       if (!meta.licence)     bad.push("the Bukhārī pack names no licence — this text is third-party open data, not ours");
       if (!meta.attribution) bad.push("the Bukhārī pack carries no attribution line, which the ODbL requires to travel with the data");
-      if (meta.count !== 7008)
-        bad.push(`the Bukhārī pack holds ${meta.count} hadith, expected 7008 — a reference whose numbering changes length breaks every citation made from it`);
-      /* Every chunk the index promises must actually be there. */
-      const missing = [];
-      for (let i = 1; i <= (meta.chunks || 0); i++)
-        if (!existsSync(`${PACK}/c/${i}.json`)) missing.push(i);
-      if (missing.length)
-        bad.push(`the Bukhārī pack is missing ${missing.length} of ${meta.chunks} chunks (first: ${missing[0]})`);
+      if (meta.highest !== 7563)
+        bad.push(`the Bukhārī numbering runs to ${meta.highest}, expected 7563 — this is the number people cite, and changing it breaks every reference made from the app`);
+      if (meta.books !== 97)
+        bad.push(`the Bukhārī pack lists ${meta.books} books, expected 97`);
+
+      /* Every book the index promises must actually be there, and the books
+         must between them account for the hadith. A reference that silently
+         loses a book is worse than one that fails loudly. */
+      if (!existsSync(`${PACK}/books.json`)) {
+        bad.push("the Bukhārī pack has no books.json — there would be nothing to browse, only a flat list");
+      } else {
+        const books = JSON.parse(readFileSync(`${PACK}/books.json`, "utf8"));
+        const missing = books.filter(b => !existsSync(`${PACK}/b/${b.n}.json`));
+        if (missing.length)
+          bad.push(`the Bukhārī pack is missing ${missing.length} book file(s), first: book ${missing[0].n} (${missing[0].name})`);
+        const unnamed = books.filter(b => !b.name || /^Book \d+$/.test(b.name));
+        if (unnamed.length)
+          bad.push(`${unnamed.length} Bukhārī book(s) have no name, so the list would read as bare numbers`);
+        const total = books.reduce((a, b) => a + b.count, 0);
+        if (total < meta.count - 20)
+          bad.push(`the books account for ${total} hadith but the pack holds ${meta.count} — ${meta.count - total} are unreachable by browsing`);
+      }
       if (!existsSync(`${PACK}/search.json`))
         bad.push("the Bukhārī search index is missing, so search would fail on a device with no connection to rebuild it");
     }
@@ -1054,10 +1068,14 @@ for (const f of ["index.html", "admin.html"]) {
       bad.push("the Bukhārī pack has no LICENCE.txt beside the data — the ODbL notice has to travel with it");
     else {
       const lic = readFileSync(`${PACK}/LICENCE.txt`, "utf8");
-      if (!/opendatacommons\.org\/licenses\/odbl/i.test(lic))
-        bad.push("the Bukhārī LICENCE.txt does not point at the ODbL it is shipped under");
-      if (!/Open Hadith Data/i.test(lic))
-        bad.push("the Bukhārī LICENCE.txt does not credit the Open Hadith Data project it came from");
+      if (!/unlicense\.org|public domain/i.test(lic))
+        bad.push("the Bukhārī LICENCE.txt does not state the public-domain dedication it is shipped under");
+      if (!/hadith-api/i.test(lic))
+        bad.push("the Bukhārī LICENCE.txt does not record where the text came from");
+      /* The store question is "show me the right to ship this". The answer
+         has to include why no translation is bundled. */
+      if (!/NO ENGLISH TRANSLATION/i.test(lic))
+        bad.push("the Bukhārī LICENCE.txt no longer explains why no translation is bundled — that is the part a store actually asks about");
     }
   }
 
@@ -1065,7 +1083,35 @@ for (const f of ["index.html", "admin.html"]) {
   if (!/pack names no source or licence/.test(app))
     bad.push("the app no longer refuses a Bukhārī pack that names no source and licence — it would render text the masjid cannot evidence rights to");
   if (!/hd-attr/.test(app) || !/m\.attribution/.test(app))
-    bad.push("the app does not print the Bukhārī attribution on screen, which is the ODbL condition for using it");
+    bad.push("the app does not print where the Bukhārī text came from, which is how the masjid can answer for it");
+  /* The whole point of the rebuild: it must open on the books. */
+  if (!/hdShowBooks/.test(app) || !/books\.json/.test(app))
+    bad.push("the Bukhārī reader no longer browses by book — a flat list of 7,580 numbered paragraphs is not a readable Bukhārī");
+  /* The search normaliser destroys Arabic if its ranges are wrong, and the
+     failure is silent: every query matches everything, or nothing.
+
+     The probe is taken FROM THE PACK, never typed here. A hand-typed Arabic
+     probe has now given a false answer three times in this codebase — the
+     characters get reordered in transit and the literal stops matching the
+     text it is meant to represent. Compare the app's normaliser against the
+     index the builder actually produced. */
+  if (existsSync(`${PACK}/b/1.json`) && existsSync(`${PACK}/search.json`)) {
+    const m = app.match(/function hdSearchable\(s\)\{[\s\S]*?\n\}/);
+    if (!m) {
+      bad.push("the Bukhārī search normaliser is gone");
+    } else {
+      const fn = new Function("return (" + m[0] + ")")();
+      const raw = JSON.parse(readFileSync(`${PACK}/b/1.json`, "utf8"))[0].ar;
+      const built = JSON.parse(readFileSync(`${PACK}/search.json`, "utf8"))[0][2];
+      const mine = fn(raw);
+      if (!mine.trim())
+        bad.push("the app's Bukhārī search normaliser reduces a real hadith to nothing — every query would match everything or nothing");
+      else if (mine !== built)
+        bad.push("the app normalises search text differently from the builder, so a query will never match the index it is searching " +
+                 `(app produced ${mine.length} chars, the index holds ${built.length})`);
+    }
+  }
+
   /* The reader must not reuse the hall booking's element ids. They collided
      once: bk-title, bk-prev, bk-next and bk-back existed twice, and
      getElementById takes the first, which broke both screens at once. */
@@ -1102,7 +1148,7 @@ for (const f of ["index.html", "admin.html"]) {
   }
 
   if (bad.length) bad.forEach(fail);
-  else ok(`Ṣaḥīḥ al-Bukhārī — 7008 hadith, licensed and attributed, reachable from the home screen, and all ${tiles.length} tiles wired`);
+  else ok(`Ṣaḥīḥ al-Bukhārī — 97 books browsable, numbering to 7563, public domain and sourced, reachable from the home screen, and all ${tiles.length} tiles wired`);
 }
 
 /* ---- 4. the service worker cache changed when the app did ----
