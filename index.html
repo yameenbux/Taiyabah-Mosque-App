@@ -273,6 +273,7 @@
   .ph-h{font-family:"Fraunces",Georgia,serif;font-size:calc(19px * var(--ts));font-weight:600;line-height:1.25}
   .ph-p{font-size:calc(14px * var(--ts));line-height:1.55;color:var(--muted);margin-top:8px}
   .needs{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+  .cur-card .needs{margin-top:0}
   .needs span{font-size:calc(12px * var(--ts));font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
     border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
 
@@ -3549,15 +3550,70 @@
               <span class="md-t2" data-i18n="madrasah.sign_in_registers_still_being_built">Sign in · registers and pupil records still being built</span>
             </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
           </a>
-          <button class="md-row" id="mdr-go-education">
-            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.2 21 8.6l-9 4.4-9-4.4 9-4.4Z"/><path d="M6.6 10.6v4.9c0 1.6 2.4 2.9 5.4 2.9s5.4-1.3 5.4-2.9v-4.9"/></svg></span>
+          <button class="md-row" id="mdr-go-curriculum">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.4v13"/><path d="M12 6.4C10.3 5 8.1 4.3 5.4 4.3A1.4 1.4 0 0 0 4 5.7v11.1a1.4 1.4 0 0 0 1.4 1.4c2.7 0 4.9.7 6.6 2.1"/><path d="M12 6.4c1.7-1.4 3.9-2.1 6.6-2.1A1.4 1.4 0 0 1 20 5.7v11.1a1.4 1.4 0 0 1-1.4 1.4c-2.7 0-4.9.7-6.6 2.1"/></svg></span>
             <span class="md-t">
               <span class="md-t1" data-i18n="madrasah.what_is_taught">What is taught</span>
-              <span class="md-t2" data-i18n="madrasah.the_classes_and_what_they_cover">The classes and what they cover</span>
+              <span class="md-t2" data-i18n="madrasah.the_curriculum_the_madrasah_teaches">The curriculum the madrasah teaches</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
         </div>
         <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- The madrasah's own curriculum, as published on the masjid website.
+
+       This row used to open the adult Education sheet, so a parent tapping
+       "What is taught" under Madrasah was shown evening Arabic and the ghusl
+       workshop — adult classes, presented as their child's syllabus. The
+       wording below is the website's, kept verbatim so it matches what
+       parents have already read. The book series are named, not translated:
+       Safar and An Nasihah are specific published texts a parent would go
+       looking for by name. -->
+  <div class="sheet" id="curriculum" data-open="0" role="dialog" aria-modal="true" aria-label="Madrasah curriculum" data-i18n-attr="aria-label:a11y.madrasah_curriculum">
+    <div class="scrim" id="cur-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="madrasah.what_is_taught">What is taught</h3>
+        <button class="sh-close" id="cur-close" data-i18n="adm.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="hh-en" data-i18n="cur.our_curriculum">Our Curriculum</div>
+          <p class="hh-sub" data-i18n="cur.what_students_learn_at_the">What students learn at the madrasah.</p>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="sec-h"><h2 data-i18n="cur.quran_reading_arabic">Qur&rsquo;an &amp; Reading Arabic</h2><span class="rule"></span></div>
+          <div class="card cur-card">
+            <div class="needs"><span data-i18n="cur.safar_qaidah">Safar Qaidah</span><span data-i18n="cur.safar_tajweed_rules">Safar Tajweed Rules</span><span data-i18n="cur.juz_amma">Juz &rsquo;Amma</span><span data-i18n="cur.quran">Qur&rsquo;an</span></div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="cur.islamic_studies">Islamic Studies</h2><span class="rule"></span></div>
+          <div class="card cur-card">
+            <div class="needs"><span data-i18n="cur.iman">Iman</span><span data-i18n="cur.fiqh">Fiqh</span><span data-i18n="cur.seerah">Seerah</span><span data-i18n="cur.aqaid">Aqaid</span><span data-i18n="cur.hadith">Hadith</span></div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="cur.quran_tafseer">Qur&rsquo;an &amp; Tafseer</h2><span class="rule"></span></div>
+          <div class="card cur-card">
+            <div class="needs"><span data-i18n="cur.memorising_short_surahs">Memorising Short Surahs</span><span data-i18n="cur.understanding_short_surahs">Understanding Short Surahs</span></div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="cur.memorisation">Memorisation</h2><span class="rule"></span></div>
+          <div class="card cur-card">
+            <div class="needs"><span data-i18n="cur.an_nasihah_surah_dua">An Nasihah Surah &amp; Dua</span></div>
+          </div>
+
+          <div class="card hh-card">
+            <p data-i18n="cur.class_times_fees_and_how">Class times, fees and how to apply are under Admissions &amp; Fees.</p>
+          </div>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
       </div>
     </div>
   </div>
@@ -9897,6 +9953,24 @@ function initNikah(){
   nkShow(false);
 }
 
+/* ---------------- madrasah: what is taught ---------------- */
+function openCurriculum(){
+  document.getElementById('curriculum').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#curriculum .sh-body').scrollTop=0;
+}
+function closeCurriculum(){
+  document.getElementById('curriculum').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initCurriculum(){
+  document.getElementById('cur-close').addEventListener('click',closeCurriculum);
+  document.getElementById('cur-scrim').addEventListener('click',closeCurriculum);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('curriculum').dataset.open==="1") closeCurriculum();
+  });
+}
+
 /* ---------------- madrasah: admissions ---------------- */
 function openAdmissions(){
   document.getElementById('madmissions').dataset.open="1";
@@ -9924,7 +9998,7 @@ function initMadrasah(){
   const go = fn => () => { closeMadrasah(); setTimeout(fn, 120); };
   document.getElementById('mdr-go-admissions').addEventListener('click', go(openAdmissions));
   document.getElementById('mdr-go-holidays').addEventListener('click', go(openHolidays));
-  document.getElementById('mdr-go-education').addEventListener('click', go(openEducation));
+  document.getElementById('mdr-go-curriculum').addEventListener('click', go(openCurriculum));
   /* the portal is an ordinary link out; close behind it so coming back from
      the browser does not land on a sheet left hanging open */
   document.getElementById('mdr-go-portal').addEventListener('click', ()=>closeMadrasah());
@@ -10952,6 +11026,7 @@ function boot(){
   initWill();
   initFuneral();
   initMadrasah();
+  initCurriculum();
   initAdmissions();
   initHolidays();
   initEducation();
