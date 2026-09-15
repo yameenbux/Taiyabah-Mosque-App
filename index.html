@@ -273,7 +273,6 @@
   .ph-h{font-family:"Fraunces",Georgia,serif;font-size:calc(19px * var(--ts));font-weight:600;line-height:1.25}
   .ph-p{font-size:calc(14px * var(--ts));line-height:1.55;color:var(--muted);margin-top:8px}
   .needs{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
-  .cur-card .needs{margin-top:0}
   .needs span{font-size:calc(12px * var(--ts));font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
     border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
 
@@ -1490,6 +1489,46 @@
 
   /* ---- sections ---- */
   .wrap{padding:20px 16px 0}
+
+  /* Madrasah curriculum — one document, not twelve objects.
+
+     First attempt was gold pills in cream cards: pills read as things you tap
+     and filter by, and each heading sat jammed against the card beneath it.
+     Second was one card per group with a row per subject, which fixed the
+     cramping but spent 51px of screen on the word "Fiqh".
+
+     A curriculum is a single document, so it is set as one: one surface, four
+     sections divided by hairlines, and the subjects as running type separated
+     by gold middots — which is how the masjid's own website sets them. The
+     Arabic name of each discipline sits above the English in Amiri, the
+     pairing this app already uses in every hero, and is hidden when the app
+     itself is in Arabic, where it would only repeat the heading. */
+  .cu-doc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:4px 20px}
+  .cu-g{padding:19px 0;border-top:1px solid var(--line)}
+  .cu-g:first-child{border-top:0}
+  .cu-ar{display:block;font-family:"Amiri",serif;font-size:calc(14px * var(--ts));
+    color:var(--gold);line-height:1.2;margin-bottom:3px}
+  :root[lang="ar"] .cu-ar{display:none}
+  .cu-t{font-family:"Fraunces",Georgia,serif;font-size:calc(16.5px * var(--ts));
+    font-weight:600;color:var(--ink);line-height:1.3}
+  /* A short gold rule under each heading: it holds the heading off its own
+     list, which otherwise starts too close to read as separate. */
+  .cu-t::after{content:"";display:block;width:26px;height:2px;border-radius:2px;
+    background:var(--gold);opacity:.7;margin-top:11px}
+  /* One subject per line.
+
+     Dot-separated running type was tried first, because that is how the
+     website sets it. It fights this content: the names run from four
+     characters ("Iman") to twenty-six ("Understanding Short Surahs"), so the
+     line packing is always ragged and the separator ends up stranded — at the
+     head of a wrapped line, or dangling at the end of a short one. Keeping
+     each name whole on its own line is immune to that, and is shorter overall,
+     because nothing wraps. */
+  .cu-l{list-style:none;margin-top:12px}
+  .cu-l li{margin-top:7px;font-size:calc(15px * var(--ts));color:#4A3C45;line-height:1.45}
+  .cu-l li:first-child{margin-top:0}
+  .cu-note{margin:15px 4px 0;font-size:calc(13px * var(--ts));color:var(--muted);line-height:1.6}
   .sec-h{display:flex;align-items:center;gap:10px;margin:6px 4px 12px}
   .sec-h h2{font-family:"Fraunces",serif;font-size:calc(15px * var(--ts));font-weight:600}
   .sec-h .rule{flex:1;height:1px;background:var(--line)}
@@ -3588,29 +3627,54 @@
         </section>
 
         <div class="ab-wrap">
-          <div class="sec-h"><h2 data-i18n="cur.quran_reading_arabic">Qur&rsquo;an &amp; Reading Arabic</h2><span class="rule"></span></div>
-          <div class="card cur-card">
-            <div class="needs"><span data-i18n="cur.safar_qaidah">Safar Qaidah</span><span data-i18n="cur.safar_tajweed_rules">Safar Tajweed Rules</span><span data-i18n="cur.juz_amma">Juz &rsquo;Amma</span><span data-i18n="cur.quran">Qur&rsquo;an</span></div>
+          <div class="cu-doc">
+            <section class="cu-g">
+              <header class="cu-h">
+                <span class="cu-ar" lang="ar">القرآن وقراءة العربية</span>
+                <h2 class="cu-t" data-i18n="cur.quran_reading_arabic">Qur&rsquo;an &amp; Reading Arabic</h2>
+              </header>
+              <ul class="cu-l">
+                <li data-i18n="cur.safar_qaidah">Safar Qaidah</li>
+                <li data-i18n="cur.safar_tajweed_rules">Safar Tajweed Rules</li>
+                <li data-i18n="cur.juz_amma">Juz &rsquo;Amma</li>
+                <li data-i18n="cur.quran">Qur&rsquo;an</li>
+              </ul>
+            </section>
+            <section class="cu-g">
+              <header class="cu-h">
+                <span class="cu-ar" lang="ar">الدراسات الإسلامية</span>
+                <h2 class="cu-t" data-i18n="cur.islamic_studies">Islamic Studies</h2>
+              </header>
+              <ul class="cu-l">
+                <li data-i18n="cur.iman">Iman</li>
+                <li data-i18n="cur.fiqh">Fiqh</li>
+                <li data-i18n="cur.seerah">Seerah</li>
+                <li data-i18n="cur.aqaid">Aqaid</li>
+                <li data-i18n="cur.hadith">Hadith</li>
+              </ul>
+            </section>
+            <section class="cu-g">
+              <header class="cu-h">
+                <span class="cu-ar" lang="ar">القرآن والتفسير</span>
+                <h2 class="cu-t" data-i18n="cur.quran_tafseer">Qur&rsquo;an &amp; Tafseer</h2>
+              </header>
+              <ul class="cu-l">
+                <li data-i18n="cur.memorising_short_surahs">Memorising Short Surahs</li>
+                <li data-i18n="cur.understanding_short_surahs">Understanding Short Surahs</li>
+              </ul>
+            </section>
+            <section class="cu-g">
+              <header class="cu-h">
+                <span class="cu-ar" lang="ar">الحفظ</span>
+                <h2 class="cu-t" data-i18n="cur.memorisation">Memorisation</h2>
+              </header>
+              <ul class="cu-l">
+                <li data-i18n="cur.an_nasihah_surah_dua">An Nasihah Surah &amp; Dua</li>
+              </ul>
+            </section>
           </div>
 
-          <div class="sec-h"><h2 data-i18n="cur.islamic_studies">Islamic Studies</h2><span class="rule"></span></div>
-          <div class="card cur-card">
-            <div class="needs"><span data-i18n="cur.iman">Iman</span><span data-i18n="cur.fiqh">Fiqh</span><span data-i18n="cur.seerah">Seerah</span><span data-i18n="cur.aqaid">Aqaid</span><span data-i18n="cur.hadith">Hadith</span></div>
-          </div>
-
-          <div class="sec-h"><h2 data-i18n="cur.quran_tafseer">Qur&rsquo;an &amp; Tafseer</h2><span class="rule"></span></div>
-          <div class="card cur-card">
-            <div class="needs"><span data-i18n="cur.memorising_short_surahs">Memorising Short Surahs</span><span data-i18n="cur.understanding_short_surahs">Understanding Short Surahs</span></div>
-          </div>
-
-          <div class="sec-h"><h2 data-i18n="cur.memorisation">Memorisation</h2><span class="rule"></span></div>
-          <div class="card cur-card">
-            <div class="needs"><span data-i18n="cur.an_nasihah_surah_dua">An Nasihah Surah &amp; Dua</span></div>
-          </div>
-
-          <div class="card hh-card">
-            <p data-i18n="cur.class_times_fees_and_how">Class times, fees and how to apply are under Admissions &amp; Fees.</p>
-          </div>
+          <p class="cu-note" data-i18n="cur.class_times_fees_and_how">Class times, fees and how to apply are under Admissions &amp; Fees.</p>
 
           <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
