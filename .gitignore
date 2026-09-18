@@ -23,3 +23,10 @@ vibe-session.log
 # OS noise
 .DS_Store
 Thumbs.db
+
+# The Android signing key never belongs in this repository.
+android.keystore
+*.keystore
+*.keystore.b64
+*.aab
+*.apk

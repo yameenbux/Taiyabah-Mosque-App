@@ -1333,6 +1333,20 @@ for (const f of ["index.html", "admin.html"]) {
   if (!/5\s*\*\s*1024\s*\*\s*1024/.test(max))
     bad.push("CC_CERT_MAX no longer matches the 5 MB cap the bmcc bucket enforces");
 
+  /* THE THREE MONTHS ARE COUNTED THE WAY POSTGRES COUNTS THEM. setMonth()
+     overflows rather than clamping — asked for 31 February it answers 3 March
+     — so a form using it bare refuses certificates the database would accept,
+     by up to three days, and only ever on a month-end. The fix is to move to
+     the 1st, change the month, then clamp the day to that month's last. This
+     checks the clamp is still there, because the bare version looks correct
+     and passes every test run on a day that is not the 29th, 30th or 31st. */
+  const earliest = (html.match(/function ccCertEarliest\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!earliest)
+    bad.push("ccCertEarliest is gone — the certificate window needs it");
+  else if (!/setDate\(1\)/.test(earliest) || !/Math\.min\(/.test(earliest))
+    bad.push("ccCertEarliest no longer clamps to the end of the month, so on a month-end " +
+             "the form refuses certificates request_charity_collection() would accept");
+
   /* Validation must actually gate on the file, or the upload is attempted
      with nothing in hand. */
   const val = (html.match(/function ccValidate\(\)\{[\s\S]*?\n\}/) || [""])[0];
