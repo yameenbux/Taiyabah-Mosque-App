@@ -1229,6 +1229,7 @@ for (const f of ["index.html", "admin.html"]) {
     "charity_number", "collector_name", "collector_role", "collector_paid",
     "trustee_name", "trustee_phone", "trustee_email",
     "rules_version", "rules_accepted", "signed_name", "privacy_accepted",
+    "bmcc_certificate_path", "bmcc_certificate_date",
   ];
 
   const submit = (html.match(/function ccSubmit\(e\)\{[\s\S]*?\n\}/) || [""])[0];
@@ -1294,9 +1295,54 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push(`CC_NOTICE_DAYS is ${notice || "missing"}; request_charity_collection() enforces 14, ` +
              `so the form would offer dates the database then refuses`);
 
+  /* ---- the BMCC certificate ----
+     A charity cannot collect in Bolton without one, and the masjid will not
+     take a request without seeing it. Three things have to hold.
+
+     THE CERTIFICATE GOES UP BEFORE THE REQUEST. The other order writes a row
+     saying a certificate exists and then fails to produce one; this order, at
+     worst, leaves an unreferenced file in a private bucket. If ccUpload stops
+     gating the request, that ordering is gone.
+
+     THE FILE IS CHECKED BEFORE IT IS SENT. Storage enforces the type and the
+     5 MB cap itself, but it answers with a status code, and somebody who has
+     just waited for a 12 MB photo to upload deserves to have been told first.
+
+     THE THREE MONTHS MATCH THE DATABASE. request_charity_collection() is
+     where the rule is enforced; this copy only exists so the form can refuse
+     early. If they disagree, the form offers dates the database then refuses. */
+  if (submit) {
+    if (!/ccUpload\(CC\.file\)\s*\.then\(\s*certPath\s*=>/.test(submit))
+      bad.push("the certificate is no longer uploaded before the request is sent — " +
+               "a request can now be written claiming a certificate that was never stored");
+    if (!/bmcc_certificate_path:\s*certPath/.test(submit))
+      bad.push("the payload does not carry the path ccUpload returned, so the office " +
+               "would have a request it cannot find the certificate for");
+  }
+  const take = (html.match(/function ccTakeFile\([\s\S]*?\n\}/) || [""])[0];
+  if (!/CC_CERT_TYPES\[file\.type\]/.test(take))
+    bad.push("ccTakeFile no longer checks the file type before upload");
+  if (!/file\.size\s*>\s*CC_CERT_MAX/.test(take))
+    bad.push("ccTakeFile no longer checks the file size before upload");
+
+  const months = Number((html.match(/const CC_CERT_MONTHS\s*=\s*(\d+)/) || [])[1]);
+  if (months !== 3)
+    bad.push(`CC_CERT_MONTHS is ${months || "missing"}; request_charity_collection() enforces 3, ` +
+             `so the form would accept a certificate the database then refuses`);
+  const max = (html.match(/const CC_CERT_MAX\s*=\s*([^;]+);/) || [])[1] || "";
+  if (!/5\s*\*\s*1024\s*\*\s*1024/.test(max))
+    bad.push("CC_CERT_MAX no longer matches the 5 MB cap the bmcc bucket enforces");
+
+  /* Validation must actually gate on the file, or the upload is attempted
+     with nothing in hand. */
+  const val = (html.match(/function ccValidate\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!/if\(!CC\.file\)/.test(val))
+    bad.push("ccValidate no longer requires a certificate, so the form can be submitted without one");
+
   if (bad.length) bad.forEach(fail);
-  else ok(`charity collections — all ${REQUIRED.length} fields sent, both agreements read from their ` +
-          `checkboxes, and the rules version on screen is the one recorded`);
+  else ok(`charity collections — all ${REQUIRED.length} fields sent, the BMCC certificate uploaded ` +
+          `before the request and checked against the same 3 months the database enforces, and ` +
+          `both agreements read from their checkboxes`);
 }
 
 /* ---- 4c. a swipe cannot be triggered by scrolling past it ----

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "3f85b753abfe",
+ "version": "b271ae46dcf0",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -1972,7 +1972,7 @@ window.LANG_PACK = {
   "collect.address": "پتہ",
   "collect.phone_number": "فون نمبر",
   "collect.email": "ای میل",
-  "collect.charity_number_if_you_have": "چیریٹی نمبر <span style=\"text-transform:none;letter-spacing:0;font-weight:500\">— اگر آپ کے پاس ہو</span>",
+  "collect.charity_number_if_you_have": "چیریٹی نمبر",
   "collect.leave_this_empty_if_the": "اگر ادارہ بیرونِ ملک ہے یا انگلینڈ و ویلز میں رجسٹرڈ نہیں تو اسے خالی چھوڑ دیں۔",
   "collect.who_will_be_collecting": "چندہ کون جمع کرے گا",
   "collect.name_of_the_person_doing": "چندہ جمع کرنے والے کا نام",
@@ -2004,6 +2004,22 @@ window.LANG_PACK = {
   "collect.request_sent": "آپ کی درخواست بھیج دی گئی ہے",
   "collect.please_keep_this_reference": "براہِ کرم یہ حوالہ نمبر محفوظ رکھیں۔ مسجد کا دفتر آپ کے بتائے ہوئے ٹرسٹی سے رابطہ کر کے تاریخ کی تصدیق کرے گا۔ اگر چند دن میں جواب نہ ملے تو نیچے دیے گئے نمبر پر رابطہ کر کے یہ حوالہ بتائیں۔",
   "collect.reference": "حوالہ",
-  "collect.the_earliest_date_the_masjid": "مسجد جو سب سے قریبی تاریخ لے سکتی ہے وہ ہے"
+  "collect.the_earliest_date_the_masjid": "مسجد جو سب سے قریبی تاریخ لے سکتی ہے وہ ہے",
+  "collect.your_bmcc_certificate": "آپ کا BMCC سرٹیفکیٹ",
+  "collect.the_masjid_cannot_take_a": "مسجد <b>اس کے بغیر درخواست قبول نہیں کر سکتی</b>۔ یہ سرٹیفکیٹ Bolton Masjid Chanda Committee جاری کرتی ہے، اور یہ <b>پچھلے تین ماہ کے اندر</b> جاری ہوا ہونا چاہیے۔",
+  "collect.photo_or_scan_of_the": "سرٹیفکیٹ کی تصویر یا اسکین",
+  "collect.choose_a_file": "فائل منتخب کریں",
+  "collect.a_clear_photo_is_fine": "واضح تصویر کافی ہے۔ JPG، PNG، WEBP یا PDF، زیادہ سے زیادہ 5 MB۔",
+  "collect.the_date_on_the_certificate": "سرٹیفکیٹ پر درج تاریخ",
+  "collect.it_must_be_dated_on": "یہ اس تاریخ یا اس کے بعد کا ہونا چاہیے:",
+  "collect.students_altogether": "کل طلبہ",
+  "collect.of_those_boarding": "ان میں سے رہائشی",
+  "collect.if_your_madrasah_or_school": "اگر آپ کے مدرسے یا اسکول میں طلبہ ہیں تو مسجد کے لیے یہ جاننا مفید ہے کہ کتنے ہیں اور ان میں سے کتنے رہائشی ہیں۔ اگر لاگو نہ ہو تو دونوں خالی چھوڑ دیں۔",
+  "a11y.remove_the_chosen_file": "منتخب فائل ہٹائیں",
+  "collect.that_file_type_wont_work": "اس قسم کی فائل نہیں چلے گی۔ براہِ کرم JPG، PNG، WEBP یا PDF استعمال کریں۔",
+  "collect.that_file_is_too_big": "یہ فائل بہت بڑی ہے۔ مسجد زیادہ سے زیادہ 5 MB لے سکتی ہے — فون سے لی گئی تصویر عام طور پر اس سے کم ہوتی ہے۔",
+  "collect.the_certificate_didnt_upload": "سرٹیفکیٹ اپ لوڈ نہیں ہو سکا۔ اپنا کنکشن دیکھ کر دوبارہ کوشش کریں، یا رفیق پٹیل سے 07951 795 465 پر رابطہ کریں۔",
+  "collect.optional": "— اختیاری",
+  "collect.if_you_have_one": "— اگر آپ کے پاس ہو"
  }
 };
