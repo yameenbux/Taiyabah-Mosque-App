@@ -1607,6 +1607,30 @@
   .cc-help{margin-top:18px;padding:13px 15px;border-radius:12px;border:1px solid var(--line);
     background:var(--card);font-size:calc(13px * var(--ts));line-height:1.65;
     display:flex;flex-direction:column;gap:3px}
+  .bk-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .bk-field label .cc-opt,
+  .cc-opt{text-transform:none;letter-spacing:0;font-weight:500;color:var(--muted)}
+  /* The one thing on this form that stops it being sent, so it is said in the
+     danger colour the Zakāt note already uses rather than in a hint nobody
+     reads until the button refuses. */
+  .cc-req{margin:2px 0 12px;padding:12px 14px;border-radius:12px;
+    border:1px solid rgba(180,83,47,.3);background:rgba(180,83,47,.07);
+    font-size:calc(13px * var(--ts));line-height:1.6;color:var(--danger)}
+  .cc-pick{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    padding:13px;border:1.5px dashed var(--line);border-radius:12px;background:var(--paper);
+    font:inherit;font-weight:600;font-size:calc(13.5px * var(--ts));color:var(--brand-600);cursor:pointer}
+  .cc-pick svg{width:18px;height:18px;flex:0 0 auto}
+  .cc-pick:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  [data-bad="1"] .cc-pick{border-color:var(--danger);border-style:solid}
+  .cc-chosen{display:flex;align-items:center;gap:10px;margin-top:9px;padding:9px 10px;
+    border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  .cc-chosen img{width:42px;height:42px;object-fit:cover;border-radius:8px;flex:0 0 auto;
+    border:1px solid var(--line)}
+  .cc-chosen-n{flex:1;min-width:0;font-size:calc(12.5px * var(--ts));line-height:1.4;
+    overflow-wrap:anywhere}
+  .cc-drop{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
+    background:var(--paper);font:inherit;font-size:calc(17px * var(--ts));line-height:1;
+    color:var(--muted);cursor:pointer}
   .cc-help .cc-help-t{font-weight:700;color:var(--ink)}
   .cc-help a{color:var(--brand-600);font-weight:700;text-decoration:none}
   .gv-goes dt{font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.1em;
@@ -3955,9 +3979,44 @@
               <input type="email" id="cc-email" inputmode="email" autocomplete="email" data-i18n-latin>
             </div>
             <div class="bk-field">
-              <label for="cc-num" data-i18n-html="collect.charity_number_if_you_have">Charity number <span style="text-transform:none;letter-spacing:0;font-weight:500">&mdash; if you have one</span></label>
+              <label for="cc-num"><span data-i18n="collect.charity_number_if_you_have">Charity number</span> <span class="cc-opt" data-i18n="collect.if_you_have_one">&mdash; if you have one</span></label>
               <input type="text" id="cc-num" autocomplete="off" data-i18n-latin>
               <span class="bk-hint" data-i18n="collect.leave_this_empty_if_the">Leave this empty if the cause is overseas or not registered in England and Wales.</span>
+            </div>
+            <div class="bk-two">
+              <div class="bk-field">
+                <label for="cc-students"><span data-i18n="collect.students_altogether">Students altogether</span> <span class="cc-opt" data-i18n="collect.optional">&mdash; optional</span></label>
+                <input type="number" id="cc-students" inputmode="numeric" min="0" max="100000" data-i18n-latin>
+              </div>
+              <div class="bk-field">
+                <label for="cc-boarding"><span data-i18n="collect.of_those_boarding">Of those, boarding</span> <span class="cc-opt" data-i18n="collect.optional">&mdash; optional</span></label>
+                <input type="number" id="cc-boarding" inputmode="numeric" min="0" max="100000" data-i18n-latin>
+              </div>
+            </div>
+            <span class="bk-hint" data-i18n="collect.if_your_madrasah_or_school">If your madrasah or school has students, it helps the masjid to know how many, and how many of them board. Leave both empty if it does not apply.</span>
+
+            <div class="bk-div" data-i18n="collect.your_bmcc_certificate">Your BMCC certificate</div>
+            <p class="cc-req" data-i18n-html="collect.the_masjid_cannot_take_a">The masjid <b>cannot take a request without this</b>. Bolton Masjid Chanda
+              Committee issues the certificate, and it must have been issued <b>within the last three months</b>.</p>
+            <div class="bk-field" id="cc-file-field">
+              <label for="cc-file" data-i18n="collect.photo_or_scan_of_the">Photo or scan of the certificate</label>
+              <input type="file" id="cc-file" accept="image/jpeg,image/png,image/webp,application/pdf" hidden>
+              <button type="button" class="cc-pick" id="cc-pick">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16.5V4.2"/><path d="M7.6 8.6 12 4.2l4.4 4.4"/><path d="M4.5 15.5v3a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-3"/></svg>
+                <span id="cc-pick-t" data-i18n="collect.choose_a_file">Choose a file</span>
+              </button>
+              <div class="cc-chosen" id="cc-chosen" hidden>
+                <img id="cc-thumb" alt="" hidden>
+                <span class="cc-chosen-n" id="cc-chosen-n"></span>
+                <button type="button" class="cc-drop" id="cc-drop" aria-label="Remove the chosen file"
+                        data-i18n-attr="aria-label:a11y.remove_the_chosen_file">&times;</button>
+              </div>
+              <span class="bk-hint" data-i18n="collect.a_clear_photo_is_fine">A clear photo is fine. JPG, PNG, WEBP or PDF, up to 5 MB.</span>
+            </div>
+            <div class="bk-field">
+              <label for="cc-certdate" data-i18n="collect.the_date_on_the_certificate">The date on the certificate</label>
+              <input type="date" id="cc-certdate" autocomplete="off" data-i18n-latin>
+              <span class="bk-hint" id="cc-certdate-hint"></span>
             </div>
 
             <div class="bk-div" data-i18n="collect.who_will_be_collecting">Who will be collecting</div>
@@ -10522,9 +10581,24 @@ function closeGiving(){
    shortens the notice, all three have to change. */
 const CC_RULES_VERSION = "2026-09-14";
 const CC_NOTICE_DAYS   = 14;
+/* The BMCC certificate. Three months is the masjid's rule and
+   request_charity_collection() is where it is ENFORCED — this copy exists so
+   the form can refuse before somebody uploads a file and waits, and so the
+   date field will not offer a date the database is going to reject. If the
+   masjid changes the rule, both have to change.
+
+   The bucket is private and takes these four types at up to 5 MB, which is
+   what storage.buckets says; a file that breaks either rule is refused here
+   with a sentence rather than by storage with a 400 nobody can read. */
+const CC_CERT_MONTHS   = 3;
+const CC_CERT_BUCKET   = "bmcc";
+const CC_CERT_MAX      = 5 * 1024 * 1024;
+const CC_CERT_TYPES    = {
+  "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "application/pdf": "pdf",
+};
 const CC_HORIZON_DAYS  = 365;
 
-const CC = { paid: null, sent: false, open: null };
+const CC = { paid: null, sent: false, open: null, file: null };
 
 function ccIso(d){
   return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
@@ -10571,13 +10645,78 @@ function ccShow(open){
   f.hidden = !(open && !CC.sent);
 }
 
+/* What the person chose, checked before it is sent anywhere. Storage would
+   refuse a bad file too, but it answers with a status code, and somebody who
+   has just waited for a 12 MB photo to upload deserves to have been told
+   before it started. */
+function ccTakeFile(file){
+  const chosen = document.getElementById("cc-chosen");
+  const err = document.getElementById("cc-err");
+  if(!file){ CC.file = null; chosen.hidden = true; return; }
+
+  if(!CC_CERT_TYPES[file.type]){
+    CC.file = null; chosen.hidden = true;
+    err.hidden = false;
+    err.textContent = t("collect.that_file_type_wont_work",
+      "That kind of file won't work. Please use a JPG, PNG, WEBP or PDF.");
+    return;
+  }
+  if(file.size > CC_CERT_MAX){
+    CC.file = null; chosen.hidden = true;
+    err.hidden = false;
+    err.textContent = t("collect.that_file_is_too_big",
+      "That file is too big. The largest the masjid can take is 5 MB — a photo taken on a phone usually is.");
+    return;
+  }
+
+  CC.file = file;
+  err.hidden = true;
+  delete document.getElementById("cc-file-field").dataset.bad;
+  /* KB under a megabyte: a 40 KB scan reading "0.0 MB" looks like it failed. */
+  const size = file.size >= 1024 * 1024
+    ? num((file.size / 1024 / 1024).toFixed(1)) + " MB"
+    : num(String(Math.max(1, Math.round(file.size / 1024)))) + " KB";
+  document.getElementById("cc-chosen-n").textContent = file.name + " · " + size;
+  const thumb = document.getElementById("cc-thumb");
+  /* A PDF gets no thumbnail rather than a broken image box. */
+  if(file.type === "application/pdf"){
+    thumb.hidden = true;
+    thumb.removeAttribute("src");
+  }else{
+    thumb.src = URL.createObjectURL(file);
+    thumb.hidden = false;
+  }
+  chosen.hidden = false;
+}
+
+/* Uploaded under a name nobody can guess, in a private bucket. anon may write
+   here and may not read, list or overwrite, so the name is not a secret — but
+   a guessable one would let two applicants collide, and storage refuses an
+   upload to a key that exists rather than silently replacing it. */
+function ccUpload(file){
+  const ext = CC_CERT_TYPES[file.type] || "bin";
+  const rand = (crypto && crypto.randomUUID) ? crypto.randomUUID()
+             : String(Date.now()) + "-" + Math.random().toString(36).slice(2);
+  const path = nowLondon().getFullYear() + "/" + rand + "." + ext;
+  return fetch(`${supaBase()}/storage/v1/object/${CC_CERT_BUCKET}/${path}`, {
+    method: "POST",
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": file.type, "x-upsert": "false" },
+    body: file,
+  }).then(res => {
+    if(!res.ok) throw new Error("upload " + res.status);
+    return path;
+  });
+}
+
 function ccValidate(){
   const v = id => document.getElementById(id).value.trim();
   const bad = id => { document.getElementById(id).parentElement.dataset.bad = "1"; };
   ["cc-date","cc-org","cc-addr","cc-phone","cc-email","cc-cname","cc-crole",
-   "cc-tname","cc-tphone","cc-temail","cc-sign"].forEach(id=>{
+   "cc-tname","cc-tphone","cc-temail","cc-sign","cc-certdate","cc-students","cc-boarding"].forEach(id=>{
     delete document.getElementById(id).parentElement.dataset.bad;
   });
+  delete document.getElementById("cc-file-field").dataset.bad;
   const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   let ok = true;
 
@@ -10601,6 +10740,25 @@ function ccValidate(){
   /* "They did not answer" and "they answered no" are different facts, and a
      null would quietly become the second one — which is why the database
      refuses a null here too. */
+  /* The certificate, which is the one thing that stops the form being sent. */
+  if(!CC.file){ document.getElementById("cc-file-field").dataset.bad = "1"; ok = false; }
+  const cd = v("cc-certdate");
+  let cdOk = false;
+  if(cd){
+    const chosen = new Date(cd + "T00:00:00");
+    const today = nowLondon(); today.setHours(0,0,0,0);
+    cdOk = !isNaN(chosen) && chosen >= ccCertEarliest() && chosen <= today;
+  }
+  if(!cdOk){ bad("cc-certdate"); ok = false; }
+
+  /* Optional, so empty is fine — but a boarding count larger than the total
+     is a typo, and the office would have to ring to find out which number
+     was wrong. The database refuses it too. */
+  const st = v("cc-students"), bo = v("cc-boarding");
+  if(st !== "" && !(Number(st) >= 0)){ bad("cc-students"); ok = false; }
+  if(bo !== "" && !(Number(bo) >= 0)){ bad("cc-boarding"); ok = false; }
+  if(st !== "" && bo !== "" && Number(bo) > Number(st)){ bad("cc-boarding"); ok = false; }
+
   if(CC.paid !== "yes" && CC.paid !== "no") ok = false;
   if(!document.getElementById("cc-agree-rules").checked) ok = false;
   if(!document.getElementById("cc-agree-priv").checked) ok = false;
@@ -10629,6 +10787,11 @@ function ccSubmit(e){
   const timer = setTimeout(() => ctrl.abort(), 12000);
   const v = id => document.getElementById(id).value.trim();
 
+  /* The certificate goes up FIRST, because the request is not worth writing
+     without it. If the request then fails, the file is left in the bucket
+     unreferenced — that is the cheaper failure by a distance: the other order
+     would write a request that says a certificate exists when it does not. */
+  ccUpload(CC.file).then(certPath =>
   fetch(`${supaBase()}/rest/v1/rpc/request_charity_collection`, {
     method: "POST",
     signal: ctrl.signal,
@@ -10655,8 +10818,13 @@ function ccSubmit(e){
          send true and the database would record an agreement nobody gave. */
       rules_accepted:   document.getElementById("cc-agree-rules").checked,
       privacy_accepted: document.getElementById("cc-agree-priv").checked,
+      bmcc_certificate_path: certPath,
+      bmcc_certificate_date: v("cc-certdate"),
+      /* Empty means "not answered", not zero. */
+      students_total:    v("cc-students") || null,
+      students_boarding: v("cc-boarding") || null,
     }}),
-  }).then(res => res.text().then(body => {
+  })).then(res => res.text().then(body => {
     clearTimeout(timer);
     if(res.ok){
       CC.sent = true;
@@ -10675,13 +10843,18 @@ function ccSubmit(e){
     err.hidden = false;
     err.textContent = msg || t("collect.couldnt_send",
       "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.");
-  })).catch(() => {
+  })).catch(e => {
     clearTimeout(timer);
     btn.disabled = false;
     btn.textContent = t("collect.send_this_request", "Send this request");
     err.hidden = false;
-    err.textContent = t("collect.couldnt_send",
-      "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.");
+    /* An upload that failed and a request that failed are different problems
+       and the second one is not worth suggesting a retry of the first. */
+    err.textContent = /^upload /.test(String(e && e.message))
+      ? t("collect.the_certificate_didnt_upload",
+          "The certificate didn't upload. Check your connection and try again, or ring Rafik Patel on 07951 795 465.")
+      : t("collect.couldnt_send",
+          "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.");
   });
 }
 
@@ -10701,9 +10874,26 @@ function ccDone(ref){
    to be redrawn when the language changes, not just when the screen opens.
    refreshRenderedText() is what calls it then; it was translated once at
    startup and left in English otherwise. */
+function ccCertEarliest(){
+  const d = nowLondon(); d.setHours(0,0,0,0);
+  d.setMonth(d.getMonth() - CC_CERT_MONTHS);
+  return d;
+}
+
 function ccDateBounds(){
   const date = document.getElementById("cc-date");
   if(!date) return;
+  /* The certificate window moves with today, so it is set here beside the
+     collection date and redrawn for the same reasons. */
+  const cert = document.getElementById("cc-certdate");
+  const today = nowLondon(); today.setHours(0,0,0,0);
+  const from = ccCertEarliest();
+  cert.min = ccIso(from);
+  cert.max = ccIso(today);
+  document.getElementById("cc-certdate-hint").textContent =
+    t("collect.it_must_be_dated_on", "It must be dated on or after")
+    + " " + fullDow(from.getDay()) + " " + num(from.getDate()) + " "
+    + mon(from.getMonth()) + " " + num(from.getFullYear()) + ".";
   const first = ccFirstAllowed();
   date.min = ccIso(first);
   date.max = ccIso(ccLastAllowed());
@@ -10722,6 +10912,14 @@ function initCollect(){
 
   document.getElementById("cc-rules-ver").textContent = CC_RULES_VERSION;
   ccDateBounds();
+
+  const pick = document.getElementById("cc-file");
+  document.getElementById("cc-pick").addEventListener("click", ()=> pick.click());
+  pick.addEventListener("change", ()=> ccTakeFile(pick.files && pick.files[0]));
+  document.getElementById("cc-drop").addEventListener("click", ()=>{
+    pick.value = "";
+    ccTakeFile(null);
+  });
 
   document.getElementById("cc-paid").addEventListener("click", e=>{
     const b = e.target.closest(".bk-opt");

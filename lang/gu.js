@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "fa7a1891c3e3",
+ "version": "8b724c111713",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -1972,7 +1972,7 @@ window.LANG_PACK = {
   "collect.address": "સરનામું",
   "collect.phone_number": "ફોન નંબર",
   "collect.email": "ઈમેલ",
-  "collect.charity_number_if_you_have": "ચેરિટી નંબર <span style=\"text-transform:none;letter-spacing:0;font-weight:500\">— જો તમારી પાસે હોય</span>",
+  "collect.charity_number_if_you_have": "ચેરિટી નંબર",
   "collect.leave_this_empty_if_the": "જો કાર્ય વિદેશમાં હોય અથવા ઇંગ્લેન્ડ અને વેલ્સમાં નોંધાયેલું ન હોય તો આ ખાલી છોડો.",
   "collect.who_will_be_collecting": "કોણ એકત્ર કરશે",
   "collect.name_of_the_person_doing": "કલેક્શન કરનાર વ્યક્તિનું નામ",
@@ -2004,6 +2004,22 @@ window.LANG_PACK = {
   "collect.request_sent": "તમારી વિનંતી મોકલાઈ ગઈ છે",
   "collect.please_keep_this_reference": "કૃપા કરીને આ સંદર્ભ સાચવી રાખો. મસ્જિદની ઓફિસ તમે જણાવેલા ટ્રસ્ટીને ફોન કરીને તારીખની ખાતરી કરશે. જો થોડા દિવસોમાં જવાબ ન મળે તો નીચેના નંબર પર ફોન કરીને આ સંદર્ભ જણાવો.",
   "collect.reference": "સંદર્ભ",
-  "collect.the_earliest_date_the_masjid": "મસ્જિદ લઈ શકે તે સૌથી નજીકની તારીખ છે"
+  "collect.the_earliest_date_the_masjid": "મસ્જિદ લઈ શકે તે સૌથી નજીકની તારીખ છે",
+  "collect.your_bmcc_certificate": "તમારું BMCC સર્ટિફિકેટ",
+  "collect.the_masjid_cannot_take_a": "મસ્જિદ <b>આના વગર વિનંતી સ્વીકારી શકતી નથી</b>. આ સર્ટિફિકેટ Bolton Masjid Chanda Committee આપે છે, અને તે <b>છેલ્લા ત્રણ મહિનામાં</b> અપાયેલું હોવું જોઈએ.",
+  "collect.photo_or_scan_of_the": "સર્ટિફિકેટનો ફોટો અથવા સ્કેન",
+  "collect.choose_a_file": "ફાઇલ પસંદ કરો",
+  "collect.a_clear_photo_is_fine": "સ્પષ્ટ ફોટો ચાલશે. JPG, PNG, WEBP અથવા PDF, વધુમાં વધુ 5 MB.",
+  "collect.the_date_on_the_certificate": "સર્ટિફિકેટ પરની તારીખ",
+  "collect.it_must_be_dated_on": "તે આ તારીખ કે તે પછીનું હોવું જોઈએ:",
+  "collect.students_altogether": "કુલ વિદ્યાર્થીઓ",
+  "collect.of_those_boarding": "તેમાંથી બોર્ડિંગ",
+  "collect.if_your_madrasah_or_school": "જો તમારા મદરેસા કે શાળામાં વિદ્યાર્થીઓ હોય, તો મસ્જિદને જાણવું ઉપયોગી છે કે કેટલા છે અને તેમાંથી કેટલા બોર્ડિંગમાં રહે છે. લાગુ ન પડે તો બંને ખાલી છોડો.",
+  "a11y.remove_the_chosen_file": "પસંદ કરેલી ફાઇલ દૂર કરો",
+  "collect.that_file_type_wont_work": "આ પ્રકારની ફાઇલ ચાલશે નહીં. કૃપા કરીને JPG, PNG, WEBP અથવા PDF વાપરો.",
+  "collect.that_file_is_too_big": "આ ફાઇલ બહુ મોટી છે. મસ્જિદ વધુમાં વધુ 5 MB લઈ શકે છે — ફોનથી લીધેલો ફોટો સામાન્ય રીતે એટલો જ હોય છે.",
+  "collect.the_certificate_didnt_upload": "સર્ટિફિકેટ અપલોડ થયું નહીં. તમારું કનેક્શન તપાસીને ફરી પ્રયાસ કરો, અથવા રફીક પટેલને 07951 795 465 પર ફોન કરો.",
+  "collect.optional": "— વૈકલ્પિક",
+  "collect.if_you_have_one": "— જો તમારી પાસે હોય"
  }
 };

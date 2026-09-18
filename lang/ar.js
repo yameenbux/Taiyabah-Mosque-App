@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "91896b09cca1",
+ "version": "21a55bd01b97",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -1972,7 +1972,7 @@ window.LANG_PACK = {
   "collect.address": "العنوان",
   "collect.phone_number": "رقم الهاتف",
   "collect.email": "البريد الإلكتروني",
-  "collect.charity_number_if_you_have": "رقم الجمعية <span style=\"text-transform:none;letter-spacing:0;font-weight:500\">— إن كان لديك</span>",
+  "collect.charity_number_if_you_have": "رقم الجمعية",
   "collect.leave_this_empty_if_the": "اتركه فارغًا إن كانت القضية خارج البلاد أو غير مسجَّلة في إنجلترا وويلز.",
   "collect.who_will_be_collecting": "من سيقوم بالجمع",
   "collect.name_of_the_person_doing": "اسم من يقوم بالجمع",
@@ -2004,6 +2004,22 @@ window.LANG_PACK = {
   "collect.request_sent": "أُرسل طلبك",
   "collect.please_keep_this_reference": "يُرجى الاحتفاظ بهذا المرجع. سيتصل مكتب المسجد بالوصيّ الذي سمّيته لتأكيد التاريخ. وإن لم يصلك ردّ خلال أيام، فاتصل بالرقم أدناه واذكر المرجع.",
   "collect.reference": "المرجع",
-  "collect.the_earliest_date_the_masjid": "أقرب تاريخ يمكن للمسجد قبوله هو"
+  "collect.the_earliest_date_the_masjid": "أقرب تاريخ يمكن للمسجد قبوله هو",
+  "collect.your_bmcc_certificate": "شهادة BMCC الخاصة بكم",
+  "collect.the_masjid_cannot_take_a": "لا يستطيع المسجد <b>قبول طلب بدونها</b>. تصدر هذه الشهادة عن Bolton Masjid Chanda Committee، ويجب أن تكون صادرة <b>خلال الأشهر الثلاثة الأخيرة</b>.",
+  "collect.photo_or_scan_of_the": "صورة أو نسخة ممسوحة من الشهادة",
+  "collect.choose_a_file": "اختر ملفًا",
+  "collect.a_clear_photo_is_fine": "تكفي صورة واضحة. JPG أو PNG أو WEBP أو PDF، بحد أقصى 5 ميغابايت.",
+  "collect.the_date_on_the_certificate": "التاريخ المدوَّن على الشهادة",
+  "collect.it_must_be_dated_on": "يجب أن يكون تاريخها في أو بعد",
+  "collect.students_altogether": "إجمالي الطلاب",
+  "collect.of_those_boarding": "منهم المقيمون",
+  "collect.if_your_madrasah_or_school": "إن كان في مدرستكم أو معهدكم طلاب، فمن المفيد أن يعرف المسجد عددهم وكم منهم مقيم. اتركوا الحقلين فارغين إن لم ينطبق ذلك.",
+  "a11y.remove_the_chosen_file": "إزالة الملف المختار",
+  "collect.that_file_type_wont_work": "هذا النوع من الملفات لا يصلح. يُرجى استخدام JPG أو PNG أو WEBP أو PDF.",
+  "collect.that_file_is_too_big": "هذا الملف كبير جدًا. أقصى ما يقبله المسجد 5 ميغابايت — وصورة الهاتف عادةً أقل من ذلك.",
+  "collect.the_certificate_didnt_upload": "لم تُرفع الشهادة. تحقق من اتصالك وأعد المحاولة، أو اتصل برفيق باتيل على 07951 795 465.",
+  "collect.optional": "— اختياري",
+  "collect.if_you_have_one": "— إن كان لديك"
  }
 };
