@@ -1078,6 +1078,38 @@ for (const f of ["index.html", "admin.html"]) {
   else ok(`element references — ${panes.length} tab panes all listed in switchTab() and nothing reaches for an id that is not there`);
 }
 
+/* ---- 4a. everyday giving cannot ship with no links behind it ----
+
+   The giving screen offers a fund, a frequency and an amount, and the button
+   at the bottom has to go somewhere. The masjid's own Stripe links are not
+   guessable, and a guessed one either 404s or sends somebody's ṣadaqah to the
+   wrong place — so GIVING_LINKS starts empty and this refuses the build until
+   it is filled.
+
+   Every combination the screen offers must resolve. A masjid that uses one
+   link for all of them simply repeats it. */
+{
+  const html = readFileSync("index.html", "utf8");
+  const bad = [];
+  const m = html.match(/const GIVING_LINKS = \{([\s\S]*?)\n\};/);
+  if (!m) bad.push("GIVING_LINKS is gone from index.html — the giving screen needs it");
+  else {
+    const body = m[1].replace(/\/\*[\s\S]*?\*\//g, "");
+    const have = new Set([...body.matchAll(/["']([a-z]+\|[a-z]+)["']\s*:\s*["'](https:\/\/[^"']+)["']/g)].map(x => x[1]));
+    const funds = [...new Set([...html.matchAll(/data-gv="fund" data-val="([a-z]+)"/g)].map(x => x[1]))];
+    const freqs = [...new Set([...html.matchAll(/data-gv="freq" data-val="([a-z]+)"/g)].map(x => x[1]))];
+    if (!funds.length || !freqs.length) bad.push("the giving screen's fund or frequency options could not be read");
+    const missing = [];
+    for (const f of funds) for (const q of freqs) if (!have.has(`${f}|${q}`)) missing.push(`${f}|${q}`);
+    if (missing.length)
+      bad.push(`the giving screen has no link for ${missing.length} of ${funds.length * freqs.length} ` +
+               `combinations — ${missing.slice(0, 4).join(", ")}${missing.length > 4 ? ", …" : ""}. ` +
+               `Ask the masjid for the Stripe links; do not invent them.`);
+  }
+  if (bad.length) bad.forEach(fail);
+  else ok("everyday giving — every fund and frequency the screen offers has a real link behind it");
+}
+
 /* ---- 3y. the Bukhārī text is licensed before it ships ----
 
    The hadith text is NOT ours. It is third-party open data under the ODbL,
