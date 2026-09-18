@@ -1196,6 +1196,109 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("everyday giving — every combination the screen offers has a real link, and the fund travels with it");
 }
 
+/* ---- 4b. the charity collection form records a real agreement ----
+
+   This form is a legal-ish artefact: it replaces a signed paper sheet, and
+   the row it writes says a named person agreed to the masjid's collection
+   rules on behalf of a charity. Two things therefore have to be true of it,
+   and neither is visible in a screenshot.
+
+   THE AGREEMENT MUST COME FROM THE CHECKBOX. Sending a literal `true` for
+   rules_accepted or privacy_accepted looks identical in a diff and passes
+   every manual test, because the validation above it refuses to submit with
+   the box unticked. But it turns a two-layer guarantee into a one-layer one:
+   remove or break the validation and the app records an agreement nobody
+   gave. The website's own volunteer form carries a comment about exactly
+   this mistake, caught there by a negative control.
+
+   THE VERSION ON SCREEN MUST BE THE VERSION SENT. The rules are versioned so
+   that changing them later does not rewrite what past applicants signed. If
+   the screen prints one version and the payload carries another, the row is
+   a record of an agreement to rules the applicant never read.
+
+   And the payload must carry every field request_charity_collection() reads,
+   or the office is handed a request with blanks in it.                    */
+{
+  const html = readFileSync("index.html", "utf8");
+  const bad = [];
+
+  /* Everything request_charity_collection() reads out of the payload —
+     db/030_charity_collections.sql in the website repository. */
+  const REQUIRED = [
+    "requested_date", "org_name", "org_address", "org_phone", "org_email",
+    "charity_number", "collector_name", "collector_role", "collector_paid",
+    "trustee_name", "trustee_phone", "trustee_email",
+    "rules_version", "rules_accepted", "signed_name", "privacy_accepted",
+  ];
+
+  const submit = (html.match(/function ccSubmit\(e\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!submit) {
+    bad.push("ccSubmit is gone from index.html — the charity collection form needs it");
+  } else {
+    if (!/rpc\/request_charity_collection/.test(submit))
+      bad.push("the charity collection form no longer posts to request_charity_collection");
+
+    const missing = REQUIRED.filter(k => !new RegExp(`\\b${k}\\s*:`).test(submit));
+    if (missing.length)
+      bad.push(`the charity collection payload is missing ${missing.join(", ")} — ` +
+               `the office would be handed a request with blanks in it`);
+
+    /* The two agreements, read from their checkboxes rather than asserted. */
+    for (const [key, box] of [["rules_accepted", "cc-agree-rules"],
+                              ["privacy_accepted", "cc-agree-priv"]]) {
+      const line = (submit.match(new RegExp(`${key}\\s*:\\s*([^,\n]+)`)) || [])[1] || "";
+      if (!line.includes(box) || !line.includes("checked"))
+        bad.push(`${key} is not read from the ${box} checkbox — it sends ${line.trim() || "nothing"}. ` +
+                 `A literal here records an agreement nobody gave.`);
+    }
+
+    if (!/rules_version:\s*CC_RULES_VERSION/.test(submit))
+      bad.push("the charity collection payload does not send CC_RULES_VERSION, so the row " +
+               "would not say which rules the applicant agreed to");
+  }
+
+  /* The version printed above the form is the same constant that is sent. */
+  const init = (html.match(/function initCollect\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!/getElementById\("cc-rules-ver"\)\.textContent\s*=\s*CC_RULES_VERSION/.test(init))
+    bad.push("the rules version shown on screen is not CC_RULES_VERSION, so the applicant " +
+             "can be shown one version and have another recorded against them");
+
+  const ver = (html.match(/const CC_RULES_VERSION\s*=\s*"([^"]+)"/) || [])[1];
+  if (!ver || !/^\d{4}-\d{2}-\d{2}$/.test(ver))
+    bad.push("CC_RULES_VERSION is missing or is not a date — it is stored on every row");
+
+  /* The date field must be bounded by the notice period rather than by a
+     hard-coded date that goes stale — and the sentence under it names a date,
+     so it has to be REDRAWN when the language changes rather than translated
+     once at startup. Both live in ccDateBounds(); this checks that they do,
+     that opening the screen calls it, and that a language change does too.
+     The last of those is how it was caught: the hint stayed in English. */
+  const bounds = (html.match(/function ccDateBounds\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!/date\.min\s*=\s*ccIso\(/.test(bounds) || !/date\.max\s*=\s*ccIso\(/.test(bounds))
+    bad.push("the collection date field is not bounded from ccFirstAllowed/ccLastAllowed, " +
+             "so it can offer a date the masjid cannot take");
+  if (!/cc-date-hint/.test(bounds))
+    bad.push("the earliest-date sentence is not written by ccDateBounds, so it will not " +
+             "be redrawn when the language changes");
+  const openFn = (html.match(/function openCollect\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  if (!/ccDateBounds\(\)/.test(openFn))
+    bad.push("openCollect does not call ccDateBounds, so the date bounds go stale " +
+             "on a phone left open overnight");
+  const refresh = (html.match(/function refreshRenderedText\(\)\{[\s\S]*?\n\}/) || [""])[0];
+  for (const [screen, fn] of [["collect", "ccDateBounds"], ["giving", "gvRender"]])
+    if (!new RegExp(`open\\("${screen}"\\)\\)\\s*${fn}\\(\\)`).test(refresh))
+      bad.push(`refreshRenderedText does not redraw the ${screen} screen, so text its own ` +
+               `code writes stays in the previous language when somebody switches`);
+  const notice = Number((html.match(/const CC_NOTICE_DAYS\s*=\s*(\d+)/) || [])[1]);
+  if (notice !== 14)
+    bad.push(`CC_NOTICE_DAYS is ${notice || "missing"}; request_charity_collection() enforces 14, ` +
+             `so the form would offer dates the database then refuses`);
+
+  if (bad.length) bad.forEach(fail);
+  else ok(`charity collections — all ${REQUIRED.length} fields sent, both agreements read from their ` +
+          `checkboxes, and the rules version on screen is the one recorded`);
+}
+
 /* ---- 3y. the Bukhārī text is licensed before it ships ----
 
    The hadith text is NOT ours. It is third-party open data under the ODbL,
