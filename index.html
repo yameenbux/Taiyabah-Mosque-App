@@ -60,6 +60,10 @@
   .vis-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;
     left:16px;top:0;border:0;padding:0;margin:0}
   html,body{background:#EDE7D8;color:var(--ink);-webkit-font-smoothing:antialiased}
+  /* Nothing in this app scrolls left and right except the three strips that
+     say so. Anything else that overhangs is a bug, and it must not be
+     draggable while somebody is trying to read down the page. */
+  html,body{overflow-x:hidden;overscroll-behavior-x:none}
   body{max-width:520px;margin-inline:auto;min-height:100dvh;
     background:
       radial-gradient(120% 60% at 50% -10%, rgba(198,162,76,.10), transparent 60%),
@@ -242,7 +246,11 @@
   .sh-toggle button{flex:1;cursor:pointer;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:600;padding:8px;
     border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
   .sh-toggle button[data-on="1"]{background:var(--brand-700);border-color:var(--brand-700);color:#F3EFE3}
-  .sh-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  .sh-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+    /* Keep the scroll inside the sheet: at the top or the bottom it used to
+       chain to the page underneath, which is what made a sheet feel like it
+       was sliding about. */
+    overscroll-behavior:contain;
     padding-bottom:env(safe-area-inset-bottom,0)}
   table.mt{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
   table.mt th{position:sticky;top:0;z-index:2;background:var(--card);font-size:calc(10px * var(--ts));letter-spacing:.08em;
@@ -5817,18 +5825,50 @@ function initFridayCall(){
   });
 }
 
+/* ---------------- swipes ----------------
+
+   A swipe only counts when it is decisively along its own axis.
+
+   There were five of these and every one tested a single axis and ignored
+   the other: the day strip changed the day on any touch that ended 50px to
+   the side, however far it had travelled up or down. So scrolling the home
+   screen with a thumb — which never moves in a straight line — kept moving
+   the page off the day you were reading. Same fault closed the drawer
+   mid-scroll and dismissed two sheets.
+
+   DOMINANCE, NOT JUST DISTANCE. The gesture has to beat the other axis by
+   half again before it is treated as a swipe at all, so an ordinary scroll
+   can drift as far sideways as it likes and nothing happens.
+
+   Multi-touch is dropped outright: a pinch is not a swipe. */
+function onSwipe(el, axis, run, min){
+  if(!el) return;
+  const MIN = min || 45;
+  const DOMINANCE = 1.5;
+  let x0 = null, y0 = null;
+  el.addEventListener("touchstart", e => {
+    if(e.touches.length !== 1){ x0 = null; return; }
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+  }, {passive:true});
+  el.addEventListener("touchend", e => {
+    if(x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    x0 = y0 = null;
+    const along  = axis === "x" ? dx : dy;
+    const across = axis === "x" ? dy : dx;
+    if(Math.abs(along) < MIN) return;
+    if(Math.abs(along) < Math.abs(across) * DOMINANCE) return;
+    run(along);
+  }, {passive:true});
+}
+
 function initReminders(){
   document.getElementById('rm-prev').addEventListener('click',()=>rmStep(-1));
   document.getElementById('rm-next').addEventListener('click',()=>rmStep(1));
   // swipe the card as well
-  const el=document.getElementById('remind');
-  let x0=null;
-  el.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
-  el.addEventListener('touchend',e=>{
-    if(x0===null) return;
-    const dx=e.changedTouches[0].clientX-x0; x0=null;
-    if(Math.abs(dx)>45) rmStep(dx<0?1:-1);
-  },{passive:true});
+  onSwipe(document.getElementById('remind'), "x", dx => rmStep(dx < 0 ? 1 : -1), 45);
 }
 
 /* ---------------- month view ---------------- */
@@ -5901,16 +5941,7 @@ function initMonth(){
   document.getElementById('m-close').addEventListener('click',closeMonth);
   document.getElementById('scrim').addEventListener('click',closeMonth);
   // swipe down on the header to dismiss (the scrim isn't reachable on a phone)
-  (function(){
-    const top=document.querySelector('.sh-top');
-    let y0=null;
-    top.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
-    top.addEventListener('touchend',e=>{
-      if(y0===null) return;
-      const dy=e.changedTouches[0].clientY-y0; y0=null;
-      if(dy>45) closeMonth();
-    },{passive:true});
-  })();
+  onSwipe(document.querySelector('.sh-top'), "y", dy => { if(dy > 0) closeMonth(); }, 45);
   document.getElementById('m-prev').addEventListener('click',()=>{
     M_MONTH=new Date(M_MONTH.getFullYear(),M_MONTH.getMonth()-1,1); renderMonth();
   });
@@ -5945,15 +5976,7 @@ function initNav(){
     goto(new Date(Y,M-1,D));
   });
   // swipe between days
-  let x0=null;
-  const hero=document.querySelector('.hero');
-  hero.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
-  hero.addEventListener('touchend',e=>{
-    if(x0===null) return;
-    const dx=e.changedTouches[0].clientX-x0; x0=null;
-    if(Math.abs(dx)<50) return;
-    goto(addDays(VIEW, dx<0?1:-1));
-  },{passive:true});
+  onSwipe(document.querySelector('.hero'), "x", dx => goto(addDays(VIEW, dx < 0 ? 1 : -1)), 50);
   // keyboard
   document.addEventListener('keydown',e=>{
     if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
@@ -11078,16 +11101,7 @@ function initAbout(){
   document.getElementById('ab-donate').addEventListener('click',()=>{
     closeAbout(); switchTab('donate');
   });
-  (function(){
-    const top=document.querySelector('#about .sh-top');
-    let y0=null;
-    top.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
-    top.addEventListener('touchend',e=>{
-      if(y0===null) return;
-      const dy=e.changedTouches[0].clientY-y0; y0=null;
-      if(dy>45) closeAbout();
-    },{passive:true});
-  })();
+  onSwipe(document.querySelector('#about .sh-top'), "y", dy => { if(dy > 0) closeAbout(); }, 45);
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('about').dataset.open==="1") closeAbout();
   });
@@ -11146,16 +11160,7 @@ function initDrawer(){
   // any external link closes the drawer behind it
   document.querySelectorAll('.dr-row[href]').forEach(a=>a.addEventListener('click',closeDrawer));
   // swipe right to dismiss
-  (function(){
-    const p=document.querySelector('.dr-panel');
-    let x0=null;
-    p.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
-    p.addEventListener('touchend',e=>{
-      if(x0===null) return;
-      const dx=e.changedTouches[0].clientX-x0; x0=null;
-      if(dx>55) closeDrawer();
-    },{passive:true});
-  })();
+  onSwipe(document.querySelector('.dr-panel'), "x", dx => { if(dx > 0) closeDrawer(); }, 55);
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('drawer').dataset.open==="1") closeDrawer();
   });

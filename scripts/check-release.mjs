@@ -1299,6 +1299,65 @@ for (const f of ["index.html", "admin.html"]) {
           `checkboxes, and the rules version on screen is the one recorded`);
 }
 
+/* ---- 4c. a swipe cannot be triggered by scrolling past it ----
+
+   Reported as "the page moves — I need it to stick and only scroll up and
+   down". The cause was not the scroll container. It was five hand-rolled
+   swipe handlers, each of which measured ONE axis and ignored the other: the
+   day strip changed the day on any touch that ended 50px to the side, however
+   far it had travelled vertically. A thumb never scrolls in a straight line,
+   so reading down the home screen kept moving the page off the day.
+
+   All five now go through onSwipe(), which requires the gesture to beat the
+   other axis by half again before it counts. This refuses a build that grows
+   a sixth hand-rolled one, and one that lets a sheet be dragged sideways.  */
+{
+  const html = readFileSync("index.html", "utf8");
+  const bad = [];
+
+  const helper = (html.match(/function onSwipe\([\s\S]*?\n\}/) || [""])[0];
+  if (!helper) bad.push("onSwipe is gone from index.html — the swipe handlers need it");
+  else {
+    /* Both axes read, and compared against each other. */
+    if (!/clientX/.test(helper) || !/clientY/.test(helper))
+      bad.push("onSwipe no longer reads both axes, so a scroll can trigger a swipe again");
+    if (!/Math\.abs\(along\)\s*<\s*Math\.abs\(across\)/.test(helper))
+      bad.push("onSwipe no longer compares the gesture against the other axis — distance " +
+               "alone is what let a vertical scroll change the day");
+    if (!/e\.touches\.length !== 1/.test(helper))
+      bad.push("onSwipe no longer ignores multi-touch, so a pinch counts as a swipe");
+  }
+
+  /* Nobody may hand-roll another one. A touchstart that stashes a coordinate
+     is the shape of the bug; onSwipe is the only place allowed to do it. */
+  const body = html.replace(/<!--[\s\S]*?-->/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ");
+  const rolled = [...body.matchAll(/addEventListener\(\s*["']touchstart["'][\s\S]{0,220}?clientX/g)];
+  /* onSwipe itself, and the mushaf reader, which tracks a live drag rather
+     than classifying one gesture at the end and is exempt by name. */
+  const allowed = rolled.filter(m => {
+    const around = body.slice(Math.max(0, m.index - 900), m.index);
+    return /function onSwipe/.test(around) || /mushaf/i.test(around);
+  });
+  if (rolled.length > allowed.length)
+    bad.push(`${rolled.length - allowed.length} hand-rolled swipe handler(s) outside onSwipe — ` +
+             `each one is a chance to measure a single axis again and move the page ` +
+             `under somebody who was only scrolling`);
+
+  /* And the sheets themselves must not be draggable sideways. A scroller with
+     overflow-y:auto and overflow-x unset computes overflow-x to AUTO, so this
+     has to be said rather than assumed. */
+  const sh = (html.match(/\.sh-body\{[^}]*\}/) || [""])[0];
+  if (!/overflow-x:\s*hidden/.test(sh))
+    bad.push(".sh-body does not set overflow-x:hidden, so every sheet is a horizontal " +
+             "scroller and anything that overhangs can be dragged");
+  if (!/overscroll-behavior:\s*contain/.test(sh))
+    bad.push(".sh-body does not contain its overscroll, so scrolling past the end of a " +
+             "sheet drags the page underneath it");
+
+  if (bad.length) bad.forEach(fail);
+  else ok("swipes — all gestures go through onSwipe and must beat the other axis, and no sheet scrolls sideways");
+}
+
 /* ---- 3y. the Bukhārī text is licensed before it ships ----
 
    The hadith text is NOT ours. It is third-party open data under the ODbL,
