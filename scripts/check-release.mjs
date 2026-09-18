@@ -229,6 +229,26 @@ for (const f of ["index.html", "admin.html"]) {
     "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03": "Gold £1,000",
     "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04": "Platinum £5,000",
     "https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05": "any other amount",
+    /* Everyday giving. One link per amount per frequency, because a Stripe
+       Payment Link carries its own fixed price and cannot be handed an amount
+       in the URL. Copied from the website's index_template.html; a guessed
+       link either 404s or sends somebody's ṣadaqah to the wrong place. */
+    "https://donate.stripe.com/3cI6oH8ry5XO2x84l0f3a09": "one-off £5",
+    "https://donate.stripe.com/cNi7sL7nu71S8Vw3gWf3a0a": "one-off £10",
+    "https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b": "one-off £25",
+    "https://donate.stripe.com/eVq3cvfU03PG8VwdVAf3a0c": "one-off £50",
+    "https://donate.stripe.com/28EcN5cHOcmc7Rs4l0f3a0d": "one-off £100",
+    "https://donate.stripe.com/6oU00j7nueuk2x8bNsf3a0o": "one-off, donor chooses",
+    "https://donate.stripe.com/dRmcN523aeukc7I6t8f3a0f": "monthly £5",
+    "https://donate.stripe.com/4gMcN55fm71S0p018Of3a0e": "monthly £10",
+    "https://donate.stripe.com/14A8wPgY4gCs9ZAeZEf3a0g": "monthly £25",
+    "https://donate.stripe.com/5kQ00jdLScmc9ZAaJof3a0h": "monthly £50",
+    "https://donate.stripe.com/dRm9ATgY4bi86NocRwf3a0i": "monthly £100",
+    "https://donate.stripe.com/28E5kD8ry2LCdbM04Kf3a0j": "Friday Pay £5",
+    "https://donate.stripe.com/5kQfZhdLSbi81t418Of3a0k": "Friday Pay £10",
+    "https://donate.stripe.com/dRm3cv5fm71S9ZA9Fkf3a0l": "Friday Pay £25",
+    "https://donate.stripe.com/dRmaEX37e9a0b3E8Bgf3a0m": "Friday Pay £50",
+    "https://donate.stripe.com/3cIaEXfU0cmc2x8dVAf3a0n": "Friday Pay £100",
   };
   /* Money the masjid is owed, not money it is given. These are Payment Links
      for SERVICES, and the distinction is not bookkeeping pedantry: a hall
@@ -243,9 +263,10 @@ for (const f of ["index.html", "admin.html"]) {
   };
   const src = existsSync("index.html") ? R("index.html") : "";
   if (src) {
-    /* book.stripe.com as well as buy.stripe.com: the hall deposit is on the
-       other host, and a test-mode link there would ship just as invisibly. */
-    const found = [...src.matchAll(/https:\/\/(?:buy|book)\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]);
+    /* All three Stripe hosts: the hall deposit is on book.stripe.com and
+       everyday giving on donate.stripe.com, and a test-mode link on either
+       would ship just as invisibly as one on buy.stripe.com. */
+    const found = [...src.matchAll(/https:\/\/(?:buy|book|donate)\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]);
     const uniq = [...new Set(found)];
     const test = uniq.filter(u => u.includes("test_"));
     if (test.length) fail(`Stripe link in TEST MODE — it takes no money and looks identical: ${test.join(", ")}`);
@@ -269,14 +290,43 @@ for (const f of ["index.html", "admin.html"]) {
     const old = [...src.matchAll(/https:\/\/(?:www\.)?taiyabahmasjid\.com\/product\/[^"']*/g)].map(m => m[0]);
     if (old.length) fail(`donation still points at the old shop: ${[...new Set(old)].join(", ")}`);
 
-    /* Stripe cannot produce or store an HMRC declaration, so the app must not
-       promise Gift Aid on a card payment. */
-    /* Comments explain why the app avoids Gift Aid; only what reaches a screen
-       counts as a promise, so strip HTML and JS comments alike before looking. */
-    const onScreen = src.replace(/<!--[\s\S]*?-->/g, " ")
-                        .replace(/\/\*[\s\S]*?\*\//g, " ");
-    if (/Gift\s*Aid/i.test(onScreen))
-      fail("index.html promises Gift Aid, but the donation path is Stripe, which cannot produce a valid HMRC declaration");
+    /* GIFT AID. The rule here used to be a flat ban: Stripe cannot produce or
+       store an HMRC declaration, so the app must not promise the donor one.
+       That changed on 12 September 2026, when the committee had every donation
+       Payment Link built with a Stripe custom field — a Gift Aid dropdown, Yes
+       or No — and the full declaration in the product description beside it.
+       Stripe collects the name and address on that same screen and sends all
+       of it, signed, to the masjid's webhook. So the promise is now honest.
+
+       What must not happen is the promise drifting onto a screen where the
+       money is not a gift. Gift Aid on a hall deposit or a nikāḥ fee is relief
+       claimed on something the masjid was owed, and HMRC would want it back.
+       So: every Gift Aid mention that reaches a screen has to sit inside the
+       everyday giving sheet, and that sheet may carry donation links only.
+
+       Comments discuss Gift Aid at length and none of it reaches a screen, so
+       they are blanked — but blanked to the same LENGTH, because the test is
+       where a mention sits, and shortening the text ahead of it would move
+       every offset after it. */
+    const blank = m => " ".repeat(m.length);
+    const onScreen = src.replace(/<!--[\s\S]*?-->/g, blank)
+                        .replace(/\/\*[\s\S]*?\*\//g, blank);
+    const gvAt = src.indexOf('<div class="sheet" id="giving"');
+    const gvEnd = gvAt === -1 ? -1 : src.indexOf('<div class="sheet" id="', gvAt + 30);
+    if (gvAt === -1 || gvEnd === -1) {
+      fail("the everyday giving sheet could not be found, so nothing is checking where Gift Aid is promised");
+    } else {
+      const stray = [...onScreen.matchAll(/Gift\s*Aid/gi)]
+        .filter(m => m.index < gvAt || m.index >= gvEnd)
+        .map(m => JSON.stringify(src.slice(Math.max(0, m.index - 60), m.index + 40).replace(/\s+/g, " ")));
+      if (stray.length)
+        fail(`Gift Aid is promised outside the everyday giving sheet — relief cannot be claimed on a fee: ${stray.slice(0, 2).join(" … ")}`);
+      const gvLinks = [...new Set([...src.slice(gvAt, gvEnd)
+        .matchAll(/https:\/\/(?:buy|book|donate)\.stripe\.com\/[A-Za-z0-9_]+/g)].map(m => m[0]))];
+      const fees = gvLinks.filter(u => u in SERVICE);
+      if (fees.length)
+        fail(`the giving sheet offers ${fees.map(u => SERVICE[u]).join(", ")} — a fee is not a gift, and it sits beside a Gift Aid promise`);
+    }
 
     if (!test.length && !missing.length && !extra.length && !old.length)
       ok(`donations — all ${uniq.length} Stripe links present, live mode, no old shop links`);
@@ -1076,6 +1126,74 @@ for (const f of ["index.html", "admin.html"]) {
 
   if (bad.length) bad.forEach(fail);
   else ok(`element references — ${panes.length} tab panes all listed in switchTab() and nothing reaches for an id that is not there`);
+}
+
+/* ---- 4a. every combination the giving screen offers must go somewhere ----
+
+   The giving screen offers a fund, a frequency and an amount, and the button
+   at the bottom has to go somewhere. The masjid's Stripe links are not
+   guessable, and a guessed one either 404s or sends somebody's ṣadaqah to the
+   wrong place.
+
+   Not every combination has a link, and that is legitimate: the masjid never
+   made a recurring link for an amount the donor types, because a Payment Link
+   carries its own fixed price. What is NOT legitimate is offering a
+   combination that leads nowhere — so any amount without a link for the
+   chosen frequency has to be greyed out, and this checks that it is.
+
+   The fund is deliberately absent from the table: ṣadaqah and lillāh are
+   designations, not products, and ride on the same links as
+   client_reference_id. So the fund is checked to be carried, not looked up. */
+{
+  const html = readFileSync("index.html", "utf8");
+  const bad = [];
+  const m = html.match(/const GIVING_LINKS = \{([\s\S]*?)\n\};/);
+  if (!m) bad.push("GIVING_LINKS is gone from index.html — the giving screen needs it");
+  else {
+    const body = m[1].replace(/\/\*[\s\S]*?\*\//g, "");
+    /* freq -> { amount: link } */
+    const table = {};
+    for (const blk of body.matchAll(/([a-z]+)\s*:\s*\{([^}]*)\}/g)) {
+      table[blk[1]] = {};
+      for (const row of blk[2].matchAll(/["']([a-z0-9]+)["']\s*:\s*["']([^"']*)["']/g))
+        if (row[2]) table[blk[1]][row[1]] = row[2];
+    }
+    const grab = k => [...new Set([...html.matchAll(
+      new RegExp(`data-gv="${k}" data-val="([a-z0-9]+)"`, "g"))].map(x => x[1]))];
+    const funds = grab("fund"), freqs = grab("freq"), amts = grab("amt");
+    if (!funds.length || !freqs.length || !amts.length)
+      bad.push("the giving screen's fund, frequency or amount options could not be read");
+
+    for (const q of freqs) {
+      if (!table[q]) { bad.push(`the giving screen offers "${q}" but GIVING_LINKS has no such frequency`); continue; }
+      if (!Object.keys(table[q]).length)
+        bad.push(`no link at all for "${q}" — every amount under it would be dead. ` +
+                 `Ask the masjid for the Stripe links; do not invent them.`);
+      for (const a of Object.keys(table[q]))
+        if (!amts.includes(a)) bad.push(`GIVING_LINKS has "${q}.${a}", which the screen never offers`);
+    }
+    /* Whatever the screen opens on must work, or the first thing a donor sees
+       is a dead button. */
+    const on = k => (html.match(new RegExp(`data-gv="${k}" data-val="([a-z0-9]+)" aria-pressed="true"`)) || [])[1];
+    const d = { freq: on("freq"), amt: on("amt") };
+    if (!d.freq || !d.amt) bad.push("the giving screen has no default frequency or amount selected");
+    else if (!(table[d.freq] || {})[d.amt])
+      bad.push(`the giving screen opens on ${d.freq}/${d.amt}, which has no link — the first thing a donor sees is a dead button`);
+
+    /* A combination with no link must be unreachable, not merely broken. */
+    const render = (html.match(/function gvRender\(\)\{[\s\S]*?\n\}/) || [""])[0];
+    if (!/\bdisabled\s*=\s*![\s\S]{0,120}GIVING_LINKS\[GV\.freq\]/.test(render))
+      bad.push("gvRender no longer greys out amounts the chosen frequency has no link for, " +
+               "so the screen can offer a combination that goes nowhere");
+
+    /* The fund is not in the table, so it has to travel some other way. */
+    if (!/client_reference_id=["'\s]*\+\s*encodeURIComponent\(GV\.fund\)/.test(html) &&
+        !/client_reference_id=" \+ encodeURIComponent\(GV\.fund\)/.test(html))
+      bad.push("the chosen fund is not sent with the payment — ṣadaqah, lillāh and the general " +
+               "fund would all arrive at Stripe indistinguishable");
+  }
+  if (bad.length) bad.forEach(fail);
+  else ok("everyday giving — every combination the screen offers has a real link, and the fund travels with it");
 }
 
 /* ---- 3y. the Bukhārī text is licensed before it ships ----

@@ -1529,6 +1529,54 @@
   .cu-l li{margin-top:7px;font-size:calc(15px * var(--ts));color:#4A3C45;line-height:1.45}
   .cu-l li:first-child{margin-top:0}
   .cu-note{margin:15px 4px 0;font-size:calc(13px * var(--ts));color:var(--muted);line-height:1.6}
+
+  /* Everyday giving — ṣadaqah, lillāh and the general fund.
+
+     A faithful port of the masjid website's #donate section: the same three
+     choosers (what it is for, how often, how much), the same wording, the same
+     bank details. The build appeal keeps its own tab; this is the giving that
+     keeps the lights on, which is a different ask and deserves its own door. */
+  .gv-eyebrow{font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--gold-bright);margin-bottom:6px}
+  .gv-ar{font-size:calc(19px * var(--ts));color:var(--gold-bright);line-height:1.3;
+    margin-bottom:6px}
+  .gv-lab{font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);margin:18px 2px 9px}
+  .gv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .gv-opt{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:11px 7px;font:inherit;color:var(--ink);cursor:pointer;text-align:center;
+    display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;
+    min-height:62px}
+  .gv-opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  /* Greyed, not gone: the masjid has no link for a recurring gift of an
+     amount the donor types, and a grid that changes shape as you switch
+     frequency is a grid people think they misclicked. */
+  .gv-opt:disabled{opacity:.42;cursor:default;background:var(--paper)}
+  .gv-opt[aria-pressed="true"]{background:var(--brand-900);border-color:var(--brand-900);color:#F3EFE3}
+  .gv-t{font-weight:700;font-size:calc(14.5px * var(--ts));line-height:1.2}
+  .gv-s{font-size:calc(10px * var(--ts));letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);line-height:1.25}
+  .gv-opt[aria-pressed="true"] .gv-s{color:var(--gold-bright)}
+  .gv-note{margin:12px 2px 0;font-size:calc(13.5px * var(--ts));color:var(--ink);line-height:1.6}
+  .gv-zakat{margin:11px 0 0;padding:12px 14px;border:1px solid rgba(180,83,47,.3);
+    background:rgba(180,83,47,.07);border-radius:12px;
+    font-size:calc(13.5px * var(--ts));line-height:1.6;color:var(--danger)}
+  .gv-zakat strong{font-weight:700}
+  .gv-gift{margin:16px 0 0;padding:13px 15px;border:1px solid var(--line);
+    background:rgba(198,162,76,.1);border-radius:12px;
+    font-size:calc(13.5px * var(--ts));line-height:1.6}
+  .gv-cta{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:16px;
+    width:100%;border:none;cursor:pointer;font:inherit;text-decoration:none;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#3A2A08;
+    border-radius:16px;padding:15px 18px;box-shadow:var(--shadow)}
+  .gv-cta[aria-disabled="true"]{background:var(--line);color:var(--muted);box-shadow:none;cursor:default}
+  .gv-cta-m{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(20px * var(--ts))}
+  .gv-cta-s{font-size:calc(10.5px * var(--ts));letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+  .gv-goes dt{font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--brand-600);margin-bottom:5px}
+  .gv-goes dd{font-size:calc(14px * var(--ts));line-height:1.6;color:var(--ink)}
+  .gv-goes > div{padding:15px 0;border-top:1px solid var(--line)}
+  .gv-goes > div:first-child{border-top:0;padding-top:4px}
   .sec-h{display:flex;align-items:center;gap:10px;margin:6px 4px 12px}
   .sec-h h2{font-family:"Fraunces",serif;font-size:calc(15px * var(--ts));font-weight:600}
   .sec-h .rule{flex:1;height:1px;background:var(--line)}
@@ -1766,6 +1814,7 @@
         <button class="tile" data-tile="funeral"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6"/><path d="M3.5 20.5h17"/><path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z"/></svg></span><span class="t-l" data-i18n="tiles.funeral_services">Funeral Services</span></button>
         <button class="tile" data-tile="hallhire"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/></svg></span><span class="t-l" data-i18n="tiles.hall_booking">Hall Booking</span></button>
         <button class="tile" data-tile="donate"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.9 20.2S5 15.9 5 10.7a4.4 4.4 0 0 1 6.9-3.6 4.4 4.4 0 0 1 6.9 3.6c0 5.2-6.9 9.5-6.9 9.5Z"/></svg></span><span class="t-l" data-i18n="tiles.donate">Donate</span></button>
+        <button class="tile" data-tile="giving"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.6" r="2.7"/><path d="M4.4 11.4h15.2a1 1 0 0 1 1 1v7.1a1 1 0 0 1-1 1H4.4a1 1 0 0 1-1-1v-7.1a1 1 0 0 1 1-1Z"/><path d="M9.7 15h4.6"/></svg></span><span class="t-l">Sadaqah &amp; Lillah</span></button>
         <button class="tile" data-tile="whatsapp"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" stroke="none" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg></span><span class="t-l" data-i18n="tiles.join_whatsapp">Join WhatsApp</span></button>
     </div>
 
@@ -3675,6 +3724,108 @@
           </div>
 
           <p class="cu-note" data-i18n="cur.class_times_fees_and_how">Class times, fees and how to apply are under Admissions &amp; Fees.</p>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Everyday giving. Ported from the masjid website's #donate section so the
+       two say the same thing; the build appeal stays on its own tab. -->
+  <div class="sheet" id="giving" data-open="0" role="dialog" aria-modal="true" aria-label="Sadaqah and Lillah" data-i18n-attr="aria-label:a11y.sadaqah_and_lillah">
+    <div class="scrim" id="gv-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="giving.sadaqah_lillah">Sadaqah &amp; Lillah</h3>
+        <button class="sh-close" id="gv-close" data-i18n="giving.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="gv-eyebrow" data-i18n="giving.support_the_masjid">Support the masjid</div>
+          <div class="gv-ar arabic">&#1589;&#1614;&#1583;&#1614;&#1602;&#1614;&#1577;</div>
+          <div class="hh-en" data-i18n="giving.give_to_taiyabah_masjid">Give to Taiyabah Masjid</div>
+          <p class="hh-sub" data-i18n="giving.every_prayer_held_here">Every prayer held here, every child taught, every jan&#257;zah carried out
+            rests on what the community gives. This page is for the masjid itself &mdash; its upkeep,
+            its running, and the work it does in Bolton.</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="sec-h"><h2 data-i18n="giving.where_your_giving_goes">Where your giving goes</h2><span class="rule"></span></div>
+          <dl class="card gv-goes" style="padding:4px 17px 14px">
+            <div><dt data-i18n="giving.keeping_the_doors_open">Keeping the doors open</dt><dd data-i18n="giving.heating_lighting_water_and_insurance">Heating, lighting, water and insurance. The masjid is open for five prayers a day, every day of the year, and that is the bill behind it.</dd></div>
+            <div><dt data-i18n="giving.the_madrasah">The madrasah</dt><dd data-i18n="giving.teaching_the_children_of_the">Teaching the children of the community, as it has since 1967. Fees do not cover it.</dd></div>
+            <div><dt data-i18n="giving.janazah_and_burial">Jan&#257;zah and burial</dt><dd data-i18n="giving.the_mortuary_the_ghusl_facilities">The mortuary, the ghusl facilities and the help given to families at the hardest time. The masjid does not charge for this.</dd></div>
+            <div><dt data-i18n="giving.repairs_and_upkeep">Repairs and upkeep</dt><dd data-i18n="giving.a_building_used_this_heavily">A building used this heavily needs work done on it, and most of it is not the sort anybody notices until it fails.</dd></div>
+            <div><dt data-i18n="giving.the_food_bank_and_outreach">The food bank and outreach</dt><dd data-i18n="giving.serving_people_in_bolton_who">Serving people in Bolton who need it, Muslim and non-Muslim alike.</dd></div>
+          </dl>
+
+          <div class="sec-h"><h2 data-i18n="giving.give_online">Give online</h2><span class="rule"></span><span class="tag" data-i18n="giving.apple_google_pay">Apple &amp; Google Pay</span></div>
+          <div class="card" style="padding:16px 17px 18px">
+
+            <div class="gv-lab" style="margin-top:0" data-i18n="giving.what_it_is_for">What it is for</div>
+            <div class="gv-grid">
+            <button class="gv-opt" data-gv="fund" data-val="general" aria-pressed="true"><span class="gv-t" data-i18n="giving.the_masjid">The masjid</span><span class="gv-s" data-i18n="giving.general">General</span></button>
+            <button class="gv-opt" data-gv="fund" data-val="sadaqah" aria-pressed="false"><span class="gv-t" data-i18n="giving.sadaqah">Sadaqah</span><span class="gv-s" data-i18n="giving.voluntary">Voluntary</span></button>
+            <button class="gv-opt" data-gv="fund" data-val="lillah" aria-pressed="false"><span class="gv-t" data-i18n="giving.lillah">Lillah</span><span class="gv-s" data-i18n="giving.for_allah">For Allah</span></button>
+            </div>
+            <p class="gv-note" data-fundnote="general" data-i18n="giving.the_general_fund_upkeep_running">The general fund &mdash; upkeep, running costs, and the masjid&rsquo;s work in Bolton.</p>
+            <p class="gv-note" data-fundnote="sadaqah" hidden data-i18n="giving.voluntary_charity_given_as_and">Voluntary charity, given as and when you wish.</p>
+            <p class="gv-note" data-fundnote="lillah" hidden data-i18n="giving.given_purely_for_the_sake">Given purely for the sake of Allah, with nothing expected in return.</p>
+
+            <p class="gv-zakat" data-i18n-html="giving.zakat_is_not_taken_here"><strong>Zak&#257;t is not taken here.</strong> It has its own categories &mdash;
+              please ring the office on <a href="tel:01204535997" dir="ltr" style="color:inherit">01204 535 997</a>.</p>
+
+            <div class="gv-lab" data-i18n="giving.how_often">How often</div>
+            <div class="gv-grid">
+            <button class="gv-opt" data-gv="freq" data-val="once" aria-pressed="true"><span class="gv-t" data-i18n="giving.one_off">One-off</span><span class="gv-s" data-i18n="giving.a_single_gift">A single gift</span></button>
+            <button class="gv-opt" data-gv="freq" data-val="monthly" aria-pressed="false"><span class="gv-t" data-i18n="giving.monthly">Monthly</span><span class="gv-s" data-i18n="giving.until_you_stop">Until you stop</span></button>
+            <button class="gv-opt" data-gv="freq" data-val="friday" aria-pressed="false"><span class="gv-t" data-i18n="giving.friday_pay">Friday Pay</span><span class="gv-s" data-i18n="giving.jumuah">Jumu&#703;ah</span></button>
+            </div>
+            <p class="gv-note" data-freqnote="monthly" hidden data-i18n="giving.taken_once_a_month_from">Taken once a month from the day you set it up, until you
+              stop it. You can cancel any time from the receipt Stripe emails you.</p>
+            <p class="gv-note" data-freqnote="friday" hidden data-i18n="giving.a_weekly_gift_for_jumuah">A weekly gift for Jumu&#703;ah. Stripe takes it every seven
+              days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop
+              it any time.</p>
+
+            <div class="gv-lab" data-i18n="giving.amount">Amount</div>
+            <div class="gv-grid">
+            <button class="gv-opt" data-gv="amt" data-val="5" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;5</span><span class="gv-s"></span></button>
+            <button class="gv-opt" data-gv="amt" data-val="10" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;10</span><span class="gv-s"></span></button>
+            <button class="gv-opt" data-gv="amt" data-val="25" aria-pressed="true"><span class="gv-t" data-i18n-num>&pound;25</span><span class="gv-s"></span></button>
+            <button class="gv-opt" data-gv="amt" data-val="50" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;50</span><span class="gv-s"></span></button>
+            <button class="gv-opt" data-gv="amt" data-val="100" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;100</span><span class="gv-s"></span></button>
+            <button class="gv-opt" data-gv="amt" data-val="other" aria-pressed="false"><span class="gv-t" data-i18n="giving.other">Other</span><span class="gv-s" data-i18n="giving.you_choose">You choose</span></button>
+            </div>
+
+            <p class="gv-gift" data-i18n-html="giving.gift_aid_if_you_are"><strong>Gift Aid:</strong> if you are a UK taxpayer, tick <strong>Yes</strong> on the
+              payment page and the masjid reclaims <strong>25p for every &pound;1</strong> at no cost to you.
+              You will need to give your name and home address there.</p>
+
+            <a class="gv-cta" id="gv-cta" href="#" target="_blank" rel="noopener">
+              <span class="gv-cta-m" id="gv-cta-amt">Donate &pound;25</span>
+              <span class="gv-cta-s" id="gv-cta-sub">Card &middot; Apple Pay &middot; Google Pay</span>
+            </a>
+            <p class="dc-note" data-i18n="giving.opens_the_masjid_s_secure">Opens the masjid&rsquo;s secure donation page. Card payments carry a small
+              processing fee &mdash; a bank transfer below reaches the masjid in full, if that suits you better.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="giving.or_transfer_directly">Or transfer directly</h2><span class="rule"></span><span class="tag" data-i18n="giving.tap_to_copy">Tap to copy</span></div>
+          <div class="card bank" id="gv-bank">
+            <button class="bk" data-copy="Bolton Central Islamic Society">
+              <span class="bk-k" data-i18n="giving.account_name">Account name</span><span class="bk-v" data-i18n="giving.bolton_central_islamic_society_bcis">Bolton Central Islamic Society (BCIS)</span></button>
+            <button class="bk" data-copy="HSBC">
+              <span class="bk-k" data-i18n="giving.bank">Bank</span><span class="bk-v" data-i18n="giving.hsbc">HSBC</span></button>
+            <button class="bk" data-copy="40-04-15">
+              <span class="bk-k" data-i18n="giving.sort_code">Sort code</span><span class="bk-v tnum" data-i18n-latin>40-04-15</span></button>
+            <button class="bk" data-copy="02320258">
+              <span class="bk-k" data-i18n="giving.account_number">Account number</span><span class="bk-v tnum" data-i18n-latin>02320258</span></button>
+          </div>
+          <p class="dnote" data-i18n="giving.please_use_your_surname_as">Please use your surname as the reference. If you are a UK taxpayer and want the
+            masjid to claim Gift Aid on a transfer, ring the office &mdash; a declaration has to be held for it.</p>
 
           <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
@@ -9468,6 +9619,7 @@ const TILE_ACTIONS = {
   funeral:  () => openFuneral(),
   hallhire: () => openHallHire(),
   donate:   () => switchTab("donate"),
+  giving:   () => openGiving(),
   whatsapp: () => { if(WHATSAPP_URL) window.open(WHATSAPP_URL, "_blank", "noopener"); },
 };
 
@@ -10015,6 +10167,120 @@ function initNikah(){
   nkRenderCal();
   nkRenderPicks();
   nkShow(false);
+}
+
+/* ---------------- everyday giving: ṣadaqah, lillāh, general ----------------
+
+   The masjid's own Stripe Payment Links, taken from the website's
+   index_template.html rather than guessed: a wrong link either goes nowhere
+   or sends somebody's ṣadaqah to the wrong place.
+
+   ONE LINK PER AMOUNT PER FREQUENCY. A Payment Link carries its own fixed
+   price and cannot be handed an amount in the URL — the only parameters it
+   accepts are UTM codes and client_reference_id.
+
+   WHAT THE GIFT IS FOR IS NOT IN THE TABLE. Ṣadaqah and lillāh are
+   designations, not different products, so they ride on the same links as
+   client_reference_id and show against the payment in Stripe's dashboard and
+   on the webhook. The values are exactly the website's, so the masjid's
+   reports do not split in two.
+
+   TWO COMBINATIONS HAVE NO LINK: a recurring gift of an amount the donor
+   types. The masjid has not made those, so they grey out rather than
+   vanishing — a grid that changes shape as you switch frequency is a grid
+   people think they misclicked. */
+const GIVING_LINKS = {
+  once: {
+    "5":     "https://donate.stripe.com/3cI6oH8ry5XO2x84l0f3a09",
+    "10":    "https://donate.stripe.com/cNi7sL7nu71S8Vw3gWf3a0a",
+    "25":    "https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b",
+    "50":    "https://donate.stripe.com/eVq3cvfU03PG8VwdVAf3a0c",
+    "100":   "https://donate.stripe.com/28EcN5cHOcmc7Rs4l0f3a0d",
+    "other": "https://donate.stripe.com/6oU00j7nueuk2x8bNsf3a0o",
+  },
+  monthly: {
+    "5":     "https://donate.stripe.com/dRmcN523aeukc7I6t8f3a0f",
+    "10":    "https://donate.stripe.com/4gMcN55fm71S0p018Of3a0e",
+    "25":    "https://donate.stripe.com/14A8wPgY4gCs9ZAeZEf3a0g",
+    "50":    "https://donate.stripe.com/5kQ00jdLScmc9ZAaJof3a0h",
+    "100":   "https://donate.stripe.com/dRm9ATgY4bi86NocRwf3a0i",
+    "other": "",
+  },
+  friday: {
+    "5":     "https://donate.stripe.com/28E5kD8ry2LCdbM04Kf3a0j",
+    "10":    "https://donate.stripe.com/5kQfZhdLSbi81t418Of3a0k",
+    "25":    "https://donate.stripe.com/dRm3cv5fm71S9ZA9Fkf3a0l",
+    "50":    "https://donate.stripe.com/dRmaEX37e9a0b3E8Bgf3a0m",
+    "100":   "https://donate.stripe.com/3cIaEXfU0cmc2x8dVAf3a0n",
+    "other": "",
+  },
+};
+const GIVING_AMOUNTS = { "5":"£5", "10":"£10", "25":"£25", "50":"£50", "100":"£100", "other":null };
+const GV = { fund:"general", freq:"once", amt:"25" };
+
+function gvLink(){ return (GIVING_LINKS[GV.freq] || {})[GV.amt] || null; }
+
+function gvRender(){
+  document.querySelectorAll('#giving .gv-opt').forEach(b=>{
+    b.setAttribute("aria-pressed", String(GV[b.dataset.gv] === b.dataset.val));
+    /* Amounts the chosen frequency has no link for are greyed, not removed. */
+    if(b.dataset.gv === "amt")
+      b.disabled = !((GIVING_LINKS[GV.freq] || {})[b.dataset.val]);
+  });
+  document.querySelectorAll('#giving [data-fundnote]').forEach(p=>{
+    p.hidden = p.dataset.fundnote !== GV.fund;
+  });
+  document.querySelectorAll('#giving [data-freqnote]').forEach(p=>{
+    p.hidden = p.dataset.freqnote !== GV.freq;
+  });
+  const amt = GIVING_AMOUNTS[GV.amt];
+  const cta = document.getElementById("gv-cta");
+  const main = document.getElementById("gv-cta-amt");
+  const sub = document.getElementById("gv-cta-sub");
+  const href = gvLink();
+  /* What the donor is agreeing to, on the button itself. "Donate £10" and
+     "Donate £10 every Friday" are different promises, and the button is the
+     last thing read before the card page. */
+  const per = GV.freq === "monthly" ? " " + t("giving.a_month","a month")
+            : GV.freq === "friday"  ? " " + t("giving.every_friday","every Friday") : "";
+  if(href){
+    /* The designation travels with the payment rather than needing its own
+       link. Appended, not assigned, in case a UTM code is ever added here. */
+    cta.href = href + (href.indexOf("?") === -1 ? "?" : "&") +
+               "client_reference_id=" + encodeURIComponent(GV.fund);
+    cta.removeAttribute("aria-disabled");
+    main.textContent = amt ? t("giving.donate","Donate") + " " + num(amt) + per
+                           : t("giving.choose_your_amount","Choose your amount") + per;
+    sub.textContent = t("giving.card_apple_pay_google","Card · Apple Pay · Google Pay");
+  }else{
+    cta.removeAttribute("href");
+    cta.setAttribute("aria-disabled","true");
+    main.textContent = t("giving.not_available_yet","Not available yet");
+    sub.textContent = t("giving.choose_another_amount","Choose another amount, or use the bank details below");
+  }
+}
+function initGiving(){
+  document.getElementById('gv-close').addEventListener('click', closeGiving);
+  document.getElementById('gv-scrim').addEventListener('click', closeGiving);
+  document.querySelectorAll('#giving .gv-opt').forEach(b=>{
+    b.addEventListener('click', ()=>{ GV[b.dataset.gv] = b.dataset.val; gvRender(); });
+  });
+  /* The bank rows need no wiring here: the donate tab's handler binds every
+     .bk on the page, and these are .bk too. */
+  document.addEventListener('keydown', e=>{
+    if(e.key === "Escape" && document.getElementById('giving').dataset.open === "1") closeGiving();
+  });
+  gvRender();
+}
+function openGiving(){
+  document.getElementById('giving').dataset.open = "1";
+  document.body.style.overflow = "hidden";
+  document.querySelector('#giving .sh-body').scrollTop = 0;
+  gvRender();
+}
+function closeGiving(){
+  document.getElementById('giving').dataset.open = "0";
+  document.body.style.overflow = "";
 }
 
 /* ---------------- madrasah: what is taught ---------------- */
@@ -11091,6 +11357,7 @@ function boot(){
   initFuneral();
   initMadrasah();
   initCurriculum();
+  initGiving();
   initAdmissions();
   initHolidays();
   initEducation();
