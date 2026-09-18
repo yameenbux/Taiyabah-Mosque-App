@@ -1572,6 +1572,35 @@
   .gv-cta[aria-disabled="true"]{background:var(--line);color:var(--muted);box-shadow:none;cursor:default}
   .gv-cta-m{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(20px * var(--ts))}
   .gv-cta-s{font-size:calc(10.5px * var(--ts));letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+  /* ---- charity collection (chanda) ---- */
+  /* A divider that names the next group of questions. Sixteen fields in one
+     column is a wall; four named groups of four is a form. */
+  .bk-div{margin:20px 0 2px;padding-top:14px;border-top:1px solid var(--line);
+    font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(15px * var(--ts));color:var(--brand-900)}
+  .bk-form .bk-div:first-of-type{border-top:none;padding-top:0;margin-top:14px}
+  /* The rules are the thing being agreed to, so they get the dark panel the
+     app uses for anything it wants read rather than skimmed. */
+  .cc-rules{margin:2px 0 6px;padding:16px 17px 17px;border-radius:var(--radius);
+    background:linear-gradient(155deg,var(--brand-600) 0%,var(--brand-900) 72%);color:#F3EFE3;
+    box-shadow:var(--shadow)}
+  .cc-rules h4{font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:calc(17px * var(--ts));margin-bottom:4px}
+  .cc-rules .cc-ver{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;
+    color:var(--gold-bright);margin-bottom:13px}
+  .cc-rules ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .cc-rules li{display:grid;grid-template-columns:16px 1fr;gap:10px;
+    font-size:calc(13.5px * var(--ts));line-height:1.6;color:#E8DCE4}
+  .cc-rules li b{color:#F3EFE3;font-weight:700}
+  .cc-rules .tick{color:var(--gold-bright);font-weight:700}
+  /* Not an error — a paid collector is allowed — so it must not look like one. */
+  .cc-paid-note{margin:10px 0 0;padding:11px 13px;border-radius:12px;
+    border:1px solid var(--line);background:rgba(198,162,76,.1);
+    font-size:calc(12.5px * var(--ts));line-height:1.6}
+  .cc-help{margin-top:18px;padding:13px 15px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card);font-size:calc(13px * var(--ts));line-height:1.65;
+    display:flex;flex-direction:column;gap:3px}
+  .cc-help .cc-help-t{font-weight:700;color:var(--ink)}
+  .cc-help a{color:var(--brand-600);font-weight:700;text-decoration:none}
   .gv-goes dt{font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.1em;
     text-transform:uppercase;color:var(--brand-600);margin-bottom:5px}
   .gv-goes dd{font-size:calc(14px * var(--ts));line-height:1.6;color:var(--ink)}
@@ -3833,6 +3862,166 @@
     </div>
   </div>
 
+  <!-- ================= CHARITY COLLECTION (CHANDA) =================
+       The masjid's paper CHARITY DATA FORM, and the poster of mobile numbers
+       it came with. Same request_charity_collection() the website calls, so
+       the office reads one list rather than two.
+
+       A REQUEST, NOT A BOOKING, and the screen says so three times. The paper
+       form was headed "Date Of Booking" and charities turned up believing
+       they had one. -->
+  <div class="sheet" id="collect" data-open="0" role="dialog" aria-modal="true" aria-label="Charity collections" data-i18n-attr="aria-label:a11y.charity_collections">
+    <div class="scrim" id="cc-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="collect.charity_collections">Charity Collections</h3>
+        <button class="sh-close" id="cc-close" data-i18n="collect.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="hh-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="gv-eyebrow" data-i18n="collect.collections_chanda">Collections &middot; Chanda</div>
+          <div class="hh-en" data-i18n="collect.collect_for_your_cause">Collect for your cause at Taiyabah Masjid</div>
+          <p class="hh-sub" data-i18n="collect.charities_and_institutes_are_welcome">Charities and institutes are welcome to collect here. Fill this in and the
+            masjid office will contact your trustee to confirm a date. Nothing on this screen books a
+            day &mdash; it is a request, and the masjid will be in touch.</p>
+        </section>
+
+        <div class="ab-wrap">
+
+          <div class="cc-rules">
+            <h4 data-i18n="collect.rules_for_collection">Rules for collection</h4>
+            <div class="cc-ver"><span data-i18n="collect.version">Version</span>
+              <span id="cc-rules-ver" data-i18n-latin>&mdash;</span>
+              <span data-i18n="collect.you_are_agreeing_to_this">&middot; you are agreeing to this version</span></div>
+            <ul>
+              <li><span class="tick" aria-hidden="true">&#10003;</span><span data-i18n-html="collect.collection_starts_after_zohr">Collection starts <b>after Zohr salah</b> and ends <b>after Isha salah</b>.</span></li>
+              <li><span class="tick" aria-hidden="true">&#10003;</span><span data-i18n-html="collect.announcements_elaan_are_made_without">Announcements (el&#257;an) are made <b>without the microphone</b>.</span></li>
+              <li><span class="tick" aria-hidden="true">&#10003;</span><span data-i18n-html="collect.announcements_are_only_allowed_after">Announcements are only allowed <b>after Asr and after Isha</b>, and must last <b>no more than two minutes</b>.</span></li>
+            </ul>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="collect.before_you_fill_this_in">Before you fill this in</h2><span class="rule"></span></div>
+          <dl class="card gv-goes" style="padding:4px 17px 14px">
+            <div><dt data-i18n="collect.notice">Notice</dt><dd><span data-i18n="collect.the_masjid_needs_at_least">The masjid needs at least</span>
+              <span data-i18n-num>14</span> <span data-i18n="collect.days_notice_and_takes_requests">days&rsquo; notice, and takes requests up to a year ahead.</span></dd></div>
+            <div><dt data-i18n="collect.one_a_day">One a day</dt><dd data-i18n="collect.only_one_collection_is_allowed">Only one collection is allowed on any given day, so an early request has the best chance of the date you want.</dd></div>
+            <div><dt data-i18n="collect.the_trustee_is_rung">The trustee is rung</dt><dd data-i18n="collect.the_masjid_rings_the_trustee">The masjid rings the trustee or manager you name &mdash; somebody other than the collector &mdash; to check the collection is genuine before confirming.</dd></div>
+          </dl>
+
+          <div id="cc-closed" hidden>
+            <div class="ad-note">
+              <span class="lab" data-i18n="collect.requests">Requests</span>
+              <h4 data-i18n="collect.requests_by_phone_for_now">Requests are taken by phone for now</h4>
+              <p data-i18n="collect.this_form_is_not_open">This form is not open yet. Please ring the number below and the masjid will take the details.</p>
+            </div>
+          </div>
+
+          <form class="bk-form" id="cc-form" novalidate autocomplete="on" hidden>
+            <p class="bk-hint" data-i18n="collect.every_question_is_needed_unless">Every question is needed unless it says otherwise. The masjid rings the trustee
+              named at the bottom before confirming anything, so please give a number that will be answered.</p>
+
+            <div class="bk-div" data-i18n="collect.the_date">The date</div>
+            <div class="bk-field">
+              <label for="cc-date" data-i18n="collect.date_you_would_like_to">Date you would like to collect</label>
+              <input type="date" id="cc-date" autocomplete="off" data-i18n-latin>
+              <span class="bk-hint" id="cc-date-hint"></span>
+            </div>
+
+            <div class="bk-div" data-i18n="collect.the_charity_or_institute">The charity or institute</div>
+            <div class="bk-field">
+              <label for="cc-org" data-i18n="collect.full_name_of_charity_institute">Full name of charity / institute (id&#257;ra)</label>
+              <input type="text" id="cc-org" autocomplete="organization">
+            </div>
+            <div class="bk-field">
+              <label for="cc-addr" data-i18n="collect.address">Address</label>
+              <textarea id="cc-addr" rows="2" maxlength="400" autocomplete="street-address"></textarea>
+            </div>
+            <div class="bk-field">
+              <label for="cc-phone" data-i18n="collect.phone_number">Phone number</label>
+              <input type="tel" id="cc-phone" inputmode="tel" autocomplete="tel" data-i18n-latin>
+            </div>
+            <div class="bk-field">
+              <label for="cc-email" data-i18n="collect.email">Email</label>
+              <input type="email" id="cc-email" inputmode="email" autocomplete="email" data-i18n-latin>
+            </div>
+            <div class="bk-field">
+              <label for="cc-num" data-i18n-html="collect.charity_number_if_you_have">Charity number <span style="text-transform:none;letter-spacing:0;font-weight:500">&mdash; if you have one</span></label>
+              <input type="text" id="cc-num" autocomplete="off" data-i18n-latin>
+              <span class="bk-hint" data-i18n="collect.leave_this_empty_if_the">Leave this empty if the cause is overseas or not registered in England and Wales.</span>
+            </div>
+
+            <div class="bk-div" data-i18n="collect.who_will_be_collecting">Who will be collecting</div>
+            <div class="bk-field">
+              <label for="cc-cname" data-i18n="collect.name_of_the_person_doing">Name of the person doing the collection</label>
+              <input type="text" id="cc-cname" autocomplete="name">
+            </div>
+            <div class="bk-field">
+              <label for="cc-crole" data-i18n="collect.their_role_in_the_institute">Their role in the institute</label>
+              <input type="text" id="cc-crole" autocomplete="organization-title">
+            </div>
+            <span class="bk-clabel" data-i18n="collect.do_they_receive_any_wage">Do they receive any wage or commission for this collection?</span>
+            <div class="bk-opts" id="cc-paid">
+              <button type="button" class="bk-opt" data-paid="no" data-i18n="collect.no">No</button>
+              <button type="button" class="bk-opt" data-paid="yes" data-i18n="collect.yes">Yes</button>
+            </div>
+            <p class="cc-paid-note" id="cc-paid-note" hidden data-i18n="collect.thank_you_for_saying_so">Thank you for saying so. A paid collector is allowed &mdash; the masjid
+              simply needs to know beforehand, and the committee may ask about it when they ring.</p>
+
+            <div class="bk-div" data-i18n="collect.trustee_or_manager">Trustee or manager</div>
+            <div class="bk-field">
+              <label for="cc-tname" data-i18n="collect.full_name_of_trustee_ceo">Full name of trustee / CEO / principal</label>
+              <input type="text" id="cc-tname" autocomplete="off">
+              <span class="bk-hint" data-i18n="collect.somebody_other_than_the_collector">Somebody other than the collector. The masjid rings this person to confirm the collection is genuine.</span>
+            </div>
+            <div class="bk-field">
+              <label for="cc-tphone" data-i18n="collect.their_phone_number">Their phone number</label>
+              <input type="tel" id="cc-tphone" inputmode="tel" autocomplete="off" data-i18n-latin>
+            </div>
+            <div class="bk-field">
+              <label for="cc-temail" data-i18n="collect.their_email">Their email</label>
+              <input type="email" id="cc-temail" inputmode="email" autocomplete="off" data-i18n-latin>
+            </div>
+
+            <div class="bk-div" data-i18n="collect.agreement">Agreement</div>
+            <label class="bk-agree">
+              <input type="checkbox" id="cc-agree-rules">
+              <span data-i18n-html="collect.i_have_read_the_rules">I have read the <b>rules for collection</b> above and agree to them on behalf of
+                the charity or institute named on this form.</span>
+            </label>
+            <label class="bk-agree">
+              <input type="checkbox" id="cc-agree-priv">
+              <span data-i18n="collect.i_understand_the_masjid_will">I understand the masjid will keep these details to arrange and check the
+                collection, will contact the trustee named above, and will delete them afterwards in line with its privacy
+                notice. I confirm the trustee is content to be contacted about this.</span>
+            </label>
+            <p class="bk-hint"><a href="./privacy.html" target="_blank" rel="noopener"
+               data-i18n="privacy.read_the_privacy_notice">Read the privacy notice</a></p>
+            <div class="bk-field">
+              <label for="cc-sign" data-i18n="collect.signed_type_your_full_name">Signed &mdash; type your full name</label>
+              <input type="text" id="cc-sign" autocomplete="name">
+              <span class="bk-hint" data-i18n="collect.typing_your_name_here_has">Typing your name here has the same effect as signing the paper form. The date and time are recorded with it.</span>
+            </div>
+
+            <div class="bk-err" id="cc-err" hidden></div>
+            <button type="submit" class="bk-submit" id="cc-submit" data-i18n="collect.send_this_request">Send this request</button>
+            <p class="bk-hint" style="text-align:center" data-i18n="collect.the_masjid_will_contact_your">The masjid will contact your trustee to confirm. Nothing here reserves a date.</p>
+          </form>
+
+          <div class="bk-done" id="cc-done" hidden></div>
+
+          <div class="cc-help">
+            <span class="cc-help-t" data-i18n="collect.need_help_with_this_form">Need help with this form?</span>
+            <a href="tel:+447951795465"><span data-i18n="collect.rafik_patel">Rafik Patel</span>
+              &mdash; <span data-i18n-latin>07951 795 465</span></a>
+          </div>
+
+          <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="rabbanas" data-open="0" role="dialog" aria-modal="true" aria-label="40 Rabbana Duas" data-i18n-attr="aria-label:a11y.40_rabbana_duas">
     <div class="scrim" id="rb-scrim"></div>
     <div class="panel">
@@ -4561,6 +4750,9 @@
         </button>
         <button class="dr-row" data-act="education">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="dr-t" data-i18n="marriage.education">Education</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <button class="dr-row" data-act="collect">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h16v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19.5Z"/><path d="M3 6.5h18v3H3Z"/><path d="M10 13h4"/><path d="M12 6.5V4.2a2.2 2.2 0 1 0-2.2 2.3Z"/><path d="M12 6.5V4.2a2.2 2.2 0 1 1 2.2 2.3Z"/></svg></span><span class="dr-t" data-i18n="collect.charity_collections">Charity Collections</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t" data-i18n="marriage.tours_visits">Tours &amp; Visits</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
@@ -6953,6 +7145,8 @@ function refreshRenderedText(){
     () => { const p = prefStore.get("alerts"); if(p && prefStore.get("alertsSet")) showCollapsed(p); },
     () => { if(typeof renderNotices === "function") renderNotices(); },
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
+    () => { if(open("giving")) gvRender(); },
+    () => { if(open("collect")) ccDateBounds(); },
   ];
   /* One screen failing to redraw must not stop the rest from being translated. */
   for(const job of jobs){ try{ job(); }catch(e){ console.warn("re-render after language change:", e); } }
@@ -10283,6 +10477,258 @@ function closeGiving(){
   document.body.style.overflow = "";
 }
 
+/* ---------------- charity collection (chanda) ----------------
+
+   The masjid's paper CHARITY DATA FORM. Same request_charity_collection()
+   the website calls, so the office reads one list and a charity that starts
+   on the website can finish in the app.
+
+   THE RULES ARE VERSIONED, AND THE VERSION IS STORED ON THE ROW. If the
+   masjid changes the rules, a request sent today still says what this
+   applicant actually agreed to — which the paper form could never do, since
+   the sheet in the drawer does not name a version either. CC_RULES_VERSION
+   must therefore match the rules printed on the screen above it, and the
+   website's, because all three describe the same agreement.
+
+   NOTICE_DAYS IS ENFORCED IN THREE PLACES and that is deliberate: here, so
+   the date field will not offer a date that cannot work; in the website's own
+   copy; and in request_charity_collection(), which is the one that counts,
+   because a form can be driven from outside a browser. If the masjid
+   shortens the notice, all three have to change. */
+const CC_RULES_VERSION = "2026-09-14";
+const CC_NOTICE_DAYS   = 14;
+const CC_HORIZON_DAYS  = 365;
+
+const CC = { paid: null, sent: false, open: null };
+
+function ccIso(d){
+  return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
+}
+function ccFirstAllowed(){
+  const d = nowLondon(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + CC_NOTICE_DAYS);
+  return d;
+}
+function ccLastAllowed(){
+  const d = nowLondon(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + CC_HORIZON_DAYS);
+  return d;
+}
+
+/* Is the office taking requests? Asked of Postgres rather than a boolean
+   somebody edits by hand, so the app and the website cannot drift.
+
+   An empty payload is a safe question. request_charity_collection() validates
+   the date before it touches the table, so this raises "Please choose a date"
+   and writes nothing — which also means it does not spend one of the three
+   requests per contact per day that the rate limiter allows, because that
+   limiter is a trigger on INSERT and no insert happens. */
+function ccProbe(){
+  if(CC.open !== null) return Promise.resolve(CC.open);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  return fetch(`${supaBase()}/rest/v1/rpc/request_charity_collection`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ payload: {} }),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    CC.open = !(res.status === 404 || /PGRST202/.test(body));
+    return CC.open;
+  })).catch(() => { clearTimeout(timer); CC.open = false; return false; });
+}
+
+function ccShow(open){
+  document.getElementById("cc-closed").hidden = !!open;
+  const f = document.getElementById("cc-form");
+  f.hidden = !(open && !CC.sent);
+}
+
+function ccValidate(){
+  const v = id => document.getElementById(id).value.trim();
+  const bad = id => { document.getElementById(id).parentElement.dataset.bad = "1"; };
+  ["cc-date","cc-org","cc-addr","cc-phone","cc-email","cc-cname","cc-crole",
+   "cc-tname","cc-tphone","cc-temail","cc-sign"].forEach(id=>{
+    delete document.getElementById(id).parentElement.dataset.bad;
+  });
+  const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  let ok = true;
+
+  const d = v("cc-date");
+  let dOk = false;
+  if(d){
+    const chosen = new Date(d + "T00:00:00");
+    dOk = !isNaN(chosen) && chosen >= ccFirstAllowed() && chosen <= ccLastAllowed();
+  }
+  if(!dOk){ bad("cc-date"); ok = false; }
+
+  [["cc-org",2],["cc-addr",4],["cc-cname",2],["cc-crole",2],["cc-tname",2],["cc-sign",2]]
+    .forEach(([id,min])=>{ if(v(id).length < min){ bad(id); ok = false; } });
+  [["cc-phone",10],["cc-tphone",10]].forEach(([id,min])=>{
+    if(v(id).replace(/\D/g,"").length < min){ bad(id); ok = false; }
+  });
+  [["cc-email"],["cc-temail"]].forEach(([id])=>{
+    if(!EMAIL.test(v(id))){ bad(id); ok = false; }
+  });
+
+  /* "They did not answer" and "they answered no" are different facts, and a
+     null would quietly become the second one — which is why the database
+     refuses a null here too. */
+  if(CC.paid !== "yes" && CC.paid !== "no") ok = false;
+  if(!document.getElementById("cc-agree-rules").checked) ok = false;
+  if(!document.getElementById("cc-agree-priv").checked) ok = false;
+  return ok;
+}
+
+function ccSubmit(e){
+  e.preventDefault();
+  if(CC.sent) return;
+  const err = document.getElementById("cc-err");
+  if(!ccValidate()){
+    err.hidden = false;
+    err.textContent = t("collect.check_the_form",
+      "Please fill in every question, choose a date at least two weeks away, and tick both boxes.");
+    const first = document.querySelector('#cc-form [data-bad]');
+    if(first) first.scrollIntoView({ behavior:"smooth", block:"center" });
+    return;
+  }
+  err.hidden = true;
+
+  const btn = document.getElementById("cc-submit");
+  btn.disabled = true;
+  btn.textContent = t("collect.sending", "Sending…");
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  const v = id => document.getElementById(id).value.trim();
+
+  fetch(`${supaBase()}/rest/v1/rpc/request_charity_collection`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ payload: {
+      requested_date:  v("cc-date"),
+      org_name:        v("cc-org"),
+      org_address:     v("cc-addr"),
+      org_phone:       v("cc-phone"),
+      org_email:       v("cc-email"),
+      charity_number:  v("cc-num"),
+      collector_name:  v("cc-cname"),
+      collector_role:  v("cc-crole"),
+      collector_paid:  CC.paid === "yes",
+      trustee_name:    v("cc-tname"),
+      trustee_phone:   v("cc-tphone"),
+      trustee_email:   v("cc-temail"),
+      rules_version:   CC_RULES_VERSION,
+      signed_name:     v("cc-sign"),
+      /* THE CHECKBOXES, not literal trues. Hard-coding these would turn a
+         two-layer guarantee into a one-layer one and look identical in the
+         diff: with the validation above removed, an unticked box would still
+         send true and the database would record an agreement nobody gave. */
+      rules_accepted:   document.getElementById("cc-agree-rules").checked,
+      privacy_accepted: document.getElementById("cc-agree-priv").checked,
+    }}),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    if(res.ok){
+      CC.sent = true;
+      let ref = null;
+      try{ ref = JSON.parse(body).reference; }catch(_){}
+      ccDone(ref);
+      return;
+    }
+    /* The function speaks to the applicant directly — "the masjid already has
+       a request from this email address for that date" — so where it does,
+       say what it said rather than an apology over the top of it. */
+    let msg = null;
+    try{ const j = JSON.parse(body); if(j && j.message && /^[A-Z]/.test(j.message)) msg = j.message; }catch(_){}
+    btn.disabled = false;
+    btn.textContent = t("collect.send_this_request", "Send this request");
+    err.hidden = false;
+    err.textContent = msg || t("collect.couldnt_send",
+      "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.");
+  })).catch(() => {
+    clearTimeout(timer);
+    btn.disabled = false;
+    btn.textContent = t("collect.send_this_request", "Send this request");
+    err.hidden = false;
+    err.textContent = t("collect.couldnt_send",
+      "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.");
+  });
+}
+
+function ccDone(ref){
+  document.getElementById("cc-form").hidden = true;
+  const box = document.getElementById("cc-done");
+  let html = `<h4>${esc(t("collect.request_sent","Your request has been sent"))}</h4>`
+           + `<p>${esc(t("collect.please_keep_this_reference",
+               "Please keep this reference. The masjid office will ring the trustee you named to confirm the date. If you have not heard within a few days, ring the number below and quote it."))}</p>`;
+  if(ref) html += `<div class="bk-sum"><span class="k">${esc(t("collect.reference","Reference"))}</span><span class="v">${esc(ref)}</span></div>`;
+  box.innerHTML = html;
+  box.hidden = false;
+}
+
+/* The bounds AND the sentence under the date field. Written by hand rather
+   than carried on a data-i18n attribute, because it names a date — so it has
+   to be redrawn when the language changes, not just when the screen opens.
+   refreshRenderedText() is what calls it then; it was translated once at
+   startup and left in English otherwise. */
+function ccDateBounds(){
+  const date = document.getElementById("cc-date");
+  if(!date) return;
+  const first = ccFirstAllowed();
+  date.min = ccIso(first);
+  date.max = ccIso(ccLastAllowed());
+  document.getElementById("cc-date-hint").textContent =
+    t("collect.the_earliest_date_the_masjid", "The earliest date the masjid can take is")
+    + " " + fullDow(first.getDay()) + " " + num(first.getDate()) + " "
+    + mon(first.getMonth()) + " " + num(first.getFullYear()) + ".";
+}
+
+function initCollect(){
+  document.getElementById("cc-close").addEventListener("click", closeCollect);
+  document.getElementById("cc-scrim").addEventListener("click", closeCollect);
+  document.addEventListener("keydown", e=>{
+    if(e.key === "Escape" && document.getElementById("collect").dataset.open === "1") closeCollect();
+  });
+
+  document.getElementById("cc-rules-ver").textContent = CC_RULES_VERSION;
+  ccDateBounds();
+
+  document.getElementById("cc-paid").addEventListener("click", e=>{
+    const b = e.target.closest(".bk-opt");
+    if(!b) return;
+    CC.paid = b.dataset.paid;
+    document.querySelectorAll("#cc-paid .bk-opt").forEach(x=>
+      x.classList.toggle("on", x.dataset.paid === CC.paid));
+    /* Shown the moment they say Yes, and it is not a warning. */
+    document.getElementById("cc-paid-note").hidden = CC.paid !== "yes";
+  });
+
+  /* Clear the red as soon as somebody starts fixing it. Leaving a field red
+     while they type tells them the thing they are doing is wrong. */
+  document.getElementById("cc-form").addEventListener("input", e=>{
+    const f = e.target.closest(".bk-field");
+    if(f) delete f.dataset.bad;
+  });
+  document.getElementById("cc-form").addEventListener("submit", ccSubmit);
+}
+
+function openCollect(){
+  document.getElementById("collect").dataset.open = "1";
+  document.body.style.overflow = "hidden";
+  document.querySelector("#collect .sh-body").scrollTop = 0;
+  ccDateBounds();
+  ccProbe().then(ccShow);
+}
+function closeCollect(){
+  document.getElementById("collect").dataset.open = "0";
+  document.body.style.overflow = "";
+}
+
 /* ---------------- madrasah: what is taught ---------------- */
 function openCurriculum(){
   document.getElementById('curriculum').dataset.open="1";
@@ -10694,6 +11140,7 @@ function initDrawer(){
       if(act==="holidays"){ setTimeout(openHolidays,120); }
       if(act==="education"){ setTimeout(openEducation,120); }
       if(act==="membership"){ setTimeout(openMembership,120); }
+      if(act==="collect"){ setTimeout(openCollect,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -11358,6 +11805,7 @@ function boot(){
   initMadrasah();
   initCurriculum();
   initGiving();
+  initCollect();
   initAdmissions();
   initHolidays();
   initEducation();
