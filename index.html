@@ -10874,9 +10874,22 @@ function ccDone(ref){
    to be redrawn when the language changes, not just when the screen opens.
    refreshRenderedText() is what calls it then; it was translated once at
    startup and left in English otherwise. */
+/* Three months back from today, CLAMPED TO THE END OF THE MONTH — which is
+   what Postgres does, and therefore what request_charity_collection() will
+   accept.
+
+   setMonth() on its own overflows instead of clamping: on 31 May it is asked
+   for 31 February and answers 3 March, so the form refused certificates dated
+   28 February, 1 and 2 March that the database would have taken. Up to three
+   days a charity is told its current certificate is too old. It only shows on
+   month-ends, which is why it survived the first round of testing. */
 function ccCertEarliest(){
   const d = nowLondon(); d.setHours(0,0,0,0);
+  const day = d.getDate();
+  d.setDate(1);
   d.setMonth(d.getMonth() - CC_CERT_MONTHS);
+  const lastOfMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastOfMonth));
   return d;
 }
 
