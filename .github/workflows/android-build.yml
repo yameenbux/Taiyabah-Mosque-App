@@ -114,12 +114,24 @@ jobs:
           VNAME: ${{ inputs.versionName }}
           VCODE: ${{ inputs.versionCode }}
 
+      # Regenerates the Android project from twa-manifest.json. It has to run,
+      # and it has to run AFTER the version edit above: `build` on its own
+      # expects a project that is already there, and if it notices the manifest
+      # has changed since the project was generated it stops and ASKS whether
+      # to update it — which on a runner means hanging until the job times out.
+      - name: Generate the Android project
+        run: bubblewrap update --skipVersionUpgrade
+
+      # Bubblewrap takes these from the environment, not from flags. Both must
+      # be set or it falls back to prompting, which hangs the run. keytool
+      # offers to reuse the store password for the key, so one secret fills
+      # both; if they were ever made different, this needs a second secret.
       - name: Build
         env:
-          PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          bubblewrap build --skipPwaValidation \
-            --signingKeyPassword="$PASS" --signingKeyAlias=taiyabah
+          bubblewrap build --skipPwaValidation
           ls -la ./*.aab ./*.apk 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
