@@ -76,7 +76,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # `packages` defaults to "tools platform-tools", and `tools` was retired
+      # from Google's repository — sdkmanager exits 1 on "Failed to find package
+      # 'tools'" and the whole job dies seven seconds in. Nothing here needs it.
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      # Bubblewrap would install these itself, but it looks for sdkmanager at
+      # $ANDROID_HOME/tools/bin or $ANDROID_HOME/bin, and on a runner it lives
+      # under cmdline-tools/<version>/bin — so that path throws instead. Putting
+      # the packages in first means checkBuildTools() passes and it never tries.
+      # Versions come from Bubblewrap 1.25.0: BUILD_TOOLS_VERSION in
+      # AndroidSdkTools, and compileSdkVersion in its Gradle template.
+      - name: Install the SDK pieces Bubblewrap expects
+        run: |
+          sdkmanager --install "platforms;android-36" "build-tools;36.1.0"
+          ls "$ANDROID_SDK_ROOT/build-tools"
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli@1.25.0
