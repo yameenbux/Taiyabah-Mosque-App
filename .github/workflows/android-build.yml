@@ -94,6 +94,21 @@ jobs:
           sdkmanager --install "platforms;android-36" "build-tools;36.1.0"
           ls "$ANDROID_SDK_ROOT/build-tools"
 
+      # Bubblewrap decides whether an SDK path is real by looking for a `tools`
+      # or a `bin` directory immediately inside it (AndroidSdkTools.validatePath).
+      # A runner's SDK has neither — its command line tools sit in
+      # cmdline-tools/<version>/bin — so `build` stops on "The provided
+      # androidSdk isn't correct" before compiling anything. Linking the real
+      # directory into place is enough, and it is also the second location
+      # installBuildTools() looks in, so nothing else has to know.
+      - name: Give Bubblewrap the SDK layout it expects
+        run: |
+          bin=$(command -v sdkmanager || true)
+          if [ -n "$bin" ]; then bin=$(dirname "$bin");
+          else bin=$(ls -d "$ANDROID_SDK_ROOT"/cmdline-tools/*/bin | tail -1); fi
+          ln -sfn "$bin" "$ANDROID_SDK_ROOT/bin"
+          ls -l "$ANDROID_SDK_ROOT/bin/sdkmanager"
+
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli@1.25.0
 
