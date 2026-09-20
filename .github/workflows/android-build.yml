@@ -171,6 +171,37 @@ jobs:
           bubblewrap build --skipPwaValidation
           ls -la ./*.aab ./*.apk 2>/dev/null || true
 
+      # An app whose signing key the site does not name runs fine and shows a
+      # browser bar across the top, with no error in the build, in the install
+      # or on the device. Nothing else here compares the two, so the only way
+      # to find out used to be installing it and looking. Now every build says
+      # which key it signed with and whether the site will vouch for it.
+      - name: Say which key signed this, and whether the site knows it
+        run: |
+          apk=$(ls ./*.apk 2>/dev/null | grep -v unsigned | head -1)
+          signer=$(ls "$ANDROID_SDK_ROOT"/build-tools/*/apksigner | tail -1)
+          fp=$("$signer" verify --print-certs "$apk" \
+               | sed -n 's/.*SHA-256 digest: *//p' | head -1 | tr 'a-z' 'A-Z')
+          python3 - "$fp" <<'PY'
+          import json, sys
+          fp = sys.argv[1].strip()
+          named = [p.replace(':', '').upper() for p in
+                   json.load(open('.well-known/assetlinks.json'))
+                       [0]['target']['sha256_cert_fingerprints']]
+          print('this APK is signed with SHA-256', fp or '(could not read it)')
+          if not fp:
+              print('::warning::could not read the APK signature, so nothing was compared')
+          elif fp in named:
+              print('assetlinks.json names that key — a sideloaded install verifies')
+          else:
+              print('::warning::assetlinks.json does NOT name the key this APK is signed with,')
+              print('::warning::so installing it by hand shows a browser bar across the top.')
+              print('::warning::  the APK is signed with: ' + fp)
+              print('::warning::  the site names:         ' + (', '.join(named) or '(nothing)'))
+              print('::warning::Installs from Play are signed by Google instead and are a')
+              print('::warning::separate entry, so this does not by itself mean Play is wrong.')
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: taiyabah-${{ inputs.versionName }}
