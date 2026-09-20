@@ -1,11 +1,13 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.taiyabahmasjid.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256"
+        "F5:7F:73:1F:2B:85:C1:C1:45:64:BD:B7:43:6B:BB:3D:09:45:CD:E5:1E:F9:7E:B9:58:98:50:5E:D1:6D:6E:6E"
       ]
     }
   }
