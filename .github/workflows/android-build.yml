@@ -58,17 +58,23 @@ jobs:
           test "$code" = "200" || { echo "::error::the manifest is not being served"; exit 1; }
           python3 -c "import json;d=json.load(open('manifest.live.json'));print('live name:',d['name'])"
 
-      # If this file still has the placeholder, the app installs and then
-      # shows a browser bar, which is the single most common way a TWA ships
-      # broken. It is only fillable AFTER the first upload, so this warns
-      # rather than failing.
-      - name: Warn if asset links are not filled in
+      # The finished file carries TWO fingerprints: the upload key, so APKs
+      # built here verify when sideloaded, and Google's app signing key, so
+      # installs from the Play Store verify. Only the first can be known
+      # before a build has ever been uploaded, so a single entry is the
+      # normal state until then and this warns rather than failing. Ship to
+      # production with one and every install shows a browser bar, which
+      # reads to everybody as broken.
+      - name: Warn if asset links are not complete
         run: |
-          if grep -q REPLACE_WITH .well-known/assetlinks.json; then
-            echo "::warning::assetlinks.json still has the placeholder fingerprint."
-            echo "::warning::Expected before the FIRST upload. Fill it from Play Console"
-            echo "::warning::(Setup -> App integrity -> App signing key certificate) and"
-            echo "::warning::merge that to main BEFORE promoting the release to production."
+          n=$(python3 -c "import json;print(len(json.load(open('.well-known/assetlinks.json'))[0]['target']['sha256_cert_fingerprints']))")
+          echo "assetlinks.json carries $n fingerprint(s)"
+          if [ "$n" -lt 2 ]; then
+            echo "::warning::assetlinks.json has $n fingerprint, and a published app needs 2."
+            echo "::warning::Missing Google's app signing key. Read it from Play Console"
+            echo "::warning::(Setup -> App integrity -> App signing key certificate), add it"
+            echo "::warning::alongside the upload key, and merge to main BEFORE promoting to"
+            echo "::warning::production."
           fi
 
       - uses: actions/setup-java@v4
