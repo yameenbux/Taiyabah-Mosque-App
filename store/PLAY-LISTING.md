@@ -93,20 +93,30 @@ domain moves, and update it in the Console at the same time.)
 |---|---|---|
 | App icon | 512 × 512 PNG | `icon-512.png` in the repository root |
 | Feature graphic | 1024 × 500 PNG | `store/feature-graphic.png` |
-| Phone screenshots | 2–8, min 320px | `store/screenshots/*.png`, 1080 × 2400 |
+| Phone screenshots | 2–8, **9:16 or 16:9** | `store/screenshots/*.png`, 1080 × 1920 |
 
-Screenshots are captured from the real app, not mocked. To regenerate them
-after a design change, see `store/feature-graphic.html` for the graphic and the
-Playwright recipe in the commit that added this folder.
+Screenshots are captured from the real app, not mocked.
+
+THE ASPECT RATIO IS A HARD REQUIREMENT, not a suggestion. The Console asks
+for 9:16 or 16:9. The first set was 1080 × 2400, the shape of a real modern
+phone, which is 9:20 and is refused. Capture at a 540 × 960 viewport with
+deviceScaleFactor 2: that is exactly 1080 × 1920, and the text renders at
+phone density instead of being scaled up from something small.
+
+Capture with the service worker blocked, or a stale cache renders an old
+build under a new version number. And look at every frame before using it:
+the zakat screen was dropped from this set because the price service is not
+reachable from a sandbox and the shot carried a red "Couldn't fetch today's
+price" banner across it, which reads as a broken app.
 
 Suggested captions, if you use them:
 
 1. Every prayer, and the next one counting down
-2. The Qurʼan, offline, upright or sideways
-3. Morning and evening adhkār
-4. Work out your zakat at today's prices
-5. Book the hall, and see what is free
-6. Madrasah fees, classes and term dates
+2. Beginning and jamāʿah times, today and all year
+3. The whole Qurʼan, and it works offline
+4. Morning, evening and after-prayer adhkār
+5. Give to the masjid in seconds
+6. Ask to collect for your cause
 
 ---
 
