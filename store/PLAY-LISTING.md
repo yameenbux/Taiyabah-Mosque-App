@@ -127,12 +127,25 @@ By telephone and email, as set out in the privacy notice.
 
 | Type | Collected | Shared | Optional? | Purpose | Where in the code |
 |---|---|---|---|---|---|
-| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name` |
-| Address | Yes | No | Optional | App functionality | Hall booking `address` |
-| Phone number | Yes | No | Optional | App functionality | Hall booking `phone`; nikāḥ `contact_phone` |
-| Email address | Yes | No | Optional | App functionality | Nikāḥ `contact_email` |
+| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name`; charity collection `collector_name`, `trustee_name`, `signed_name` |
+| Address | Yes | No | Optional | App functionality | Hall booking `address`; charity collection `org_address` |
+| Phone number | Yes | No | Optional | App functionality | Hall booking `phone`; nikāḥ `contact_phone`; charity collection `org_phone`, `trustee_phone` |
+| Email address | Yes | No | Optional | App functionality | Nikāḥ `contact_email`; charity collection `org_email`, `trustee_email` |
+| Photos | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a JPEG, PNG or WebP |
+| Files and docs | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a PDF |
 | Other user-generated content | Yes | No | Optional | App functionality | Nikāḥ `notes` free-text box |
 | Device or other IDs | Yes | No | Optional | App functionality | OneSignal subscription id, only if notifications are turned on |
+
+The certificate is one upload that the form accepts in four formats, so which
+of the two file categories applies depends on what the person picked. Declare
+both: `CC_CERT_TYPES` in `index.html` allows `image/jpeg`, `image/png`,
+`image/webp` and `application/pdf`, and the `bmcc` bucket accepts exactly
+those. A declaration that named only one would be false half the time.
+
+It goes to a **private** Supabase bucket that `anon` may write and only
+`verified_admin()` may read, and the portal reaches it through a signed URL
+valid for 300 seconds. It is not shared with anyone outside the masjid, which
+is why the Shared column says No.
 
 "Optional" because none of it is required to use the app — every one of these
 is collected only if the person chooses to book a hall, request a nikāḥ, or
