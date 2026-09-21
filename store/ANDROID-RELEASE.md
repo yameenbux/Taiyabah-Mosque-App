@@ -40,7 +40,7 @@ a sideloaded APK is exactly how you would first notice.
 | Fingerprint | Signs | Where it comes from |
 |---|---|---|
 | `F5:7F:73:…:6E` | APKs from the workflow, sideloaded or via Internal App Sharing | our upload key, `android.keystore`, alias `taiyabah` |
-| *(to be added)* | every install from the Play Store | Play Console → Setup → App integrity |
+| `14:11:94:…:3F` | every install from the Play Store | Play App Signing, read 21 Sep 2026 |
 
 Fingerprints are public by design — the whole purpose of the file is to
 publish them. The keystore and its password are the secrets, and neither
