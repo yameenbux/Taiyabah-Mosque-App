@@ -239,6 +239,62 @@ await scenario("block", async () => {
   await ctx.close();
 });
 
+/* 12 — ONE STEP BACK, NOT ALL THE WAY HOME.
+
+   Twelve journeys in this app go sheet-to-sheet, and each one is written as
+   "close this, open that 120ms later". That leaves nothing underneath, so
+   both Done and Android's Back used to land on the home screen: three levels
+   into the madrasah pages meant walking back in from the beginning. A header
+   arrow now returns to the sheet the current one was opened from, and Back
+   follows the same trail. Done still means done. */
+await scenario("block", async () => {
+  const { ctx, p, errs } = await fresh();
+  const arrow = () => p.evaluate(() => {
+    const b = document.querySelector('[data-open="1"] .sh-upback');
+    return b ? (b.getAttribute("aria-label") || "(unnamed)") : null;
+  });
+
+  await tap(p, '[data-tile="madrasah"]');
+  check(await arrow() === null, "12a a sheet opened from the home screen offers a back arrow pointing at nothing");
+
+  await tap(p, "#mdr-go-admissions");
+  check((await state(p)).open.includes("madmissions"), "12b admissions did not open");
+  const a1 = await arrow();
+  check(a1 !== null, "12c no back arrow after one sheet handed over to another — Done would strand the person at home");
+  check(/madrasah/i.test(a1 || ""), "12d the back arrow does not name the sheet it returns to, got: " + a1);
+
+  await tap(p, "#ad-to-holidays");
+  check((await state(p)).open.includes("holidays"), "12e holidays did not open");
+  check(/admission/i.test((await arrow()) || ""), "12f three levels in, the arrow does not point one level back");
+
+  /* Down three, now up three, one at a time. */
+  await tap(p, '[data-open="1"] .sh-upback');
+  check((await state(p)).open.includes("madmissions"), "12g the arrow did not step back one level");
+  await tap(p, '[data-open="1"] .sh-upback');
+  check((await state(p)).open.includes("madrasah"), "12h the second step back did not reach the first sheet");
+  check(await arrow() === null, "12i an arrow survives at the first sheet, so back would walk forwards again");
+
+  /* Done is not a step back: it is finished. */
+  await tap(p, '[data-open="1"] .sh-close');
+  await p.waitForTimeout(500);
+  check((await state(p)).open.length === 0, "12j Done did not close the sheet");
+
+  /* Finishing one sheet and starting another quickly must not look like a
+     handover — that is how a false arrow gets onto an unrelated screen. */
+  await tap(p, '[data-tile="madrasah"]');
+  check(await arrow() === null, "12k finishing one sheet and opening another left a false back arrow");
+
+  /* And Android's Back agrees with the arrow. */
+  await tap(p, "#mdr-go-admissions");
+  await back(p);
+  const s = await state(p);
+  check(s.onPage, "12l Back left the page");
+  check(s.open.includes("madrasah"), "12m Back went home instead of one step back, open=" + s.open.join());
+
+  check(errs.length === 0, "12n page errors: " + errs.join(" | "));
+  await ctx.close();
+});
+
 console.log(`${pass} passed, ${fails.length} failed`);
 fails.forEach(f => console.log("  FAIL " + f));
 await b.close();

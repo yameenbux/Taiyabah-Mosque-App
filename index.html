@@ -243,6 +243,16 @@
   .sh-top h3{font-family:"Fraunces",serif;font-size:calc(15.5px * var(--ts));font-weight:600;flex:1;text-align:center}
   .sh-nav{width:38px;height:38px;flex:0 0 auto;border-radius:11px;cursor:pointer;font:inherit;font-size:calc(20px * var(--ts));
     border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#F3EFE3}
+  /* Returns to the sheet this one was opened from. It only exists when there
+     IS such a sheet, so a screen reached from the home screen never shows a
+     back arrow pointing at nothing. Same chrome as .sh-nav so it reads as part
+     of the header rather than as content. */
+  .sh-upback{width:38px;height:38px;flex:0 0 auto;border-radius:11px;cursor:pointer;
+    font:inherit;font-size:calc(19px * var(--ts));line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#F3EFE3}
+  .sh-upback:active{background:rgba(255,255,255,.18)}
+  :root[dir="rtl"] .sh-upback{transform:scaleX(-1)}
   .sh-nav:disabled{opacity:.3;cursor:default}
   .sh-close{flex:0 0 auto;border:1px solid rgba(198,162,76,.45);background:rgba(198,162,76,.14);
     color:var(--gold-bright);font:inherit;font-size:calc(13px * var(--ts));font-weight:700;cursor:pointer;
@@ -11936,6 +11946,104 @@ function switchTab(name){
    Play's own guidance asks for. This makes Back work; it does not trap
    anybody in the app.
    =========================================================================== */
+/* ===========================================================================
+   WHERE THIS SHEET WAS OPENED FROM
+   ---------------------------------------------------------------------------
+   Twelve journeys in this app go from one sheet to another, and every one of
+   them is written the same way: close the sheet you are on, then open the next
+   one 120ms later. That crossfade looks right, but it throws away the fact
+   that there WAS a previous sheet. "Done" then returns to the home screen,
+   because by the time it is pressed the home screen is genuinely all that is
+   left underneath — and the Android Back button lands there too, for the same
+   reason. Somebody three levels into the madrasah pages had to walk back in
+   from the beginning.
+
+   Rather than change twelve call sites, the transition is recognised: a layer
+   closing and a DIFFERENT layer opening within the same breath is one sheet
+   handing over to another, and the one that closed goes on the trail. This is
+   the same reasoning as the Back button watcher below — a rule about what
+   happened cannot be forgotten by whoever adds the thirteenth journey.
+
+   The trail is cleared when everything closes, so a sheet opened fresh from
+   the home screen never offers a back arrow pointing at nothing.
+   =========================================================================== */
+const TRAIL = [];
+const LAYER_OPENER = {};     // layer id -> the function that opens it
+let navPendingClose = null;  // {id, at} — a layer that just closed
+let navTrailTimer = null;
+let navGoingBack = false;
+
+/* Built by reading the openers rather than by hand: every open*() in this file
+   sets dataset.open on exactly one element, so the function itself says which
+   layer it belongs to. A hand-written map would be one more thing to forget. */
+function navIndexOpeners(){
+  for(const k of Object.keys(window)){
+    if(!/^open[A-Z]/.test(k) || typeof window[k] !== "function") continue;
+    const m = /getElementById\(\s*['"]([\w-]+)['"]\s*\)[\s\S]{0,80}?dataset\.open\s*=\s*["']1["']/
+              .exec(String(window[k]));
+    if(m && !LAYER_OPENER[m[1]]) LAYER_OPENER[m[1]] = window[k];
+  }
+}
+
+/* Only a sheet goes on the trail. The "More" menu is a launcher, not a place:
+   returning to it after finishing something would be a step backwards into a
+   menu the person had already used, and Back has always dismissed it outright.
+   A sheet is recognised by its .sh-top header, which is also the only place
+   the arrow could be drawn. */
+function navIsSheet(id){
+  return !!document.querySelector("#" + id + " .sh-top");
+}
+
+function navSheetTitle(id){
+  const h = document.querySelector("#" + id + " .sh-top h3");
+  return (h && h.textContent.trim()) || "";
+}
+
+/* The arrow lives in the header of whichever sheet is on top, and is rebuilt
+   rather than toggled — there is only ever one, and it always points at the
+   current end of the trail. */
+function navRenderUpBack(){
+  document.querySelectorAll(".sh-upback").forEach(b => b.remove());
+  const open = navLayers();
+  const top = open[open.length - 1];
+  const parent = TRAIL[TRAIL.length - 1];
+  if(!top || !parent || !LAYER_OPENER[parent]) return;
+  const head = document.querySelector("#" + top + " .sh-top");
+  if(!head) return;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "sh-upback";
+  b.innerHTML = "&larr;";
+  /* No new wording: the parent sheet's own heading is already translated into
+     whichever language the person is reading, so it names the destination
+     exactly. "Back" as a bare word would have needed three translations that
+     nobody has checked. */
+  const label = navSheetTitle(parent);
+  if(label){ b.setAttribute("aria-label", label); b.title = label; }
+  b.addEventListener("click", navUpBack);
+  head.insertBefore(b, head.firstChild);
+}
+
+/* The reverse of the journey that got here, performed the same way it was:
+   close this one, open the previous one after the same 120ms. */
+function navUpBack(){
+  const parent = TRAIL[TRAIL.length - 1];
+  const open = navLayers();
+  const top = open[open.length - 1];
+  if(!parent || !top) return;
+  const fn = LAYER_OPENER[parent];
+  if(!fn) return;
+  TRAIL.pop();
+  navGoingBack = true;
+  const closer = document.querySelector("#" + top + " .sh-close, #" + top + " .dr-close");
+  if(closer) closer.click();
+  /* navGoingBack is NOT cleared here. The observer runs after this tick, so
+     clearing it on this line would let the reopened parent be recorded as a
+     handover and pushed straight back onto the trail — walking back would
+     then walk forward. Whoever reads the flag clears it. */
+  setTimeout(fn, 120);
+}
+
 const NAV = {
   order: [],        // layer ids, in the order they were opened
   armed: false,     // do we currently hold the sentinel?
@@ -11955,6 +12063,12 @@ function navControl(id){
   if(!el) return null;
   const back = el.querySelector('.sh-back');
   if(back && back.offsetParent !== null) return back;
+  /* Then the arrow back to the sheet this one was opened from, so Android's
+     Back and the arrow in the header do the same thing. Without this, Back
+     would close the sheet and land on the home screen while the header was
+     still offering a step the person could see. */
+  const up = el.querySelector('.sh-upback');
+  if(up && up.offsetParent !== null) return up;
   return el.querySelector('.sh-close, .dr-close, #dr-close');
 }
 
@@ -11984,10 +12098,61 @@ function initBackButton(){
      functions are called from menu rows, tiles, scrims, Escape, timeouts and
      each other; a watcher sees the result however it happened, and cannot be
      forgotten by the next screen somebody adds. */
+  navIndexOpeners();
+
+  /* A handover is recognised from timing, which works because the twelve
+     journeys all close and reopen within 120ms. But somebody who presses Done
+     and immediately taps something else from the home screen produces the same
+     shape, and would get a back arrow pointing at a sheet they had deliberately
+     finished with. Done is not a guess: it is the person saying they are done,
+     so the trail goes with it. Captured, because a sheet's own close handler
+     may stop the event before it bubbles. Not while stepping back — that step
+     presses the same button on purpose. */
+  document.addEventListener("click", e => {
+    if(navGoingBack) return;
+    const t = e.target;
+    if(t && t.closest && t.closest(".sh-close, .dr-close, .scrim, .dr-scrim"))
+      TRAIL.length = 0;
+  }, true);
+
   const seen = new MutationObserver(() => {
     const open = navLayers();
+    const closed = NAV.order.filter(id => open.indexOf(id) === -1);
+    const opened = open.filter(id => NAV.order.indexOf(id) === -1);
     NAV.order = NAV.order.filter(id => open.indexOf(id) !== -1);
     open.forEach(id => { if(NAV.order.indexOf(id) === -1) NAV.order.push(id); });
+
+    /* A sheet closing MIGHT be a handover to another one. Which it is only
+       becomes clear a moment later, when either something else opens or
+       nothing does, so the decision waits rather than guessing. */
+    if(closed.length){
+      navPendingClose = { id: closed[closed.length - 1], at: Date.now() };
+      clearTimeout(navTrailTimer);
+      navTrailTimer = setTimeout(() => {
+        /* Nothing followed it: the person has left, not moved across. */
+        if(!navLayers().length){ TRAIL.length = 0; }
+        navPendingClose = null;
+        navRenderUpBack();
+      }, 400);
+    }
+
+    if(opened.length){
+      const o = opened[opened.length - 1];
+      const handover = navPendingClose
+        && navPendingClose.id !== o
+        && Date.now() - navPendingClose.at < 260;
+      /* Walking back up the trail pops; it must never also push, or the trail
+         would grow in the direction it is being unwound. */
+      if(handover && !navGoingBack && LAYER_OPENER[navPendingClose.id]
+         && navIsSheet(navPendingClose.id) && navIsSheet(o)
+         && TRAIL.indexOf(navPendingClose.id) === -1)
+        TRAIL.push(navPendingClose.id);
+      navGoingBack = false;          // consumed: this was the step back itself
+      navPendingClose = null;
+      clearTimeout(navTrailTimer);
+      navRenderUpBack();
+    }
+
     if(open.length && !NAV.armed) navArm();
     else if(!open.length && NAV.armed) navDisarm();
   });
