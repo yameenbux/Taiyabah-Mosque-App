@@ -77,6 +77,41 @@ jobs:
             echo "::warning::production."
           fi
 
+      # Checking the file is in the repository proves nothing: it has to be
+      # SERVED, PARSED and MATCHED. Google runs the same verifier Android does
+      # and will answer for a live site, so ask it rather than inspecting our
+      # own copy and hoping. This is the check that would have settled the
+      # "why is there an address bar" question in seconds instead of an
+      # afternoon.
+      - name: Ask Google whether the live site actually verifies
+        run: |
+          set -e
+          api="https://digitalassetlinks.googleapis.com/v1/statements:list"
+          q="source.web.site=https://taiyabahapp.ysbdesigns.uk&relation=delegate_permission/common.handle_all_urls"
+          curl -sS "$api?$q" -o dal.json
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("dal.json"))
+          if d.get("errorCode") or d.get("debugString"):
+              print("::error::Google could not verify the site:",
+                    d.get("errorCode"), d.get("debugString"))
+              sys.exit(1)
+          want = "com.taiyabahmasjid.app"
+          fps = [s["target"]["androidApp"]["certificate"]["sha256Fingerprint"]
+                 for s in d.get("statements", [])
+                 if s.get("target", {}).get("androidApp", {}).get("packageName") == want]
+          print(f"Google verifies {len(fps)} certificate(s) for {want}:")
+          for f in fps: print("   ", f)
+          if not fps:
+              print("::error::Google returns NO statements for this package. Every install")
+              print("::error::will show a browser address bar. Check that")
+              print("::error::/.well-known/assetlinks.json is served as application/json.")
+              sys.exit(1)
+          if len(fps) < 2:
+              print("::warning::only one certificate verifies. Installs signed by the other")
+              print("::warning::key — Play's, or ours — will show a browser address bar.")
+          PY
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
