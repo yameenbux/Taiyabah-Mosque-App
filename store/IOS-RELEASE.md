@@ -3,11 +3,46 @@
 Android first, iOS second — see `ANDROID-RELEASE.md` for that half. This file
 is the iOS half, and it starts with a wait nobody can shorten.
 
-**Status: blocked on Dun & Bradstreet.** Nothing else can start.
+**Status: the D-U-N-S is cleared.** Enrolment can proceed.
 
 ---
 
-## Where it is stuck, and the reference numbers
+## The D-U-N-S record, as D&B confirmed it
+
+Cleared on **2 October 2026**, six days after the correction was raised —
+inside D&B's own 7–14 business day estimate rather than at the end of it.
+
+**Enter these into Apple exactly as written.** D&B's own instruction, and the
+reason the first attempt failed: Apple matches the string, not the meaning.
+
+| Field | Value |
+|---|---|
+| DUNS | `222426253` |
+| Company Name | `BOLTON CENTRAL ISLAMIC SOCIETY` |
+| Trade Style | *(leave blank)* |
+| Street Address | `31A DRAYCOTT STREET` |
+| City | `BOLTON` |
+| State | *(leave blank)* |
+| Zip | `BL1 8HD` |
+| Legal Structure | Charity |
+| Country | United Kingdom |
+
+Three of those are easy to get wrong by being helpful:
+
+- **`31A`, not `31a`.** The record holds a capital A.
+- **State is blank.** The United Kingdom has no state. Typing "England" or
+  "Greater Manchester", as the old malformed record did, is a mismatch.
+- **Trade Style is blank.** "Taiyabah Masjid" is a trading name, and Apple
+  rejects those outright — it wants the legal entity.
+
+**Legal Structure: Charity** is what makes the Nonprofit entity type and the
+fee waiver available. It is the field that was missing before.
+
+If Apple still refuses the number, it is caching the old data rather than
+rejecting the new. Wait and retry before escalating; D&B's note points at
+https://developer.apple.com/contact for alternate registration if it persists.
+
+## The history, and the reference numbers
 
 Apple will not enrol an organisation it cannot verify, and it verifies through
 Dun & Bradstreet rather than Companies House or the Charity Commission.
@@ -15,9 +50,8 @@ Dun & Bradstreet rather than Companies House or the Charity Commission.
 | | |
 |---|---|
 | D-U-N-S number | **222426253** |
-| D&B correction case | **34879551**, raised 26 September 2026 |
-| D&B's own estimate | 7–14 **business** days |
-| Apple's error | *"This organization could not be verified as a legal entity."* |
+| D&B correction case | **34879551** — raised 26 Sept, confirmed 2 Oct 2026 |
+| Apple's error at the time | *"This organization could not be verified as a legal entity."* |
 
 **What was wrong with the record.** The Street line held the organisation's
 name — `BOLTON CENTRAL ISLAMIC SOCIETY` — and no street was recorded at all.
@@ -38,7 +72,7 @@ confirm its own details sounds exactly like a fraud attempt, and the natural
 response is to hang up — which fails the verification silently and restarts
 the clock.
 
-**After D&B accept the change, Apple does not see it immediately.** Apple
+**After D&B accept the change, Apple may not see it immediately.** Apple
 caches D&B data. Allow another week or two before the enrolment form will
 take the number. Total, realistically: three to five weeks from 26 September.
 
