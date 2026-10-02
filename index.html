@@ -50,6 +50,7 @@
     --brand-700:#5E1844;    /* raised on dark */
     --brand-600:#772157;
     --gold:#C6A24C;
+    --on-air:#3FBE73;
     --gold-bright:#DCBB63;
     --paper:#F5F1E8;        /* light content bg */
     --card:#FCFAF3;
@@ -336,7 +337,7 @@
     border-radius:999px;padding:5px 12px}
   .lv-dot{width:7px;height:7px;border-radius:50%;background:#A49AA0;flex:0 0 auto}
   .lv-state[data-s="playing"]{color:var(--gold-bright);border-color:rgba(198,162,76,.45)}
-  .lv-state[data-s="playing"] .lv-dot{background:#E0483C;animation:pulse 2s infinite}
+  .lv-state[data-s="playing"] .lv-dot{background:var(--on-air);animation:pulse 2s infinite}
   .lv-state[data-s="loading"] .lv-dot{background:var(--gold);animation:pulse 1.1s infinite}
   .lv-state[data-s="error"]{color:#E8A88F;border-color:rgba(232,168,143,.4)}
   .lv-state[data-s="error"] .lv-dot{background:#E0483C}
