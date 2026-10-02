@@ -10325,8 +10325,35 @@ function nkPretty(d){
    function answers PGRST202, and anything we cannot interpret — offline, a
    proxy, a 500 — is treated as closed, because sending someone into a form
    that will fail is worse than sending them to the phone. */
+/* THE APP CANNOT SATISFY request_nikah_date, AND ASKING IT NICELY DOES NOT HELP.
+
+   This form sends a date, a slot and one contact. The function has required the
+   particulars of five people — groom, bride, wali and two witnesses, each with
+   a full name, an age and a full address, with the groom and bride refused
+   under 18 — since the website added them. So a submission from this app is
+   refused with "The bridegroom is missing from the request", every time. The
+   nikah_people table has no rows at all, which is what that looks like from
+   the other end.
+
+   nkProbe below cannot detect it. It asks whether the function EXISTS by
+   posting an empty payload and reading the 400 that the function's own DATE
+   validation returns first — so a function that rejects every real submission
+   passes the test. Existence is not compatibility, and that is the gap this
+   flag closes until the form is built properly.
+
+   Collecting five people's names, ages and home addresses in the app is a DPIA
+   question rather than a layout one, and the website already has that form. So
+   the screen shows the phone and email route it already carries, which reaches
+   the same office and takes the chosen dates with it. A form that always fails
+   is worse than no form: somebody fills in the most significant booking of
+   their year and is handed nothing.
+
+   Turning this on without building the form is caught by release check 3l. */
+const NK_FORM_CAN_SUBMIT = false;
+
 function nkProbe(){
   if(NK.open !== null) return Promise.resolve(NK.open);
+  if(!NK_FORM_CAN_SUBMIT){ NK.open = false; return Promise.resolve(false); }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 8000);
   return fetch(`${supaBase()}/rest/v1/rpc/request_nikah_date`, {

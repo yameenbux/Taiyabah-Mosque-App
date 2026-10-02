@@ -488,6 +488,26 @@ for (const f of ["index.html", "admin.html"]) {
   if (!/function nkClosedSummary\(\)/.test(app) || !/mail\.href = "mailto:/.test(app))
     missing.push("the office email no longer carries the chosen dates and prayer, so a person has to read them back off the screen");
 
+  /* The flag that admits the form must not be turned on until the form can
+     actually be submitted. request_nikah_date requires five people — groom,
+     bride, wali, witness_1, witness_2 — each with a name, an age and an
+     address, and the app sends none of them, so every submission is refused
+     with "The bridegroom is missing from the request". nkProbe cannot catch
+     that: it posts an empty payload and reads the 400 the DATE validation
+     returns first, so a function that rejects everything still looks present.
+
+     So the flag is held to the payload. Flip it on without building the form
+     and this fails, which is the only moment anybody would think to check. */
+  const canSubmit = /const NK_FORM_CAN_SUBMIT = (true|false);/.exec(app);
+  if (!canSubmit)
+    missing.push("NK_FORM_CAN_SUBMIT is gone — nothing now stands between the app and a form the database refuses");
+  else if (canSubmit[1] === "true") {
+    const sends = ["groom", "bride", "wali", "witness_1", "witness_2"]
+                    .filter(who => !new RegExp(`["']?${who}["']?\\s*:`).test(app));
+    if (sends.length)
+      missing.push(`NK_FORM_CAN_SUBMIT is true but the app still sends nothing for ${sends.join(", ")} — request_nikah_date refuses the request and the family is handed an error`);
+  }
+
   if (missing.length) missing.forEach(fail);
   else ok("nikāḥ requests — gated on the server, failing closed, and never a dead end when closed");
 }

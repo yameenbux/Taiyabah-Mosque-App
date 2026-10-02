@@ -5,7 +5,7 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v167";
+const CACHE = "taiyabah-v168";
 /* fonts.css and the two faces that set the first screen are shell: the app is
    expected to open with no signal, and a first launch that has to go to the
    network for its typeface renders the masjid's name in Times. The other

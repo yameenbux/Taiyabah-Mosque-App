@@ -355,8 +355,10 @@ and appearing to ship. Current: `taiyabah-v164`.
 **Life-stage services**
 - **Birth** — guidance for new arrivals, including circumcision referral
 - **Nikāḥ** — what the masjid provides, the standing advice to also register the
-  marriage civilly, and a date request: pick a day and the prayer it would
-  follow, with that day's own jamāʿah time shown beside it
+  marriage civilly, and a calendar: pick a day and the prayer it would follow,
+  with that day's own jamāʿah time shown beside it. **The request itself goes by
+  phone or email, with the chosen dates carried into the message** — see
+  *Submitting a nikāḥ date from the app*
 - **Islamic Will** — wasiyyah, the fixed shares, and where a solicitor is needed
 - **Funeral Services** — BCoM's out-of-hours number first, because that call has
   to happen before anything else can, then everything the masjid itself arranges:
@@ -408,6 +410,38 @@ and appearing to ship. Current: `taiyabah-v164`.
   (۰۱۲ / ٠١٢ / ૦૧૨), calendars mirrored right-to-left, and identifiers such as
   postcodes and phone numbers deliberately left in Latin so they still work.
   Packs download on demand, cache offline, and switch the interface instantly
+
+---
+
+## Submitting a nikāḥ date from the app
+
+> [!IMPORTANT]
+> **The app's nikāḥ form is closed, deliberately, and the screen offers the
+> phone and email route instead.** Fixing the duplicate id made the Submit
+> button run — and the request was then refused by the database every time.
+>
+> `request_nikah_date` has required the particulars of **five people** since the
+> website added them: groom, bride, wali and two witnesses, each with a full
+> name, an age and a full address, with the groom and bride refused under 18.
+> The app sends a date, a slot and one contact. So every submission comes back
+> *"The bridegroom is missing from the request"*. `nikah_people` has no rows at
+> all, which is what that looks like from the other end.
+
+**`nkProbe()` could not see this, and that is the lesson.** It asks whether the
+function *exists* by posting an empty payload and reading the 400 that the
+function's own **date** validation returns first — so a function that refuses
+every real submission passes the test. Existence is not compatibility, and
+check 3l was written against the same idea and inherited the same blind spot.
+
+`NK_FORM_CAN_SUBMIT` now closes the form, and **check 3l holds that flag to the
+payload**: turn it on without sending the five people and the build fails, which
+is the only moment anybody would think to look. Both halves proved by
+triggering them.
+
+Finishing it is a decision rather than a layout job — collecting five people's
+names, ages and home addresses in the app is DPIA territory, and the website
+already has that form. Until then the calendar still works, and the request
+goes to the office by phone or by an email carrying the chosen dates.
 
 ---
 
@@ -794,11 +828,12 @@ Still outstanding, roughly in the order it matters:
 
 ### Done since the first release
 
-- **The nikāḥ date request form**, which could not be submitted at all for
-  twenty-six days: the mailto link in the closed panel and the email box in the
-  form both carried `id="nk-email"`, `getElementById` returned the anchor, and
-  `nkValidate()` threw a TypeError on every press. Check 3z2 now refuses any
-  duplicate id in either page
+- **The nikāḥ date request form**, which could not be submitted at all: the
+  mailto link in the closed panel and the email box in the form both carried
+  `id="nk-email"`, `getElementById` returned the anchor, and `nkValidate()`
+  threw a TypeError on every press. Check 3z2 now refuses any duplicate id in
+  either page. **That turned out to be the first of two faults** — see
+  *Submitting a nikāḥ date from the app*
 - **The typefaces moved onto the masjid's own origin.** They were fetched from
   Google on every first load — disclosed in the privacy notice, so not a
   surprise to anybody, but a render-blocking third party on the critical path
