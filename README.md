@@ -12,7 +12,7 @@ Bolton Central Islamic Society · Registered charity 1041569
 ![Offline](https://img.shields.io/badge/offline-service%20worker-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Languages](https://img.shields.io/badge/languages-EN%20·%20UR%20·%20GU%20·%20AR-C6A24C?style=flat-square&labelColor=3C0B2A)
-![Release checks](https://img.shields.io/badge/release%20checks-37-C6A24C?style=flat-square&labelColor=3C0B2A)
+![Release checks](https://img.shields.io/badge/release%20checks-38-C6A24C?style=flat-square&labelColor=3C0B2A)
 ![Licence](https://img.shields.io/badge/licence-all%20rights%20reserved-7A5D14?style=flat-square&labelColor=3C0B2A)
 
 [**Open the app →**](https://taiyabahapp.ysbdesigns.uk)
@@ -488,7 +488,7 @@ Anything committed here is reachable by URL.
 │                                 so no local tooling is ever required.
 │
 ├── scripts/                     Build and verification. Node, no dependencies.
-│   ├── check-release.mjs         37 checks — the release gate. See below.
+│   ├── check-release.mjs         38 checks — the release gate. See below.
 │   ├── check-i18n.mjs            Measures translation coverage against the app.
 │   ├── check-back-button.mjs     Drives a real browser through eleven Back
 │   │                              scenarios. Not in CI; needs Playwright.
@@ -579,7 +579,7 @@ congregation. It is not a linter. **Each check exists because something went
 wrong once**, and each is written so that removing the behaviour it guards makes
 the build fail.
 
-There are **37**, and each prints what it confirmed rather than a tick. Among
+There are **38**, and each prints what it confirmed rather than a tick. Among
 them:
 
 | Check | What it caught |

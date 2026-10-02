@@ -2185,6 +2185,17 @@
            hosts the checkout, so no card detail ever reaches this app and there
            is no server code behind these — they are ordinary links.
 
+           EVERY ONE OF THEM CARRIES client_reference_id. Without it the webhook
+           has nothing to match the payment to: it falls through to "money has
+           arrived that I cannot account for", and the donation never reaches
+           the donations table, the masjid's totals, or the Gift Aid export.
+           These five were the only Stripe links in the app that did not carry
+           one — the giving screen, hall deposits and nikāḥ fees all do — and
+           they are the reason forty-two paid checkouts on 2 October 2026 were
+           recorded nowhere. The value is the purpose the money is for, which is
+           what donations.purpose and the webhook's PURPOSES both accept, and
+           newbuild is the appeal these four tiers and the open amount fund.
+
            A tier is charged straight away. It used to be worded as a pledge
            settled later by bank transfer, which was true of the old shop links
            and is not true of these.
@@ -2196,17 +2207,17 @@
            declaration held at the office. -->
       <div class="sec-h"><h2 data-i18n="sheet.give_now">Give now</h2><span class="rule"></span><span class="tag" data-i18n="sheet.apple_google_pay">Apple &amp; Google Pay</span></div>
       <div class="tiers">
-        <a class="tier t-bronze" href="https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01" target="_blank" rel="noopener">
+        <a class="tier t-bronze" href="https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" target="_blank" rel="noopener">
           <span class="t-amt" data-i18n-num>£250</span><span class="t-name" data-i18n="sheet.bronze">Bronze</span></a>
-        <a class="tier t-silver" href="https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02" target="_blank" rel="noopener">
+        <a class="tier t-silver" href="https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" target="_blank" rel="noopener">
           <span class="t-amt" data-i18n-num>£500</span><span class="t-name" data-i18n="sheet.silver">Silver</span></a>
-        <a class="tier t-gold" href="https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03" target="_blank" rel="noopener">
+        <a class="tier t-gold" href="https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" target="_blank" rel="noopener">
           <span class="t-amt" data-i18n-num>£1,000</span><span class="t-name" data-i18n="sheet.gold">Gold</span></a>
-        <a class="tier t-plat" href="https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04" target="_blank" rel="noopener">
+        <a class="tier t-plat" href="https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04?client_reference_id=newbuild" target="_blank" rel="noopener">
           <span class="t-amt" data-i18n-num>£5,000</span><span class="t-name" data-i18n="sheet.platinum">Platinum</span></a>
       </div>
 
-      <a class="donate-cta" href="https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05" target="_blank" rel="noopener">
+      <a class="donate-cta" href="https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05?client_reference_id=newbuild" target="_blank" rel="noopener">
         <span class="dc-main" data-i18n="sheet.give_any_other_amount">Give any other amount</span>
         <span class="dc-sub" data-i18n="sheet.card_apple_pay_google_pay">Card &middot; Apple Pay &middot; Google Pay</span>
       </a>

@@ -1914,6 +1914,49 @@ for (const f of ["sw.js", workerEntry && `worker/${workerEntry}`].filter(Boolean
   catch (e) { fail(`${f} has a syntax error: ${String(e.stderr || e).split("\n").slice(0, 3).join(" ")}`); }
 }
 
+/* ---- 4f. every Stripe link says what the money is for ----
+
+   A Stripe Payment Link that carries no client_reference_id is money the
+   masjid cannot account for. The webhook matches a payment by that field and
+   nothing else; without it the payment falls through to "money has arrived
+   that I cannot account for", never reaches the donations table, never reaches
+   the masjid's totals, and never reaches the Gift Aid export to HMRC. The
+   donor is told nothing is wrong, because nothing is wrong at Stripe's end.
+
+   This is not hypothetical. Five links in this file carried no reference, and
+   on 2 October 2026 forty-two paid checkout sessions arrived unattributable
+   in a single day. The safety net that should have made that visible had been
+   failing silently since 17 September, so the first anyone knew of it was
+   somebody asking where a donation had gone.
+
+   A link may satisfy this in one of two ways: the URL carries the parameter
+   literally, or the href is built in JavaScript that appends it. The giving
+   screen, hall deposits and nikāḥ fees all take the second route. */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  const builders = /client_reference_id/.test(app);
+  const LITERAL = /https:\/\/(?:buy|donate|book)\.stripe\.com\/[A-Za-z0-9]+(\?[^"'`\s]*)?/g;
+
+  for (const m of app.matchAll(LITERAL)) {
+    const url = m[0];
+    if (/client_reference_id=/.test(url)) continue;
+
+    /* Not in the href? Then the only acceptable answer is that JavaScript puts
+       it there. Look at how this URL is used: a bare href= is static and ships
+       as-is; a URL held in a constant is built somewhere, and the builder is
+       checked separately by the giving/booking/nikāḥ checks above. */
+    const asHref = new RegExp('href="' + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"');
+    if (asHref.test(app))
+      bad.push(`${url} is a static href with no client_reference_id — a payment through it cannot be matched to a donation, a total, or the Gift Aid export`);
+    else if (!builders)
+      bad.push(`${url} has no client_reference_id and nothing in this file appends one`);
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok("Stripe links — every payment link says what the money is for, so no donation can arrive unattributable");
+}
+
 for (const n of notes) console.log("  ok    " + n);
 for (const p of problems) console.error("  FAIL  " + p);
 console.log(problems.length ? `\n${problems.length} problem(s) would reach devices.` : "\nAll release checks passed.");
