@@ -1843,6 +1843,30 @@
       <button class="jc-btn" id="jc-btn" data-i18n="app.give_this_jumu_ah">Give this Jumu&#703;ah</button>
       <div class="jc-note" data-i18n="app.support_the_new_taiyabah_masjid">Support the new Taiyabah Masjid</div>
     </div>
+    <script>
+      /* The Friday card is revealed by render(), which is the second-to-last
+         thing boot() does — and boot() is the last thing in a script block the
+         browser has to parse in full before any of it runs. So on a Friday the
+         card appeared about three seconds in and pushed everything below it
+         down 259px. Measured: 0.37 cumulative layout shift against a 0.1
+         "good" threshold, and on a WARM cache too — every launch, not just the
+         first, on the one day of the week most people open the app.
+
+         Whether it is Friday is knowable immediately and costs nothing to work
+         out, so it is worked out here, during parse, and the card is in the
+         very first frame. render() still owns the element: it sets hidden from
+         VIEW a moment later, which is what makes browsing to another day hide
+         it again. This only fixes the opening frame.
+
+         London, not the device, because the whole app is on the masjid's clock.
+         Wrapped in try/catch: if anything here throws, the card is simply late
+         again, which is where it started. */
+      try {
+        if (new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", weekday: "short" })
+              .format(new Date()) === "Fri")
+          document.getElementById("jcall").hidden = false;
+      } catch (e) { /* render() puts it right shortly */ }
+    </script>
   </section>
 
 
