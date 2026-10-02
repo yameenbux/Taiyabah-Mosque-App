@@ -29,6 +29,8 @@
    including "Back left the page — in a TWA the app closes", which is the
    reported bug reproduced as an assertion.
    =========================================================================== */
+import { chromium } from "playwright";
+
 const b = await chromium.launch();
 let pass = 0; const fails = [];
 const check = (ok, why) => { if (ok) pass++; else fails.push(why); };
