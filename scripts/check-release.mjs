@@ -1089,6 +1089,25 @@ for (const f of ["index.html", "admin.html"]) {
   if (/(body|payload)[\s\S]{0,120}NT_SEEN|NT_SEEN[\s\S]{0,120}fetch\(/.test(app))
     bad.push("what this phone has read appears to be leaving it — that belongs on the device and nowhere else");
 
+  /* A poster must be one of ours. image_url arrives from a database row, and
+     although the office is its only writer, an <img src> is a request: a row
+     carrying a stranger's URL would quietly report every reader's IP address
+     and the size of the congregation to whoever owns that host, the moment the
+     Notices tab opened. Both the card and the full-screen viewer therefore go
+     through ntPoster(), which recognises our own storage path and returns
+     nothing for anything else. This check is here because the unsafe version
+     reads identically to the safe one at a glance. */
+  if (!/function ntPoster\(/.test(app))
+    bad.push("ntPoster() is gone — poster URLs are reaching <img src> unchecked, so one bad row could beacon every reader's IP to a stranger's server");
+  else {
+    const rendered = app.match(/const shot = [\s\S]{0,420}?\n      : "";/);
+    if (!rendered) bad.push("the notice card's poster markup could not be found, so it cannot be confirmed to use the vetted URL");
+    else if (/n\.image_url/.test(rendered[0]))
+      bad.push("the notice card builds its <img src> from n.image_url rather than the URL ntPoster() vetted — the gate is being bypassed");
+    if (/ntShowPoster\(n\.image_url\)/.test(app))
+      bad.push("the full-screen poster viewer is opened straight from n.image_url, bypassing ntPoster()");
+  }
+
   /* The service key must never be committed, anywhere. Comments are stripped
      first: the files carry warnings that say "never put the service_role key
      here", and a check that fires on its own warning teaches people to ignore
@@ -1107,7 +1126,7 @@ for (const f of ["index.html", "admin.html"]) {
   }
 
   if (bad.length) bad.forEach(fail);
-  else ok("notices — the app reads the public view, the Worker writes through publish_notice() on a key with no table privileges of its own, and a poster reaches all three platforms");
+  else ok("notices — the app reads the public view, the Worker writes through publish_notice() on a key with no table privileges of its own, a poster reaches all three platforms, and only our own storage path can reach an <img src>");
 }
 
 /* ---- 3x. the duʿā translations still line up with the duʿās ----

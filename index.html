@@ -352,9 +352,34 @@
   .lv-sub{font-size:calc(12.5px * var(--ts));color:#BBA9B4;margin-top:3px}
   .lv-vol{display:flex;align-items:center;gap:11px;max-width:230px;margin:20px auto 0;color:#BBA9B4}
   .lv-vol svg{width:18px;height:18px;flex:0 0 auto}
-  .lv-vol input{flex:1;accent-color:var(--gold);height:4px}
+  /* This was a 4px-tall band to drag, which on a phone is a miss waiting to
+     happen. Raising the box alone made the native track thicken into a slab,
+     so the track and thumb are drawn here instead: the line stays 4px to the
+     eye while the full 24px height takes the touch. accent-color goes with
+     the native appearance, hence the explicit gold. */
+  .lv-vol input{flex:1;height:24px;margin:0;background:none;
+    -webkit-appearance:none;appearance:none;cursor:pointer}
+  /* WebKit has no progress pseudo-element, so the filled part of the line is a
+     gradient stopped at --p, which the input handler keeps in step with the
+     value. Firefox has ::-moz-range-progress and needs none of it. In RTL the
+     control itself mirrors, so the gradient is mirrored to match. */
+  .lv-vol input::-webkit-slider-runnable-track{height:4px;border-radius:2px;
+    background:linear-gradient(to right, var(--gold) 0 var(--p,100%), #4B3542 var(--p,100%) 100%)}
+  :root[dir="rtl"] .lv-vol input::-webkit-slider-runnable-track{
+    background:linear-gradient(to left, var(--gold) 0 var(--p,100%), #4B3542 var(--p,100%) 100%)}
+  .lv-vol input::-moz-range-track{height:4px;border-radius:2px;background:#4B3542}
+  .lv-vol input::-moz-range-progress{height:4px;border-radius:2px;background:var(--gold)}
+  .lv-vol input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:16px;height:16px;border-radius:50%;background:var(--gold);margin-top:-6px;border:0}
+  .lv-vol input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;
+    background:var(--gold);border:0}
+  .lv-vol input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .card.lv-info{padding:4px 16px;margin-top:4px}
-  .lv-btn{background:none;border:none;font:inherit;cursor:pointer;padding:0}
+  /* A bare row button is only as tall as its text, which left this one at 21px
+     — under the 24px minimum target. It grows to 24 rather than taking padding,
+     so the row it sits in keeps its own rhythm. */
+  .lv-btn{background:none;border:none;font:inherit;cursor:pointer;padding:0;
+          min-height:24px;display:inline-flex;align-items:center}
   .lv-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
     border-top:1px solid var(--line)}
   .lv-row:first-child{border-top:none}
@@ -905,7 +930,10 @@
     background:rgba(119,33,87,.09);border-radius:6px;padding:2px 6px;margin-top:2px}
   .striplink{display:flex;justify-content:flex-end;margin-top:8px}
   .striplink button{font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;color:var(--brand-600);
-    background:none;border:0;cursor:pointer;padding:2px}
+    background:none;border:0;cursor:pointer;padding:2px 2px;
+    /* 11.5px text in a padding:2px box is a 21px tap target. The width is
+       already generous; only the height needed raising to clear 24. */
+    min-height:24px;display:inline-flex;align-items:center}
 
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
@@ -1281,6 +1309,12 @@
      familiar; the hadith themselves get the scripture stack and generous
      leading the duʿās use, because they are read in long runs. */
   .hd-bar{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+  /* The search box had no rules of its own and rendered at the browser's
+     default 19px — too small to hit, and visibly unlike the number field
+     directly beneath it. It now matches that sibling exactly. */
+  .hd-bar > input[type="search"]{font:inherit;font-size:calc(14px * var(--ts));
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card);color:var(--ink);-webkit-appearance:none;appearance:none}
   .hd-jump{display:flex;align-items:center;gap:8px}
   .hd-jump label{font-size:calc(12.5px * var(--ts));font-weight:600;color:var(--muted)}
   .hd-jump input{flex:0 1 100px;font:inherit;font-size:calc(14px * var(--ts));
@@ -7267,8 +7301,14 @@ function openLive(){ switchTab('live'); }
 
 function initLive(){
   document.getElementById('lv-play').addEventListener('click',lvToggle);
-  document.getElementById('lv-volume').addEventListener('input',e=>{
+  const vol = document.getElementById('lv-volume');
+  /* The gold part of the line is painted from this, so it has to be set now as
+     well as on every change — otherwise the bar starts out blank. */
+  const lvVolPaint = el => el.style.setProperty('--p', el.value + '%');
+  lvVolPaint(vol);
+  vol.addEventListener('input',e=>{
     if(AUDIO) AUDIO.volume=e.target.value/100;
+    lvVolPaint(e.target);
   });
   document.getElementById('lv-vids').addEventListener('click',openVids);
 }
@@ -9369,10 +9409,11 @@ function renderNotices(){
   list.innerHTML = items.map(n => {
     const when = n.event_at ? ntFmtWhen(n.event_at) : ntFmtWhen(n.created_at);
     /* width/height on the image so the card does not jump as posters load. */
-    const shot = n.image_url
-      ? `<button type="button" class="nt-shot" data-img="${esc(n.image_url)}"
+    const img  = ntPoster(n.image_url);
+    const shot = img
+      ? `<button type="button" class="nt-shot" data-img="${esc(img)}"
            aria-label="${esc(t("notices.view_poster","View the poster"))}">
-           <img src="${esc(n.image_url)}" alt="${esc(n.title)}" loading="lazy"
+           <img src="${esc(img)}" alt="${esc(n.title)}" loading="lazy"
                 ${n.image_w ? `width="${n.image_w}"` : ""} ${n.image_h ? `height="${n.image_h}"` : ""}>
          </button>`
       : "";
@@ -9390,6 +9431,21 @@ function renderNotices(){
 
   list.querySelectorAll(".nt-shot").forEach(b =>
     b.addEventListener("click", () => ntShowPoster(b.dataset.img)));
+}
+
+/* Every real poster is a file this masjid uploaded, so it can only ever live on
+   our own Supabase storage path. A notice row is office-written and the office
+   is the only writer, but the app should not be one compromised row away from
+   loading a stranger's image: an <img src> pointing anywhere else would hand
+   that host every reader's IP address and a rough headcount of the congregation
+   the moment the Notices tab opened. So the URL is not sanitised, it is
+   recognised — anything that is not our own posters folder renders no image at
+   all rather than a slightly safer version of someone else's. */
+const NT_POSTER_RE = new RegExp(
+  "^" + supaBase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+  "/storage/v1/object/public/notices/[A-Za-z0-9._-]+$");
+function ntPoster(url){
+  return (typeof url === "string" && NT_POSTER_RE.test(url)) ? url : "";
 }
 
 function ntShowPoster(url){
@@ -9459,9 +9515,9 @@ function ntOpenFromHash(){
   Promise.resolve(NT.pending).then(() => {
     const n = (NT.items || []).find(x => x.id === id);
     if(!n) return;                       // withdrawn, or expired since sending
-    const card = document.querySelector(`#nt-list .nt-shot[data-img="${CSS.escape(n.image_url || "")}"]`);
+    const card = document.querySelector(`#nt-list .nt-shot[data-img="${CSS.escape(ntPoster(n.image_url))}"]`);
     if(card) card.scrollIntoView({ block: "center", behavior: "instant" });
-    if(n.image_url) ntShowPoster(n.image_url);
+    if(ntPoster(n.image_url)) ntShowPoster(ntPoster(n.image_url));
   });
 }
 
