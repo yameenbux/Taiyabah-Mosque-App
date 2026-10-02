@@ -12,7 +12,7 @@ Bolton Central Islamic Society · Registered charity 1041569
 ![Offline](https://img.shields.io/badge/offline-service%20worker-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Languages](https://img.shields.io/badge/languages-EN%20·%20UR%20·%20GU%20·%20AR-C6A24C?style=flat-square&labelColor=3C0B2A)
-![Release checks](https://img.shields.io/badge/release%20checks-36-C6A24C?style=flat-square&labelColor=3C0B2A)
+![Release checks](https://img.shields.io/badge/release%20checks-37-C6A24C?style=flat-square&labelColor=3C0B2A)
 ![Licence](https://img.shields.io/badge/licence-all%20rights%20reserved-7A5D14?style=flat-square&labelColor=3C0B2A)
 
 [**Open the app →**](https://taiyabahapp.ysbdesigns.uk)
@@ -407,7 +407,7 @@ Anything committed here is reachable by URL.
 │                                 so no local tooling is ever required.
 │
 ├── scripts/                     Build and verification. Node, no dependencies.
-│   ├── check-release.mjs         36 checks — the release gate. See below.
+│   ├── check-release.mjs         37 checks — the release gate. See below.
 │   ├── check-i18n.mjs            Measures translation coverage against the app.
 │   ├── check-back-button.mjs     Drives a real browser through eleven Back
 │   │                              scenarios. Not in CI; needs Playwright.
@@ -498,7 +498,7 @@ congregation. It is not a linter. **Each check exists because something went
 wrong once**, and each is written so that removing the behaviour it guards makes
 the build fail.
 
-There are **36**, and each prints what it confirmed rather than a tick. Among
+There are **37**, and each prints what it confirmed rather than a tick. Among
 them:
 
 | Check | What it caught |
@@ -783,6 +783,13 @@ Still outstanding, roughly in the order it matters:
   the drawer note at 2.95:1 — replaced by four tokens on `:root` rather than
   four more hand-picked hexes, which is how the sister repo ended up with four
   different golds
+- **The privacy notice made true again.** It named Google Fonts as a recipient
+  after the typefaces moved onto this origin, and it had **never** mentioned
+  the live broadcast — press Listen and a third-party stream host learns your
+  address. Check 4e now holds every external host `index.html` names against a
+  list with a decision beside it, and fails on a host nobody has classified, on
+  a recipient the notice omits, and on a recipient the notice still claims
+  after the app stopped contacting it
 - **`LICENSE.md`**, which four source-file headers had pointed at since the
   first commit and which had never existed
 - **The Android Back button**, which closed the app from any screen in a Trusted

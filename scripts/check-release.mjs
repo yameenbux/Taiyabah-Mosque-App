@@ -1745,6 +1745,87 @@ try {
   }
 }
 
+/* ---- 4e. no third party is contacted that the privacy notice does not know about ----
+
+   privacy.html is the document given to Google Play and to anybody who asks
+   what the app does with their data. It is prose, and prose cannot fail a
+   build, so it goes stale in both directions: it listed Google Fonts for weeks
+   after the typefaces moved onto this origin, and it had never mentioned the
+   live broadcast at all — press Listen and a third party learns your address.
+
+   So every external host index.html names is listed here with a decision
+   beside it, and a host that is not on this list fails the build. That is the
+   point: adding one is the moment to ask whether the notice needs a line, and
+   nothing else makes that moment happen.
+
+   A host being here is NOT a claim the notice names it — a link somebody taps
+   is not a recipient. The ones marked `notice` are, and those are checked
+   against privacy.html by name. ---- */
+{
+  const KNOWN = [
+    // host                                 kind      what it is
+    ["phenbhmobxwyvdeshvqw.supabase.co",    "notice", "Supabase"],
+    ["cdn.onesignal.com",                   "notice", "OneSignal"],
+    ["taiyabah-sender.yameenbux.workers.dev","notice", "Cloudflare"],
+    ["donate.stripe.com",                   "notice", "Stripe"],
+    ["buy.stripe.com",                      "notice", "Stripe"],
+    ["book.stripe.com",                     "notice", "Stripe"],
+    ["www.youtube.com",                     "notice", "YouTube"],
+    ["www.youtube-nocookie.com",            "notice", "YouTube"],
+    ["i.ytimg.com",                         "notice", "YouTube"],
+    ["taiyabahmbolton.radioca.st",          "notice", "broadcast"],
+    // price and rate services: the notice covers these as a class, in prose,
+    // because they are asked for a number and told nothing
+    ["api.gold-api.com",                    "prices", ""],
+    ["data-asg.goldprice.org",              "prices", ""],
+    ["www.bullionbypost.co.uk",             "prices", ""],
+    ["api.frankfurter.app",                 "prices", ""],
+    ["api.frankfurter.dev",                 "prices", ""],
+    ["open.er-api.com",                     "prices", ""],
+    ["cdn.jsdelivr.net",                    "prices", ""],
+    // places a person is taken when they tap something. Not recipients: the
+    // app sends them nothing, and the person chose to go.
+    ["sunnah.com",                          "link",   ""],
+    ["maps.apple.com",                      "link",   ""],
+    ["www.instagram.com",                   "link",   ""],
+    ["twitter.com",                         "link",   ""],
+    ["chat.whatsapp.com",                   "link",   ""],
+    ["github.com",                          "link",   ""],
+    ["masjidone.co.uk",                     "link",   ""],
+    ["taiyabahwebsite.ysbdesigns.uk",       "link",   ""],
+    ["www.taiyabahmasjid.com",              "link",   ""],
+  ];
+  const app = R("index.html");
+  const notice = existsSync("privacy.html") ? R("privacy.html") : "";
+  const found = [...new Set([...app.matchAll(/https:\/\/([a-z0-9.-]+\.[a-z]{2,})/gi)].map(m => m[1].toLowerCase()))];
+  const listed = new Map(KNOWN.map(([h, k, n]) => [h, { kind: k, name: n }]));
+  const bad = [];
+
+  const strangers = found.filter(h => !listed.has(h));
+  strangers.forEach(h => bad.push(
+    `index.html contacts ${h}, which is not in this check's list — decide what it is, and whether privacy.html has to name it, then add it here`));
+
+  if (!notice) bad.push("privacy.html is missing — the app has no privacy notice at all");
+  else {
+    /* Against the <dt> rows — the recipients table — not against the whole
+       page. "is this word anywhere in the notice" passed a control that
+       renamed OneSignal's row, because the word still appeared in a sentence
+       further down. A recipient is declared by having a row. */
+    const rows = [...notice.matchAll(/<dt>(.*?)<\/dt>/gs)].map(m => m[1]);
+    const needed = [...new Set(KNOWN.filter(([h, k]) => k === "notice" && found.includes(h)).map(([, , n]) => n))];
+    const absent = needed.filter(n => !rows.some(r => new RegExp(n, "i").test(r)));
+    absent.forEach(n => bad.push(
+      `index.html contacts ${n} and privacy.html does not name it — a recipient the notice omits is a notice that is wrong`));
+    /* and the other way: the fault that was actually shipped */
+    if (/fonts\.googleapis\.com|fonts\.gstatic\.com|Google Fonts/i.test(notice) &&
+        !/fonts\.(googleapis|gstatic)\.com/.test(app))
+      bad.push("privacy.html still names Google Fonts as a recipient and the app no longer contacts it — the notice claims a data flow that does not happen");
+  }
+
+  if (bad.length) bad.forEach(fail);
+  else ok(`third parties — all ${found.length} external hosts in index.html are accounted for, and privacy.html names every one that receives something`);
+}
+
 /* ---- 5. everything parses ---- */
 import { writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
