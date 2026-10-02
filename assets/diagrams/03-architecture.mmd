@@ -1,0 +1,37 @@
+flowchart TB
+    subgraph CL["Where the app runs"]
+        direction LR
+        C1["📲 <b>Installed to the home screen</b><br/>iOS and Android"]
+        C2["🤖 <b>Android app from Google Play</b><br/>a Trusted Web Activity over the same URL"]
+        C3["💻 <b>Any browser</b><br/>one URL, no install"]
+        C1 ~~~ C2 ~~~ C3
+    end
+
+    subgraph PG["GitHub Pages — plain files, nothing running at request time"]
+        direction LR
+        F1["<b>index.html</b><br/>the whole app, with the<br/>year's timetable embedded"]
+        F2["<b>sw.js</b><br/>offline shell, push handlers,<br/>and the update path"]
+        F3["<b>quran/ · lang/</b><br/>fetched only when opened,<br/>then cached"]
+        F1 ~~~ F2 ~~~ F3
+    end
+
+    CL --> PG
+
+    PG --> DB[("🗄️ <b>Supabase Postgres</b><br/>Row Level Security is the access control, not an <code>if</code> in the app.<br/>The app holds only the publishable key: it writes a hall booking, a nikāḥ or an<br/>advice request, and reads the notices view, availability and term dates.<br/>It can read none of those requests back, and it can write no notice")]
+    PG --> ST["💳 <b>Stripe</b><br/>the masjid's own payment<br/>links, with Gift Aid"]
+    PG --> LV["🔊 <b>eMasjid Live</b><br/>the masjid's<br/>own broadcast"]
+    PG -->|"preferences and notices,<br/>never a secret"| WK
+
+    WK["⚙️ <b>Cloudflare Worker</b><br/>the only place the OneSignal REST key and the<br/>Supabase service key exist. A cron trigger runs it every minute"]
+
+    WK --> DB
+    WK --> OS["🔔 <b>OneSignal</b><br/>delivery and device subscriptions,<br/>out to every phone above"]
+
+    classDef client fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef ours fill:#3C0B2A,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef store fill:#2A0E1F,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef out fill:#F5F1E8,stroke:#C9BFB2,color:#6E616A
+    class C1,C2,C3 client
+    class F1,F2,F3,WK ours
+    class DB store
+    class ST,LV,OS out

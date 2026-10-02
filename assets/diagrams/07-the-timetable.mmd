@@ -1,0 +1,39 @@
+flowchart TB
+    subgraph BUILD["Building the dataset — nothing here is calculated"]
+        direction LR
+        PDF["📄 <b>The masjid's published<br/>Salah timetable</b><br/>There is no calculation<br/>engine in this app"]
+        PARSE["🐍 <b>parse_timetable.py</b><br/>resolves ditto marks,<br/>maps the Hijri dates"]
+        CHECK{{"<b>Verifies before it writes</b><br/>day counts per month · jamāʿah never<br/>before the beginning time · Jumuʿah on<br/>every Friday · BST transitions"}}
+        PDF --> PARSE --> CHECK
+    end
+
+    CHECK -->|"any check fails"| NONE["🚫 <b>Writes nothing at all</b><br/>a half-correct timetable is worse than none"]
+
+    subgraph OUT["Two outputs, one source"]
+        direction LR
+        EMB["<b>Embedded in index.html</b><br/>what the congregation sees. No network<br/>request is made to show a prayer time"]
+        JSON["<b>data/timetable-2026.json</b><br/>what the Worker's reminder<br/>scheduler reads"]
+    end
+
+    CHECK -->|"all pass"| OUT
+
+    OUT --> DRIFT{{"Every scheduled run <b>cross-checks its times<br/>against the app's own timetable</b> before sending"}}
+
+    DRIFT -->|"they disagree"| HALT["⏹️ <b>Halts, and logs the discrepancy</b><br/>rather than announcing a time nobody can see"]
+    DRIFT -->|"the app simply<br/>cannot be reached"| GO["▶️ <b>Proceeds</b> — an outage should<br/>not silence prayer reminders"]
+
+    OUT -.-> SIGN["✍️ <b>data/VERIFICATION.md</b> — a person checks the generated times against the printed board.<br/>Automated checks prove internal consistency; only a person can confirm it is what the masjid intends"]
+    SIGN -.-> NEXT["📅 <b>The dataset ends 31 December 2026.</b> The 2027 rows are the one dated job in this repository"]
+
+    classDef source fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef ours fill:#3C0B2A,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef gate fill:#2A0E1F,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef bad fill:#F6E2DA,stroke:#B4532F,stroke-width:2px,color:#261B22
+    classDef good fill:#E4EDE4,stroke:#3F7A46,stroke-width:2px,color:#261B22
+    classDef soon fill:#F3EBD8,stroke:#8A6A18,stroke-width:2px,color:#261B22,stroke-dasharray:4 3
+    class PDF,SIGN source
+    class PARSE,EMB,JSON ours
+    class CHECK,DRIFT gate
+    class NONE,HALT bad
+    class GO good
+    class NEXT soon

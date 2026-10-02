@@ -1,0 +1,26 @@
+flowchart TB
+    U["🧕 <b>A subscriber</b><br/>sets five switches and a lead time<br/>in Settings → Notifications"]
+    LIMIT["❗ <b>Why one tag and not five</b><br/>A tag each was built first. OneSignal<br/>answered <code>409 entitlements-tag-limit</code>"]
+
+    U --> PACK["<b>Packed into one tag</b> — five positional flags, then the lead time in two digits"]
+    LIMIT -.-> PACK
+
+    PACK --> TAG["<code>p = 1010010</code><br/>jamāʿah <b>1</b> · janāzah <b>0</b> · announcements <b>1</b><br/>events <b>0</b> · al-Kahf <b>0</b> · <b>10</b> minutes"]
+    RULE["🔒 <b>PREF_ORDER is positional and append-only</b><br/>Inserting a flag in the middle breaks no build.<br/>It silently reassigns the meaning of every value<br/>already stored on every subscriber's device"]
+    RULE -.-> TAG
+
+    TAG --> WRITE["Written through the <b>Worker</b>, not the browser SDK —<br/>the SDK's own tag write proved unreliable on every device tested"]
+    WRITE --> OS[("🔔 <b>OneSignal</b><br/>one tag per device")]
+
+    OS --> SEND["A send <b>enumerates the tag values that match</b>,<br/>and refuses above 120 rather than being<br/>rejected by OneSignal mid-send"]
+    LEG["<b>LEGACY_FLAGS</b><br/>al-Kahf made it five. A phone not opened<br/>since still carries four — and still gets<br/>its janāzah alerts"]
+    LEG -.-> SEND
+
+    classDef person fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef ours fill:#3C0B2A,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef store fill:#2A0E1F,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef warn fill:#F3EBD8,stroke:#8A6A18,stroke-width:2px,color:#261B22
+    class U person
+    class PACK,TAG,WRITE,SEND ours
+    class OS store
+    class LIMIT,RULE,LEG warn

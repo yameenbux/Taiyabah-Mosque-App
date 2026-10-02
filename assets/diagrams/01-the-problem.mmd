@@ -1,0 +1,28 @@
+flowchart LR
+    Q["🧕 <b>Somebody in the congregation</b><br/>When is Jumuʿah?<br/>Is the madrasah open on Monday?<br/>Who do I ring for a janāzah?"]
+
+    subgraph OLD["How that was answered before"]
+        direction TB
+        P1["📄 A printed card<br/>in a coat pocket,<br/>a year out of date"]
+        P2["📱 A third-party app<br/>calculating times the<br/>masjid never published"]
+        P3["💬 A forwarded message<br/>nobody can date"]
+        P4["☎️ Ringing the office<br/>and hoping somebody<br/>is in"]
+    end
+
+    Q --> OLD
+
+    OLD -.-> MISS["❓ <b>Four answers,<br/>and no way to tell<br/>which one is the masjid's</b>"]
+
+    Q ==> APP["📲 <b>Taiyabah Masjid</b><br/>One app. The masjid's own<br/>timetable, its own notices,<br/>its own numbers"]
+    APP ==> ONE["✅ <b>One answer</b><br/>and it is the masjid's,<br/>offline, in four languages"]
+
+    classDef person fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef old fill:#F5F1E8,stroke:#C9BFB2,color:#6E616A
+    classDef miss fill:#F3EBD8,stroke:#8A6A18,stroke-width:2px,color:#261B22,stroke-dasharray:4 3
+    classDef core fill:#3C0B2A,stroke:#C6A24C,stroke-width:3px,color:#F5F1E8,font-size:15px
+    classDef good fill:#E4EDE4,stroke:#3F7A46,stroke-width:2px,color:#261B22
+    class Q person
+    class P1,P2,P3,P4 old
+    class MISS miss
+    class APP core
+    class ONE good

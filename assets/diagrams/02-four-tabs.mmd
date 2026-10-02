@@ -1,0 +1,37 @@
+flowchart TD
+    APP(("Taiyabah<br/>Masjid"))
+
+    APP --> H["🏠 <b>Home</b><br/>The next jamāʿah and its<br/>countdown, today's five<br/>prayers, the day's reminder,<br/>and the services as a grid"]
+    APP --> T["🕌 <b>Prayer Times</b><br/>Beginning and jamāʿah,<br/>any date, the whole month.<br/>From the masjid's own<br/>published timetable"]
+    APP --> N["📣 <b>Notices</b><br/>Every announcement the<br/>masjid has sent, poster<br/>included, still there days<br/>after the notification"]
+    APP --> M["☰ <b>More</b><br/>Opens the full menu in<br/>place rather than<br/>navigating away"]
+
+    H --- HL(["Live"])
+    T --- TL(["Live"])
+    N --- NL(["Live"])
+
+    M --> R["📖 Recite<br/>Qur'an · 13-line mus-haf<br/>Ṣaḥīḥ al-Bukhārī<br/>Adhkār · Duʿās · Rabbanā"]
+    M --> S["🤲 Services<br/>Qibla · Listen live · Zakat<br/>Giving · Hall hire · Nikāḥ<br/>Funerals · Imam's advice"]
+    M --> E["🎓 Madrasah<br/>Admissions and fees,<br/>holiday planner, and the<br/>portal on the website"]
+    M --> G["⚙️ Settings<br/>Text size, language,<br/>notification preferences"]
+
+    R --- RL(["Live"])
+    S --- SL(["Live"])
+    E --- EL(["Live"])
+    G --- GL(["Live"])
+
+    S -.-> X["🎧 <b>Recordings</b><br/>past bayaans, inside<br/>the app's own player"]
+    E -.-> Y["🪪 <b>Membership status</b><br/>whether <i>you</i> have<br/>paid this year"]
+    X --- XL(["In development"])
+    Y --- YL(["In development"])
+
+    classDef core fill:#3C0B2A,stroke:#C6A24C,stroke-width:3px,color:#F5F1E8,font-size:16px
+    classDef live fill:#EDE7DD,stroke:#3F7A46,stroke-width:2px,color:#261B22
+    classDef soon fill:#EDE7DD,stroke:#8A6A18,stroke-width:2px,color:#261B22,stroke-dasharray:4 3
+    classDef tagok fill:#E4EDE4,stroke:#3F7A46,color:#3F7A46
+    classDef tagsoon fill:#F3EBD8,stroke:#8A6A18,color:#8A6A18
+    class APP core
+    class H,T,N,M,R,S,E,G live
+    class X,Y soon
+    class HL,TL,NL,RL,SL,EL,GL tagok
+    class XL,YL tagsoon

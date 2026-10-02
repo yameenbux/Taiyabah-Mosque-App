@@ -1631,6 +1631,39 @@ try {
   }
 } catch { /* no git range available (e.g. a shallow checkout); skip */ }
 
+/* ---- 4d. the README's count of these checks is still the truth ----
+   The README said 29 for long enough that it had drifted by five. A number in
+   prose cannot fail a build, so this one does: it counts the section banners in
+   this file and holds every figure in the README to what it finds — the badge,
+   the file tree and the sentence. Writing a new check therefore means changing
+   three numbers, which is the point. ---- */
+{
+  const banners = [...R("scripts/check-release.mjs").matchAll(/^\/\* ---- ([0-9][a-z0-9]*)\. /gm)];
+  const real = banners.length;
+
+  const seen = new Set();
+  const dupe = banners.map(m => m[1]).filter(n => seen.size === seen.add(n).size);
+  if (dupe.length) fail(`two checks share the number ${dupe.join(", ")} — renumber one, or the count below is wrong`);
+
+  if (!existsSync("README.md")) fail("README.md is missing");
+  else {
+    const readme = R("README.md");
+    const claims = [
+      ["the badge",    /release%20checks-(\d+)-/],
+      ["the file tree", /check-release\.mjs\s+(\d+) checks/],
+      ["the sentence", /There are \*\*(\d+)\*\*/],
+    ];
+    const wrong = [];
+    for (const [where, re] of claims) {
+      const m = readme.match(re);
+      if (!m) wrong.push(`${where} no longer states a number this check can find`);
+      else if (Number(m[1]) !== real) wrong.push(`${where} says ${m[1]}`);
+    }
+    if (wrong.length) fail(`there are ${real} checks in this file, but the README disagrees: ${wrong.join("; ")}`);
+    else ok(`README — all 3 places that count these checks say ${real}, and ${real} is what is here`);
+  }
+}
+
 /* ---- 5. everything parses ---- */
 import { writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";

@@ -1,0 +1,34 @@
+flowchart TB
+    subgraph MORN["🌅 Friday morning"]
+        direction LR
+        A1["<b>09:00</b><br/>the Worker's cron notices<br/>it is Friday"]
+        A2["Sūrah al-Kahf reminder<br/>to everybody whose<br/>al-Kahf flag is set"]
+        A3["Its own switch, and<br/><b>on by default</b>"]
+        A1 --> A2 --> A3
+    end
+
+    subgraph OPEN["📲 Opening the app that day"]
+        direction LR
+        B1["<b>Jumuʿah replaces Zuhr</b><br/>in the timetable and in<br/>the day's heading"]
+        B2["Both Jumuʿah times<br/>shown inline"]
+        B3["A Friday-only call to give,<br/>beside an authentic hadith<br/>on the day's virtue"]
+        B4["The Sūrah al-Kahf card,<br/>because it is Friday"]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph JAM["🕌 Before the jamāʿah"]
+        direction LR
+        C1["Each subscriber's <b>own</b><br/>lead time — 5, 10 or 15<br/>minutes, from their own tag"]
+        C2{{"Cross-check against the<br/>app's own timetable<br/>before sending"}}
+        C3["<b>Jamāʿah Time Now</b><br/>at the jamāʿah itself"]
+        C1 --> C2 --> C3
+    end
+
+    MORN --> OPEN --> JAM
+
+    classDef act fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef gate fill:#3C0B2A,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef done fill:#E4EDE4,stroke:#3F7A46,stroke-width:2px,color:#261B22
+    class A1,A2,B1,B2,B3,B4,C1 act
+    class C2 gate
+    class A3,C3 done

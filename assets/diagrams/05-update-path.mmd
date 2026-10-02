@@ -1,0 +1,29 @@
+flowchart TB
+    E["✏️ <b>index.html edited</b> — a new price, a new screen, a fix"]
+    E --> GATE{{"<b>Release check</b><br/>did sw.js change, and did its CACHE name move with it?"}}
+
+    GATE -->|"no"| STOP["🚫 <b>Build fails</b><br/>A worker with the same cache name opens the cache already there and<br/>hands back everything already in it. The push would look exactly like shipping"]
+    GATE -->|"yes"| PUSH["⬆️ <b>Push to main</b> — GitHub Pages serves the new files"]
+
+    PUSH --> ARRIVING
+
+    subgraph ARRIVING["Arriving on a phone that already has the app installed"]
+        direction LR
+        I1["<b>1</b> · the new worker installs<br/>beside the old one"]
+        I2["<b>2</b> · it fills its cache <b>from the network</b>,<br/>not through the browser's own<br/>copy, which may itself be stale"]
+        I3["<b>3</b> · on replacing the old worker it<br/><b>sends its windows back<br/>through the door</b>"]
+        I1 --> I2 --> I3
+    end
+
+    ARRIVING --> DONE["✅ <b>The open app is now the new build</b> — not a launch later, and no reinstall.<br/>Bumping CACHE in sw.js is one line, and it is the difference between shipping and appearing to ship"]
+
+    classDef act fill:#EDE7DD,stroke:#C9BFB2,color:#261B22
+    classDef gate fill:#3C0B2A,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef bad fill:#F6E2DA,stroke:#B4532F,stroke-width:2px,color:#261B22
+    classDef ours fill:#2A0E1F,stroke:#C6A24C,stroke-width:2px,color:#F5F1E8
+    classDef good fill:#E4EDE4,stroke:#3F7A46,stroke-width:2px,color:#261B22
+    class E,PUSH act
+    class GATE gate
+    class STOP bad
+    class I1,I2,I3 ours
+    class DONE good
