@@ -355,10 +355,10 @@ and appearing to ship. Current: `taiyabah-v164`.
 **Life-stage services**
 - **Birth** — guidance for new arrivals, including circumcision referral
 - **Nikāḥ** — what the masjid provides, the standing advice to also register the
-  marriage civilly, and a calendar: pick a day and the prayer it would follow,
-  with that day's own jamāʿah time shown beside it. **The request itself goes by
-  phone or email, with the chosen dates carried into the message** — see
-  *Submitting a nikāḥ date from the app*
+  marriage civilly, and a date request: pick a day and the prayer it would
+  follow, with that day's own jamāʿah time shown beside it, then give the five
+  people the masjid records for every nikāḥ. It lands in the office's own screen
+  — see *Submitting a nikāḥ date from the app*
 - **Islamic Will** — wasiyyah, the fixed shares, and where a solicitor is needed
 - **Funeral Services** — BCoM's out-of-hours number first, because that call has
   to happen before anything else can, then everything the masjid itself arranges:
@@ -415,33 +415,50 @@ and appearing to ship. Current: `taiyabah-v164`.
 
 ## Submitting a nikāḥ date from the app
 
+The form asks for a date and a prayer, the requester's own details, and then
+**the five people the masjid records for every nikāḥ**: the bridegroom, the
+bride, the bride's representative and two witnesses, each with a full name, an
+age and a home address.
+
 > [!IMPORTANT]
-> **The app's nikāḥ form is closed, deliberately, and the screen offers the
-> phone and email route instead.** Fixing the duplicate id made the Submit
-> button run — and the request was then refused by the database every time.
->
-> `request_nikah_date` has required the particulars of **five people** since the
-> website added them: groom, bride, wali and two witnesses, each with a full
-> name, an age and a full address, with the groom and bride refused under 18.
-> The app sends a date, a slot and one contact. So every submission comes back
-> *"The bridegroom is missing from the request"*. `nikah_people` has no rows at
-> all, which is what that looks like from the other end.
+> **The bridegroom and the bride are refused under 18**, in the app and again in
+> the database. Since February 2023 performing a marriage ceremony for anyone
+> under 18 is a criminal offence in England and Wales, whether or not the
+> marriage is registered. That is not a preference and it is not a setting.
 
-**`nkProbe()` could not see this, and that is the lesson.** It asks whether the
-function *exists* by posting an empty payload and reading the 400 that the
-function's own **date** validation returns first — so a function that refuses
-every real submission passes the test. Existence is not compatibility, and
-check 3l was written against the same idea and inherited the same blind spot.
+**This is the second fault that screen had, and the first one hid it.** The
+duplicate `id="nk-email"` meant Submit threw before anything was sent, so the
+request never reached the database — and the database had required those five
+people since the website added them. Fixing the id took the form from "does
+nothing" to "refused every time", with *"The bridegroom is missing from the
+request"*.
 
-`NK_FORM_CAN_SUBMIT` now closes the form, and **check 3l holds that flag to the
-payload**: turn it on without sending the five people and the build fails, which
-is the only moment anybody would think to look. Both halves proved by
-triggering them.
+**`nkProbe()` could not see it, and that is the lesson worth keeping.** It asks
+whether the function *exists* by posting an empty payload and reading the 400 —
+but that 400 is the function's own **date** validation firing first, so the
+people requirement was never reached and a function that refused every real
+submission passed the test. Existence is not compatibility. Check 3l was written
+from the same idea and inherited the same blind spot.
 
-Finishing it is a decision rather than a layout job — collecting five people's
-names, ages and home addresses in the app is DPIA territory, and the website
-already has that form. Until then the calendar still works, and the request
-goes to the office by phone or by an email carrying the chosen dates.
+`NK_PEOPLE` is now the single list the markup ids, the validation and the
+payload are all built from, because three copies of a list like that is how one
+of them ends up with four entries. Check 3l holds `NK_FORM_CAN_SUBMIT` to it:
+turn the form on without sending all five roles, or drop one of the 25 fields,
+and the build fails.
+
+**Tested against the live database, not against a fixture.** The contract was
+read out of the function, probed inside a transaction that rolled back, then the
+browser was driven through the real form — click a day, click a prayer, fill
+twenty-five fields, press send — and the captured payload was submitted for
+real. It created `NK-26-0014` with all five people, their ages and their
+postcodes, and the row was then deleted. Refusals were checked too: a blank
+person flags all five of their fields, a 17-year-old groom or bride flags the
+age, a missing postcode flags that box, and nothing is sent in any of those
+cases.
+
+`anon` holds **no privileges at all** on either table. The app writes through a
+`SECURITY DEFINER` function and cannot read a single row back; the office reads
+them under `verified_office()` with two-step completed.
 
 ---
 

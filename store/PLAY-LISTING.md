@@ -137,14 +137,15 @@ By telephone and email, as set out in the privacy notice.
 
 | Type | Collected | Shared | Optional? | Purpose | Where in the code |
 |---|---|---|---|---|---|
-| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name`; charity collection `collector_name`, `trustee_name`, `signed_name`; imams' advice `name` |
-| Address | Yes | No | Optional | App functionality | Hall booking `address`; charity collection `org_address` |
+| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name` **and `people[].full_name` — the bridegroom, bride, wali and two witnesses**; charity collection `collector_name`, `trustee_name`, `signed_name`; imams' advice `name` |
+| Address | Yes | No | Optional | App functionality | Hall booking `address`; **nikāḥ `people[].address_line`, `town`, `postcode` for each of the five**; charity collection `org_address` |
 | Phone number | Yes | No | Optional | App functionality | Hall booking `phone`; nikāḥ `contact_phone`; charity collection `org_phone`, `trustee_phone`; imams' advice `phone` |
 | Email address | Yes | No | Optional | App functionality | Nikāḥ `contact_email`; charity collection `org_email`, `trustee_email`; imams' advice `email` |
 | Photos | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a JPEG, PNG or WebP |
 | Files and docs | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a PDF |
 | Other in-app messages | Yes | No | Optional | App functionality | A written question to the imams: `subject` and `question`, and the imam's reply |
 | Other user-generated content | Yes | No | Optional | App functionality | Nikāḥ `notes` free-text box |
+| Other info | Yes | No | Optional | App functionality | Nikāḥ `people[].age` — an age in years for each of the five. The bridegroom and bride are refused under 18, which is a legal requirement rather than a preference |
 | Device or other IDs | Yes | No | Optional | App functionality | OneSignal subscription id, only if notifications are turned on |
 
 The certificate is one upload that the form accepts in four formats, so which

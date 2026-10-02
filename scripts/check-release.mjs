@@ -502,10 +502,23 @@ for (const f of ["index.html", "admin.html"]) {
   if (!canSubmit)
     missing.push("NK_FORM_CAN_SUBMIT is gone — nothing now stands between the app and a form the database refuses");
   else if (canSubmit[1] === "true") {
-    const sends = ["groom", "bride", "wali", "witness_1", "witness_2"]
-                    .filter(who => !new RegExp(`["']?${who}["']?\\s*:`).test(app));
-    if (sends.length)
-      missing.push(`NK_FORM_CAN_SUBMIT is true but the app still sends nothing for ${sends.join(", ")} — request_nikah_date refuses the request and the family is handed an error`);
+    /* Looks for the ROLE VALUES the app sends, not for payload keys of those
+       names. The first version assumed the payload would carry a `groom:` key;
+       the app builds the array from NK_PEOPLE instead, which is better, and the
+       check was wrong rather than the code. It fired, which is how that was
+       noticed. */
+    const roles = ["groom", "bride", "wali", "witness_1", "witness_2"];
+    const absent = roles.filter(r => !new RegExp(`role:\\s*["']${r}["']`).test(app));
+    if (absent.length)
+      missing.push(`NK_FORM_CAN_SUBMIT is true but NK_PEOPLE names no ${absent.join(", ")} — request_nikah_date refuses the request and the family is handed an error`);
+    if (!/people:\s*NK_PEOPLE\.map/.test(app))
+      missing.push("NK_FORM_CAN_SUBMIT is true but the payload no longer carries a people array built from NK_PEOPLE");
+    /* the markup has to carry a field for every one of them, or validation
+       reaches for an element that is not there and throws on submit */
+    for (const id of ["groom", "bride", "wali", "w1", "w2"])
+      for (const f of ["name", "age", "addr", "town", "pc"])
+        if (!new RegExp(`id="nk-${id}-${f}"`).test(app))
+          missing.push(`the nikāḥ form has no nk-${id}-${f} field, which validation and the payload both reach for`);
   }
 
   if (missing.length) missing.forEach(fail);

@@ -1783,6 +1783,15 @@
   footer .credit{margin-top:6px;font-size:calc(10.5px * var(--ts));color:#A49AA0}
   footer .credit a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(124,110,119,.3)}
 
+  .nk-people{margin:18px 0 4px}
+  .nk-people-h{font-family:"Fraunces",Georgia,serif;font-size:calc(19px * var(--ts));margin:0 0 4px}
+  .nk-person{border:1px solid var(--line);border-radius:12px;padding:12px 13px 4px;margin:12px 0;background:var(--card)}
+  .nk-person-h{font-size:calc(13px * var(--ts));letter-spacing:.08em;text-transform:uppercase;
+               color:var(--gold-ink);margin:0 0 8px}
+  .nk-age input{max-width:110px}
+  /* the hint belongs to the age box above it, not to the field below */
+  .nk-age .bk-hint{margin-top:3px}
+  .nk-person .bk-field{margin-bottom:12px}
   .vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
   @media (prefers-reduced-motion: reduce){.datechip .live{animation:none}.track>i{transition:none}}
 </style>
@@ -4818,6 +4827,128 @@
                   <label for="nk-email" data-i18n="nikah.email">Email</label>
                   <input type="email" id="nk-email" inputmode="email" autocomplete="email" data-i18n-latin>
                 </div>
+                <div class="nk-people" id="nk-people">
+                  <h3 class="nk-people-h" data-i18n="nikah.who_is_getting_married">Who is getting married</h3>
+                  <p class="bk-hint" data-i18n="nikah.the_masjid_records_these_five">The masjid records these five people for every nikāḥ, and cannot perform
+                     one without them. They are kept with your request and used for nothing else.</p>
+                <div class="nk-person">
+                  <h4 class="nk-person-h" data-i18n="nikah.the_bridegroom">The bridegroom</h4>
+                  <div class="bk-field">
+                    <label for="nk-groom-name" data-i18n="nikah.full_name">Full name</label>
+                    <input type="text" id="nk-groom-name" autocomplete="off">
+                  </div>
+                  <div class="bk-field nk-age">
+                    <label for="nk-groom-age" data-i18n="nikah.age">Age</label>
+                    <input type="number" id="nk-groom-age" inputmode="numeric" min="0" max="120">
+                    <span class="bk-hint" data-i18n="nikah.must_be_18_or_over">Must be 18 or over.</span>
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-groom-addr" data-i18n="nikah.address">Address</label>
+                    <input type="text" id="nk-groom-addr" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-groom-town" data-i18n="nikah.town">Town</label>
+                    <input type="text" id="nk-groom-town" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-groom-pc" data-i18n="nikah.postcode">Postcode</label>
+                    <input type="text" id="nk-groom-pc" autocomplete="off" data-i18n-latin>
+                  </div>
+                </div>
+                <div class="nk-person">
+                  <h4 class="nk-person-h" data-i18n="nikah.the_bride">The bride</h4>
+                  <div class="bk-field">
+                    <label for="nk-bride-name" data-i18n="nikah.full_name">Full name</label>
+                    <input type="text" id="nk-bride-name" autocomplete="off">
+                  </div>
+                  <div class="bk-field nk-age">
+                    <label for="nk-bride-age" data-i18n="nikah.age">Age</label>
+                    <input type="number" id="nk-bride-age" inputmode="numeric" min="0" max="120">
+                    <span class="bk-hint" data-i18n="nikah.must_be_18_or_over">Must be 18 or over.</span>
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-bride-addr" data-i18n="nikah.address">Address</label>
+                    <input type="text" id="nk-bride-addr" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-bride-town" data-i18n="nikah.town">Town</label>
+                    <input type="text" id="nk-bride-town" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-bride-pc" data-i18n="nikah.postcode">Postcode</label>
+                    <input type="text" id="nk-bride-pc" autocomplete="off" data-i18n-latin>
+                  </div>
+                </div>
+                <div class="nk-person">
+                  <h4 class="nk-person-h" data-i18n="nikah.the_brides_representative">The bride's representative</h4>
+                  <div class="bk-field">
+                    <label for="nk-wali-name" data-i18n="nikah.full_name">Full name</label>
+                    <input type="text" id="nk-wali-name" autocomplete="off">
+                  </div>
+                  <div class="bk-field nk-age">
+                    <label for="nk-wali-age" data-i18n="nikah.age">Age</label>
+                    <input type="number" id="nk-wali-age" inputmode="numeric" min="0" max="120">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-wali-addr" data-i18n="nikah.address">Address</label>
+                    <input type="text" id="nk-wali-addr" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-wali-town" data-i18n="nikah.town">Town</label>
+                    <input type="text" id="nk-wali-town" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-wali-pc" data-i18n="nikah.postcode">Postcode</label>
+                    <input type="text" id="nk-wali-pc" autocomplete="off" data-i18n-latin>
+                  </div>
+                </div>
+                <div class="nk-person">
+                  <h4 class="nk-person-h" data-i18n="nikah.witness_1">Witness 1</h4>
+                  <div class="bk-field">
+                    <label for="nk-w1-name" data-i18n="nikah.full_name">Full name</label>
+                    <input type="text" id="nk-w1-name" autocomplete="off">
+                  </div>
+                  <div class="bk-field nk-age">
+                    <label for="nk-w1-age" data-i18n="nikah.age">Age</label>
+                    <input type="number" id="nk-w1-age" inputmode="numeric" min="0" max="120">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w1-addr" data-i18n="nikah.address">Address</label>
+                    <input type="text" id="nk-w1-addr" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w1-town" data-i18n="nikah.town">Town</label>
+                    <input type="text" id="nk-w1-town" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w1-pc" data-i18n="nikah.postcode">Postcode</label>
+                    <input type="text" id="nk-w1-pc" autocomplete="off" data-i18n-latin>
+                  </div>
+                </div>
+                <div class="nk-person">
+                  <h4 class="nk-person-h" data-i18n="nikah.witness_2">Witness 2</h4>
+                  <div class="bk-field">
+                    <label for="nk-w2-name" data-i18n="nikah.full_name">Full name</label>
+                    <input type="text" id="nk-w2-name" autocomplete="off">
+                  </div>
+                  <div class="bk-field nk-age">
+                    <label for="nk-w2-age" data-i18n="nikah.age">Age</label>
+                    <input type="number" id="nk-w2-age" inputmode="numeric" min="0" max="120">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w2-addr" data-i18n="nikah.address">Address</label>
+                    <input type="text" id="nk-w2-addr" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w2-town" data-i18n="nikah.town">Town</label>
+                    <input type="text" id="nk-w2-town" autocomplete="off">
+                  </div>
+                  <div class="bk-field">
+                    <label for="nk-w2-pc" data-i18n="nikah.postcode">Postcode</label>
+                    <input type="text" id="nk-w2-pc" autocomplete="off" data-i18n-latin>
+                  </div>
+                </div>
+                </div>
                 <div class="bk-field">
                   <label for="nk-guests" data-i18n="nikah.roughly_how_many_guests">Roughly how many guests <span style="text-transform:none;letter-spacing:0;font-weight:500" data-i18n="nikah.optional_2">(optional)</span></label>
                   <input type="number" id="nk-guests" inputmode="numeric" min="0" max="2000">
@@ -4828,8 +4959,8 @@
                 </div>
                 <label class="bk-agree" id="nk-agree-wrap">
                   <input type="checkbox" id="nk-agree">
-                  <span data-i18n="nikah.i_understand_the_masjid_will">I understand the masjid will keep my name and contact details to deal with
-                    this request, and nothing else.</span>
+                  <span data-i18n="nikah.i_understand_the_masjid_will">I understand the masjid will keep my contact details and the five people&rsquo;s
+                    names, ages and addresses to deal with this request, and nothing else.</span>
                 </label>
                 <p class="bk-hint"><a href="./privacy.html" target="_blank" rel="noopener"
                    data-i18n="privacy.read_the_privacy_notice">Read the privacy notice</a></p>
@@ -10349,7 +10480,20 @@ function nkPretty(d){
    their year and is handed nothing.
 
    Turning this on without building the form is caught by release check 3l. */
-const NK_FORM_CAN_SUBMIT = false;
+/* The five the masjid records for every nikāḥ. request_nikah_date names the
+   same five and refuses the request if any is missing, so this list is the one
+   place the app says who they are — the markup ids, the validation and the
+   payload are all built from it. Three copies of a list like this is how one of
+   them ends up with four entries. */
+const NK_PEOPLE = [
+  { id: "groom", role: "groom",     adult: true  },
+  { id: "bride", role: "bride",     adult: true  },
+  { id: "wali",  role: "wali",      adult: false },
+  { id: "w1",    role: "witness_1", adult: false },
+  { id: "w2",    role: "witness_2", adult: false },
+];
+
+const NK_FORM_CAN_SUBMIT = true;
 
 function nkProbe(){
   if(NK.open !== null) return Promise.resolve(NK.open);
@@ -10559,6 +10703,23 @@ function nkValidate(){
   if(!v("nk-name")){ bad("nk-name"); ok = false; }
   if(!v("nk-phone")){ bad("nk-phone"); ok = false; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v("nk-email"))){ bad("nk-email"); ok = false; }
+
+  /* The five people. Every field the database insists on is insisted on here
+     too, so somebody is told what is missing by the form rather than by a
+     refusal after they press send. The 18 rule is the server's and is checked
+     here as well, because being told that at the end, once, in English, about
+     a marriage, is the worst possible way to learn it. */
+  NK_PEOPLE.forEach(pp => {
+    ["name","age","addr","town","pc"].forEach(f => {
+      const id = "nk-" + pp.id + "-" + f;
+      delete document.getElementById(id).parentElement.dataset.bad;
+      if(!v(id)){ bad(id); ok = false; }
+    });
+    const ageId = "nk-" + pp.id + "-age";
+    const age = parseInt(v(ageId), 10);
+    if(v(ageId) && (isNaN(age) || age < 0 || age > 120)){ bad(ageId); ok = false; }
+    if(pp.adult && !isNaN(age) && age < 18){ bad(ageId); ok = false; }
+  });
   if(!NK.role) ok = false;
   if(!document.getElementById("nk-agree").checked) ok = false;
   if(!NK.d1 || !NK.slot) ok = false;
@@ -10612,6 +10773,16 @@ function nkSubmit(e){
       contact_email:    document.getElementById("nk-email").value.trim(),
       notes:            document.getElementById("nk-notes").value.trim() || null,
       privacy_accepted: document.getElementById("nk-agree").checked,
+      people: NK_PEOPLE.map(pp => ({
+        role:         pp.role,
+        full_name:    document.getElementById("nk-" + pp.id + "-name").value.trim(),
+        age:          Number(document.getElementById("nk-" + pp.id + "-age").value.trim()),
+        address_line: document.getElementById("nk-" + pp.id + "-addr").value.trim(),
+        town:         document.getElementById("nk-" + pp.id + "-town").value.trim(),
+        /* the database upper-cases it anyway; doing it here means the person
+           sees what was stored rather than what they typed */
+        postcode:     document.getElementById("nk-" + pp.id + "-pc").value.trim().toUpperCase(),
+      })),
     }}),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
