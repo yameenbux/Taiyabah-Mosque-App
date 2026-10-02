@@ -1,9 +1,21 @@
 #!/usr/bin/env python3
 """
-Taiyabah Masjid — 2026 timetable ingestion.
+Taiyabah Masjid — timetable ingestion.
 
-Input : raw_timetable_2026.txt  (rows lifted verbatim from the official PDF)
-Output: timetable-2026.json     (clean daily dataset for the app)
+    python3 parse_timetable.py 2027
+
+Input : raw_timetable_<year>.txt  (rows lifted verbatim from the official PDF)
+        year-<year>.json          (the Hijri year on 1 January, and the days
+                                   hand-checked against the printed board)
+Output: timetable-<year>.json     (clean daily dataset for the app)
+
+The year is an argument, not a constant. It was 2026 in fourteen places —
+filenames, three date constructors, two regexes, the Hijri seed, the day count,
+the BST dates and the spot checks — which made the annual refresh an edit to
+this script, in late December, under time pressure, by whoever is holding it.
+That is the worst possible moment to be changing a parser. Now the only things
+that change are the two input files, and the script refuses to run without
+them rather than quietly assuming last year's.
 
 Model notes
 -----------
@@ -19,8 +31,17 @@ Model notes
 """
 import re, json, sys, datetime
 
-SRC = "raw_timetable_2026.txt"
-OUT = "timetable-2026.json"
+def year_from_argv():
+    """The year to build, with no default. A default here would mean a typo
+       silently rebuilding last year over this year's output."""
+    if len(sys.argv) < 2 or not re.fullmatch(r"\d{4}", sys.argv[1]):
+        sys.exit("usage: parse_timetable.py <year>   e.g. parse_timetable.py 2027")
+    return int(sys.argv[1])
+
+YEAR = year_from_argv()
+SRC  = f"raw_timetable_{YEAR}.txt"
+OUT  = f"timetable-{YEAR}.json"
+CFG  = f"year-{YEAR}.json"
 
 MONTHS = {m: i+1 for i, m in enumerate(
     ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY",
@@ -53,18 +74,18 @@ def is_time(tok):
 def parse_second_jummah(lines):
     explicit = {}   # date -> "HH:MM"
     window = None
-    date_re = re.compile(r"^(\d{1,2})\w{0,2}\s+(\w+)\s+2026\s+(\d{1,2}:\d{2})(AM|PM)", re.I)
-    win_re  = re.compile(r"WINDOW_330\s+(\d{1,2})\w{0,2}\s+(\w+)\s+2026\s+to\s+(\d{1,2})\w{0,2}\s+(\w+)\s+2026", re.I)
+    date_re = re.compile(rf"^(\d{{1,2}})\w{{0,2}}\s+(\w+)\s+{YEAR}\s+(\d{{1,2}}:\d{{2}})(AM|PM)", re.I)
+    win_re  = re.compile(rf"WINDOW_330\s+(\d{{1,2}})\w{{0,2}}\s+(\w+)\s+{YEAR}\s+to\s+(\d{{1,2}})\w{{0,2}}\s+(\w+)\s+{YEAR}", re.I)
     for ln in lines:
         w = win_re.search(ln)
         if w:
-            a = datetime.date(2026, MONTHS[w.group(2).upper()], int(w.group(1)))
-            b = datetime.date(2026, MONTHS[w.group(4).upper()], int(w.group(3)))
+            a = datetime.date(YEAR, MONTHS[w.group(2).upper()], int(w.group(1)))
+            b = datetime.date(YEAR, MONTHS[w.group(4).upper()], int(w.group(3)))
             window = (a, b)
             continue
         m = date_re.match(ln.strip())
         if m:
-            d = datetime.date(2026, MONTHS[m.group(2).upper()], int(m.group(1)))
+            d = datetime.date(YEAR, MONTHS[m.group(2).upper()], int(m.group(1)))
             explicit[d] = to24(m.group(3), m.group(4).upper())
     return explicit, window
 
@@ -77,14 +98,38 @@ def second_jummah_for(d, explicit, window):
     prior = [k for k in explicit if k <= d]
     return explicit[max(prior)] if prior else None
 
+def last_sunday(year, month):
+    """UK clocks change on the last Sunday of March and of October. Derived,
+       because two more hand-typed dates a year is two more things to get
+       wrong, and this one is a rule rather than a fact about the PDF."""
+    from calendar import monthrange
+    d = datetime.date(year, month, monthrange(year, month)[1])
+    return d - datetime.timedelta(days=(d.weekday() + 1) % 7)
+
+
 def main():
+    try:
+        cfg = json.load(open(CFG, encoding="utf-8"))
+    except FileNotFoundError:
+        sys.exit(f"missing {CFG} — it carries the Hijri year on 1 January and the "
+                 f"days checked against the printed board. Copy year-2026.json and "
+                 f"fill it in from the new timetable; do not guess it.")
+    ah_start = cfg["ah_year_at_jan_1"]
+    spot = {k: tuple(v) for k, v in cfg["spot"].items()}
+    if not spot:
+        sys.exit(f"{CFG} lists no spot checks. A day count does not catch a year "
+                 f"read the American way round; a handful of checked days does.")
+    bad_year = [k for k in spot if not k.startswith(f"{YEAR}-")]
+    if bad_year:
+        sys.exit(f"{CFG} has spot checks for another year: {', '.join(bad_year)}")
+
     lines = open(SRC, encoding="utf-8").read().splitlines()
     explicit_jum, window = parse_second_jummah(lines)
 
     data = {}
     cur_month = None
     cur_hijri_month = None
-    ah_year = 1447
+    ah_year = ah_start
     last_jam = {k: None for k in JAM_KEYS}
     warnings = []
 
@@ -118,7 +163,7 @@ def main():
                 if code in HIJRI:
                     newm = HIJRI[code]
                     if newm == "Muharram" and cur_hijri_month != "Muharram":
-                        ah_year = 1448
+                        ah_year += 1
                     cur_hijri_month = newm
                 else:
                     warnings.append(f"{cur_month}/{gday}: unknown hijri code {code}")
@@ -156,7 +201,7 @@ def main():
 
         begins["maghrib"] = jamaat["maghrib"]   # Maghrib begin == its time
 
-        date = datetime.date(2026, cur_month, gday)
+        date = datetime.date(YEAR, cur_month, gday)
         rec = {
             "hijri": f"{hday} {cur_hijri_month} {ah_year} AH",
             "begins": {k: begins[k] for k in ["fajr","sunrise","zuhr","asr","maghrib","isha"]},
@@ -171,11 +216,12 @@ def main():
     errs = []
     keys = sorted(data)
     # 1. day count + per-month completeness
-    if len(keys) != 365:
-        errs.append(f"expected 365 days, got {len(keys)}")
-    from calendar import monthrange
+    from calendar import isleap, monthrange
+    want_days = 366 if isleap(YEAR) else 365
+    if len(keys) != want_days:
+        errs.append(f"expected {want_days} days, got {len(keys)}")
     for mo in range(1, 13):
-        want = monthrange(2026, mo)[1]
+        want = monthrange(YEAR, mo)[1]
         got = sum(1 for k in keys if int(k[5:7]) == mo)
         if got != want:
             errs.append(f"month {mo}: {got} days (expected {want})")
@@ -201,12 +247,8 @@ def main():
         if d.weekday() == 4 and "jummah" not in data[k]:
             errs.append(f"{k}: Friday missing jummah")
 
-    # ---------------- spot checks (hand-verified vs PDF) ----------------
-    spot = {
-        "2026-01-01": ("06:36","07:45","12:20","12:45","16:06","18:30"),  # fajrB,fajrJ,zuhrB,zuhrJ,maghrib,ishaJ
-        "2026-08-12": ("04:02","05:10","13:21","13:45","20:50","22:15"),
-        "2026-12-31": ("06:36",None,"12:20","12:45","16:04","18:30"),
-    }
+    # ---- spot checks, hand-verified against the printed board (from CFG) ----
+    #      (fajr begins, fajr jamaat, zuhr begins, zuhr jamaat, maghrib, isha jamaat)
     for k,(fb,fj,zb,zj,mg,ij) in spot.items():
         r = data.get(k)
         if not r: errs.append(f"spot {k}: missing"); continue
@@ -225,8 +267,9 @@ def main():
     print(f"Errors      : {len(errs)}")
     for e in errs[:20]: print("   ✗", e)
     print("="*54)
-    print("Sample — 2026-08-12:")
-    print(json.dumps(data["2026-08-12"], indent=2, ensure_ascii=False))
+    mid = keys[len(keys)//2]
+    print(f"Sample — {mid}:")
+    print(json.dumps(data[mid], indent=2, ensure_ascii=False))
 
     if errs:
         print("\nVERIFICATION FAILED — not writing output.")
@@ -235,9 +278,12 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({
             "masjid": "Taiyabah Masjid (Bolton Central Islamic Society)",
-            "year": 2026, "source": "Official 2026 Salah Timetable (1447–1448 AH)",
+            "year": YEAR,
+            "source": f"Official {YEAR} Salah Timetable "
+                      f"({data[keys[0]]['hijri'].split()[-2]}–{data[keys[-1]]['hijri'].split()[-2]} AH)",
             "timezone": "Europe/London",
-            "notes": {"bst_start": "2026-03-29", "bst_end": "2026-10-25",
+            "notes": {"bst_start": last_sunday(YEAR, 3).isoformat(),
+                      "bst_end": last_sunday(YEAR, 10).isoformat(),
                       "maghrib": "begins == jamaat (prayed at listed time)"},
             "days": data,
         }, f, ensure_ascii=False, indent=1)

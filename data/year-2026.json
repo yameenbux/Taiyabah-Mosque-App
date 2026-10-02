@@ -1,0 +1,24 @@
+{
+  "_comment": [
+    "What only the printed timetable for this year can tell you. parse_timetable.py",
+    "refuses to run without a file like this, because every value here is read off",
+    "the masjid's own board and cannot be derived from the rows.",
+    "",
+    "ah_year_at_jan_1 : the Hijri year on 1 January. The parser moves it on by one",
+    "                   each time Muharram appears, so only the starting value is",
+    "                   needed.",
+    "spot             : hand-checked days, as (fajr begins, fajr jamaat, zuhr",
+    "                   begins, zuhr jamaat, maghrib, isha jamaat). null means",
+    "                   'whatever the row says' — used where the board dittos.",
+    "                   Three is the minimum: the first day, the last day, and one",
+    "                   in high summer where the times are most extreme. A parser",
+    "                   that mangles the year still passes a day count; it does not",
+    "                   pass these."
+  ],
+  "ah_year_at_jan_1": 1447,
+  "spot": {
+    "2026-01-01": ["06:36", "07:45", "12:20", "12:45", "16:06", "18:30"],
+    "2026-08-12": ["04:02", "05:10", "13:21", "13:45", "20:50", "22:15"],
+    "2026-12-31": ["06:36", null,    "12:20", "12:45", "16:04", "18:30"]
+  }
+}

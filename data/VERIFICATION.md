@@ -36,9 +36,10 @@ source PDF was transcribed to their intent:
 
 ## Regenerating (e.g. for 2027)
 
-1. Pull the new timetable's rows into `raw_timetable_2026.txt` format
+1. Pull the new timetable's rows into `raw_timetable_<year>.txt` format, and
+   fill in `year-<year>.json` from the printed board
    (month header line + one row per day, ditto marks preserved).
-2. `python3 parse_timetable.py` — it verifies, and refuses to write output if any
+2. `python3 parse_timetable.py <year>` — it verifies, and refuses to write output if any
    check fails.
 3. Re-run the human sign-off above.
 

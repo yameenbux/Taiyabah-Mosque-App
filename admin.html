@@ -185,9 +185,18 @@
     color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     max-height:260px;overflow:auto;background:var(--paper);padding:9px;border-radius:8px}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+  #tt-warn[hidden]{display:none}
+  #tt-warn{margin:0;padding:13px 16px;font-size:15px;line-height:1.45;
+           background:#F6E2DA;color:#5A2412;border-bottom:2px solid #B4532F}
+  #tt-warn b{display:block;font-size:16px;margin-bottom:3px}
+  #tt-warn.soon{background:#F7EEDA;color:#4A3B14;border-bottom-color:#8A6A18}
 </style>
 </head>
 <body>
+  <!-- Nobody reads a Cloudflare log. The trustees do open this screen, so this
+       is where the timetable running out gets said. It is drawn only when there
+       is something to say, so it cannot become furniture. -->
+  <div id="tt-warn" hidden></div>
   <div class="topbar">
     <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100">
     <div>
@@ -511,6 +520,36 @@ async function checkDevice(){
       : "Couldn't check: " + e.message);
   }finally{ btn.disabled = false; }
 }
+
+/* How long the prayer timetable has left. The reminders stop dead when the
+   dataset runs out, and until this banner existed the only sign was a line in
+   a log nobody reads — so the first anybody would know is a congregation not
+   being told about jamāʿah. Checked on every load of this screen, which is the
+   one place a trustee reliably goes. */
+async function timetableWatch(){
+  const el = document.getElementById("tt-warn");
+  if (!el) return;
+  try {
+    const res = await fetch(API_BASE + "/api/health");
+    const t = (await res.json()).timetable;
+    if (!t) return;
+    if (t.missing || t.exhausted) {
+      el.className = "";
+      el.innerHTML = "<b>The prayer timetable has run out.</b>" +
+        "Automatic jamāʿah and Sūrah al-Kahf reminders are <b style='display:inline'>not being sent</b>. " +
+        "The app needs the masjid's published timetable for " + t.year +
+        " before they start again.";
+      el.hidden = false;
+    } else if (typeof t.daysLeft === "number" && t.daysLeft <= 60) {
+      el.className = "soon";
+      el.innerHTML = "<b>The prayer timetable ends in " + t.daysLeft + " days.</b>" +
+        "It runs to " + t.lastDate + ". When it ends, the automatic jamāʿah and " +
+        "Sūrah al-Kahf reminders stop. Ask the masjid for next year's timetable now.";
+      el.hidden = false;
+    }
+  } catch (e) { /* the sender being unreachable is already reported elsewhere */ }
+}
+addEventListener("load", timetableWatch);
 
 async function checkService(){
   const btn = $("diag-health");

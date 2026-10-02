@@ -1701,8 +1701,18 @@ for (const f of ["index.html", "admin.html"]) {
    already there and hands back everything already in it. ---- */
 try {
   const changed = execSync("git diff --name-only origin/main...HEAD", { encoding: "utf8" }).split("\n");
-  if (changed.includes("index.html") && !changed.includes("sw.js"))
-    fail("index.html changed but sw.js did not — installed devices will keep serving the cached old build");
+  /* EVERY file in SHELL, not just index.html. The check was written from the
+     shape of the bug that caused it and only watched index.html — so a change
+     to admin.html or privacy.html, both of which the worker precaches, would
+     ship behind a cache name that had not moved and never reach a phone that
+     already had one. The list is read out of sw.js rather than kept here,
+     because a second copy of it is a second thing to forget. */
+  const shell = (R("sw.js").match(/const SHELL = \[([^\]]*)\]/) || [, ""])[1]
+                  .split(",").map(x => x.trim().replace(/^["'.\/]+|["']$/g, ""))
+                  .map(x => x.split("?")[0]).filter(Boolean);
+  const stale = shell.filter(f => changed.includes(f));
+  if (stale.length && !changed.includes("sw.js"))
+    fail(`${stale.join(", ")} changed but sw.js did not — these are precached, so installed devices will keep serving the cached old copy`);
   if (changed.includes("sw.js")) {
     const nameOf = t => (t.match(/const CACHE\s*=\s*["']([^"']+)["']/) || [])[1];
     const was = nameOf(execSync("git show origin/main:sw.js", { encoding: "utf8" }));

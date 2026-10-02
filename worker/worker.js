@@ -223,7 +223,35 @@ export default {
 
 /* ================= scheduled jamāʿah reminders ================= */
 
-const TIMETABLE_URL = "https://taiyabahapp.ysbdesigns.uk/data/timetable-2026.json";
+/* The year is derived, not pinned. This was a constant naming the 2026 file,
+   which does not fail on 1 January — the file still exists, so the fetch
+   succeeds, today's date is simply not in it, and the run returns
+   { skipped: "no timetable entry for ..." } every minute, for ever, telling
+   nobody. A run that asks for the year it is in gets a 404 it can report. */
+const TIMETABLE_BASE = "https://taiyabahapp.ysbdesigns.uk/data/timetable-";
+const timetableUrl = (year) => `${TIMETABLE_BASE}${year}.json`;
+
+/* Read the dataset and say where it ends. Used by the reminder run and by
+   /api/health, so "when do the reminders stop" has an answer somebody can go
+   and look at rather than a date in a README. */
+async function timetableState() {
+  const { date } = londonNow();
+  const year = Number(date.slice(0, 4));
+  try {
+    const res = await fetch(timetableUrl(year), { cf: { cacheTtl: 0 } });
+    if (res.status === 404)
+      return { year, missing: true, note: `data/timetable-${year}.json does not exist — the reminders have stopped` };
+    if (!res.ok) return { year, error: `timetable fetch ${res.status}` };
+    const data = await res.json();
+    const days = Object.keys(data.days || {}).sort();
+    if (!days.length) return { year, error: "timetable has no days in it" };
+    const last = days[days.length - 1];
+    const daysLeft = Math.round((Date.parse(last + "T12:00:00Z") - Date.parse(date + "T12:00:00Z")) / 86400000);
+    return { year, lastDate: last, daysLeft, exhausted: daysLeft < 0, today: date, data };
+  } catch (e) {
+    return { year, error: e.message };
+  }
+}
 const PRAYER_NAMES = { fajr: "Fajr", zuhr: "Zuhr", asr: "Asr", maghrib: "Maghrib", isha: "Isha" };
 const OFFSETS = [5, 10, 15];      // must match the choices in the app's UI
 const DEDUP_TTL_SECONDS = 60 * 60 * 26;   // a little over a day — always covers the next run
@@ -463,17 +491,24 @@ async function runJamaahReminders(env) {
   const { date, hm } = londonNow();
   const results = [];
 
-  let rec;
-  try {
-    const res = await fetch(TIMETABLE_URL, { cf: { cacheTtl: 0 } });
-    if (!res.ok) throw new Error(`timetable fetch ${res.status}`);
-    const data = await res.json();
-    rec = data.days && data.days[date];
-  } catch (e) {
-    console.error("reminder run: couldn't load timetable —", e.message);
-    return { error: e.message };
+  const tt = await timetableState();
+  if (tt.missing || tt.error) {
+    console.error("reminder run: no usable timetable —", tt.note || tt.error);
+    return { error: tt.note || tt.error, year: tt.year };
   }
-  if (!rec) return { skipped: "no timetable entry for " + date };   // e.g. past year end
+  const rec = tt.data.days[date];
+  if (!rec) {
+    /* Running past the end of the dataset is not a skip. A skip is an ordinary
+       minute with nothing due; this is every minute from now on, and the
+       congregation stops being told about jamāʿah without anybody deciding
+       that. It is logged as an error and reported by /api/health, which is
+       what the Admin Centre's banner reads. */
+    const why = tt.exhausted
+      ? `the ${tt.year} timetable ends on ${tt.lastDate} — no reminders will be sent again until a new year is published`
+      : `no timetable entry for ${date}`;
+    console.error("reminder run HALTED —", why);
+    return { halted: "timetable exhausted", detail: why, date };
+  }
 
   // Never announce a time the app itself isn't showing.
   const match = await timetableMatchesApp(rec, date);
@@ -544,6 +579,11 @@ async function handle(request, env) {
           supabaseKey: !!env.SUPABASE_SERVICE_KEY,
           allowedOrigin: env.ALLOWED_ORIGIN || null,
         },
+        timetable: await (async () => {
+          const t = await timetableState();
+          return { year: t.year, lastDate: t.lastDate || null, daysLeft: t.daysLeft ?? null,
+                   exhausted: !!t.exhausted, missing: !!t.missing, error: t.error || null };
+        })(),
         yourOrigin: request.headers.get("Origin") || null,
       }, 200, ch);
     }

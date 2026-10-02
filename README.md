@@ -139,26 +139,56 @@ Generated, never hand-entered, and never calculated.
 Current dataset: **1 January – 31 December 2026** (1447–1448 AH).
 
 > [!WARNING]
-> **The 2027 timetable is the one dated job in this repository.** On 1 January
-> 2027 the embedded dataset runs out and the app falls to its "timetable ended"
-> state, and the Worker's scheduler fetches `data/timetable-2027.json`, finds
-> nothing, and stops sending reminders — quietly, with nobody told. The masjid
-> publishes the following year's timetable around late November. Building it is
-> routine; forgetting it is not recoverable on the day.
+> **The 2027 timetable is the one dated job in this repository, and it cannot
+> be done here.** It needs the masjid's own published timetable; prayer times
+> are never calculated and never invented. On 1 January 2027 the embedded
+> dataset runs out, the app falls to its "timetable ended" state, and the
+> automatic jamāʿah and Sūrah al-Kahf reminders stop. The masjid publishes the
+> following year's around late November.
+
+**This used to say the Worker "fetches `data/timetable-2027.json`, finds
+nothing" — it did not.** `TIMETABLE_URL` was a constant naming the 2026 file,
+which still exists on 1 January, so the fetch succeeded, today's date simply
+was not in it, and the run returned `{ skipped: "no timetable entry for …" }`
+every minute for ever. The failure was quieter than the document describing it.
+
+Three things now make it loud, because the day it matters nobody will be
+reading this file:
+
+- the Worker asks for **the year it is actually in**, and treats running past
+  the end of the dataset as a halt to be logged, not a minute with nothing due
+- **`/api/health` reports the timetable's last date and the days left**, so the
+  question has an answer somebody can go and look at
+- **the trustee screen draws a banner** — amber from 60 days out, red once it
+  has run out — because a trustee opens `admin.html` and nobody opens a
+  Cloudflare log
 
 ### Annual refresh
 
-1. Add the new year's rows in `data/raw_timetable_2026.txt`'s format.
-2. `python3 data/parse_timetable.py` — it verifies, and refuses to write output
-   on any failure.
-3. Embed the generated JSON into `index.html`, replacing the `const DATA` block.
-4. **Update the year's `data/timetable-*.json` too** — the scheduler reads it,
-   and the cross-check above will halt reminders if the two disagree.
-5. Complete the sign-off in `data/VERIFICATION.md`, checking the generated times
+The year is an argument now, so nothing in the pipeline is edited:
+
+1. Put the new rows in `data/raw_timetable_<year>.txt`, in the existing format.
+2. Copy `data/year-2026.json` to `data/year-<year>.json` and fill in the two
+   things only the printed board can tell you: the Hijri year on 1 January, and
+   a few hand-checked days. **Do not guess either** — the script refuses to run
+   without them, and a day count does not catch a year read the American way
+   round.
+3. `python3 data/parse_timetable.py <year>` — it verifies and writes nothing at
+   all on any failure.
+4. Embed the generated JSON into `index.html`, replacing the `const DATA` block.
+5. Commit `data/timetable-<year>.json` too — the scheduler reads it, and the
+   cross-check halts reminders if the two ever disagree.
+6. Complete the sign-off in `data/VERIFICATION.md`, checking the generated times
    against the printed board, before deploying.
 
-Step 5 is not optional. Automated checks confirm internal consistency; only a
+Step 6 is not optional. Automated checks confirm internal consistency; only a
 person can confirm it matches what the masjid intends.
+
+> [!NOTE]
+> The refactor that made the year an argument was proved by rebuilding 2026
+> with it: the output is byte-identical to the committed file. The guards were
+> proved by breaking them — no year, a missing `year-<year>.json`, spot checks
+> belonging to another year, and a config with no spot checks at all.
 
 ---
 
