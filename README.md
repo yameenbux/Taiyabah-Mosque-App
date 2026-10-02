@@ -12,7 +12,7 @@ Bolton Central Islamic Society · Registered charity 1041569
 ![Offline](https://img.shields.io/badge/offline-service%20worker-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3C0B2A?style=flat-square&labelColor=3C0B2A&color=5E1844)
 ![Languages](https://img.shields.io/badge/languages-EN%20·%20UR%20·%20GU%20·%20AR-C6A24C?style=flat-square&labelColor=3C0B2A)
-![Release checks](https://img.shields.io/badge/release%20checks-35-C6A24C?style=flat-square&labelColor=3C0B2A)
+![Release checks](https://img.shields.io/badge/release%20checks-36-C6A24C?style=flat-square&labelColor=3C0B2A)
 ![Licence](https://img.shields.io/badge/licence-all%20rights%20reserved-7A5D14?style=flat-square&labelColor=3C0B2A)
 
 [**Open the app →**](https://taiyabahapp.ysbdesigns.uk)
@@ -398,6 +398,8 @@ Anything committed here is reachable by URL.
 │                                and the update path.
 ├── manifest.webmanifest         Home-screen install metadata.
 ├── twa-manifest.json            The Android wrapper's configuration.
+├── LICENSE.md                   Ownership, the charity's licence, and the
+│                                 third-party content this does NOT cover.
 │
 ├── .github/workflows/
 │   ├── release-checks.yml       Runs scripts/check-release.mjs on every push.
@@ -405,7 +407,7 @@ Anything committed here is reachable by URL.
 │                                 so no local tooling is ever required.
 │
 ├── scripts/                     Build and verification. Node, no dependencies.
-│   ├── check-release.mjs         35 checks — the release gate. See below.
+│   ├── check-release.mjs         36 checks — the release gate. See below.
 │   ├── check-i18n.mjs            Measures translation coverage against the app.
 │   ├── check-back-button.mjs     Drives a real browser through eleven Back
 │   │                              scenarios. Not in CI; needs Playwright.
@@ -422,6 +424,12 @@ Anything committed here is reachable by URL.
 │
 ├── assets/diagrams/             The pictures in this README, as .mmd source
 │                                 beside the .svg each one builds to.
+│
+├── fonts/                       The four typefaces, served from this origin
+│   ├── fonts.css                 rather than from Google. fonts.css is
+│   ├── *.woff2                   Google's own stylesheet with the URLs
+│   └── OFL.txt                   rewritten — same files, same unicode-range,
+│                                  so the same glyphs. OFL.txt is the licence.
 │
 ├── push/onesignal/              OneSignal's own service workers, kept on a
 │   └── …                         separate scope so they don't collide with
@@ -490,7 +498,7 @@ congregation. It is not a linter. **Each check exists because something went
 wrong once**, and each is written so that removing the behaviour it guards makes
 the build fail.
 
-There are **35**, and each prints what it confirmed rather than a tick. Among
+There are **36**, and each prints what it confirmed rather than a tick. Among
 them:
 
 | Check | What it caught |
@@ -719,9 +727,6 @@ Still outstanding, roughly in the order it matters:
 - **Account ownership** — OneSignal, Cloudflare, Stripe, Supabase and GitHub are
   under a personal account rather than the charity's. This is the most important
   item on this list.
-- **`LICENSE.md` is missing.** Every source file header says "See LICENSE.md" and
-  no such file exists. The ownership terms are written out below, but not in the
-  file the code points at.
 - **Apple.** A D-U-N-S number for the charity is needed before an Apple Developer
   Organization account can be opened; the D&B record has a blank Legal Status and
   needs correcting first. Apple's rules also say an app that is not an approved
@@ -755,16 +760,31 @@ Still outstanding, roughly in the order it matters:
 - **Religious content review** — the Islamic Will and Marriage guidance have not
   separately been signed off. The 40 Rabbanā no longer need it: every one is
   checked against the Qur'an text on each build.
-- **Source attributions** — the citation line under each duʿā
-  (`ṢAḤĪḤ AL-BUKHĀRĪ`) is gold and measures 3.38:1 against its card, below the
-  4.5:1 floor. A larger text size does not fix it; the ratio is the colour.
 - **Vector logo** — current assets are upscaled from a small source image.
-- **Housekeeping** — `files.zip` at the repository root is a stale 145 KB copy of
-  files that are already public individually. It is harmless but is served at the
-  site root and can go.
 
 ### Done since the first release
 
+- **The nikāḥ date request form**, which could not be submitted at all for
+  twenty-six days: the mailto link in the closed panel and the email box in the
+  form both carried `id="nk-email"`, `getElementById` returned the anchor, and
+  `nkValidate()` threw a TypeError on every press. Check 3z2 now refuses any
+  duplicate id in either page
+- **The typefaces moved onto the masjid's own origin.** They were fetched from
+  Google on every first load — disclosed in the privacy notice, so not a
+  surprise to anybody, but a render-blocking third party on the critical path
+  of an app whose whole claim is that it works with no signal, and the opposite
+  of what the sister website does. `fonts/` now holds the same 18 `.woff2`
+  subsets Google serves and `fonts/fonts.css` is Google's own stylesheet with
+  the URLs rewritten, so a browser picks the same file for the same characters
+  as before. The service worker keeps them, so the Arabic renders in Amiri in
+  the basement
+- **Six colours that failed the contrast floor** on a real light background —
+  the duʿā and Islamic-will citations at 3.6:1, the three donor tier names, and
+  the drawer note at 2.95:1 — replaced by four tokens on `:root` rather than
+  four more hand-picked hexes, which is how the sister repo ended up with four
+  different golds
+- **`LICENSE.md`**, which four source-file headers had pointed at since the
+  first commit and which had never existed
 - **The Android Back button**, which closed the app from any screen in a Trusted
   Web Activity because nothing had ever pushed a history entry
 - **The imam's advice**, end to end: a form in the app, an `imam` role in the

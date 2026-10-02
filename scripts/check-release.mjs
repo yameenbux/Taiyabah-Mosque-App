@@ -177,9 +177,47 @@ for (const f of ["index.html", "admin.html"]) {
     else if (!offenders) ok("Arabic marks — scripture is on the Noto Naskh stack and only the unrenderable U+08E2 is stripped");
   }
 
-  // 3. the page actually asks for the font that has the glyphs
-  if (src && !/fonts\.googleapis\.com[^"']*Noto\+Naskh\+Arabic/.test(src))
-    fail("index.html no longer loads Noto Naskh Arabic — every waqf mark in the Qur'an becomes a tofu box");
+  /* 3. the page actually gets the font that has the glyphs.
+
+     This read the Google Fonts URL until 2 October, when the typefaces moved
+     onto the masjid's own origin. Pointing it at the new stylesheet is not
+     enough on its own: a <link> can name a file that is not there, and a
+     stylesheet can name a .woff2 that is not there, and either way the mark
+     is a tofu box. So all three are checked — the page asks for the sheet,
+     the sheet declares the family, and every file the sheet names exists. */
+  if (src && !/<link[^>]+href="fonts\/fonts\.css"/.test(src))
+    fail("index.html no longer loads fonts/fonts.css — every typeface falls back, including the one with the waqf marks");
+  else if (!existsSync("fonts/fonts.css"))
+    fail("fonts/fonts.css is missing, so index.html links a stylesheet that is not there");
+  else {
+    const css = R("fonts/fonts.css");
+    if (!/font-family: *'Noto Naskh Arabic'/.test(css))
+      fail("fonts/fonts.css no longer declares Noto Naskh Arabic — every waqf mark in the Qur'an becomes a tofu box");
+    else {
+      const files = [...new Set([...css.matchAll(/url\(([^)]+)\)/g)].map(m => m[1]))];
+      /* The HOST inside a url() or an href, not the words anywhere in the
+         file: the first version matched fonts.css's own comment explaining
+         where the files came from, which is a check failing on its own
+         documentation.
+
+         And it is tested BEFORE the missing-file test, not after. It was
+         after, which made it unreachable — a Google URL is also a file that
+         is not in fonts/, so the earlier branch always caught it first and
+         reported "names 1 file(s) that are not in fonts/:
+         https://fonts.gstatic.com/…", which is true, useless, and hides the
+         actual mistake. Found by running the control and watching the wrong
+         check fire. */
+      if (/url\(\s*['"]?https?:\/\/fonts\.(googleapis|gstatic)\.com/.test(css) ||
+          /href="https?:\/\/fonts\.(googleapis|gstatic)\.com/.test(src))
+        fail("a typeface is being fetched from Google again — the point of fonts/ is that no visitor's device has to ask a third party for the masjid's own page to render");
+      else if (!files.length) fail("fonts/fonts.css names no font files at all");
+      else if (files.filter(f => !existsSync(join("fonts", f))).length) {
+        const gone = files.filter(f => !existsSync(join("fonts", f)));
+        fail(`fonts/fonts.css names ${gone.length} file(s) that are not in fonts/: ${gone.slice(0,3).join(", ")}`);
+      }
+      else ok(`typefaces — served from this origin, all ${files.length} files present, Noto Naskh among them, and nothing asks Google`);
+    }
+  }
 }
 
 /* ---- 3h. no selector is silently overridden by a second copy of itself ----
@@ -443,7 +481,9 @@ for (const f of ["index.html", "admin.html"]) {
   if (closed < 0 || clear < 0 || closed < clear)
     missing.push("the phone-only note is not below the date and prayer picks — someone who chooses both reaches the bottom of the screen with nothing to press");
   const block = app.slice(closed, closed + 3000);
-  if (!/href="tel:01204535997"/.test(block) || !/id="nk-email"/.test(block))
+  /* id="nk-mailto", not "nk-email": the form's own email box owns that one.
+     They shared it until 2 October, which is what broke Submit — see 3z2. */
+  if (!/href="tel:01204535997"/.test(block) || !/id="nk-mailto"/.test(block))
     missing.push("the phone-only note offers no way to reach the office; it is a dead end");
   if (!/function nkClosedSummary\(\)/.test(app) || !/mail\.href = "mailto:/.test(app))
     missing.push("the office email no longer carries the chosen dates and prayer, so a person has to read them back off the screen");
@@ -1162,6 +1202,47 @@ for (const f of ["index.html", "admin.html"]) {
 
   if (bad.length) bad.forEach(fail);
   else ok(`element references — ${panes.length} tab panes all listed in switchTab() and nothing reaches for an id that is not there`);
+}
+
+/* ---- 3z2. no two elements may claim the same id ----
+
+   The nikāḥ date request form could not be submitted for twenty-six days,
+   across 114 commits and the Play Store release, because the mailto link in
+   the closed panel and the email box in the form both carried id="nk-email".
+   getElementById returns the FIRST, which was the <a>. So:
+
+       document.getElementById("nk-email").value.trim()
+         -> TypeError: Cannot read properties of undefined (reading 'trim')
+
+   thrown inside nkValidate(), so Submit did nothing at all, silently. The
+   <label for="nk-email"> pointed at the anchor too.
+
+   3z exists because ids collided once before — the hadith reader and the hall
+   booking shared four — and it was written to check the tab panes and the
+   handful of ids the tab code reaches for. That is the shape of the bug it was
+   written from, not the shape of the bug. This one checks every id in the
+   document, which is the thing that is actually true: a duplicate id is never
+   correct.
+
+   Scoped to markup, not to script: an id inside a template literal is a
+   different element each time it is written, and counting those would cry
+   wolf. ---- */
+for (const f of ["index.html", "admin.html"]) {
+  if (!existsSync(f)) continue;
+  const html = R(f);
+  /* strip <script> bodies first, so an id built in a template literal is not
+     mistaken for a second element in the page. */
+  const markup = html.replace(/<script(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/g, "");
+  const seen = new Map();
+  for (const m of markup.matchAll(/\sid="([^"]+)"/g))
+    seen.set(m[1], (seen.get(m[1]) || 0) + 1);
+  const dupes = [...seen.entries()].filter(([, n]) => n > 1);
+  if (dupes.length)
+    dupes.forEach(([id, n]) => fail(
+      `${f} — ${n} elements claim id="${id}". getElementById returns the first, so ` +
+      `everything written for the other one silently reads the wrong element`));
+  else
+    ok(`${f} — all ${seen.size} ids are unique, so getElementById cannot return the wrong element`);
 }
 
 /* ---- 4a. every combination the giving screen offers must go somewhere ----

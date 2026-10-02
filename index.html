@@ -36,9 +36,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Taiyabah" />
 <title>Taiyabah Masjid — Salah Times</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="preload" href="fonts/hanken-grotesk-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/fraunces-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   :root{
     /* Reader-set text scale. Every font-size below is multiplied by it, so one
@@ -51,7 +51,7 @@
     --brand-600:#772157;
     --gold:#C6A24C;
     --on-air:#3FBE73;
-    --gold-bright:#DCBB63;
+    --gold-bright:#DCBB63;--gold-ink:#7A5D14;--silver-ink:#6E656B;--bronze-ink:#8E5730;--muted-ink:#6E616A;
     --paper:#F5F1E8;        /* light content bg */
     --card:#FCFAF3;
     --ink:#261B22;
@@ -297,9 +297,9 @@
     border:1px solid var(--line);box-shadow:var(--shadow)}
   .t-amt{font-size:calc(20px * var(--ts));font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
   .t-name{font-size:calc(10.5px * var(--ts));letter-spacing:.16em;text-transform:uppercase;font-weight:700}
-  .t-bronze{border-color:#D3A47C} .t-bronze .t-name{color:#A2673A}
-  .t-silver{border-color:#C4BFC2} .t-silver .t-name{color:#837A80}
-  .t-gold{border-color:#D8BC72}   .t-gold .t-name{color:#9A7A1E}
+  .t-bronze{border-color:#D3A47C} .t-bronze .t-name{color:var(--bronze-ink)}
+  .t-silver{border-color:#C4BFC2} .t-silver .t-name{color:var(--silver-ink)}
+  .t-gold{border-color:#D8BC72}   .t-gold .t-name{color:var(--gold-ink)}
   .t-plat{border-color:#B89FAF}   .t-plat .t-name{color:#7C5E71}
   .tier:active{transform:translateY(1px)}
 
@@ -480,7 +480,7 @@
   /* A row that leaves the app says so: the chevron becomes an outward arrow,
      so nobody taps expecting a sheet and lands in a browser tab. */
   .dr-ext{flex:0 0 auto;font-size:calc(13px * var(--ts));color:var(--gold-bright);opacity:.8}
-  .dr-note{display:block;font-size:calc(11px * var(--ts));line-height:1.4;color:#9C8794;margin-top:3px;font-weight:400}
+  .dr-note{display:block;font-size:calc(11px * var(--ts));line-height:1.4;color:var(--muted-ink);margin-top:3px;font-weight:400}
   a.dr-row{text-decoration:none}
 
   /* ---- hall booking ---- */
@@ -722,7 +722,7 @@
      one people said they could not read. */
   .wl-ar2{font-size:calc(16px * var(--ts));line-height:2;color:#000;direction:rtl;text-align:right}
   .wl-en2{font-family:"Fraunces",Georgia,serif;font-size:calc(14.5px * var(--ts));line-height:1.55;color:var(--ink);margin-top:9px}
-  .wl-src{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:#9A7A1E;margin-top:9px}
+  .wl-src{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);margin-top:9px}
   .wl-card{padding:16px}
   .wl-card p{font-size:calc(14px * var(--ts));line-height:1.65;color:var(--ink)}
   .wl-card p+p{margin-top:11px}
@@ -1677,7 +1677,7 @@
   .row .name .ar{font-size:calc(14px * var(--ts));color:var(--muted)}
   .row .begins,.row .jam{width:64px;text-align:right;font-size:calc(16px * var(--ts));font-weight:600}
   .row .begins{color:var(--muted);font-weight:500}
-  .jsub{display:block;font-size:calc(11.5px * var(--ts));font-weight:600;color:#9A7A1E;margin-top:4px;
+  .jsub{display:block;font-size:calc(11.5px * var(--ts));font-weight:600;color:var(--gold-ink);margin-top:4px;
     letter-spacing:.01em;line-height:1.5}
   .row.is-jummah{background:rgba(198,162,76,.09)}
   .row.sunrise .en{font-weight:500;color:var(--muted)}
@@ -1783,11 +1783,13 @@
   footer .credit{margin-top:6px;font-size:calc(10.5px * var(--ts));color:#A49AA0}
   footer .credit a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(124,110,119,.3)}
 
+  .vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
   @media (prefers-reduced-motion: reduce){.datechip .live{animation:none}.track>i{transition:none}}
 </style>
 </head>
 <body>
   <div class="topbar">
+    <h1 class="vh" data-i18n="a11y.taiyabah_masjid">Taiyabah Masjid</h1>
     <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
     <div class="brand">
       <p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p>
@@ -2038,9 +2040,9 @@
           <label class="switch"><input type="checkbox" checked id="tg-jam"><span class="sl"></span></label>
         </div>
         <div class="mins">
-          <span data-i18n="sheet.remind_me">Remind me</span>
-          <select id="mins"><option value="5" data-i18n="sheet.5_min">5 min</option><option value="10" selected data-i18n="sheet.10_min">10 min</option><option value="15" data-i18n="sheet.15_min">15 min</option></select>
-          <span data-i18n="sheet.before_jamaah">before jamā&#703;ah</span>
+          <span id="mins-l1" data-i18n="sheet.remind_me">Remind me</span>
+          <select id="mins" aria-labelledby="mins-l1 mins-l2"><option value="5" data-i18n="sheet.5_min">5 min</option><option value="10" selected data-i18n="sheet.10_min">10 min</option><option value="15" data-i18n="sheet.15_min">15 min</option></select>
+          <span id="mins-l2" data-i18n="sheet.before_jamaah">before jamā&#703;ah</span>
         </div>
         <div class="tg">
           <div class="txt"><div class="t"><span data-i18n="sheet.janazah">Janāzah</span> <span class="urgent" data-i18n="sheet.urgent">Urgent</span></div><div class="d" data-i18n="sheet.funeral_prayer_announcements">Funeral prayer announcements</div></div>
@@ -2067,7 +2069,8 @@
         <button class="diag-fix" id="diag-retag" data-i18n="sheet.send_my_categories_again">Send my categories again</button>
         <button class="diag-fix" id="diag-send" data-i18n="sheet.send_this_report_to_the">Send this report to the masjid</button>
         <textarea id="diag-note" rows="2" placeholder="What went wrong? (optional)"
-                  maxlength="500" data-i18n-attr="placeholder:a11y.what_went_wrong_optional"></textarea>
+                  maxlength="500" aria-label="What went wrong? (optional)"
+                  data-i18n-attr="placeholder:a11y.what_went_wrong_optional,aria-label:a11y.what_went_wrong_optional"></textarea>
         <p class="diag-note" id="diag-sent"></p>
         <button class="diag-fix" id="diag-fix" data-i18n="sheet.reset_reload_the_app">Reset &amp; reload the app</button>
         <p class="diag-note" data-i18n="sheet.this_clears_the_app_s">This clears the app’s stored files and re-installs its
@@ -4760,7 +4763,7 @@
                       <span><span data-i18n="nikah.ring_the_office">Ring the office</span>
                         <span class="sub"><span data-i18n-latin>01204 535 997</span> <span data-i18n="nikah.5pm_to_7pm">&middot; 5pm to 7pm</span></span></span>
                     </a>
-                    <a class="nk-act" id="nk-email" href="mailto:info@taiyabahmasjid.com">
+                    <a class="nk-act" id="nk-mailto" href="mailto:info@taiyabahmasjid.com">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 6 9-6"/></svg>
                       <span><span data-i18n="nikah.email_the_office">Email the office</span>
                         <span class="sub" data-i18n="nikah.opens_your_email_app">Opens your email app with the details filled in</span></span>
@@ -6137,7 +6140,15 @@ function endedState(){
   document.getElementById('subline').textContent=
     t("times.no_further_dates","The loaded timetable has no further dates.");
   document.getElementById('track').style.width='0%';
-  status("This app's timetable has ended. Please update the app / check the masjid noticeboard for current times.");
+  /* Built from the two keys either side of it rather than from a new English
+     sentence. This line was the one piece of the ended state that was hard-
+     coded English, so on 1 January the Urdu, Gujarati and Arabic readers of
+     this app would have been shown English on the one screen that had stopped
+     working. Composing it from strings that are already translated fixes that
+     today, without inventing three translations nobody who speaks those
+     languages has read. */
+  status(t("times.timetable_ended", "Timetable ended") + " — " +
+         t("times.no_further_dates", "The loaded timetable has no further dates."));
 }
 
 function tick(){
@@ -10433,7 +10444,7 @@ function nkRenderPicks(){
    inbox and no further. */
 function nkClosedSummary(){
   const p = document.getElementById("nk-closed-p");
-  const mail = document.getElementById("nk-email");
+  const mail = document.getElementById("nk-mailto");
   if(!p || !mail) return;
 
   if(!(NK.d1 && NK.slot)){
