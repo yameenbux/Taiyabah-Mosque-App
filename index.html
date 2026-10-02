@@ -11596,6 +11596,133 @@ function switchTab(name){
   window.scrollTo({top:0,behavior:"instant"});
   if(name === "notices") NT.pending = ntEnterTab();
 }
+/* ===========================================================================
+   THE ANDROID BACK BUTTON
+
+   REPORTED FROM THE PLAY STORE: "click anything on the burger stack then
+   click back, the app freezes and closes down." It did, and it did it for
+   every screen in the app, not just the menu.
+
+   In a Trusted Web Activity the hardware/gesture Back button is
+   history.back(). Nothing here ever pushed a history entry — the drawer and
+   all 28 sheets are DOM state, data-open="1" and nothing more — so the start
+   URL was the only entry there was. Back therefore left it, and leaving the
+   start URL finishes the activity: the app closes. The "freeze" is the half
+   second before it goes, with body.style.overflow still "hidden" from the
+   open sheet, so the screen is scroll-locked while the webview is torn down.
+
+   Measured before fixing: history.length stayed at 2 from a fresh load,
+   through opening the drawer, through opening a sheet. Not one entry.
+
+   ---------------------------------------------------------------------------
+   ONE ENTRY, NOT ONE PER LAYER
+   ---------------------------------------------------------------------------
+   The obvious fix is to push an entry every time a layer opens and pop it
+   when it closes. That needs the history stack and the DOM to agree after
+   every open, close, scrim tap, Escape and the drawer-closes-then-sheet-opens
+   handoff that every menu row does — and when they disagree, Back either
+   does nothing or closes two things at once.
+
+   So there is at most ONE extra entry, ever: a sentinel meaning "something is
+   open". Opening the second, third, fourth layer adds nothing; closing back
+   down to one removes nothing. Back consumes the sentinel, this closes the
+   topmost layer, and if anything is still open the sentinel is pushed again.
+   The invariant is small enough to state: the sentinel exists if and only if
+   at least one layer is open.
+
+   IT CLOSES BY CLICKING THE REAL CONTROL, not by setting data-open="0".
+   Every layer's close button already does its own tidying — releasing the
+   scroll lock, stopping the stream, saving a reading position — and a
+   reimplementation here would drift from it. Clicking what the user would
+   have clicked cannot drift.
+
+   SUB-VIEWS FIRST. Four sheets (Qur'an, Athkār, Bukhārī, duʿās) have a
+   "← back" control that is visible only inside a sub-view. Back uses that
+   when it is showing, so leaving a sūrah returns to the list rather than
+   shutting the whole sheet — which is what the button beside it does, and
+   what anybody pressing Back expects.
+
+   WHEN NOTHING IS OPEN, BACK IS NOT TOUCHED. Pressing Back on the home
+   screen still leaves the app, which is what Android users expect and what
+   Play's own guidance asks for. This makes Back work; it does not trap
+   anybody in the app.
+   =========================================================================== */
+const NAV = {
+  order: [],        // layer ids, in the order they were opened
+  armed: false,     // do we currently hold the sentinel?
+  ours: false,      // did WE just call history.back()?
+};
+
+function navLayers(){
+  return Array.from(document.querySelectorAll('[data-open="1"]')).map(el => el.id);
+}
+
+/* The control the user would have pressed. A visible "← back" wins over the
+   close button, so a sub-view is left before the sheet is. `offsetParent` is
+   the cheap "is it actually on screen" test; the back buttons are toggled
+   with the hidden attribute, which offsetParent already answers for. */
+function navControl(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const back = el.querySelector('.sh-back');
+  if(back && back.offsetParent !== null) return back;
+  return el.querySelector('.sh-close, .dr-close, #dr-close');
+}
+
+function navArm(){
+  if(NAV.armed) return;
+  /* No third argument: the URL must not change. A TWA verifies the origin of
+     what it is showing, and an app that quietly rewrites its own address bar
+     is an app that can stop being verified. */
+  history.pushState({ tLayer: true }, "");
+  NAV.armed = true;
+}
+
+/* Only ever consumes an entry THIS code pushed. history.state is the proof:
+   if the top entry is not ours, something else owns it and calling back()
+   would take the person off the page — the exact bug being fixed. */
+function navDisarm(){
+  if(!NAV.armed) return;
+  NAV.armed = false;
+  if(history.state && history.state.tLayer){
+    NAV.ours = true;
+    history.back();
+  }
+}
+
+function initBackButton(){
+  /* Watched rather than wired into 29 pairs of open/close functions. Those
+     functions are called from menu rows, tiles, scrims, Escape, timeouts and
+     each other; a watcher sees the result however it happened, and cannot be
+     forgotten by the next screen somebody adds. */
+  const seen = new MutationObserver(() => {
+    const open = navLayers();
+    NAV.order = NAV.order.filter(id => open.indexOf(id) !== -1);
+    open.forEach(id => { if(NAV.order.indexOf(id) === -1) NAV.order.push(id); });
+    if(open.length && !NAV.armed) navArm();
+    else if(!open.length && NAV.armed) navDisarm();
+  });
+  document.querySelectorAll('[data-open]').forEach(el =>
+    seen.observe(el, { attributes: true, attributeFilter: ['data-open'] }));
+
+  addEventListener("popstate", () => {
+    if(NAV.ours){ NAV.ours = false; return; }   // our own disarm, not the user
+    NAV.armed = false;                          // the browser has taken it back
+
+    const top = NAV.order[NAV.order.length - 1];
+    const control = top && navControl(top);
+    if(!control){
+      /* Nothing open, or a layer with no way to close it. Either way this is
+         not ours to intercept and Back should do what Back does. */
+      return;
+    }
+    control.click();
+    /* Still something open — a sub-view stepped back to its list, or there
+       was a sheet underneath. Re-arm so the NEXT press is caught too. */
+    if(navLayers().length) navArm();
+  });
+}
+
 function initDrawer(){
   document.getElementById('dr-close').addEventListener('click',closeDrawer);
   document.getElementById('dr-scrim').addEventListener('click',closeDrawer);
@@ -12268,6 +12395,7 @@ function boot(){
   initNotices();
   loadNotices();
   initBukhari();
+  initBackButton();
   initDrawer();
   initHome();
   initMembership();

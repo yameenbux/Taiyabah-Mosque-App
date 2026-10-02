@@ -576,6 +576,42 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("tab bar — recovers its place on the screen after the keyboard has been up");
 }
 
+/* ---- 3n2. the Android Back button still closes one layer at a time ----
+   REPORTED FROM THE PLAY STORE, 2 October: "click anything on the burger
+   stack then click back, the app freezes and closes down."
+
+   In a TWA the Back button is history.back(). Nothing in the app pushed a
+   history entry, so the start URL was the only one and Back left it — which
+   finishes the activity. Every sheet in the app did this, not just the menu;
+   measured history.length stayed at 2 from a fresh load through opening the
+   drawer through opening a sheet.
+
+   The fix keeps ONE sentinel entry while any layer is open. Losing any piece
+   of it brings a closing app back, and the failure is invisible on a desktop
+   browser — which is why it is checked here rather than trusted to review. ---- */
+{
+  const app = readFileSync("index.html", "utf8");
+  const bad = [];
+  if (!/function navArm\(/.test(app))
+    bad.push("navArm is gone — nothing pushes the history entry Back needs to land on");
+  if (!/history\.pushState\(\{ tLayer: true \}/.test(app))
+    bad.push("the sentinel is no longer pushed, so Back goes straight out of the app");
+  if (!/addEventListener\("popstate"/.test(app))
+    bad.push("nothing listens for Back at all");
+  if (!/history\.state && history\.state\.tLayer/.test(app))
+    bad.push("navDisarm no longer checks the entry is ours — it could navigate the person off the page");
+  if (!/new MutationObserver/.test(app) || !/attributeFilter: \['data-open'\]/.test(app))
+    bad.push("the data-open watcher is gone, so newly opened layers arm nothing");
+  /* A LINE THAT IS NOTHING BUT THE CALL. The obvious /initBackButton\(\);/
+     matches it inside a comment too, so commenting the call out — which is
+     exactly how somebody would disable it — left this check reporting ok.
+     Caught by trying it, not by reading it. */
+  if (!/^\s*initBackButton\(\);\s*$/m.test(app))
+    bad.push("initBackButton is never called, so none of it is wired up");
+  if (bad.length) bad.forEach(fail);
+  else ok("Android Back — closes one layer at a time instead of closing the app");
+}
+
 /* ---- 3o. the nisab does not rest on one website staying up ----
    A phone came back with "Couldn't fetch today's price": all three figures
    were asked for together, so whichever one was missing took the other two
