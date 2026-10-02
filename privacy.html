@@ -83,7 +83,7 @@
     <h2>The short version</h2>
     <div class="card">
       <p>Most of the app asks nothing of you. Prayer times, the Qur&rsquo;an, the du&rsquo;ā collections, the qibla compass, the zakat calculator and the mosque information all work without an account and without sending anything about you anywhere.</p>
-      <p>Four things do involve your information: <strong>booking the hall</strong>, <strong>requesting a nikāḥ date</strong>, <strong>asking to hold a charity collection</strong>, and <strong>turning on notifications</strong>. Each is described below.</p>
+      <p>Five things do involve your information: <strong>booking the hall</strong>, <strong>requesting a nikāḥ date</strong>, <strong>asking to hold a charity collection</strong>, <strong>sending a written question to the imams</strong>, and <strong>turning on notifications</strong>. Each is described below.</p>
       <p>There is no advertising in the app, no analytics, and no tracking of any kind. We do not profile you, we do not sell anything about you, and nothing you do in the app is used to build a picture of you.</p>
     </div>
   </section>
@@ -103,6 +103,14 @@
     <p>When an organisation asks to collect at the masjid we receive the <strong>organisation&rsquo;s name, address, telephone number, email address and registered charity number</strong>, the <strong>name and role of the collector</strong> and whether they are paid, the <strong>name, telephone number and email address of a trustee</strong> who can vouch for the request, the name signed on the declaration, and the date asked for. We need these to check the request is genuine and to reach somebody accountable if a question arises.</p>
     <p>The form also requires a <strong>copy of the organisation&rsquo;s BMCC certificate</strong>, dated within the last three months. You may upload it as a photograph or a PDF. It is stored in a private area that only administrators who have completed two-step verification can open, through a link that expires after five minutes. The person who uploaded it cannot read it back, and it is never published or passed on.</p>
     <p>Our lawful basis is <strong>legitimate interests</strong> &mdash; the masjid has to satisfy itself that money collected in its name goes where it is said to go, and the congregation would expect no less. You may object at any time by ringing the office.</p>
+
+    <h3>Sending a written question to the imams</h3>
+    <p>If you write to the imams from the <strong>Imams&rsquo; Advice</strong> screen, we receive your <strong>name, telephone number and email address</strong>, the short line you write describing what it is about, and <strong>the question itself</strong>. We need your name so the imam knows who he is answering, your email because that is where his answer is sent, and your number in case ringing you would be kinder than writing.</p>
+    <p><strong>Who can read it.</strong> Only an imam. Access is held by a single role in the masjid&rsquo;s portal, and that role is deliberately <strong>not</strong> included in the administrators&rsquo; role &mdash; so the office, the committee and the masjid&rsquo;s administrators cannot open these questions, and the database refuses them if they try. Every time an imam opens one, a record is kept that somebody looked; that record names the reference and nothing else &mdash; not you, not the subject, not a word of what you wrote. The email that tells the imam a question has arrived <strong>does not contain the question</strong>, your name or your address.</p>
+    <p><strong>What we cannot promise.</strong> We do not say that nobody anywhere could ever see it. The people who hold the keys to the masjid&rsquo;s database could, as they could for anything else stored there, and no software can honestly promise otherwise. What we do say is that no other role, screen or account at the masjid reaches it.</p>
+    <p>You may be asked something, or tell us something, that is sensitive &mdash; about your health, your family, a bereavement or your faith. Where that happens our condition for processing it is <strong>Article 9(2)(a), your explicit consent</strong>, which you give by choosing to write and send it. Our lawful basis for the rest is <strong>consent</strong> as well. You may withdraw it at any time by ringing the office, and we will delete the question and any answer.</p>
+    <p>The imam&rsquo;s answer is emailed to the address you gave, from the masjid&rsquo;s own address. That mailbox is not watched, so you cannot reply to it &mdash; the email tells you how to write again or ring instead. <strong>We do not send you an email confirming your question arrived</strong>: your reference is shown on the screen instead, so that nothing about it lands in an inbox somebody else may read.</p>
+    <p>If a question has been waiting more than a week without an answer, the office is told <strong>how many</strong> are waiting, so that somebody can ask the imam to look. It is never told who from, what about, or anything you wrote.</p>
 
     <h3>Notifications</h3>
     <p>If you turn on prayer reminders, your device is registered with <strong>OneSignal</strong>, our notification provider. They hold an anonymous identifier for your device and the preferences you chose &mdash; whether you want jamā&rsquo;ah reminders, how many minutes before, and whether you want janāzah, announcement and event notices. <strong>Your name is not sent, and nothing identifies you personally.</strong></p>
@@ -130,7 +138,7 @@
     <h2>Who else is involved</h2>
     <p>We use a small number of suppliers to run the app. They act on our instructions and may not use your information for their own purposes.</p>
     <div class="kv">
-      <div><dt>Supabase</dt><dd>Stores hall bookings, nikāḥ requests, charity collection requests and the certificates uploaded with them. Hosted in the EU.</dd></div>
+      <div><dt>Supabase</dt><dd>Stores hall bookings, nikāḥ requests, charity collection requests and the certificates uploaded with them, and written questions to the imams. Hosted in the EU.</dd></div>
       <div><dt>OneSignal</dt><dd>Delivers notifications. Holds a device identifier and your notification preferences only.</dd></div>
       <div><dt>Stripe</dt><dd>Takes payments on its own pages. We never see card details.</dd></div>
       <div><dt>Cloudflare</dt><dd>Serves the app and runs the small service that saves your notification preferences.</dd></div>
@@ -148,6 +156,7 @@
       <div><dt>Nikāḥ requests</dt><dd>Deleted twelve months after the request is dealt with, unless a nikāḥ took place, in which case the marriage record is kept as a permanent register.</dd></div>
       <div><dt>Notification preferences</dt><dd>Until you turn notifications off or uninstall the app.</dd></div>
       <div><dt>Charity collection requests</dt><dd>Deleted twelve months after the collection is completed, declined or withdrawn, together with the certificate uploaded with it. A job runs every night to do this.</dd></div>
+      <div><dt>Questions to the imams</dt><dd>Deleted twelve months after the last thing happened on the question, together with the imam&rsquo;s answers. A job runs every night to do this. If you may want to look back at an answer after that, keep the email.</dd></div>
       <div><dt>Requests that go nowhere</dt><dd>An unpaid hall booking releases its hold after thirty minutes and is deleted.</dd></div>
     </div>
   </section>

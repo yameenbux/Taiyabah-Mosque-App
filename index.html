@@ -767,6 +767,15 @@
   .ia-call-v{font-size:calc(16px * var(--ts));font-weight:700;color:var(--ink)}
   .ia-note{font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.6;margin:12px 6px 0}
   .ia-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
+  /* What the masjid can and cannot promise about a written question. Gold
+     rather than the plum .ad-note, because .ad-note is the "this is shut"
+     panel on these sheets and this is not a refusal. */
+  .ia-conf{background:rgba(198,162,76,.13);border:1px solid rgba(198,162,76,.42);
+    border-radius:14px;padding:13px 15px;margin:0 0 16px}
+  .ia-conf h4{font-family:"Fraunces",Georgia,serif;font-size:calc(14px * var(--ts));margin:0 0 6px;color:var(--ink)}
+  .ia-conf p{font-size:calc(12.5px * var(--ts));line-height:1.65;color:var(--ink);margin:0 0 7px}
+  .ia-conf p:last-child{margin-bottom:0;color:var(--muted)}
+  .ia-conf b{font-weight:700}
 
   /* ---- hall / room hire ---- */
   .hh-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#F3EFE3;
@@ -4408,6 +4417,84 @@
           <p class="ia-note" data-i18n="advice.appointments_are_arranged_through_the">Appointments are arranged through the office, so the imam
             can make time to see you properly rather than in passing.</p>
 
+          <!-- ==================================================================
+               WRITING TO THE IMAMS
+
+               The masjid asked for this: a way to put a question to the imams
+               in confidence, answered by an imam himself.
+
+               IT SITS UNDER THE PHONE NUMBER, NOT ABOVE IT, ON PURPOSE. Some of
+               what people need to ask an imam should be a conversation, and a
+               form is the easier thing to reach for when you are upset. The
+               number stays first, and the heading below says plainly which
+               route is which.
+
+               THE FORM IS NOT ALWAYS DRAWN. advice_is_open() is asked on the
+               way in (db/132); it is false unless somebody holds the imam role
+               in the portal, because a form that accepts a confidence nobody
+               will read is worse than no form. When it is false the panel
+               below it is shown instead.
+               ============================================================== -->
+          <div class="sec-h"><h2 data-i18n="advice.or_write_to_them">Or write to them</h2><span class="rule"></span></div>
+
+          <div id="ia-closed" hidden>
+            <div class="ad-note">
+              <span class="lab" data-i18n="advice.questions">Questions</span>
+              <h4 data-i18n="advice.written_questions_are_not_being">Written questions are not being taken just now</h4>
+              <p data-i18n="advice.please_ring_the_office_and_an_imam">Please ring the office on the number above and somebody will arrange
+                a time for you to speak to an imam.</p>
+            </div>
+          </div>
+
+          <form class="bk-form" id="ia-form" novalidate autocomplete="on" hidden>
+            <!-- WHAT THE MASJID CAN AND CANNOT PROMISE, said before anybody
+                 types. The second sentence is not legal cover - it is what
+                 stops somebody believing something untrue about where their
+                 words go. -->
+            <div class="ia-conf">
+              <h4 data-i18n="advice.who_reads_this">Who reads this</h4>
+              <p data-i18n-html="advice.what_you_write_here_is_read">What you write here is read by <b>the imams and by nobody else at the
+                masjid</b> &mdash; not the office, not the committee, not an administrator.
+                The imam answers you by email.</p>
+              <p data-i18n="advice.if_this_is_urgent_please_ring">If this is urgent, or you would rather speak to somebody, please ring
+                the number above instead of writing.</p>
+            </div>
+
+            <p class="bk-hint" data-i18n="advice.every_box_is_needed_so">Every box is needed: the imam has to know who he is answering,
+              where to send his answer, and how to reach you if ringing would be kinder than writing.</p>
+
+            <div class="bk-field">
+              <label for="ia-name" data-i18n="advice.your_name">Your name</label>
+              <input type="text" id="ia-name" autocomplete="name" maxlength="120">
+            </div>
+            <div class="bk-field">
+              <label for="ia-phone" data-i18n="advice.phone_number">Phone number</label>
+              <input type="tel" id="ia-phone" inputmode="tel" autocomplete="tel" maxlength="40" data-i18n-latin>
+            </div>
+            <div class="bk-field">
+              <label for="ia-email" data-i18n="advice.email">Email</label>
+              <input type="email" id="ia-email" inputmode="email" autocomplete="email" maxlength="254" data-i18n-latin>
+              <span class="bk-hint" data-i18n="advice.the_imams_answer_is_sent_here">The imam&rsquo;s answer is sent to this address, so please check it.</span>
+            </div>
+            <div class="bk-field">
+              <label for="ia-subject" data-i18n="advice.what_it_is_about">What it is about &mdash; one short line</label>
+              <input type="text" id="ia-subject" autocomplete="off" maxlength="120">
+            </div>
+            <div class="bk-field">
+              <label for="ia-question" data-i18n="advice.your_question">Your question</label>
+              <textarea id="ia-question" rows="7" maxlength="4000"></textarea>
+              <span class="bk-hint" id="ia-count"></span>
+            </div>
+
+            <div class="bk-err" id="ia-err" hidden></div>
+            <button type="submit" class="bk-submit" id="ia-submit" data-i18n="advice.send_this_to_the_imams">Send this to the imams</button>
+            <p class="bk-hint" style="text-align:center" data-i18n="advice.you_will_get_no_email_confirming">You will not get an email confirming this was sent &mdash; your
+              reference is shown on this screen instead, so nothing about it lands in an inbox
+              somebody else may read.</p>
+          </form>
+
+          <div class="bk-done" id="ia-done" hidden></div>
+
           <p class="ia-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
@@ -7226,6 +7313,12 @@ function refreshRenderedText(){
     () => { if(typeof zkCalc === "function" && open("zakat")) zkCalc(); },
     () => { if(open("giving")) gvRender(); },
     () => { if(open("collect")) ccDateBounds(); },
+    /* The character count under the question box is written by hand rather
+       than carried on a data-i18n attribute, because it names a number that
+       changes as somebody types. So it has to be redrawn when the language
+       changes, not only when the screen opens — otherwise an Urdu reader is
+       left with one line of English under the box they are typing in. */
+    () => { if(open("advice")) iaTally(); },
   ];
   /* One screen failing to redraw must not stop the rest from being translated. */
   for(const job of jobs){ try{ job(); }catch(e){ console.warn("re-render after language change:", e); } }
@@ -9733,6 +9826,12 @@ function openAdvice(){
   document.getElementById('advice').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#advice .sh-body').scrollTop=0;
+  /* The count line is written by hand, so it is in whatever language was
+     active when initAdvice() ran. Redrawn on the way in as well as on a
+     language change, because the usual order is "change language, then open
+     the screen" and the refresh hook cannot see a screen that is shut. */
+  iaTally();
+  iaProbe().then(iaShow);
 }
 function closeAdvice(){
   document.getElementById('advice').dataset.open="0";
@@ -9745,6 +9844,170 @@ function initAdvice(){
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('advice').dataset.open==="1") closeAdvice();
   });
+
+  const q = document.getElementById("ia-question");
+  q.addEventListener("input", iaTally);
+  iaTally();
+
+  /* The red outline comes off as soon as somebody starts fixing the field it
+     is on, not when they submit again. Same as the collections form. */
+  document.getElementById("ia-form").addEventListener("input", e=>{
+    const f = e.target.closest(".bk-field");
+    if(f) delete f.dataset.bad;
+  });
+  document.getElementById("ia-form").addEventListener("submit", iaSubmit);
+}
+
+/* ---------------- writing to the imams (db/132) ----------------
+
+   IA.open IS THREE-VALUED. null means "not asked yet", so the answer is asked
+   for once per session and not once per sheet opening; true and false are the
+   answer. Same shape as CC.open on the collections form, and for the same
+   reason: the probe is a network call and the sheet is opened and closed a lot.
+
+   IA.sent exists so that reopening the sheet after sending does not put the
+   form back under the reference, inviting somebody to send the same question
+   twice because they could not tell it had gone.                            */
+const IA = { open: null, sent: false };
+const IA_MAX = 4000;   /* request_imam_advice() refuses more than this */
+
+function iaTally(){
+  const n = document.getElementById("ia-question").value.length;
+  const box = document.getElementById("ia-count");
+  box.textContent = n === 0
+    ? t("advice.up_to_4000_characters", "Up to 4,000 characters.")
+    : num(String(n)) + " / " + num(String(IA_MAX));
+}
+
+/* Is anybody going to read it?
+
+   advice_is_open() is false unless somebody active holds the imam role in the
+   portal. ASKED RATHER THAN ASSUMED, and asked of Postgres rather than a flag
+   in this file, because the thing that makes it false — a role being removed,
+   an account being suspended — happens in the portal and nothing here would
+   hear about it. It reveals no names and no addresses, only the yes or no.
+
+   A failure to reach the server is treated as SHUT. The other way round would
+   draw the form, take somebody's confidence, and fail at the end, which is
+   the worse of the two failures by a distance. */
+function iaProbe(){
+  if(IA.open !== null) return Promise.resolve(IA.open);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  return fetch(`${supaBase()}/rest/v1/rpc/advice_is_open`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: "{}",
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    IA.open = res.ok && String(body).trim() === "true";
+    return IA.open;
+  })).catch(() => { clearTimeout(timer); IA.open = false; return false; });
+}
+
+function iaShow(open){
+  document.getElementById("ia-closed").hidden = !!open;
+  document.getElementById("ia-form").hidden = !(open && !IA.sent);
+}
+
+function iaValidate(){
+  const v = id => document.getElementById(id).value.trim();
+  const bad = id => { document.getElementById(id).closest(".bk-field").dataset.bad = "1"; };
+  let ok = true;
+
+  if(!v("ia-name")){ bad("ia-name"); ok = false; }
+  if(!v("ia-phone")){ bad("ia-phone"); ok = false; }
+  /* The same shape Postgres checks. Checked here too so somebody is told
+     before they have pressed send, not after — and in the function because
+     that is the one that counts. */
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("ia-email"))){ bad("ia-email"); ok = false; }
+  if(!v("ia-subject")){ bad("ia-subject"); ok = false; }
+  if(!v("ia-question")){ bad("ia-question"); ok = false; }
+  return ok;
+}
+
+function iaSubmit(e){
+  e.preventDefault();
+  if(IA.sent) return;
+  const err = document.getElementById("ia-err");
+  if(!iaValidate()){
+    err.hidden = false;
+    err.textContent = t("advice.check_the_form",
+      "Please fill in every box, and check the email address — that is where the answer goes.");
+    const first = document.querySelector('#ia-form [data-bad]');
+    if(first) first.scrollIntoView({ behavior:"smooth", block:"center" });
+    return;
+  }
+  err.hidden = true;
+
+  const btn = document.getElementById("ia-submit");
+  btn.disabled = true;
+  btn.textContent = t("advice.sending", "Sending…");
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  const v = id => document.getElementById(id).value.trim();
+
+  fetch(`${supaBase()}/rest/v1/rpc/request_imam_advice`, {
+    method: "POST",
+    signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ payload: {
+      name:     v("ia-name"),
+      phone:    v("ia-phone"),
+      email:    v("ia-email"),
+      subject:  v("ia-subject"),
+      question: v("ia-question"),
+    }}),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    if(res.ok){
+      IA.sent = true;
+      let ref = null;
+      try{ ref = JSON.parse(body).reference; }catch(_){}
+      iaDone(ref);
+      return;
+    }
+    /* request_imam_advice() speaks to the person directly — "the masjid cannot
+       take written questions at the moment", "that does not look like an email
+       address" — so where it does, say what it said rather than an apology over
+       the top of it. */
+    let msg = null;
+    try{ const j = JSON.parse(body); if(j && j.message && /^[A-Z]/.test(j.message)) msg = j.message; }catch(_){}
+    btn.disabled = false;
+    btn.textContent = t("advice.send_this_to_the_imams", "Send this to the imams");
+    err.hidden = false;
+    err.textContent = msg || t("advice.couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  })).catch(() => {
+    clearTimeout(timer);
+    btn.disabled = false;
+    btn.textContent = t("advice.send_this_to_the_imams", "Send this to the imams");
+    err.hidden = false;
+    err.textContent = t("advice.couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  });
+}
+
+/* THE REFERENCE IS SHOWN HERE AND NOWHERE ELSE, and there is no confirmation
+   email on purpose (see the long note in the notify function). An email saying
+   "we have your question for the imams" landing in a family inbox tells
+   whoever else reads that inbox that this person wrote to an imam in
+   confidence. The screen is the one place only they are looking. */
+function iaDone(ref){
+  document.getElementById("ia-form").hidden = true;
+  const box = document.getElementById("ia-done");
+  let html = `<h4>${esc(t("advice.sent_to_the_imams","Your question has gone to the imams"))}</h4>`
+           + `<p>${esc(t("advice.an_imam_will_read_this",
+               "An imam will read this and answer you by email. Nobody else at the masjid can see it. If it is urgent, ring the office as well."))}</p>`;
+  if(ref) html += `<div class="bk-sum"><span class="k">${esc(t("advice.reference","Reference"))}</span><span class="v">${esc(ref)}</span></div>`;
+  html += `<p>${esc(t("advice.please_keep_this_reference_written",
+             "Please keep this reference. If you write again, quote it and the imam will know which question you mean."))}</p>`;
+  box.innerHTML = html;
+  box.hidden = false;
 }
 
 /* ---------------- hall / room hire page ---------------- */

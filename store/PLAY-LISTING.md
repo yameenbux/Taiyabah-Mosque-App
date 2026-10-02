@@ -137,12 +137,13 @@ By telephone and email, as set out in the privacy notice.
 
 | Type | Collected | Shared | Optional? | Purpose | Where in the code |
 |---|---|---|---|---|---|
-| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name`; charity collection `collector_name`, `trustee_name`, `signed_name` |
+| Name | Yes | No | Optional | App functionality | Hall booking `first_name`/`last_name`; nikāḥ `contact_name`; charity collection `collector_name`, `trustee_name`, `signed_name`; imams' advice `name` |
 | Address | Yes | No | Optional | App functionality | Hall booking `address`; charity collection `org_address` |
-| Phone number | Yes | No | Optional | App functionality | Hall booking `phone`; nikāḥ `contact_phone`; charity collection `org_phone`, `trustee_phone` |
-| Email address | Yes | No | Optional | App functionality | Nikāḥ `contact_email`; charity collection `org_email`, `trustee_email` |
+| Phone number | Yes | No | Optional | App functionality | Hall booking `phone`; nikāḥ `contact_phone`; charity collection `org_phone`, `trustee_phone`; imams' advice `phone` |
+| Email address | Yes | No | Optional | App functionality | Nikāḥ `contact_email`; charity collection `org_email`, `trustee_email`; imams' advice `email` |
 | Photos | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a JPEG, PNG or WebP |
 | Files and docs | Yes | No | Optional | App functionality | The BMCC certificate, when uploaded as a PDF |
+| Other in-app messages | Yes | No | Optional | App functionality | A written question to the imams: `subject` and `question`, and the imam's reply |
 | Other user-generated content | Yes | No | Optional | App functionality | Nikāḥ `notes` free-text box |
 | Device or other IDs | Yes | No | Optional | App functionality | OneSignal subscription id, only if notifications are turned on |
 
@@ -157,9 +158,29 @@ It goes to a **private** Supabase bucket that `anon` may write and only
 valid for 300 seconds. It is not shared with anyone outside the masjid, which
 is why the Shared column says No.
 
+**"Other in-app messages" is the right box for a question to the imams, and
+"Other user-generated content" is not.** Google's own definition of that
+category is content the user creates and sends to somebody else, and it lists
+"other in-app messages" for exactly this: free text written to a named
+recipient rather than posted. The nikāḥ notes box stays under user-generated
+content because it is an aside on a booking form, not a message to a person.
+Getting this wrong is the kind of mismatch that gets a listing pulled, and the
+honest reading of what this feature is — somebody writing privately to an
+imam — is a message.
+
+Under **Data usage and handling** for that type, answer:
+- **Is this data processed ephemerally?** No. It is stored until the imam
+  answers and for twelve months afterwards.
+- **Is this data required?** No — optional.
+- **Why is it collected?** App functionality only. Nothing else applies: it is
+  not used for analytics, personalisation, advertising or fraud prevention.
+- **Is it shared with other companies or organisations?** No. It is sent by
+  email to the person who asked and to the imam, both through the masjid's own
+  mail provider.
+
 "Optional" because none of it is required to use the app — every one of these
-is collected only if the person chooses to book a hall, request a nikāḥ, or
-turn notifications on.
+is collected only if the person chooses to book a hall, request a nikāḥ, write
+to the imams, or turn notifications on.
 
 ### Data types NOT to declare, and why
 
@@ -179,8 +200,9 @@ Answer as a **Reference, News, or Educational** app.
 
 - Violence, sexuality, language, controlled substances — none.
 - **Does the app contain user-generated content shared with others?** No. The
-  nikāḥ notes box goes to the masjid office only; nothing is shown to other
-  users.
+  nikāḥ notes box goes to the masjid office only, and a question to the imams
+  goes to one imam. Nothing a user writes is ever shown to another user, and
+  there is no feed, no comments and no profile anybody else can see.
 - **Does the app share the user's location with other users?** No.
 - **Does the app allow purchases?** Yes — it links out to Stripe for the hall
   deposit, the nikāḥ fee and donations. These are payments for real-world
