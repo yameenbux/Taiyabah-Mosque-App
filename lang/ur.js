@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "325f3d8c49d8",
+ "version": "b8045acf0fb6",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -62,8 +62,6 @@ window.LANG_PACK = {
   "sysprefs.done": "ہو گیا",
   "sysprefs.language": "زبان",
   "sysprefs.choose_the_language_the_app": "وہ زبان منتخب کریں جس میں ایپ چلے۔ پیک ایک بار ڈاؤن لوڈ ہوتے ہیں اور پھر آف لائن کام کرتے ہیں۔",
-  "sysprefs.translations_not_yet_reviewed": "تراجم کا ابھی جائزہ نہیں لیا گیا",
-  "sysprefs.the_urdu_gujarati_and_arabic": "اردو، گجراتی اور عربی کے پیکجز اب پوری ایپ کا احاطہ کرتے ہیں، بشمول دعائیں، اذکار اور سورتوں کے نام۔ ڈاک کے پتے، فون نمبر، ای میل اور ویب پتے لاطینی رسم الخط میں رہتے ہیں تاکہ وہ کام کرتے رہیں۔ ابھی تک کسی اہلِ زبان نے اس کی جانچ نہیں کی — براہِ کرم اجرا سے پہلے امام صاحب اور کمیونٹی کے کسی فرد سے نظرثانی کروا لیں۔",
   "quran.surahs": "← سورتیں",
   "quran.qur_an": "قرآن",
   "quran.done": "ہو گیا",

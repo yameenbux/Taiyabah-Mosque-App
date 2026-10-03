@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "30a89e77e435",
+ "version": "76a16795d15f",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -62,8 +62,6 @@ window.LANG_PACK = {
   "sysprefs.done": "થઈ ગયું",
   "sysprefs.language": "ભાષા",
   "sysprefs.choose_the_language_the_app": "એપ્લિકેશન જે ભાષામાં ચાલે તે પસંદ કરો. પૅક એક વાર ડાઉનલોડ થાય છે અને પછી ઑફલાઇન કામ કરે છે.",
-  "sysprefs.translations_not_yet_reviewed": "અનુવાદોની હજી સમીક્ષા થઈ નથી",
-  "sysprefs.the_urdu_gujarati_and_arabic": "ઉર્દૂ, ગુજરાતી અને અરબી પૅક હવે આખી એપને આવરી લે છે, જેમાં દુઆઓ, અઝકાર અને સૂરહનાં નામ પણ સામેલ છે. ટપાલનાં સરનામાં, ફોન નંબર, ઈમેલ અને વેબ સરનામાં લેટિન લિપિમાં રહે છે જેથી તે કામ કરતાં રહે. હજી સુધી કોઈ મૂળ ભાષીએ તેની ચકાસણી કરી નથી — કૃપા કરીને લૉન્ચ પહેલાં ઇમામ સાહેબ અને સમુદાયના કોઈ સભ્ય પાસે સમીક્ષા કરાવો.",
   "quran.surahs": "← સૂરહ",
   "quran.qur_an": "કુરઆન",
   "quran.done": "થઈ ગયું",
