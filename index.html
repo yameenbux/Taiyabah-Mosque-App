@@ -150,9 +150,20 @@
      are spent at nearly zero. This curve holds the opacity up and then lets
      go, which is what buys the reading time.
 
-     Taps do NOT pass through while it is up. The layer is opaque, so a tap
-     that fell through would hit something the person cannot see — and at
-     this length that is long enough to happen.
+     pointer-events ARE off, from the first frame, and that is not a detail.
+     The layer covers the whole app. If anything stops it leaving, a layer
+     that accepts taps is an invisible wall and not one button in the app
+     works — which is exactly what happened when this said otherwise.
+
+     It can be stopped from leaving. `visibility` inside a keyframe is a
+     discrete animation, and a renderer that does not apply it leaves the
+     element at its base `visible` with opacity 0: gone to the eye, still
+     there to the finger. So the fade is NOT what makes it safe. Being
+     untouchable is what makes it safe, and that holds whether or not the
+     keyframe runs, whether or not the script runs.
+
+     A tap during the splash therefore reaches the app underneath. That is
+     the lesser problem by a wide margin: the alternative is a dead app.
 
      The artwork is logo.svg — outlines, not a bitmap — so it is as sharp at
      240px as at 2000 and does not care which screen it lands on.
@@ -163,7 +174,7 @@
      visibility:hidden, so it takes itself out of the page rather than lying
      over the app as an invisible sheet that swallows every tap. */
   .boot{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;
-    background:var(--brand-900);
+    background:var(--brand-900);pointer-events:none;
     animation:boot-veil 420ms cubic-bezier(.45,0,.85,.6) 1200ms both}
   /* Deliberately modest. A splash mark does not need to be large to read,
      and a smaller one shows less of what the source artwork lost before it
@@ -1904,6 +1915,20 @@
   <div class="boot" aria-hidden="true">
     <img src="logo.svg" alt="" width="780" height="552">
   </div>
+  <script>
+  /* Belt and braces. The CSS above is already safe on its own — the layer
+     never accepts a tap — but this takes the element out of the document
+     entirely once the fade has run, so there is nothing left to go wrong.
+     If this script never runs, nothing is worse off. */
+  (function(){
+    var b = document.querySelector(".boot");
+    if (!b) return;
+    var gone = function(){ if (b && b.parentNode) b.parentNode.removeChild(b); };
+    b.addEventListener("animationend", gone, { once: true });
+    /* and a hard floor, in case the animation never fires at all */
+    setTimeout(gone, 4000);
+  })();
+  </script>
 
   <div class="topbar">
     <h1 class="vh" data-i18n="a11y.taiyabah_masjid">Taiyabah Masjid</h1>
