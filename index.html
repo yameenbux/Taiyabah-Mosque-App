@@ -1955,8 +1955,12 @@
         <!-- The Latin band, which is not written — it settles in afterwards. -->
         <clipPath id="bootBelow"><rect x="0" y="300" width="780" height="252"/></clipPath>
       </defs>
-      <image href="logo-cream.png" width="780" height="552" mask="url(#bootInk)"/>
-      <image href="logo-cream.png" width="780" height="552" clip-path="url(#bootBelow)" class="word"/>
+      <!-- The artwork is outlines, not a bitmap, so it is as sharp at 240px as
+           at 2000 and does not care what screen it lands on. It is referenced
+           rather than inlined so the topbar and the drawer share one cached
+           copy of it. -->
+      <image href="logo.svg" width="780" height="552" mask="url(#bootInk)"/>
+      <image href="logo.svg" width="780" height="552" clip-path="url(#bootBelow)" class="word"/>
     </svg>
   </div>
   <script>
@@ -1978,7 +1982,7 @@
 
   <div class="topbar">
     <h1 class="vh" data-i18n="a11y.taiyabah_masjid">Taiyabah Masjid</h1>
-    <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
+    <img class="brandmark" src="logo.svg" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
     <div class="brand">
       <p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p>
     </div>
@@ -5181,7 +5185,7 @@
     <div class="dr-scrim" id="dr-scrim"></div>
     <aside class="dr-panel">
       <div class="dr-top">
-        <img class="dr-logo" src="logo-cream.png" alt="Taiyabah Masjid" data-i18n-attr="alt:a11y.taiyabah_masjid">
+        <img class="dr-logo" src="logo.svg" alt="Taiyabah Masjid" data-i18n-attr="alt:a11y.taiyabah_masjid">
         <button class="dr-close" id="dr-close" aria-label="Close" data-i18n-attr="aria-label:a11y.close">&times;</button>
       </div>
       <div class="dr-body">
