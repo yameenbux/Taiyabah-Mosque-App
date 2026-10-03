@@ -11987,7 +11987,44 @@ function closeDrawer(){
   document.getElementById('drawer').dataset.open="0";
   document.body.style.overflow="";
 }
+/* ---------------------------------------------------------------------------
+   TABS YOU ARRIVE AT BY DRILLING DOWN
+
+   Four screens are tab views but are not in the tab bar: you reach Qibla and
+   Donate from a tile on the home screen, Notifications and Live from the More
+   menu. They are therefore somewhere you went INTO, and Back should bring you
+   out — but switchTab only toggles `hidden`, so nothing was ever pushed and
+   Back left the app instead. Reported as the same complaint as the sheets:
+   press Back, the app closes.
+
+   They reuse the sentinel rather than adding a second mechanism. The rule it
+   already keeps — the sentinel exists if and only if something is open — just
+   gains one more way of being open: NAV.tabFrom is the tab to return to, and
+   is null the rest of the time. Pressing Back on a tab-bar tab still leaves
+   the app, which is what Android expects.
+   ------------------------------------------------------------------------ */
+const DRILL_TABS = ["qibla","live","alerts","donate"];
+
 function switchTab(name){
+  /* Not conditioned on whether a layer is open: every menu row closes the
+     drawer and switches tab in the same breath, and the drawer is still
+     data-open="1" at this moment. Skipping the arm here was what left
+     "Notifications" exiting the app while the tiles behaved. navArm is a
+     no-op when the sentinel is already held, so the handoff is safe. */
+  const from = navCurrentTab();
+  if(DRILL_TABS.indexOf(name) !== -1){
+    /* Entering one. Remember where from — but only the first time, so
+       hopping between two drill-down tabs still returns to the tab bar. */
+    if(NAV.tabFrom === null && from && DRILL_TABS.indexOf(from) === -1){
+      NAV.tabFrom = from;
+      navArm();
+    }
+  } else if(NAV.tabFrom !== null){
+    /* Leaving by some other route — a tab-bar tap. The sentinel is no
+       longer earned, so give it back. */
+    NAV.tabFrom = null;
+    navDisarm();
+  }
   document.querySelectorAll('.tab').forEach(t=>t.dataset.on = t.dataset.tab===name ? "1":"0");
   ["home","times","notices","live","alerts","donate","qibla"].forEach(n=>{
     document.getElementById("tab-"+n).hidden = (n!==name);
@@ -12162,10 +12199,17 @@ function navUpBack(){
 }
 
 const NAV = {
+  /* The tab to return to when Back is pressed on a drill-down tab, or null. */
+  tabFrom: null,
   order: [],        // layer ids, in the order they were opened
   armed: false,     // do we currently hold the sentinel?
   ours: false,      // did WE just call history.back()?
 };
+
+function navCurrentTab(){
+  const m = document.querySelector('main[id^="tab-"]:not([hidden])');
+  return m ? m.id.slice(4) : null;
+}
 
 function navLayers(){
   return Array.from(document.querySelectorAll('[data-open="1"]')).map(el => el.id);
@@ -12271,8 +12315,10 @@ function initBackButton(){
       navRenderUpBack();
     }
 
-    if(open.length && !NAV.armed) navArm();
-    else if(!open.length && NAV.armed) navDisarm();
+    /* A drill-down tab holds the sentinel too, so the drawer closing behind
+       "Notifications" must not hand it back while the tab still needs it. */
+    if((open.length || NAV.tabFrom !== null) && !NAV.armed) navArm();
+    else if(!open.length && NAV.tabFrom === null && NAV.armed) navDisarm();
   });
   document.querySelectorAll('[data-open]').forEach(el =>
     seen.observe(el, { attributes: true, attributeFilter: ['data-open'] }));
@@ -12283,6 +12329,15 @@ function initBackButton(){
 
     const top = NAV.order[NAV.order.length - 1];
     const control = top && navControl(top);
+
+    /* No layer, but we are inside a drill-down tab: step out of it. */
+    if(!control && NAV.tabFrom !== null){
+      const back = NAV.tabFrom;
+      NAV.tabFrom = null;            // cleared first: switchTab must not disarm
+      switchTab(back);
+      return;
+    }
+
     if(!control){
       /* Nothing open, or a layer with no way to close it. Either way this is
          not ours to intercept and Back should do what Back does. */
@@ -12291,7 +12346,7 @@ function initBackButton(){
     control.click();
     /* Still something open — a sub-view stepped back to its list, or there
        was a sheet underneath. Re-arm so the NEXT press is caught too. */
-    if(navLayers().length) navArm();
+    if(navLayers().length || NAV.tabFrom !== null) navArm();
   });
 }
 
