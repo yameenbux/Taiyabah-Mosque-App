@@ -39,8 +39,30 @@ a sideloaded APK is exactly how you would first notice.
 
 | Fingerprint | Signs | Where it comes from |
 |---|---|---|
+| `AC:10:3A:…:D7` | every install from the Play Store **now** | Play App Signing, current key, read 3 Oct 2026 |
+| `14:11:94:…:3F` | installs made before the key was rotated | Play App Signing, **previous** key, first used 21 Sep 2026 |
 | `F5:7F:73:…:6E` | APKs from the workflow, sideloaded or via Internal App Sharing | our upload key, `android.keystore`, alias `taiyabah` |
-| `14:11:94:…:3F` | every install from the Play Store | Play App Signing, read 21 Sep 2026 |
+
+### Play rotates its signing key, and says nothing
+
+On 3 October 2026 every Play install showed the browser bar while a
+sideloaded build did not. Same site, same file, same package — the only
+difference was which key signed the APK, which is what made it certain.
+
+Play had **upgraded the app signing key** since 21 September. The console
+records the old one under "Previous app signing keys" and quietly starts
+signing with a new one; nothing warns you, and nothing in this repository
+could have noticed. `14:11:94:…:3F` was correct when it was written and
+simply stopped being the key in use.
+
+All three stay listed. Dropping the previous key would fix new installs and
+break every phone that installed before the rotation, because those carry
+the old signature for as long as they are not reinstalled.
+
+**If the bar ever comes back, check this first.** Protected with Play →
+Play Store protection → Protect app signing key → Manage Play App Signing,
+and compare the App signing key's SHA-256 against the top row above. The
+page moved there from App integrity, which now only redirects.
 
 Fingerprints are public by design — the whole purpose of the file is to
 publish them. The keystore and its password are the secrets, and neither
