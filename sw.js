@@ -5,13 +5,13 @@
 /* Taiyabah Masjid — service worker (v1 shell)
    Caches the app shell so today's times open offline.
    Push handling is stubbed; the store build wires this to OneSignal/APNs/FCM. */
-const CACHE = "taiyabah-v176";
+const CACHE = "taiyabah-v177";
 /* fonts.css and the two faces that set the first screen are shell: the app is
    expected to open with no signal, and a first launch that has to go to the
    network for its typeface renders the masjid's name in Times. The other
    sixteen subsets are fetched on demand and kept — see the /fonts/ rule in
    the fetch handler. */
-const SHELL = ["./index.html", "./admin.html", "./privacy.html", "./delete-data.html", "./manifest.webmanifest", "./logo-cream.png", "./icon-192.png?v=3", "./icon-512.png?v=3", "./apple-touch-icon.png?v=3", "./fonts/fonts.css", "./fonts/hanken-grotesk-latin-400.woff2", "./fonts/fraunces-latin-400.woff2"];
+const SHELL = ["./index.html", "./admin.html", "./privacy.html", "./delete-data.html", "./manifest.webmanifest", "./logo.svg", "./icon-192.png?v=3", "./icon-512.png?v=3", "./apple-touch-icon.png?v=3", "./fonts/fonts.css", "./fonts/hanken-grotesk-latin-400.woff2", "./fonts/fraunces-latin-400.woff2"];
 
 /* addAll goes through the browser's ordinary HTTP cache, and GitHub Pages
    serves index.html with a lifetime on it. So a worker built to deliver a new
