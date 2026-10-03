@@ -11976,7 +11976,9 @@ function switchTab(name){
    happened cannot be forgotten by whoever adds the thirteenth journey.
 
    The trail is cleared when everything closes, so a sheet opened fresh from
-   the home screen never offers a back arrow pointing at nothing.
+   the home screen never offers a back arrow pointing at nothing — there, Done
+   already returns to the home screen and a second control doing the identical
+   thing would be worse than one.
    =========================================================================== */
 const TRAIL = [];
 const LAYER_OPENER = {};     // layer id -> the function that opens it
@@ -11996,18 +11998,33 @@ function navIndexOpeners(){
   }
 }
 
-/* Only a sheet goes on the trail. The "More" menu is a launcher, not a place:
-   returning to it after finishing something would be a step backwards into a
-   menu the person had already used, and Back has always dismissed it outright.
-   A sheet is recognised by its .sh-top header, which is also the only place
-   the arrow could be drawn. */
+/* The arrow is drawn in a sheet's header, so the screen being ARRIVED AT has
+   to be a sheet — recognised by its .sh-top, which is the only place to put
+   it. Where it came FROM is a looser question, and the first version of this
+   got it wrong: it insisted the previous screen be a sheet too, which excluded
+   the "More" menu on the grounds that a launcher is not a place.
+
+   Thirteen screens are reachable from that menu and nothing else — Contact,
+   Membership, Hall hire, Zakāt and the rest. Excluding it meant every one of
+   them offered only "Done", which lands on the home screen, so getting from
+   Contact to Membership meant reopening the menu and finding it again. That
+   is the exact tedium this was built to remove. The menu is where the person
+   was, so the menu is what Back returns to. */
 function navIsSheet(id){
   return !!document.querySelector("#" + id + " .sh-top");
 }
+function navIsDrawer(id){
+  return id === "drawer";
+}
 
+/* A sheet names itself with its heading. The menu has no heading — it is a
+   logo and a close button — but it does carry an aria-label that the language
+   packs already translate, so the arrow can name it without a new string. */
 function navSheetTitle(id){
   const h = document.querySelector("#" + id + " .sh-top h3");
-  return (h && h.textContent.trim()) || "";
+  if(h && h.textContent.trim()) return h.textContent.trim();
+  const el = document.getElementById(id);
+  return (el && (el.getAttribute("aria-label") || "").trim()) || "";
 }
 
 /* The arrow lives in the header of whichever sheet is on top, and is rebuilt
@@ -12155,7 +12172,8 @@ function initBackButton(){
       /* Walking back up the trail pops; it must never also push, or the trail
          would grow in the direction it is being unwound. */
       if(handover && !navGoingBack && LAYER_OPENER[navPendingClose.id]
-         && navIsSheet(navPendingClose.id) && navIsSheet(o)
+         && (navIsSheet(navPendingClose.id) || navIsDrawer(navPendingClose.id))
+         && navIsSheet(o)
          && TRAIL.indexOf(navPendingClose.id) === -1)
         TRAIL.push(navPendingClose.id);
       navGoingBack = false;          // consumed: this was the step back itself

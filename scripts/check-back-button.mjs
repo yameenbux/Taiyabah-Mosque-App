@@ -55,10 +55,16 @@ const tap  = async (p, sel) => {
   await p.locator(sel).first().click({ timeout: 15000 });
   await p.waitForTimeout(400);
 };
-/* A crash in one scenario must not hide the other seven. */
+/* A crash in one scenario must not hide the others — and it must say WHICH
+   one crashed. Every call passes the same name, so a thrown scenario used to
+   report "block threw: locator.click: Timeout" with no way to tell which of
+   the twelve it was; the only route to an answer was commenting them out one
+   at a time. They are numbered in the order they run. */
+let scenarioNo = 0;
 const scenario = async (name, fn) => {
+  const n = ++scenarioNo;
   try { await fn(); }
-  catch (e) { fails.push(name + " threw: " + String(e.message || e).split("\n")[0].slice(0, 120)); }
+  catch (e) { fails.push(`scenario ${n} threw: ` + String(e.message || e).split("\n")[0].slice(0, 120)); }
 };
 
 /* 1 — THE REPORTED BUG: burger menu, tap a row, press Back */
@@ -73,8 +79,21 @@ await scenario("block", async () => {
   await back(p);
   s = await state(p);
   check(s.onPage,          "1d THE BUG: Back left the page — in a TWA the app closes");
-  check(s.open.length === 0, "1e Back did not close the sheet, open=" + s.open.join());
-  check(s.overflow === "",   "1f THE FREEZE: scroll lock still on, overflow=" + s.overflow);
+  /* 1e CHANGED, deliberately. It used to require that Back from a menu-opened
+     sheet left NOTHING open — the sheet closed and the person was on the home
+     screen. Thirteen screens are reachable only from that menu, so that rule
+     meant getting from Contact to Membership was: Done, open the menu, find it
+     again. Back now returns to the menu it came from, which is where the
+     person actually was.
+
+     1d is untouched and is the assertion this scenario exists for: the bug was
+     Back LEAVING THE PAGE, which in a TWA closes the app. Returning to the
+     menu is still being on the page. */
+  check(s.open.join() === "drawer",
+        "1e Back did not return to the menu the sheet was opened from, open=" + s.open.join());
+  /* The scroll lock belongs to whatever is open. The menu is open, so it stays
+     on — the freeze this guards against is a lock with nothing open under it. */
+  check(s.overflow === "hidden", "1f scroll lock released while the menu was still open, overflow=" + s.overflow);
   check(errs.length === 0,   "1g page errors: " + errs.join(" | "));
   await ctx.close();
 });
@@ -86,15 +105,28 @@ await scenario("block", async () => {
   check(p.url() !== before, "2a Back on the home screen did not leave — people trapped in the app");
   await ctx.close();
 });
-/* 3 — one press per layer: close the sheet, then leave */
+/* 3 — one press per layer, and then leave.
+
+   The count changed when the "More" menu became somewhere Back returns to.
+   It is still one press per layer; there is simply one more layer, because
+   opening a sheet from the menu is now two steps rather than one. Menu,
+   sheet, home, gone. The principle this scenario defends is unchanged: no
+   press is swallowed, and none is doubled. */
 await scenario("block", async () => {
   const { ctx, p } = await fresh();
   await tap(p, "#nav-more"); await tap(p, '.dr-row[data-act="advice"]');
   await back(p);
-  check((await state(p)).onPage, "3a first Back left the page");
+  let s = await state(p);
+  check(s.onPage, "3a first Back left the page");
+  check(s.open.join() === "drawer", "3b first Back did not return to the menu, open=" + s.open.join());
+  await back(p);
+  s = await state(p);
+  check(s.onPage, "3c second Back left the page");
+  check(s.open.length === 0, "3d second Back did not close the menu, open=" + s.open.join());
+  check(s.overflow === "", "3e scroll lock survived the last layer closing, overflow=" + s.overflow);
   const before = p.url();
   await back(p);
-  check(p.url() !== before, "3b second Back did not leave — an extra press to exit");
+  check(p.url() !== before, "3f third Back did not leave — Back is being swallowed");
   await ctx.close();
 });
 /* 4 — closed with the X: the sentinel must be given back */
@@ -156,13 +188,20 @@ await scenario("block", async () => {
   check(s.open.length === 0 && !s.armed, "7a Escape left the sentinel armed");
   await ctx.close();
 });
-/* 8 — ten rounds, nothing may drift */
+/* 8 — ten rounds, nothing may drift.
+
+   A round is two Backs now, not one: the first returns to the menu and the
+   second closes it. With only one, the menu was still open when the round
+   ended, the burger button underneath it could not be clicked, and this
+   scenario failed by timing out rather than by drifting — which is how the
+   change to the menu's place in the trail first showed up here. */
 await scenario("block", async () => {
   const { ctx, p, errs } = await fresh();
   for (let i = 0; i < 10; i++) {
     await tap(p, "#nav-more");
     await tap(p, '.dr-row[data-act="advice"]');
-    await back(p);
+    await back(p);                       // sheet -> menu
+    await back(p);                       // menu -> home
   }
   const s = await state(p);
   check(s.onPage, "8a left the page somewhere in ten rounds");
@@ -292,6 +331,64 @@ await scenario("block", async () => {
   check(s.open.includes("madrasah"), "12m Back went home instead of one step back, open=" + s.open.join());
 
   check(errs.length === 0, "12n page errors: " + errs.join(" | "));
+  await ctx.close();
+});
+
+/* 13 — THE SCREENS WITH ONLY A "DONE".
+
+   Thirteen screens are reachable from the "More" menu and from nowhere else:
+   Contact, Membership, Hall hire, Zakāt, Advice, Videos, About, Education,
+   Admissions, Holidays, Collections, Marriage & Death, System preferences.
+   Each one used to offer a single button, "Done", which closes to the home
+   screen — so going from Contact to Membership meant Done, reopen the menu,
+   scroll, find it. Two of those screens were photographed and sent in, which
+   is how this was noticed; the arrow added for sheet-to-sheet journeys did not
+   appear on any of them, because the menu was excluded from the trail.
+
+   A screen opened from a home TILE still has no arrow, and should not: Done
+   already returns to the home screen, and a second control doing the same
+   thing is worse than one. The distinction this checks is "is there somewhere
+   else to go back to", not "is this a sheet". */
+await scenario("block", async () => {
+  const { ctx, p, errs } = await fresh();
+  const arrow = () => p.evaluate(() => {
+    const b = document.querySelector('[data-open="1"] .sh-upback');
+    return b ? (b.getAttribute("aria-label") || "(unnamed)") : null;
+  });
+
+  for (const act of ["contact", "membership"]) {
+    await tap(p, "#nav-more");
+    await tap(p, `.dr-row[data-act="${act}"]`);
+    let s = await state(p);
+    check(s.open.join() === act || s.open.includes(act),
+          `13a ${act} did not open from the menu, open=` + s.open.join());
+
+    const a = await arrow();
+    check(a !== null,
+          `13b ${act} offers no way back to the menu it was opened from — only "Done", which goes to the home screen`);
+
+    /* The label is the menu's own aria-label, which the language packs
+       already translate. A bare "Back" would have needed three new strings. */
+    check(/more/i.test(a || ""),
+          `13c the arrow on ${act} does not name the menu, got: ` + a);
+
+    await tap(p, '[data-open="1"] .sh-upback');
+    s = await state(p);
+    check(s.open.join() === "drawer",
+          `13d the arrow on ${act} did not return to the menu, open=` + s.open.join());
+    check(s.onPage, `13e the arrow on ${act} left the page`);
+
+    await back(p);                                   // menu -> home, ready for the next
+    check((await state(p)).open.length === 0, `13f could not get back to the home screen after ${act}`);
+  }
+
+  /* And the other half of the rule: a sheet opened from a home tile has
+     nowhere else to go, so it keeps its single button. */
+  await tap(p, '[data-tile="madrasah"]');
+  check(await arrow() === null,
+        "13g a sheet opened from a home tile grew a back arrow that would do exactly what Done does");
+
+  check(errs.length === 0, "13h page errors: " + errs.join(" | "));
   await ctx.close();
 });
 
