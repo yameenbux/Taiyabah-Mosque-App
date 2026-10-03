@@ -30,8 +30,8 @@
 <meta name="theme-color" content="#3C0B2A" />
 <link rel="manifest" href="manifest.webmanifest" />
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=3" />
-<link rel="icon" href="icon-192.png?v=3" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=5" />
+<link rel="icon" href="icon-192.png?v=5" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Taiyabah" />
@@ -165,9 +165,11 @@
   .boot{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;
     background:var(--brand-900);
     animation:boot-veil 420ms cubic-bezier(.45,0,.85,.6) 1200ms both}
-  /* 240px keeps the mark the size it was, and the vector has no resolution
-     to outrun anyway. */
-  .boot img{width:min(62vw,240px);height:auto}
+  /* Deliberately modest. A splash mark does not need to be large to read,
+     and a smaller one shows less of what the source artwork lost before it
+     ever reached this project. 176px is the size it was before the write-on
+     animation enlarged it. */
+  .boot img{width:min(46vw,176px);height:auto}
   @keyframes boot-veil{0%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
 
   /* Reduced motion keeps the fade — it still explains that one screen is
@@ -7370,7 +7372,7 @@ async function lvToggle(){
     if('mediaSession' in navigator){
       navigator.mediaSession.metadata=new MediaMetadata({
         title:t("live.from_the_masjid","Live from the masjid"), artist:t("app.name","Taiyabah Masjid"),
-        artwork:[{src:"icon-512.png?v=3",sizes:"512x512",type:"image/png"}]
+        artwork:[{src:"icon-512.png?v=5",sizes:"512x512",type:"image/png"}]
       });
       navigator.mediaSession.setActionHandler('play',()=>lvToggle());
       navigator.mediaSession.setActionHandler('pause',()=>{a.pause();});
