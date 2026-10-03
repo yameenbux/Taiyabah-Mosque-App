@@ -137,6 +137,23 @@
      every single launch: three seconds between the person and their prayer
      times, every time they opened the app.
 
+     IT HOLDS BEFORE IT GOES. 1200ms still, then a 420ms fade. The first
+     version of this fell away after 560ms, which is not a splash, it is a
+     flash — the name was gone before the eye had finished landing on it.
+     A brand screen has to be readable or there is no reason to show it.
+     To change how long it sits, move the 1200ms delay below; the 420ms is
+     the fade itself and wants to stay short.
+
+     The fade does NOT use --ease-out. That curve is for things arriving: it
+     spends almost all its travel in the first few frames, which on a fade
+     OUT means the name is gone a hundred milliseconds in and the other 320
+     are spent at nearly zero. This curve holds the opacity up and then lets
+     go, which is what buys the reading time.
+
+     Taps do NOT pass through while it is up. The layer is opaque, so a tap
+     that fell through would hit something the person cannot see — and at
+     this length that is long enough to happen.
+
      The artwork is logo.svg — outlines, not a bitmap — so it is as sharp at
      240px as at 2000 and does not care which screen it lands on.
 
@@ -146,8 +163,8 @@
      visibility:hidden, so it takes itself out of the page rather than lying
      over the app as an invisible sheet that swallows every tap. */
   .boot{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;
-    background:var(--brand-900);pointer-events:none;
-    animation:boot-veil 360ms var(--ease-out) 200ms both}
+    background:var(--brand-900);
+    animation:boot-veil 420ms cubic-bezier(.45,0,.85,.6) 1200ms both}
   /* 240px keeps the mark the size it was, and the vector has no resolution
      to outrun anyway. */
   .boot img{width:min(62vw,240px);height:auto}
@@ -156,7 +173,7 @@
   /* Reduced motion keeps the fade — it still explains that one screen is
      becoming another — and gets out of the way sooner. */
   @media (prefers-reduced-motion: reduce){
-    .boot{animation-duration:200ms;animation-delay:120ms}
+    .boot{animation-duration:260ms;animation-delay:900ms}
   }
 
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,187,99,.5)}70%{box-shadow:0 0 0 7px rgba(220,187,99,0)}100%{box-shadow:0 0 0 0 rgba(220,187,99,0)}}
