@@ -45,6 +45,10 @@
        value moves the whole app; 1.12 is the default because the community
        told us the old size made people squint. */
     --ts:1.12;
+    /* A strong ease-out. The browser's own is too weak to read as deliberate,
+       and this is the only curve the app needs: everything that animates here
+       is entering or leaving. */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --brand-900:#3C0B2A;    /* hero canvas */
     --brand-800:#4B1136;
     --brand-700:#5E1844;    /* raised on dark */
@@ -122,6 +126,45 @@
   .datechip{display:inline-flex;align-items:center;gap:8px;font-size:calc(12px * var(--ts));color:#D0BFCA;
     border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:5px 11px;margin-bottom:20px}
   .datechip .live{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 0 0 rgba(220,187,99,.6);animation:pulse 2.4s infinite}
+  /* ---- the opening ----------------------------------------------------
+     Android shows a splash of its own before this page exists: the cream
+     wordmark on #3C0B2A, compiled into the app. Until now the app simply
+     appeared in its place, which is a cut rather than a transition — the
+     brand screen vanishes and the home screen is suddenly there.
+
+     This is the same picture again, in HTML, on top of the app. It is in the
+     markup rather than drawn by script, so it is on screen in the first paint
+     and there is no gap where the native splash has gone and this has not
+     arrived. Then it lifts: the veil fades while the mark grows a little, as
+     though the screen were opening rather than being swapped.
+
+     IT NEEDS NO JAVASCRIPT. The animation is CSS and runs on the compositor,
+     which matters because the moment it plays is the moment the page is at
+     its busiest — parsing, fetching prayer times, registering the worker. A
+     script-driven fade would stutter exactly here. More importantly, if the
+     script never runs at all the veil still leaves: nothing can be trapped
+     behind it. pointer-events are off from the first frame, so even while it
+     is visible a tap goes to the app underneath.
+
+     The app is NOT held back for it. Everything beneath has already painted;
+     this only covers it for half a second. */
+  .boot{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;
+    background:var(--brand-900);pointer-events:none;
+    animation:boot-veil 360ms var(--ease-out) 200ms both}
+  .boot img{width:clamp(128px,36vw,176px);height:auto;
+    animation:boot-mark 360ms var(--ease-out) 200ms both}
+  @keyframes boot-veil{to{opacity:0}}
+  /* Never from scale(0) and never to it: the mark is already the right size,
+     it only drifts forward as the screen opens. */
+  @keyframes boot-mark{from{transform:scale(1)}to{transform:scale(1.06)}}
+
+  /* Reduced motion keeps the fade — it still explains that one screen is
+     becoming another — and drops the movement. */
+  @media (prefers-reduced-motion: reduce){
+    .boot{animation-duration:200ms;animation-delay:120ms}
+    .boot img{animation:none}
+  }
+
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,187,99,.5)}70%{box-shadow:0 0 0 7px rgba(220,187,99,0)}100%{box-shadow:0 0 0 0 rgba(220,187,99,0)}}
   .eyebrow{font-size:calc(11px * var(--ts));letter-spacing:.24em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:9px}
   .nextname{display:flex;align-items:baseline;gap:12px}
@@ -1841,6 +1884,13 @@
 </style>
 </head>
 <body>
+  <!-- Matches the native splash exactly: same artwork, same background. See
+       .boot above. aria-hidden because it says nothing a screen reader needs —
+       the page behind it is already the real one. -->
+  <div class="boot" aria-hidden="true">
+    <img src="logo-cream.png" alt="" width="139" height="100">
+  </div>
+
   <div class="topbar">
     <h1 class="vh" data-i18n="a11y.taiyabah_masjid">Taiyabah Masjid</h1>
     <img class="brandmark" src="logo-cream.png" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
