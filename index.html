@@ -132,37 +132,73 @@
      appeared in its place, which is a cut rather than a transition — the
      brand screen vanishes and the home screen is suddenly there.
 
-     This is the same picture again, in HTML, on top of the app. It is in the
-     markup rather than drawn by script, so it is on screen in the first paint
-     and there is no gap where the native splash has gone and this has not
-     arrived. Then it lifts: the veil fades while the mark grows a little, as
-     though the screen were opening rather than being swapped.
+     This writes the name instead. طيبة مسجد is drawn stroke by stroke in the
+     order a hand would write it — right to left, each word's body first and
+     its dots afterwards, with the pen lifting between them — and the Latin
+     wordmark settles underneath once the Arabic is finished. There is no hand
+     and no pen: the line simply arrives.
+
+     HOW IT WORKS. The artwork is the logo PNG, shown twice. The top copy is
+     masked by seventeen strokes traced along the real centrelines of the
+     calligraphy; each stroke is one path with pathLength="1", so animating
+     stroke-dashoffset from 1 to 0 wipes it on from its own start point. What
+     you see is therefore the actual artwork being revealed, not a redrawing
+     of it that would never quite match. The bottom copy is clipped to the
+     Latin band and simply fades in.
 
      IT NEEDS NO JAVASCRIPT. The animation is CSS and runs on the compositor,
      which matters because the moment it plays is the moment the page is at
      its busiest — parsing, fetching prayer times, registering the worker. A
-     script-driven fade would stutter exactly here. More importantly, if the
-     script never runs at all the veil still leaves: nothing can be trapped
-     behind it. pointer-events are off from the first frame, so even while it
-     is visible a tap goes to the app underneath.
+     script-driven version would stutter exactly here. More importantly, if
+     the script never runs at all the veil still leaves: the last keyframe
+     sets visibility:hidden, so the layer takes itself out of the page and
+     nothing can be trapped behind it.
 
-     The app is NOT held back for it. Everything beneath has already painted;
-     this only covers it for half a second. */
+     The app is NOT held back for it. Everything beneath has already painted.
+     TO MAKE IT SHORTER: every delay below is measured from zero, so scale
+     them together — or just move the two numbers on .boot and .boot .word. */
   .boot{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;
-    background:var(--brand-900);pointer-events:none;
-    animation:boot-veil 360ms var(--ease-out) 200ms both}
-  .boot img{width:clamp(128px,36vw,176px);height:auto;
-    animation:boot-mark 360ms var(--ease-out) 200ms both}
-  @keyframes boot-veil{to{opacity:0}}
-  /* Never from scale(0) and never to it: the mark is already the right size,
-     it only drifts forward as the screen opens. */
-  @keyframes boot-mark{from{transform:scale(1)}to{transform:scale(1.06)}}
+    background:var(--brand-900);
+    animation:boot-veil 420ms var(--ease-out) 2460ms both}
+  /* 240px caps it below the artwork's own 780px even on a 3x screen, so the
+     mark is always being scaled down and never stretched. */
+  .boot svg{width:min(62vw,240px);height:auto}
+  .boot .word{opacity:0;animation:boot-settle 460ms var(--ease-out) 2051ms both}
+  .boot path{stroke-dasharray:1;stroke-dashoffset:1}
+  @keyframes boot-draw{to{stroke-dashoffset:0}}
+  @keyframes boot-settle{to{opacity:1}}
+  /* visibility is the part that matters: opacity alone would leave an
+     invisible sheet over the whole app swallowing every tap. */
+  @keyframes boot-veil{0%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
 
-  /* Reduced motion keeps the fade — it still explains that one screen is
-     becoming another — and drops the movement. */
+  /* Two pen speeds. The long sweeps of a nib ease in and out; the dots and
+     short marks are quick and land flat. */
+  .boot .k0{animation:boot-draw 126ms cubic-bezier(0.42,0,0.35,1) 0ms both}
+  .boot .k1{animation:boot-draw 174ms cubic-bezier(0.42,0,0.35,1) 111ms both}
+  .boot .k2{animation:boot-draw 55ms cubic-bezier(0.32,0,0.28,1) 264ms both}
+  .boot .k3{animation:boot-draw 55ms cubic-bezier(0.32,0,0.28,1) 312ms both}
+  .boot .k4{animation:boot-draw 210ms cubic-bezier(0.42,0,0.35,1) 361ms both}
+  .boot .k5{animation:boot-draw 158ms cubic-bezier(0.42,0,0.35,1) 545ms both}
+  .boot .k6{animation:boot-draw 58ms cubic-bezier(0.3,0,0.4,1) 812ms both}
+  .boot .k7{animation:boot-draw 58ms cubic-bezier(0.3,0,0.4,1) 908ms both}
+  .boot .k8{animation:boot-draw 58ms cubic-bezier(0.3,0,0.4,1) 1004ms both}
+  .boot .k9{animation:boot-draw 106ms cubic-bezier(0.32,0,0.28,1) 1157ms both}
+  .boot .k10{animation:boot-draw 55ms cubic-bezier(0.32,0,0.28,1) 1250ms both}
+  .boot .k11{animation:boot-draw 68ms cubic-bezier(0.32,0,0.28,1) 1299ms both}
+  .boot .k12{animation:boot-draw 99ms cubic-bezier(0.32,0,0.28,1) 1359ms both}
+  .boot .k13{animation:boot-draw 102ms cubic-bezier(0.32,0,0.28,1) 1446ms both}
+  .boot .k14{animation:boot-draw 97ms cubic-bezier(0.32,0,0.28,1) 1535ms both}
+  .boot .k15{animation:boot-draw 143ms cubic-bezier(0.42,0,0.35,1) 1621ms both}
+  .boot .k16{animation:boot-draw 58ms cubic-bezier(0.3,0,0.4,1) 1873ms both}
+
+  /* Reduced motion gets no writing at all — a stroke crossing the screen is
+     exactly the kind of movement the setting is asking us to stop. The whole
+     mark is simply there, and the veil lifts. */
   @media (prefers-reduced-motion: reduce){
-    .boot{animation-duration:200ms;animation-delay:120ms}
-    .boot img{animation:none}
+    .boot{animation-duration:200ms;animation-delay:420ms}
+    .boot path{stroke-dashoffset:0}
+    .boot .word{opacity:1}
+    .boot path,.boot .word{animation:none}
   }
 
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,187,99,.5)}70%{box-shadow:0 0 0 7px rgba(220,187,99,0)}100%{box-shadow:0 0 0 0 rgba(220,187,99,0)}}
@@ -1884,12 +1920,61 @@
 </style>
 </head>
 <body>
-  <!-- Matches the native splash exactly: same artwork, same background. See
-       .boot above. aria-hidden because it says nothing a screen reader needs —
-       the page behind it is already the real one. -->
+  <!-- The opening. Same artwork and same background as the native splash, so
+       the handover from Android's own splash to this is invisible; see .boot
+       above for how the writing works. aria-hidden because it says nothing a
+       screen reader needs — the page behind it is already the real one, and
+       the name it writes is in the <h1> below. -->
   <div class="boot" aria-hidden="true">
-    <img src="logo-cream.png" alt="" width="139" height="100">
+    <svg viewBox="0 0 780 552" xmlns="http://www.w3.org/2000/svg" focusable="false">
+      <defs>
+        <!-- The stroke order of the hand: each word's body, then its dots.
+             stroke-width is deliberately wider than the calligraphy so the
+             mask clears the whole thickness of the letter as it passes. -->
+        <mask id="bootInk" maskUnits="userSpaceOnUse" x="0" y="0" width="780" height="300">
+          <g fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+      <path class="k0" pathLength="1" d="M642.0,178.0 L639.0,188.0 L633.0,194.0 L622.0,200.0 L590.0,209.0 L544.0,212.0 L538.0,208.0 L520.0,205.0 L511.0,198.0"/>
+      <path class="k1" pathLength="1" d="M642.0,175.0 L637.0,164.0 L623.0,155.0 L600.0,158.0 L580.0,170.0 L565.0,171.0 L570.0,137.0 L569.0,89.0 L565.0,48.0 L565.0,32.0 L567.0,29.0"/>
+      <path class="k2" pathLength="1" d="M577.0,36.0 L566.0,26.0 L567.0,2.0"/>
+      <path class="k3" pathLength="1" d="M565.0,173.0 L545.0,192.0 L539.0,207.0"/>
+      <path class="k4" pathLength="1" d="M509.0,199.0 L499.0,200.0 L468.0,214.0 L421.0,227.0 L350.0,236.0 L307.0,234.0 L261.0,227.0 L212.0,209.0"/>
+      <path class="k5" pathLength="1" d="M210.0,189.0 L212.0,208.0 L198.0,214.0 L186.0,216.0 L179.0,214.0 L172.0,203.0 L171.0,183.0 L168.0,176.0 L162.0,177.0 L148.0,186.0 L140.0,187.0 L134.0,184.0 L136.0,174.0 L146.0,164.0 L156.0,157.0 L168.0,153.0 L165.0,131.0"/>
+      <path class="k6" pathLength="1" d="M507.0,247.0 L501.0,245.0 L485.0,248.0"/>
+      <path class="k7" pathLength="1" d="M223.0,247.0 L222.0,248.0"/>
+      <path class="k8" pathLength="1" d="M143.0,100.0 L150.0,98.0 L154.0,101.0 L156.0,99.0 L171.0,98.0"/>
+      <path class="k9" pathLength="1" d="M517.0,107.0 L515.0,90.0 L504.0,79.0 L499.0,78.0 L490.0,80.0 L483.0,86.0 L481.0,101.0 L467.0,114.0 L456.0,117.0 L445.0,110.0"/>
+      <path class="k10" pathLength="1" d="M517.0,108.0 L515.0,111.0 L504.0,113.0 L482.0,101.0"/>
+      <path class="k11" pathLength="1" d="M446.0,94.0 L445.0,109.0 L425.0,116.0 L415.0,109.0 L418.0,96.0"/>
+      <path class="k12" pathLength="1" d="M415.0,110.0 L409.0,111.0 L402.0,116.0 L392.0,117.0 L375.0,101.0 L368.0,99.0 L333.0,117.0 L328.0,125.0"/>
+      <path class="k13" pathLength="1" d="M409.0,146.0 L367.0,145.0 L358.0,136.0 L334.0,133.0 L327.0,125.0 L308.0,123.0"/>
+      <path class="k14" pathLength="1" d="M366.0,145.0 L360.0,153.0 L355.0,155.0 L327.0,162.0 L310.0,162.0 L298.0,155.0 L292.0,147.0 L290.0,139.0 L284.0,133.0"/>
+      <path class="k15" pathLength="1" d="M272.0,67.0 L284.0,104.0 L285.0,129.0 L282.0,134.0 L277.0,135.0 L268.0,145.0 L251.0,156.0 L240.0,159.0 L229.0,158.0 L218.0,145.0 L219.0,117.0"/>
+      <path class="k16" pathLength="1" d="M366.0,186.0 L365.0,186.0"/>
+          </g>
+        </mask>
+        <!-- The Latin band, which is not written — it settles in afterwards. -->
+        <clipPath id="bootBelow"><rect x="0" y="300" width="780" height="252"/></clipPath>
+      </defs>
+      <image href="logo-cream.png" width="780" height="552" mask="url(#bootInk)"/>
+      <image href="logo-cream.png" width="780" height="552" clip-path="url(#bootBelow)" class="word"/>
+    </svg>
   </div>
+  <script>
+  /* A tap gets you past the writing. The CSS above already clears the layer on
+     its own and still would if this never ran — this only lets someone who has
+     opened the app a hundred times skip to the end. Consuming the tap here is
+     deliberate: the layer is opaque, so a tap that fell through to the app
+     underneath would hit something the person cannot see. */
+  (function(){
+    var b = document.querySelector(".boot");
+    if (!b) return;
+    b.addEventListener("pointerdown", function(){
+      b.style.animation = "none";
+      b.style.opacity = "0";
+      b.style.visibility = "hidden";
+    }, { once: true, passive: true });
+  })();
+  </script>
 
   <div class="topbar">
     <h1 class="vh" data-i18n="a11y.taiyabah_masjid">Taiyabah Masjid</h1>
