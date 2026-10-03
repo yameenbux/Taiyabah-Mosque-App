@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "e55f44b541a7",
+ "version": "1231fb95ea87",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -62,8 +62,6 @@ window.LANG_PACK = {
   "sysprefs.done": "تم",
   "sysprefs.language": "اللغة",
   "sysprefs.choose_the_language_the_app": "اختر اللغة التي يعمل بها التطبيق. تُنزَّل الحزم مرة واحدة ثم تعمل دون اتصال.",
-  "sysprefs.translations_not_yet_reviewed": "لم تُراجَع الترجمات بعد",
-  "sysprefs.the_urdu_gujarati_and_arabic": "تغطي حزم الأردية والغوجراتية والعربية التطبيق كاملًا الآن، بما في ذلك الأدعية والأذكار وأسماء السور. أما العناوين البريدية وأرقام الهواتف والبريد الإلكتروني وعناوين المواقع فتبقى بالحروف اللاتينية كي تظل صالحة للاستعمال. ولم يراجعها بعدُ ناطق أصلي — فيرجى عرضها على الإمام وعلى أحد أبناء الجالية قبل الإطلاق.",
   "quran.surahs": "← السور",
   "quran.qur_an": "القرآن",
   "quran.done": "تم",
