@@ -13,7 +13,7 @@ export function Portal() {
   return (
     <Screen pad={false}>
       <Hero lines={[
-        { k: "menu.madrasah_portal", t: "Madrasah Portal", w: "title" },
+        { k: "portals.madrasah_portal", t: "Madrasah Portal", w: "title" },
         { k: "portal.sub", t: "Registers, pupil records and fees", w: "sub" },
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
@@ -25,7 +25,7 @@ export function Portal() {
         </Card>
         <CTA label={t("portal.open", "Open the portal")} href="https://taiyabahwebsite.ysbdesigns.uk/portal/" />
         <RowGroup>
-          <NavRow icon="call-outline" label={t("adm.ring_the_office", "Ring the office")}
+          <NavRow icon="call-outline" label={t("nikah.ring_the_office", "Ring the office")}
                   sub="01204 535 997 · 5pm to 7pm" href="tel:01204535997" />
         </RowGroup>
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
@@ -38,7 +38,7 @@ export function Privacy() {
   const { t } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "menu.privacy_notice", t: "Privacy notice", w: "title" }]} />
+      <Hero lines={[{ k: "privacy.privacy_notice", t: "Privacy notice", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
         <Card>
           <P>{t("privacy.body",

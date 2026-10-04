@@ -40,8 +40,8 @@ export default function Zakat() {
   return (
     <Screen pad={false}>
       <Hero lines={[
-        { k: "zakat.charity_does_not_decrease", t: "“Charity does not decrease wealth.”", w: "title" },
-        { k: "zakat.the_prophet_sahih_muslim", t: "The Prophet ﷺ · Ṣaḥīḥ Muslim 2588", w: "sub" },
+        { k: "zakat.charity_does_not_decrease_wealth", t: "“Charity does not decrease wealth.”", w: "title" },
+        { k: "zakat.the_prophet_sahih_muslim_2588", t: "The Prophet ﷺ · Ṣaḥīḥ Muslim 2588", w: "sub" },
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
 
@@ -50,7 +50,7 @@ export default function Zakat() {
           "Nisab is the minimum you must own before zakat is due. It is fixed in gold and silver, so it moves with the price.")}</P>
 
         <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
-          {[["silver", `${t("zakat.silver", "Silver")} · 612.36g`], ["gold", `${t("zakat.gold", "Gold")} · 87.48g`]].map(([k, lab]) => {
+          {[["silver", `${t("sheet.silver", "Silver")} · 612.36g`], ["gold", `${t("sheet.gold", "Gold")} · 87.48g`]].map(([k, lab]) => {
             const on = standard === k;
             return (
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
@@ -61,8 +61,10 @@ export default function Zakat() {
               </Pressable>);
           })}
         </View>
+        <View style={{ marginTop: 10 }}>
         <Note>{t("zakat.most_scholars_silver",
           "Most scholars prefer the silver standard, because it is lower and so more people qualify to give.")}</Note>
+        </View>
 
         <Field label={t("zakat.price_per_gram_today", `Price per gram of ${standard} today (£)`)}
                value={price} onChange={x => setPrice(x.replace(/[^0-9.]/g, ""))} />
@@ -78,7 +80,7 @@ export default function Zakat() {
         <Card>
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
             {out.nisab === null
-              ? t("zakat.enter_todays_price_to_see", "Enter today's price to see the nisab")
+              ? t("zakat.enter_today_s_price_to", "Enter today's price to see the nisab")
               : `${t("zakat.nisab_is", "Nisab is")} ${money(out.nisab)}`}
           </Text>
         </Card>
@@ -87,17 +89,19 @@ export default function Zakat() {
         <Field label={t("zakat.cash_at_home_bank_savings", "Cash — at home, bank, savings (£)")} value={v.cash} onChange={x => set("cash", x)} />
         <Field label={t("zakat.gold_you_own_grams", "Gold you own (grams)")} value={v.gold} onChange={x => set("gold", x)} />
         <Field label={t("zakat.silver_you_own_grams", "Silver you own (grams)")} value={v.silver} onChange={x => set("silver", x)} />
-        <Field label={t("zakat.money_owed_to_you", "Money owed to you that you expect back (£)")} value={v.owed} onChange={x => set("owed", x)} />
-        <Field label={t("zakat.business_stock", "Business stock — goods bought to sell (£)")} value={v.stock} onChange={x => set("stock", x)} />
-        <Field label={t("zakat.shares_crypto", "Shares, crypto & other investments (£)")} value={v.invest} onChange={x => set("invest", x)} />
+        <Field label={t("zakat.money_owed_to_you_that", "Money owed to you that you expect back (£)")} value={v.owed} onChange={x => set("owed", x)} />
+        <Field label={t("zakat.business_stock_goods_bought_to", "Business stock — goods bought to sell (£)")} value={v.stock} onChange={x => set("stock", x)} />
+        <Field label={t("zakat.shares_crypto_other_investments", "Shares, crypto & other investments (£)")} value={v.invest} onChange={x => set("invest", x)} />
         {(n("gold") > 0 || n("silver") > 0) && !Number(price) && (
           <Warn>{t("zakat.gsnote",
             "Enter a price per gram above, or the gold and silver you own cannot be valued.")}</Warn>)}
 
         <Heading tag="3">{t("zakat.what_you_owe", "What you owe")}</Heading>
         <Field label={t("zakat.debts_and_bills_due_now", "Debts and bills due now (£)")} value={v.debts} onChange={x => set("debts", x)} />
-        <Note>{t("zakat.include_what_you_owe",
-          "Include what you owe right now — bills, rent, money borrowed.")}</Note>
+        <View style={{ marginTop: 9 }}>
+          <Note>{t("zakat.include_what_you_owe",
+            "Include what you owe right now — bills, rent, money borrowed.")}</Note>
+        </View>
 
         {/* The answer. Three lines of arithmetic shown so the figure can be
             checked rather than taken on trust. */}
@@ -138,11 +142,11 @@ export default function Zakat() {
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>
             {t("zakat.include_these", "Include these")}</Text>
           <Ticks items={[
-            { k: "zakat.cash_at_home_in_the_bank", t: "Cash at home, in the bank, or in any savings account" },
+            { k: "zakat.cash_at_home_in_the", t: "Cash at home, in the bank, or in any savings account" },
             { k: "zakat.money_you_are_saving_for", t: "Money you are saving for something, like a wedding, a car or Hajj" },
-            { k: "zakat.money_people_owe_you", t: "Money people owe you that you expect to get back" },
+            { k: "zakat.money_people_owe_you_that", t: "Money people owe you that you expect to get back" },
             { k: "zakat.goods_you_bought_in_order", t: "Goods you bought in order to sell them" },
-            { k: "zakat.shares_bought_to_trade", t: "Shares bought to trade, and cryptocurrency" },
+            { k: "zakat.shares_bought_to_trade_and", t: "Shares bought to trade, and cryptocurrency" },
           ]} />
         </Card>
 

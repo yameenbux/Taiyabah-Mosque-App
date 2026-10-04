@@ -11,8 +11,7 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, tap } from "../ui";
 import { dayFor, pretty, NAMES, ORDER, nextJamaah } from "../prayer";
-
-const DAYNAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+import { longDate, shortDate, hijri } from "../dates";
 
 export default function PrayerTimes({ navigation }) {
   const { t, fs, rtl } = useApp();
@@ -22,16 +21,16 @@ export default function PrayerTimes({ navigation }) {
   const next = offset === 0 ? nextJamaah(when) : null;
 
   const step = n => { tap(); setOffset(o => o + n); };
-  const label = offset === 0 ? t("times.today", "Today")
+  const label = offset === 0 ? t("app.today", "Today")
               : offset === 1 ? t("times.tomorrow", "Tomorrow")
               : offset === -1 ? t("times.yesterday", "Yesterday")
-              : `${DAYNAMES[when.getDay()]} ${when.getDate()} ${when.toLocaleDateString("en-GB", { month: "long" })}`;
+              : longDate(t, when);
 
   return (
     <Screen pad={false}>
       <Hero lines={[
         { t: t("nav.prayer_times", "Prayer times"), w: "title" },
-        { t: day ? day.hijri : "", w: "sub" },
+        { t: day ? hijri(t, day.hijri) : "", w: "sub" },
       ]}>
         {/* Day stepper. Inside the hero so the date and the times you are
             looking at never appear in two different places on the screen. */}
@@ -45,7 +44,7 @@ export default function PrayerTimes({ navigation }) {
                      borderWidth: 1, borderColor: "rgba(220,187,99,.4)", minWidth: 168, alignItems: "center" }}>
             <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.cream }}>{label}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)", marginTop: 1 }}>
-              {when.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              {`${shortDate(t, when)} ${when.getFullYear()}`}
             </Text>
           </Press>
           <Press onPress={() => step(1)} style={{ padding: 9, borderRadius: R.pill }}>
@@ -68,7 +67,7 @@ export default function PrayerTimes({ navigation }) {
                              paddingTop: 13, paddingBottom: 9 }}>
                 <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.2,
                                color: C.muted, textTransform: "uppercase" }}>
-                  {t("sheet.prayer", "Prayer")}</Text>
+                  {t("nikah.prayer", "Prayer")}</Text>
                 <Text style={{ width: 78, textAlign: "center", fontFamily: F.sans, fontSize: fs(10.5),
                                letterSpacing: 1.2, color: C.muted, textTransform: "uppercase" }}>
                   {t("sheet.begins", "Begins")}</Text>
@@ -110,7 +109,7 @@ export default function PrayerTimes({ navigation }) {
 
             {day.jummah && (
               <>
-                <Heading tag={t("sheet.friday", "Friday")}>{t("sheet.jummah", "Jumuʿah")}</Heading>
+                <Heading tag={t("sheet.friday", "Friday")}>{t("giving.jumuah", "Jumuʿah")}</Heading>
                 <Card gap={0} pad={0}>
                   {[["first", t("sheet.first_jummah", "First jamāʿah")],
                     ["second", t("sheet.second_jummah", "Second jamāʿah")]].map(([k, lab], i) =>
@@ -129,7 +128,7 @@ export default function PrayerTimes({ navigation }) {
         )}
 
         <RowGroup style={{ marginTop: 22 }}>
-          <NavRow icon="calendar-outline" label={t("sheet.full_timetable", "Full prayer timetable")}
+          <NavRow icon="calendar-outline" label={t("menu.timetable", "Full prayer timetable")}
                   sub={t("times.whole_year", "Every day of 2026, month by month")}
                   onPress={() => navigation.navigate("Timetable")} />
           <NavRow icon="notifications-outline" label={t("menu.notifications", "Notifications")}

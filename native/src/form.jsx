@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "./theme";
 import { useApp } from "./store";
 import { Card, Note, Pill, Press, CTA, tap } from "./ui";
+import { monthYear } from "./dates";
 
 /* Keyboards, so nobody types a phone number on a qwerty pad. */
 const KB = {
@@ -118,7 +119,7 @@ export function Calendar({ month, onMonth, selected = [], taken = [], first, las
           <Ionicons name="chevron-back" size={18} color={atStart ? C.line : C.brand600} />
         </Press>
         <Text style={{ fontFamily: F.display, fontSize: fs(15.5), color: C.ink }}>
-          {month.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</Text>
+          {monthYear(t, month)}</Text>
         <Press onPress={() => !atEnd && (tap(), onMonth(new Date(y, m + 1, 1)))} style={{ padding: 7 }}>
           <Ionicons name="chevron-forward" size={18} color={atEnd ? C.line : C.brand600} />
         </Press>

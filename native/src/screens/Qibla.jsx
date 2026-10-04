@@ -99,7 +99,7 @@ export default function Qibla() {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[{ t: t("sheet.qibla", "Qibla"), w: "title" },
+      <Hero lines={[{ t: t("tiles.qibla", "Qibla"), w: "title" },
                     { t: t("qibla.hold_flat", "Hold the phone flat and turn until the needle meets the mark."), w: "sub" }]} />
       <View style={{ paddingHorizontal: 16 }}>
         <View style={{ alignItems: "center", marginTop: 22 }}>
@@ -148,7 +148,7 @@ export default function Qibla() {
         <RowGroup style={{ marginTop: 24 }}>
           <KV k={t("sheet.bearing", "Bearing")} v={`${qibla.toFixed(1)}° ${t("qibla.true", "true")}`} />
           <KV k={t("qibla.distance", "Distance to the Kaʿbah")} v={`${Math.round(km).toLocaleString("en-GB")} km`} />
-          <KV k={t("qibla.measured_from", "Measured from")}
+          <KV k={t("sheet.measured_from", "Measured from")}
               v={from.mine ? t("qibla.your_location", "Your location") : t("about.taiyabah_masjid", "Taiyabah Masjid")} />
         </RowGroup>
 

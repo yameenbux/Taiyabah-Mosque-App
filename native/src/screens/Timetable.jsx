@@ -11,10 +11,10 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Hero, Press, Note, tap } from "../ui";
 import TT from "../data/timetable-2026.json";
+import { MON } from "../dates";
 import { pretty, NAMES } from "../prayer";
 
-const MONTHS = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"];
+const MONTHS = MON;
 const COLS = ["fajr", "zuhr", "asr", "maghrib", "isha"];
 
 export default function Timetable() {
@@ -37,8 +37,8 @@ export default function Timetable() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.paper }}>
-      <Hero lines={[{ t: `${MONTHS[m]} ${TT.year}`, w: "title" },
-                    { t: t("sheet.jamaah_times", "Jamāʿah times"), w: "sub" }]}>
+      <Hero lines={[{ t: `${t(`date.fullmon.${m}`, MONTHS[m])} ${TT.year}`, w: "title" },
+                    { t: t("sheet.jama_ah_times", "Jamāʿah times"), w: "sub" }]}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 14 }}>
           <Press onPress={() => step(-1)} style={{ padding: 9 }}>
             <Ionicons name="chevron-back" size={19} color={m === 0 ? "rgba(220,187,99,.3)" : C.goldBright} />
@@ -79,7 +79,7 @@ export default function Timetable() {
         contentContainerStyle={{ paddingBottom: 34 }}
         ListFooterComponent={
           <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 8 }}>
-            <Note>{t("times.source", `Source: ${TT.source}.`)}</Note>
+            <Note>{`${t("times.source", "Source")}: ${TT.source}`}</Note>
             <Note>{t("times.maghrib_note",
               "Maghrib jamāʿah is at the beginning time — the masjid prays it as it comes in.")}</Note>
           </View>}
@@ -96,7 +96,7 @@ export default function Timetable() {
               <View style={{ width: 34 }}>
                 <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>{date.getDate()}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(9), color: friday ? C.brand600 : C.muted }}>
-                  {date.toLocaleDateString("en-GB", { weekday: "short" }).slice(0, 3)}</Text>
+                  {t(`date.dow.${date.getDay()}`, ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()])}</Text>
               </View>
               {COLS.map(k => (
                 <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(12),

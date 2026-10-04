@@ -83,9 +83,12 @@ export default function HallHire({ navigation }) {
 
   const sheet = SHEETS.hallhire;
   const hero = sheet?.blocks.find(b => b.type === "hero");
-  /* The sheet's own prose stops short of the form: everything up to the booking
-   * heading is the masjid's description of the Centre and its charges. */
-  const prose = sheet?.blocks.filter(b => b.type !== "hero") || [];
+  /* The website's own "Book the hall" heading and its deposit notice are
+   * reproduced below, immediately above the form they introduce — so they are
+   * dropped here rather than appearing twice, once orphaned. */
+  const prose = (sheet?.blocks || []).filter(b =>
+    b.type !== "hero" && b.k !== "hallhire.book_the_hall" &&
+    !(b.type === "notice" && b.k === "hallhire.deposit_books_the_date"));
 
   if (state.sent)
     return (
@@ -96,7 +99,7 @@ export default function HallHire({ navigation }) {
               reference={state.reference}
               extra={
                 <View style={{ width: "100%", paddingHorizontal: 8 }}>
-                  <CTA label={t("hallhire.continue_to_the_deposit", "Continue to the deposit")}
+                  <CTA label={t("hallhire.continue_to_deposit", "Continue to the deposit")}
                        sub="£100 · Card · Apple Pay · Google Pay"
                        onPress={() => open(DEPOSIT_LINK +
                          (DEPOSIT_LINK.includes("?") ? "&" : "?") +
@@ -120,9 +123,9 @@ export default function HallHire({ navigation }) {
 
         <Choice label={t("hallhire.what_do_you_need", "What do you need?")} value={hire} onChange={setHire}
                 options={[
-                  { v: "halls1", t: t("hallhire.1_hall", "1 hall"), s: t("hallhire.mon_thu_only", "Mon–Thu only") },
-                  { v: "halls2", t: t("hallhire.2_halls", "2 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
-                  { v: "halls3", t: t("hallhire.3_halls", "3 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
+                  { v: "halls1", t: t("hallhire.one_hall", "1 hall"), s: t("hallhire.mon_thu_only", "Mon–Thu only") },
+                  { v: "halls2", t: t("hallhire.two_halls", "2 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
+                  { v: "halls3", t: t("hallhire.three_halls", "3 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
                   { v: "kitchen", t: t("hallhire.kitchen_only", "Kitchen only"), s: t("hallhire.no_halls", "No halls") },
                 ]} />
         {bad.hire && <ErrorBox>{t("hallhire.choose_what_you_need", "Please choose what you need.")}</ErrorBox>}
@@ -144,7 +147,7 @@ export default function HallHire({ navigation }) {
                onChange={v => setWho(s => ({ ...s, first: v }))} />
         <Field label={t("hallhire.surname", "Surname")} type="name" value={who.last} bad={bad.last}
                onChange={v => setWho(s => ({ ...s, last: v }))} />
-        <Field label={t("hallhire.address", "Address")} type="multi" value={who.addr} bad={bad.addr}
+        <Field label={t("nikah.address", "Address")} type="multi" value={who.addr} bad={bad.addr}
                onChange={v => setWho(s => ({ ...s, addr: v }))} />
         <Field label={t("hallhire.contact_number", "Contact number")} type="tel" value={who.phone} bad={bad.phone}
                hint={t("hallhire.the_caretaker_will_call_you",
@@ -152,7 +155,7 @@ export default function HallHire({ navigation }) {
                onChange={v => setWho(s => ({ ...s, phone: v }))} />
 
         <ErrorBox>{state.error}</ErrorBox>
-        <Submit label={t("hallhire.continue_to_the_deposit", "Continue to the deposit")}
+        <Submit label={t("hallhire.continue_to_deposit", "Continue to the deposit")}
                 sending={state.sending} onPress={send} />
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
       </View>

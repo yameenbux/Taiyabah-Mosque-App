@@ -69,7 +69,7 @@ export default function Advice({ navigation }) {
             <Notice>{t("advice.not_taking_written",
               "The masjid is not taking written questions at the moment.")}</Notice>
             <RowGroup>
-              <NavRow icon="call-outline" label={t("advice.ring_the_office", "Ring the office")}
+              <NavRow icon="call-outline" label={t("nikah.ring_the_office", "Ring the office")}
                       sub="01204 535 997 · 5pm to 7pm" href="tel:01204535997" />
               <NavRow icon="mail-outline" label={t("advice.or_write_to_them", "Or write to them")}
                       sub="info@taiyabahmasjid.com" href="mailto:info@taiyabahmasjid.com" />
@@ -80,7 +80,7 @@ export default function Advice({ navigation }) {
             <Heading>{t("advice.ask_a_question", "Ask a question")}</Heading>
             <Field label={t("advice.your_name", "Your name")} type="name" value={v.name} bad={bad.name}
                    onChange={x => setV(s => ({ ...s, name: x }))} />
-            <Field label={t("advice.contact_number", "Contact number")} type="tel" value={v.phone} bad={bad.phone}
+            <Field label={t("nikah.contact_number", "Contact number")} type="tel" value={v.phone} bad={bad.phone}
                    onChange={x => setV(s => ({ ...s, phone: x }))} />
             <Field label={t("advice.email", "Email")} type="email" value={v.email} bad={bad.email}
                    hint={t("advice.thats_where_the_answer_goes", "That is where the answer goes.")}

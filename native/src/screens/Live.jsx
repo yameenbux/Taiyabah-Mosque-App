@@ -6,7 +6,7 @@
  * some phones, which for a bayaan is the whole point lost.
  */
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Dimensions } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
@@ -51,7 +51,9 @@ export default function Live({ navigation }) {
 
   return (
     <Screen pad={false}>
-      <Hero tall lines={[]}>
+      {/* The player fills the screen the way a radio app does, rather than
+          sitting in a band at the top with nothing under it. */}
+      <Hero tall minHeight={Dimensions.get("window").height * 0.58} lines={[]}>
         <View style={{ alignItems: "center", gap: 14 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 7,
                          borderWidth: 1, borderColor: "rgba(243,239,227,.22)", borderRadius: R.pill,

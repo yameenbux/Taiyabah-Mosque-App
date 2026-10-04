@@ -91,5 +91,5 @@ export const Duas = () => (
 export const Rabbanas = () => {
   const { t } = useApp();
   const list = Array.isArray(RABBANAS) ? RABBANAS : (RABBANAS.items || RABBANAS.rabbanas || []);
-  return <Collection groups={[{ title: t("menu.rabbana_duas", "Forty Rabban\u0101 du\u02bf\u0101s"), data: list }]} />;
+  return <Collection groups={[{ title: t("athkar.the_forty_rabbana_du_as", "Forty Rabban\u0101 du\u02bf\u0101s"), data: list }]} />;
 };

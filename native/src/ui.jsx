@@ -111,7 +111,7 @@ export function Girih({ size = 190, color = "#FFFFFF", opacity = 0.035, style })
   );
 }
 
-export function Hero({ lines = [], children, tall }) {
+export function Hero({ lines = [], children, tall, minHeight }) {
   const { fs, tx, rtl } = useApp();
   const insets = useSafeAreaInsets();
   /* These screens draw their own hero behind the status bar, so they carry no
@@ -127,7 +127,8 @@ export function Hero({ lines = [], children, tall }) {
   return (
     <LinearGradient colors={[C.brand900, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       style={{ paddingTop: insets.top + (tall ? 30 : 18), paddingBottom: tall ? 32 : 24,
-               paddingHorizontal: 22, overflow: "hidden" }}>
+               paddingHorizontal: 22, overflow: "hidden",
+               minHeight, justifyContent: minHeight ? "center" : "flex-start" }}>
       <Girih style={{ right: -70, top: -62 }} size={215} />
       {canBack && (
         <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"

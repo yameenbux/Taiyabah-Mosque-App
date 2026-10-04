@@ -15,7 +15,7 @@ name: Native app (Android)
 # grows a real signing step using the same two secrets the web app's build
 # already uses. Until then it cannot touch the listing even by accident.
 #
-# WHAT COMES OUT. app-debug.apk, attached to the run. Download it, allow
+# WHAT COMES OUT. app-release.apk, attached to the run. Download it, allow
 # installs from the browser, open it. It sits alongside the Play version
 # rather than replacing it — different signing key, so Android treats them as
 # two apps, which is exactly what you want while comparing them.
@@ -41,6 +41,20 @@ jobs:
       - name: Install
         working-directory: native
         run: npm ci
+
+      # Eight minutes of Gradle is a long time to find out a screen has a typo
+      # in it. Every source file goes through the project's own Babel config
+      # first, which costs seconds and fails loudly.
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+
+      # Not fatal — a key with no pack entry reads in English rather than
+      # breaking — but it should be visible in the log rather than found on
+      # somebody's phone after they have switched to Urdu.
+      - name: Which strings are still English only
+        working-directory: native
+        run: node scripts/check-i18n.mjs | head -40
 
       # Expo generates the android/ project from app.json. It is not committed:
       # it is build output, and a stale copy in the repo is a whole class of

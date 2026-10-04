@@ -11,25 +11,26 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Card, Note, RowGroup, NavRow, Press, Pill, open, tap } from "../ui";
-import { dayFor, nextJamaah, countdown, pretty, NAMES, ORDER } from "../prayer";
+import { dayFor, nextJamaah, pretty, NAMES, ORDER } from "../prayer";
+import { countdown, shortDate, hijri } from "../dates";
 
 const TILES = [
-  { to: "Quran",     icon: "book",             k: "home.holy_quran",      t: "Holy Qurʼan" },
-  { to: "Athkar",    icon: "sunny",            k: "home.daily_adhkar",    t: "Daily Adhkār" },
-  { to: "Qibla",     icon: "compass",          k: "sheet.qibla",          t: "Qibla" },
+  { to: "Quran",     icon: "book",             k: "tiles.holy_quran",      t: "Holy Qurʼan" },
+  { to: "Athkar",    icon: "sunny",            k: "tiles.daily_adhkar",    t: "Daily Adhkār" },
+  { to: "Qibla",     icon: "compass",          k: "tiles.qibla",          t: "Qibla" },
   { to: "Live",      icon: "radio",            k: "home.listen_live",     t: "Listen live" },
-  { to: "Madrasah",  icon: "school",           k: "menu.madrasah",        t: "Madrasah" },
-  { to: "Marriage",  icon: "heart",            k: "home.nikah_services",  t: "Nikāḥ Services" },
-  { to: "Funeral",   icon: "flower",           k: "home.funeral_services",t: "Funeral Services" },
-  { to: "HallHire",  icon: "business",         k: "home.hall_booking",    t: "Hall Booking" },
-  { to: "Zakat",     icon: "calculator",       k: "menu.zakat_calculator",t: "Zakat calculator" },
-  { to: "Giving",    icon: "gift",             k: "home.sadaqah_lillah",  t: "Sadaqah & Lillah" },
-  { to: "Bukhari",   icon: "library",          k: "home.sahih_al_bukhari",t: "Ṣaḥīḥ al-Bukhārī" },
-  { to: "Collect",   icon: "people",           k: "home.charity_collections", t: "Charity Collections" },
+  { to: "Madrasah",  icon: "school",           k: "a11y.madrasah",        t: "Madrasah" },
+  { to: "Marriage",  icon: "heart",            k: "tiles.nikah_services",  t: "Nikāḥ Services" },
+  { to: "Funeral",   icon: "flower",           k: "a11y.funeral_services",t: "Funeral Services" },
+  { to: "HallHire",  icon: "business",         k: "tiles.hall_booking",    t: "Hall Booking" },
+  { to: "Zakat",     icon: "calculator",       k: "menu.zakat",t: "Zakat calculator" },
+  { to: "Giving",    icon: "gift",             k: "giving.sadaqah_lillah",  t: "Sadaqah & Lillah" },
+  { to: "Bukhari",   icon: "library",          k: "tiles.hadith",t: "Ṣaḥīḥ al-Bukhārī" },
+  { to: "Collect",   icon: "people",           k: "a11y.charity_collections", t: "Charity Collections" },
 ];
 
 export default function Home({ navigation }) {
-  const { t, fs } = useApp();
+  const { t, fs, rtl } = useApp();
   const top = useSafeAreaInsets().top;
   const [now, setNow] = useState(new Date());
 
@@ -58,11 +59,13 @@ export default function Home({ navigation }) {
   return (
     <Screen pad={false}>
       <LinearGradient colors={[C.brand900, C.brand800, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        style={{ paddingTop: top + 12, paddingHorizontal: 18, paddingBottom: 24, overflow: "hidden" }}>
+        style={{ paddingTop: top + 12, paddingHorizontal: 18, paddingBottom: 24, overflow: "hidden",
+                 alignItems: rtl ? "flex-end" : "flex-start" }}>
         <Girih style={{ right: -74, top: -18 }} size={250} />
 
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <View>
+        <View style={{ alignSelf: "stretch", flexDirection: rtl ? "row-reverse" : "row",
+                       alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ alignItems: rtl ? "flex-end" : "flex-start" }}>
             {["BOLTON CENTRAL", "ISLAMIC SOCIETY"].map(l => (
               <Text key={l} style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.7,
                                      color: C.cream }}>{l}</Text>))}
@@ -84,8 +87,7 @@ export default function Home({ navigation }) {
                        paddingHorizontal: 12, paddingVertical: 6, marginTop: 6 }}>
           <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.goldBright }} />
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "#D0BFCA" }}>
-            {now.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
-            {day ? ` · ${day.hijri}` : ""}
+            {shortDate(t, now)}{day ? ` · ${hijri(t, day.hijri)}` : ""}
           </Text>
         </View>
 
@@ -93,8 +95,8 @@ export default function Home({ navigation }) {
           <>
             <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.5,
                            color: C.goldBright, marginTop: 22 }}>
-              {t("home.next_jamaah", "NEXT JAMĀʿAH").toUpperCase()}</Text>
-            <View style={{ flexDirection: "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
+              {t("app.next_jama_ah", "NEXT JAMĀʿAH").toUpperCase()}</Text>
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(29), color: C.cream }}>
                 {t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>{NAMES[next.key].ar}</Text>
@@ -102,20 +104,22 @@ export default function Home({ navigation }) {
             <Text style={{ fontFamily: F.sansMedium, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
               {pretty(next.at)}</Text>
 
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
+                           marginTop: 10, flexWrap: "wrap" }}>
               <View style={{ borderWidth: 1, borderColor: "rgba(220,187,99,.45)", borderRadius: R.pill,
                              paddingHorizontal: 13, paddingVertical: 6 }}>
                 <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.goldBright }}>
-                  {countdown(next.minutesAway)}</Text>
+                  {countdown(t, next.minutesAway)}</Text>
               </View>
               <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "#D0BFCA" }}>
-                {t("home.beginning_time", "Beginning time")}{" "}
+                {t("sheet.beginning_times", "Beginning time")}{" "}
                 <Text style={{ fontFamily: F.sansMedium, color: "#fff" }}>{pretty(next.begins)}</Text>
                 {next.tomorrow ? ` · ${t("times.tomorrow", "tomorrow")}` : ""}
               </Text>
             </View>
 
-            <View style={{ height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,.14)", marginTop: 16 }}>
+            <View style={{ alignSelf: "stretch", height: 4, borderRadius: 2,
+                       backgroundColor: "rgba(255,255,255,.14)", marginTop: 16 }}>
               <View style={{ height: 4, borderRadius: 2, width: `${gap * 100}%`, backgroundColor: C.goldBright }} />
             </View>
           </>
@@ -135,27 +139,27 @@ export default function Home({ navigation }) {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <Pill tone="gold">{t("sheet.friday", "Friday")}</Pill>
               <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.goldInk }}>
-                {t("sheet.jummah", "Jumuʿah")} {pretty(day.jummah.first)}
+                {t("giving.jumuah", "Jumuʿah")} {pretty(day.jummah.first)}
                 {day.jummah.second ? ` · ${pretty(day.jummah.second)}` : ""}</Text>
             </View>
             <Text style={{ fontFamily: F.arabic, fontSize: fs(15), lineHeight: fs(26), color: "#5E4A12" }}>
-              {t("home.the_best_day_on_which",
+              {t("app.the_best_day_on_which",
                 "“The best day on which the sun has risen is Friday.” — Ṣaḥīḥ Muslim 854")}</Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
               <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
-                {t("home.give_this_jumuah", "Give this Jumuʿah")}</Text>
+                {t("app.give_this_jumu_ah", "Give this Jumuʿah")}</Text>
               <Ionicons name="chevron-forward" size={14} color={C.brand600} />
             </View>
           </Press>)}
 
         {/* Today's five, at a glance. */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: friday && day?.jummah ? 20 : 0 }}>
-          <Text style={{ fontFamily: F.display, fontSize: fs(19), color: C.ink }}>{t("sheet.today", "Today")}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: fs(19), color: C.ink }}>{t("home.today", "Today")}</Text>
           <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
           <Press onPress={() => navigation.navigate("Timetable")}
             style={{ flexDirection: "row", alignItems: "center", gap: 3, paddingVertical: 4, paddingHorizontal: 2 }}>
             <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.brand600 }}>
-              {t("sheet.full_timetable", "Full timetable")}</Text>
+              {t("menu.timetable", "Full timetable")}</Text>
             <Ionicons name="chevron-forward" size={13} color={C.brand600} />
           </Press>
         </View>
@@ -194,9 +198,9 @@ export default function Home({ navigation }) {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(16), color: C.cream }}>
-                {t("sheet.support_the_new_taiyabah", "Support the new Taiyabah Masjid")}</Text>
+                {t("app.support_the_new_taiyabah_masjid", "Support the new Taiyabah Masjid")}</Text>
               <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "rgba(243,239,227,.7)", marginTop: 2 }}>
-                {t("sheet.current_appeal", "Current appeal · Phase 3.3")}</Text>
+                {t("sheet.current_appeal_phase_3_3", "Current appeal · Phase 3.3")}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={C.goldBright} />
           </LinearGradient>
@@ -226,7 +230,7 @@ export default function Home({ navigation }) {
         </View>
 
         <RowGroup style={{ marginTop: 18 }}>
-          <NavRow icon="logo-whatsapp" tone="gold" label={t("home.join_whatsapp", "Join WhatsApp")}
+          <NavRow icon="logo-whatsapp" tone="gold" label={t("tiles.join_whatsapp", "Join WhatsApp")}
                   sub={t("home.whatsapp_sub", "Announcements from the masjid office")}
                   href="https://chat.whatsapp.com/" />
         </RowGroup>
@@ -235,7 +239,7 @@ export default function Home({ navigation }) {
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
             Bolton Central Islamic Society · Registered charity 1041569</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.line }}>
-            {t("home.powered_by", "Powered by")} MasjidOne</Text>
+            {t("sheet.app_built_by", "Powered by")} MasjidOne</Text>
         </View>
       </View>
     </Screen>

@@ -57,7 +57,7 @@ const icon = name => ({ color, focused }) =>
   <Ionicons name={focused ? name : `${name}-outline`} size={23} color={color} />;
 
 function Tabs() {
-  const { t, fs } = useApp();
+  const { t, fs, rtl } = useApp();
   return (
     <Tab.Navigator
       screenListeners={{ tabPress: tick }}
@@ -65,8 +65,13 @@ function Tabs() {
         headerShown: false,
         tabBarActiveTintColor: C.brand600,
         tabBarInactiveTintColor: C.muted,
-        tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6, height: 64 },
-        tabBarLabelStyle: { fontFamily: F.sans, fontSize: fs(10.5), marginBottom: 7 },
+        tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6,
+                       /* Urdu and Arabic glyphs hang well below the baseline; at
+                          the Latin height their descenders are sliced off. */
+                       height: rtl ? 74 : 64 },
+        tabBarLabelStyle: { fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
+                            lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
+                            includeFontPadding: false },
         sceneContainerStyle: { backgroundColor: C.paper },
       }}>
       <Tab.Screen name="HomeTab"    component={Home}        options={{ title: t("nav.home", "Home"), tabBarIcon: icon("home") }} />
@@ -107,11 +112,11 @@ function Root() {
                                                                        headerStyle: { backgroundColor: "#15060F" },
                                                                        headerTintColor: C.goldBright,
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
-        <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("home.sahih_al_bukhari", "Ṣaḥīḥ al-Bukhārī") }} />
+        <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("tiles.hadith", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
-        <Stack.Screen name="Athkar"   component={Athkar}   options={{ ...pushed, title: t("home.daily_adhkar", "Daily Adhkār") }} />
-        <Stack.Screen name="Duas"     component={Duas}     options={{ ...pushed, title: t("menu.everyday_duas", "Everyday duʿās") }} />
-        <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("menu.rabbana_duas", "40 Rabbanā duʿās") }} />
+        <Stack.Screen name="Athkar"   component={Athkar}   options={{ ...pushed, title: t("tiles.daily_adhkar", "Daily Adhkār") }} />
+        <Stack.Screen name="Duas"     component={Duas}     options={{ ...pushed, title: t("duas.everyday_du_as", "Everyday duʿās") }} />
+        <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("athkar.the_forty_rabbana_du_as", "40 Rabbanā duʿās") }} />
 
         {/* the masjid */}
         <Stack.Screen name="Qibla"     component={Qibla}     options={bare} />

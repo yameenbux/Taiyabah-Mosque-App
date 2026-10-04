@@ -23,7 +23,7 @@ export default function Prefs({ navigation }) {
   const { t, fs, lang, setLang, scale, setScale } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "menu.system_preferences", t: "Display & language", w: "title" }]} />
+      <Hero lines={[{ k: "sysprefs.display_language", t: "Display & language", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
         <Heading>{t("sysprefs.language", "Language")}</Heading>
@@ -37,8 +37,12 @@ export default function Prefs({ navigation }) {
                          borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{l.name}</Text>
-                  <Text style={{ fontFamily: l.code === "en" ? F.sans : F.arabic,
-                                 fontSize: fs(l.code === "en" ? 12 : 15), color: C.muted, marginTop: 2 }}>
+                  {/* Amiri is an Arabic face — it carries Urdu, but it has no
+                      Gujarati at all, so that one stays in the sans. */}
+                  <Text style={{ fontFamily: l.code === "ar" || l.code === "ur" ? F.arabic : F.sans,
+                                 fontSize: fs(l.code === "en" ? 12 : 15), color: C.muted, marginTop: 2,
+                                 textAlign: "left", alignSelf: "flex-start",
+                                 writingDirection: l.code === "ar" || l.code === "ur" ? "rtl" : "ltr" }}>
                     {l.native}</Text>
                 </View>
                 {l.code !== "en" && <Pill>{t("sysprefs.not_yet_reviewed", "Being reviewed")}</Pill>}
@@ -78,14 +82,14 @@ export default function Prefs({ navigation }) {
 
         <Heading>{t("sysprefs.about_this_app", "About this app")}</Heading>
         <RowGroup>
-          <NavRow icon="shield-checkmark-outline" label={t("menu.privacy_notice", "Privacy notice")}
+          <NavRow icon="shield-checkmark-outline" label={t("privacy.privacy_notice", "Privacy notice")}
                   onPress={() => navigation.navigate("Privacy")} />
           <NavRow icon="information-circle-outline" label={t("about.about_us", "About us")}
                   onPress={() => navigation.navigate("About")} />
         </RowGroup>
         <View style={{ marginTop: 14, alignItems: "center", gap: 3 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
-            Taiyabah Masjid · {t("sysprefs.version", "Version")} 1.0.0</Text>
+            Taiyabah Masjid · {t("collect.version", "Version")} 1.0.0</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
             Bolton Central Islamic Society · Registered charity 1041569</Text>
         </View>

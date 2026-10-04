@@ -67,6 +67,18 @@ const out = await page.evaluate(ids => {
 
   /* A text-bearing leaf: keep the key beside the English so a language pack
    * can replace it, and keep the English so a missing key still reads. */
+  const isForm = el => {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName.toLowerCase();
+    if (/^(input|textarea|select|form|label|option)$/.test(tag)) return true;
+    /* A panel that holds a form control IS the form — drop it whole. A plain
+     * wrapper that happens to contain one further down is not, or every sheet
+     * with a form anywhere in it would come back empty. */
+    const names = (el.className || "") + " " + (el.id || "");
+    return !!el.querySelector("input,textarea,select") &&
+           (/(^|\s)card(\s|$)/.test(el.className || "") ||
+            /form|panel|-pay|-field|-btns|-agree|-upload/.test(names));
+  };
   const str = el => { const k = KEY(el); const t = txt(el); return k ? { k, t } : { t }; };
 
   function walk(el, blocks) {
@@ -74,9 +86,10 @@ const out = await page.evaluate(ids => {
       const tag = c.tagName.toLowerCase();
 
       if (tag === "svg" || tag === "script" || tag === "style") continue;
-      /* A hidden panel full of inputs is a form the app reveals later — those are
-       * hand-written natively. Hidden PROSE is still content and comes across. */
-      if (c.hasAttribute("hidden") && c.querySelector("input,textarea,select,form")) continue;
+      /* Every form in this app is hand-written native, so the markup for one is
+       * not content. (The `hidden` attribute is no help: these panels are
+       * revealed by script, and the DOM we read has already lost it.) */
+      if (isForm(c)) continue;
 
       /* heroes ------------------------------------------------------------ */
       if (tag === "section" && /-hero$/.test(c.className.split(" ").find(x => /-hero$/.test(x)) || "")) {
@@ -141,8 +154,8 @@ const out = await page.evaluate(ids => {
         /* a plain list-of-divs card, e.g. the founders */
         const divs = [...c.children].filter(x => x.tagName === "DIV" && !x.children.length ||
                                                 (x.tagName === "DIV" && [...x.children].every(y => y.tagName === "SPAN")));
-        const anyKV = divs.some(d => d.querySelector('[class$="-k"], :scope > .k') &&
-                                     d.querySelector('[class*="-v"], :scope > .v'));
+        const anyKV = divs.some(d => d.querySelector('[class$="-k"], :scope > .k, :scope > .n') &&
+                                     d.querySelector('[class*="-v"], :scope > .v, :scope > .p'));
         if (divs.length >= 3 && divs.length === c.children.length && !anyKV) {
           inner.push(node("list", {
             items: divs.map(d => {
@@ -166,6 +179,14 @@ const out = await page.evaluate(ids => {
             return t1 ? { ...str(t1), sub: t2 ? str(t2) : null } : str(k);
           }),
         }));
+        continue;
+      }
+
+      /* a legal advisory: a headline and the warning under it ------------- */
+      if (/-advisory$/.test(c.className)) {
+        const h = c.querySelector('[class$="-adv-h"], h3, h4');
+        blocks.push(node("advisory", { h: h ? str(h) : null,
+          ps: [...c.querySelectorAll("p")].map(str).filter(x => x.t) }));
         continue;
       }
 
@@ -205,9 +226,9 @@ const out = await page.evaluate(ids => {
       }
 
       /* a key/value row: Address, Telephone, Email, Website, Radio … ------ */
-      if (/(^|\s)[a-z]+-(row|r)(\s|$)/.test(c.className)) {
-        const k = c.querySelector('[class$="-k"], :scope > .k, :scope > * > .k');
-        const v = c.querySelector('[class*="-v"], :scope > .v, :scope > * > .v');
+      if (/(^|\s)[a-z-]*-(row|line|r)(\s|$)/.test(c.className)) {
+        const k = c.querySelector('[class$="-k"], :scope > .k, :scope > * > .k, :scope > .n');
+        const v = c.querySelector('[class*="-v"], :scope > .v, :scope > * > .v, :scope > .p');
         if (k && v) {
           const href = c.getAttribute("href") || null;
           blocks.push(node("kv", {
@@ -260,6 +281,12 @@ const out = await page.evaluate(ids => {
         blocks.push(node("foot", { lines: txt(c).split("\n").filter(Boolean) })); continue;
       }
 
+      /* a term: a bold line that titles the paragraph under it ------------ */
+      if (/(^|\s)[a-z-]*-term(\s|$)/.test(c.className)) {
+        const b = c.querySelector("b,strong"), ps = [...c.querySelectorAll("p")].map(str).filter(x => x.t);
+        if (b) { blocks.push(node("sub", str(b))); ps.forEach(x => blocks.push(node("note", x))); continue; }
+      }
+
       /* plain prose ------------------------------------------------------- */
       if (tag === "p") {
         const t = txt(c); if (!t) continue;
@@ -267,7 +294,7 @@ const out = await page.evaluate(ids => {
         blocks.push(node(/note$/.test(cls) || /hint/.test(cls) ? "note" : "p", str(c)));
         continue;
       }
-      if (/^h[1-6]$/.test(tag)) { blocks.push(node("sub", str(c))); continue; }
+      if (/^h[1-6]$/.test(tag) || tag === "b" || tag === "strong") { blocks.push(node("sub", str(c))); continue; }
 
       if (tag === "a") {
         blocks.push(node("link", { ...str(c), href: c.getAttribute("href") })); continue;

@@ -14,6 +14,7 @@ import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Foot } 
 import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { dayFor } from "../prayer";
+import { longDate } from "../dates";
 import { SHEETS, Blocks } from "../Blocks";
 
 const NOTICE_DAYS = 14;        // the masjid needs a fortnight
@@ -181,7 +182,7 @@ export default function Marriage({ navigation }) {
                         }} />)}
             <View style={{ marginTop: 9 }}>
               <Note>{d1
-                ? `${t("nikah.1st_choice_2", "1st choice")}: ${pretty(d1)}${d2 ? ` · ${t("nikah.2nd_choice_2", "2nd choice")}: ${pretty(d2)}` : ""}`
+                ? `${t("nikah.1st_choice_2", "1st choice")}: ${prettyIn(t, d1)}${d2 ? ` · ${t("nikah.2nd_choice_2", "2nd choice")}: ${prettyIn(t, d2)}` : ""}`
                 : t("nikah.not_chosen", "Not chosen")}</Note>
             </View>
             {bad.date && <ErrorBox>{t("nikah.pick_a_date", "Please pick a date.")}</ErrorBox>}
@@ -252,8 +253,8 @@ export default function Marriage({ navigation }) {
   );
 }
 
-const pretty = iso => new Date(iso + "T12:00:00")
-  .toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+/* Dates read back to the family in the language they chose. */
+const prettyIn = (t, iso) => longDate(t, new Date(iso + "T12:00:00"));
 const pretty12 = hhmm => {
   let [h, m] = hhmm.split(":").map(Number);
   const s = h >= 12 ? "pm" : "am"; h = h % 12 || 12;

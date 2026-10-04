@@ -731,14 +731,17 @@
     ]
    },
    {
-    "type": "p",
-    "k": "funeral.before_you_make_arrangements",
-    "t": "Before you make arrangements"
-   },
-   {
-    "type": "p",
-    "k": "funeral.please_check_with_the_office",
-    "t": "Please check with the office before making arrangements. What can be provided depends on the circumstances and on when the deceased is released. Nothing here should be taken as confirmed for a particular funeral until the masjid has spoken to you."
+    "type": "advisory",
+    "h": {
+     "k": "funeral.before_you_make_arrangements",
+     "t": "Before you make arrangements"
+    },
+    "ps": [
+     {
+      "k": "funeral.please_check_with_the_office",
+      "t": "Please check with the office before making arrangements. What can be provided depends on the circumstances and on when the deceased is released. Nothing here should be taken as confirmed for a particular funeral until the masjid has spoken to you."
+     }
+    ]
    },
    {
     "type": "row",
@@ -891,14 +894,17 @@
     ]
    },
    {
-    "type": "p",
-    "k": "will.general_information_not_advice",
-    "t": "General information, not advice"
-   },
-   {
-    "type": "p",
-    "k": "will.this_page_is_a_starting",
-    "t": "This page is a starting point, not legal, financial or religious advice for your own circumstances. UK inheritance tax and probate rules are detailed and change over time — please speak to a qualified solicitor to write your will, and to the imam for guidance on the Islamic shares that apply to your family."
+    "type": "advisory",
+    "h": {
+     "k": "will.general_information_not_advice",
+     "t": "General information, not advice"
+    },
+    "ps": [
+     {
+      "k": "will.this_page_is_a_starting",
+      "t": "This page is a starting point, not legal, financial or religious advice for your own circumstances. UK inheritance tax and probate rules are detailed and change over time — please speak to a qualified solicitor to write your will, and to the imam for guidance on the Islamic shares that apply to your family."
+     }
+    ]
    },
    {
     "type": "link",
@@ -1505,14 +1511,17 @@
     "card": true
    },
    {
-    "type": "p",
-    "k": "edu.if_you_need_help_now",
-    "t": "If you need help now"
-   },
-   {
-    "type": "p",
-    "k": "edu.if_you_have_had_a",
-    "t": "If you have had a bereavement and need help now, this is not the screen you want — the masjid’s funeral service is available around the clock. Ring the office, or open Birth, Marriage & Death from the menu."
+    "type": "advisory",
+    "h": {
+     "k": "edu.if_you_need_help_now",
+     "t": "If you need help now"
+    },
+    "ps": [
+     {
+      "k": "edu.if_you_have_had_a",
+      "t": "If you have had a bereavement and need help now, this is not the screen you want — the masjid’s funeral service is available around the clock. Ring the office, or open Birth, Marriage & Death from the menu."
+     }
+    ]
    },
    {
     "type": "row",
@@ -2359,14 +2368,17 @@
     "blocks": []
    },
    {
-    "type": "p",
-    "k": "hol.these_dates_are_estimates",
-    "t": "These dates are estimates"
-   },
-   {
-    "type": "p",
-    "k": "hol.the_islamic_calendar_follows_the",
-    "t": "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand. The madrasah’s closure dates above are fixed and were set by the madrasah itself."
+    "type": "advisory",
+    "h": {
+     "k": "hol.these_dates_are_estimates",
+     "t": "These dates are estimates"
+    },
+    "ps": [
+     {
+      "k": "hol.the_islamic_calendar_follows_the",
+      "t": "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand. The madrasah’s closure dates above are fixed and were set by the madrasah itself."
+     }
+    ]
    },
    {
     "type": "callout",
@@ -3015,133 +3027,6 @@
     "t": "*Paying the £100 deposit books the date.* Choose your day, fill in the short form and pay — the date is yours as soon as the deposit goes through, with nobody to wait for. It is held for you for thirty minutes while you pay."
    },
    {
-    "type": "card",
-    "blocks": [
-     {
-      "type": "p",
-      "k": "hallhire.what_do_you_need",
-      "t": "What do you need?"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.one_hall",
-      "t": "1 hall"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.mon_thu_only",
-      "t": "Mon–Thu only"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.two_halls",
-      "t": "2 halls"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.kitchen_included",
-      "t": "Kitchen included"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.three_halls",
-      "t": "3 halls"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.kitchen_included_2",
-      "t": "Kitchen included"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.kitchen_only",
-      "t": "Kitchen only"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.no_halls",
-      "t": "No halls"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.available",
-      "t": "Available"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.booked",
-      "t": "Booked"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.not_published",
-      "t": "Not published"
-     },
-     {
-      "type": "p",
-      "t": "‹"
-     },
-     {
-      "type": "sub",
-      "t": "October 2026"
-     },
-     {
-      "type": "p",
-      "t": "›"
-     },
-     {
-      "type": "p",
-      "t": "Sun"
-     },
-     {
-      "type": "p",
-      "t": "Mon"
-     },
-     {
-      "type": "p",
-      "t": "Tue"
-     },
-     {
-      "type": "p",
-      "t": "Wed"
-     },
-     {
-      "type": "p",
-      "t": "Thu"
-     },
-     {
-      "type": "p",
-      "t": "Fri"
-     },
-     {
-      "type": "p",
-      "t": "Sat"
-     },
-     {
-      "type": "p",
-      "t": "1"
-     },
-     {
-      "type": "p",
-      "t": "2"
-     },
-     {
-      "type": "p",
-      "t": "3"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.bookings_up_to_12_months",
-      "t": "Bookings can be made up to 12 months ahead."
-     },
-     {
-      "type": "p",
-      "k": "hallhire.hire_is_whole_day",
-      "t": "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day."
-     }
-    ]
-   },
-   {
     "type": "heading",
     "k": "hallhire.charges",
     "t": "Charges",
@@ -3161,31 +3046,46 @@
       "t": "Monday – Thursday"
      },
      {
-      "type": "p",
-      "k": "hallhire.one_hall_2",
-      "t": "1 hall"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.one_hall_2",
+       "t": "1 hall"
+      },
+      "v": {
+       "t": "£350"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "£350"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.two_halls_2",
+       "t": "2 halls"
+      },
+      "v": {
+       "t": "£500"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "k": "hallhire.two_halls_2",
-      "t": "2 halls"
-     },
-     {
-      "type": "p",
-      "t": "£500"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.three_halls_2",
-      "t": "3 halls"
-     },
-     {
-      "type": "p",
-      "t": "£600"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.three_halls_2",
+       "t": "3 halls"
+      },
+      "v": {
+       "t": "£600"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
       "type": "p",
@@ -3193,22 +3093,32 @@
       "t": "Friday, Saturday & Sunday"
      },
      {
-      "type": "p",
-      "k": "hallhire.two_halls_3",
-      "t": "2 halls"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.two_halls_3",
+       "t": "2 halls"
+      },
+      "v": {
+       "t": "£600"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "£600"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.three_halls_3",
-      "t": "3 halls"
-     },
-     {
-      "type": "p",
-      "t": "£700"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.three_halls_3",
+       "t": "3 halls"
+      },
+      "v": {
+       "t": "£700"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
       "type": "note",
@@ -3221,23 +3131,33 @@
       "t": "Kitchen on its own"
      },
      {
-      "type": "p",
-      "k": "hallhire.kitchen_hire",
-      "t": "Kitchen hire"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.kitchen_hire",
+       "t": "Kitchen hire"
+      },
+      "v": {
+       "t": "£125"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "£125"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.utility_charge",
-      "t": "Utility charge"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.per_person_45p",
-      "t": "45p per person"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utility_charge",
+       "t": "Utility charge"
+      },
+      "v": {
+       "k": "hallhire.per_person_45p",
+       "t": "45p per person"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
       "type": "p",
@@ -3245,32 +3165,47 @@
       "t": "If they apply"
      },
      {
-      "type": "p",
-      "k": "hallhire.utensils_only_if_used",
-      "t": "Utensils, only if used"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utensils_only_if_used",
+       "t": "Utensils, only if used"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "£100"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utility_charge_if_you_cook",
+       "t": "Utility charge, if you cook in the kitchen"
+      },
+      "v": {
+       "k": "hallhire.per_person_45p_2",
+       "t": "45p per person"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "k": "hallhire.utility_charge_if_you_cook",
-      "t": "Utility charge, if you cook in the kitchen"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.per_person_45p_2",
-      "t": "45p per person"
-     },
-     {
-      "type": "p",
-      "k": "hallhire.damage_to_the_venue",
-      "t": "Damage to the venue"
-     },
-     {
-      "type": "p",
-      "t": "£100"
+      "type": "kv",
+      "k": {
+       "k": "hallhire.damage_to_the_venue",
+       "t": "Damage to the venue"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
       "type": "note",
@@ -3283,22 +3218,32 @@
       "t": "The *balance* is due 30 days before your booking date and is paid at the office: cash, or bank transfer to *Bolton Central Islamic Society*."
      },
      {
-      "type": "p",
-      "k": "sheet.sort_code",
-      "t": "Sort code"
+      "type": "kv",
+      "k": {
+       "k": "sheet.sort_code",
+       "t": "Sort code"
+      },
+      "v": {
+       "t": "30-99-50"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "30-99-50"
-     },
-     {
-      "type": "p",
-      "k": "sheet.account_number",
-      "t": "Account number"
-     },
-     {
-      "type": "p",
-      "t": "59286668"
+      "type": "kv",
+      "k": {
+       "k": "sheet.account_number",
+       "t": "Account number"
+      },
+      "v": {
+       "t": "59286668"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      }
     ]
    },
@@ -3312,97 +3257,97 @@
     "type": "card",
     "blocks": [
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t1_h",
       "t": "Use in accordance with Islamic rulings"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t1_p",
       "t": "Any hire agreement is subject to the venue being used in accordance with Islamic rulings. This includes, but is not limited to, no music being played on the premises. Agreeing to this is a condition of booking."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t2_h",
       "t": "Deposit and balance"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t2_p1",
       "t": "A *£100 deposit* reserves your date. *The date is not held until the deposit is paid, and the deposit is paid online when you book.* Nothing else holds a date."
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t2_p2",
       "t": "The *full balance is due 30 days before* your booking date, and is paid at the office in cash or by bank transfer. It is not a fixed amount — it depends on how many halls you take, the day of the week, and whether the utensils or the utility charge apply — so the office confirms the figure when it calls you."
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t2_p3",
       "t": "The deposit is *not refundable if you cancel*. It *is refunded in full* if the masjid cannot give you the date — if we decline the booking, or if two payments reach us for the same day. You will not be left out of pocket for something that was not your doing."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t3_h",
       "t": "Cleaning is included, and we do it"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t3_p",
       "t": "Cleaning is included in the hire charge and is carried out by Taiyabah Centre cleaners only. Please do not arrange your own cleaners. You are still responsible for taking away anything you brought in, and for leaving the venue in a reasonable state."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t4_h",
       "t": "Utensils and the utility charge"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t4_p",
       "t": "If you use the masjid’s utensils, a charge of *£100* applies. If you cook your own food in the kitchen, a utility charge of *45p per person* applies. Neither is charged unless it applies to your booking — the office confirms the final figure when it calls you."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t5_h",
       "t": "Access on the day"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t5_p",
       "t": "A caretaker will be in touch before the day of your booking to arrange access to the venue. Please make sure the contact details you give us are ones you can be reached on."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t6_h",
       "t": "How far ahead you can book"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t6_p",
       "t": "Bookings can be made up to 12 months in advance. Dates beyond that are not available to book and cannot be provisionally held."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t7_h",
       "t": "Cancelling or moving your booking"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t7_p1",
       "t": "The *£100 deposit is not refundable if you cancel*, including if you cancel the same day you booked. Anything you have paid beyond the deposit is refunded if you cancel *more than 30 days before* your booked date. Inside 30 days the balance is not refundable — but we will move your booking to another date instead, once, subject to what is free. Ring the office as early as you can: the sooner we know, the more likely we can offer the date you want."
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t7_p2",
       "t": "If *the masjid* cancels or cannot honour your date, everything you have paid is refunded in full, deposit included."
      },
      {
-      "type": "p",
+      "type": "sub",
       "k": "hallhire.t8_h",
       "t": "Damage to the venue"
      },
      {
-      "type": "p",
+      "type": "note",
       "k": "hallhire.t8_p",
       "t": "The person named on the booking is responsible for the condition the venue is left in, including anything done by their guests. Where damage has been caused, a charge of *£100* applies. This is separate from the cleaning and waste-removal charges above."
      }
@@ -3507,14 +3452,17 @@
     ]
    },
    {
-    "type": "p",
-    "k": "marriage.please_also_register_your_marriage",
-    "t": "Please also register your marriage legally"
-   },
-   {
-    "type": "p",
-    "k": "marriage.a_nikah_performed_at_the",
-    "t": "A Nikāḥ performed at the masjid is not, by itself, a marriage recognised under UK law. We strongly encourage every couple to additionally complete a separate civil marriage — this protects both partners’ legal rights, including around property and inheritance, should the need ever arise."
+    "type": "advisory",
+    "h": {
+     "k": "marriage.please_also_register_your_marriage",
+     "t": "Please also register your marriage legally"
+    },
+    "ps": [
+     {
+      "k": "marriage.a_nikah_performed_at_the",
+      "t": "A Nikāḥ performed at the masjid is not, by itself, a marriage recognised under UK law. We strongly encourage every couple to additionally complete a separate civil marriage — this protects both partners’ legal rights, including around property and inheritance, should the need ever arise."
+     }
+    ]
    },
    {
     "type": "heading",
@@ -3531,22 +3479,32 @@
       "t": "The same whatever the day and whatever the time."
      },
      {
-      "type": "p",
-      "k": "nikah.members_of_the_masjid",
-      "t": "Members of the masjid"
+      "type": "kv",
+      "k": {
+       "k": "nikah.members_of_the_masjid",
+       "t": "Members of the masjid"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "£100"
-     },
-     {
-      "type": "p",
-      "k": "nikah.non_members",
-      "t": "Non-members"
-     },
-     {
-      "type": "p",
-      "t": "£200"
+      "type": "kv",
+      "k": {
+       "k": "nikah.non_members",
+       "t": "Non-members"
+      },
+      "v": {
+       "t": "£200"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
       "type": "note",
@@ -3554,57 +3512,32 @@
       "t": "Pay in cash at the masjid office, by bank transfer to *Bolton Central Islamic Society*, or online below."
      },
      {
-      "type": "p",
-      "k": "sheet.sort_code",
-      "t": "Sort code"
+      "type": "kv",
+      "k": {
+       "k": "sheet.sort_code",
+       "t": "Sort code"
+      },
+      "v": {
+       "t": "30-99-50"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      },
      {
-      "type": "p",
-      "t": "30-99-50"
-     },
-     {
-      "type": "p",
-      "k": "sheet.account_number",
-      "t": "Account number"
-     },
-     {
-      "type": "p",
-      "t": "59286668"
-     }
-    ]
-   },
-   {
-    "type": "card",
-    "blocks": [
-     {
-      "type": "sub",
-      "k": "nikah.pay_the_fee_online",
-      "t": "Pay the fee online"
-     },
-     {
-      "type": "p",
-      "k": "nikah.once_the_office_has_rung",
-      "t": "*Once the office has rung you and agreed your date.* Paying does not book a date on its own — the masjid confirms what it can do first."
-     },
-     {
-      "type": "p",
-      "k": "nikah.your_reference",
-      "t": "Your reference"
-     },
-     {
-      "type": "p",
-      "k": "nikah.member_pay_100",
-      "t": "Member — pay £100"
-     },
-     {
-      "type": "p",
-      "k": "nikah.non_member_pay_200",
-      "t": "Non-member — pay £200"
-     },
-     {
-      "type": "note",
-      "k": "nikah.your_reference_is_on_the",
-      "t": "Your reference is on the confirmation you were given when you sent your request, and the office can read it out. Pick the rate that applies to you — the office checks it, and will tell you if anything is owed or owed back."
+      "type": "kv",
+      "k": {
+       "k": "sheet.account_number",
+       "t": "Account number"
+      },
+      "v": {
+       "t": "59286668"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
      }
     ]
    },

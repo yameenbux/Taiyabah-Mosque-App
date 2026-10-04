@@ -40,7 +40,7 @@ export default function Alerts() {
         { k: "alerts.sub", t: "Be reminded before jamāʿah, with no signal needed.", w: "sub" },
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
-        <Heading>{t("alerts.jamaah_reminders", "Jamāʿah reminders")}</Heading>
+        <Heading>{t("sheet.jama_ah_reminders", "Jamāʿah reminders")}</Heading>
         <Card gap={0} pad={0}>
           {ORDER.map((k, i) => {
             const on = reminders?.[k] !== undefined;
@@ -92,11 +92,11 @@ export default function Alerts() {
                       color={armed ? "#2E8C56" : C.muted} />
             <Note>{armed === null ? t("alerts.checking", "Checking…")
                  : armed === 0 ? t("alerts.none_set", "No reminders set.")
-                 : t("alerts.armed", `${armed} reminders set for the week ahead. They are refreshed each time you open the app.`)}</Note>
+                 : `${armed} ${t("alerts.armed", "reminders set for the week ahead. They are refreshed each time you open the app.")}`}</Note>
           </View>
         )}
 
-        <Heading>{t("alerts.from_the_masjid", "From the masjid")}</Heading>
+        <Heading>{t("sheet.from_the_masjid", "From the masjid")}</Heading>
         <P muted>{t("alerts.notices_note",
           "Announcements from the office — janāzah notices, madrasah closures, Ramadan timings — appear on the Notices tab. Push notifications for those are being set up and will arrive in a later version of the app.")}</P>
       </View>

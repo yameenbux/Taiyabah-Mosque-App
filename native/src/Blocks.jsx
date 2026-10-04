@@ -55,6 +55,8 @@ function Block({ b, nav, inCard }) {
     case "social":  return <Social items={b.items} />;
     case "foot":    return <Foot lines={b.lines} />;
     case "callout": return <Callout {...b} />;
+    case "advisory": return (
+      <Warn>{[b.h, ...(b.ps || [])].filter(Boolean).map(tx).join("\n\n")}</Warn>);
 
     case "list":
       return (
@@ -67,14 +69,24 @@ function Block({ b, nav, inCard }) {
         </View>
       );
 
-    case "card":
-      return <Card gap={0} pad={b.blocks.some(x => x.type === "kv" || x.type === "row") ? 0 : 15}>
-               {b.blocks.map((x, i) => (
-                 <View key={i} style={i && (x.type === "kv" || x.type === "row" || x.type === "link")
-                                      ? { borderTopWidth: 1, borderTopColor: C.line } : null}>
-                   <Block b={x} nav={nav} inCard />
-                 </View>))}
-             </Card>;
+    case "card": {
+      /* A card that holds rows draws them edge to edge, so the card itself has
+       * no padding — which means the prose between them has to carry its own,
+       * or it sits flush against the border. */
+      const ROW = new Set(["kv", "row", "link"]);
+      const hasRows = b.blocks.some(x => ROW.has(x.type));
+      return (
+        <Card gap={0} pad={hasRows ? 0 : 15}>
+          {b.blocks.map((x, i) => (
+            <View key={i} style={[
+              i && ROW.has(x.type) ? { borderTopWidth: 1, borderTopColor: C.line } : null,
+              hasRows && !ROW.has(x.type) ? { paddingHorizontal: 15, paddingVertical: 4 } : null,
+            ]}>
+              <Block b={x} nav={nav} inCard />
+            </View>))}
+        </Card>
+      );
+    }
 
     case "kv": {
       const row = <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;

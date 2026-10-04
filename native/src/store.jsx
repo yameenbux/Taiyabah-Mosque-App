@@ -21,7 +21,7 @@ export const LANGS = [
 const RTL = new Set(["ar", "ur"]);
 
 const KEY = "taiyabah.prefs.v1";
-const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [] };
+const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null };
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -44,10 +44,18 @@ export function AppProvider({ children, fallback = null }) {
     if (!prefs) return null;
     const pack = prefs.lang !== "en" && PACKS[prefs.lang] ? PACKS[prefs.lang]() : null;
 
-    /* One lookup, used everywhere. A key missing from a pack falls through to
-     * the English rather than showing a blank — the packs are not yet reviewed
-     * by a native speaker, and a gap must degrade, not break. */
-    const t = (key, english) => (key && pack && pack[key]) || (key && EN[key]) || english || "";
+    /* One lookup, used everywhere.
+     *
+     * The caller's own English beats the English pack, and that order matters:
+     * a screen here may deliberately word something better than the website
+     * did — "Display & language" rather than "System Preferences" — while
+     * still borrowing the website's Urdu, Gujarati and Arabic for it. The
+     * English pack is the fallback for a key with no wording at the call site.
+     *
+     * A key missing from a pack falls through to the English rather than
+     * showing a blank: the packs are not yet reviewed by a native speaker, and
+     * a gap must degrade, not break. */
+    const t = (key, english) => (key && pack && pack[key]) || english || (key && EN[key]) || "";
     /* Blocks carry {k, t}: the key to translate by and the English to fall back
      * on. This is the form almost every call in the app actually uses. */
     const tx = o => (o ? t(o.k, o.t) : "");
@@ -62,6 +70,9 @@ export function AppProvider({ children, fallback = null }) {
       setLang: lang => save({ ...prefs, lang }),
       setScale: scale => save({ ...prefs, scale }),
       setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),
+      /* Where the reader got to, so the Qur'an screen can offer it back rather
+       * than making somebody scroll to page 300 again. */
+      setLastRead: lastRead => save({ ...prefs, lastRead }),
       toggleFavourite: id => save({
         ...prefs,
         favourites: prefs.favourites.includes(id)

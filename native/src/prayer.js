@@ -59,8 +59,5 @@ export function nextJamaah(now = new Date()) {
   };
 }
 
-export function countdown(minutes) {
-  if (minutes < 60) return `in ${minutes} min`;
-  const h = Math.floor(minutes / 60), m = minutes % 60;
-  return m ? `in ${h}h ${String(m).padStart(2, "0")}m` : `in ${h}h`;
-}
+/* The countdown lives in dates.js now: it is the one string on the home screen
+ * that is built from a number, and it has to be sayable in four languages. */

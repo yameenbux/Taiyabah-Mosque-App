@@ -74,6 +74,34 @@ for (const f of fs.readdirSync(path.join(ROOT, "lang/src")).sort()) {
   }
 }
 
+/* --- the strings this app introduced ------------------------------------- *
+ * Forms, reminders, the compass, the muṣḥaf reader: screens the web app never
+ * had, so their words are nowhere in lang/src. They are collected here anyway,
+ * for two reasons — the English pack is then the complete list of what the app
+ * can say, and TODO-translate.json is a file somebody can be handed. */
+const srcDir = path.resolve(import.meta.dirname, "../src");
+const srcFiles = [];
+(function walk(d) { for (const f of fs.readdirSync(d)) {
+  const p = path.join(d, f);
+  if (fs.statSync(p).isDirectory()) { if (f !== "i18n" && f !== "data") walk(p); }
+  else if (/\.jsx?$/.test(f)) srcFiles.push(p);
+} })(srcDir);
+
+const own = {};
+for (const f of srcFiles) {
+  const code = fs.readFileSync(f, "utf8");
+  const re = /\bt\(\s*"([a-z0-9_.]+)"\s*,\s*((?:"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`)(?:\s*\+\s*(?:"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`))*)/gis;
+  for (const m of code.matchAll(re)) {
+    if (en[m[1]] || own[m[1]] || /\$\{/.test(m[2])) continue;
+    try { own[m[1]] = String(eval(m[2])); } catch {}
+  }
+  for (const m of code.matchAll(/\bk:\s*"([a-z0-9_.]+)",\s*t:\s*"((?:[^"\\]|\\.)*)"/g)) {
+    if (!en[m[1]] && !own[m[1]]) own[m[1]] = m[2].replace(/\\"/g, '"');
+  }
+}
+Object.assign(en, own);
+fs.writeFileSync(path.join(OUT, "TODO-translate.json"), JSON.stringify(own, null, 1));
+
 fs.writeFileSync(path.join(OUT, "en.json"), JSON.stringify(en, null, 1));
 for (const [code, p] of Object.entries(packs))
   fs.writeFileSync(path.join(OUT, `${code}.json`), JSON.stringify(p, null, 1));
@@ -85,3 +113,5 @@ for (const [code, n] of Object.entries(kept)) {
   console.log(`${code}  ${String(n).padStart(5)} strings  ${String(Math.round(100 * covered / enKeys)).padStart(3)}% of the English keys`);
 }
 console.log(`\n${rows} rows read from lang/src — wrote src/i18n/{en,ur,gu,ar}.json`);
+console.log(`${Object.keys(own).length} strings are this app's own and have no translation yet —`);
+console.log(`they are listed in src/i18n/TODO-translate.json, and show in English meanwhile.`);

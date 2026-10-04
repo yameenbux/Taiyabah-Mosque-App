@@ -25,6 +25,51 @@ Rated 4 October: front end 92%, back end 88%, community value 94%.
 
 ---
 
+## The native app is now feature-complete
+
+`native/` is a React Native rebuild in Expo. It exists because a Trusted Web
+Activity cannot stop saying "Running in Chrome", cannot keep audio playing in
+the background, and cannot give a screen the platform's own swipe-back. The
+web app stays live and maintained; this replaces it when it is better, not
+before.
+
+Every screen the web app has, the native app now has:
+
+| | |
+|---|---|
+| tabs | Home, Prayer times, Notices, More |
+| reading | Qurʼan (muṣḥaf page images or by surah with translation), Ṣaḥīḥ al-Bukhārī, adhkār, duʿās, rabbanās |
+| the masjid | about, membership, contact, qibla, live radio, videos, full-year timetable |
+| services | nikāḥ, funeral, birth, will, hall hire, charity collections, imams' advice, education |
+| madrasah | admissions and fees, curriculum, holiday planner, portal |
+| giving | the new-build appeal, ṣadaqah and lillāh, zakat calculator |
+| settings | language, text size, prayer reminders, privacy |
+
+Three of those are real forms writing through the same Postgres functions the
+website calls — `request_nikah_date`, `request_hall_booking`,
+`request_imam_advice` — so the office gets one queue rather than two.
+
+**How the content got there.** `native/scripts/extract-content.mjs` opens the
+web app's `index.html` in a browser and lifts each sheet out of the DOM as a
+block tree, keeping every `data-i18n` key beside its English.
+`check-extract.mjs` then walks both and reports anything dropped: **619 of 619**
+text fragments carried across. Because the keys came too, `build-i18n.mjs`
+reuses `lang/src/*.json` unchanged — so Urdu, Gujarati and Arabic work on all
+of it without a word being retyped. **459 of 459** keys the app asks for
+resolve against a pack; 350 have Urdu today, and the 135 strings this app
+introduced are listed in `native/src/i18n/TODO-translate.json` for whoever
+reviews the packs.
+
+**Checking it without a phone:** `node scripts/shots.mjs` photographs all 36
+screens and reports any runtime error. See `native/README.md`.
+
+**Still not for Play.** The build signs with Expo's debug keystore, so the APK
+installs by hand but Play would reject it — which is the right shape while the
+listing belongs to the web app. It installs *alongside* the Play app, different
+package id, so the two can be compared side by side.
+
+---
+
 ## Three things are waiting, none of them urgent
 
 ### 1. The Android splash icon — a build is ready and not uploaded
@@ -104,3 +149,15 @@ node scripts/check-everything.mjs  # the whole app, end to end
 
 The scripts import `playwright` by bare name, so they need a `node_modules`
 beside them.
+
+For the native app:
+
+```sh
+cd native
+npm run content                    # rebuild data + language packs from the web app
+node scripts/parse-check.mjs       # every screen through the project's Babel
+node scripts/check-extract.mjs     # did any of the masjid's prose get dropped?
+node scripts/check-i18n.mjs        # which strings are still English only
+npx expo export --platform web --output-dir dist
+node scripts/shots.mjs             # photograph all 36 screens
+```

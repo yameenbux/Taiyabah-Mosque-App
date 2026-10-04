@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, open, tap } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap } from "../ui";
+import { SHEETS } from "../Blocks";
 
 const BANK = [
   { k: { k: "sheet.account_name", t: "Account name" }, v: { t: "Bolton Central Islamic Society (BCIS)" } },
@@ -38,7 +39,7 @@ export function NewBuild() {
   return (
     <Screen pad={false}>
       <Hero lines={[
-        { k: "sheet.current_appeal", t: "Current appeal · Phase 3.3", w: "eyebrow" },
+        { k: "sheet.current_appeal_phase_3_3", t: "Current appeal · Phase 3.3", w: "eyebrow" },
         { k: "sheet.internal_fixtures_fittings", t: "Internal fixtures & fittings", w: "title" },
         { k: "sheet.help_make_the_masjid_ready", t: "Help make the masjid ready for salah, Qurʼan and remembrance", w: "sub" },
       ]} />
@@ -46,10 +47,10 @@ export function NewBuild() {
         <Card style={{ marginTop: 16 }}>
           <Text style={{ fontFamily: F.arabic, fontSize: fs(17), lineHeight: fs(30), color: C.ink,
                          textAlign: "center" }}>
-            {t("sheet.whoever_builds_a_mosque",
+            {t("sheet.whoever_builds_a_mosque_for",
               "“Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.”")}
           </Text>
-          <Note>{t("sheet.narrated_by_uthman",
+          <Note>{t("sheet.narrated_by_uthman_ibn_affan",
             "Narrated by ʿUthmān ibn ʿAffān · Ṣaḥīḥ al-Bukhārī 450 · Ṣaḥīḥ Muslim 533")}</Note>
         </Card>
 
@@ -131,9 +132,9 @@ export function Giving() {
 
   const FUNDS = [
     { v: "general",  t: t("giving.the_masjid", "The masjid"), s: t("giving.general", "General"),
-      note: t("giving.the_general_fund", "The general fund — upkeep, running costs, and the masjid's work in Bolton.") },
+      note: t("giving.the_general_fund_upkeep_running", "The general fund — upkeep, running costs, and the masjid's work in Bolton.") },
     { v: "sadaqah",  t: t("giving.sadaqah", "Sadaqah"), s: t("giving.voluntary", "Voluntary"),
-      note: t("giving.voluntary_charity_given_as", "Voluntary charity, given as and when you wish.") },
+      note: t("giving.voluntary_charity_given_as_and", "Voluntary charity, given as and when you wish.") },
     { v: "lillah",   t: t("giving.lillah", "Lillah"), s: t("giving.for_allah", "For Allah"),
       note: t("giving.given_purely_for_the_sake", "Given purely for the sake of Allah, with nothing expected in return.") },
   ];
@@ -143,6 +144,7 @@ export function Giving() {
     { v: "friday",  t: t("giving.friday_pay", "Friday Pay"), s: t("giving.jumuah", "Jumuʿah") },
   ];
 
+  const goes = SHEETS.giving?.blocks.find(b => b.type === "dl");
   const base = LINKS[freq][amt];
   /* The designation rides on the same link rather than needing its own, exactly
    * as it does on the website, so the masjid's reports do not split in two. */
@@ -151,7 +153,7 @@ export function Giving() {
             : freq === "friday"  ? " " + t("giving.every_friday", "every Friday") : "";
   const label = !href ? t("giving.not_available_yet", "Not available yet")
               : amt === "other" ? t("giving.choose_your_amount", "Choose your amount") + per
-              : `${t("giving.donate", "Donate")} £${amt}${per}`;
+              : `${t("tiles.donate", "Donate")} £${amt}${per}`;
 
   return (
     <Screen pad={false}>
@@ -161,6 +163,13 @@ export function Giving() {
         { k: "giving.every_prayer_held_here", t: "Every prayer held here, every child taught, every janāzah carried out", w: "sub" },
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
+        {/* What the money actually pays for, in the masjid's own words. */}
+        {!!goes && (
+          <>
+            <Heading>{t("giving.where_your_giving_goes", "Where your giving goes")}</Heading>
+            <DL items={goes.items} />
+          </>)}
+
         <Heading>{t("giving.what_it_is_for", "What it is for")}</Heading>
         <Options options={FUNDS} value={fund} onChange={setFund} />
         <View style={{ marginTop: 10 }}><Note>{FUNDS.find(f => f.v === fund).note}</Note></View>
@@ -193,12 +202,16 @@ export function Giving() {
             misclicked. */}
 
         <CTA label={label} href={href} disabled={!href}
-             sub={href ? t("giving.card_apple_pay_google", "Card · Apple Pay · Google Pay")
+             sub={href ? t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")
                        : t("giving.choose_another_amount", "Choose another amount, or use the bank details below")} />
 
         <Heading tag={t("sheet.tap_to_copy", "Tap to copy")}>{t("sheet.or_transfer_directly", "Or transfer directly")}</Heading>
         <Bank items={BANK} />
         <CopyAll />
+        <View style={{ marginTop: 13 }}>
+          <Note>{t("giving.please_use_your_surname_as",
+            "Please use your surname as the reference.")}</Note>
+        </View>
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
       </View>
     </Screen>

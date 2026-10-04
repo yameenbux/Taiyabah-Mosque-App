@@ -62,7 +62,9 @@ const back = async () => {
     const b = all.nth(i);
     if (await b.isVisible()) { await b.click(); await page.waitForTimeout(550); return true; }
   }
-  await page.goBack().catch(() => {}); await page.waitForTimeout(550); return false;
+  /* Never fall through to the browser's own history: these screens do not use
+   * it, and going back in it leaves the app entirely. */
+  return false;
 };
 
 const steps = [
@@ -90,13 +92,41 @@ const MENU = [
   ["31-giving", /^Sadaqah & Lillah$/], ["32-prefs", /^Display & language$/],
   ["33-alerts", /^Notifications$/], ["34-privacy", /^Privacy notice$/],
 ];
+/* Back to the menu before each one, so a screen that fails to open cannot
+ * cascade into every screen after it failing too. */
+const toMenu = async () => {
+  for (let i = 0; i < 4; i++) if (!(await back())) break;
+  await tapText("More").catch(() => {});
+  await page.waitForTimeout(350);
+};
 for (const [name, label] of MENU) {
   try {
+    await toMenu();
     await tapText(label);
     await shot(name);
-    await back();
   } catch (e) { process.stdout.write("  MISS  " + name + "  (" + label + ") " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
 }
+
+/* The real test of four languages: switch to Urdu and photograph the app in it.
+ * A language pack that loads but leaves half the screen in English is worth
+ * knowing about before an APK is built, not after. */
+try {
+  await toMenu();
+  await tapText(/^Display & language$/);
+  await page.waitForTimeout(600);
+  await tapText(/^Urdu$/);
+  await page.waitForTimeout(900);
+  await shot("35-urdu-prefs");
+  await toMenu();
+  await shot("36-urdu-more");
+  await tapText(/^Home$/);
+  await shot("37-urdu-home");
+  /* …and back to English, so the next run starts where this one did. */
+  await toMenu();
+  const langRow = page.getByText(/زبان|Display & language/).first();
+  if (await langRow.count()) { await langRow.click({ timeout: 3000 }).catch(() => {}); await page.waitForTimeout(500); }
+  await tapText(/^English$/).catch(() => {});
+} catch (e) { process.stdout.write("  MISS  language switch: " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
 
 await browser.close(); server.close();
 const seen = [...new Set(errors)];

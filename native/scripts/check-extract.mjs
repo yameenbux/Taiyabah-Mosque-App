@@ -15,6 +15,18 @@ await page.goto("file://" + path.join(ROOT, "index.html"), { waitUntil: "domcont
 
 const STOPS = { marriage: "nikah.request_a_date" };
 const dom = await page.evaluate(([ids, stops]) => {
+  const isForm = el => {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName.toLowerCase();
+    if (/^(input|textarea|select|form|label|option)$/.test(tag)) return true;
+    /* A panel that holds a form control IS the form — drop it whole. A plain
+     * wrapper that happens to contain one further down is not, or every sheet
+     * with a form anywhere in it would come back empty. */
+    const names = (el.className || "") + " " + (el.id || "");
+    return !!el.querySelector("input,textarea,select") &&
+           (/(^|\s)card(\s|$)/.test(el.className || "") ||
+            /form|panel|-pay|-field|-btns|-agree|-upload/.test(names));
+  };
   const out = {};
   for (const id of ids) {
     const body = document.getElementById(id)?.querySelector(".sh-body");
@@ -24,8 +36,10 @@ const dom = await page.evaluate(([ids, stops]) => {
     const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
     let n; while ((n = w.nextNode())) {
       if (n.parentElement.closest("svg,script,style")) continue;
-      { const h = n.parentElement.closest("[hidden]");
-        if (h && h.querySelector("input,textarea,select,form")) continue; }
+      /* the same rule the extractor uses: a form is not prose */
+      { let a = n.parentElement, inForm = false;
+        while (a && a !== body) { if (isForm(a)) { inForm = true; break; } a = a.parentElement; }
+        if (inForm) continue; }
       /* once past where the hand-written form takes over, stop comparing */
       if (stopEl && (stopEl.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING)) break;
       const t = n.nodeValue.replace(/\s+/g, " ").trim();

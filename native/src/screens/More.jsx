@@ -15,48 +15,48 @@ import { Screen, Heading, RowGroup, NavRow, Foot, open } from "../ui";
 
 const GROUPS = [
   { k: "menu.resources", title: "Resources", rows: [
-    { to: "Quran",     icon: "book-outline",         k: "home.holy_quran",       t: "Holy Qurʼan",       sub: "604 pages · IndoPak, or with translation" },
-    { to: "Athkar",    icon: "sunny-outline",        k: "home.daily_adhkar",     t: "Daily Adhkār",      sub: "Morning, evening, after ṣalāh" },
-    { to: "Duas",      icon: "heart-outline",        k: "menu.everyday_duas",    t: "Everyday duʿās" },
-    { to: "Rabbanas",  icon: "sparkles-outline",     k: "menu.rabbana_duas",     t: "40 Rabbanā duʿās" },
-    { to: "Bukhari",   icon: "library-outline",      k: "home.sahih_al_bukhari", t: "Ṣaḥīḥ al-Bukhārī" },
-    { to: "Timetable", icon: "calendar-outline",     k: "sheet.full_timetable",  t: "Full prayer timetable" },
+    { to: "Quran",     icon: "book-outline",         k: "tiles.holy_quran",       t: "Holy Qurʼan",       sub: "604 pages · IndoPak, or with translation" },
+    { to: "Athkar",    icon: "sunny-outline",        k: "tiles.daily_adhkar",     t: "Daily Adhkār",      sub: "Morning, evening, after ṣalāh" },
+    { to: "Duas",      icon: "heart-outline",        k: "duas.everyday_du_as",    t: "Everyday duʿās" },
+    { to: "Rabbanas",  icon: "sparkles-outline",     k: "athkar.the_forty_rabbana_du_as",     t: "40 Rabbanā duʿās" },
+    { to: "Bukhari",   icon: "library-outline",      k: "tiles.hadith", t: "Ṣaḥīḥ al-Bukhārī" },
+    { to: "Timetable", icon: "calendar-outline",     k: "menu.timetable",  t: "Full prayer timetable" },
     { to: "Videos",    icon: "play-circle-outline",  k: "about.videos_bayaans",  t: "Videos & bayaans" },
-    { to: "Qibla",     icon: "compass-outline",      k: "sheet.qibla",           t: "Qibla" },
+    { to: "Qibla",     icon: "compass-outline",      k: "tiles.qibla",           t: "Qibla" },
     { to: "Live",      icon: "radio-outline",        k: "home.listen_live",      t: "Listen live" },
-    { to: "Zakat",     icon: "calculator-outline",   k: "menu.zakat_calculator", t: "Zakat calculator" },
-    { soon: true,      icon: "airplane-outline",     k: "menu.hajj_umrah",       t: "Hajj / Umrah" },
-    { soon: true,      icon: "moon-outline",         k: "menu.ramadan_2027",     t: "Ramadan 2027" },
+    { to: "Zakat",     icon: "calculator-outline",   k: "menu.zakat", t: "Zakat calculator" },
+    { soon: true,      icon: "airplane-outline",     k: "marriage.hajj_umrah",       t: "Hajj / Umrah" },
+    { soon: true,      icon: "moon-outline",         k: "marriage.ramadan_2027",     t: "Ramadan 2027" },
   ]},
-  { k: "menu.madrasah", title: "Madrasah", rows: [
-    { to: "Madrasah",   icon: "school-outline",      k: "menu.madrasah",         t: "Madrasah" },
+  { k: "tiles.madrasah", title: "Madrasah", rows: [
+    { to: "Madrasah",   icon: "school-outline",      k: "a11y.madrasah",         t: "Madrasah" },
     { to: "Admissions", icon: "clipboard-outline",   k: "adm.admissions_fees",   t: "Admissions & Fees" },
-    { to: "Curriculum", icon: "book-outline",        k: "menu.what_is_taught",   t: "What is taught" },
-    { to: "Holidays",   icon: "calendar-outline",    k: "menu.holiday_planner",  t: "Holiday Planner" },
-    { to: "Portal",     icon: "log-in-outline",      k: "menu.madrasah_portal",  t: "Madrasah Portal",
+    { to: "Curriculum", icon: "book-outline",        k: "madrasah.what_is_taught",   t: "What is taught" },
+    { to: "Holidays",   icon: "calendar-outline",    k: "adm.holiday_planner",  t: "Holiday Planner" },
+    { to: "Portal",     icon: "log-in-outline",      k: "portals.madrasah_portal",  t: "Madrasah Portal",
       sub: "Sign in · registers and pupil records still being built" },
   ]},
-  { k: "menu.our_services", title: "Our services", rows: [
-    { to: "MarriageDeath", icon: "git-branch-outline", k: "menu.birth_marriage_death", t: "Birth, Marriage & Death" },
-    { to: "Marriage",   icon: "heart-outline",       k: "home.nikah_services",   t: "Nikāḥ Services" },
-    { to: "Funeral",    icon: "flower-outline",      k: "home.funeral_services", t: "Funeral Services" },
-    { to: "HallHire",   icon: "business-outline",    k: "home.hall_booking",     t: "Hall / Room Hire" },
-    { to: "Collect",    icon: "people-outline",      k: "home.charity_collections", t: "Charity Collections" },
-    { to: "Advice",     icon: "chatbubbles-outline", k: "menu.imams_advice",     t: "Imams’ Advice" },
+  { k: "marriage.our_services", title: "Our services", rows: [
+    { to: "MarriageDeath", icon: "git-branch-outline", k: "marriage.birth_marriage_death", t: "Birth, Marriage & Death" },
+    { to: "Marriage",   icon: "heart-outline",       k: "tiles.nikah_services",   t: "Nikāḥ Services" },
+    { to: "Funeral",    icon: "flower-outline",      k: "a11y.funeral_services", t: "Funeral Services" },
+    { to: "HallHire",   icon: "business-outline",    k: "hallhire.hall_room_hire",     t: "Hall / Room Hire" },
+    { to: "Collect",    icon: "people-outline",      k: "a11y.charity_collections", t: "Charity Collections" },
+    { to: "Advice",     icon: "chatbubbles-outline", k: "a11y.imams_advice",     t: "Imams’ Advice" },
     { to: "Education",  icon: "ribbon-outline",      k: "edu.education",         t: "Education" },
-    { soon: true,       icon: "walk-outline",        k: "menu.tours_visits",     t: "Tours & Visits" },
+    { soon: true,       icon: "walk-outline",        k: "marriage.tours_visits",     t: "Tours & Visits" },
   ]},
-  { k: "menu.the_masjid", title: "The masjid", rows: [
+  { k: "marriage.the_masjid", title: "The masjid", rows: [
     { to: "About",      icon: "information-circle-outline", k: "about.about_us", t: "About us" },
-    { to: "Membership", icon: "card-outline",        k: "menu.membership",       t: "Membership" },
+    { to: "Membership", icon: "card-outline",        k: "a11y.membership",       t: "Membership" },
     { to: "Contact",    icon: "call-outline",        k: "contact.contact_us",    t: "Contact us" },
-    { to: "NewBuild",   icon: "hammer-outline",      k: "menu.the_new_build",    t: "The new build" },
-    { to: "Giving",     icon: "gift-outline",        k: "home.sadaqah_lillah",   t: "Sadaqah & Lillah" },
+    { to: "NewBuild",   icon: "hammer-outline",      k: "about.support_the_new_build",    t: "The new build" },
+    { to: "Giving",     icon: "gift-outline",        k: "giving.sadaqah_lillah",   t: "Sadaqah & Lillah" },
   ]},
   { k: "menu.settings", title: "Settings", rows: [
-    { to: "Prefs",      icon: "options-outline",     k: "menu.system_preferences", t: "Display & language" },
+    { to: "Prefs",      icon: "options-outline",     k: "sysprefs.display_language", t: "Display & language" },
     { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications",  t: "Notifications" },
-    { to: "Privacy",    icon: "shield-checkmark-outline", k: "menu.privacy_notice", t: "Privacy notice" },
+    { to: "Privacy",    icon: "shield-checkmark-outline", k: "privacy.privacy_notice", t: "Privacy notice" },
   ]},
 ];
 
@@ -73,7 +73,7 @@ export default function More({ navigation }) {
             {g.rows.map(r => (
               <NavRow key={r.k + r.t} icon={r.icon} label={t(r.k, r.t)}
                       sub={r.sub ? t(`${r.k}.sub`, r.sub) : null}
-                      soon={r.soon ? t("menu.coming_soon", "Coming soon") : null}
+                      soon={r.soon ? t("edu.coming_soon", "Coming soon") : null}
                       onPress={r.to ? () => navigation.navigate(r.to) : null} />))}
           </RowGroup>
         </View>))}
