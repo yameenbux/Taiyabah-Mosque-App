@@ -57,13 +57,19 @@ jobs:
           set -o pipefail
           ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
+      # A job summary is not reachable through the REST API, but an
+      # ::error:: workflow command becomes a check ANNOTATION, and annotations
+      # are. So the failure is echoed back as annotations, which means a
+      # broken build can be diagnosed without opening a browser.
       - name: What Gradle actually said
         if: failure()
         run: |
           echo '## Gradle failed' >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          grep -iE "what went wrong|error:|caused by|FAILURE:" -A4 /tmp/gradle.log | head -60 >> "$GITHUB_STEP_SUMMARY" || true
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          sed -n '/FAILURE: Build failed/,$p' /tmp/gradle.log | head -40 >> "$GITHUB_STEP_SUMMARY" || true
+          grep -iE "what went wrong" -A6 /tmp/gradle.log | head -30 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
+          grep -iE "^e: |error: |Caused by:|Could not |OutOfMemory|SDK location" /tmp/gradle.log | head -12 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
 
       - uses: actions/upload-artifact@v4
         with:
