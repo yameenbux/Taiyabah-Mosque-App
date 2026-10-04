@@ -1,0 +1,76 @@
+/* Everything the app remembers between launches, in one place.
+ *
+ * The web app kept these in localStorage and read them synchronously, which is
+ * a luxury AsyncStorage does not give us. So the provider renders nothing until
+ * the first read comes back — a few milliseconds behind the font gate, and far
+ * better than the app visibly changing size or language a beat after it opens.
+ */
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import EN from "./i18n/en.json";
+
+const PACKS = { ur: () => require("./i18n/ur.json"), gu: () => require("./i18n/gu.json"), ar: () => require("./i18n/ar.json") };
+export const LANGS = [
+  { code: "en", name: "English",  native: "English" },
+  { code: "ur", name: "Urdu",     native: "اردو" },
+  { code: "gu", name: "Gujarati", native: "ગુજરાતી" },
+  { code: "ar", name: "Arabic",   native: "العربية" },
+];
+/* Only Arabic and Urdu are written right to left; Gujarati is not, and getting
+ * that wrong is the kind of mistake a community notices immediately. */
+const RTL = new Set(["ar", "ur"]);
+
+const KEY = "taiyabah.prefs.v1";
+const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [] };
+
+const Ctx = createContext(null);
+export const useApp = () => useContext(Ctx);
+
+export function AppProvider({ children, fallback = null }) {
+  const [prefs, setPrefs] = useState(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem(KEY)
+      .then(raw => setPrefs({ ...DEFAULTS, ...(raw ? JSON.parse(raw) : null) }))
+      .catch(() => setPrefs(DEFAULTS));   // a corrupt store must not brick the app
+  }, []);
+
+  const save = useCallback(next => {
+    setPrefs(next);
+    AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
+  }, []);
+
+  const value = useMemo(() => {
+    if (!prefs) return null;
+    const pack = prefs.lang !== "en" && PACKS[prefs.lang] ? PACKS[prefs.lang]() : null;
+
+    /* One lookup, used everywhere. A key missing from a pack falls through to
+     * the English rather than showing a blank — the packs are not yet reviewed
+     * by a native speaker, and a gap must degrade, not break. */
+    const t = (key, english) => (key && pack && pack[key]) || (key && EN[key]) || english || "";
+    /* Blocks carry {k, t}: the key to translate by and the English to fall back
+     * on. This is the form almost every call in the app actually uses. */
+    const tx = o => (o ? t(o.k, o.t) : "");
+
+    return {
+      ...prefs,
+      t, tx,
+      rtl: RTL.has(prefs.lang),
+      /* Text size multiplies every size in the app, exactly as --ts did on the
+       * web. Arabic and Urdu need a touch more height to stay legible. */
+      fs: n => Math.round(n * prefs.scale),
+      setLang: lang => save({ ...prefs, lang }),
+      setScale: scale => save({ ...prefs, scale }),
+      setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),
+      toggleFavourite: id => save({
+        ...prefs,
+        favourites: prefs.favourites.includes(id)
+          ? prefs.favourites.filter(x => x !== id)
+          : [...prefs.favourites, id],
+      }),
+    };
+  }, [prefs, save]);
+
+  if (!value) return fallback;
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}

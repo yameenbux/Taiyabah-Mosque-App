@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, FlatList, RefreshControl, ActivityIndicator, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, fs, R } from "../theme";
+import { C, F, R } from "../theme";
+import { useApp } from "../store";
 import { readView } from "../supabase";
 
 /* Notices come from `notices_live`, a view that exposes the notice text and
@@ -10,6 +11,7 @@ import { readView } from "../supabase";
  * is deny-all. That is deliberate and it is why reading it with a public key
  * is safe. */
 export default function Notices() {
+  const { t, fs } = useApp();
   const top = useSafeAreaInsets().top;
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState(null);
@@ -26,7 +28,7 @@ export default function Notices() {
 
   const Header = (
     <View style={{ paddingTop: top + 16, paddingHorizontal: 18, paddingBottom: 10 }}>
-      <Text style={{ fontFamily: F.display, fontSize: fs(26), color: C.ink }}>Notices</Text>
+      <Text style={{ fontFamily: F.display, fontSize: fs(26), color: C.ink }}>{t("nav.notices", "Notices")}</Text>
     </View>
   );
 
@@ -49,13 +51,13 @@ export default function Notices() {
             <Ionicons name="notifications-outline" size={26} color={C.gold} />
           </View>
           <Text style={{ fontFamily: F.display, fontSize: fs(19), color: C.ink, marginTop: 16 }}>
-            {err ? "Can’t reach the masjid" : "Nothing just now"}
+            {err ? t("notices.cant_reach", "Can\u2019t reach the masjid") : t("notices.nothing_just_now", "Nothing just now")}
           </Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, marginTop: 8,
                          textAlign: "center", lineHeight: fs(21) }}>
             {err
-              ? "Announcements will appear once you’re back online. Pull down to try again."
-              : "Announcements from the masjid will appear here and stay, so a message you swipe away can still be read."}
+              ? t("notices.offline", "Announcements will appear once you\u2019re back online. Pull down to try again.")
+              : t("notices.empty", "Announcements from the masjid will appear here and stay, so a message you swipe away can still be read.")}
           </Text>
         </View>}
       renderItem={({ item }) => (

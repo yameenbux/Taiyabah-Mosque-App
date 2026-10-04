@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, SectionList, ScrollView } from "react-native";
-import { C, F, fs, R } from "../theme";
+import { C, F, R } from "../theme";
+import { useApp } from "../store";
 import ATHKAR from "../data/athkar.json";
 import DUAS from "../data/duas.json";
 import RABBANAS from "../data/rabbanas.json";
@@ -14,6 +15,7 @@ import RABBANAS from "../data/rabbanas.json";
  * beside it — you can stop reading it without having to look away.
  */
 function Block({ item }) {
+  const { fs } = useApp();
   const ar = item.ar || item.arabic;
   const en = item.en || item.english || item.meaning;
   const tr = item.tr || item.translit || item.transliteration;
@@ -52,6 +54,7 @@ function Block({ item }) {
 }
 
 function Collection({ groups, note }) {
+  const { fs } = useApp();
   return (
     <SectionList
       style={{ backgroundColor: C.paper }}
@@ -86,6 +89,7 @@ export const Duas = () => (
 );
 
 export const Rabbanas = () => {
+  const { t } = useApp();
   const list = Array.isArray(RABBANAS) ? RABBANAS : (RABBANAS.items || RABBANAS.rabbanas || []);
-  return <Collection groups={[{ title: "Forty Rabbanā duʿās", data: list }]} />;
+  return <Collection groups={[{ title: t("menu.rabbana_duas", "Forty Rabban\u0101 du\u02bf\u0101s"), data: list }]} />;
 };
