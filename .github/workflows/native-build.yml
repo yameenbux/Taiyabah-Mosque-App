@@ -2,12 +2,18 @@ name: Native app (Android)
 
 # Builds the React Native rebuild in native/ into an installable APK.
 #
-# WHY A DEBUG-SIGNED APK AND NOT AN .AAB. This is for holding, not for Play.
-# An .aab cannot be installed directly, and the Play listing still belongs to
-# the web app until the native one is better than it. When that day comes this
-# workflow grows a release-signing step using the same two secrets the web
-# app's build already uses; until then it must not be able to touch the
-# listing even by accident.
+# RELEASE, NOT DEBUG — and this is the whole point. A DEBUG build does not
+# contain the JavaScript. It expects to reach a Metro dev server on a laptop
+# over the network, and with no server to find it sits on the splash screen
+# forever. That is exactly what the first build did on a real phone.
+# `assembleRelease` bundles the JavaScript into the APK, so it runs on its own.
+#
+# It is still not for Play. Expo's generated project signs release with the
+# DEBUG keystore (see android/app/build.gradle), which makes an APK that
+# installs by hand but that Play would reject — which is the right shape while
+# the listing still belongs to the web app. When the native app is ready, this
+# grows a real signing step using the same two secrets the web app's build
+# already uses. Until then it cannot touch the listing even by accident.
 #
 # WHAT COMES OUT. app-debug.apk, attached to the run. Download it, allow
 # installs from the browser, open it. It sits alongside the Play version
@@ -55,7 +61,7 @@ jobs:
         working-directory: native/android
         run: |
           set -o pipefail
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+          ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
       # A job summary is not reachable through the REST API, but an
       # ::error:: workflow command becomes a check ANNOTATION, and annotations
@@ -74,5 +80,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: taiyabah-native-${{ github.run_number }}
-          path: native/android/app/build/outputs/apk/debug/app-debug.apk
+          path: native/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
