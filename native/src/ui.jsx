@@ -7,7 +7,7 @@
  * or the text size redraws the whole app with no screen knowing about it.
  */
 import React from "react";
-import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -107,6 +107,43 @@ export function Girih({ size = 190, color = "#FFFFFF", opacity = 0.035, style })
       <Svg width={size} height={size} viewBox="0 0 100 100">
         <Polygon fill={color} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
       </Svg>
+    </View>
+  );
+}
+
+/* The bar the web app carries above every tab: the masjid's own wordmark, the
+ * society's name, and a bell that goes to Notices. It sits on the plum so it
+ * runs into the hero below it rather than sitting on top of one. */
+export function TopBar({ navigation, onBell }) {
+  const { t, fs, rtl } = useApp();
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
+                   paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: 16 }}>
+      <Image source={require("../assets/logo.png")}
+             style={{ width: 62, height: 44, resizeMode: "contain" }} />
+      <View style={{ width: 1, height: 30, backgroundColor: "rgba(243,239,227,.22)" }} />
+      <View style={{ flex: 1 }}>
+        {t("app.bolton_central_islamic_society", "Bolton Central Islamic Society")
+          .split(" ").reduce((rows, w) => {
+            /* Two lines, as the web app's bar wraps it — and in a language that
+             * does not split that way, one line that simply fits. */
+            if (rows.length < 2 && rows.join(" ").length + w.length > 14) rows.push(w); 
+            else rows[rows.length - 1] = (rows[rows.length - 1] + " " + w).trim();
+            return rows;
+          }, [""]).map((line, i) => (
+            <Text key={i} style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.5,
+                                   color: C.cream, textTransform: "uppercase",
+                                   textAlign: rtl ? "right" : "left" }}>{line}</Text>))}
+      </View>
+      <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
+        accessibilityLabel={t("a11y.notices", "Notices")}
+        style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 11, alignItems: "center",
+                                   justifyContent: "center", borderWidth: 1,
+                                   borderColor: "rgba(243,239,227,.25)",
+                                   backgroundColor: pressed ? "rgba(198,162,76,.2)" : "transparent" })}>
+        <Ionicons name="notifications-outline" size={19} color={C.goldBright} />
+      </Pressable>
     </View>
   );
 }

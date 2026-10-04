@@ -31,7 +31,7 @@ import Quran, { Surahs, Surah, Mushaf } from "./screens/Quran";
 import Bukhari, { BukhariBook } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
-import { Athkar, Duas, Rabbanas } from "./screens/Reader";
+import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

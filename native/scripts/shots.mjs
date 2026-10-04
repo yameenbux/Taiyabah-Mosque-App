@@ -70,49 +70,65 @@ const back = async () => {
 const steps = [
   ["01-home",      async () => {}],
   ["02-times",     async () => tapText("Prayer times")],
-  ["03-timetable", async () => tapText("Full prayer timetable")],
   ["04-notices",   async () => { await back(); await tapText("Notices"); }],
   ["05-more",      async () => tapText("More")],
 ];
 
 for (const [name, go] of steps) { await go(); await shot(name); }
 
-/* Everything the More menu opens, one at a time, returning to the menu between. */
-const MENU = [
-  ["06-quran", /^Holy Qur.an$/], ["07-athkar", /^Daily Adhk/], ["08-duas", /^Everyday du/],
-  ["09-rabbanas", /^40 Rabban/], ["10-bukhari", /^..a.*al-Bukh/], ["11-videos", /^Videos & bayaans$/],
-  ["12-qibla", /^Qibla$/], ["13-live", /^Listen live$/], ["14-zakat", /^Zakat calculator$/],
-  ["15-madrasah", /^Madrasah$/], ["16-admissions", /^Admissions & Fees$/],
-  ["17-curriculum", /^What is taught$/], ["18-holidays", /^Holiday Planner$/],
-  ["19-portal", /^Madrasah Portal$/], ["20-lifestages", /^Birth, Marriage & Death$/],
-  ["21-nikah", /^Nik.*Services$/], ["22-funeral", /^Funeral Services$/],
-  ["23-hallhire", /^Hall \/ Room Hire$/], ["24-collect", /^Charity Collections$/],
-  ["25-advice", /^Imams. Advice$/], ["26-education", /^Education$/], ["27-about", /^About us$/],
-  ["28-membership", /^Membership$/], ["29-contact", /^Contact us$/], ["30-newbuild", /^The new build$/],
-  ["31-giving", /^Sadaqah & Lillah$/], ["32-prefs", /^Display & language$/],
-  ["33-alerts", /^Notifications$/], ["34-privacy", /^Privacy notice$/],
-];
-/* Back to the menu before each one, so a screen that fails to open cannot
- * cascade into every screen after it failing too. */
+/* The twelve home tiles, in the order the home screen shows them, then
+ * everything the More menu opens. Both lists follow the web app, which is the
+ * point: if a row moves, a shot goes missing and this run says so. */
+const toHome = async () => {
+  for (let i = 0; i < 4; i++) if (!(await back())) break;
+  await tapText(/^Home$/).catch(() => {});
+  await page.waitForTimeout(350);
+};
 const toMenu = async () => {
   for (let i = 0; i < 4; i++) if (!(await back())) break;
   await tapText("More").catch(() => {});
   await page.waitForTimeout(350);
 };
-for (const [name, label] of MENU) {
-  try {
-    await toMenu();
-    await tapText(label);
-    await shot(name);
-  } catch (e) { process.stdout.write("  MISS  " + name + "  (" + label + ") " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
+
+const TILES = [
+  ["06-quran", /^Holy Qur.an$/], ["07-athkar", /^Daily Adhk/], ["10-bukhari", /al-Bukh/],
+  ["12-qibla", /^Qibla$/], ["15-madrasah", /^Madrasah$/], ["21-nikah", /^Nik.*Services$/],
+  ["22-funeral", /^Funeral Services$/], ["23-hallhire", /^Hall Booking$/],
+  ["30-newbuild", /^Donate$/], ["31-giving", /^Sadaqah & Lillah$/],
+  ["24-collect", /^Charity Collections$/],
+];
+for (const [name, label] of TILES) {
+  try { await toHome(); await tapText(label); await shot(name); }
+  catch (e) { process.stdout.write("  MISS  " + name + "  (" + label + ") " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
 }
+
+const MENU = [
+  ["03-timetable", /^Full prayer timetable$/], ["11-videos", /^Videos & bayaans$/],
+  ["14-zakat", /^Zakat calculator$/], ["16-admissions", /^Admissions & Fees$/],
+  ["18-holidays", /^Holiday Planner$/], ["19-portal", /^Madrasah Portal$/],
+  ["27-about", /^About us$/], ["28-membership", /^Membership$/], ["29-contact", /^Contact us$/],
+  ["20-lifestages", /^Birth, Marriage & Death$/], ["25-advice", /^Imams. Advice$/],
+  ["26-education", /^Education$/], ["33-alerts", /^Notifications$/],
+  ["32-prefs", /^System Preferences$/],
+];
+for (const [name, label] of MENU) {
+  try { await toMenu(); await tapText(label); await shot(name); }
+  catch (e) { process.stdout.write("  MISS  " + name + "  (" + label + ") " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
+}
+
+/* Two more that are only reached from inside another screen. */
+try { await toHome(); await tapText(/^Listen live$/); await shot("13-live"); } catch {}
+try { await toHome(); await tapText(/^Daily Adhk/); await tapText(/^Everyday Du/); await shot("08-duas"); } catch {}
+try { await toHome(); await tapText(/^Daily Adhk/); await tapText(/Rabban/); await shot("09-rabbanas"); } catch {}
+try { await toMenu(); await tapText(/^Privacy notice$/); await shot("34-privacy"); } catch {}
+try { await toHome(); await tapText(/^Madrasah$/); await tapText(/What is taught|Curriculum/); await shot("17-curriculum"); } catch {}
 
 /* The real test of four languages: switch to Urdu and photograph the app in it.
  * A language pack that loads but leaves half the screen in English is worth
  * knowing about before an APK is built, not after. */
 try {
   await toMenu();
-  await tapText(/^Display & language$/);
+  await tapText(/^System Preferences$/);
   await page.waitForTimeout(600);
   await tapText(/^Urdu$/);
   await page.waitForTimeout(900);
@@ -121,13 +137,12 @@ try {
   await shot("36-urdu-more");
   /* The tab labels are in Urdu by now, so the Home tab is found by its position
    * rather than by a word this script would have to know the translation of. */
-  const tabs = page.getByRole("button").filter({ hasNotText: /./ });
   await page.locator('[role="tablist"] button, [role="tab"]').first().click({ timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(600);
   await shot("37-urdu-home");
   /* …and back to English, so the next run starts where this one did. */
   await toMenu();
-  const langRow = page.getByText(/زبان|Display & language/).first();
+  const langRow = page.getByText(/زبان|System Preferences/).first();
   if (await langRow.count()) { await langRow.click({ timeout: 3000 }).catch(() => {}); await page.waitForTimeout(500); }
   await tapText(/^English$/).catch(() => {});
 } catch (e) { process.stdout.write("  MISS  language switch: " + String(e.message).split("\n")[0].slice(0, 70) + "\n"); }
