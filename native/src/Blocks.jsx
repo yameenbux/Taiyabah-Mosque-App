@@ -31,6 +31,17 @@ const ROUTE = {
 
 /* An icon for each row, chosen by what the row leads to rather than by
  * guessing from its words — so a translated label still gets the right glyph. */
+/* A row's glyph comes from where it leads, not from its words — so a translated
+ * label still gets the right one, and a phone number never gets the
+ * open-in-browser arrow. */
+const hrefIcon = href =>
+  !href ? null
+  : href.startsWith("tel:") ? "call-outline"
+  : href.startsWith("mailto:") ? "mail-outline"
+  : /maps\.|geo:/.test(href) ? "location-outline"
+  : /youtube|youtu\.be/.test(href) ? "logo-youtube"
+  : "open-outline";
+
 const ICON = {
   EduArabic: "language-outline", EduGhusl: "water-outline", Birth: "egg-outline",
   Funeral: "flower-outline", Marriage: "heart-outline", Will: "document-text-outline",
@@ -97,7 +108,7 @@ function Block({ b, nav, inCard }) {
       const route = b.id && ROUTE[b.id];
       const row = (
         <NavRow
-          icon={route ? ICON[route] : b.href ? "open-outline" : null}
+          icon={route ? ICON[route] : hrefIcon(b.href)}
           label={tx(b.label)} sub={b.sub ? tx(b.sub) : null}
           soon={b.soon ? tx(b.soon) : null}
           onPress={route ? () => nav?.navigate(route) : b.href ? () => open(b.href) : null} />);
@@ -105,7 +116,7 @@ function Block({ b, nav, inCard }) {
     }
 
     case "link": {
-      const row = <NavRow icon="open-outline" label={tx(b)} onPress={() => open(b.href)} />;
+      const row = <NavRow icon={hrefIcon(b.href)} label={tx(b)} onPress={() => open(b.href)} />;
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
@@ -157,7 +168,7 @@ function GroupRow({ b, nav }) {
   const label = b.type === "link" ? tx(b) : tx(b.label);
   return (
     <NavRow
-      icon={route ? ICON[route] : b.href ? "open-outline" : null}
+      icon={route ? ICON[route] : hrefIcon(b.href)}
       label={label} sub={b.sub ? tx(b.sub) : null} soon={b.soon ? tx(b.soon) : null}
       onPress={route ? () => nav?.navigate(route) : b.href ? () => open(b.href) : null} />
   );

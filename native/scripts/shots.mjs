@@ -119,7 +119,11 @@ try {
   await shot("35-urdu-prefs");
   await toMenu();
   await shot("36-urdu-more");
-  await tapText(/^Home$/);
+  /* The tab labels are in Urdu by now, so the Home tab is found by its position
+   * rather than by a word this script would have to know the translation of. */
+  const tabs = page.getByRole("button").filter({ hasNotText: /./ });
+  await page.locator('[role="tablist"] button, [role="tab"]').first().click({ timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(600);
   await shot("37-urdu-home");
   /* …and back to English, so the next run starts where this one did. */
   await toMenu();

@@ -241,6 +241,19 @@ export function NavRow({ icon, label, sub, soon, onPress, href, value, right, to
 export function KV({ k, v, href, icon, onPress }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
+  /* A row with somewhere to go — Address, Telephone — stacks its label over its
+   * value and takes a chevron. A row that is only a fact — "All classes · £10 /
+   * week" — is a table row, and reads as one: label left, figure right. */
+  const table = !act && !icon;
+  if (table) return (
+    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
+                   paddingVertical: 13, paddingHorizontal: 15 }}>
+      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(20), color: C.muted,
+                     textAlign: rtl ? "right" : "left" }}>{k}</Rich>
+      <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), lineHeight: fs(20), color: C.ink,
+                     textAlign: rtl ? "left" : "right", maxWidth: "52%" }}>{v}</Rich>
+    </View>
+  );
   return (
     <Press onPress={act} disabled={!act}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
