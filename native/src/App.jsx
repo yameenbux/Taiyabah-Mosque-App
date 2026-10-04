@@ -114,9 +114,15 @@ function Root() {
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("tiles.hadith", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
-        <Stack.Screen name="Athkar"   component={Athkar}   options={{ ...pushed, title: t("tiles.daily_adhkar", "Daily Adhkār") }} />
-        <Stack.Screen name="Duas"     component={Duas}     options={{ ...pushed, title: t("duas.everyday_du_as", "Everyday duʿās") }} />
-        <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("athkar.the_forty_rabbana_du_as", "40 Rabbanā duʿās") }} />
+        {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}
+        <Stack.Screen name="Athkar"    component={Athkar}    options={bare} />
+        <Stack.Screen name="AthkarSet" component={AthkarSet}
+          options={({ route }) => ({ ...pushed,
+            title: [t("athkar.morning_evening", "Morning & Evening"),
+                    t("athkar.after_every_salah", "After Every Ṣalāh"),
+                    t("athkar.before_sleep", "Before Sleep")][route.params?.n] || "" })} />
+        <Stack.Screen name="Duas"     component={Duas}     options={{ ...pushed, title: t("duas.everyday_du_as", "Everyday Duʿās") }} />
+        <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("rabbanas.40_rabbana", "40 Rabbanā") }} />
 
         {/* the masjid */}
         <Stack.Screen name="Qibla"     component={Qibla}     options={bare} />

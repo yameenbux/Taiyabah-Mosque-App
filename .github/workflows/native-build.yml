@@ -56,6 +56,11 @@ jobs:
         working-directory: native
         run: node scripts/check-i18n.mjs | head -40
 
+
+      # check-parity.mjs is deliberately NOT here: it drives a browser, and the
+      # APK build is not the place to acquire one. It runs before a hand-over —
+      # see native/README.md.
+
       # Expo generates the android/ project from app.json. It is not committed:
       # it is build output, and a stale copy in the repo is a whole class of
       # "works on my machine" that nobody needs.

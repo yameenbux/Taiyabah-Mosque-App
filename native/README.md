@@ -29,6 +29,9 @@ Almost none of it was retyped.
 |---|---|
 | `scripts/extract-content.mjs` | Opens the web app's `index.html` in a real browser and lifts each sheet out of the DOM as a block tree, keeping each `data-i18n` key beside its English. |
 | `scripts/check-extract.mjs` | Walks the DOM and the JSON side by side and reports anything dropped. It currently carries **619 of 619** text fragments across — forms excluded, since those are hand-written here. |
+| `scripts/check-parity.mjs` | Opens **both** apps in a browser and compares the home screen's sections, the twelve tiles *and their order*, and the More menu's groups and rows. This is the check behind "every link and button where the web app has it" — asserting that is easy, measuring it is the only version worth having. |
+| `scripts/extract-reminders.mjs` | Copies the home screen's fifty-four reminders out of `index.html` as source, predicates and all, and refuses to write the file if one of them calls a helper the generated module does not define. |
+| `scripts/build-logo.mjs` | Renders `logo.svg` to a bitmap for the top bar, at 3×. |
 | `scripts/build-i18n.mjs` | Builds `src/i18n/{en,ur,gu,ar}.json`. English comes off the markup; Urdu, Gujarati and Arabic come from `lang/src/*.json` unchanged — 2,021 strings each, covering 99% of the English keys. |
 | `scripts/build-data.mjs` | Bundles the Qur'an text, the surah and book headings, the muṣḥaf page map and the timetable. |
 | `scripts/import-content.mjs` | Executes `quran/athkar.js`, `duas.js` and `rabbanas.js` in a sandbox and writes them as JSON. |
@@ -71,6 +74,7 @@ records.
 npm run content                      # rebuild data + language packs from the web app
 node scripts/parse-check.mjs         # every source file through the project's Babel
 node scripts/check-extract.mjs       # did any prose get dropped?
+node scripts/check-parity.mjs        # is everything where the web app puts it?
 npx expo export --platform web --output-dir dist
 node scripts/shots.mjs               # photograph all 37 screens, report runtime errors
 ```
