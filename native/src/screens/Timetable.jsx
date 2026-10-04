@@ -12,14 +12,14 @@ import { useApp } from "../store";
 import { Hero, Press, Note, tap } from "../ui";
 import TT from "../data/timetable-2026.json";
 import { MON } from "../dates";
-import { pretty, NAMES } from "../prayer";
+import { pretty, nowLondon, NAMES } from "../prayer";
 
 const MONTHS = MON;
 const COLS = ["fajr", "zuhr", "asr", "maghrib", "isha"];
 
 export default function Timetable() {
   const { t, fs } = useApp();
-  const today = new Date();
+  const today = nowLondon();
   const [m, setM] = useState(today.getFullYear() === TT.year ? today.getMonth() : 0);
   const list = useRef(null);
 

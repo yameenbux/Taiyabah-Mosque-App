@@ -5,7 +5,7 @@
  * ported from the web app's reminderCtx().
  */
 import { REMINDERS, setReminderTranslator } from "./reminders-data";
-import { dayFor } from "./prayer";
+import { dayFor, nowLondon } from "./prayer";
 
 const minusMins = (hhmm, n) => {
   const [h, m] = hhmm.split(":").map(Number);
@@ -17,7 +17,7 @@ const at = (d, hhmm) => {
   const x = new Date(d); x.setHours(h, m, 0, 0); return x;
 };
 
-export function context(now = new Date()) {
+export function context(now = nowLondon()) {
   const rec = dayFor(now);
   if (!rec) return null;
   const hm = (rec.hijri || "").match(/^(\d+)\s+(.+?)\s+\d+/);
@@ -45,7 +45,7 @@ export function context(now = new Date()) {
 
 /* Everything that applies right now. A predicate that throws is simply not
  * shown — one bad date test must not take the whole strip down. */
-export function current(now = new Date()) {
+export function current(now = nowLondon()) {
   const c = context(now);
   if (!c) return { list: [], c: null };
   return { list: REMINDERS.filter(r => { try { return r.when(c); } catch { return false; } }), c };

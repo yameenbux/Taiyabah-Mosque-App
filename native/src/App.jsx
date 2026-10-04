@@ -75,7 +75,7 @@ function Tabs() {
         sceneContainerStyle: { backgroundColor: C.paper },
       }}>
       <Tab.Screen name="HomeTab"    component={Home}        options={{ title: t("nav.home", "Home"), tabBarIcon: icon("home") }} />
-      <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer times"), tabBarIcon: icon("time") }} />
+      <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer Times"), tabBarIcon: icon("time") }} />
       <Tab.Screen name="NoticesTab" component={Notices}     options={{ title: t("nav.notices", "Notices"), tabBarIcon: icon("document-text") }} />
       <Tab.Screen name="MoreTab"    component={More}        options={{ title: t("nav.more", "More"), tabBarIcon: icon("ellipsis-horizontal") }} />
     </Tab.Navigator>

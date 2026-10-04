@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, open, tap } from "../ui";
-import { dayFor, nextJamaah, pretty, NAMES, ORDER } from "../prayer";
+import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
 
@@ -68,13 +68,13 @@ function TileIcon({ name }) {
 
 export default function Home({ navigation }) {
   const { t, fs, rtl } = useApp();
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState(nowLondon());
   const [rmIdx, setRmIdx] = useState(0);
 
   /* Tick on the half minute: the only thing that changes is the countdown, and
    * a per-second timer is a battery cost for nothing. */
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30000);
+    const id = setInterval(() => setNow(nowLondon()), 30000);
     return () => clearInterval(id);
   }, []);
   /* Set before the reminders are read, not in an effect afterwards: the first
@@ -263,13 +263,15 @@ export default function Home({ navigation }) {
                                            backgroundColor: i === rmIdx % reminders.length
                                              ? C.goldInk : "rgba(122,104,56,.3)" }} />))}
                 </View>
-                <View style={{ flexDirection: "row", gap: 2 }}>
-                  <Press onPress={() => { tap(); setRmIdx(i => (i - 1 + reminders.length) % reminders.length); }}
-                    style={{ padding: 7 }}>
-                    <Ionicons name="chevron-back" size={16} color={C.goldInk} /></Press>
-                  <Press onPress={() => { tap(); setRmIdx(i => (i + 1) % reminders.length); }}
-                    style={{ padding: 7 }}>
-                    <Ionicons name="chevron-forward" size={16} color={C.goldInk} /></Press>
+                <View style={{ flexDirection: "row", gap: 7 }}>
+                  {[["chevron-back", -1], ["chevron-forward", 1]].map(([icon, step]) => (
+                    <Press key={icon}
+                      onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
+                      style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
+                               justifyContent: "center", borderWidth: 1,
+                               borderColor: "rgba(198,162,76,.45)" }}>
+                      <Ionicons name={icon} size={15} color={C.goldInk} />
+                    </Press>))}
                 </View>
               </View>)}
           </View>)}

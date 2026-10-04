@@ -12,7 +12,7 @@
  */
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { dayFor, NAMES, ORDER } from "./prayer";
+import { dayFor, nowLondon, londonInstant, NAMES, ORDER } from "./prayer";
 
 const DAYS_AHEAD = 7;
 
@@ -44,18 +44,22 @@ export async function arm(reminders) {
       sound: "default", vibrationPattern: [0, 220, 120, 220],
     });
 
-  const now = new Date();
+  /* Two clocks here, deliberately. Which DAY and which jamāʿah come from
+   * London, because that is what the timetable is in. The alarm itself is set
+   * for a real instant, because that is what the OS wakes on — and on a phone
+   * that has travelled, those are not the same thing. */
+  const london = nowLondon();
+  const realNow = new Date();
   let armed = 0;
   for (let d = 0; d < DAYS_AHEAD; d++) {
-    const date = new Date(now); date.setDate(date.getDate() + d);
+    const date = new Date(london); date.setDate(date.getDate() + d);
     const day = dayFor(date);
     if (!day) continue;
     for (const [key, before] of wanted) {
       const at = day.jamaat[key];
       if (!at || !ORDER.includes(key)) continue;
-      const [h, m] = at.split(":").map(Number);
-      const when = new Date(date); when.setHours(h, m - Number(before), 0, 0);
-      if (when <= now) continue;              // never schedule into the past
+      const when = new Date(londonInstant(date, at).getTime() - Number(before) * 60000);
+      if (when <= realNow) continue;          // never schedule into the past
       await Notifications.scheduleNotificationAsync({
         content: {
           title: Number(before) === 0

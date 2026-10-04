@@ -10,13 +10,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, tap } from "../ui";
-import { dayFor, pretty, NAMES, ORDER, nextJamaah } from "../prayer";
+import { dayFor, pretty, nowLondon, NAMES, ORDER, nextJamaah } from "../prayer";
 import { longDate, shortDate, hijri } from "../dates";
 
 export default function PrayerTimes({ navigation }) {
   const { t, fs, rtl } = useApp();
   const [offset, setOffset] = useState(0);         // days from today
-  const when = new Date(); when.setDate(when.getDate() + offset);
+  const when = nowLondon(); when.setDate(when.getDate() + offset);
   const day = dayFor(when);
   const next = offset === 0 ? nextJamaah(when) : null;
 
