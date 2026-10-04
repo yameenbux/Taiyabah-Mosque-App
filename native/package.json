@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "web": "expo start --web",
-    "export:web": "expo export --platform web --output-dir dist"
+    "export:web": "expo export --platform web --output-dir dist",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
