@@ -10,6 +10,7 @@
     "android": {
       "package": "com.taiyabahmasjid.app.dev",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#3C0B2A"
       }
     },
@@ -30,6 +31,12 @@
     ],
     "experiments": {
       "typedRoutes": false
+    },
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3C0B2A"
     }
   }
 }
