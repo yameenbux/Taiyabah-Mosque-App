@@ -29,4 +29,5 @@ export const F = {
   sans:        "HankenGrotesk",
   sansMedium:  "HankenGroteskMedium",
   display:     "Fraunces",          // the serif used for prayer names
+  arabic:      "Amiri",             // scripture is set in Amiri, never a fallback
 };
