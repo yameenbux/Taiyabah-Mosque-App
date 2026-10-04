@@ -1,0 +1,59 @@
+name: Native app (Android)
+
+# Builds the React Native rebuild in native/ into an installable APK.
+#
+# WHY A DEBUG-SIGNED APK AND NOT AN .AAB. This is for holding, not for Play.
+# An .aab cannot be installed directly, and the Play listing still belongs to
+# the web app until the native one is better than it. When that day comes this
+# workflow grows a release-signing step using the same two secrets the web
+# app's build already uses; until then it must not be able to touch the
+# listing even by accident.
+#
+# WHAT COMES OUT. app-debug.apk, attached to the run. Download it, allow
+# installs from the browser, open it. It sits alongside the Play version
+# rather than replacing it — different signing key, so Android treats them as
+# two apps, which is exactly what you want while comparing them.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["native/**", ".github/workflows/native-build.yml"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      # Expo generates the android/ project from app.json. It is not committed:
+      # it is build output, and a stale copy in the repo is a whole class of
+      # "works on my machine" that nobody needs.
+      - name: Generate the Android project
+        working-directory: native
+        run: npx expo prebuild --platform android --no-install
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build the APK
+        working-directory: native/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taiyabah-native-${{ github.run_number }}
+          path: native/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30

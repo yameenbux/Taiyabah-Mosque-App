@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Taiyabah Masjid",
+    "slug": "taiyabah-masjid",
+    "scheme": "taiyabah",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#3C0B2A",
+    "android": {
+      "package": "com.taiyabahmasjid.app.dev",
+      "adaptiveIcon": {
+        "backgroundColor": "#3C0B2A"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
