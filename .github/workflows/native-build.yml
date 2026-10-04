@@ -48,9 +48,22 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # Gradle's real complaint is usually thirty lines above the one line a
+      # check annotation shows, and the raw log is not reachable through the
+      # API. So the tail goes into the job summary, which is.
       - name: Build the APK
         working-directory: native/android
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+
+      - name: What Gradle actually said
+        if: failure()
+        run: |
+          echo '## Gradle failed' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          grep -iE "what went wrong|error:|caused by|FAILURE:" -A4 /tmp/gradle.log | head -60 >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         with:
