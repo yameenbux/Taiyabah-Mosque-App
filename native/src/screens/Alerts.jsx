@@ -14,7 +14,7 @@
  * and will take effect as soon as it is.
  */
 import React, { useEffect, useState } from "react";
-import { View, Text, Switch } from "react-native";
+import { View, Text, Switch, Linking } from "react-native";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
@@ -23,6 +23,7 @@ import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
 import { syncTags, optIn, optOut, whoAmI } from "../push";
+import { batteryHelp } from "../battery-help";
 
 const MINS = [5, 10, 15, 20, 30];
 
@@ -59,6 +60,9 @@ export default function Alerts() {
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
   const [diag, setDiag] = useState(false);
+  /* Worked out once from the manufacturer; it cannot change while the app is
+   * open, and it is null on anything that is not Android. */
+  const help = React.useMemo(batteryHelp, []);
   const [who, setWho] = useState(null);
 
   useEffect(() => {
@@ -185,6 +189,33 @@ export default function Alerts() {
 
         {diag && (
           <Card gap={10}>
+            {/* FIRST, because it is the answer far more often than anything
+                below it. A phone that has stopped the app in the background
+                receives nothing — the masjid's send succeeds, every dashboard
+                says delivered, and nothing appears. Only the person holding
+                the phone can undo that, so the steps are for THEIR phone. */}
+            {!!help && (
+              <View style={{ gap: 7 }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                  {t("alerts.nothing_arriving", "Reminders not arriving at all?")}</Text>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
+                  {help.name
+                    ? `${help.name} ${t("alerts.phones_stop_apps", "phones stop apps running in the background to save battery, and a stopped app cannot receive anything. On this phone:")}`
+                    : t("alerts.phones_stop_apps_generic", "Android stops apps running in the background to save battery, and a stopped app cannot receive anything. On this phone:")}
+                </Text>
+                {help.steps.map((line, i) => (
+                  <Text key={i} style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted,
+                                         lineHeight: fs(19), paddingLeft: 10 }}>
+                    {`${i + 1}.  ${line}`}
+                  </Text>))}
+                <Press onPress={() => { tap(); Linking.openSettings().catch(() => {}); }}
+                  style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                           borderWidth: 1, borderColor: C.line, marginTop: 3 }}>
+                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                    {t("alerts.open_app_settings", "Open this app's settings")}</Text>
+                </Press>
+              </View>)}
+
             {/* The id this phone is known by, so one handset can be sent a test
                 rather than the whole congregation. */}
             <Press onPress={async () => { tap(); setWho(await whoAmI()); }}
