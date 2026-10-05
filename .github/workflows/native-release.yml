@@ -58,6 +58,37 @@ jobs:
           cache: npm
           cache-dependency-path: native/package-lock.json
 
+      # EVERY OTHER CHECK HERE IS ABOUT PACKAGING. They read the manifest, the
+      # applicationId, the signature, the version code — and not one of them
+      # opens the app. On 5 October a bundle would have passed all of them
+      # while the app died before its first frame, because react-native-onesignal
+      # needed the New Architecture and nothing said so.
+      #
+      # The smoke run is the only thing in this repository that installs the
+      # app and taps through it. So a bundle cannot be cut from a commit it has
+      # not passed on. Not "a recent commit" — this one, by SHA, because the
+      # whole failure mode is a change that looks harmless.
+      #
+      # No run for this commit? Actions -> "Native app — does it actually run?"
+      # -> Run workflow, on this same ref, and come back when it is green.
+      - name: Has this exact commit been opened on a phone?
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          sha=${{ github.sha }}
+          n=$(gh api "repos/${{ github.repository }}/actions/workflows/native-smoke.yml/runs?head_sha=$sha&status=success" \
+                --jq '.total_count')
+          echo "successful smoke runs for $sha: $n"
+          if [ "${n:-0}" -lt 1 ]; then
+            echo "::error::No successful smoke run for $sha, so nothing has opened this build."
+            echo "::error::Run 'Native app — does it actually run?' on this ref first."
+            echo "::error::A bundle that packages correctly and crashes on launch passes"
+            echo "::error::every other check in this workflow."
+            exit 1
+          fi
+
+
       - name: Install
         working-directory: native
         run: npm ci

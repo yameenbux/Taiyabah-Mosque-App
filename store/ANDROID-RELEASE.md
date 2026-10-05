@@ -70,7 +70,16 @@ The last TWA production release was version code **1**, so 2 is free. If that
 is ever in doubt, read it off **Release → Production** in the console rather
 than guessing; Play refuses a repeat and only says so after the upload.
 
-The run checks every screen parses, that each one says what the website says,
+The run refuses to start unless **this exact commit has already passed the
+smoke run** — the one that boots an emulator, installs the app and taps
+through it. That is not belt and braces. Every other check in the release
+workflow is about packaging: the manifest, the applicationId, the signature,
+the version code. None of them opens the app, and on 5 October a bundle would
+have passed all of them while the app crashed before its first frame. If it
+stops here, run **Actions → "Native app — does it actually run?"** on the same
+ref and come back when it is green.
+
+Then it checks every screen parses, that each one says what the website says,
 and that every link and Stripe URL points where the website points — then
 builds, signs, and **reads the certificate back out of the finished bundle**
 to prove it is the upload key and not Expo's debug key. A debug-signed bundle
