@@ -254,7 +254,8 @@ if (!findIn(home, DREW)) {
   say("\nwhat WAS on screen (" + seen.length + " items):\n  " + seen.join("\n  ").slice(0, 3000));
   annotate("on screen instead: " + (seen.length ? seen.slice(0, 12).join(" | ") : "(nothing at all)"));
   try {
-    const focus = adb(["shell", "dumpsys", "window"]).match(/mCurrentFocus=.*/)?.[0] || "(none)";
+    /* Every display's line, not just the first — see the focus check below. */
+    const focus = focusedWindows().join(" / ") || "(none)";
     say("focus: " + focus); annotate("focused window: " + focus);
   } catch {}
   try {
@@ -273,9 +274,31 @@ shot("home");
 const early = crashes();
 if (early.length) fail("crashed on launch:\n    " + early.slice(0, 6).join("\n    "));
 
-/* Is the app actually the thing in front? A blank activity still "runs". */
-const focus = adb(["shell", "dumpsys", "window"]).match(/mCurrentFocus=.*\n?/)?.[0] || "";
-if (!focus.includes(PKG)) fail(`the app is not in front — focus is ${focus.trim() || "nothing"}`);
+/* Is the app actually the thing in front? A blank activity still "runs".
+ *
+ * This asked `dumpsys window` once and read only the FIRST mCurrentFocus line,
+ * and it failed a run in which the app had drawn and every one of the fifty
+ * checks after it passed. Two reasons it was wrong to trust: there is one
+ * mCurrentFocus per display, so the first line is not necessarily the display
+ * being looked at; and a single instant is the wrong unit — a background
+ * launcher restarting or an ANR dialog can hold focus for a moment while the
+ * app is perfectly healthy. So: every line, and a few seconds to settle. */
+function focusedWindows() {
+  try {
+    return [...adb(["shell", "dumpsys", "window"]).matchAll(/mCurrentFocus=.*/g)].map(m => m[0]);
+  } catch { return []; }
+}
+let focus = [];
+let inFront = false;
+for (let i = 0; i < 8 && !inFront; i++) {
+  if (i) sleep(1000);
+  focus = focusedWindows();
+  inFront = focus.some(f => f.includes(PKG));
+  /* Halfway through, stop waiting politely and clear whatever is on top. */
+  if (!inFront && i === 4 && dismissSystemDialogs()) { launch(); sleep(3000); }
+}
+if (!inFront) fail("the app is not in front after 8s — focus is " +
+                   (focus.join(" / ").trim() || "nothing"));
 else log("ok", "the app is the focused window");
 
 /* ---------- everything on the home screen -------------------------------- */
