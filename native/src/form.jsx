@@ -155,9 +155,13 @@ export function Calendar({ month, onMonth, selected = [], taken = [], first, las
       </View>
 
       {!!taken.length && (
-        <View style={{ flexDirection: "row", gap: 14, justifyContent: "center", marginTop: 4 }}>
+        <View style={{ flexDirection: "row", gap: 14, justifyContent: "center", flexWrap: "wrap", marginTop: 4 }}>
           <Legend colour="rgba(180,83,47,.3)" label={t("hallhire.booked", "Booked")} />
           <Legend colour={C.card} label={t("hallhire.available", "Available")} bordered />
+          {/* A day outside the published window is not free — the office has
+              simply not said yet, and the website names that third state
+              rather than letting it look available. */}
+          <Legend colour="rgba(0,0,0,.06)" label={t("hallhire.not_published", "Not published")} bordered />
         </View>)}
     </Card>
   );

@@ -19,7 +19,7 @@ import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, Press, tap } from "../ui";
+import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
 
@@ -57,6 +57,7 @@ export default function Alerts() {
   const [granted, setGranted] = useState(null);
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [diag, setDiag] = useState(false);
 
   useEffect(() => {
     Notifications.getPermissionsAsync()
@@ -130,7 +131,7 @@ export default function Alerts() {
           </View>
 
           <Row title={t("sheet.janazah", "Janāzah")} badge={t("sheet.urgent", "Urgent")}
-            sub={t("sheet.a_death_in_the_community", "A death in the community")}
+            sub={t("sheet.funeral_prayer_announcements", "Funeral prayer announcements")}
             value={!!alerts.janazah} onChange={v => set({ janazah: v })} />
           <Row title={t("sheet.announcements", "Announcements")}
             sub={t("sheet.timetable_changes_ramadan_eid", "Timetable changes, Ramadan, Eid")}
@@ -147,7 +148,8 @@ export default function Alerts() {
           style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
                    borderWidth: 1, borderColor: C.brand600, marginTop: 14 }}>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
-            {saved ? t("sheet.notifications_on", "Notifications on") : t("sheet.save", "Save")}</Text>
+            {saved ? `${t("sheet.notifications_on", "Notifications on")} · ${t("sheet.change", "Change")}`
+                   : t("sheet.save", "Save")}</Text>
         </Press>
 
         {granted === false
@@ -156,6 +158,44 @@ export default function Alerts() {
             <Note>{armed === 0
               ? t("alerts.none_set", "No reminders set.")
               : `${armed} ${t("alerts.scheduled", "reminders are scheduled on this phone.")}`}</Note>)}
+
+        {/* The website's diagnostics. When a reminder does not arrive, the
+            answer is almost always one of three things, and a person with no
+            way to check any of them simply decides the app does not work. */}
+        <Press onPress={() => { tap(); setDiag(d => !d); }}
+          style={{ alignItems: "center", paddingVertical: 11, marginTop: 14 }}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
+            {t("sheet.having_trouble", "Having trouble?")}</Text>
+        </Press>
+
+        {diag && (
+          <Card gap={10}>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
+              {`${t("alerts.permission", "Permission")}: ${granted ? t("sheet.notifications_on", "Notifications on") : t("alerts.notifications_off", "Notifications off")}\n` +
+               `${t("alerts.scheduled_now", "Scheduled now")}: ${armed ?? "—"}\n` +
+               `${t("sheet.jama_ah_reminders", "Jamāʿah reminders")}: ${alerts.jamaah ? `${alerts.mins} min` : "—"}`}
+            </Text>
+            <Press onPress={async () => { tap(); await rearm({}); }}
+              style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                       borderWidth: 1, borderColor: C.line }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                {t("sheet.send_my_categories_again", "Send my categories again")}</Text>
+            </Press>
+            <Press onPress={() => { tap(); open(`mailto:admin@taiyabahmasjid.com?subject=${encodeURIComponent("App notifications")}&body=${encodeURIComponent(`Permission: ${granted}\nScheduled: ${armed}\nJamaah: ${alerts.jamaah ? alerts.mins + " min" : "off"}\nKahf: ${alerts.kahf}`)}`); }}
+              style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                       borderWidth: 1, borderColor: C.line }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                {t("sheet.send_this_report_to_the", "Send this report to the masjid")}</Text>
+            </Press>
+            <Press onPress={async () => { tap(); await Notifications.cancelAllScheduledNotificationsAsync(); await rearm({}); }}
+              style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                       borderWidth: 1, borderColor: C.line }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                {t("sheet.reset_reload_the_app", "Reset & reload the app")}</Text>
+            </Press>
+            <Note>{t("sheet.this_clears_the_app_s",
+              "This clears the app’s stored files and re-installs its background service. Your prayer times are built in, so nothing is lost.")}</Note>
+          </Card>)}
 
         <Note>{t("alerts.from_the_masjid_needs_push",
           "Janāzah, announcements and events are sent by the masjid. Your choices are saved and will take effect once this app is registered for the masjid's notifications; jamāʿah and Sūrah al-Kahf reminders already work on this phone, with no signal.")}</Note>

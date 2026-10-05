@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, Text } from "react-native";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, open } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, RowGroup, NavRow, open } from "../ui";
 import { Field, Choice, Calendar, ErrorBox, Submit, Sent, isPhone } from "../form";
 import { rpc, readView } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
@@ -117,6 +117,18 @@ export default function HallHire({ navigation }) {
       <View style={{ paddingHorizontal: 16 }}>
         <Blocks blocks={prose} nav={navigation} />
 
+        {/* Where the hall actually is, and how to get to it — the website puts
+            this above the form, and without it the booking form asks people to
+            commit to a venue the app never names. */}
+        <RowGroup>
+          <NavRow icon="location-outline"
+                  label={t("hallhire.taiyabah_centre_get_directions", "Taiyabah Centre · get directions")}
+                  sub={t("hallhire.astley_street_bolton_bl1_8eh", "Astley Street, Bolton BL1 8EH")}
+                  href="https://maps.google.com/?q=Astley+Street,+Bolton+BL1+8EH" />
+        </RowGroup>
+        <Note>{t("hallhire.hire_is_whole_day",
+          "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day.")}</Note>
+
         <Heading>{t("hallhire.book_the_hall", "Book the hall")}</Heading>
         <Notice>{t("hallhire.deposit_books_the_date",
           "*Paying the £100 deposit books the date.* Choose your day, fill in the short form and pay — the date is yours as soon as the deposit goes through, with nobody to wait for. It is held for you for thirty minutes while you pay.")}</Notice>
@@ -125,7 +137,7 @@ export default function HallHire({ navigation }) {
                 options={[
                   { v: "halls1", t: t("hallhire.one_hall", "1 hall"), s: t("hallhire.mon_thu_only", "Mon–Thu only") },
                   { v: "halls2", t: t("hallhire.two_halls", "2 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
-                  { v: "halls3", t: t("hallhire.three_halls", "3 halls"), s: t("hallhire.kitchen_included", "Kitchen included") },
+                  { v: "halls3", t: t("hallhire.three_halls", "3 halls"), s: t("hallhire.kitchen_included_2", "Kitchen included") },
                   { v: "kitchen", t: t("hallhire.kitchen_only", "Kitchen only"), s: t("hallhire.no_halls", "No halls") },
                 ]} />
         {bad.hire && <ErrorBox>{t("hallhire.choose_what_you_need", "Please choose what you need.")}</ErrorBox>}
@@ -147,9 +159,10 @@ export default function HallHire({ navigation }) {
                onChange={v => setWho(s => ({ ...s, first: v }))} />
         <Field label={t("hallhire.surname", "Surname")} type="name" value={who.last} bad={bad.last}
                onChange={v => setWho(s => ({ ...s, last: v }))} />
-        <Field label={t("nikah.address", "Address")} type="multi" value={who.addr} bad={bad.addr}
+        <Field label={t("hallhire.address_label", "Address")} type="multi" value={who.addr} bad={bad.addr}
                onChange={v => setWho(s => ({ ...s, addr: v }))} />
         <Field label={t("hallhire.contact_number", "Contact number")} type="tel" value={who.phone} bad={bad.phone}
+               hint={t("hallhire.phone_hint", "The caretaker will call you before the day to arrange access, so this must be a number that reaches you.")}
                hint={t("hallhire.the_caretaker_will_call_you",
                  "The caretaker will call you before the day to arrange access, so it must be a number that reaches you.")}
                onChange={v => setWho(s => ({ ...s, phone: v }))} />

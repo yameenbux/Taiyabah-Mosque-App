@@ -69,7 +69,7 @@ export default function Advice({ navigation }) {
             <Notice>{t("advice.not_taking_written",
               "The masjid is not taking written questions at the moment.")}</Notice>
             <RowGroup>
-              <NavRow icon="call-outline" label={t("nikah.ring_the_office", "Ring the office")}
+              <NavRow icon="call-outline" label={t("advice.call_the_main_office_to", "Call the main office to book")}
                       sub="01204 535 997 · 5pm to 7pm" href="tel:01204535997" />
               <NavRow icon="mail-outline" label={t("advice.or_write_to_them", "Or write to them")}
                       sub="info@taiyabahmasjid.com" href="mailto:info@taiyabahmasjid.com" />
@@ -78,18 +78,32 @@ export default function Advice({ navigation }) {
         ) : (
           <>
             <Heading>{t("advice.ask_a_question", "Ask a question")}</Heading>
+            {/* Why the form asks for everything it asks for, and what will and
+                will not happen afterwards. The website says both; without them
+                the form looks nosy and its silence afterwards looks broken. */}
+            <Note>{t("advice.every_box_is_needed_so",
+              "Every box is needed: the imam has to know who he is answering, where to send his answer, and what the question is about.")}</Note>
             <Field label={t("advice.your_name", "Your name")} type="name" value={v.name} bad={bad.name}
                    onChange={x => setV(s => ({ ...s, name: x }))} />
-            <Field label={t("nikah.contact_number", "Contact number")} type="tel" value={v.phone} bad={bad.phone}
+            <Field label={t("advice.phone_number", "Phone number")} type="tel" value={v.phone} bad={bad.phone}
                    onChange={x => setV(s => ({ ...s, phone: x }))} />
             <Field label={t("advice.email", "Email")} type="email" value={v.email} bad={bad.email}
-                   hint={t("advice.thats_where_the_answer_goes", "That is where the answer goes.")}
+                   hint={t("advice.the_imams_answer_is_sent_here", "The imam’s answer is sent to this address, so please check it.")}
                    onChange={x => setV(s => ({ ...s, email: x }))} />
-            <Field label={t("advice.subject", "What is it about?")} value={v.subject} bad={bad.subject}
+            <Field label={t("advice.what_it_is_about", "What it is about — one short line")} value={v.subject} bad={bad.subject}
                    onChange={x => setV(s => ({ ...s, subject: x }))} />
             <Field label={t("advice.your_question", "Your question")} type="multi" value={v.question} bad={bad.question}
                    onChange={x => setV(s => ({ ...s, question: x }))} />
             <ErrorBox>{state.error}</ErrorBox>
+            <Note>{t("advice.you_will_get_no_email_confirming",
+              "You will not get an email confirming this was sent — your reference is shown on the next screen, so keep it.")}</Note>
+            {/* Who sees it. For some of what people write here, this is the
+                single most important sentence on the screen. */}
+            <Heading>{t("advice.who_reads_this", "Who reads this")}</Heading>
+            <Note>{t("advice.what_you_write_here_is_read",
+              "What you write here is read by *the imams and by nobody else at the masjid* — not the office, not the committee, not an administrator. The imam answers you by email.")}</Note>
+            <Note>{t("advice.if_this_is_urgent_please_ring",
+              "If this is urgent, or you would rather speak to somebody, please ring the number above instead of writing.")}</Note>
             <Submit label={t("advice.send_this_to_the_imams", "Send this to the imams")}
                     sending={state.sending} onPress={send} />
           </>

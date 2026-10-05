@@ -58,6 +58,7 @@ const WONT_NEED = {
   "bukhari.all_books":              "a back link; the app has a back arrow in the header",
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
   "sheet.use_my_phone_s_compass":   "a browser needs a tap before it may read the compass; the app reads it on open",
+  "hallhire.change":                "the website's form is two steps and this is its way back to the first; the app's is one page, so there is nothing to go back to",
 };
 
 /* A screen ends at its own closing tag, not where the next one starts.
@@ -87,6 +88,24 @@ const prose = new Set();
 for (const m of fs.readFileSync(path.join(root, "src/data/sheets.json"), "utf8")
                  .matchAll(/"k"\s*:\s*"([^"]+)"/g)) prose.add(m[1]);
 
+/* Everything the app says, anywhere. A string the app puts on a different
+ * screen from the website is a layout difference, not a missing string, and
+ * reporting it as missing sends somebody to write what is already written. */
+function allSources(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => {
+    const f = path.join(dir, e.name);
+    if (e.isDirectory()) return e.name === "data" || e.name === "i18n" ? [] : allSources(f);
+    return /\.(js|jsx)$/.test(e.name) ? [fs.readFileSync(f, "utf8")] : [];
+  });
+}
+const ALL_SRC = allSources(path.join(root, "src")).join("");
+
+/* Keys the app builds at runtime — t(`sheet.${n}_min`) answers sheet.5_min,
+ * sheet.10_min and the rest, and asking for the literal finds none of them. */
+const TEMPLATES = [...ALL_SRC.matchAll(/`([a-z][\w.]*\$\{[^}]+\}[\w.]*)`/gi)]
+  .map(m => new RegExp("^" + m[1].replace(/[.]/g, "\\.").replace(/\$\{[^}]+\}/g, "[\\w-]+") + "$"));
+const has = (src, k) => src.includes(`"${k}"`) || TEMPLATES.some(re => re.test(k));
+
 const rows = [];
 for (let i = 0; i < anchors.length; i++) {
   const [pos, name, tag] = anchors[i];
@@ -99,7 +118,7 @@ for (let i = 0; i < anchors.length; i++) {
     .map(f => path.join(root, "src", f))
     .filter(fs.existsSync).map(f => fs.readFileSync(f, "utf8")).join("");
   const missing = keys.filter(k =>
-    !src.includes(`"${k}"`) && !prose.has(k) && !WONT_NEED[k]);
+    !has(src, k) && !prose.has(k) && !WONT_NEED[k] && !has(ALL_SRC, k));
   rows.push({ name, keys: keys.length, missing });
 }
 rows.sort((a, b) => b.missing.length - a.missing.length);

@@ -16,7 +16,30 @@ import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
+import TT from "../data/timetable-2026.json";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
+
+/* Ramadan, counted down on the home screen for the month before it.
+ *
+ * The website carries this band and the app did not, so the one thing the whole
+ * community is counting toward was the one thing the home screen never said.
+ * The date comes from the timetable's own hijri column — the first "1 Ramadan"
+ * on or after today — which is the masjid's printed calendar rather than a
+ * second calculation that could disagree with it. */
+const RAM_WINDOW = 30;
+
+function ramadanIn(now) {
+  for (const [iso, d] of Object.entries(TT.days)) {
+    if (!/^1\s+Rama(d|dh)an/i.test(d.hijri || "")) continue;
+    const [Y, M, D] = iso.split("-").map(Number);
+    const when = new Date(Y, M - 1, D);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((when - today) / 86400000);
+    if (days < 0 || days > RAM_WINDOW) continue;
+    return { days, year: (d.hijri.match(/(\d+)\s*AH/) || [])[1] };
+  }
+  return null;
+}
 
 /* The twelve tiles, in the web app's order. Not alphabetical, not grouped by
  * kind — this is the order the committee settled on, so it is the order here. */
@@ -82,6 +105,8 @@ export default function Home({ navigation }) {
    * 24-hour on it. */
   setReminderTranslator(t, pretty);
 
+  const ramadan = ramadanIn(now);
+
   const day = dayFor(now);
   const next = nextJamaah(now);
   const friday = now.getDay() === 5;
@@ -138,6 +163,20 @@ export default function Home({ navigation }) {
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "#D0BFCA" }}>
             {shortDate(t, now)}{day ? ` · ${hijri(t, day.hijri)}` : ""}</Text>
         </View>
+
+        {!!ramadan && (
+          <View style={{ alignItems: "center", marginTop: 10 }}>
+            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright,
+                           textAlign: "center" }}>
+              {ramadan.days === 0 ? t("ramadan.begins_today", "Ramadan begins today")
+               : ramadan.days === 1 ? t("ramadan.begins_tomorrow", "Ramadan begins tomorrow")
+               : t("ramadan.begins_in_about", "Ramadan begins in about {n} days")
+                   .replace("{n}", String(ramadan.days))}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)",
+                           marginTop: 2, textAlign: "center" }}>
+              {t("app.subject_to_moon_sighting", "Subject to moon sighting")}
+              {ramadan.year ? ` · ${ramadan.year} AH` : ""}</Text>
+          </View>)}
 
         {next ? (
           <>
