@@ -148,6 +148,52 @@ function crashes() {
   return lines;
 }
 
+/* ---------- getting the app in front ------------------------------------- */
+
+/* The emulator's own launcher can ANR on a cold boot, and its "isn't
+ * responding" dialog takes focus — which read exactly like the app failing to
+ * draw, and got reported as such. Clearing it is not papering over an app
+ * fault: it only ever touches a dialog about another package, our own crash
+ * dialog is left alone and still fails the run, and the app has to draw
+ * afterwards regardless. */
+function dismissSystemDialogs() {
+  let acted = false;
+  for (let i = 0; i < 3; i++) {
+    let ns;
+    try { ns = nodes(dump()); } catch { return acted; }
+    const anr = ns.find(n => /isn[\u2019']?t responding|has stopped|keeps stopping/i.test(n.label || ""));
+    if (!anr) return acted;
+    const what = (anr.label || "").trim();
+    if (/taiyabah/i.test(what)) { say("  our own app is the one not responding"); return acted; }
+    say("  a system dialog was in the way: " + what.slice(0, 80));
+    const btn = ns.find(n => /^(Wait|Close app|Close|OK)$/i.test((n.label || "").trim()));
+    if (btn) tap(btn); else adb(["shell", "input", "keyevent", "KEYCODE_BACK"]);
+    acted = true;
+    sleep(1500);
+  }
+  return acted;
+}
+
+let component = null;
+function launch() {
+  /* `am start` names the activity directly, so a wedged launcher cannot
+   * swallow the launch the way the launcher intent could. */
+  if (!component) {
+    try {
+      const out = adb(["shell", "cmd", "package", "resolve-activity", "--brief", PKG]).trim();
+      const line = out.split("\n").map(l => l.trim()).filter(Boolean).pop();
+      component = line && line.includes("/") ? line : `${PKG}/${PKG}.MainActivity`;
+    } catch { component = `${PKG}/${PKG}.MainActivity`; }
+    say("  component: " + component);
+  }
+  try { adb(["shell", "am", "start", "-W", "-n", component]); }
+  catch (e) {
+    say("  am start failed (" + e.message.slice(0, 120) + ") — trying the launcher intent");
+    adb(["shell", "monkey", "-p", PKG, "-c", "android.intent.category.LAUNCHER", "1"],
+        { stdio: ["ignore", "ignore", "ignore"] });
+  }
+}
+
 /* ---------- the run ------------------------------------------------------ */
 
 /* Everything below runs inside this, so a throw leaves a log, a picture and an
@@ -175,8 +221,8 @@ try {
 adb(["logcat", "-c"]);
 
 log("··", "launching");
-adb(["shell", "monkey", "-p", PKG, "-c", "android.intent.category.LAUNCHER", "1"],
-    { stdio: ["ignore", "ignore", "ignore"] });
+dismissSystemDialogs();
+launch();
 /* One picture before any assertion, so there is always something to look at. */
 sleep(6000);
 shot("first-frame");
@@ -188,16 +234,22 @@ shot("first-frame");
  * asking whether the page had been scrolled, not whether the app had started. */
 const DREW = /BOLTON CENTRAL|NEXT JAM|Beginning time|السَّلَامُ/i;
 let xml = "", home = [];
-for (let i = 0; i < 20; i++) {
-  sleep(1500);
-  xml = dump(); home = nodes(xml);
-  if (findIn(home, DREW)) break;
+for (let attempt = 1; attempt <= 3 && !findIn(home, DREW); attempt++) {
+  if (attempt > 1) { say(`  nothing yet — relaunching (attempt ${attempt} of 3)`); launch(); sleep(4000); }
+  for (let i = 0; i < 20; i++) {
+    sleep(1500);
+    xml = dump(); home = nodes(xml);
+    if (findIn(home, DREW)) break;
+    /* Every few turns, check whether something is sitting on top of us. */
+    if (i % 5 === 4 && dismissSystemDialogs()) { launch(); sleep(3000); }
+  }
 }
 if (!findIn(home, DREW)) {
   shot("home-FAILED");
   if (dumpFailures) fail(`could not read the screen at all (${dumpFailures} failed dumps) — ` +
                          "so whether the app drew is unknown");
-  else fail("the home screen never drew — nothing matching 'Services' after 30s");
+  else fail("the home screen never drew — no sign of the hero (the society's name, " +
+            "the salām, the next jamāʿah) after three launches");
   const seen = home.map(n => n.label).filter(Boolean);
   say("\nwhat WAS on screen (" + seen.length + " items):\n  " + seen.join("\n  ").slice(0, 3000));
   annotate("on screen instead: " + (seen.length ? seen.slice(0, 12).join(" | ") : "(nothing at all)"));
