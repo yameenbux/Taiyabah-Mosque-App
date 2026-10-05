@@ -314,7 +314,19 @@ function jsLog(re) {
     return adb(["logcat", "-d", "-s", "ReactNativeJS:V"]).split("\n").filter(l => re.test(l));
   } catch { return []; }
 }
-const fontSays = jsLog(/font|asset|Asset/i);
+/* "has been rejected." is all React Native prints; the reason for it is on the
+ * native side, under other tags entirely — usually naming the URI it tried to
+ * fetch, which is the whole answer. So the whole log is swept, not just JS. */
+function nativeSays(re) {
+  try {
+    return adb(["logcat", "-d", "-t", "4000"]).split("\n")
+      .filter(l => re.test(l) && !/^\s*$/.test(l));
+  } catch { return []; }
+}
+const fontSays = [
+  ...jsLog(/font|asset|Asset/i),
+  ...nativeSays(/ExpoAsset|expo\.modules\.asset|Unable to download|AssetSourceResolver|ExpoFontLoader|FileNotFound|ENOENT|No such file/i),
+];
 if (fontSays.length) {
   say("\nwhat the app said about its fonts:\n  " + fontSays.join("\n  "));
   fontSays.slice(0, 6).forEach(l => annotate("app says: " + l.slice(0, 900)));
