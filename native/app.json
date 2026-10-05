@@ -81,6 +81,15 @@
         {
           "microphonePermission": false
         }
+      ],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production",
+          "smallIcons": [
+            "./assets/notification-icon.png"
+          ]
+        }
       ]
     ],
     "experiments": {

@@ -13,6 +13,7 @@ import { AppProvider, useApp } from "./store";
 import { sheetScreen } from "./Blocks";
 import Opening from "./Opening";
 import FirstRun from "./FirstRun";
+import { startPush } from "./push";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -187,6 +188,10 @@ export default function App() {
     /* Said out loud so the Android test can assert it rather than take a
      * screenshot's word for it. */
     try { console.log("fonts available: " + Font.getLoadedFonts().join(", ")); } catch {}
+    /* Started here and nowhere else. Initialising does NOT ask for permission
+     * and does not subscribe anybody — it only makes the SDK ready, so that
+     * when somebody does say yes there is something to say yes to. */
+    startPush();
   }, []);
 
   /* Shown only while the settings store answers, which has its own ceiling in

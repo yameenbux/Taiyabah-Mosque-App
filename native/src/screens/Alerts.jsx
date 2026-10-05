@@ -22,6 +22,7 @@ import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
+import { syncTags, optIn, optOut } from "../push";
 
 const MINS = [5, 10, 15, 20, 30];
 
@@ -84,6 +85,19 @@ export default function Alerts() {
 
   const set = patch => { tap(); setAlerts(patch); setSaved(false); };
 
+  /* The three the masjid sends are tags on this device, and a tag written is
+   * the whole of what makes a phone reachable by a targeted send. Written when
+   * Save is pressed rather than on every flick of a switch, so a person
+   * changing their mind four times does not queue four writes. */
+  const [tagState, setTagState] = useState(null);
+  const saveAll = async () => {
+    tap(); setSaved(true);
+    await rearm({});
+    const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf;
+    if (wantsAny) await optIn(); else await optOut();
+    setTagState(await syncTags(alerts));
+  };
+
   return (
     <Screen pad={false}>
       <Hero lines={[
@@ -144,7 +158,7 @@ export default function Alerts() {
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
         </Card>
 
-        <Press onPress={() => { tap(); setSaved(true); rearm({}); }}
+        <Press onPress={saveAll}
           style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
                    borderWidth: 1, borderColor: C.brand600, marginTop: 14 }}>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
@@ -197,8 +211,11 @@ export default function Alerts() {
               "This clears the app’s stored files and re-installs its background service. Your prayer times are built in, so nothing is lost.")}</Note>
           </Card>)}
 
-        <Note>{t("alerts.from_the_masjid_needs_push",
-          "Janāzah, announcements and events are sent by the masjid. Your choices are saved and will take effect once this app is registered for the masjid's notifications; jamāʿah and Sūrah al-Kahf reminders already work on this phone, with no signal.")}</Note>
+        <Note>{t("alerts.what_comes_from_where",
+          "Jamāʿah and Sūrah al-Kahf reminders are set on this phone and arrive with no signal. Janāzah, announcements and events are sent by the masjid, so those need a connection.")}</Note>
+        {!!tagState && tagState !== "stored" && (
+          <Note>{t("alerts.choices_not_stored",
+            "Your choices for the masjid's announcements could not be saved just now. They are kept on this phone and will be sent again next time you press Save.")}</Note>)}
       </View>
     </Screen>
   );

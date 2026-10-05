@@ -22,6 +22,7 @@ import { useApp } from "./store";
 import { Press, tap } from "./ui";
 import { ORDER } from "./prayer";
 import { arm, ask } from "./reminders";
+import { askPush, syncTags, optIn } from "./push";
 
 export default function FirstRun() {
   const { t, fs, alerts, askedPush, setAskedPush } = useApp();
@@ -45,13 +46,19 @@ export default function FirstRun() {
 
   const yes = async () => {
     tap();
-    const ok = await ask();
-    /* Granted and then armed, so the first reminder is real rather than a
-     * promise the person has to go and switch on themselves. */
+    /* One dialog, raised through OneSignal so it records the answer too —
+     * asking twice for the same permission is how an app looks broken. */
+    const ok = (await askPush()) || (await ask());
     if (ok) {
+      /* Armed immediately, so the first reminder is real rather than a promise
+       * somebody has to go and switch on themselves. */
       const per = {};
       if (alerts.jamaah) for (const k of ORDER) per[k] = alerts.mins;
       try { await arm(per, { kahf: alerts.kahf }); } catch {}
+      /* And subscribed with the tags the masjid's segments are built on, so
+       * this phone is reachable from the moment it says yes rather than only
+       * after somebody finds the Notifications screen and presses Save. */
+      try { await optIn(); await syncTags(alerts); } catch {}
     }
     close();
   };
