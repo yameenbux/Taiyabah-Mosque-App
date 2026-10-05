@@ -148,61 +148,35 @@ export function TopBar({ navigation, onBell }) {
   );
 }
 
-/* The web app closes a sheet with one control — "Done" — and has no back arrow
- * on a sheet opened from the home screen. The app had an arrow on every pushed
- * screen AND a chevron in the hero, which is two affordances the website does
- * not have and a different way of moving around. These two components are the
- * website's `.sh-close` and `.sh-top`, to its own measurements. */
-export function Done({ onPress }) {
-  const { t, fs } = useApp();
-  return (
-    <Press onPress={() => { tap(); onPress(); }} accessibilityRole="button"
-      style={{ flexShrink: 0, borderWidth: 1, borderColor: "rgba(198,162,76,.45)",
-               backgroundColor: "rgba(198,162,76,.14)", paddingHorizontal: 14, paddingVertical: 9,
-               borderRadius: R.pill, marginLeft: 2 }}>
-      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: C.goldBright }}>
-        {t("sheet.done", "Done")}</Text>
-    </Press>);
-}
-
-export function SheetTop({ title, onDone }) {
-  const { fs } = useApp();
-  const insets = useSafeAreaInsets();
-  return (
-    <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-      style={{ flexDirection: "row", alignItems: "center", gap: 10,
-               paddingTop: insets.top + 14, paddingBottom: 14, paddingHorizontal: 14 }}>
-      {/* flex:1 and centred, exactly as .sh-top h3 is — so the title sits in the
-          middle of what is left once Done has taken its place. */}
-      <Text numberOfLines={1}
-        style={{ flex: 1, textAlign: "center", fontFamily: F.display, fontSize: fs(15.5), color: C.cream }}>
-        {title}</Text>
-      <Done onPress={onDone} />
-    </LinearGradient>);
-}
-
 export function Hero({ lines = [], children, tall, minHeight }) {
   const { fs, tx, rtl } = useApp();
   const insets = useSafeAreaInsets();
   /* These screens draw their own hero behind the status bar, so they carry no
-   * platform header. The way out is Done, in the same corner and the same shape
-   * as every other screen's — which is what the website does. */
+   * platform header — and with it no back arrow. The swipe-back gesture still
+   * works, but an arrow you can see is not optional: plenty of people never
+   * learn the gesture, and a screen with no visible way out is the single
+   * loudest "this was a website" tell there is. */
   const nav = useNavigation();
   /* Only on a pushed screen. Inside a tab, canGoBack() is true as soon as you
    * have visited another tab, and an arrow that takes you sideways rather than
    * back is worse than no arrow at all. */
-  const pushedScreen = nav?.getState?.()?.type === "stack" && nav.canGoBack();
+  const canBack = nav?.getState?.()?.type === "stack" && nav.canGoBack();
   return (
     <LinearGradient colors={[C.brand900, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       style={{ paddingTop: insets.top + (tall ? 30 : 18), paddingBottom: tall ? 32 : 24,
                paddingHorizontal: 22, overflow: "hidden",
                minHeight, justifyContent: minHeight ? "center" : "flex-start" }}>
       <Girih style={{ right: -70, top: -62 }} size={215} />
-      {pushedScreen && (
-        <View style={{ position: "absolute", right: 14, top: insets.top + 10, zIndex: 2 }}>
-          <Done onPress={() => nav.popToTop()} />
-        </View>)}
-      <View style={{ height: pushedScreen ? 34 : 0 }} />
+      {canBack && (
+        <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"
+          hitSlop={10}
+          style={({ pressed }) => ({ position: "absolute", left: 12, top: insets.top + 6,
+                                     width: 40, height: 40, borderRadius: 20, alignItems: "center",
+                                     justifyContent: "center", zIndex: 2,
+                                     backgroundColor: pressed ? "rgba(243,239,227,.16)" : "transparent" })}>
+          <Ionicons name={rtl ? "chevron-forward" : "chevron-back"} size={25} color={C.cream} />
+        </Pressable>)}
+      <View style={{ height: canBack ? 34 : 0 }} />
       {lines.map((l, i) => {
         const text = tx(l);
         if (!text) return null;

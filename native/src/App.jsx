@@ -4,15 +4,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Platform, View } from "react-native";
-import { useFonts } from "expo-font";
+import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
 import { AppProvider, useApp } from "./store";
 import { sheetScreen } from "./Blocks";
-import { SheetTop } from "./ui";
-import IDX from "./data/quran-index.json";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -87,15 +85,12 @@ function Tabs() {
 function Root() {
   const { t, fs, lang } = useApp();
 
-  /* The website gives a sheet one plum bar with its name and a Done button, and
-   * no back arrow. This was a pale platform header with the arrow the platform
-   * puts there by default — a different bar, in different colours, offering a
-   * way out the website does not have. Replaced wholesale, so every screen in
-   * the app is topped the same way the website tops it. */
   const pushed = {
-    header: ({ navigation, options }) => (
-      <SheetTop title={options.title} onDone={() => navigation.popToTop()} />
-    ),
+    headerStyle: { backgroundColor: C.paper },
+    headerTintColor: C.brand600,
+    headerTitleStyle: { fontFamily: F.display, fontSize: fs(17), color: C.ink },
+    headerShadowVisible: false,
+    headerBackTitleVisible: false,
     contentStyle: { backgroundColor: C.paper },
   };
   /* Screens that draw their own hero behind the status bar have no header at
@@ -112,11 +107,11 @@ function Root() {
         {/* reading */}
         <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare }} />
         <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.english_translation", "Translation") }} />
-        <Stack.Screen name="Surah"     component={Surah}
-          options={({ route }) => ({ ...pushed,
-            title: t(`surah.${route.params?.n}.name`,
-                     IDX.surahs.find(s => s.n === route.params?.n)?.nameEn || "") })} />
-        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan") }} />
+        <Stack.Screen name="Surah"     component={Surah}    options={{ ...pushed, title: "" }} />
+        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan"),
+                                                                       headerStyle: { backgroundColor: "#15060F" },
+                                                                       headerTintColor: C.goldBright,
+                                                                       headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("tiles.hadith", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}
@@ -160,45 +155,38 @@ function Root() {
 }
 
 export default function App() {
-  const [ready, fontError] = useFonts({
-    HankenGrotesk:       require("../assets/fonts/HankenGrotesk-Regular.ttf"),
-    HankenGroteskMedium: require("../assets/fonts/HankenGrotesk-Medium.ttf"),
-    HankenGroteskBold:   require("../assets/fonts/HankenGrotesk-Bold.ttf"),
-    Fraunces:            require("../assets/fonts/Fraunces-Regular.ttf"),
-    Amiri:               require("../assets/fonts/Amiri-Regular.ttf"),
-    /* Every icon in this app is a glyph in this one file, and nothing was
-     * loading it. Each <Ionicons> asks for it on mount and renders an EMPTY
-     * <Text> until the answer comes back — so when that request never
-     * completes, the app draws perfectly except that not one icon exists,
-     * which is exactly what shipped. Loading it here puts it on the same path
-     * as the brand faces, which demonstrably work, and means the icons are in
-     * before the first frame instead of popping in afterwards. */
-    ...Ionicons.font,
-  });
-
-  /* THE APP MUST NEVER WAIT FOR EVER ON ANYTHING.
+  /* THE FONTS ARE BUILT IN, not fetched.
    *
-   * Holding the first frame back until the brand faces are in is worth doing:
-   * a flash of a system font on the masjid's own name is the exact cheapness
-   * we are moving away from. Holding it back INDEFINITELY is not — and that is
-   * what this did. If a face failed to load, `ready` stayed false and the app
-   * showed a plum rectangle, silently, for ever. We have already shipped one
-   * version of that bug.
+   * They used to be loaded at runtime with useFonts(), which asks expo-asset
+   * for each file. In a release build with no expo-updates there is no local
+   * asset map, and expo-asset's shortcut for already-present files only covers
+   * images — a font has no width or height, so it fell through and tried to
+   * DOWNLOAD a bare Android resource name as if it were a URL. Every font in
+   * the app failed that way, with one line in the log:
    *
-   * So the wait has a ceiling. After it, the app opens in whatever faces the
-   * system has, which is a hundred times better than not opening. */
-  const [waited, setWaited] = React.useState(false);
+   *     fonts did not load: Call to function 'ExpoAsset.downloadAsync' has
+   *     been rejected.
+   *
+   * The app then drew in whatever the system had — and because every icon in
+   * this app is a glyph in a font, that is why no icon existed, the back
+   * chevrons included. A timeout was put over the top of this earlier, which
+   * stopped the app hanging and let the real fault ship.
+   *
+   * They are now listed in app.json and copied into the build by the expo-font
+   * plugin, so Android registers them before a line of JavaScript runs. A file
+   * named ionicons.ttf registers the family @expo/vector-icons asks for, so
+   * the icons are simply there — no loading, nothing to fail, and nothing to
+   * wait for before the first frame. */
   React.useEffect(() => {
-    const id = setTimeout(() => setWaited(true), 2500);
-    return () => clearTimeout(id);
+    /* Said out loud so the Android test can assert it rather than take a
+     * screenshot's word for it. */
+    try { console.log("fonts available: " + Font.getLoadedFonts().join(", ")); } catch {}
   }, []);
-  React.useEffect(() => {
-    if (fontError) console.warn("fonts did not load: " + String(fontError));
-  }, [fontError]);
-  /* Expo hides its own splash on the first frame, so the veil is only ever
-   * seen for the moment between that and the fonts arriving. */
+
+  /* Shown only while the settings store answers, which has its own ceiling in
+     store.jsx. Expo hides its splash on the first frame, so without this there
+     would be a flash of white before the plum. */
   const veil = <View style={{ flex: 1, backgroundColor: C.brand900 }} />;
-  if (!ready && !fontError && !waited) return veil;
 
   return (
     <SafeAreaProvider>

@@ -338,6 +338,20 @@ if (fontSays.length) {
          "file loaded, every icon in the app renders as nothing");
 }
 
+/* The app says which fonts Android registered. Asserting on that is worth more
+ * than any screenshot: if ionicons is not in the list, not one icon in the app
+ * can draw, and the back chevrons go with them. */
+const available = jsLog(/fonts available:/i).slice(-1)[0] || "";
+if (!available) fail("the app never said which fonts it had — expected a 'fonts available:' line");
+else {
+  say("\n" + available.replace(/^.*?fonts available:/, "fonts available:"));
+  annotate(available.slice(-400));
+  for (const want of ["ionicons", "HankenGrotesk", "Fraunces", "Amiri"])
+    if (!new RegExp(want, "i").test(available))
+      fail(`the font "${want}" is not registered on the device` +
+           (want === "ionicons" ? " — so no icon in the app can draw" : ""));
+}
+
 /* Unique colours in a slice of a screenshot. An icon that drew has strokes and
  * antialiasing, so dozens of them; flat background has one or two. */
 function colours(png, x, y, w, h) {

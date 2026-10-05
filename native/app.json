@@ -33,7 +33,9 @@
       "bundleIdentifier": "com.taiyabahmasjid.app.dev",
       "supportsTablet": false,
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "web": {
@@ -41,7 +43,19 @@
       "output": "single"
     },
     "plugins": [
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/HankenGrotesk.ttf",
+            "./assets/fonts/HankenGroteskMedium.ttf",
+            "./assets/fonts/HankenGroteskBold.ttf",
+            "./assets/fonts/Fraunces.ttf",
+            "./assets/fonts/Amiri.ttf",
+            "./assets/fonts/ionicons.ttf"
+          ]
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -53,8 +67,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission":
-            "Taiyabah Masjid uses your location only to work out the Qibla direction from where you are. It is never stored or sent anywhere."
+          "locationAlwaysAndWhenInUsePermission": "Taiyabah Masjid uses your location only to work out the Qibla direction from where you are. It is never stored or sent anywhere."
         }
       ],
       [
