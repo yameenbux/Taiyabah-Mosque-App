@@ -108,7 +108,7 @@ function Root() {
         <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare }} />
         <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.english_translation", "Translation") }} />
         <Stack.Screen name="Surah"     component={Surah}    options={{ ...pushed, title: "" }} />
-        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf", "Muṣḥaf"),
+        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan"),
                                                                        headerStyle: { backgroundColor: "#15060F" },
                                                                        headerTintColor: C.goldBright,
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
@@ -161,6 +161,14 @@ export default function App() {
     HankenGroteskBold:   require("../assets/fonts/HankenGrotesk-Bold.ttf"),
     Fraunces:            require("../assets/fonts/Fraunces-Regular.ttf"),
     Amiri:               require("../assets/fonts/Amiri-Regular.ttf"),
+    /* Every icon in this app is a glyph in this one file, and nothing was
+     * loading it. Each <Ionicons> asks for it on mount and renders an EMPTY
+     * <Text> until the answer comes back — so when that request never
+     * completes, the app draws perfectly except that not one icon exists,
+     * which is exactly what shipped. Loading it here puts it on the same path
+     * as the brand faces, which demonstrably work, and means the icons are in
+     * before the first frame instead of popping in afterwards. */
+    ...Ionicons.font,
   });
 
   /* THE APP MUST NEVER WAIT FOR EVER ON ANYTHING.

@@ -21,7 +21,12 @@ export const LANGS = [
 const RTL = new Set(["ar", "ur"]);
 
 const KEY = "taiyabah.prefs.v1";
-const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null };
+/* muMark is the one bookmark — the everyday one, moved by putting it somewhere
+ * else and taken away by putting it where it already is. muFavs is the list you
+ * build up on purpose. The web app keeps exactly these two, separately and for
+ * the same reason, so a reader who uses both on the website finds both here. */
+const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null,
+                   muMark: 0, muFavs: [] };
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -83,6 +88,15 @@ export function AppProvider({ children, fallback = null }) {
       /* Where the reader got to, so the Qur'an screen can offer it back rather
        * than making somebody scroll to page 300 again. */
       setLastRead: lastRead => save({ ...prefs, lastRead }),
+      /* One bookmark, so putting it here is also how you move it: there is
+       * nothing to choose between and nothing to tidy up afterwards. */
+      toggleMushafMark: page => save({ ...prefs, muMark: prefs.muMark === page ? 0 : page }),
+      toggleMushafFav: page => save({
+        ...prefs,
+        muFavs: prefs.muFavs.includes(page)
+          ? prefs.muFavs.filter(n => n !== page)
+          : [...prefs.muFavs, page].sort((a, b) => a - b),
+      }),
       toggleFavourite: id => save({
         ...prefs,
         favourites: prefs.favourites.includes(id)

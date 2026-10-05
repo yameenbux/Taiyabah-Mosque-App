@@ -1,6 +1,8 @@
 /* The Qurʼan: two ways of reading it, chosen on the way in.
  *
- *   Mushaf      the 13-line Indo-Pak muṣḥaf most of this community learned on,
+ *   Mushaf      the 13-line muṣḥaf most of this community learned on, called
+ *               "13 Line Quraan" throughout because that is what people here
+ *               ask for by name,
  *               as page images. Streamed and then cached, because 848 pages is
  *               66MB and would nearly triple the download.
  *   Translation the Arabic verse by verse with Abdullah Yusuf Ali beneath it.
@@ -8,8 +10,9 @@
  *               mostly are when they open it, sitting in the masjid.
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, FlatList, Pressable, Dimensions, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, Pressable, TextInput, useWindowDimensions, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
+import * as ScreenOrientation from "expo-screen-orientation";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
@@ -45,7 +48,7 @@ export default function Quran({ navigation }) {
           </RowGroup>)}
 
         <RowGroup>
-          <NavRow icon="book-outline" label={MUSHAF.name}
+          <NavRow icon="book-outline" label={t("quran.mushaf_name", "13 Line Quraan")}
                   sub={`${MUSHAF.pages} ${t("quran.mushaf_sub", "pages · needs a connection the first time")}`}
                   onPress={() => navigation.navigate("Mushaf", {})} />
           <NavRow icon="language-outline" label={t("quran.english_translation", "English translation")}
@@ -184,11 +187,15 @@ export function Surah({ route, navigation }) {
 /* ---------- the muṣḥaf -------------------------------------------------- */
 
 export function Mushaf({ route, navigation }) {
-  const { t, fs, setLastRead } = useApp();
-  const { width } = Dimensions.get("window");
+  const { t, fs, setLastRead, muMark, muFavs, toggleMushafMark, toggleMushafFav } = useApp();
+  /* Not Dimensions.get(): that is measured once, and this screen is the one
+   * place in the app that turns sideways on purpose. */
+  const { width, height } = useWindowDimensions();
   const start = route.params?.page || 1;
   const [page, setPage] = useState(start);
   const [jump, setJump] = useState(false);
+  const [land, setLand] = useState(false);
+  const [toast, setToast] = useState(null);
   const list = useRef(null);
   const pages = useMemo(() => Array.from({ length: MUSHAF.pages }, (_, i) => i + 1), []);
 
@@ -204,10 +211,57 @@ export function Mushaf({ route, navigation }) {
    * putting the phone down, not by pressing back. */
   useEffect(() => { setLastRead({ mode: "mushaf", page }); }, [page]);
 
+  /* A note that says what just happened, because a ribbon quietly filling in is
+   * not an answer to "where did that go?". */
+  const toastRef = useRef(0);
+  const say = msg => {
+    setToast(msg);
+    clearTimeout(toastRef.current);
+    toastRef.current = setTimeout(() => setToast(null), 2600);
+  };
+  useEffect(() => () => clearTimeout(toastRef.current), []);
+
   const goto = n => {
     const i = Math.min(MUSHAF.pages, Math.max(1, n));
     setJump(false); setPage(i);
     list.current?.scrollToIndex({ index: i - 1, animated: false });
+  };
+
+  /* Turning the phone changes how wide a page is, and the strip is laid out in
+   * page-widths — so without this the reader would be left between two pages. */
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try { list.current?.scrollToIndex({ index: page - 1, animated: false }); } catch {}
+    }, 60);
+    return () => clearTimeout(id);
+  }, [width, height]);
+
+  /* The web app turns the page a quarter turn inside an upright window, because
+   * a browser cannot unlock rotation. An app can, so this turns the screen
+   * itself — the same intent, done the way the platform does it. */
+  const orient = async () => {
+    tap();
+    try {
+      await ScreenOrientation.lockAsync(land
+        ? ScreenOrientation.OrientationLock.PORTRAIT_UP
+        : ScreenOrientation.OrientationLock.LANDSCAPE);
+      setLand(!land);
+    } catch { say(t("mushaf.could_not_turn", "This phone would not turn the screen")); }
+  };
+  /* Whatever happens, the rest of the app is upright. Leaving a lock behind
+   * would turn every other screen sideways too. */
+  useEffect(() => () => {
+    ScreenOrientation.unlockAsync().catch(() => {});
+  }, []);
+
+  const marked = muMark === page;
+  const fav = muFavs.includes(page);
+
+  const bookmark = () => {
+    tap();
+    toggleMushafMark(page);
+    say(marked ? t("mushaf.bookmark_taken_away", "Bookmark taken off this page")
+               : t("mushaf.bookmark_put_here", "Bookmark put on this page"));
   };
 
   return (
@@ -226,10 +280,12 @@ export function Mushaf({ route, navigation }) {
         onMomentumScrollEnd={e => setPage(Math.round(e.nativeEvent.contentOffset.x / width) + 1)}
         windowSize={3}
         renderItem={({ item: n }) => (
-          <View style={{ width, flex: 1, justifyContent: "center", backgroundColor: "#15060F" }}>
+          <View style={{ width, height, justifyContent: "center", backgroundColor: "#15060F" }}>
             <Image
               source={{ uri: pageUrl(n) }}
-              style={{ width, aspectRatio: MUSHAF.width / MUSHAF.height }}
+              /* Fitted to the whole window rather than to a fixed aspect, so the
+                 same page fills the screen upright and sideways. */
+              style={{ width, height }}
               contentFit="contain"
               /* Cached to disk on first read, so a page loads instantly the
                  second time and works with no signal after that. */
@@ -238,9 +294,31 @@ export function Mushaf({ route, navigation }) {
               placeholder={null} />
           </View>)} />
 
+      {/* The way back to the bookmark, which is the whole point of having one.
+          It stays out of the way while you are standing on it. */}
+      {!!muMark && !marked && !jump && (
+        <Press onPress={() => { tap(); goto(muMark); }}
+          style={{ position: "absolute", left: 0, right: 0, bottom: 74, alignItems: "center" }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 7, paddingHorizontal: 14,
+                         paddingVertical: 7, borderRadius: R.pill, backgroundColor: "rgba(220,187,99,.17)",
+                         borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
+            <Ionicons name="bookmark" size={13} color={C.goldBright} />
+            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.goldBright }}>
+              {t("mushaf.page", "Page")} {muMark}</Text>
+          </View>
+        </Press>)}
+
+      {!!toast && (
+        <View style={{ position: "absolute", left: 16, right: 16, bottom: 120, alignItems: "center" }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.cream, textAlign: "center",
+                         backgroundColor: "rgba(21,6,15,.94)", borderWidth: 1, borderColor: "rgba(243,239,227,.18)",
+                         borderRadius: R.pill, paddingHorizontal: 15, paddingVertical: 9, overflow: "hidden" }}>
+            {toast}</Text>
+        </View>)}
+
       {/* The page bar. Tapping the number opens a jump list of juzʼ and surah. */}
       <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
-                     alignItems: "center", justifyContent: "center", gap: 14,
+                     alignItems: "center", justifyContent: "center", gap: 10,
                      paddingVertical: 11, backgroundColor: "rgba(21,6,15,.9)" }}>
         <Press onPress={() => goto(page - 1)} style={{ padding: 8 }}>
           <Ionicons name="chevron-forward" size={20} color={C.goldBright} />
@@ -256,46 +334,114 @@ export function Mushaf({ route, navigation }) {
         <Press onPress={() => goto(page + 1)} style={{ padding: 8 }}>
           <Ionicons name="chevron-back" size={20} color={C.goldBright} />
         </Press>
+
+        {/* The ribbon on the bar is the bookmark, and only the bookmark. */}
+        <Press onPress={bookmark} style={{ padding: 8 }}
+          accessibilityLabel={marked ? t("a11y.take_the_bookmark_off", "Take the bookmark off this page")
+                                     : t("a11y.bookmark_this_page", "Put your bookmark on this page")}>
+          <Ionicons name={marked ? "bookmark" : "bookmark-outline"} size={19}
+                    color={marked ? C.goldBright : "rgba(243,239,227,.65)"} />
+        </Press>
+        <Press onPress={orient} style={{ padding: 8 }}
+          accessibilityLabel={t("mushaf.horizontal", "Horizontal")}>
+          <Ionicons name={land ? "phone-portrait-outline" : "phone-landscape-outline"} size={19}
+                    color="rgba(243,239,227,.65)" />
+        </Press>
       </View>
 
-      {jump && <Jump onPick={goto} onClose={() => setJump(false)} />}
+      {jump && <Jump page={page} fav={fav} onPick={goto} onClose={() => setJump(false)}
+                     onFav={() => {
+                       tap(); toggleMushafFav(page);
+                       say(fav ? t("mushaf.removed_from_favourites", "Removed from your favourites")
+                               : t("mushaf.added_to_favourites", "Added to your favourites"));
+                     }} />}
     </View>
   );
 }
 
-function Jump({ onPick, onClose }) {
-  const { t, fs } = useApp();
+function Jump({ page, fav, onPick, onClose, onFav }) {
+  const { t, fs, muFavs, muMark } = useApp();
   const [mode, setMode] = useState("juz");
+  const [typed, setTyped] = useState("");
+
   const items = mode === "juz"
     ? Object.entries(MUSHAF.juzPage).map(([j, p]) => ({ label: `${t("quran.juz", "Juzʼ")} ${j}`, sub: `p.${p}`, page: p }))
-    : IDX.surahs.map(s => ({ label: `${s.n}. ${t(`surah.${s.n}.name`, s.nameEn)}`,
-                             sub: `p.${MUSHAF.surahPage[s.n]}`, page: MUSHAF.surahPage[s.n] }));
+    : mode === "surah"
+      ? IDX.surahs.map(s => ({ label: `${s.n}. ${t(`surah.${s.n}.name`, s.nameEn)}`,
+                               sub: `p.${MUSHAF.surahPage[s.n]}`, page: MUSHAF.surahPage[s.n] }))
+      : muFavs.map(p => ({ label: `${t("mushaf.page", "Page")} ${p}`,
+                           sub: p === muMark ? t("mushaf.bookmark", "Bookmark") : "", page: p }));
+
+  const TABS = [["juz", t("quran.by_juz", "By juzʼ")],
+                ["surah", t("quran.by_surah", "By surah")],
+                ["fav", t("mushaf.favourites", "Favourites")]];
+
   return (
     <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: "rgba(21,6,15,.97)" }}>
       <View style={{ flexDirection: "row", gap: 8, padding: 14, paddingTop: 20 }}>
-        {[["juz", t("quran.by_juz", "By juzʼ")], ["surah", t("quran.by_surah", "By surah")]].map(([k, lab]) => (
+        {TABS.map(([k, lab]) => (
           <Press key={k} onPress={() => { tap(); setMode(k); }}
             style={{ flex: 1, alignItems: "center", paddingVertical: 10, borderRadius: R.pill,
                      borderWidth: 1, borderColor: mode === k ? C.goldBright : "rgba(243,239,227,.22)",
                      backgroundColor: mode === k ? "rgba(220,187,99,.16)" : "transparent" }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13),
+            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
                            color: mode === k ? C.goldBright : "rgba(243,239,227,.7)" }}>{lab}</Text>
           </Press>))}
         <Press onPress={onClose} style={{ padding: 10 }}>
           <Ionicons name="close" size={22} color={C.cream} />
         </Press>
       </View>
-      <FlatList
-        data={items}
-        keyExtractor={(x, i) => String(i)}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        renderItem={({ item }) => (
-          <Press onPress={() => { tap(); onPick(item.page); }}
-            style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 18, paddingVertical: 13,
-                     borderBottomWidth: 1, borderBottomColor: "rgba(243,239,227,.08)" }}>
-            <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), color: C.cream }}>{item.label}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "rgba(243,239,227,.5)" }}>{item.sub}</Text>
-          </Press>)} />
+
+      {/* Straight to a page number. Somebody being told "page 412" in a ḥalqa
+          should not have to work out which juzʼ that is first. */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 9, paddingHorizontal: 16, paddingBottom: 12 }}>
+        <TextInput
+          value={typed}
+          onChangeText={v => setTyped(v.replace(/[^0-9]/g, ""))}
+          keyboardType="number-pad"
+          returnKeyType="go"
+          onSubmitEditing={() => typed && onPick(Number(typed))}
+          placeholder={`${t("mushaf.page", "Page")} 1–${MUSHAF.pages}`}
+          placeholderTextColor="rgba(243,239,227,.4)"
+          style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), color: C.cream,
+                   borderWidth: 1, borderColor: "rgba(243,239,227,.22)", borderRadius: R.pill,
+                   paddingHorizontal: 15, paddingVertical: 9 }} />
+        <Press onPress={() => typed && onPick(Number(typed))}
+          style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: R.pill,
+                   backgroundColor: "rgba(220,187,99,.18)", borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright }}>
+            {t("mushaf.go", "Go")}</Text>
+        </Press>
+      </View>
+
+      <Press onPress={onFav}
+        style={{ marginHorizontal: 16, marginBottom: 10, flexDirection: "row", alignItems: "center",
+                 gap: 9, paddingHorizontal: 15, paddingVertical: 11, borderRadius: R.pill,
+                 borderWidth: 1, borderColor: "rgba(243,239,227,.22)" }}>
+        <Ionicons name={fav ? "heart" : "heart-outline"} size={16}
+                  color={fav ? C.goldBright : "rgba(243,239,227,.7)"} />
+        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.cream }}>
+          {fav ? t("mushaf.remove_this_page", "Remove this page from favourites")
+               : t("mushaf.add_this_page", "Add this page to favourites")}</Text>
+      </Press>
+
+      {mode === "fav" && !muFavs.length
+        ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "rgba(243,239,227,.55)",
+                         textAlign: "center", paddingHorizontal: 30, paddingTop: 24 }}>
+            {t("mushaf.no_favourites_yet", "No favourites yet. Add a page and it will be listed here.")}</Text>
+        : <FlatList
+            data={items}
+            keyExtractor={(x, i) => String(i)}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 30 }}
+            renderItem={({ item }) => (
+              <Press onPress={() => { tap(); onPick(item.page); }}
+                style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 18, paddingVertical: 13,
+                         borderBottomWidth: 1, borderBottomColor: "rgba(243,239,227,.08)" }}>
+                {item.page === muMark && <Ionicons name="bookmark" size={13} color={C.goldBright} />}
+                <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), color: C.cream }}>{item.label}</Text>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "rgba(243,239,227,.5)" }}>{item.sub}</Text>
+              </Press>)} />}
     </View>
   );
 }
