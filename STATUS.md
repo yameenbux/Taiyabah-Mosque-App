@@ -142,7 +142,23 @@ The D-U-N-S record was corrected and D&B confirmed it on 2 October — the
 street line had held the organisation's name and no street at all.
 
 Apple caches D&B data for a week or two, so the enrolment form was still
-refusing the number on 4 October. **That is expected, not a new problem.**
+refusing the number on 4 October. **That is expected, not a new problem** —
+and the 4th was a Sunday, two days after a Friday confirmation, so not one
+business day had passed. Apple's own figure is up to two business days for
+D&B to hand the record over, and up to about a fortnight before an updated
+number appears in their look-up.
+
+**Retry from Wednesday 7 October**, and again midweek after. A refusal any
+time up to roughly 16 October is the queue running, not a fault: do not open
+a support case before then. A failed attempt costs nothing and is not held
+against the account.
+
+**Ask for the fee waiver during enrolment, not after.** The UK is eligible and
+the society is a registered charity, so the £79 a year goes away — but only on
+the organisation path, and only while the account has not signed the Paid
+Applications Agreement or sold digital goods. Donations leaving to Stripe in a
+browser are fine and are the normal nonprofit pattern; adding an in-app
+purchase later would end the waiver.
 
 **Do not enrol as an Individual.** It lets you through only because that path
 never asks for a D-U-N-S. It would put a personal name on the listing as
