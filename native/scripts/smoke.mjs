@@ -18,7 +18,13 @@ const APK = process.argv[2];
 /* NOT a dotted directory: upload-artifact skips hidden files by default, which
  * is why the first two runs produced an empty artifact and nothing to read. */
 const OUT = process.env.SMOKE_DIR || path.resolve(import.meta.dirname, "../../smoke-out");
-const PKG = "com.taiyabahmasjid.app.dev";
+/* Read, not written down. The package id now depends on TAIYABAH_VARIANT
+ * (app.config.js), and a copy of it here would be wrong the first time that
+ * changed — the run would install one app and then drive another, which looks
+ * exactly like the app failing to open. */
+const PKG = (await import("../app.config.js")).default({
+  config: JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../app.json"), "utf8")).expo,
+}).android.package;
 fs.mkdirSync(OUT, { recursive: true });
 
 /* A CI job's log is not reachable through the API, and the first version of

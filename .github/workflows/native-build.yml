@@ -8,17 +8,17 @@ name: Native app (Android)
 # forever. That is exactly what the first build did on a real phone.
 # `assembleRelease` bundles the JavaScript into the APK, so it runs on its own.
 #
-# It is still not for Play. Expo's generated project signs release with the
-# DEBUG keystore (see android/app/build.gradle), which makes an APK that
-# installs by hand but that Play would reject — which is the right shape while
-# the listing still belongs to the web app. When the native app is ready, this
-# grows a real signing step using the same two secrets the web app's build
-# already uses. Until then it cannot touch the listing even by accident.
+# IT IS NOT FOR PLAY, and cannot become so by accident. Two things see to
+# that. It signs with the DEBUG keystore, which Play refuses; and it builds the
+# .dev variant (TAIYABAH_VARIANT below, see native/app.config.js), so the
+# package id is com.taiyabahmasjid.app.dev rather than the one the listing owns.
+# The release that goes to Play is a separate workflow: native-release.yml.
 #
 # WHAT COMES OUT. app-release.apk, attached to the run. Download it, allow
-# installs from the browser, open it. It sits alongside the Play version
-# rather than replacing it — different signing key, so Android treats them as
-# two apps, which is exactly what you want while comparing them.
+# installs from the browser, open it. It sits alongside the real app rather
+# than replacing it — different package id AND a different signing key, so
+# Android treats them as two apps, which is what you want while comparing
+# them. The name on the home screen says "(test)".
 
 on:
   workflow_dispatch:
@@ -29,6 +29,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Everything this job builds is the sideload variant. app.config.js reads
+    # this and appends .dev to the package id.
+    env:
+      TAIYABAH_VARIANT: dev
     steps:
       - uses: actions/checkout@v4
 

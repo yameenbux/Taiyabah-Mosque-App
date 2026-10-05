@@ -1,5 +1,119 @@
 # Getting the app onto Google Play
 
+> **The listing is changing hands.** Everything below the line describes the
+> Trusted Web Activity — the shell that opens the website — which is what
+> `com.taiyabahmasjid.app` has been since September 2026. It is being replaced
+> by the native app in `native/`, under the **same package name**, so that
+> everybody who already has it simply receives an update. Read
+> **[Replacing the web app with the native app](#replacing-the-web-app-with-the-native-app)**
+> first. The TWA section is kept because the signing key, the fingerprints and
+> the Play Console paths are all still the same, and because until the native
+> app has fully rolled out there are people running the old one.
+
+---
+
+## Replacing the web app with the native app
+
+### What is actually changing
+
+| | Before | After |
+|---|---|---|
+| What it is | a browser window with no address bar | a real Android app |
+| Package | `com.taiyabahmasjid.app` | **the same** — that is the point |
+| Upload key | `android.keystore`, alias `taiyabah` | **the same** |
+| Built by | `android-build.yml` (Bubblewrap) | `native-release.yml` (Expo) |
+| Format | `.aab` | `.aab` |
+| Version code | 1 | 2 or higher |
+| Minimum Android | 5 | 7 |
+
+Keeping the package name is what makes this an update rather than a second
+app in the store: one listing, the installs and reviews kept, and no one has
+to be told to go and download something new.
+
+**It only goes one way.** Once a build of the native app is in production
+under this package, there is no putting the TWA back for anyone who has taken
+the update. That is why the rollout below is staged.
+
+### Four things that are different and will be noticed
+
+1. **Everything saved is gone.** The TWA kept settings in Chrome's storage for
+   the website; the native app has its own. Language, notification choices and
+   bookmarks start again. Nobody loses data that matters, but it is the first
+   thing a regular will say.
+2. **Notification permission is asked again**, by Android this time rather
+   than by Chrome. Anyone who had web push from the TWA may keep receiving it
+   through the browser as well until they clear it, so a few people could see
+   a notice twice for a while.
+3. **New permissions.** The app asks for location (qibla) and notifications.
+   The TWA asked for neither, so the **Data safety form has to be updated
+   before this can be promoted** — Play rejects a release whose declared data
+   use does not match what the bundle requests.
+4. **Android 5 and 6 drop off.** The native app needs Android 7. Those phones
+   keep the TWA they already have; they simply stop getting updates. Play will
+   tell you how many are affected when you upload — it was a handful.
+
+### Build it
+
+**Actions → Native app bundle (Play) → Run workflow.**
+
+It will not appear in that list until the branch carrying it has been merged
+to `main` — GitHub only offers a workflow it can see on the default branch.
+That is deliberate: the one build that can change what is on people's phones
+should not be runnable from a branch nobody has reviewed.
+
+| | |
+|---|---|
+| Version people see | `2.0.0` |
+| Version code | `2` — must be higher than anything already uploaded |
+
+The last TWA production release was version code **1**, so 2 is free. If that
+is ever in doubt, read it off **Release → Production** in the console rather
+than guessing; Play refuses a repeat and only says so after the upload.
+
+The run checks every screen parses, that each one says what the website says,
+and that every link and Stripe URL points where the website points — then
+builds, signs, and **reads the certificate back out of the finished bundle**
+to prove it is the upload key and not Expo's debug key. A debug-signed bundle
+builds perfectly and is rejected on upload, so this is checked here rather
+than discovered there.
+
+Download `taiyabah-play-<run>` from the run's Artifacts.
+
+### Put it out
+
+1. **Internal testing** first — Play Console → Test and release → Internal
+   testing → Create new release → upload the `.aab`.
+2. Install it from the internal testing link **on a phone that already has the
+   old app**, and let it update in place. That is the path every user takes
+   and the only way to see what they will see. Check: it opens, prayer times
+   load, the qibla compass asks for location, a notification arrives.
+3. **Update the Data safety form** (point 3 above). Do this before promoting,
+   not after.
+4. **Closed testing**, then **Production at 10%**. Watch Android vitals and
+   the crash rate for a day or two before going to 100%. A staged rollout can
+   be halted; a full one cannot be taken back.
+
+### Leave `assetlinks.json` alone
+
+`.well-known/assetlinks.json` and its three fingerprints stay exactly as they
+are. Anyone still on the TWA — someone on Android 6, or simply someone who has
+not opened the Play Store in a month — needs that file to keep working, and it
+costs nothing to serve. Remove it only once nobody is running the old app.
+
+### Test builds still install alongside
+
+`native-build.yml` and the smoke run build `com.taiyabahmasjid.app.**dev**`,
+signed with the debug key and called "Taiyabah Masjid (test)" on the home
+screen (see `native/app.config.js`). That is deliberate: a build you are
+testing must never overwrite the real app on your own phone, and nothing that
+cannot reach the Play listing should share its package name. Only
+`native-release.yml` builds the real one.
+
+---
+
+
+## The Trusted Web Activity (what is being replaced)
+
 The app is a **Trusted Web Activity**: an Android shell that opens
 `taiyabahapp.ysbdesigns.uk` full screen with no browser bar. The site proves
 the shell is allowed to do that, through `/.well-known/assetlinks.json`.

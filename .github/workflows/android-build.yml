@@ -2,6 +2,12 @@ name: Android app bundle
 
 # Builds the Play Store app from the PWA.
 #
+# SUPERSEDED. The listing com.taiyabahmasjid.app now belongs to the NATIVE app
+# in native/, built by native-release.yml. Running this and uploading the
+# result would put every user back onto a browser window. It is kept because
+# people on Android 6, and anyone who has not updated, are still running what
+# it built — not because it should be run again. See store/ANDROID-RELEASE.md.
+#
 # WHY THIS RUNS HERE AND NOT ON A LAPTOP. The app is a Trusted Web Activity:
 # a thin Android shell that opens taiyabahapp.ysbdesigns.uk full screen, with
 # no browser bar, because the site proves the app is allowed to do that

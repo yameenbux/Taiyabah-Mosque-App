@@ -3,7 +3,7 @@
     "name": "Taiyabah Masjid",
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
-    "version": "0.2.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "backgroundColor": "#3C0B2A",
@@ -14,7 +14,7 @@
       "backgroundColor": "#3C0B2A"
     },
     "android": {
-      "package": "com.taiyabahmasjid.app.dev",
+      "package": "com.taiyabahmasjid.app",
       "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
@@ -30,7 +30,7 @@
       ]
     },
     "ios": {
-      "bundleIdentifier": "com.taiyabahmasjid.app.dev",
+      "bundleIdentifier": "com.taiyabahmasjid.app",
       "supportsTablet": false,
       "infoPlist": {
         "UIBackgroundModes": [
@@ -60,7 +60,9 @@
         "expo-build-properties",
         {
           "android": {
-            "kotlinVersion": "1.9.25"
+            "kotlinVersion": "1.9.25",
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
           }
         }
       ],
