@@ -151,6 +151,25 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      # No APK is uploaded here on purpose. This one is built for two
-      # architectures to keep the job quick; the build to install on a phone
-      # comes from the "Native app (Android)" workflow, which is universal.
+      # The APK that was actually driven, uploaded whatever the result.
+      #
+      # It used to be left out on the grounds that the "Native app (Android)"
+      # workflow builds a universal one and this is only arm64 + x86_64. That
+      # reasoning held right up until the evening GitHub's runner pool started
+      # refusing to pick jobs up: the run that proved the app works finished,
+      # and the separate run that produces something installable was cancelled
+      # three times without executing a step. Two runs, two chances to lose.
+      #
+      # It is also the stronger artifact. This is the exact binary that opened,
+      # drew its home screen and survived every tap — not a second build of the
+      # same commit that nothing has run. arm64-v8a covers every phone sold in
+      # roughly the last decade, so for testing by hand the difference is
+      # theoretical. The universal build is still what the other workflow makes,
+      # and Play gets an .aab that carries every architecture regardless.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: taiyabah-tested-apk-${{ github.run_number }}
+          path: native/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: warn
+          retention-days: 30
