@@ -96,6 +96,19 @@ then taps every tile and every menu row — verifying after each tap that a new
 screen drew and that nothing reached the crash log or the ReactNativeJS error
 log. Every screen is photographed and uploaded, pass or fail.
 
+**Read the notice, not the tick.** A passing run emits its tally as a workflow
+notice — how many home items it found, how many tiles and menu rows opened a
+screen, which tabs worked — because a green tick says a run passed but not what
+it looked at, and `run.log` can only be read by downloading the artifact.
+
+**A red run is worth reading before believing.** Every failure so far has been
+this harness, not the app: labels below the fold called missing, the emulator's
+own launcher ANR'ing and taking focus, a `mCurrentFocus` snapshot read from the
+first of several displays. Each is fixed, but the lesson stands — check whether
+the other fifty checks passed before concluding the app is broken, because they
+cannot pass if it is. Run it two or three times on the same commit; identical
+tallies are the signal, a single pass is not.
+
 Two things it cannot tell you: how the scrolling *feels*, and anything about
 the compass — an emulator has no magnetometer, so Qibla shows its "no compass"
 state. Everything else is the real app on real Android.

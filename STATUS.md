@@ -74,6 +74,19 @@ a plum rectangle permanently; and the settings provider rendered a blank veil
 until AsyncStorage answered, which a missing native module never does. Both now
 have a ceiling.
 
+**It has been run repeatedly, which mattered more than running it once.** Three
+emulator boots on the same commit now pass with identical tallies: home screen
+drew, 16/16 expected items, 11/11 tiles opened a screen, 5/5 menu groups, 19/19
+menu rows present and 13 followed into a screen, three tabs working, nothing in
+the crash log, 31 screenshots. Repeating it was worth it because the app was
+never the thing at fault: three separate failures were the test crying wolf —
+labels below the fold reported missing, the *emulator's own* launcher ANR'ing
+and taking focus, and a single `mCurrentFocus` snapshot read from only the
+first of several displays. Each is fixed in the harness. A passing run also
+emits its tally as a workflow notice now, because a green tick records that a
+run passed but not what it looked at, and the detailed log can only be read by
+downloading the artifact.
+
 **Checking it without a phone:** `node scripts/shots.mjs` photographs all 37
 screens and reports any runtime error; `node scripts/check-parity.mjs` compares
 the layout against the web app. See `native/README.md`.
