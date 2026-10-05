@@ -41,6 +41,15 @@ function dump() {
   return "";
 }
 
+/* uiautomator writes XML, so "Sadaqah & Lillah" arrives as "Sadaqah &amp;
+ * Lillah". Without this, every label with an ampersand or an apostrophe in it
+ * would be reported missing when it is on screen. */
+const unescapeXml = s => s
+  .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+  .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+  .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+  .replace(/&amp;/g, "&");
+
 /* Every node that carries words, with the box you would tap to reach it. */
 function nodes(xml) {
   const out = [];
@@ -50,7 +59,7 @@ function nodes(xml) {
     const desc = (tag.match(/\bcontent-desc="([^"]*)"/) || [, ""])[1];
     const b = tag.match(/\bbounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/);
     if (!b) continue;
-    const label = (text || desc).trim();
+    const label = unescapeXml(text || desc).trim();
     if (!label) continue;
     const [, x1, y1, x2, y2] = b.map(Number);
     out.push({ label, x: Math.round((x1 + x2) / 2), y: Math.round((y1 + y2) / 2),
