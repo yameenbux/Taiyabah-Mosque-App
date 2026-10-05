@@ -102,6 +102,26 @@ const findIn = (list, want) =>
   list.find(n => (want instanceof RegExp ? want.test(n.label) : norm(n.label) === norm(want)));
 
 function tap(node) { adb(["shell", "input", "tap", String(node.x), String(node.y)]); sleep(1400); }
+
+/* uiautomator only reports what is on the glass, and both the home screen and
+ * the menu are longer than the glass. So looking once and declaring a label
+ * missing is wrong — it has to be looked for, scrolled to, and only then given
+ * up on. The first version of this test did exactly that and reported nine
+ * things missing that were simply further down. */
+function toTop() {
+  for (let i = 0; i < 6; i++) { adb(["shell", "input", "swipe", "540", "700", "540", "2000", "240"]); sleep(260); }
+  sleep(500);
+}
+function seek(label, { swipes = 9, fromTop = true } = {}) {
+  if (fromTop) toTop();
+  let n = findIn(nodes(dump()), label);
+  for (let i = 0; i < swipes && !n; i++) {
+    adb(["shell", "input", "swipe", "540", "1800", "540", "800", "300"]);
+    sleep(600);
+    n = findIn(nodes(dump()), label);
+  }
+  return n;
+}
 function back() { adb(["shell", "input", "keyevent", "KEYCODE_BACK"]); sleep(1200); }
 
 function shot(name) {
@@ -201,27 +221,31 @@ const TILES = ["Holy Qur'an", "Daily Adhkār", "Ṣaḥīḥ al-Bukhārī", "Qib
                "Sadaqah & Lillah", "Charity Collections", "Join WhatsApp"];
 const HOME_ALSO = ["Listen live", "Today", "Services", "Full timetable"];
 
+let found = 0;
 for (const want of [...HOME_ALSO, ...TILES]) {
-  if (!findIn(home, want)) fail(`"${want}" is not on the home screen`);
+  if (seek(want)) found++;
+  else fail(`"${want}" is nowhere on the home screen, even after scrolling`);
 }
-log("··", `${[...HOME_ALSO, ...TILES].filter(w => findIn(home, w)).length}/${HOME_ALSO.length + TILES.length} expected items found on home`);
+log("··", `${found}/${HOME_ALSO.length + TILES.length} expected items found on the home screen`);
+shot("home-bottom");
 
 /* Tap each tile, check something new drew, come back. WhatsApp leaves the app,
  * so it is checked for presence but not followed. */
 for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
-  const n = findIn(nodes(dump()), label);
-  if (!n) { fail(`cannot tap "${label}" — not on screen`); continue; }
+  const n = seek(label);
+  if (!n) { fail(`cannot tap "${label}" — not found on the home screen`); continue; }
   tap(n);
   const after = nodes(dump());
-  const stillHome = findIn(after, "Services") && findIn(after, "Listen live");
+  /* The tab bar is the tell: a pushed screen covers it, so if it is still there
+   * the tap went nowhere. */
+  const stillHome = findIn(after, "Home") && findIn(after, "Notices") && findIn(after, "More");
   if (stillHome) fail(`tapping "${label}" did nothing`);
   else log("ok", `${label} → opened`);
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
   const c = crashes();
   if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   back();
-  /* Back out of anything deeper the screen pushed on its own. */
-  for (let i = 0; i < 2 && !findIn(nodes(dump()), "Services"); i++) back();
+  for (let i = 0; i < 2 && !findIn(nodes(dump()), "Home"); i++) back();
 }
 
 /* ---------- the menu ------------------------------------------------------ */
@@ -246,22 +270,18 @@ else {
   const SKIP = new Set(["Hajj / Umrah", "Ramadan 2027", "Tours & Visits",   // deliberately inert
                         "Madrasah Portal", "Find us", "Privacy notice"]);   // leave the app
   for (const label of ROWS) {
-    let n = findIn(nodes(dump()), label);
-    for (let s = 0; !n && s < 6; s++) {
-      adb(["shell", "input", "swipe", "540", "1600", "540", "900", "320"]); sleep(700);
-      n = findIn(nodes(dump()), label);
-    }
-    if (!n) { fail(`menu row "${label}" is missing`); continue; }
+    const n = seek(label);
+    if (!n) { fail(`menu row "${label}" is missing, even after scrolling`); continue; }
     if (SKIP.has(label)) { log("··", `${label} — present, not followed`); continue; }
     tap(n);
     const after = nodes(dump());
-    if (findIn(after, "Resources") && findIn(after, "Settings")) fail(`tapping "${label}" did nothing`);
+    if (findIn(after, "Resources")) fail(`tapping "${label}" did nothing`);
     else log("ok", `${label} → opened`);
     shot("menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
     const c = crashes();
     if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
     back();
-    for (let i = 0; i < 2 && !findIn(nodes(dump()), "Resources"); i++) back();
+    for (let i = 0; i < 2 && !seek("Resources", { swipes: 3 }); i++) back();
   }
 }
 
