@@ -31,7 +31,12 @@ const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastR
                     * so somebody who set this up on the website finds the same
                     * choices here rather than a different set. */
                    alerts: { jamaah: true, mins: 10, janazah: true,
-                             announcements: true, events: false, kahf: true } };
+                             announcements: true, events: false, kahf: true },
+                   /* Whether this phone has been offered reminders. The system
+                    * dialog can only be raised once — after that it is the
+                    * settings app or nothing — so the offer is made once, on
+                    * purpose, and never nags. */
+                   askedPush: false };
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -95,6 +100,7 @@ export function AppProvider({ children, fallback = null }) {
       setLastRead: lastRead => save({ ...prefs, lastRead }),
       /* One bookmark, so putting it here is also how you move it: there is
        * nothing to choose between and nothing to tidy up afterwards. */
+      setAskedPush: () => save({ ...prefs, askedPush: true }),
       setAlerts: patch => save({ ...prefs, alerts: { ...prefs.alerts, ...patch } }),
       toggleMushafMark: page => save({ ...prefs, muMark: prefs.muMark === page ? 0 : page }),
       toggleMushafFav: page => save({

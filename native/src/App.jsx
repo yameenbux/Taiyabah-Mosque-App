@@ -12,6 +12,7 @@ import { C, F } from "./theme";
 import { AppProvider, useApp } from "./store";
 import { sheetScreen } from "./Blocks";
 import Opening from "./Opening";
+import FirstRun from "./FirstRun";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -199,11 +200,14 @@ export default function App() {
       <StatusBar style="light" />
       <AppProvider fallback={veil}>
         <Root />
+        <FirstRun />
       </AppProvider>
       {/* Last, so it sits over the app — and only over it. The app is mounted
           and live underneath from the first frame; this never gates it, never
           takes a touch, and takes itself away on a timer whatever happens. */}
       <Opening />
+      {/* Inside the provider, because it needs the saved preferences to know
+          whether this phone has already been offered reminders. */}
     </SafeAreaProvider>
   );
 }

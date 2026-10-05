@@ -233,11 +233,28 @@ shot("first-frame");
  * next jamāʿah. NOT "Services", which lives below the fold: asking for that was
  * asking whether the page had been scrolled, not whether the app had started. */
 const DREW = /BOLTON CENTRAL|NEXT JAM|Beginning time|السَّلَامُ/i;
+
+/* The app offers reminders once, on a first run, and this IS a first run every
+ * time — the emulator is new. The offer is a real dialog that takes touches,
+ * so it has to be answered before anything else can be, exactly as a person
+ * would. Answering "Not now" also proves the offer appeared and that it can be
+ * got rid of: an offer with no way out would strand every new installation. */
+let sawOffer = false;
+function clearFirstRun() {
+  const n = findIn(nodes(dump()), "Not now");
+  if (!n) return false;
+  sawOffer = true;
+  say("  the first-run reminder offer appeared — answering \"Not now\"");
+  tap(n);
+  sleep(700);
+  return true;
+}
 let xml = "", home = [];
 for (let attempt = 1; attempt <= 3 && !findIn(home, DREW); attempt++) {
   if (attempt > 1) { say(`  nothing yet — relaunching (attempt ${attempt} of 3)`); launch(); sleep(4000); }
   for (let i = 0; i < 20; i++) {
     sleep(1500);
+    clearFirstRun();
     xml = dump(); home = nodes(xml);
     if (findIn(home, DREW)) break;
     /* Every few turns, check whether something is sitting on top of us. */
@@ -300,6 +317,12 @@ for (let i = 0; i < 8 && !inFront; i++) {
 if (!inFront) fail("the app is not in front after 8s — focus is " +
                    (focus.join(" / ").trim() || "nothing"));
 else log("ok", "the app is the focused window");
+
+/* It can also arrive a moment after the home screen has drawn. */
+clearFirstRun();
+log(sawOffer ? "ok" : "··",
+    sawOffer ? "the reminder offer was shown and dismissed"
+             : "no reminder offer appeared (already answered, or permission settled)");
 
 /* ---------- did the fonts and the icons actually arrive? ------------------ */
 
@@ -511,6 +534,7 @@ const tally = [
   `${opened.rows.length} menu rows opened a screen; ${inert.length} present but not followed (${inert.join(", ")})`,
   `tabs working: ${tabsOk.join(", ")}`,
   `tab bar icons drew: ${iconsDrew}/${iconsChecked || "not checked"} (${iconCounts.join(" ") || "—"})`,
+  `the first-run reminder offer ${sawOffer ? "appeared and was dismissed" : "did not appear"}`,
   `no crash or fatal JS error in logcat at any point`,
   `${shots} screenshots taken`,
 ];
