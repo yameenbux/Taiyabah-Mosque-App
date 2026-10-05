@@ -99,8 +99,9 @@ export default function Qibla() {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[{ t: t("tiles.qibla", "Qibla"), w: "title" },
-                    { t: t("qibla.hold_flat", "Hold the phone flat and turn until the needle meets the mark."), w: "sub" }]} />
+      <Hero lines={[{ t: t("sheet.qibla_direction", "Qibla direction"), w: "title" },
+                    { t: t("sheet.hold_the_phone_flat_compasses",
+                           "Hold the phone flat. Compasses drift near metal, cars and speakers \u2014 turn in a figure of eight to settle it."), w: "sub" }]} />
       <View style={{ paddingHorizontal: 16 }}>
         <View style={{ alignItems: "center", marginTop: 22 }}>
           <Animated.View style={{ width: DIAL, height: DIAL, transform: [{ rotate }] }}>
@@ -137,6 +138,10 @@ export default function Qibla() {
 
           <View style={{ alignItems: "center", marginTop: 18, gap: 4 }}>
             <Text style={{ fontFamily: F.display, fontSize: fs(44), color: C.ink }}>{qibla.toFixed(0)}°</Text>
+            {/* The website says what the number is measured from and how far it
+                is, under the number itself. Alone, "118°" says neither. */}
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, textAlign: "center" }}>
+              {t("sheet.from_true_north_5_042", "from true north · 5,042 km to Makkah")}</Text>
             {aligned
               ? <Pill tone="live">{t("qibla.facing", "You are facing the Qibla")}</Pill>
               : heading === null
@@ -146,10 +151,16 @@ export default function Qibla() {
         </View>
 
         <RowGroup style={{ marginTop: 24 }}>
-          <KV k={t("sheet.bearing", "Bearing")} v={`${qibla.toFixed(1)}° ${t("qibla.true", "true")}`} />
-          <KV k={t("qibla.distance", "Distance to the Kaʿbah")} v={`${Math.round(km).toLocaleString("en-GB")} km`} />
+          <KV k={t("sheet.bearing", "Bearing")}
+              v={from.mine ? `${qibla.toFixed(1)}° ${t("qibla.true", "true")}`
+                           : t("sheet.118_true", "118° true")} />
+          <KV k={t("sheet.from_the_masjid", "From the masjid")}
+              v={`${qibla.toFixed(1)}° ${t("qibla.true", "true")}`} />
+          <KV k={t("sheet.distance", "Distance")}
+              v={from.mine ? `${Math.round(km).toLocaleString("en-GB")} km`
+                           : t("sheet.5_042_km", "5,042 km")} />
           <KV k={t("sheet.measured_from", "Measured from")}
-              v={from.mine ? t("qibla.your_location", "Your location") : t("about.taiyabah_masjid", "Taiyabah Masjid")} />
+              v={from.mine ? t("qibla.your_location", "Your location") : t("sheet.taiyabah_masjid", "Taiyabah Masjid")} />
         </RowGroup>
 
         {!from.mine && (
@@ -168,6 +179,11 @@ export default function Qibla() {
               "A phone compass is thrown off by anything magnetic — a car, a radiator, a metal table. If the needle wanders, move away from it and wave the phone in a figure of eight.")}</Note>
           </View>
         </Card>
+        {/* The website ends this screen by saying what a phone compass is not.
+            Leaving it off overstates what the needle can promise. */}
+        <Note>{t("sheet.a_phone_compass_is_a",
+          "A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.")}</Note>
+
       </View>
     </Screen>
   );

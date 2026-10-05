@@ -5,7 +5,7 @@
  * 8.7MB and most people open two or three.
  */
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TextInput, ActivityIndicator } from "react-native";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Card, Note, Press, Empty, Arabic, tap } from "../ui";
@@ -15,6 +15,21 @@ const HOST = "https://taiyabahapp.ysbdesigns.uk";
 
 export default function Bukhari({ navigation }) {
   const { t, fs, rtl } = useApp();
+  const [num, setNum] = useState("");
+  const [err, setErr] = useState("");
+
+  /* Somebody given "Bukhārī 3461" has no way to find it otherwise but to guess
+   * which of ninety-seven books it falls in. The website resolves it from the
+   * book ranges; so does this. */
+  const goTo = () => {
+    const n = Number(num);
+    if (!n) return;
+    const b = B.list.find(x => n >= x.first && n <= x.last);
+    if (!b) return setErr(t("bukhari.no_such_hadith", "There is no hadith with that number."));
+    tap(); setErr("");
+    navigation.navigate("BukhariBook", { n: b.n, name: b.name, at: n });
+  };
+
   return (
     <FlatList
       style={{ backgroundColor: C.paper }}
@@ -29,6 +44,29 @@ export default function Bukhari({ navigation }) {
               {B.nameAr}</Text>
             <Note>{`${B.books} ${t("bukhari.books", "books")} · ${B.count.toLocaleString("en-GB")} ${t("bukhari.narrations", "narrations")} · ${B.licence}`}</Note>
           </Card>
+
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 9, marginTop: 13 }}>
+            <TextInput
+              value={num}
+              onChangeText={v => { setErr(""); setNum(v.replace(/[^0-9]/g, "")); }}
+              keyboardType="number-pad" returnKeyType="go" onSubmitEditing={goTo}
+              placeholder={t("bukhari.go_to", "Go to hadith")} placeholderTextColor={C.muted}
+              style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), color: C.ink,
+                       borderWidth: 1, borderColor: C.line, borderRadius: R.pill,
+                       paddingHorizontal: 15, paddingVertical: 10, backgroundColor: C.card }} />
+            <Press onPress={goTo}
+              style={{ paddingHorizontal: 18, paddingVertical: 11, borderRadius: R.pill,
+                       backgroundColor: C.brand600 }}>
+              <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: C.cream }}>
+                {t("bukhari.go", "Go")}</Text>
+            </Press>
+          </View>
+          {!!err && <Note>{err}</Note>}
+
+          {/* Why there is no English here: a licensing fact, not an omission. */}
+          <Note>{t("bukhari.arabic_only", "Arabic here, English on sunnah.com")}</Note>
+          <Note>{t("bukhari.no_translation_note",
+            "The Arabic is 9th-century and free to reproduce. Every complete English translation in circulation is a modern work still in copyright, so rather than copy one, each hadith links out to its English on sunnah.com. That needs a connection; the Arabic does not.")}</Note>
         </View>}
       renderItem={({ item: b }) => (
         <Press onPress={() => { tap(); navigation.navigate("BukhariBook", { n: b.n, name: b.name }); }}

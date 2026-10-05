@@ -57,6 +57,7 @@ const WONT_NEED = {
   "athkar.back_to_athkar":          "a back link; the app has a back arrow in the header",
   "bukhari.all_books":              "a back link; the app has a back arrow in the header",
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
+  "sheet.use_my_phone_s_compass":   "a browser needs a tap before it may read the compass; the app reads it on open",
 };
 
 /* A screen ends at its own closing tag, not where the next one starts.
