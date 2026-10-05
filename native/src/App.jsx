@@ -108,10 +108,10 @@ function Root() {
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
 
         {/* reading */}
-        <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare }} />
-        <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.english_translation", "Translation") }} />
+        <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare, title: t("quran.qur_an", "Qurʼan") }} />
+        <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.all_114_surahs", "All 114 sūrahs") }} />
         <Stack.Screen name="Surah"     component={Surah}    options={{ ...pushed, title: "" }} />
-        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan"),
+        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.13_line_qur_an", "13-Line Qurʼan"),
                                                                        headerStyle: { backgroundColor: "#15060F" },
                                                                        headerTintColor: C.goldBright,
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />

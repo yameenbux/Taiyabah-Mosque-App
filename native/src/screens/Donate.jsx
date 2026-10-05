@@ -17,8 +17,9 @@ import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL,
 import { SHEETS } from "../Blocks";
 
 const BANK = [
-  { k: { k: "sheet.account_name", t: "Account name" }, v: { t: "Bolton Central Islamic Society (BCIS)" } },
-  { k: { k: "sheet.bank", t: "Bank" },                 v: { t: "HSBC" } },
+  { k: { k: "sheet.account_name", t: "Account name" },
+    v: { k: "sheet.bolton_central_islamic_society_bcis", t: "Bolton Central Islamic Society (BCIS)" } },
+  { k: { k: "sheet.bank", t: "Bank" }, v: { k: "sheet.hsbc", t: "HSBC" } },
   { k: { k: "sheet.sort_code", t: "Sort code" },        v: { t: "40-04-15" } },
   { k: { k: "sheet.account_number", t: "Account number" }, v: { t: "02320258" } },
 ];
@@ -26,13 +27,25 @@ const BANK = [
 /* ---------- the new build ------------------------------------------------- */
 
 const TIERS = [
-  { amt: "£250",   label: "Bronze",   href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
-  { amt: "£500",   label: "Silver",   href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
-  { amt: "£1,000", label: "Gold",     href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
-  { amt: "£2,500", label: "Platinum", href: "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04?client_reference_id=newbuild" },
+  { amt: "£250",   k: "sheet.bronze",   label: "Bronze",   href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
+  { amt: "£500",   k: "sheet.silver",   label: "Silver",   href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
+  { amt: "£1,000", k: "sheet.gold",     label: "Gold",     href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
+  /* £5,000, as the website says and as the Stripe link charges. This read
+   * £2,500 against the same link, so the app was advertising half the amount
+   * somebody would actually be asked for. */
+  { amt: "£5,000", k: "sheet.platinum", label: "Platinum", href: "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04?client_reference_id=newbuild" },
 ];
 const ANY = "https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05?client_reference_id=newbuild";
-const PHASE = ["Tiling", "Carpets", "Heating", "Lighting", "Electrical", "Decor"];
+/* What phase 3.3 is actually paying for. Keyed, because a donor reading the
+ * app in Urdu should be told what the money buys in Urdu. */
+const PHASE = [
+  { k: "sheet.tiling",     t: "Tiling" },
+  { k: "sheet.carpets",    t: "Carpets" },
+  { k: "sheet.heating",    t: "Heating" },
+  { k: "sheet.lighting",   t: "Lighting" },
+  { k: "sheet.electrical", t: "Electrical" },
+  { k: "sheet.decor",      t: "Decor" },
+];
 
 export function NewBuild() {
   const { t, fs } = useApp();
@@ -54,11 +67,12 @@ export function NewBuild() {
             "Narrated by ʿUthmān ibn ʿAffān · Ṣaḥīḥ al-Bukhārī 450 · Ṣaḥīḥ Muslim 533")}</Note>
         </Card>
 
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 14 }}>
+        <Heading>{t("sheet.where_the_build_is_now", "Where the build is now")}</Heading>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7 }}>
           {PHASE.map(x => (
-            <View key={x} style={{ borderWidth: 1, borderColor: C.line, borderRadius: R.pill,
+            <View key={x.k} style={{ borderWidth: 1, borderColor: C.line, borderRadius: R.pill,
                                    paddingHorizontal: 11, paddingVertical: 6, backgroundColor: C.card }}>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.brand600 }}>{x}</Text>
+              <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.brand600 }}>{t(x.k, x.t)}</Text>
             </View>))}
         </View>
 
@@ -72,7 +86,7 @@ export function NewBuild() {
                                          transform: [{ scale: pressed ? 0.98 : 1 }] })}>
               <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.ink }}>{x.amt}</Text>
               <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1,
-                             textTransform: "uppercase", color: C.goldInk }}>{x.label}</Text>
+                             textTransform: "uppercase", color: C.goldInk }}>{t(x.k, x.label)}</Text>
             </Pressable>))}
         </View>
 

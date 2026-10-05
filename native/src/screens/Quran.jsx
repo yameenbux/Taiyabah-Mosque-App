@@ -48,11 +48,11 @@ export default function Quran({ navigation }) {
           </RowGroup>)}
 
         <RowGroup>
-          <NavRow icon="book-outline" label={t("quran.mushaf_name", "13 Line Quraan")}
+          <NavRow icon="book-outline" label={t("quran.13_line_qur_an", "13-Line Qurʼan")}
                   sub={`${MUSHAF.pages} ${t("quran.mushaf_sub", "pages · needs a connection the first time")}`}
                   onPress={() => navigation.navigate("Mushaf", {})} />
           <NavRow icon="language-outline" label={t("quran.english_translation", "English translation")}
-                  sub={`${IDX.translation} · ${t("quran.works_offline", "works offline")}`}
+                  sub={t("quran.all_114_s_rahs_with_an_english", "All 114 sūrahs, with the English beside the Arabic")}
                   onPress={() => navigation.navigate("Surahs")} />
         </RowGroup>
 
@@ -309,18 +309,21 @@ export function Mushaf({ route, navigation }) {
         </Press>)}
 
       {!!toast && (
-        <View style={{ position: "absolute", left: 16, right: 16, bottom: 120, alignItems: "center" }}>
+        <Press onPress={() => { tap(); setToast(null); setJump(true); }}
+          style={{ position: "absolute", left: 16, right: 16, bottom: 120, alignItems: "center" }}
+          accessibilityLabel={t("mushaf.view_favourites", "View favourites")}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.cream, textAlign: "center",
                          backgroundColor: "rgba(21,6,15,.94)", borderWidth: 1, borderColor: "rgba(243,239,227,.18)",
                          borderRadius: R.pill, paddingHorizontal: 15, paddingVertical: 9, overflow: "hidden" }}>
             {toast}</Text>
-        </View>)}
+        </Press>)}
 
       {/* The page bar. Tapping the number opens a jump list of juzʼ and surah. */}
       <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
                      alignItems: "center", justifyContent: "center", gap: 10,
                      paddingVertical: 11, backgroundColor: "rgba(21,6,15,.9)" }}>
-        <Press onPress={() => goto(page - 1)} style={{ padding: 8 }}>
+        <Press onPress={() => goto(page - 1)} style={{ padding: 8 }}
+          accessibilityLabel={t("mushaf.previous", "Previous")}>
           <Ionicons name="chevron-forward" size={20} color={C.goldBright} />
         </Press>
         <Press onPress={() => { tap(); setJump(j => !j); }}
@@ -331,7 +334,8 @@ export function Mushaf({ route, navigation }) {
           <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.6)" }}>
             {t("quran.juz", "Juzʼ")} {juz}</Text>
         </Press>
-        <Press onPress={() => goto(page + 1)} style={{ padding: 8 }}>
+        <Press onPress={() => goto(page + 1)} style={{ padding: 8 }}
+          accessibilityLabel={t("mushaf.next", "Next")}>
           <Ionicons name="chevron-back" size={20} color={C.goldBright} />
         </Press>
 
@@ -372,8 +376,8 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
       : muFavs.map(p => ({ label: `${t("mushaf.page", "Page")} ${p}`,
                            sub: p === muMark ? t("mushaf.bookmark", "Bookmark") : "", page: p }));
 
-  const TABS = [["juz", t("quran.by_juz", "By juzʼ")],
-                ["surah", t("quran.by_surah", "By surah")],
+  const TABS = [["juz", t("mushaf.juz", "Juz")],
+                ["surah", t("mushaf.s_rah", "Sūrah")],
                 ["fav", t("mushaf.favourites", "Favourites")]];
 
   return (

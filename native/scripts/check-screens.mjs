@@ -59,6 +59,11 @@ const WONT_NEED = {
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
   "sheet.use_my_phone_s_compass":   "a browser needs a tap before it may read the compass; the app reads it on open",
   "hallhire.change":                "the website's form is two steps and this is its way back to the first; the app's is one page, so there is nothing to go back to",
+  "quran.the_familiar_indo_pak_page": "names the edition Indo-Pak; the masjid asked for it to be called the 13-Line Qurʼan throughout",
+  "mushaf.not_installed_yet":        "the website shows this when the licensed pages have not been added; this app is served them",
+  "mushaf.the_reader_is_ready":      "part of that same not-installed state",
+  "mushaf.in_the_meantime_the_english": "part of that same not-installed state",
+  "mushaf.open_the_translation_instead": "part of that same not-installed state",
 };
 
 /* A screen ends at its own closing tag, not where the next one starts.
