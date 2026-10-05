@@ -12,15 +12,25 @@ import { useApp } from "../store";
 import { Hero, Press, Note, tap } from "../ui";
 import TT from "../data/timetable-2026.json";
 import { MON } from "../dates";
-import { pretty, nowLondon, NAMES } from "../prayer";
+import { pretty, nowLondon } from "../prayer";
 
 const MONTHS = MON;
-const COLS = ["fajr", "zuhr", "asr", "maghrib", "isha"];
+/* The website's two sets, and they are not the same five. Beginning times drop
+ * Maghrib — it is prayed as it comes in, so its beginning IS its jamāʿah — and
+ * put sunrise in its place, which is the one a person actually needs when they
+ * are looking at beginning times. The heads are abbreviated because five
+ * prayers have to fit across a phone. */
+const SETS = {
+  jamaat: [["fajr", "Fajr"], ["zuhr", "Zuhr"], ["asr", "Asr"], ["maghrib", "Mag"], ["isha", "Isha"]],
+  begins: [["fajr", "Fajr"], ["sunrise", "Sun"], ["zuhr", "Zuhr"], ["asr", "Asr"], ["isha", "Isha"]],
+};
 
 export default function Timetable() {
   const { t, fs } = useApp();
   const today = nowLondon();
   const [m, setM] = useState(today.getFullYear() === TT.year ? today.getMonth() : 0);
+  const [mode, setMode] = useState("jamaat");
+  const cols = SETS[mode];
   const list = useRef(null);
 
   const days = useMemo(() => Object.entries(TT.days)
@@ -38,7 +48,8 @@ export default function Timetable() {
   return (
     <View style={{ flex: 1, backgroundColor: C.paper }}>
       <Hero lines={[{ t: `${t(`date.fullmon.${m}`, MONTHS[m])} ${TT.year}`, w: "title" },
-                    { t: t("sheet.jama_ah_times", "Jamāʿah times"), w: "sub" }]}>
+                    { t: mode === "jamaat" ? t("sheet.jama_ah_times", "Jamāʿah times")
+                                            : t("sheet.beginning_times", "Beginning times"), w: "sub" }]}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 14 }}>
           <Press onPress={() => step(-1)} style={{ padding: 9 }}>
             <Ionicons name="chevron-back" size={19} color={m === 0 ? "rgba(220,187,99,.3)" : C.goldBright} />
@@ -57,6 +68,20 @@ export default function Timetable() {
             <Ionicons name="chevron-forward" size={19} color={m === 11 ? "rgba(220,187,99,.3)" : C.goldBright} />
           </Press>
         </View>
+
+        {/* The website's .sh-toggle. Without it this screen could only ever show
+            one of the two things the timetable is for. */}
+        <View style={{ flexDirection: "row", gap: 6, marginTop: 14, padding: 4, borderRadius: R.pill,
+                       backgroundColor: "rgba(0,0,0,.18)" }}>
+          {[["jamaat", t("sheet.jama_ah_times", "Jamāʿah times")],
+            ["begins", t("sheet.beginning_times", "Beginning times")]].map(([k, lab]) => (
+            <Press key={k} onPress={() => { tap(); setMode(k); }}
+              style={{ flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: R.pill,
+                       backgroundColor: mode === k ? C.goldBright : "transparent" }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+                             color: mode === k ? C.brand900 : "rgba(243,239,227,.8)" }}>{lab}</Text>
+            </Press>))}
+        </View>
       </Hero>
 
       {/* A sticky header, because scrolling past the column names in a table of
@@ -65,10 +90,10 @@ export default function Timetable() {
                      backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.line }}>
         <Text style={{ width: 34, fontFamily: F.sans, fontSize: fs(9.5), color: C.muted }}>
           {t("sheet.date", "DATE")}</Text>
-        {COLS.map(k => (
+        {cols.map(([k, short]) => (
           <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(9.5),
                                  letterSpacing: 0.4, color: C.muted, textTransform: "uppercase" }}>
-            {t(`prayer.${k}`, NAMES[k].en)}</Text>))}
+            {t(`month.col.${k}`, short)}</Text>))}
       </View>
 
       <FlatList
@@ -79,9 +104,12 @@ export default function Timetable() {
         contentContainerStyle={{ paddingBottom: 34 }}
         ListFooterComponent={
           <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 8 }}>
+            <Note>{mode === "jamaat"
+              ? t("month.congregation_note", "Congregation times. Fridays highlighted — tap any day for Jumuʿah times.")
+              : t("month.beginning_note", "Beginning times. Maghrib is prayed at its listed time.")}</Note>
+            <Note>{t("month.12_hour_note",
+              "Times shown in 12-hour format without am/pm, as on the printed timetable.")}</Note>
             <Note>{`${t("times.source", "Source")}: ${TT.source}`}</Note>
-            <Note>{t("times.maghrib_note",
-              "Maghrib jamāʿah is at the beginning time — the masjid prays it as it comes in.")}</Note>
           </View>}
         renderItem={({ item: d, index }) => {
           const date = new Date(d.iso + "T00:00:00");
@@ -98,10 +126,13 @@ export default function Timetable() {
                 <Text style={{ fontFamily: F.sans, fontSize: fs(9), color: friday ? C.brand600 : C.muted }}>
                   {t(`date.dow.${date.getDay()}`, ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()])}</Text>
               </View>
-              {COLS.map(k => (
-                <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(12),
-                                       color: C.ink }}>
-                  {pretty(d.jamaat[k] || d.begins[k]).replace(/ (am|pm)$/, "")}</Text>))}
+              {cols.map(([k]) => {
+                const v = (mode === "jamaat" ? d.jamaat : d.begins)[k];
+                return (
+                  <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(12),
+                                         color: C.ink }}>
+                    {v ? pretty(v).replace(/ (am|pm)$/, "") : "—"}</Text>);
+              })}
             </View>);
         }} />
     </View>
