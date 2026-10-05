@@ -3,8 +3,16 @@
  * On 5 October a test push was accepted by OneSignal, accepted by Google's
  * FCM servers for this exact handset, and never shown. The phone — a Huawei
  * on EMUI — had stopped the app in the background, and a stopped app receives
- * nothing at all. Turning off "Manage automatically" under Battery → App
- * launch fixed it immediately, and the next two arrived on a locked screen.
+ * nothing at all. Switching App launch from "Manage automatically" to manual,
+ * with all three toggles on, was the moment it started working: the phone
+ * buzzed on the next send, and the one before it — which had been sent to a
+ * locked screen and silently held — was flushed through at the same time.
+ *
+ * That flush is worth knowing when helping somebody. Nothing is lost while a
+ * phone is blocking delivery; it arrives late, in a burst, once the app is
+ * allowed to run. A jamāʿah reminder delivered twenty minutes late is still a
+ * reminder nobody wanted, which is why this is worth fixing rather than
+ * explaining away.
  *
  * This is not a Huawei quirk. Xiaomi, Oppo, Realme, Vivo, OnePlus and Samsung
  * all ship their own version, usually on by default, and the congregation is
@@ -34,7 +42,7 @@ const GUIDES = [
     name: "Huawei",
     steps: [
       "Settings → Battery → App launch",
-      "Find Taiyabah Masjid and turn OFF “Manage automatically”",
+      "Find Taiyabah Masjid and turn OFF “Manage automatically”, so it says Manage manually",
       "Switch on all three: Auto-launch, Secondary launch, Run in background",
     ],
   },
