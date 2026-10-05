@@ -10,12 +10,33 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, Text } from "react-native";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Foot } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Foot, Press, tap, open } from "../ui";
 import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { dayFor } from "../prayer";
 import { longDate } from "../dates";
 import { SHEETS, Blocks } from "../Blocks";
+
+/* The nikāḥ fee, and NOT a donation link.
+ *
+ * A nikāḥ fee is not a gift. Putting it through a donation link misstates it in
+ * the charity's accounts and risks a Gift Aid problem, which is why the website
+ * keeps these two Payment Links separate from every other one — and why the app
+ * must use the same two rather than send people to the donate page. */
+const PAY = {
+  member:     "https://buy.stripe.com/5kQ6oHfU02LC0p05p4f3a07",   // £100
+  non_member: "https://buy.stripe.com/28EcN58ry85W1t4cRwf3a08",   // £200
+};
+
+/* Typed in any shape, stored in one: NK-26-0001. */
+const tidyRef = v => {
+  let out = String(v).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+                     .replace(/[૦-૯]/g, d => "૦૧૨૩૪૫૬૭૮૯".indexOf(d))
+                     .toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (/^NK\d/.test(out))       out = "NK-" + out.slice(2);
+  if (/^NK-\d{2}\d/.test(out)) out = out.slice(0, 5) + "-" + out.slice(5);
+  return out.slice(0, 11);
+};
 
 const NOTICE_DAYS = 14;        // the masjid needs a fortnight
 const HORIZON_DAYS = 365;
@@ -245,6 +266,8 @@ export default function Marriage({ navigation }) {
 
             <ErrorBox>{state.error}</ErrorBox>
             <Submit label={t("nikah.send_my_request", "Send my request")} sending={state.sending} onPress={send} />
+
+            <Pay t={t} />
             <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
           </>
         )}
@@ -260,3 +283,61 @@ const pretty12 = hhmm => {
   const s = h >= 12 ? "pm" : "am"; h = h % 12 || 12;
   return `${h}:${String(m).padStart(2, "0")}${s}`;
 };
+
+/* Paying the fee, after the office has agreed a date.
+ *
+ * This was missing from the app entirely, so the only two Stripe links on the
+ * website that are not donations had no way of being reached. The reference is
+ * what carries the payment back to the request: client_reference_id is the only
+ * thing tying the two together, and without it Stripe takes the money and
+ * nobody knows whose it is.
+ */
+function Pay({ t }) {
+  const { fs } = useApp();
+  const [ref, setRef] = useState("");
+  const [err, setErr] = useState("");
+
+  const go = kind => {
+    const v = tidyRef(ref);
+    if (!v) return setErr(t("nikah.enter_your_reference_first",
+      "Please enter your reference first, so the masjid knows whose fee this is. It looks like NK-26-0001."));
+    /* Checked here only so a typo does not send money against a reference that
+     * cannot be matched. The database checks it again properly. */
+    if (!/^NK-\d{2}-\d{4}$/.test(v)) return setErr(t("nikah.that_is_not_a_reference",
+      "That does not look like a nikāḥ reference. It is four digits after the year, like NK-26-0001. The office can read yours out if you cannot find it."));
+    const link = PAY[kind];
+    if (!link) return setErr(t("nikah.that_option_unavailable",
+      "That payment option is not available just now. Please ring the office."));
+    setErr("");
+    open(link + (link.includes("?") ? "&" : "?") + "client_reference_id=" + encodeURIComponent(v));
+  };
+
+  return (
+    <>
+      <Heading>{t("nikah.pay_the_fee_online", "Pay the fee online")}</Heading>
+      <Card>
+        <P>{t("nikah.once_the_office_has_rung",
+          "*Once the office has rung you and agreed your date.* Paying does not book a date on its own — the masjid confirms what it can do first.")}</P>
+        <Field label={t("nikah.your_reference", "Your reference")}
+               value={ref} onChange={v => { setErr(""); setRef(tidyRef(v)); }}
+               placeholder="NK-26-0001" autoCapitalize="characters" maxLength={11} />
+        <View style={{ gap: 9, marginTop: 4 }}>
+          <Press onPress={() => { tap(); go("member"); }}
+            style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill, backgroundColor: C.brand600 }}>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.cream }}>
+              {t("nikah.member_pay_100", "Member — pay £100")}</Text>
+          </Press>
+          <Press onPress={() => { tap(); go("non_member"); }}
+            style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
+                     borderWidth: 1, borderColor: C.brand600 }}>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
+              {t("nikah.non_member_pay_200", "Non-member — pay £200")}</Text>
+          </Press>
+        </View>
+        <ErrorBox>{err}</ErrorBox>
+        <Note>{t("nikah.your_reference_is_on_the",
+          "Your reference is on the confirmation you were given when you sent your request, and the office can read it out. Pick the rate that applies to you — the office checks it, and will tell you if anything is owed or owed back.")}</Note>
+      </Card>
+    </>
+  );
+}
