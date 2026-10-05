@@ -198,8 +198,12 @@ export function Heading({ children, tag }) {
   return (
     <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
                    marginTop: 26, marginBottom: 11 }}>
-      <Text style={{ fontFamily: F.display, fontSize: fs(17), color: C.ink }}>{children}</Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+      {/* The title gives way, never the tag. A long heading — "Viewing · Friday
+          9 October 2026" — used to push the tag clean off the right edge, so
+          the one word explaining the two columns was cut in half. */}
+      <Text numberOfLines={1}
+            style={{ flexShrink: 1, fontFamily: F.display, fontSize: fs(17), color: C.ink }}>{children}</Text>
+      <View style={{ flex: 1, minWidth: 8, height: 1, backgroundColor: C.line }} />
       {!!tag && <Pill>{tag}</Pill>}
     </View>
   );
@@ -210,8 +214,9 @@ export function Pill({ children, tone = "muted" }) {
   const bg = tone === "gold" ? "rgba(198,162,76,.16)" : tone === "live" ? "rgba(63,190,115,.15)" : "rgba(124,110,119,.12)";
   const fg = tone === "gold" ? C.goldInk : tone === "live" ? "#1F7A46" : C.muted;
   return (
-    <View style={{ backgroundColor: bg, borderRadius: R.pill, paddingHorizontal: 9, paddingVertical: 3.5 }}>
-      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), color: fg }}>{children}</Text>
+    <View style={{ flexShrink: 0, backgroundColor: bg, borderRadius: R.pill,
+                   paddingHorizontal: 9, paddingVertical: 3.5 }}>
+      <Text numberOfLines={1} style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), color: fg }}>{children}</Text>
     </View>
   );
 }

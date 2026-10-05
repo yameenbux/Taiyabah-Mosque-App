@@ -4,7 +4,7 @@
  * own, because it is the second-most-asked question in the app after "when is
  * the next jamāʿah" and should never be more than one tap away.
  */
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
@@ -34,6 +34,29 @@ function daysToJumuah() {
   return d;
 }
 
+/* Which prayer we are IN, and which jamāʿah is still to come.
+ *
+ * Ported from the website, including its two awkward edges: before dawn the
+ * prayer you are in is still Isha, and between sunrise and Zuhr you are in
+ * none at all — so there is no "Now" to show, rather than Fajr lingering on
+ * the row for five hours after it has gone. */
+function nowAndNext(day, at, now) {
+  const b = day.begins;
+  const key = now < at(b.fajr)    ? "isha"
+            : now < at(b.sunrise) ? "fajr"
+            : now < at(b.zuhr)    ? null
+            : now < at(b.asr)     ? "zuhr"
+            : now < at(b.maghrib) ? "asr"
+            : now < at(b.isha)    ? "maghrib"
+            : "isha";
+  let next = null;
+  for (const k of ORDER) {
+    const j = day.jamaat[k];
+    if (j && at(j) > now) { next = k; break; }
+  }
+  return { now: key, next };
+}
+
 export default function PrayerTimes({ navigation }) {
   const { t, fs, rtl } = useApp();
   const [offset, setOffset] = useState(0);         // days from today
@@ -41,6 +64,9 @@ export default function PrayerTimes({ navigation }) {
   const jumuahDate = (() => { const d = nowLondon(); d.setDate(d.getDate() + jumuah); return d; })();
   const when = nowLondon(); when.setDate(when.getDate() + offset);
   const day = dayFor(when);
+  const mark = useMemo(() => (day && offset === 0)
+    ? nowAndNext(day, hhmm => londonInstant(when, hhmm), new Date())
+    : { now: null, next: null }, [day, offset]);
   const next = offset === 0 ? nextJamaah(when) : null;
 
   const step = n => { tap(); setOffset(o => o + n); };
@@ -111,7 +137,7 @@ export default function PrayerTimes({ navigation }) {
                 Without the tag the table has two unlabelled times in it. */}
             <Heading tag={t("sheet.beginning_jama_ah", "Beginning & Jamāʿah")}>
               {offset === 0 ? t("sheet.today", "Today")
-                            : `${t("app.viewing", "Viewing")} · ${longDate(t, when)}`}</Heading>
+                            : `${t("app.viewing", "Viewing")} · ${shortDate(t, when)}`}</Heading>
             <Card gap={0} pad={0} style={{ marginTop: 2 }}>
               <View style={{ flexDirection: rtl ? "row-reverse" : "row", paddingHorizontal: 15,
                              paddingTop: 13, paddingBottom: 9 }}>
@@ -126,17 +152,29 @@ export default function PrayerTimes({ navigation }) {
                   {t("sheet.jamaah", "Jamāʿah")}</Text>
               </View>
               {["fajr", "sunrise", "zuhr", "asr", "maghrib", "isha"].map(k => {
-                const isNext = next && k === next.key;
+                /* Only on today: a "Now" pill on a date you are merely looking
+                   at would be telling you the time somewhere that is not now. */
+                const isNow  = offset === 0 && mark.now === k;
+                const isNext = offset === 0 && mark.next === k && mark.next !== mark.now;
                 const jamaat = day.jamaat[k];
                 return (
                   <View key={k} style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                                          paddingHorizontal: 15, paddingVertical: 13,
                                          borderTopWidth: 1, borderTopColor: C.line,
-                                         backgroundColor: isNext ? "rgba(198,162,76,.10)" : "transparent" }}>
-                    <View style={{ flex: 1, flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8 }}>
+                                         backgroundColor: isNow ? "rgba(94,24,68,.07)"
+                                                        : isNext ? "rgba(198,162,76,.10)" : "transparent" }}>
+                    <View style={{ flex: 1, flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
+                                   flexWrap: "wrap" }}>
                       <Text style={{ fontFamily: F.display, fontSize: fs(15.5), color: C.ink }}>
                         {t(`prayer.${k}`, NAMES[k].en)}</Text>
                       <Text style={{ fontFamily: F.arabic, fontSize: fs(15), color: C.muted }}>{NAMES[k].ar}</Text>
+                      {(isNow || isNext) && (
+                        <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: .9,
+                                       textTransform: "uppercase", overflow: "hidden",
+                                       color: isNow ? C.cream : C.goldInk,
+                                       backgroundColor: isNow ? C.brand600 : "rgba(198,162,76,.22)",
+                                       borderRadius: R.pill, paddingHorizontal: 7, paddingVertical: 2 }}>
+                          {isNow ? t("times.now", "Now") : t("times.next", "Next")}</Text>)}
                     </View>
                     <Text style={{ width: 78, textAlign: "center", fontFamily: F.sansMedium,
                                    fontSize: fs(14.5), color: C.ink }}>{pretty(day.begins[k])}</Text>

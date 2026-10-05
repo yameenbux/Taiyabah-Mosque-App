@@ -283,11 +283,15 @@ export default function Marriage({ navigation }) {
             </Press>
             <Note>{t("nikah.nothing_is_sent_until_you", "Nothing is sent until you press this.")}</Note>
             <Submit label={t("nikah.send_my_request", "Send my request")} sending={state.sending} onPress={send} />
-
-            <Pay t={t} />
-            <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
           </>
         )}
+
+        {/* Outside the branch above, deliberately. Paying the fee happens AFTER
+            the office has rung and agreed a date, so it is needed most when
+            requests are closed — and it was inside the form, which is the one
+            case where it is not drawn at all. */}
+        <Pay t={t} />
+        <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
       </View>
     </Screen>
   );

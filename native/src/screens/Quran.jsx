@@ -83,9 +83,6 @@ export default function Quran({ navigation }) {
             </Press>))}
         </View>
 
-        <Card style={{ marginTop: 20 }}>
-          <Note>{MUSHAF.licence}</Note>
-        </Card>
       </View>
     </Screen>
   );
@@ -102,10 +99,7 @@ export function Surahs({ navigation }) {
       keyExtractor={s => String(s.n)}
       initialNumToRender={14}
       contentContainerStyle={{ paddingBottom: 34 }}
-      ListHeaderComponent={
-        <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
-          <Note>{`${IDX.script} · ${IDX.translation}`}</Note>
-        </View>}
+      ListHeaderComponent={<View style={{ height: 8 }} />}
       renderItem={({ item: s }) => (
         <Press onPress={() => { tap(); navigation.navigate("Surah", { n: s.n }); }}
           style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
@@ -165,7 +159,9 @@ export function Surah({ route, navigation }) {
         </View>}
       ListFooterComponent={
         <View style={{ paddingHorizontal: 16, paddingTop: 18 }}>
-          <Note>{`${t("quran.translation_label", "Translation")}: ${IDX.translation} · ${IDX.script}`}</Note>
+          {/* The translator stays — that is an attribution. The script's own
+              name does not: the masjid calls this the 13-Line Qurʼan. */}
+          <Note>{`${t("quran.translation_label", "Translation")}: ${IDX.translation}`}</Note>
         </View>}
       renderItem={({ item: [vn, ar, en] }) => (
         <View style={{ paddingHorizontal: 18, paddingVertical: 16,
