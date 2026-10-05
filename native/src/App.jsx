@@ -155,19 +155,37 @@ function Root() {
 }
 
 export default function App() {
-  const [ready] = useFonts({
+  const [ready, fontError] = useFonts({
     HankenGrotesk:       require("../assets/fonts/HankenGrotesk-Regular.ttf"),
     HankenGroteskMedium: require("../assets/fonts/HankenGrotesk-Medium.ttf"),
     HankenGroteskBold:   require("../assets/fonts/HankenGrotesk-Bold.ttf"),
     Fraunces:            require("../assets/fonts/Fraunces-Regular.ttf"),
     Amiri:               require("../assets/fonts/Amiri-Regular.ttf"),
   });
-  /* Nothing renders until the brand faces are in and the saved preferences are
-   * read back. A flash of a system font on the masjid's own name — or of the
-   * wrong language for half a second — is the exact cheapness we are moving
-   * away from. */
+
+  /* THE APP MUST NEVER WAIT FOR EVER ON ANYTHING.
+   *
+   * Holding the first frame back until the brand faces are in is worth doing:
+   * a flash of a system font on the masjid's own name is the exact cheapness
+   * we are moving away from. Holding it back INDEFINITELY is not — and that is
+   * what this did. If a face failed to load, `ready` stayed false and the app
+   * showed a plum rectangle, silently, for ever. We have already shipped one
+   * version of that bug.
+   *
+   * So the wait has a ceiling. After it, the app opens in whatever faces the
+   * system has, which is a hundred times better than not opening. */
+  const [waited, setWaited] = React.useState(false);
+  React.useEffect(() => {
+    const id = setTimeout(() => setWaited(true), 2500);
+    return () => clearTimeout(id);
+  }, []);
+  React.useEffect(() => {
+    if (fontError) console.warn("fonts did not load: " + String(fontError));
+  }, [fontError]);
+  /* Expo hides its own splash on the first frame, so the veil is only ever
+   * seen for the moment between that and the fonts arriving. */
   const veil = <View style={{ flex: 1, backgroundColor: C.brand900 }} />;
-  if (!ready) return veil;
+  if (!ready && !fontError && !waited) return veil;
 
   return (
     <SafeAreaProvider>

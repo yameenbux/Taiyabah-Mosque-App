@@ -30,9 +30,19 @@ export function AppProvider({ children, fallback = null }) {
   const [prefs, setPrefs] = useState(null);
 
   useEffect(() => {
+    let alive = true;
+    /* The real answer always wins, even if it arrives late — losing somebody's
+     * chosen language would be its own bug. */
     AsyncStorage.getItem(KEY)
-      .then(raw => setPrefs({ ...DEFAULTS, ...(raw ? JSON.parse(raw) : null) }))
-      .catch(() => setPrefs(DEFAULTS));   // a corrupt store must not brick the app
+      .then(raw => alive && setPrefs({ ...DEFAULTS, ...(raw ? JSON.parse(raw) : null) }))
+      .catch(() => alive && setPrefs(p => p || DEFAULTS));  // a corrupt store must not brick the app
+    /* Nor must a silent one. If the native module is missing, or simply never
+     * answers, this provider would render its fallback for ever and the app
+     * would show a blank screen with nothing to explain it. Reading settings is
+     * not worth that: after a moment, open on the defaults and let the saved
+     * ones apply when they turn up. */
+    const id = setTimeout(() => alive && setPrefs(p => p || DEFAULTS), 2000);
+    return () => { alive = false; clearTimeout(id); };
   }, []);
 
   const save = useCallback(next => {

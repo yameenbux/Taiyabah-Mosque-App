@@ -15,7 +15,9 @@ import { execSync, execFileSync } from "node:child_process";
 import fs from "node:fs"; import path from "node:path";
 
 const APK = process.argv[2];
-const OUT = process.env.SMOKE_DIR || path.resolve(import.meta.dirname, "../../.smoke");
+/* NOT a dotted directory: upload-artifact skips hidden files by default, which
+ * is why the first two runs produced an empty artifact and nothing to read. */
+const OUT = process.env.SMOKE_DIR || path.resolve(import.meta.dirname, "../../smoke-out");
 const PKG = "com.taiyabahmasjid.app.dev";
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -49,15 +51,22 @@ const fail = msg => { failures.push(msg); log("FAIL", msg); annotate(msg); };
 
 /* ---------- the screen, as Android sees it ------------------------------- */
 
+let dumpFailures = 0;
 function dump() {
+  let last = "";
   for (let tries = 0; tries < 4; tries++) {
     try {
       adb(["shell", "uiautomator", "dump", "/sdcard/ui.xml"], { stdio: ["ignore", "pipe", "ignore"] });
       const xml = adb(["shell", "cat", "/sdcard/ui.xml"]);
       if (xml.includes("<node")) return xml;
-    } catch {}
+      last = xml.slice(0, 200);
+    } catch (e) { last = e.message.slice(0, 200); }
     sleep(900);
   }
+  /* An empty read and an empty screen look identical downstream, and they are
+   * completely different problems — so they are counted apart. */
+  dumpFailures++;
+  say("  (could not read the screen: " + last + ")");
   return "";
 }
 
@@ -154,8 +163,24 @@ for (let i = 0; i < 20; i++) {
 }
 if (!findIn(home, /Services/i)) {
   shot("home-FAILED");
-  fail("the home screen never drew — no 'Services' on screen after 30s");
-  console.log("\nwhat was on screen:\n  " + home.map(n => n.label).join("\n  ").slice(0, 2000));
+  if (dumpFailures) fail(`could not read the screen at all (${dumpFailures} failed dumps) — ` +
+                         "so whether the app drew is unknown");
+  else fail("the home screen never drew — nothing matching 'Services' after 30s");
+  const seen = home.map(n => n.label).filter(Boolean);
+  say("\nwhat WAS on screen (" + seen.length + " items):\n  " + seen.join("\n  ").slice(0, 3000));
+  annotate("on screen instead: " + (seen.length ? seen.slice(0, 12).join(" | ") : "(nothing at all)"));
+  try {
+    const focus = adb(["shell", "dumpsys", "window"]).match(/mCurrentFocus=.*/)?.[0] || "(none)";
+    say("focus: " + focus); annotate("focused window: " + focus);
+  } catch {}
+  try {
+    const tail = adb(["logcat", "-d", "-t", "300"]);
+    fs.writeFileSync(path.join(OUT, "logcat-launch.txt"), tail);
+    const interesting = tail.split("\n")
+      .filter(l => /ReactNative|Expo|FATAL|AndroidRuntime|taiyabah|Font|SoLoader/i.test(l));
+    say("\nrelevant logcat:\n" + interesting.slice(-40).join("\n"));
+    annotate("logcat: " + interesting.slice(-6).join(" ⏎ ").slice(0, 900));
+  } catch {}
 } else {
   log("ok", "home screen drew");
 }

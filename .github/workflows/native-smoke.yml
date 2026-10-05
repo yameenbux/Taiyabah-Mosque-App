@@ -69,7 +69,7 @@ jobs:
       # is root-only until this rule opens it up.
       # So the artifact exists even if the run dies before its first screenshot.
       - name: Somewhere to put the evidence
-        run: mkdir -p .smoke
+        run: mkdir -p smoke-out
 
       - name: Let the runner use KVM
         run: |
@@ -101,7 +101,9 @@ jobs:
         if: always()
         with:
           name: smoke-screens-${{ github.run_number }}
-          path: .smoke/
+          path: smoke-out/
+          include-hidden-files: true
+          if-no-files-found: warn
           retention-days: 30
 
       # No APK is uploaded here on purpose. This one is built for two
