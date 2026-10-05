@@ -177,7 +177,7 @@ export default function Marriage({ navigation }) {
             <Heading>{t("nikah.requests", "Requests")}</Heading>
             <Notice>{t("nikah.requests_by_phone_for_now", "Requests are taken by phone for now")}</Notice>
             <RowGroup>
-              <NavRow icon="call-outline" label={t("nikah.ring_the_office", "Ring the office")}
+              <NavRow icon="call-outline" label={t("marriage.call_the_main_office", "Call the main office")}
                       sub={"01204 535 997 · " + t("nikah.5pm_to_7pm", "5pm to 7pm")}
                       href="tel:01204535997" />
               <NavRow icon="mail-outline" label={t("nikah.email_the_office", "Email the office")}
@@ -189,9 +189,9 @@ export default function Marriage({ navigation }) {
           </>
         ) : (
           <>
-            <Heading>{t("nikah.when_would_you_like_it", "When would you like it?")}</Heading>
-            <P muted>{t("nikah.pick_a_first_choice",
-              "Pick a first choice, and a second if you have one. The masjid needs a fortnight's notice.")}</P>
+            <Heading>{t("nikah.request_a_date", "Request a date")}</Heading>
+            <P muted>{t("nikah.two_weeks_notice_minimum",
+              "Two weeks’ notice minimum, and up to a year ahead.")}</P>
             {month && (
               <Calendar month={month} onMonth={setMonth} first={first} last={last}
                         selected={[d1, d2].filter(Boolean)}
@@ -203,11 +203,22 @@ export default function Marriage({ navigation }) {
                         }} />)}
             <View style={{ marginTop: 9 }}>
               <Note>{d1
-                ? `${t("nikah.1st_choice_2", "1st choice")}: ${prettyIn(t, d1)}${d2 ? ` · ${t("nikah.2nd_choice_2", "2nd choice")}: ${prettyIn(t, d2)}` : ""}`
-                : t("nikah.not_chosen", "Not chosen")}</Note>
+                ? `${t("nikah.1st_choice", "1st choice")}: ${prettyIn(t, d1)}${d2 ? ` · ${t("nikah.2nd_choice", "2nd choice")} (${t("nikah.optional", "Optional")}): ${prettyIn(t, d2)}` : ""}`
+                : t("nikah.not_chosen_2", "Not chosen")}</Note>
+              {!!d1 && (
+                <Press onPress={() => { tap(); setD1(null); setD2(null); }}
+                  style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
+                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+                    {t("nikah.start_again", "Start again")}</Text>
+                </Press>)}
             </View>
             {bad.date && <ErrorBox>{t("nikah.pick_a_date", "Please pick a date.")}</ErrorBox>}
 
+            {/* Which prayer the nikāḥ sits after only means anything once a day
+                is chosen, so the website says so rather than leaving the list
+                looking broken. */}
+            {!d1 && <Note>{t("nikah.pick_a_date_above_so",
+              "Pick a date and a prayer above, and this will carry them across to the office for you.")}</Note>}
             <Choice label={t("nikah.what_time_would_suit_you", "What time would suit you?")}
                     value={slot} onChange={setSlot}
                     options={[
@@ -233,7 +244,7 @@ export default function Marriage({ navigation }) {
                    onChange={v => setWho(s => ({ ...s, phone: v }))} />
             <Field label={t("nikah.email", "Email")} type="email" value={who.email} bad={bad.email}
                    onChange={v => setWho(s => ({ ...s, email: v }))} />
-            <Field label={t("nikah.guests", "Roughly how many guests?")} type="num" required={false}
+            <Field label={t("nikah.roughly_how_many_guests", "Roughly how many guests (optional)")} type="num" required={false}
                    value={who.guests} onChange={v => setWho(s => ({ ...s, guests: v.replace(/[^0-9]/g, "") }))} />
 
             <Heading>{t("nikah.who_is_getting_married", "Who is getting married")}</Heading>
@@ -257,14 +268,20 @@ export default function Marriage({ navigation }) {
                        bad={bad[`${p.id}.pc`]} onChange={v => setP(p.id, "pc", v)} />
               </View>))}
 
-            <Field label={t("nikah.anything_else", "Anything else the office should know")} type="multi"
+            <Field label={t("nikah.anything_we_should_know", "Anything we should know (optional)")} type="multi"
                    required={false} value={who.notes} onChange={v => setWho(s => ({ ...s, notes: v }))} />
 
             <Check value={agree} onChange={setAgree} bad={bad.agree}
-                   label={t("nikah.i_agree_privacy",
+                   label={t("nikah.i_understand_the_masjid_will",
                      "I agree to these details being held by the masjid so that the nikāḥ can be arranged and recorded.")} />
 
             <ErrorBox>{state.error}</ErrorBox>
+            <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
+              style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+                {t("privacy.read_the_privacy_notice", "Read the privacy notice")}</Text>
+            </Press>
+            <Note>{t("nikah.nothing_is_sent_until_you", "Nothing is sent until you press this.")}</Note>
             <Submit label={t("nikah.send_my_request", "Send my request")} sending={state.sending} onPress={send} />
 
             <Pay t={t} />

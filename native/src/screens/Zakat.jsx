@@ -45,8 +45,22 @@ export default function Zakat() {
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        <Heading tag="1">{t("zakat.the_nisab", "The nisab")}</Heading>
-        <P muted>{t("zakat.nisab_is_the_minimum",
+        {/* Who owes zakat at all. The calculator asked people for their
+            savings without ever saying whether it applied to them. */}
+        <Heading>{t("zakat.new_to_zakat_start_here", "New to zakat? Start here")}</Heading>
+        <Card>
+          <P>{t("zakat.you_pay_it_if_all", "You pay it if all of these are true:")}</P>
+          <Ticks items={[
+            t("zakat.you_are_muslim_and_have", "You are Muslim and have reached the age of puberty"),
+            t("zakat.what_you_own_is_worth", "What you own is worth more than the *nisab* (the minimum amount, below)"),
+            t("zakat.you_have_owned_that_much", "You have owned that much for one full *lunar year*"),
+          ]} />
+          <Note>{t("zakat.pick_the_same_date_each",
+            "Pick the same date each Islamic year — many choose a day in Ramadan — and work out your zakat on that day every year.")}</Note>
+        </Card>
+
+        <Heading tag="1">{t("zakat.1_the_nisab", "The nisab")}</Heading>
+        <P muted>{t("zakat.nisab_is_the_minimum_you",
           "Nisab is the minimum you must own before zakat is due. It is fixed in gold and silver, so it moves with the price.")}</P>
 
         <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
@@ -62,6 +76,10 @@ export default function Zakat() {
           })}
         </View>
         <View style={{ marginTop: 10 }}>
+        <View style={{ flexDirection: "row", gap: 8, marginBottom: 9 }}>
+          <Pill>{t("zakat.silver_612_36g", "Silver · 612.36g")}</Pill>
+          <Pill>{t("zakat.gold_87_48g", "Gold · 87.48g")}</Pill>
+        </View>
         <Note>{t("zakat.most_scholars_silver",
           "Most scholars prefer the silver standard, because it is lower and so more people qualify to give.")}</Note>
         </View>
@@ -85,21 +103,22 @@ export default function Zakat() {
           </Text>
         </Card>
 
-        <Heading tag="2">{t("zakat.what_you_own", "What you own")}</Heading>
+        <Heading tag="2">{t("zakat.2_what_you_own", "What you own")}</Heading>
         <Field label={t("zakat.cash_at_home_bank_savings", "Cash — at home, bank, savings (£)")} value={v.cash} onChange={x => set("cash", x)} />
         <Field label={t("zakat.gold_you_own_grams", "Gold you own (grams)")} value={v.gold} onChange={x => set("gold", x)} />
         <Field label={t("zakat.silver_you_own_grams", "Silver you own (grams)")} value={v.silver} onChange={x => set("silver", x)} />
         <Field label={t("zakat.money_owed_to_you_that", "Money owed to you that you expect back (£)")} value={v.owed} onChange={x => set("owed", x)} />
         <Field label={t("zakat.business_stock_goods_bought_to", "Business stock — goods bought to sell (£)")} value={v.stock} onChange={x => set("stock", x)} />
         <Field label={t("zakat.shares_crypto_other_investments", "Shares, crypto & other investments (£)")} value={v.invest} onChange={x => set("invest", x)} />
+        <Note>{t("zakat.money_in_a_pension_you", "Money in a pension you can access")}</Note>
         {(n("gold") > 0 || n("silver") > 0) && !Number(price) && (
           <Warn>{t("zakat.gsnote",
             "Enter a price per gram above, or the gold and silver you own cannot be valued.")}</Warn>)}
 
-        <Heading tag="3">{t("zakat.what_you_owe", "What you owe")}</Heading>
+        <Heading tag="3">{t("zakat.3_what_you_owe", "What you owe")}</Heading>
         <Field label={t("zakat.debts_and_bills_due_now", "Debts and bills due now (£)")} value={v.debts} onChange={x => set("debts", x)} />
         <View style={{ marginTop: 9 }}>
-          <Note>{t("zakat.include_what_you_owe",
+          <Note>{t("zakat.include_what_you_owe_right",
             "Include what you owe right now — bills, rent, money borrowed.")}</Note>
         </View>
 
@@ -127,6 +146,20 @@ export default function Zakat() {
                 "No zakat is due on this amount. Ṣadaqah is always welcome.")}</Note>
             </View>
           )}
+        </Card>
+
+        {/* What is NOT counted. Without it people total up their house and
+            their car and conclude they owe zakat they do not owe. */}
+        <Heading>{t("zakat.leave_these_out", "Leave these out")}</Heading>
+        <Card>
+          <Ticks items={[
+            t("zakat.the_home_you_live_in", "The home you live in"),
+            t("zakat.your_car_clothes_phone_and", "Your car, clothes, phone and furniture"),
+            t("zakat.tools_and_machinery_you_use", "Tools and machinery you use for work — unless you bought them to sell"),
+            t("zakat.a_property_you_rent_out", "A property you rent out — but rent you have saved does count"),
+            t("zakat.debts_you_are_owed_but", "Debts you are owed but do not expect to get back"),
+            t("zakat.anything_you_have_already_spent", "Anything you have already spent"),
+          ]} />
         </Card>
 
         <Press onPress={() => { tap(); setV({ cash: "", gold: "", silver: "", owed: "", stock: "", invest: "", debts: "" }); setPrice(""); }}

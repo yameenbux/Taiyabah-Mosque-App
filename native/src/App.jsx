@@ -132,7 +132,7 @@ function Root() {
         <Stack.Screen name="Live"      component={Live}      options={bare} />
         <Stack.Screen name="Videos"    component={Videos}    options={bare} />
         <Stack.Screen name="Timetable" component={Timetable} options={bare} />
-        <Stack.Screen name="Zakat"     component={Zakat}     options={bare} />
+        <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={bare} />
         <Stack.Screen name="NewBuild"  component={NewBuild}  options={bare} />
         <Stack.Screen name="Giving"    component={Giving}    options={bare} />

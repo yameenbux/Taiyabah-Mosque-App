@@ -64,6 +64,14 @@ const WONT_NEED = {
   "mushaf.the_reader_is_ready":      "part of that same not-installed state",
   "mushaf.in_the_meantime_the_english": "part of that same not-installed state",
   "mushaf.open_the_translation_instead": "part of that same not-installed state",
+  /* The website prints the chosen dates twice — once in a panel beside the
+   * calendar and again in a review list before sending — so the pack carries
+   * two keys for one wording. The app prints them once. */
+  "nikah.1st_choice_2":  "the website's second copy of 1st choice; the app shows it once",
+  "nikah.2nd_choice_2":  "the website's second copy of 2nd choice; the app shows it once",
+  "nikah.not_chosen":    "the website's second copy of Not chosen; the app shows it once",
+  "nikah.optional_2":    "an Optional badge inside the guests label, which already reads (optional)",
+  "nikah.optional_3":    "an Optional badge inside the notes label, which already reads (optional)",
 };
 
 /* A screen ends at its own closing tag, not where the next one starts.
