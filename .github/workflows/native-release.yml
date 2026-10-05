@@ -122,6 +122,15 @@ jobs:
             echo "::error::Uploading this would make a new listing, not update the existing one."
             exit 1
           fi
+          # react-native-onesignal 5.4.3 declares its event listeners as
+          # codegen EventEmitter properties, which exist only under the New
+          # Architecture. Without it the app dies on launch with "undefined is
+          # not a function" and shows a blank screen.
+          grep -n "newArchEnabled" gradle.properties || true
+          if ! grep -q "^newArchEnabled=true" gradle.properties; then
+            echo "::error::newArchEnabled is not true — the app would crash on launch."
+            exit 1
+          fi
           target=$(grep -oE "targetSdkVersion ?= ?[0-9]+" gradle.properties build.gradle app/build.gradle 2>/dev/null \
                    | grep -oE "[0-9]+$" | sort -n | tail -1)
           echo "targetSdkVersion: ${target:-unknown}"

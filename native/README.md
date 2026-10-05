@@ -134,3 +134,32 @@ different package id (`…app.dev`) — so the two can be compared side by side.
 
 The signing keystore and its password are never generated here, never committed
 and never pasted into a transcript.
+
+## Two settings in app.json that are not cosmetic
+
+`app.json` is JSON and cannot hold a comment, so the two that would cost a day
+to re-derive are written down here.
+
+**`newArchEnabled: true`.** `react-native-onesignal` 5.4.3 declares its event
+listeners as codegen `EventEmitter` properties (`src/NativeOneSignal.ts`), and
+those properties only exist under React Native's New Architecture. Build
+without it and nothing complains: the module loads, its constructor calls
+`setupListeners`, and the first line reaches for a property that was never
+generated. The app dies on launch with `TypeError: undefined is not a
+function` and shows a blank screen — no stack anyone would connect to a
+notification library. Every workflow now checks `android/gradle.properties`
+after prebuild rather than trusting that the flag survived.
+
+**`targetSdkVersion: 35`**, under `expo-build-properties`. Play has required
+API 35 of every update since August 2025 and SDK 52 defaults to 34, so without
+this the bundle is refused on upload. Targeting 35 also means Android 15 draws
+the app edge to edge whether it asked to or not, which is why the smoke
+emulator runs API 35 — on 34 that change is invisible and a header hidden
+behind the status bar would pass every run here.
+
+**The package id lives in `app.config.js`, not only `app.json`.** `app.json`
+names the real package, `com.taiyabahmasjid.app` — the one the Play listing
+owns. Setting `TAIYABAH_VARIANT=dev`, which the APK and smoke workflows do,
+appends `.dev` and puts "(test)" in the app name so a build you are testing
+installs beside the real app instead of replacing it. The release workflow
+sets no variant, on purpose.

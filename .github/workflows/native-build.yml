@@ -84,6 +84,22 @@ jobs:
         working-directory: native
         run: npx expo prebuild --platform android --no-install
 
+      # react-native-onesignal 5.4.3 declares its event listeners as codegen
+      # EventEmitter properties, and those exist ONLY under the New
+      # Architecture. Build it with the old one and the module loads, the
+      # listener setup calls a property that is not there, and the app dies on
+      # launch with "undefined is not a function" — a blank screen, no clue.
+      # app.json asks for it; this proves prebuild actually wrote it.
+      - name: Check the New Architecture is really on
+        working-directory: native/android
+        run: |
+          grep -n "newArchEnabled" gradle.properties || true
+          if ! grep -q "^newArchEnabled=true" gradle.properties; then
+            echo "::error::newArchEnabled is not true in android/gradle.properties."
+            echo "::error::OneSignal needs it; without it the app crashes on launch."
+            exit 1
+          fi
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

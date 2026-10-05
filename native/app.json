@@ -6,6 +6,7 @@
     "version": "2.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "backgroundColor": "#3C0B2A",
     "icon": "./assets/icon.png",
     "splash": {
