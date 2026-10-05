@@ -11,6 +11,7 @@ import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
 import { AppProvider, useApp } from "./store";
 import { sheetScreen } from "./Blocks";
+import Opening from "./Opening";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -199,6 +200,10 @@ export default function App() {
       <AppProvider fallback={veil}>
         <Root />
       </AppProvider>
+      {/* Last, so it sits over the app — and only over it. The app is mounted
+          and live underneath from the first frame; this never gates it, never
+          takes a touch, and takes itself away on a timer whatever happens. */}
+      <Opening />
     </SafeAreaProvider>
   );
 }
