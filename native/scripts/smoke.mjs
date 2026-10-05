@@ -301,6 +301,59 @@ if (!inFront) fail("the app is not in front after 8s — focus is " +
                    (focus.join(" / ").trim() || "nothing"));
 else log("ok", "the app is the focused window");
 
+/* ---------- did the fonts and the icons actually arrive? ------------------ */
+
+/* uiautomator reports text, not pixels. An icon that fails to draw still has a
+ * node with a label on it, so every check in this file was blind to an app
+ * whose icons were ALL missing — which is what shipped, past three green runs.
+ * Two checks now: what the app itself says about its fonts, and whether there
+ * is any ink where the tab bar's icons belong. */
+
+function jsLog(re) {
+  try {
+    return adb(["logcat", "-d", "-s", "ReactNativeJS:V"]).split("\n").filter(l => re.test(l));
+  } catch { return []; }
+}
+const fontSays = jsLog(/font/i);
+if (fontSays.length) {
+  say("\nwhat the app said about its fonts:\n  " + fontSays.slice(-8).join("\n  "));
+  annotate("app says about fonts: " + fontSays.slice(-2).join(" / ").slice(0, 500));
+}
+
+/* Unique colours in a slice of a screenshot. An icon that drew has strokes and
+ * antialiasing, so dozens of them; flat background has one or two. */
+function colours(png, x, y, w, h) {
+  for (const bin of ["magick", "convert"]) {
+    try {
+      return Number(execFileSync(bin, [png, "-crop", `${w}x${h}+${x}+${y}`, "+repage",
+                                       "-format", "%k", "info:"], { encoding: "utf8" }).trim());
+    } catch { /* try the other name */ }
+  }
+  return null;
+}
+
+const tabShot = shot("tabbar");
+const iconCounts = [];
+let iconsDrew = 0, iconsChecked = 0;
+for (const tab of ["Home", "Prayer Times", "Notices", "More"]) {
+  const n = findIn(nodes(dump()), tab);
+  if (!n) continue;
+  const w = 72, h = 52;
+  const k = colours(tabShot, Math.max(0, Math.round(n.x - w / 2)),
+                    Math.max(0, Math.round(n.y - n.h / 2 - h - 4)), w, h);
+  if (k === null) { say("  (no ImageMagick here — the icons cannot be checked)"); break; }
+  iconsChecked++;
+  iconCounts.push(`${tab}:${k}`);
+  if (k >= 8) iconsDrew++;
+}
+if (iconsChecked) {
+  log("··", `tab bar icon ink — ${iconCounts.join(" ")} (unique colours per icon box)`);
+  if (iconsDrew < iconsChecked)
+    fail(`${iconsChecked - iconsDrew} of ${iconsChecked} tab bar icons did not draw ` +
+         `(${iconCounts.join(" ")}) — an icon that renders has dozens of colours in its ` +
+         `box, these have almost none, which means the icon font never loaded`);
+}
+
 /* ---------- everything on the home screen -------------------------------- */
 
 const TILES = ["Holy Qur'an", "Daily Adhkār", "Ṣaḥīḥ al-Bukhārī", "Qibla", "Madrasah",
@@ -409,6 +462,7 @@ const tally = [
   `${groupCount}/${groupTotal} menu groups present, ${opened.rows.length + inert.length}/${rowTotal} rows present`,
   `${opened.rows.length} menu rows opened a screen; ${inert.length} present but not followed (${inert.join(", ")})`,
   `tabs working: ${tabsOk.join(", ")}`,
+  `tab bar icons drew: ${iconsDrew}/${iconsChecked || "not checked"} (${iconCounts.join(" ") || "—"})`,
   `no crash or fatal JS error in logcat at any point`,
   `${shots} screenshots taken`,
 ];
