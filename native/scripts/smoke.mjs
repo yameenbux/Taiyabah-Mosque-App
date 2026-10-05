@@ -19,13 +19,33 @@ const OUT = process.env.SMOKE_DIR || path.resolve(import.meta.dirname, "../../.s
 const PKG = "com.taiyabahmasjid.app.dev";
 fs.mkdirSync(OUT, { recursive: true });
 
-const adb = (args, opts = {}) =>
-  execFileSync("adb", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, ...opts });
+/* A CI job's log is not reachable through the API, and the first version of
+ * this script died before its first screenshot — which left an empty artifact
+ * and nothing to read. So everything it prints is also written to a file inside
+ * the artifact, and anything that goes wrong is echoed as a ::error:: workflow
+ * command, because those become check annotations and annotations ARE readable. */
+const LOGFILE = path.join(OUT, "run.log");
+fs.writeFileSync(LOGFILE, `smoke run — ${new Date().toISOString()}\napk: ${APK}\n\n`);
+const say = line => { console.log(line); fs.appendFileSync(LOGFILE, line + "\n"); };
+const annotate = line =>
+  String(line).split("\n").slice(0, 8).forEach(l => console.log(`::error::${l}`));
+
+const adb = (args, opts = {}) => {
+  try {
+    return execFileSync("adb", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, ...opts });
+  } catch (e) {
+    /* adb writes the useful half of its complaints to stderr, and execFileSync
+     * throws them away unless they are asked for by name. */
+    const detail = [e.stdout, e.stderr].filter(Boolean).join("\n").trim();
+    e.message = `adb ${args.slice(0, 3).join(" ")} failed: ${detail || e.message}`;
+    throw e;
+  }
+};
 const sleep = ms => execSync(`sleep ${ms / 1000}`);
 
 let step = 0, failures = [], shots = 0;
-const log = (mark, msg) => console.log(`${mark} ${msg}`);
-const fail = msg => { failures.push(msg); log("FAIL", msg); };
+const log = (mark, msg) => say(`${mark} ${msg}`);
+const fail = msg => { failures.push(msg); log("FAIL", msg); annotate(msg); };
 
 /* ---------- the screen, as Android sees it ------------------------------- */
 
@@ -93,15 +113,36 @@ function crashes() {
 
 /* ---------- the run ------------------------------------------------------ */
 
+/* Everything below runs inside this, so a throw leaves a log, a picture and an
+ * annotation rather than an empty artifact. */
+try {
+try { say("device: " + adb(["devices", "-l"]).trim()); } catch (e) { say(String(e.message)); }
+try { say("api level: " + adb(["shell", "getprop", "ro.build.version.sdk"]).trim()); } catch {}
+
+/* Permissions are granted up front so a runtime prompt cannot be mistaken for
+ * the app failing to draw — but -g refuses outright on some images when a
+ * manifest asks for a permission it cannot grant that way, and an install that
+ * throws takes the whole run with it. So it falls back to a plain install. */
 log("··", `installing ${path.basename(APK)}`);
-adb(["install", "-r", "-g", APK], { stdio: "inherit" });
+try {
+  say(adb(["install", "-r", "-g", APK]).trim());
+} catch (e) {
+  say("install -g refused (" + e.message.slice(0, 160) + ") — installing without it");
+  say(adb(["install", "-r", APK]).trim());
+  for (const perm of ["android.permission.ACCESS_FINE_LOCATION",
+                      "android.permission.ACCESS_COARSE_LOCATION",
+                      "android.permission.POST_NOTIFICATIONS"]) {
+    try { adb(["shell", "pm", "grant", PKG, perm]); } catch { /* not all are grantable */ }
+  }
+}
 adb(["logcat", "-c"]);
-/* Permissions are granted up front (-g) so a runtime prompt cannot be mistaken
- * for the app failing to draw. */
 
 log("··", "launching");
 adb(["shell", "monkey", "-p", PKG, "-c", "android.intent.category.LAUNCHER", "1"],
     { stdio: ["ignore", "ignore", "ignore"] });
+/* One picture before any assertion, so there is always something to look at. */
+sleep(6000);
+shot("first-frame");
 
 /* The fonts load before the first frame, so give it room — and look for the
  * words rather than a fixed wait. */
@@ -216,11 +257,22 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
 const late = crashes();
 if (late.length) fail("crashes in the log at the end:\n    " + late.slice(0, 8).join("\n    "));
 
-console.log(`\n${shots} screenshots in ${OUT}`);
+try { fs.writeFileSync(path.join(OUT, "last-screen.xml"), dump()); } catch {}
+say(`\n${shots} screenshots in ${OUT}`);
 if (failures.length) {
-  console.log(`\n${failures.length} problem(s):`);
-  failures.forEach(f => console.log("  · " + f));
+  say(`\n${failures.length} problem(s):`);
+  failures.forEach(f => say("  · " + f));
   process.exit(1);
 }
-console.log("\nThe app installs, opens, draws its home screen, and every tile and menu row");
-console.log("opens a screen of its own. Nothing crashed.");
+say("\nThe app installs, opens, draws its home screen, and every tile and menu row");
+say("opens a screen of its own. Nothing crashed.");
+
+} catch (err) {
+  say("\nthe run stopped early: " + (err && err.message ? err.message : String(err)));
+  annotate("the smoke run stopped early: " + (err && err.message ? err.message : String(err)));
+  try { shot("where-it-stopped"); } catch {}
+  try { fs.writeFileSync(path.join(OUT, "last-screen.xml"), dump()); } catch {}
+  try { fs.writeFileSync(path.join(OUT, "logcat-tail.txt"),
+                         adb(["logcat", "-d", "-t", "400"])); } catch {}
+  process.exit(1);
+}

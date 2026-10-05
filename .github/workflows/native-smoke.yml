@@ -48,11 +48,16 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # Two architectures, not four: arm64 for real phones and x86_64 for the
+      # emulator this job runs on. It roughly halves the native compile, which
+      # is the slow half of this workflow. The APK handed over for testing comes
+      # from the other workflow and still carries every architecture.
       - name: Build the APK
         working-directory: native/android
         run: |
           set -o pipefail
-          ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+          ./gradlew assembleRelease --no-daemon --stacktrace \
+            -PreactNativeArchitectures=arm64-v8a,x86_64 2>&1 | tee /tmp/gradle.log
 
       - name: What Gradle actually said
         if: failure()
@@ -62,6 +67,10 @@ jobs:
 
       # The emulator needs hardware acceleration, and the runner's KVM device
       # is root-only until this rule opens it up.
+      # So the artifact exists even if the run dies before its first screenshot.
+      - name: Somewhere to put the evidence
+        run: mkdir -p .smoke
+
       - name: Let the runner use KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
@@ -95,9 +104,6 @@ jobs:
           path: .smoke/
           retention-days: 30
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: taiyabah-native-${{ github.run_number }}
-          path: native/android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 30
+      # No APK is uploaded here on purpose. This one is built for two
+      # architectures to keep the job quick; the build to install on a phone
+      # comes from the "Native app (Android)" workflow, which is universal.
