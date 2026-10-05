@@ -60,8 +60,23 @@ resolve against a pack; 350 have Urdu today, and the 135 strings this app
 introduced are listed in `native/src/i18n/TODO-translate.json` for whoever
 reviews the packs.
 
-**Checking it without a phone:** `node scripts/shots.mjs` photographs all 36
-screens and reports any runtime error. See `native/README.md`.
+**It has been run on Android.** A CI job boots a real emulator, installs the
+APK and drives it over adb: it waits for the home screen to actually draw,
+checks the app is the focused window, then taps all twelve tiles and all
+nineteen menu rows, verifying after each tap that a new screen drew and that
+nothing landed in the crash log. It passes, and every screen is photographed
+and uploaded. See the "Native app — does it actually run?" workflow.
+
+That run earned its keep immediately: it found that the app drew **nothing at
+all** on Android. Two gates could hang for ever — `useFonts()` returns a loaded
+flag and an error and only the flag was read, so one font failing to load left
+a plum rectangle permanently; and the settings provider rendered a blank veil
+until AsyncStorage answered, which a missing native module never does. Both now
+have a ceiling.
+
+**Checking it without a phone:** `node scripts/shots.mjs` photographs all 37
+screens and reports any runtime error; `node scripts/check-parity.mjs` compares
+the layout against the web app. See `native/README.md`.
 
 **Still not for Play.** The build signs with Expo's debug keystore, so the APK
 installs by hand but Play would reject it — which is the right shape while the

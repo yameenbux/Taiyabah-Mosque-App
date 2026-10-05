@@ -83,6 +83,27 @@ node scripts/shots.mjs               # photograph all 37 screens, report runtime
 haptics do not exist in a browser — but it catches a screen that throws or a
 layout that breaks before eight minutes of Gradle does.
 
+## Running it on Android
+
+```
+# in CI only — it needs a real emulator
+.github/workflows/native-smoke.yml   →  "Native app — does it actually run?"
+```
+
+It installs the APK on a booted Pixel 6, waits for the home screen to **draw**
+(looking for the words, not sleeping), checks the app is the focused window,
+then taps every tile and every menu row — verifying after each tap that a new
+screen drew and that nothing reached the crash log or the ReactNativeJS error
+log. Every screen is photographed and uploaded, pass or fail.
+
+Two things it cannot tell you: how the scrolling *feels*, and anything about
+the compass — an emulator has no magnetometer, so Qibla shows its "no compass"
+state. Everything else is the real app on real Android.
+
+The smoke build packs two architectures to keep the job short. The build to
+install on a phone comes from the other workflow and is universal; the two
+differ only in which architectures are inside.
+
 ## Building an APK
 
 Push to `main` under `native/`, or run the **Native app (Android)** workflow by
