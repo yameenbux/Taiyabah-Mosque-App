@@ -496,7 +496,11 @@ else {
                 "Zakat calculator", "Admissions & Fees", "Holiday Planner", "Madrasah Portal",
                 "About us", "Membership", "Find us", "Contact us", "Birth, Marriage & Death",
                 "Imams' Advice", "Education", "Tours & Visits", "Notifications",
-                "Privacy notice", "System Preferences"];
+                "Privacy notice", "System Preferences",
+                /* The one row that is not on the website. It is listed here so
+                 * the run opens it: a screen nothing taps is a screen that can
+                 * crash on a phone and pass every check. */
+                "Help"];
   if (!findIn(menu, "Resources")) fail("the More menu did not open");
   else log("ok", "the More menu opened");
   let groups = 0;

@@ -2,9 +2,16 @@
  *
  * This is the web app's drawer, row for row: the same five groups in the same
  * order, the same seventeen rows, the same two "coming soon" entries, the same
- * social strip and the same footer with the radio frequency on it. Nothing has
- * been added and nothing moved — anything the web app reaches from a tile or a
- * sheet is reached the same way here.
+ * social strip and the same footer with the radio frequency on it. Anything the
+ * web app reaches from a tile or a sheet is reached the same way here.
+ *
+ * ONE ROW IS NOT ON THE WEBSITE: Help. It is here on purpose and it is the only
+ * such row, so it is written down rather than left to be discovered. Most of
+ * what goes wrong with a phone app cannot go wrong in a browser — Android stops
+ * the app in the background, a permission is refused once and never offered
+ * again, a compass is thrown off by a magnetic case — and a help page written
+ * for the website could not answer any of it. If the website ever grows the
+ * same section, these should be reconciled rather than both left to drift.
  *
  * What changed is the mechanism, not the map: it is a screen rather than a
  * drawer, so every row pushes and the platform gives it the slide and the
@@ -55,6 +62,7 @@ const GROUPS = [
     { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications", t: "Notifications" },
     { href: PRIVACY,    icon: "shield-checkmark-outline", k: "privacy.privacy_notice", t: "Privacy notice", external: true },
     { to: "Prefs",      icon: "options-outline",     k: "a11y.system_preferences", t: "System Preferences" },
+    { to: "Help",       icon: "help-circle-outline", k: "help.title",             t: "Help" },
   ]},
 ];
 

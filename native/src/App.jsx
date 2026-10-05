@@ -31,6 +31,7 @@ import Advice from "./screens/Advice";
 import Collect from "./screens/Collect";
 import Alerts from "./screens/Alerts";
 import Prefs from "./screens/Prefs";
+import Help from "./screens/Help";
 import Quran, { Surahs, Surah, Mushaf } from "./screens/Quran";
 import Bukhari, { BukhariBook } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
@@ -151,6 +152,7 @@ function Root() {
         <Stack.Screen name="Prefs"   component={Prefs}   options={bare} />
         <Stack.Screen name="Portal"  component={Portal}  options={bare} />
         <Stack.Screen name="Privacy" component={Privacy} options={bare} />
+        <Stack.Screen name="Help"    component={Help}    options={bare} />
 
         {/* the masjid's own prose, straight from the website */}
         {Object.entries(SHEET).map(([name, id]) => (

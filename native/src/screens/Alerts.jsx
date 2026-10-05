@@ -15,6 +15,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { View, Text, Switch, Linking } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
@@ -60,6 +61,7 @@ export default function Alerts() {
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
   const [diag, setDiag] = useState(false);
+  const nav = useNavigation();
   /* Worked out once from the manufacturer; it cannot change while the app is
    * open, and it is null on anything that is not Android. */
   const help = React.useMemo(batteryHelp, []);
@@ -254,6 +256,14 @@ export default function Alerts() {
             </Press>
             <Note>{t("sheet.this_clears_the_app_s",
               "This clears the app’s stored files and re-installs its background service. Your prayer times are built in, so nothing is lost.")}</Note>
+            {/* Everything else somebody might be here about. The answers live
+              * in one place rather than being half-copied into two. */}
+            <Press onPress={() => { tap(); nav.navigate("Help"); }}
+              style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                       borderWidth: 1, borderColor: C.line }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                {t("alerts.more_answers", "More answers in Help")}</Text>
+            </Press>
           </Card>)}
 
         <Note>{t("alerts.what_comes_from_where",
