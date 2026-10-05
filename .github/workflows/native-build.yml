@@ -52,6 +52,18 @@ jobs:
       # Not fatal — a key with no pack entry reads in English rather than
       # breaking — but it should be visible in the log rather than found on
       # somebody's phone after they have switched to Urdu.
+      - name: Check every component exists
+        working-directory: native
+        run: node scripts/check-refs.mjs
+
+      - name: Check every screen says what the website says
+        working-directory: native
+        run: node scripts/check-screens.mjs --strict
+
+      - name: Check every link points where the website points
+        working-directory: native
+        run: node scripts/check-links.mjs
+
       - name: Which strings are still English only
         working-directory: native
         run: node scripts/check-i18n.mjs | head -40

@@ -38,6 +38,18 @@ jobs:
       - name: Check every screen parses
         working-directory: native
         run: node scripts/parse-check.mjs
+      - name: Check every component exists
+        working-directory: native
+        run: node scripts/check-refs.mjs
+
+      - name: Check every screen says what the website says
+        working-directory: native
+        run: node scripts/check-screens.mjs --strict
+
+      - name: Check every link points where the website points
+        working-directory: native
+        run: node scripts/check-links.mjs
+
 
       - name: Generate the Android project
         working-directory: native

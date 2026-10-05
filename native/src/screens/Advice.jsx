@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Notice, RowGroup, NavRow, Foot, P } from "../ui";
+import { Screen, Hero, Heading, Note, Notice, RowGroup, NavRow, Foot, P } from "../ui";
 import { Field, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
