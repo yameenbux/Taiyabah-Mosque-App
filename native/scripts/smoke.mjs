@@ -218,6 +218,22 @@ try {
     try { adb(["shell", "pm", "grant", PKG, perm]); } catch { /* not all are grantable */ }
   }
 }
+/* A FIRST run has to actually be one.
+ *
+ * The install above grants every permission with -g, which is right for the
+ * rest of this run — a runtime prompt mistaken for the app failing to draw has
+ * cost us before — but it means notifications are already granted, so the
+ * first-run offer correctly does not appear and its code is never run. The
+ * first green run on it reported exactly that, and would have shipped an
+ * unexercised feature as tested. So the one permission the offer is about is
+ * handed back before launch. */
+try {
+  adb(["shell", "pm", "revoke", PKG, "android.permission.POST_NOTIFICATIONS"]);
+  log("··", "notification permission revoked, so this is a real first run");
+} catch (e) {
+  say("  could not revoke POST_NOTIFICATIONS (" + String(e.message).slice(0, 90) + ")");
+}
+
 adb(["logcat", "-c"]);
 
 log("··", "launching");
@@ -320,9 +336,10 @@ else log("ok", "the app is the focused window");
 
 /* It can also arrive a moment after the home screen has drawn. */
 clearFirstRun();
-log(sawOffer ? "ok" : "··",
-    sawOffer ? "the reminder offer was shown and dismissed"
-             : "no reminder offer appeared (already answered, or permission settled)");
+if (sawOffer) log("ok", "the reminder offer was shown and dismissed");
+else fail("the first-run reminder offer never appeared. Permission was revoked " +
+          "before launch, so this IS a first run and the offer is the whole of " +
+          "how this app ever gets permission to remind anybody");
 
 /* ---------- did the fonts and the icons actually arrive? ------------------ */
 
