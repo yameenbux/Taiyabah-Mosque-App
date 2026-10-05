@@ -22,7 +22,7 @@ import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
-import { syncTags, optIn, optOut } from "../push";
+import { syncTags, optIn, optOut, whoAmI } from "../push";
 
 const MINS = [5, 10, 15, 20, 30];
 
@@ -59,6 +59,7 @@ export default function Alerts() {
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
   const [diag, setDiag] = useState(false);
+  const [who, setWho] = useState(null);
 
   useEffect(() => {
     Notifications.getPermissionsAsync()
@@ -184,6 +185,19 @@ export default function Alerts() {
 
         {diag && (
           <Card gap={10}>
+            {/* The id this phone is known by, so one handset can be sent a test
+                rather than the whole congregation. */}
+            <Press onPress={async () => { tap(); setWho(await whoAmI()); }}
+              style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
+                       borderWidth: 1, borderColor: C.line }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                {t("alerts.show_this_device_id", "Show this device's notification id")}</Text>
+            </Press>
+            {!!who && (
+              <Text selectable style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted,
+                                        lineHeight: fs(18) }}>
+                {`subscription: ${who.sub || "—"}\nuser: ${who.user || "—"}\nsubscribed: ${who.optedIn ? "yes" : "no"}${who.error ? "\n" + who.error : ""}`}
+              </Text>)}
             <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
               {`${t("alerts.permission", "Permission")}: ${granted ? t("sheet.notifications_on", "Notifications on") : t("alerts.notifications_off", "Notifications off")}\n` +
                `${t("alerts.scheduled_now", "Scheduled now")}: ${armed ?? "—"}\n` +

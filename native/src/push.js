@@ -97,6 +97,23 @@ export async function syncTags(alerts) {
   return "failed";
 }
 
+/* Who this phone is, to OneSignal.
+ *
+ * Shown under "Having trouble?" so a single handset can be sent a test without
+ * sending one to the whole congregation. Every subscriber of this app is a
+ * real person who signed up through the masjid's website, and "testing the
+ * push" by sending to all of them is a mistake that cannot be taken back. */
+export async function whoAmI() {
+  try {
+    const user = await OneSignal.User.getOnesignalId();
+    const sub = await OneSignal.User.pushSubscription.getIdAsync();
+    const optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
+    return { user: user || null, sub: sub || null, optedIn: !!optedIn };
+  } catch (e) {
+    return { user: null, sub: null, optedIn: false, error: String(e && e.message || e) };
+  }
+}
+
 /* Nothing from the masjid wanted, so stop being a subscriber rather than stay
  * one who is sent nothing. */
 export async function optOut() {
