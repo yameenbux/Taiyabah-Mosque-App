@@ -314,10 +314,16 @@ function jsLog(re) {
     return adb(["logcat", "-d", "-s", "ReactNativeJS:V"]).split("\n").filter(l => re.test(l));
   } catch { return []; }
 }
-const fontSays = jsLog(/font/i);
+const fontSays = jsLog(/font|asset|Asset/i);
 if (fontSays.length) {
-  say("\nwhat the app said about its fonts:\n  " + fontSays.slice(-8).join("\n  "));
-  annotate("app says about fonts: " + fontSays.slice(-2).join(" / ").slice(0, 500));
+  say("\nwhat the app said about its fonts:\n  " + fontSays.join("\n  "));
+  fontSays.slice(0, 6).forEach(l => annotate("app says: " + l.slice(0, 900)));
+  /* A font that does not load is not a cosmetic problem here: every icon in
+   * this app is a glyph in one, so this is the difference between an app and
+   * an app with no icons. */
+  if (fontSays.some(l => /did not load|rejected|Error/i.test(l)))
+    fail("the app could not load its fonts — see the lines above; with no font " +
+         "file loaded, every icon in the app renders as nothing");
 }
 
 /* Unique colours in a slice of a screenshot. An icon that drew has strokes and
@@ -341,7 +347,11 @@ for (const tab of ["Home", "Prayer Times", "Notices", "More"]) {
   const w = 72, h = 52;
   const k = colours(tabShot, Math.max(0, Math.round(n.x - w / 2)),
                     Math.max(0, Math.round(n.y - n.h / 2 - h - 4)), w, h);
-  if (k === null) { say("  (no ImageMagick here — the icons cannot be checked)"); break; }
+  if (k === null) {
+    fail("no ImageMagick on this runner, so whether the icons drew could not be " +
+         "checked — and an unrunnable check must not be reported as a pass");
+    break;
+  }
   iconsChecked++;
   iconCounts.push(`${tab}:${k}`);
   if (k >= 8) iconsDrew++;

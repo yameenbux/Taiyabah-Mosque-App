@@ -11,6 +11,8 @@ import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
 import { AppProvider, useApp } from "./store";
 import { sheetScreen } from "./Blocks";
+import { SheetTop } from "./ui";
+import IDX from "./data/quran-index.json";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -85,12 +87,15 @@ function Tabs() {
 function Root() {
   const { t, fs, lang } = useApp();
 
+  /* The website gives a sheet one plum bar with its name and a Done button, and
+   * no back arrow. This was a pale platform header with the arrow the platform
+   * puts there by default — a different bar, in different colours, offering a
+   * way out the website does not have. Replaced wholesale, so every screen in
+   * the app is topped the same way the website tops it. */
   const pushed = {
-    headerStyle: { backgroundColor: C.paper },
-    headerTintColor: C.brand600,
-    headerTitleStyle: { fontFamily: F.display, fontSize: fs(17), color: C.ink },
-    headerShadowVisible: false,
-    headerBackTitleVisible: false,
+    header: ({ navigation, options }) => (
+      <SheetTop title={options.title} onDone={() => navigation.popToTop()} />
+    ),
     contentStyle: { backgroundColor: C.paper },
   };
   /* Screens that draw their own hero behind the status bar have no header at
@@ -107,11 +112,11 @@ function Root() {
         {/* reading */}
         <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare }} />
         <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.english_translation", "Translation") }} />
-        <Stack.Screen name="Surah"     component={Surah}    options={{ ...pushed, title: "" }} />
-        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan"),
-                                                                       headerStyle: { backgroundColor: "#15060F" },
-                                                                       headerTintColor: C.goldBright,
-                                                                       headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
+        <Stack.Screen name="Surah"     component={Surah}
+          options={({ route }) => ({ ...pushed,
+            title: t(`surah.${route.params?.n}.name`,
+                     IDX.surahs.find(s => s.n === route.params?.n)?.nameEn || "") })} />
+        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.mushaf_name", "13 Line Quraan") }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("tiles.hadith", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}

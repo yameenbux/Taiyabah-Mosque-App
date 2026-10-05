@@ -78,6 +78,13 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # The icon check counts colours in a slice of a screenshot. Without this it
+      # found no tool, skipped itself, and the run passed — on a build where not
+      # one icon drew. A check that cannot run must not report success, so the
+      # script now fails when the tool is absent, and the tool is installed here.
+      - name: Something to look at pixels with
+        run: sudo apt-get install -y --no-install-recommends imagemagick
+
       - name: Boot a phone and use the app
         uses: reactivecircus/android-emulator-runner@v2
         with:

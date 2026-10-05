@@ -28,6 +28,7 @@ export const fs = n => Math.round(n * TS);
 export const F = {
   sans:        "HankenGrotesk",
   sansMedium:  "HankenGroteskMedium",
+  sansBold:    "HankenGroteskBold",
   display:     "Fraunces",          // the serif used for prayer names
   arabic:      "Amiri",             // scripture is set in Amiri, never a fallback
 };
