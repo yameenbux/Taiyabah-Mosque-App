@@ -945,6 +945,12 @@ async function handle(request, env) {
 
       const row = await supaRpc(env, "publish_notice", {
         payload: {
+          /* NAMED, not left to the database to work out. publish_notice reads
+             payload.masjid when it is there and only falls back to "whichever
+             masjid is the only one" when it is not — and that fallback raises
+             the day a second masjid exists. One word here is the difference
+             between the office being able to publish a notice and not. */
+          masjid: "taiyabah",
           topic, title, body: text, image_url: imageUrl, ...dims,
           event_at: eventAt ? eventAt.toISOString() : null,
           expires_at: expires ? expires.toISOString() : null,
