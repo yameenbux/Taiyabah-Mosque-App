@@ -30,12 +30,12 @@ export async function ask() {
 /* `reminders` is {fajr: 15, zuhr: 0, …} — minutes before the jamāʿah, or absent
  * for off. Returns how many were armed, which is the only honest thing to show
  * on the settings screen. */
-export async function arm(reminders) {
+export async function arm(reminders, extras = {}) {
   if (Platform.OS === "web") return 0;
   await Notifications.cancelAllScheduledNotificationsAsync();
 
   const wanted = Object.entries(reminders || {}).filter(([, v]) => v !== undefined && v !== null && v !== false);
-  if (!wanted.length) return 0;
+  if (!wanted.length && !extras.kahf) return 0;
   if (!(await ask())) return 0;
 
   if (Platform.OS === "android")
@@ -72,6 +72,24 @@ export async function arm(reminders) {
       });
       armed++;
     }
+  }
+
+  /* Sūrah al-Kahf, Friday morning. The website sends this one as a push; it
+   * needs no server at all, because the day it falls on is known for ever. A
+   * weekly trigger is the whole of it. */
+  if (extras.kahf) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Sūrah al-Kahf",
+        body: "It is Friday — a reminder to read it.",
+        sound: "default",
+      },
+      /* expo-notifications counts weekdays from Sunday, so Friday is 6. */
+      trigger: Platform.OS === "android"
+        ? { weekday: 6, hour: 7, minute: 30, repeats: true, channelId: "prayer" }
+        : { weekday: 6, hour: 7, minute: 30, repeats: true },
+    });
+    armed++;
   }
   return armed;
 }

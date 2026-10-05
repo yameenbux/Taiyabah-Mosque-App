@@ -21,6 +21,7 @@ import Qibla from "./screens/Qibla";
 import Live from "./screens/Live";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
+import Holidays from "./screens/Holidays";
 import Marriage from "./screens/Marriage";
 import HallHire from "./screens/HallHire";
 import Advice from "./screens/Advice";
@@ -45,7 +46,9 @@ const SHEET = {
   MarriageDeath: "marriagedeath", Funeral: "funeral", Will: "will", Birth: "birth",
   Education: "education", EduArabic: "eduarabic", EduGhusl: "edughusl",
   Curriculum: "curriculum", Madrasah: "madrasah", Admissions: "madmissions",
-  Holidays: "holidays",
+  /* Holidays is NOT here any more: the website fills its calendar, its closure
+   * list and its Islamic dates with JavaScript, so lifting the markup gave a
+   * legend with no colours and three empty cards. It has a real screen now. */
 };
 
 /* The tab bar is the one piece of chrome a person touches all day, so it is the
@@ -130,6 +133,7 @@ function Root() {
         <Stack.Screen name="Videos"    component={Videos}    options={bare} />
         <Stack.Screen name="Timetable" component={Timetable} options={bare} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={bare} />
+        <Stack.Screen name="Holidays"  component={Holidays}  options={bare} />
         <Stack.Screen name="NewBuild"  component={NewBuild}  options={bare} />
         <Stack.Screen name="Giving"    component={Giving}    options={bare} />
 

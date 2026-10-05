@@ -26,7 +26,12 @@ const KEY = "taiyabah.prefs.v1";
  * build up on purpose. The web app keeps exactly these two, separately and for
  * the same reason, so a reader who uses both on the website finds both here. */
 const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null,
-                   muMark: 0, muFavs: [] };
+                   muMark: 0, muFavs: [],
+                   /* The website's own five switches and its ten-minute default,
+                    * so somebody who set this up on the website finds the same
+                    * choices here rather than a different set. */
+                   alerts: { jamaah: true, mins: 10, janazah: true,
+                             announcements: true, events: false, kahf: true } };
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -90,6 +95,7 @@ export function AppProvider({ children, fallback = null }) {
       setLastRead: lastRead => save({ ...prefs, lastRead }),
       /* One bookmark, so putting it here is also how you move it: there is
        * nothing to choose between and nothing to tidy up afterwards. */
+      setAlerts: patch => save({ ...prefs, alerts: { ...prefs.alerts, ...patch } }),
       toggleMushafMark: page => save({ ...prefs, muMark: prefs.muMark === page ? 0 : page }),
       toggleMushafFav: page => save({
         ...prefs,

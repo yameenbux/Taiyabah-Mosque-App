@@ -1,104 +1,164 @@
-/* Which jamāʿahs to be reminded about, and how far ahead.
+/* Notifications, laid out the way the website lays them out.
  *
- * Every switch here arms real notifications on the phone. The count at the
- * bottom is the number actually scheduled with the OS — not a promise, a
- * reading — because a reminder people believe in and never get is worse than
- * no reminder at all.
+ * This screen used to offer five switches, one per prayer. The website has
+ * never done that: it has ONE jamāʿah switch and a "remind me N minutes
+ * before", then the four things the masjid sends — janāzah, announcements,
+ * events, and the Friday reminder for Sūrah al-Kahf. Somebody who set their
+ * notifications up on the website should find the same choices here, in the
+ * same order, with the same words.
+ *
+ * What is real and what is not, plainly: the jamāʿah reminders and the Kahf
+ * reminder are scheduled on the phone itself, so they work with no signal. The
+ * other three are sent BY the masjid and need the push service, which is on
+ * the website and is not yet wired into this app — so those three are saved
+ * and will take effect as soon as it is.
  */
 import React, { useEffect, useState } from "react";
-import { View, Text, Switch, Pressable } from "react-native";
+import { View, Text, Switch } from "react-native";
+import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, P, RowGroup, NavRow, Pill, Press, tap, open } from "../ui";
-import { NAMES, ORDER } from "../prayer";
+import { Screen, Hero, Heading, Card, Note, Press, tap } from "../ui";
+import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
 
-const AHEAD = [0, 5, 10, 15, 30];
+const MINS = [5, 10, 15, 20, 30];
+
+function Row({ title, sub, badge, value, onChange, first }) {
+  const { fs, rtl } = useApp();
+  return (
+    <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: C.line,
+                   flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                   gap: 12, paddingHorizontal: 15, paddingVertical: 13 }}>
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7 }}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{title}</Text>
+          {!!badge && (
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: .8,
+                           textTransform: "uppercase", color: C.danger, borderWidth: 1,
+                           borderColor: C.danger, borderRadius: R.pill, paddingHorizontal: 7,
+                           paddingVertical: 2, overflow: "hidden" }}>{badge}</Text>)}
+        </View>
+        {!!sub && (
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, marginTop: 2 }}>{sub}</Text>)}
+      </View>
+      {/* Left to itself the track is almost the colour of the card, so all you
+          can see is the knob — which read as a broken half-moon on a phone. */}
+      <Switch value={value} onValueChange={onChange}
+              trackColor={{ false: C.line, true: "rgba(94,24,68,.45)" }}
+              thumbColor={value ? C.brand600 : "#f4f3f4"}
+              ios_backgroundColor={C.line} />
+    </View>);
+}
 
 export default function Alerts() {
-  const { t, fs, rtl, reminders, setReminder } = useApp();
+  const { t, fs, rtl, alerts, setAlerts } = useApp();
+  const [granted, setGranted] = useState(null);
   const [armed, setArmed] = useState(null);
-  const [denied, setDenied] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  /* Re-arm whenever a choice changes. Cheap, and it means the phone is never
-   * holding a set of reminders that disagrees with this screen. */
   useEffect(() => {
-    let live = true;
-    arm(reminders).then(n => {
-      if (!live) return;
-      setArmed(n);
-      setDenied(n === 0 && Object.keys(reminders || {}).length > 0);
-    });
-    return () => { live = false; };
-  }, [reminders]);
+    Notifications.getPermissionsAsync()
+      .then(p => setGranted(p.status === "granted"))
+      .catch(() => setGranted(false));
+  }, []);
+
+  /* The count is a reading of what the OS is actually holding, not a promise.
+   * A reminder somebody believes in and never gets is worse than none. */
+  const rearm = async next => {
+    if (!granted) return;
+    const a = { ...alerts, ...next };
+    const per = {};
+    if (a.jamaah) for (const k of ORDER) per[k] = a.mins;
+    setArmed(await arm(per, { kahf: a.kahf }));
+  };
+  useEffect(() => { rearm({}); }, [granted, alerts]);
+
+  const enable = async () => {
+    tap();
+    const ok = await ask();
+    setGranted(ok);
+  };
+
+  const set = patch => { tap(); setAlerts(patch); setSaved(false); };
 
   return (
     <Screen pad={false}>
       <Hero lines={[
         { k: "menu.notifications", t: "Notifications", w: "title" },
-        { k: "alerts.sub", t: "Be reminded before jamāʿah, with no signal needed.", w: "sub" },
+        { k: "sheet.get_a_quiet_reminder_before",
+          t: "Get a quiet reminder before each jamāʿah, plus masjid announcements — on this device.", w: "sub" },
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
-        <Heading>{t("sheet.jama_ah_reminders", "Jamāʿah reminders")}</Heading>
+        <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>
+
+        {granted === false && (
+          <Press onPress={enable}
+            style={{ alignItems: "center", paddingVertical: 14, borderRadius: R.pill,
+                     backgroundColor: C.brand600, marginBottom: 14 }}>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.cream }}>
+              {t("sheet.enable_notifications", "Enable notifications")}</Text>
+          </Press>)}
+
         <Card gap={0} pad={0}>
-          {ORDER.map((k, i) => {
-            const on = reminders?.[k] !== undefined;
-            return (
-              <View key={k} style={{ borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-                <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                               paddingHorizontal: 15, paddingVertical: 13 }}>
-                  <View style={{ flex: 1, flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8 }}>
-                    <Text style={{ fontFamily: F.display, fontSize: fs(15.5), color: C.ink }}>
-                      {t(`prayer.${k}`, NAMES[k].en)}</Text>
-                    <Text style={{ fontFamily: F.arabic, fontSize: fs(14.5), color: C.muted }}>{NAMES[k].ar}</Text>
-                  </View>
-                  <Switch value={on}
-                          onValueChange={async v => {
-                            tap();
-                            if (v && !(await ask())) { setDenied(true); return; }
-                            setReminder(k, v ? 15 : undefined);
-                          }}
-                          trackColor={{ true: C.brand600, false: C.line }}
-                          thumbColor="#fff" />
-                </View>
-                {on && (
-                  <View style={{ flexDirection: "row", gap: 7, paddingHorizontal: 15, paddingBottom: 13 }}>
-                    {AHEAD.map(n => {
-                      const sel = Number(reminders[k]) === n;
-                      return (
-                        <Pressable key={n} onPress={() => { tap(); setReminder(k, n); }}
-                          style={{ flex: 1, alignItems: "center", paddingVertical: 7, borderRadius: R.pill,
-                                   borderWidth: sel ? 1.5 : 1, borderColor: sel ? C.brand600 : C.line,
-                                   backgroundColor: sel ? "rgba(119,33,87,.07)" : "transparent" }}>
-                          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11.5),
-                                         color: sel ? C.brand600 : C.muted }}>
-                            {n === 0 ? t("alerts.on_time", "On time") : `${n} min`}</Text>
-                        </Pressable>);
-                    })}
-                  </View>)}
-              </View>);
-          })}
+          <Row first
+            title={t("sheet.jama_ah_reminders", "Jamāʿah reminders")}
+            sub={t("sheet.a_nudge_before_each_congregation", "A nudge before each congregation")}
+            value={!!alerts.jamaah} onChange={v => set({ jamaah: v })} />
+
+          {/* "Remind me [10 min] before jamāʿah", as one sentence the way the
+              website writes it, with the choices inline. */}
+          <View style={{ borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 15, paddingVertical: 13,
+                         opacity: alerts.jamaah ? 1 : .45 }}>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, marginBottom: 9 }}>
+              {t("sheet.remind_me", "Remind me")} · {t("sheet.before_jamaah", "before jamāʿah")}</Text>
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", flexWrap: "wrap", gap: 7 }}>
+              {MINS.map(m => {
+                const on = alerts.mins === m;
+                return (
+                  <Press key={m} disabled={!alerts.jamaah} onPress={() => set({ mins: m })}
+                    style={{ paddingHorizontal: 13, paddingVertical: 7, borderRadius: R.pill,
+                             borderWidth: 1, borderColor: on ? C.brand600 : C.line,
+                             backgroundColor: on ? "rgba(94,24,68,.1)" : "transparent" }}>
+                    <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+                                   color: on ? C.brand600 : C.muted }}>
+                      {t(`sheet.${m}_min`, `${m} min`)}</Text>
+                  </Press>);
+              })}
+            </View>
+          </View>
+
+          <Row title={t("sheet.janazah", "Janāzah")} badge={t("sheet.urgent", "Urgent")}
+            sub={t("sheet.a_death_in_the_community", "A death in the community")}
+            value={!!alerts.janazah} onChange={v => set({ janazah: v })} />
+          <Row title={t("sheet.announcements", "Announcements")}
+            sub={t("sheet.timetable_changes_ramadan_eid", "Timetable changes, Ramadan, Eid")}
+            value={!!alerts.announcements} onChange={v => set({ announcements: v })} />
+          <Row title={t("sheet.events_talks", "Events & talks")}
+            sub={t("sheet.bayaans_classes_community_events", "Bayaans, classes, community events")}
+            value={!!alerts.events} onChange={v => set({ events: v })} />
+          <Row title={t("sheet.surah_al_kahf", "Sūrah al-Kahf")}
+            sub={t("sheet.friday_morning_reminder", "Friday morning, a reminder to read it")}
+            value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
         </Card>
 
-        {denied ? (
-          <View style={{ marginTop: 14 }}>
-            <Note>{t("alerts.denied",
-              "Notifications are turned off for this app in the phone's settings, so nothing can be scheduled. Turn them on there and come back.")}</Note>
-          </View>
-        ) : (
-          <View style={{ marginTop: 14, flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Ionicons name={armed ? "checkmark-circle" : "information-circle-outline"} size={16}
-                      color={armed ? "#2E8C56" : C.muted} />
-            <Note>{armed === null ? t("alerts.checking", "Checking…")
-                 : armed === 0 ? t("alerts.none_set", "No reminders set.")
-                 : `${armed} ${t("alerts.armed", "reminders set for the week ahead. They are refreshed each time you open the app.")}`}</Note>
-          </View>
-        )}
+        <Press onPress={() => { tap(); setSaved(true); rearm({}); }}
+          style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
+                   borderWidth: 1, borderColor: C.brand600, marginTop: 14 }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
+            {saved ? t("sheet.notifications_on", "Notifications on") : t("sheet.save", "Save")}</Text>
+        </Press>
 
-        <Heading>{t("sheet.from_the_masjid", "From the masjid")}</Heading>
-        <P muted>{t("alerts.notices_note",
-          "Announcements from the office — janāzah notices, madrasah closures, Ramadan timings — appear on the Notices tab. Push notifications for those are being set up and will arrive in a later version of the app.")}</P>
+        {granted === false
+          ? <Note>{t("alerts.turned_off", "Notifications are turned off for this app. Turn them on in Android settings and they will start straight away.")}</Note>
+          : armed !== null && (
+            <Note>{armed === 0
+              ? t("alerts.none_set", "No reminders set.")
+              : `${armed} ${t("alerts.scheduled", "reminders are scheduled on this phone.")}`}</Note>)}
+
+        <Note>{t("alerts.from_the_masjid_needs_push",
+          "Janāzah, announcements and events are sent by the masjid. Your choices are saved and will take effect once this app is registered for the masjid's notifications; jamāʿah and Sūrah al-Kahf reminders already work on this phone, with no signal.")}</Note>
       </View>
     </Screen>
   );
