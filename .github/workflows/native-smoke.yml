@@ -1,0 +1,100 @@
+name: Native app — does it actually run?
+
+# Builds the APK, boots a real Android emulator, installs it, and drives it:
+# taps every home tile and every menu row, checks after each one that a new
+# screen drew and that nothing landed in the crash log, and photographs the lot.
+#
+# This exists because "it compiled" and "it opens on a phone" are different
+# claims, and the first has been mistaken for the second here before: a debug
+# APK built cleanly, installed cleanly, and then sat on the splash screen for
+# ever because it had no JavaScript in it.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["native/**", ".github/workflows/native-smoke.yml"]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+
+      - name: Generate the Android project
+        working-directory: native
+        run: npx expo prebuild --platform android --no-install
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build the APK
+        working-directory: native/android
+        run: |
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+
+      - name: What Gradle actually said
+        if: failure()
+        run: |
+          grep -iE "what went wrong" -A6 /tmp/gradle.log | head -30 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
+
+      # The emulator needs hardware acceleration, and the runner's KVM device
+      # is root-only until this rule opens it up.
+      - name: Let the runner use KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Boot a phone and use the app
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 4096M
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb wait-for-device
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+            node native/scripts/smoke.mjs native/android/app/build/outputs/apk/release/app-release.apk
+
+      # The screenshots are the point even when it passes: they are the first
+      # look at the app on a real Android screen rather than a web export.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-screens-${{ github.run_number }}
+          path: .smoke/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: taiyabah-native-${{ github.run_number }}
+          path: native/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
