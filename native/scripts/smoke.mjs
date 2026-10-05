@@ -319,21 +319,33 @@ function jsLog(re) {
  * fetch, which is the whole answer. So the whole log is swept, not just JS. */
 function nativeSays(re) {
   try {
+    /* Only our own process. Google Play Services loses files it was never
+     * given all day long, and sweeping the whole log for ENOENT reported its
+     * housekeeping as something this app had said — which is the same crying
+     * wolf that has cost three runs already. */
+    const mine = new Set();
+    for (const l of adb(["shell", "ps", "-A"]).split("\n"))
+      if (l.includes(PKG)) { const c = l.trim().split(/\s+/); if (c[1]) mine.add(c[1]); }
     return adb(["logcat", "-d", "-t", "4000"]).split("\n")
-      .filter(l => re.test(l) && !/^\s*$/.test(l));
+      .filter(l => re.test(l) && !/^\s*$/.test(l))
+      .filter(l => [...mine].some(pid => l.includes(` ${pid} `)));
   } catch { return []; }
 }
 const fontSays = [
   ...jsLog(/font|asset|Asset/i),
-  ...nativeSays(/ExpoAsset|expo\.modules\.asset|Unable to download|AssetSourceResolver|ExpoFontLoader|FileNotFound|ENOENT|No such file/i),
+  ...nativeSays(/ExpoAsset|expo\.modules\.asset|Unable to download|AssetSourceResolver|ExpoFontLoader/i),
 ];
+const fontTrouble = fontSays.filter(l => /did not load|rejected|Error|Unable/i.test(l));
 if (fontSays.length) {
   say("\nwhat the app said about its fonts:\n  " + fontSays.join("\n  "));
-  fontSays.slice(0, 6).forEach(l => annotate("app says: " + l.slice(0, 900)));
+  /* A line saying which fonts arrived is good news, and tagging it as an error
+   * made a passing run look like a failing one. Only trouble is an error. */
+  (fontTrouble.length ? fontTrouble : fontSays).slice(0, 6)
+    .forEach(l => (fontTrouble.length ? annotate : notice)("app says: " + l.slice(0, 900)));
   /* A font that does not load is not a cosmetic problem here: every icon in
    * this app is a glyph in one, so this is the difference between an app and
    * an app with no icons. */
-  if (fontSays.some(l => /did not load|rejected|Error/i.test(l)))
+  if (fontTrouble.length)
     fail("the app could not load its fonts — see the lines above; with no font " +
          "file loaded, every icon in the app renders as nothing");
 }
@@ -345,7 +357,7 @@ const available = jsLog(/fonts available:/i).slice(-1)[0] || "";
 if (!available) fail("the app never said which fonts it had — expected a 'fonts available:' line");
 else {
   say("\n" + available.replace(/^.*?fonts available:/, "fonts available:"));
-  annotate(available.slice(-400));
+  notice(available.replace(/^.*?fonts available:/, "fonts available:").slice(0, 400));
   for (const want of ["ionicons", "HankenGrotesk", "Fraunces", "Amiri"])
     if (!new RegExp(want, "i").test(available))
       fail(`the font "${want}" is not registered on the device` +
