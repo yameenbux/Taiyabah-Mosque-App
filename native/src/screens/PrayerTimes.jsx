@@ -107,7 +107,12 @@ export default function PrayerTimes({ navigation }) {
             {/* The table. A row per prayer rather than five columns, because a
                 column of five-character times is unreadable at any text size
                 the community actually uses. */}
-            <Card gap={0} pad={0} style={{ marginTop: 16 }}>
+            {/* The website names this card and says what the two columns are.
+                Without the tag the table has two unlabelled times in it. */}
+            <Heading tag={t("sheet.beginning_jama_ah", "Beginning & Jamāʿah")}>
+              {offset === 0 ? t("sheet.today", "Today")
+                            : `${t("app.viewing", "Viewing")} · ${longDate(t, when)}`}</Heading>
+            <Card gap={0} pad={0} style={{ marginTop: 2 }}>
               <View style={{ flexDirection: rtl ? "row-reverse" : "row", paddingHorizontal: 15,
                              paddingTop: 13, paddingBottom: 9 }}>
                 <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.2,
@@ -144,6 +149,9 @@ export default function PrayerTimes({ navigation }) {
                   </View>);
               })}
             </Card>
+
+            <Note>{t("sheet.times_from_the_official_2026",
+              "Times from the official 2026 Salah Timetable")}</Note>
 
             {/* Maghrib is prayed the minute it begins. That is the masjid's
                 practice, and it looks like a data error unless it is said. */}

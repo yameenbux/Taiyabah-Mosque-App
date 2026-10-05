@@ -26,7 +26,8 @@ export default function Prefs({ navigation }) {
       <Hero lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        <Heading>{t("sysprefs.display_language", "Display & language")}</Heading>
+        <Heading tag={t("sysprefs.display_language", "Display & language")}>
+          {t("sysprefs.language", "Language")}</Heading>
         <Note>{t("sysprefs.choose_the_language_the_app",
           "Choose the language the app runs in. Packs download once and then work offline.")}</Note>
         <Card gap={0} pad={0}>

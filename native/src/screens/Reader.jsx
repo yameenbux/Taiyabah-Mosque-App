@@ -116,8 +116,8 @@ function Block({ item }) {
   );
 }
 
-function Collection({ groups, note }) {
-  const { fs } = useApp();
+function Collection({ groups, note, caution }) {
+  const { fs, t } = useApp();
   return (
     <SectionList
       style={{ backgroundColor: C.paper }}
@@ -125,10 +125,12 @@ function Collection({ groups, note }) {
       sections={groups}
       keyExtractor={(it, i) => String(i)}
       stickySectionHeadersEnabled={false}
-      ListHeaderComponent={note
-        ? <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19),
-                         marginTop: 14 }}>{note}</Text>
-        : null}
+      ListHeaderComponent={
+        <View style={{ marginTop: 14, gap: 7 }}>
+          {!!note && <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted,
+                                    lineHeight: fs(19) }}>{note}</Text>}
+          {!!caution && <Note>{caution}</Note>}
+        </View>}
       renderSectionHeader={({ section }) => (
         <View style={{ marginTop: 24 }}>
           <Text style={{ fontFamily: F.display, fontSize: fs(20), color: C.ink }}>{section.title}</Text>
@@ -142,13 +144,18 @@ function Collection({ groups, note }) {
 }
 
 export function AthkarSet({ route }) {
+  const { t } = useApp();
   const s = ATHKAR.sections[route.params.n];
-  return <Collection groups={[{ title: s.title, intro: s.intro, data: s.items }]} />;
+  return <Collection groups={[{ title: s.title, intro: s.intro, data: s.items }]}
+    caution={`${t("athkar.confirm_the_wording_with_the", "Confirm the wording with the imam")} · ${
+      t("athkar.wording_varies_between_narrations_and", "Wording varies between narrations and printings.")}`} />;
 }
 
 export const Duas = () => {
   const { t } = useApp();
   return <Collection note={t("duas.du_as_for_the_day", "Duʿās for the day, with transliteration")}
+    caution={`${t("duas.confirm_the_wording_with_the", "Confirm the wording with the imam")} · ${
+      t("duas.wording_varies_between_narrations_and", "Wording varies between narrations and printings.")}`}
     groups={DUAS.categories.map(c => ({ title: c.title, intro: c.intro, data: c.items }))} />;
 };
 

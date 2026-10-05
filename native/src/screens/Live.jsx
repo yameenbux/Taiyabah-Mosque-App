@@ -85,8 +85,10 @@ export default function Live({ navigation }) {
 
       <View style={{ paddingHorizontal: 16 }}>
         <RowGroup>
-          <KV k={t("about.radio_frequency", "Radio frequency")} v="454.1000 MHz" />
+          <KV k={t("about.radio_frequency", "Radio frequency")}
+              v={t("about.454_1000_mhz", "454.1000 MHz")} />
           <NavRow icon="play-circle-outline" label={t("about.videos_bayaans", "Videos & bayaans")}
+                  sub={t("about.watch", "Watch ›")}
                   onPress={() => navigation.navigate("Videos")} />
         </RowGroup>
         <View style={{ marginTop: 12 }}>
