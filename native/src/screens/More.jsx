@@ -30,7 +30,7 @@ const GROUPS = [
     { to: "Videos",    icon: "play-circle-outline", k: "about.videos_bayaans", t: "Videos & bayaans" },
     { soon: true,      icon: "airplane-outline",    k: "marriage.hajj_umrah",  t: "Hajj / Umrah" },
     { soon: true,      icon: "moon-outline",        k: "marriage.ramadan_2027", t: "Ramadan 2027" },
-    { to: "Zakat",     icon: "calculator-outline",  k: "tiles.zakat_calculator", t: "Zakat calculator" },
+    { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
   ]},
   { k: "marriage.madrasah", t: "Madrasah", rows: [
     { to: "Admissions", icon: "clipboard-outline",  k: "adm.admissions_fees",  t: "Admissions & Fees" },
@@ -41,8 +41,8 @@ const GROUPS = [
   ]},
   { k: "marriage.the_masjid", t: "The masjid", rows: [
     { to: "About",      icon: "information-circle-outline", k: "about.about_us",  t: "About us" },
-    { to: "Membership", icon: "card-outline",       k: "mb.membership",         t: "Membership" },
-    { href: MAPS,       icon: "location-outline",   k: "contact.find_us",       t: "Find us", external: true },
+    { to: "Membership", icon: "card-outline",       k: "a11y.membership",         t: "Membership" },
+    { href: MAPS,       icon: "location-outline",   k: "menu.location",       t: "Find us", external: true },
     { to: "Contact",    icon: "call-outline",       k: "contact.contact_us",    t: "Contact us" },
   ]},
   { k: "marriage.our_services", t: "Our services", rows: [
@@ -53,8 +53,8 @@ const GROUPS = [
   ]},
   { k: "menu.settings", t: "Settings", rows: [
     { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications", t: "Notifications" },
-    { href: PRIVACY,    icon: "shield-checkmark-outline", k: "menu.privacy_notice", t: "Privacy notice", external: true },
-    { to: "Prefs",      icon: "options-outline",     k: "menu.system_preferences", t: "System Preferences" },
+    { href: PRIVACY,    icon: "shield-checkmark-outline", k: "privacy.privacy_notice", t: "Privacy notice", external: true },
+    { to: "Prefs",      icon: "options-outline",     k: "a11y.system_preferences", t: "System Preferences" },
   ]},
 ];
 

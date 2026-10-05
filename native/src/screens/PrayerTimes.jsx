@@ -10,12 +10,35 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, tap } from "../ui";
-import { dayFor, pretty, nowLondon, NAMES, ORDER, nextJamaah } from "../prayer";
+import { dayFor, pretty, nowLondon, londonInstant, NAMES, ORDER, nextJamaah } from "../prayer";
 import { longDate, shortDate, hijri } from "../dates";
+
+/* How many days from today to the jumuʿah people mean when they say "next".
+ *
+ * Ported from the website's nextJummah(), including the part that is easy to
+ * get wrong: on a Friday it is still TODAY until the last jumuʿah has actually
+ * been prayed, and only then does it become next week. Two clocks, for the
+ * reason the rest of this app uses two — which Friday it is, is a London
+ * question; whether it has passed is a question about this instant. */
+function daysToJumuah() {
+  const london = nowLondon();
+  if (london.getDay() === 5) {
+    const rec = dayFor(london);
+    const last = rec?.jummah ? (rec.jummah.second || rec.jummah.first) : null;
+    if (last && londonInstant(london, last) > new Date()) return 0;
+  }
+  let d = 1;
+  const probe = new Date(london);
+  probe.setDate(probe.getDate() + 1);
+  while (probe.getDay() !== 5) { probe.setDate(probe.getDate() + 1); d++; }
+  return d;
+}
 
 export default function PrayerTimes({ navigation }) {
   const { t, fs, rtl } = useApp();
   const [offset, setOffset] = useState(0);         // days from today
+  const jumuah = daysToJumuah();
+  const jumuahDate = (() => { const d = nowLondon(); d.setDate(d.getDate() + jumuah); return d; })();
   const when = nowLondon(); when.setDate(when.getDate() + offset);
   const day = dayFor(when);
   const next = offset === 0 ? nextJamaah(when) : null;
@@ -50,6 +73,28 @@ export default function PrayerTimes({ navigation }) {
           <Press onPress={() => step(1)} style={{ padding: 9, borderRadius: R.pill }}>
             <Ionicons name="chevron-forward" size={19} color={C.goldBright} />
           </Press>
+        </View>
+
+        {/* The website's three chips. Without them the only way to a Friday was
+            to press the arrow until you reached one, and the full month had no
+            way in from this screen at all. */}
+        <View style={{ flexDirection: "row", justifyContent: "center", flexWrap: "wrap",
+                       gap: 7, marginTop: 12 }}>
+          {[{ k: "today", lab: t("app.today", "Today"), on: offset === 0,
+              go: () => setOffset(0) },
+            { k: "fri", lab: t("app.next_jumu_ah", "Next Jumuʿah"), on: offset === jumuah,
+              go: () => setOffset(jumuah), off: !dayFor(jumuahDate) },
+            { k: "month", lab: t("app.full_month", "Full month"),
+              go: () => navigation.navigate("Timetable") }].map(c => (
+            <Press key={c.k} disabled={c.off} onPress={() => { tap(); c.go(); }}
+              style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: R.pill,
+                       borderWidth: 1,
+                       borderColor: c.on ? C.goldBright : "rgba(243,239,227,.28)",
+                       backgroundColor: c.on ? "rgba(220,187,99,.18)" : "transparent",
+                       opacity: c.off ? .4 : 1 }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+                             color: c.on ? C.goldBright : "rgba(243,239,227,.85)" }}>{c.lab}</Text>
+            </Press>))}
         </View>
       </Hero>
 

@@ -23,10 +23,12 @@ export default function Prefs({ navigation }) {
   const { t, fs, lang, setLang, scale, setScale } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "sysprefs.display_language", t: "Display & language", w: "title" }]} />
+      <Hero lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        <Heading>{t("sysprefs.language", "Language")}</Heading>
+        <Heading>{t("sysprefs.display_language", "Display & language")}</Heading>
+        <Note>{t("sysprefs.choose_the_language_the_app",
+          "Choose the language the app runs in. Packs download once and then work offline.")}</Note>
         <Card gap={0} pad={0}>
           {LANGS.map((l, i) => {
             const on = l.code === lang;
@@ -76,6 +78,7 @@ export default function Prefs({ navigation }) {
         <Card style={{ marginTop: 13 }}>
           <Text style={{ fontFamily: F.display, fontSize: fs(15), color: C.ink }}>
             {t("sysprefs.sample_h", "A sample, at this size")}</Text>
+          <P muted>{t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</P>
           <P muted>{t("sysprefs.sample",
             "“And establish prayer and give zakāh and obey the Messenger — that you may receive mercy.”")}</P>
         </Card>

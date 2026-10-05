@@ -28,7 +28,7 @@ export default function Notices() {
 
   const Header = (
     <View style={{ paddingTop: top + 16, paddingHorizontal: 18, paddingBottom: 10 }}>
-      <Text style={{ fontFamily: F.display, fontSize: fs(26), color: C.ink }}>{t("nav.notices", "Notices")}</Text>
+      <Text style={{ fontFamily: F.display, fontSize: fs(26), color: C.ink }}>{t("notices.notices", "Notices")}</Text>
     </View>
   );
 
@@ -57,8 +57,13 @@ export default function Notices() {
                          textAlign: "center", lineHeight: fs(21) }}>
             {err
               ? t("notices.offline", "Announcements will appear once you\u2019re back online. Pull down to try again.")
-              : t("notices.empty", "Announcements from the masjid will appear here and stay, so a message you swipe away can still be read.")}
+              : t("notices.announcements_will_appear", "Announcements from the masjid will appear here and stay, so a message you miss or swipe away can still be read.")}
           </Text>
+          {!err && (
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, marginTop: 10,
+                           textAlign: "center", lineHeight: fs(20) }}>
+              {t("notices.turn_on_notifications_in_settings",
+                 "You can choose which alerts you receive under Notifications in the menu.")}</Text>)}
         </View>}
       renderItem={({ item }) => (
         <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,

@@ -410,7 +410,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
           style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: R.pill,
                    backgroundColor: "rgba(220,187,99,.18)", borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright }}>
-            {t("mushaf.go", "Go")}</Text>
+            {t("bukhari.go", "Go")}</Text>
         </Press>
       </View>
 

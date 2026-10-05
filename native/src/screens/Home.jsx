@@ -146,7 +146,7 @@ export default function Home({ navigation }) {
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(29), color: C.cream }}>
-                {friJum ? t("prayer.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
+                {friJum ? t("giving.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
@@ -161,7 +161,7 @@ export default function Home({ navigation }) {
               </View>
               <Rich style={{ fontFamily: F.sans, fontSize: fs(13), color: "#D0BFCA" }}>
                 {t("times.beginning_time", "Beginning time *{t}*").replace("{t}", pretty(next.begins)) +
-                 (next.tomorrow ? ` · ${t("date.tomorrow_lc", "tomorrow")}` : "")}
+                 (next.tomorrow ? ` · ${t("times.tomorrow", "tomorrow")}` : "")}
               </Rich>
             </View>
 
