@@ -12,7 +12,10 @@ name: Native app — does it actually run?
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    # Also on the development branch: workflow_dispatch only works for files
+    # that have reached the default branch, and this run is most useful before
+    # that — it is what says whether the APK is worth handing over.
+    branches: [main, "claude/**"]
     paths: ["native/**", ".github/workflows/native-smoke.yml"]
 
 jobs:
