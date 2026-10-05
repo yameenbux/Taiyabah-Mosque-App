@@ -31,6 +31,12 @@ fs.writeFileSync(LOGFILE, `smoke run — ${new Date().toISOString()}\napk: ${APK
 const say = line => { console.log(line); fs.appendFileSync(LOGFILE, line + "\n"); };
 const annotate = line =>
   String(line).split("\n").slice(0, 8).forEach(l => console.log(`::error::${l}`));
+/* A green tick tells you the run passed but not what it looked at, and the
+ * artifact holding run.log can only be read by downloading it. Notices are
+ * annotations too, so they are readable without the download — which is the
+ * only way a passing run can show its working. */
+const notice = line =>
+  String(line).split("\n").slice(0, 8).forEach(l => console.log(`::notice::${l}`));
 
 const adb = (args, opts = {}) => {
   try {
@@ -46,6 +52,8 @@ const adb = (args, opts = {}) => {
 const sleep = ms => execSync(`sleep ${ms / 1000}`);
 
 let step = 0, failures = [], shots = 0;
+/* What the run actually proved, kept so the verdict can say it out loud. */
+const opened = { tiles: [], rows: [] }, inert = [], tabsOk = [];
 const log = (mark, msg) => say(`${mark} ${msg}`);
 const fail = msg => { failures.push(msg); log("FAIL", msg); annotate(msg); };
 
@@ -244,7 +252,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
    * the tap went nowhere. */
   const stillHome = findIn(after, "Home") && findIn(after, "Notices") && findIn(after, "More");
   if (stillHome) fail(`tapping "${label}" did nothing`);
-  else log("ok", `${label} → opened`);
+  else { log("ok", `${label} → opened`); opened.tiles.push(label); }
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
   const c = crashes();
   if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
@@ -254,6 +262,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
 
 /* ---------- the menu ------------------------------------------------------ */
 
+let groupCount = 0, groupTotal = 0, rowTotal = 0;
 const moreTab = findIn(nodes(dump()), "More");
 if (!moreTab) fail("the More tab is not on screen");
 else {
@@ -268,7 +277,10 @@ else {
                 "Privacy notice", "System Preferences"];
   if (!findIn(menu, "Resources")) fail("the More menu did not open");
   else log("ok", "the More menu opened");
-  for (const g of GROUPS) if (!seek(g)) fail(`menu group "${g}" is missing, even after scrolling`);
+  let groups = 0;
+  for (const g of GROUPS) seek(g) ? groups++ : fail(`menu group "${g}" is missing, even after scrolling`);
+  log("··", `${groups}/${GROUPS.length} menu groups found`);
+  groupCount = groups; groupTotal = GROUPS.length; rowTotal = ROWS.length;
   toTop();
 
   /* The menu scrolls, so rows below the fold are found by scrolling to them. */
@@ -277,11 +289,11 @@ else {
   for (const label of ROWS) {
     const n = seek(label);
     if (!n) { fail(`menu row "${label}" is missing, even after scrolling`); continue; }
-    if (SKIP.has(label)) { log("··", `${label} — present, not followed`); continue; }
+    if (SKIP.has(label)) { log("··", `${label} — present, not followed`); inert.push(label); continue; }
     tap(n);
     const after = nodes(dump());
     if (findIn(after, "Resources")) fail(`tapping "${label}" did nothing`);
-    else log("ok", `${label} → opened`);
+    else { log("ok", `${label} → opened`); opened.rows.push(label); }
     shot("menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
     const c = crashes();
     if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
@@ -299,7 +311,7 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
   shot("tab-" + tab.replace(/\s+/g, "-").toLowerCase());
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
-  else log("ok", `${tab} tab`);
+  else { log("ok", `${tab} tab`); tabsOk.push(tab); }
 }
 
 /* ---------- verdict ------------------------------------------------------- */
@@ -316,6 +328,18 @@ if (failures.length) {
 }
 say("\nThe app installs, opens, draws its home screen, and every tile and menu row");
 say("opens a screen of its own. Nothing crashed.");
+const tally = [
+  `home screen drew, ${found}/${HOME_ALSO.length + TILES.length} expected items found`,
+  `${opened.tiles.length}/${TILES.length - 1} home tiles opened a screen (Join WhatsApp leaves the app)`,
+  `${groupCount}/${groupTotal} menu groups present, ${opened.rows.length + inert.length}/${rowTotal} rows present`,
+  `${opened.rows.length} menu rows opened a screen; ${inert.length} present but not followed (${inert.join(", ")})`,
+  `tabs working: ${tabsOk.join(", ")}`,
+  `no crash or fatal JS error in logcat at any point`,
+  `${shots} screenshots taken`,
+];
+say("\nwhat this run proved:");
+tally.forEach(t => say("  · " + t));
+notice("SMOKE PASSED — " + tally.join("; "));
 
 } catch (err) {
   say("\nthe run stopped early: " + (err && err.message ? err.message : String(err)));
