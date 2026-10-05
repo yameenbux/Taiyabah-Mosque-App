@@ -175,13 +175,17 @@ shot("first-frame");
 
 /* The fonts load before the first frame, so give it room — and look for the
  * words rather than a fixed wait. */
+/* Drawn means the hero is on the glass — the society's name, the salām, the
+ * next jamāʿah. NOT "Services", which lives below the fold: asking for that was
+ * asking whether the page had been scrolled, not whether the app had started. */
+const DREW = /BOLTON CENTRAL|NEXT JAM|Beginning time|السَّلَامُ/i;
 let xml = "", home = [];
 for (let i = 0; i < 20; i++) {
   sleep(1500);
   xml = dump(); home = nodes(xml);
-  if (findIn(home, /Next Jam|Today|Services/i)) break;
+  if (findIn(home, DREW)) break;
 }
-if (!findIn(home, /Services/i)) {
+if (!findIn(home, DREW)) {
   shot("home-FAILED");
   if (dumpFailures) fail(`could not read the screen at all (${dumpFailures} failed dumps) — ` +
                          "so whether the app drew is unknown");
@@ -264,7 +268,8 @@ else {
                 "Privacy notice", "System Preferences"];
   if (!findIn(menu, "Resources")) fail("the More menu did not open");
   else log("ok", "the More menu opened");
-  for (const g of GROUPS) if (!findIn(menu, g)) fail(`menu group "${g}" is missing`);
+  for (const g of GROUPS) if (!seek(g)) fail(`menu group "${g}" is missing, even after scrolling`);
+  toTop();
 
   /* The menu scrolls, so rows below the fold are found by scrolling to them. */
   const SKIP = new Set(["Hajj / Umrah", "Ramadan 2027", "Tours & Visits",   // deliberately inert
