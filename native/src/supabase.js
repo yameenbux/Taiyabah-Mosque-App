@@ -56,3 +56,31 @@ export async function isOpen(fn) {
     return !(r.status === 404 || /PGRST202/.test(r.body || ""));
   } catch { return false; }
 }
+
+/* Putting a file in a private bucket.
+ *
+ * The name is random because `anon` may write here and may not read, list or
+ * overwrite: that makes the name no secret, but a guessable one would let two
+ * applicants collide, and storage refuses an upload to a key that already
+ * exists rather than quietly replacing it. x-upsert stays false for exactly
+ * that reason — a silent replace would destroy somebody else's certificate.
+ */
+export async function upload(bucket, file, { ext = "bin", ms = 60000 } = {}) {
+  const rand = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const path = `${new Date().getFullYear()}/${rand}.${ext}`;
+  const body = await (await fetch(file.uri)).blob();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(`${URL}/storage/v1/object/${bucket}/${path}`, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: { apikey: ANON, Authorization: `Bearer ${ANON}`,
+                 "Content-Type": file.mimeType || "application/octet-stream",
+                 "x-upsert": "false" },
+      body,
+    });
+    if (!res.ok) throw new Error(`upload ${res.status}`);
+    return path;
+  } finally { clearTimeout(timer); }
+}
