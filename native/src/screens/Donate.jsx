@@ -96,8 +96,7 @@ export function NewBuild({ navigation }) {
             {t("sheet.internal_fixtures_fittings", "Internal fixtures & fittings")}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(21.5), color: C.muted,
                          marginTop: 8, textAlign: rtl ? "right" : "left" }}>
-            {t("sheet.help_make_the_masjid_ready",
-              "Help make the masjid ready for salah, Qurʼan and remembrance for generations to come.")}</Text>
+            {t("sheet.help_make_the_masjid_ready", "Help make the masjid ready for salah, Qur’an and remembrance for generations to come.")}</Text>
           {/* .needs span — a 16% gold fill inside a 30% gold border with the
               label in #4A3B14. They were plum text on a white pill. */}
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 13 }}>
@@ -128,16 +127,14 @@ export function NewBuild({ navigation }) {
         <CTA label={t("sheet.give_any_other_amount", "Give any other amount")}
              sub={t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")} href={ANY} />
         <View style={{ marginTop: 11 }}>
-          <Note>{t("sheet.opens_the_masjids_secure_donation",
-            "Opens the masjid's secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better.")}</Note>
+          <Note>{t("sheet.opens_the_masjids_secure_donation", "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better.")}</Note>
         </View>
 
         <Heading tag={t("sheet.tap_to_copy", "Tap to copy")}>{t("sheet.or_transfer_directly", "Or transfer directly")}</Heading>
         <Bank items={BANK} />
         <CopyAll />
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569",
-                      t("sheet.if_you_are_ever_unsure",
-                        "If you are ever unsure about donation details, please confirm them at the masjid office.")]} />
+                      t("sheet.if_you_are_ever_unsure", "If you are ever unsure about donation details, please confirm them at the masjid office before transferring.")]} />
       </View>
     </Screen>
   );
@@ -187,7 +184,7 @@ export function Giving() {
 
   const FUNDS = [
     { v: "general",  t: t("giving.the_masjid", "The masjid"), s: t("giving.general", "General"),
-      note: t("giving.the_general_fund_upkeep_running", "The general fund — upkeep, running costs, and the masjid's work in Bolton.") },
+      note: t("giving.the_general_fund_upkeep_running", "The general fund — upkeep, running costs, and the masjid’s work in Bolton.") },
     { v: "sadaqah",  t: t("giving.sadaqah", "Sadaqah"), s: t("giving.voluntary", "Voluntary"),
       note: t("giving.voluntary_charity_given_as_and", "Voluntary charity, given as and when you wish.") },
     { v: "lillah",   t: t("giving.lillah", "Lillah"), s: t("giving.for_allah", "For Allah"),
@@ -299,8 +296,7 @@ export function Giving() {
         <Bank items={BANK} />
         <CopyAll />
         <View style={{ marginTop: 13 }}>
-          <Note>{t("giving.please_use_your_surname_as",
-            "Please use your surname as the reference.")}</Note>
+          <Note>{t("giving.please_use_your_surname_as", "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it.")}</Note>
         </View>
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
       </View>

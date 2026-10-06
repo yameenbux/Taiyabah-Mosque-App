@@ -244,7 +244,7 @@ export default function Qibla({ navigation }) {
                 the reader's language and in their numerals; from the reader's
                 own position it has to be computed. */
              from.mine ? `${qibla.toFixed(1)}° ${t("qibla.true", "true")}`
-                       : t("sheet.118_true", "118° true")],
+                       : t("sheet.118_true", "118.3° true")],
             [t("sheet.distance", "Distance"),
              from.mine ? `${Math.round(km).toLocaleString("en-GB")} km` : t("sheet.5_042_km", "5,042 km")],
             [t("sheet.measured_from", "Measured from"),

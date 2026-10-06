@@ -72,7 +72,7 @@ export default function PrayerTimes({ navigation }) {
 
   const step = n => { tap(); setOffset(o => o + n); };
   const label = offset === 0 ? t("app.today", "Today")
-              : offset === 1 ? t("times.tomorrow", "Tomorrow")
+              : offset === 1 ? t("times.tomorrow", "tomorrow")
               : offset === -1 ? t("times.yesterday", "Yesterday")
               /* Beyond yesterday/tomorrow the website names the DAY and
                  nothing else — the date itself is the line underneath. */
@@ -139,8 +139,7 @@ export default function PrayerTimes({ navigation }) {
 
       <View style={{ paddingHorizontal: 16 }}>
         {!day ? (
-          <Card><Note>{t("times.off_timetable",
-            "That date is outside the published timetable. The masjid prints one year at a time.")}</Note></Card>
+          <Card><Note>{t("times.off_timetable", "That date is outside the published timetable.")}</Note></Card>
         ) : (
           <>
             {/* The table. A row per prayer rather than five columns, because a

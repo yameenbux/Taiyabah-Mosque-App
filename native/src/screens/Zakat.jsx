@@ -76,7 +76,13 @@ export default function Zakat() {
               t("zakat.you_have_owned_that_much", "You have owned that much for one full *lunar year*"),
             ].map((x, i) => (
               <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 8, marginBottom: 4 }}>
-                <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink }}>•</Text>
+                {/* The browser draws a list marker itself — a round dot — and
+                    does not take it from the font. Setting a literal • in
+                    Hanken Grotesk gave a small SQUARE instead, on both of this
+                    screen's lists. A circle drawn here is what the website
+                    actually shows. */}
+                <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.ink,
+                               marginTop: fs(9), marginHorizontal: 2 }} />
                 <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink,
                                textAlign: rtl ? "right" : "left" }}>{x}</Rich>
               </View>))}
@@ -146,7 +152,7 @@ export default function Zakat() {
                    paddingVertical: 8 }}>
           <Ionicons name="open-outline" size={14} color={C.brand600} />
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
-            {t("zakat.check_price", "Check today's price")}</Text>
+            {t("zakat.check_price", "check price")}</Text>
         </Press>
         {/* .zk-result — a pale plum panel inside the nisab card, not a card
             of its own sitting under it. */}
@@ -154,7 +160,7 @@ export default function Zakat() {
                        backgroundColor: "#F0E9ED" }}>
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
             {out.nisab === null
-              ? t("zakat.enter_today_s_price_to", "Enter today's price to see the nisab")
+              ? t("zakat.enter_today_s_price_to", "Enter today’s price to see the nisab")
               : `${t("zakat.nisab_is", "Nisab is")} ${money(out.nisab)}`}
           </Text>
         </View>
@@ -175,8 +181,7 @@ export default function Zakat() {
         <Heading>{t("zakat.3_what_you_owe", "3 · What you owe")}</Heading>
         <Field label={t("zakat.debts_and_bills_due_now", "Debts and bills due now (£)")} value={v.debts} onChange={x => set("debts", x)} />
         <View style={{ marginTop: 9 }}>
-          <Note>{t("zakat.include_what_you_owe_right",
-            "Include what you owe right now — bills, rent, money borrowed.")}</Note>
+          <Note>{t("zakat.include_what_you_owe_right", "Include what you owe right now — bills, rent, money borrowed. For a mortgage, most scholars say to deduct only the payments due, not the whole loan. Ask the imam if you are unsure.")}</Note>
         </View>
 
         {/* The answer. Three lines of arithmetic shown so the figure can be
@@ -310,7 +315,8 @@ function ZList({ head, items, tone }) {
                      textAlign: rtl ? "right" : "left" }}>{head}</Text>
       {items.map((x, i) => (
         <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 8, marginBottom: 6 }}>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.ink }}>•</Text>
+          <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.ink,
+                         marginTop: fs(9), marginHorizontal: 2 }} />
           <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.ink,
                          textAlign: rtl ? "right" : "left" }}>{x}</Rich>
         </View>))}

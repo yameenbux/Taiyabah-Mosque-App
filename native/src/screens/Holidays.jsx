@@ -252,7 +252,7 @@ export default function Holidays() {
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>
             {t("hol.these_dates_are_estimates", "These dates are estimates")}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: C.muted }}>
-            {t("hol.the_islamic_calendar_follows_the", "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand.")}</Text>
+            {t("hol.the_islamic_calendar_follows_the", "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand. The madrasah’s closure dates above are fixed and were set by the madrasah itself.")}</Text>
         </View>
       </View>
     </Screen>

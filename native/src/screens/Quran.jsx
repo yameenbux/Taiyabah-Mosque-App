@@ -373,7 +373,7 @@ export function Mushaf({ route, navigation }) {
         {/* The ribbon on the bar is the bookmark, and only the bookmark. */}
         <Press onPress={bookmark} style={{ padding: 8 }}
           accessibilityLabel={marked ? t("a11y.take_the_bookmark_off", "Take the bookmark off this page")
-                                     : t("a11y.bookmark_this_page", "Put your bookmark on this page")}>
+                                     : t("a11y.bookmark_this_page", "Bookmark this page")}>
           <Ionicons name={marked ? "bookmark" : "bookmark-outline"} size={19}
                     color={marked ? C.goldBright : "rgba(243,239,227,.65)"} />
         </Press>
@@ -463,7 +463,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
       {mode === "fav" && !muFavs.length
         ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "rgba(243,239,227,.55)",
                          textAlign: "center", paddingHorizontal: 30, paddingTop: 24 }}>
-            {t("mushaf.no_favourites_yet", "No favourites yet. Add a page and it will be listed here.")}</Text>
+            {t("mushaf.no_favourites_yet", "Nothing kept yet. The ribbon on the right keeps the page you are on.")}</Text>
         : <FlatList
             data={items}
             keyExtractor={(x, i) => String(i)}

@@ -972,7 +972,7 @@ export function Bank({ items }) {
             <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.26,
                            textTransform: "uppercase", color: C.muted,
                            textAlign: rtl ? "right" : "left" }}>
-              {tx(it.k)}{copied === i ? ` · ${t("ui.copied", "copied")}` : ""}</Text>
+              {tx(it.k)}{copied === i ? ` · ${t("ui.copied", "Copied")}` : ""}</Text>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16), letterSpacing: 0.16, color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>{tx(it.v)}</Text>
           </View>

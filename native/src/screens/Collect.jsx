@@ -152,8 +152,7 @@ export default function Collect({ navigation }) {
           <>
             <Heading>{t("collect.before_you_fill_this_in", "Before you fill this in")}</Heading>
             <Note>{`${t("collect.the_masjid_needs_at_least", "The masjid needs at least")} ${NOTICE_DAYS} ${t("collect.days_notice_and_takes_requests", "days’ notice, and takes requests up to a year ahead.")}`}</Note>
-            <Note>{t("collect.every_question_is_needed_unless",
-              "Every question is needed unless it says otherwise. The masjid rings the trustee to confirm before anything is agreed.")}</Note>
+            <Note>{t("collect.every_question_is_needed_unless", "Every question is needed unless it says otherwise. The masjid rings the trustee named at the bottom before confirming anything, so please give a number that will be answered.")}</Note>
 
             <Heading>{t("collect.the_date", "The date")}</Heading>
             <P muted>{t("collect.date_you_would_like_to", "Date you would like to collect")}</P>
@@ -175,13 +174,13 @@ export default function Collect({ navigation }) {
                    value={org.email} bad={bad.email} onChange={v => setOrg(s => ({ ...s, email: v }))} />
             <Field label={t("collect.charity_number_if_you_have", "Charity number")}
                    required={false} opt={t("collect.if_you_have_one", "— if you have one")}
-                   hint={t("collect.leave_this_empty_if_the", "Leave this empty if the institute is not registered.")}
+                   hint={t("collect.leave_this_empty_if_the", "Leave this empty if the cause is overseas or not registered in England and Wales.")}
                    value={org.number} onChange={v => setOrg(s => ({ ...s, number: v }))} />
             <Field label={t("collect.students_altogether", "Students altogether")}
                    type="num" required={false} opt={t("collect.optional", "— optional")}
                    value={students.total} onChange={v => setStudents(s => ({ ...s, total: v.replace(/[^0-9]/g, "") }))} />
             <Field label={t("collect.of_those_boarding", "Of those, boarding")} type="num" required={false} opt={t("collect.optional", "— optional")}
-                   hint={t("collect.if_your_madrasah_or_school", "If your madrasah or school has boarders.")}
+                   hint={t("collect.if_your_madrasah_or_school", "If your madrasah or school has students, it helps the masjid to know how many, and how many of them board. Leave both empty if it does not apply.")}
                    value={students.boarding} onChange={v => setStudents(s => ({ ...s, boarding: v.replace(/[^0-9]/g, "") }))} />
 
             <Heading>{t("collect.your_bmcc_certificate", "Your BMCC certificate")}</Heading>
@@ -220,13 +219,11 @@ export default function Collect({ navigation }) {
                     value={who.paid} onChange={v => setWho(s => ({ ...s, paid: v }))} columns={2}
                     options={[{ v: "no", t: t("collect.no", "No") }, { v: "yes", t: t("collect.yes", "Yes") }]} />
             {who.paid === "yes" && (
-              <Note>{t("collect.thank_you_for_saying_so",
-                "Thank you for saying so. A paid collector is allowed — the masjid simply has to know.")}</Note>)}
+              <Note>{t("collect.thank_you_for_saying_so", "Thank you for saying so. A paid collector is allowed — the masjid simply needs to know beforehand, and the committee may ask about it when they ring.")}</Note>)}
             {bad.paid && <ErrorBox>{t("collect.please_answer_this", "Please answer this.")}</ErrorBox>}
 
             <Heading>{t("collect.trustee_or_manager", "Trustee or manager")}</Heading>
-            <P muted>{t("collect.somebody_other_than_the_collector",
-              "Somebody other than the collector. The masjid rings this person to confirm the collection.")}</P>
+            <P muted>{t("collect.somebody_other_than_the_collector", "Somebody other than the collector. The masjid rings this person to confirm the collection is genuine.")}</P>
             <Field label={t("collect.full_name_of_trustee_ceo", "Full name of trustee / CEO / principal")}
                    type="name" value={trustee.name} bad={bad.tname}
                    onChange={v => setTrustee(s => ({ ...s, name: v }))} />
@@ -241,8 +238,8 @@ export default function Collect({ navigation }) {
                 rules_version, so the record and the screen have to name the
                 same thing — agreeing to "the rules" with no version is not a
                 record of anything. */}
-            <Note>{`${t("collect.version", "Version")} ${RULES_VERSION} · ` +
-                   t("collect.you_are_agreeing_to_this", "you are agreeing to this version")}</Note>
+            <Note>{`${t("collect.version", "Version")} ${RULES_VERSION} ` +
+                   t("collect.you_are_agreeing_to_this", "· you are agreeing to this version")}</Note>
             {/* The website's declaration is made ON BEHALF OF the charity —
                 "I have read the rules for collection above and agree to them
                 on behalf of the charity or institute named on this form." The
@@ -253,8 +250,7 @@ export default function Collect({ navigation }) {
                    label={t("collect.i_have_read_the_rules",
                      "I have read the *rules for collection* above and agree to them on behalf of the charity or institute named on this form.")} />
             <Check value={privacy} onChange={setPrivacy} bad={bad.privacy}
-                   label={t("collect.i_understand_the_masjid_will",
-                     "I understand the masjid will keep these details to arrange and check the collection.")} />
+                   label={t("collect.i_understand_the_masjid_will", "I understand the masjid will keep these details to arrange and check the collection, will contact the trustee named above, and will delete them afterwards in line with its privacy notice. I confirm the trustee is content to be contacted about this.")} />
             <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
               style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
@@ -262,8 +258,7 @@ export default function Collect({ navigation }) {
             </Press>
             <Field label={t("collect.signed_type_your_full_name", "Signed — type your full name")}
                    type="name" value={sign} bad={bad.sign} onChange={setSign} />
-            <Note>{t("collect.typing_your_name_here_has",
-              "Typing your name here has the same effect as signing the paper form.")}</Note>
+            <Note>{t("collect.typing_your_name_here_has", "Typing your name here has the same effect as signing the paper form. The date and time are recorded with it.")}</Note>
 
             <ErrorBox>{state.error}</ErrorBox>
             {/* What pressing it does and — just as important — does not do. */}

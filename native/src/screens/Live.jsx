@@ -166,8 +166,7 @@ export default function Live({ navigation }) {
             </Press>))}
         </Card>
         <View style={{ marginTop: 12 }}>
-          <Note center>{t("about.audio_keeps_playing_while_you",
-            "Audio keeps playing while you use the rest of the app or other apps. If the stream doesn't start, the masjid may not be broadcasting at the moment.")}</Note>
+          <Note center>{t("about.audio_keeps_playing_while_you", "Audio keeps playing while you use the rest of the app or other apps. If the stream doesn’t start, the masjid may not be broadcasting at the moment.")}</Note>
         </View>
       </View>
     </Screen>

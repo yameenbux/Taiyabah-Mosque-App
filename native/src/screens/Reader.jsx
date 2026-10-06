@@ -154,7 +154,6 @@ export const Duas = () => {
 export const Rabbanas = () => {
   const { t } = useApp();
   const list = Array.isArray(RABBANAS) ? RABBANAS : (RABBANAS.items || RABBANAS.rabbanas || []);
-  return <Collection note={t("rabbanas.the_du_as_of_the",
-      "The duʿās of the Qurʼan that begin “Our Lord…”, in the order they appear.")}
+  return <Collection note={t("rabbanas.the_du_as_of_the", "The duʿās of the Qur'an that begin “Our Lord…”, in the order they appear.")}
     groups={[{ title: t("rabbanas.40_rabbana", "40 Rabbanā"), data: list }]} />;
 };

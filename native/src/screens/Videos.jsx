@@ -61,7 +61,7 @@ export default function Videos() {
             </View>
           </Pressable>))}
 
-        <PanelLink label={t("vids.see_the_full_channel_on", "See the full channel on YouTube")} href={CHANNEL} />
+        <PanelLink label={t("vids.see_the_full_channel_on", "See the full channel on YouTube ›")} href={CHANNEL} />
       </View>
     </Screen>
   );

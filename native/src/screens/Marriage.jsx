@@ -198,7 +198,9 @@ export default function Marriage({ navigation }) {
             <Notice>{t("nikah.requests_by_phone_for_now", "Requests are taken by phone for now")}</Notice>
             <RowGroup>
               <NavRow icon="call-outline" label={t("marriage.call_the_main_office", "Call the main office")}
-                      sub={"01204 535 997 · " + t("nikah.5pm_to_7pm", "5pm to 7pm")}
+                      /* The website's own string carries the separator — the markup
+                         puts the · inside the span — so adding one here doubled it. */
+                      sub={"01204 535 997 " + t("nikah.5pm_to_7pm", "· 5pm to 7pm")}
                       href="tel:01204535997" />
               <NavRow icon="mail-outline" label={t("nikah.email_the_office", "Email the office")}
                       sub={t("nikah.opens_your_email_app", "Opens your email app with the details filled in")}
@@ -277,8 +279,7 @@ export default function Marriage({ navigation }) {
                    value={who.guests} onChange={v => setWho(s => ({ ...s, guests: v.replace(/[^0-9]/g, "") }))} />
 
             <Heading>{t("nikah.who_is_getting_married", "Who is getting married")}</Heading>
-            <P muted>{t("nikah.the_masjid_records_these_five",
-              "The masjid records these five people for every nikāḥ, and cannot perform one without them.")}</P>
+            <P muted>{t("nikah.the_masjid_records_these_five", "The masjid records these five people for every nikāḥ, and cannot perform one without them. They are kept with your request and used for nothing else.")}</P>
             {PEOPLE.map(p => (
               <View key={p.id} style={{ marginTop: 18 }}>
                 <Text style={{ fontFamily: F.display, fontSize: fs(15.5), color: C.brand600 }}>
@@ -301,8 +302,7 @@ export default function Marriage({ navigation }) {
                    required={false} value={who.notes} onChange={v => setWho(s => ({ ...s, notes: v }))} />
 
             <Check value={agree} onChange={setAgree} bad={bad.agree}
-                   label={t("nikah.i_understand_the_masjid_will",
-                     "I agree to these details being held by the masjid so that the nikāḥ can be arranged and recorded.")} />
+                   label={t("nikah.i_understand_the_masjid_will", "I understand the masjid will keep my contact details and the five people’s names, ages and addresses to deal with this request, and nothing else.")} />
 
             <ErrorBox>{state.error}</ErrorBox>
             <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
