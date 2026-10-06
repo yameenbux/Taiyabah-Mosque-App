@@ -7,6 +7,7 @@
  */
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { PixelRatio } from "react-native";
+import { fontSize } from "./scale";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EN from "./i18n/en.json";
 
@@ -32,13 +33,6 @@ const osFontScale = () => {
   const n = PixelRatio.getFontScale?.();
   return Number.isFinite(n) && n > 0 ? n : 1;
 };
-
-/* The ceiling. Past about 1.5 the prayer table stops fitting five columns on
- * a phone and the tab bar's labels start to clip, so this is where the app
- * stops growing text and the reader's own pinch-zoom would have to take over. */
-const SCALE_CEILING = 1.5;
-const wantedScale = chosen =>
-  Math.min(Math.max(osFontScale(), chosen || 1), SCALE_CEILING);
 
 const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null,
                    muMark: 0, muFavs: [],
@@ -131,7 +125,7 @@ export function AppProvider({ children, fallback = null }) {
        * told Android they need large text has said something about their
        * eyesight, and no in-app setting should quietly undo it; the control
        * here can still take them above it. */
-      fs: n => Math.round(n * wantedScale(prefs.scale) / osFontScale()),
+      fs: n => fontSize(n, prefs.scale, osFontScale()),
       setLang: lang => save({ ...prefs, lang }),
       setScale: scale => save({ ...prefs, scale }),
       setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),

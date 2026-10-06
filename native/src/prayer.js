@@ -34,9 +34,11 @@ function londonParts(real) {
            h: g("hour") % 24, mi: g("minute"), s: g("second") };
 }
 
-export function nowLondon() {
+/* The instant is a parameter with a default, so a test can ask what London's
+ * clock said at a given moment. Every caller passes nothing and gets exactly
+ * what it got before. */
+export function nowLondon(real = new Date()) {
   try {
-    const real = new Date();
     const p = londonParts(real);
     const asUTC = Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s);
     return new Date(asUTC + real.getTimezoneOffset() * 60000);

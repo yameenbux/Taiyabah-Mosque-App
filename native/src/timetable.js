@@ -18,9 +18,15 @@
  * downloaded year is laid OVER it, so this can only ever be an improvement on
  * what is already there.
  */
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BUNDLED from "./data/timetable-2026.json";
 import { call } from "./supabase";
+
+/* Required where it is used rather than at the top, so that importing this
+ * module — and so prayer.js, and so anything that needs the prayer arithmetic
+ * — does not drag a native storage module in with it. A module that reads
+ * from disk should do it when asked, not when loaded, and it is what lets the
+ * tests run the real code under plain Node. */
+const store = () => require("@react-native-async-storage/async-storage").default;
 
 const CACHE = "timetable.years";       // { [year]: { days, at } }
 const MAX_AGE_DAYS = 400;              // a year is still a year; older is stale
@@ -99,7 +105,7 @@ function fromRows(year, rows) {
 const merge = days => { if (days && Object.keys(days).length) { DAYS = { ...DAYS, ...days }; return true; } return false; };
 
 const readCache = async () => {
-  try { return JSON.parse(await AsyncStorage.getItem(CACHE)) || {}; } catch { return {}; }
+  try { return JSON.parse(await store().getItem(CACHE)) || {}; } catch { return {}; }
 };
 
 /* Restore what we downloaded last time BEFORE asking for anything. A phone
@@ -130,7 +136,7 @@ export async function fetchYear(year) {
 
     const cache = await readCache();
     cache[year] = { days, at: Date.now() };
-    await AsyncStorage.setItem(CACHE, JSON.stringify(cache)).catch(() => {});
+    await store().setItem(CACHE, JSON.stringify(cache)).catch(() => {});
     announce();
     return true;
   } catch {

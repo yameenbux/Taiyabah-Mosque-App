@@ -42,9 +42,27 @@ jobs:
       - name: Check every screen parses
         working-directory: native
         run: node scripts/parse-check.mjs
+
+      # The arithmetic nobody sees go wrong until it already has: which
+      # jamāʿah is next, the midnight rollover, London's clock on a phone set
+      # to another timezone, how big the text actually gets, Maghrib's jamāʿah
+      # being the minute it begins. Runs against the real modules the app
+      # ships, not copies of them, and costs about a second.
+      - name: Unit tests
+        working-directory: native
+        run: node --import ./scripts/test-register.mjs --test "scripts/test/*.test.mjs"
+
       - name: Check every component exists
         working-directory: native
         run: node scripts/check-refs.mjs
+
+      - name: Check a screen reader can name every control
+        working-directory: native
+        run: node scripts/check-a11y.mjs --strict
+
+      - name: Check the app says what the website says, in English too
+        working-directory: native
+        run: node scripts/check-english.mjs --strict
 
       - name: Check every screen says what the website says
         working-directory: native
