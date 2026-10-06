@@ -54,35 +54,33 @@ export default function Timetable() {
           <Press onPress={() => step(-1)} style={{ padding: 9 }}>
             <Ionicons name="chevron-back" size={19} color={m === 0 ? "rgba(220,187,99,.3)" : C.goldBright} />
           </Press>
-          {/* Every month reachable without eleven taps. */}
-          <View style={{ flexDirection: "row", gap: 4 }}>
-            {MONTHS.map((name, i) => (
-              <Press key={i} onPress={() => { tap(); setM(i); list.current?.scrollToOffset({ offset: 0, animated: false }); }}
-                style={{ width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center",
-                         backgroundColor: i === m ? C.goldBright : "rgba(243,239,227,.14)" }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: 9,
-                               color: i === m ? C.brand900 : "rgba(243,239,227,.75)" }}>{name[0]}</Text>
-              </Press>))}
-          </View>
+          {/* The website steps a month at a time with a chevron either side of
+              its name, and that is all. A row of twelve letter chips was mine,
+              not the site's. */}
           <Press onPress={() => step(1)} style={{ padding: 9 }}>
             <Ionicons name="chevron-forward" size={19} color={m === 11 ? "rgba(220,187,99,.3)" : C.goldBright} />
           </Press>
         </View>
 
-        {/* The website's .sh-toggle. Without it this screen could only ever show
-            one of the two things the timetable is for. */}
-        <View style={{ flexDirection: "row", gap: 6, marginTop: 14, padding: 4, borderRadius: R.pill,
-                       backgroundColor: "rgba(0,0,0,.18)" }}>
-          {[["jamaat", t("sheet.jama_ah_times", "Jamāʿah times")],
-            ["begins", t("sheet.beginning_times", "Beginning times")]].map(([k, lab]) => (
-            <Press key={k} onPress={() => { tap(); setMode(k); }}
-              style={{ flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: R.pill,
-                       backgroundColor: mode === k ? C.goldBright : "transparent" }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
-                             color: mode === k ? C.brand900 : "rgba(243,239,227,.8)" }}>{lab}</Text>
-            </Press>))}
-        </View>
       </Hero>
+
+      {/* .sh-toggle: a strip on the CARD below the header with a hairline under
+          it, two buttons at 9px of radius with a line border, and the active
+          one filled brand-700 with cream on it. This was a gold pill floating
+          inside the plum hero — the right control, in the wrong place, in a
+          colour the website never uses for it. */}
+      <View style={{ flexDirection: "row", gap: 6, paddingHorizontal: 16, paddingTop: 11, paddingBottom: 9,
+                     backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.line }}>
+        {[["jamaat", t("sheet.jama_ah_times", "Jamāʿah times")],
+          ["begins", t("sheet.beginning_times", "Beginning times")]].map(([k, lab]) => (
+          <Press key={k} onPress={() => { tap(); setMode(k); }}
+            style={{ flex: 1, alignItems: "center", paddingVertical: 8, borderRadius: 9, borderWidth: 1,
+                     borderColor: mode === k ? C.brand700 : C.line,
+                     backgroundColor: mode === k ? C.brand700 : C.card }}>
+            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+                           color: mode === k ? C.cream : C.ink }}>{lab}</Text>
+          </Press>))}
+      </View>
 
       {/* A sticky header, because scrolling past the column names in a table of
           thirty-one rows makes the numbers meaningless. */}
@@ -116,21 +114,30 @@ export default function Timetable() {
           const friday = date.getDay() === 5;
           const isToday = d.iso === todayIso;
           return (
-            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 10,
-                           borderBottomWidth: 1, borderBottomColor: "rgba(228,222,207,.6)",
-                           backgroundColor: isToday ? "rgba(198,162,76,.14)"
-                                          : friday ? "rgba(119,33,87,.035)"
-                                          : index % 2 ? "rgba(255,255,255,.4)" : "transparent" }}>
-              <View style={{ width: 34 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>{date.getDate()}</Text>
-                <Text style={{ fontFamily: F.sans, fontSize: fs(9), color: friday ? C.brand600 : C.muted }}>
+            /* .mt tr.fri td is GOLD at 10% and .mt tr.today td is PLUM at 13%
+               with weight 700 — this had them the other way about, gold for
+               today and a barely-there plum for Friday, so the one day the
+               whole highlight exists for was the quieter of the two. The
+               zebra striping on every other row was mine; the website has
+               none. today's date cell also carries a 3px plum bar down its
+               left edge (inset box-shadow on .mt tr.today td.d). */
+            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 9,
+                           borderBottomWidth: 1, borderBottomColor: C.line,
+                           backgroundColor: isToday ? "rgba(119,33,87,.13)"
+                                          : friday ? "rgba(198,162,76,.10)" : "transparent" }}>
+              <View style={{ width: 34, paddingLeft: isToday ? 9 : 0,
+                             borderLeftWidth: isToday ? 3 : 0, borderLeftColor: C.brand600 }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(12.5), color: C.ink }}>{date.getDate()}</Text>
+                {/* .mt td.d small — uppercase, tracked, muted on every day. */}
+                <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), letterSpacing: 0.4,
+                               textTransform: "uppercase", color: C.muted }}>
                   {t(`date.dow.${date.getDay()}`, ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()])}</Text>
               </View>
               {cols.map(([k]) => {
                 const v = (mode === "jamaat" ? d.jamaat : d.begins)[k];
                 return (
-                  <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(12),
-                                         color: C.ink }}>
+                  <Text key={k} style={{ flex: 1, textAlign: "center", fontSize: fs(12.5), color: C.ink,
+                                         fontFamily: isToday ? F.sansBold : F.sansMedium }}>
                     {v ? pretty(v).replace(/ (am|pm)$/, "") : "—"}</Text>);
               })}
             </View>);
