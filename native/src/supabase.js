@@ -45,6 +45,21 @@ export async function rpc(fn, payload) {
   return { ok: false, status: res.status, message, body };
 }
 
+/* The forms all take one `payload jsonb`, which is why rpc() wraps what it is
+ * given. Some older functions — prayer_year(p_year) among them, the one the
+ * website has always used — take named arguments instead, and PostgREST wants
+ * those at the top level rather than nested. Same door, different handle.
+ *
+ * Returns the function's own result or null; a caller that cannot reach the
+ * masjid is not in an error state, it simply has no answer yet. */
+export async function call(fn, args = {}) {
+  try {
+    const res = await go(`rpc/${fn}`, { method: "POST", body: JSON.stringify(args) });
+    if (!res.ok) return null;
+    return JSON.parse(await res.text());
+  } catch { return null; }
+}
+
 /* Is the office taking these requests at all? Asked of Postgres rather than a
  * flag somebody edits by hand, so the app and the website cannot drift. An
  * empty payload is a safe question: the function validates before it touches

@@ -5,7 +5,10 @@
  * jamāʿah is the same minute it begins — that is the masjid's practice, not a
  * rounding error, and the data says so explicitly in `notes`.
  */
-import TT from "./data/timetable-2026.json";
+/* Not the bundled file directly any more: timetable.js seeds itself from it
+ * and lays the committee's published year over the top, so this reads whatever
+ * is current without knowing or caring where it came from. */
+import { dayRecord, yearsHeld } from "./timetable";
 
 /* EVERY TIME IN THIS APP IS LONDON'S, not the phone's.
  *
@@ -66,8 +69,12 @@ export const ORDER = ["fajr", "zuhr", "asr", "maghrib", "isha"];
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export function dayFor(date = nowLondon()) {
-  return TT.days[iso(date)] || null;
+  return dayRecord(iso(date));
 }
+
+/* The years the app can actually answer for, so a screen with no times for
+ * today can say WHICH years it has rather than just failing. */
+export { yearsHeld };
 
 const mins = hhmm => {
   const [h, m] = hhmm.split(":").map(Number);

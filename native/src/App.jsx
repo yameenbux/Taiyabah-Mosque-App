@@ -17,6 +17,7 @@ import Opening from "./Opening";
 import Boundary from "./Boundary";
 import FirstRun from "./FirstRun";
 import { startPush } from "./push";
+import { restoreTimetable, syncTimetable } from "./timetable";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -225,6 +226,12 @@ export default function App() {
      * and does not subscribe anybody — it only makes the SDK ready, so that
      * when somebody does say yes there is something to say yes to. */
     startPush();
+
+    /* Restore what was downloaded last time FIRST, so a phone with no signal
+       already has the year it fetched before, then ask for anything newer.
+       Neither blocks a frame: the bundled file is in memory from the start,
+       so the app always has times to draw while this happens. */
+    restoreTimetable().finally(() => { syncTimetable(); });
   }, []);
 
   /* Shown only while the settings store answers, which has its own ceiling in

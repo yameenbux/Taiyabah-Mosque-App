@@ -16,7 +16,7 @@ import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
-import TT from "../data/timetable-2026.json";
+import { dayRecord, allDays, onTimetable } from "../timetable";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
 
 /* Ramadan, counted down on the home screen for the month before it.
@@ -29,7 +29,7 @@ import { current as currentReminders, setReminderTranslator } from "../reminder"
 const RAM_WINDOW = 30;
 
 function ramadanIn(now) {
-  for (const [iso, d] of Object.entries(TT.days)) {
+  for (const [iso, d] of Object.entries(allDays())) {
     if (!/^1\s+Rama(d|dh)an/i.test(d.hijri || "")) continue;
     const [Y, M, D] = iso.split("-").map(Number);
     const when = new Date(Y, M - 1, D);
@@ -106,6 +106,10 @@ export default function Home({ navigation }) {
   setReminderTranslator(t, pretty);
 
   const ramadan = ramadanIn(now);
+
+  /* Re-read when a downloaded year lands. */
+  const [ttTick, setTtTick] = useState(0);
+  React.useEffect(() => onTimetable(() => setTtTick(n => n + 1)), []);
 
   const day = dayFor(now);
   const next = nextJamaah(now);
@@ -279,6 +283,24 @@ export default function Home({ navigation }) {
                 </View>);
             })}
           </View>)}
+
+        {/* WHEN THERE ARE NO TIMES FOR TODAY, SAY SO. The timetable runs a
+            year at a time, and on the first morning of a year the masjid has
+            not published yet this card simply was not drawn — the prayer
+            times vanished off the home screen with no word of explanation,
+            which is the one thing this app must never do silently. Prayer
+            Times has said it all along; Home did not. */}
+        {!day && (
+          <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1,
+                         borderColor: C.line, padding: 15, ...SHADOW }}>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
+                           color: C.muted, textAlign: rtl ? "right" : "left" }}>
+              {t("times.off_timetable", "That date is outside the published timetable.")}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
+                           color: C.muted, marginTop: 7, textAlign: rtl ? "right" : "left" }}>
+              {t("home.times_coming", "The masjid publishes one year at a time. Times appear here as soon as the new timetable is out — please check at the masjid meanwhile.")}</Text>
+          </View>)}
+
         <Press onPress={() => { tap(); navigation.navigate("Timetable"); }}
           style={{ alignSelf: rtl ? "flex-start" : "flex-end", paddingVertical: 11, paddingHorizontal: 4,
                    flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 4 }}>

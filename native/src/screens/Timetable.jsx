@@ -11,7 +11,7 @@ import { C, F, R } from "../theme";
 import { useNavigation } from "@react-navigation/native";
 import { useApp } from "../store";
 import { Press, Note, tap } from "../ui";
-import TT from "../data/timetable-2026.json";
+import { dayRecord, yearsHeld, sourceFor, onTimetable } from "../timetable";
 import { MON } from "../dates";
 import { pretty, nowLondon } from "../prayer";
 
@@ -30,14 +30,33 @@ export default function Timetable() {
   const { t, fs } = useApp();
   const nav = useNavigation();
   const today = nowLondon();
-  const [m, setM] = useState(today.getFullYear() === TT.year ? today.getMonth() : 0);
+  /* Re-read when a downloaded year lands, so a phone that gets signal while
+     this screen is open fills in rather than staying on what it had. */
+  const [tick, setTick] = useState(0);
+  React.useEffect(() => onTimetable(() => setTick(n => n + 1)), []);
+
+  /* The year this screen is showing: the one the reader is in if the app has
+     it, otherwise the most recent one it does. It used to be pinned to the
+     bundled file's year, so in 2027 it would have opened on January 2026. */
+  const years = useMemo(yearsHeld, [tick]);
+  const year = years.includes(today.getFullYear())
+    ? today.getFullYear()
+    : (years[years.length - 1] ?? today.getFullYear());
+  const [m, setM] = useState(today.getFullYear() === year ? today.getMonth() : 0);
   const [mode, setMode] = useState("jamaat");
   const cols = SETS[mode];
   const list = useRef(null);
 
-  const days = useMemo(() => Object.entries(TT.days)
-    .filter(([iso]) => Number(iso.slice(5, 7)) === m + 1)
-    .map(([iso, d]) => ({ iso, ...d })), [m]);
+  const days = useMemo(() => {
+    const out = [];
+    const last = new Date(year, m + 1, 0).getDate();
+    for (let d = 1; d <= last; d++) {
+      const iso = `${year}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const rec = dayRecord(iso);
+      if (rec) out.push({ iso, ...rec });
+    }
+    return out;
+  }, [m, year, tick]);
 
   const step = n => {
     const next = Math.min(11, Math.max(0, m + n));
@@ -54,7 +73,7 @@ export default function Timetable() {
      website does not draw here. */
   React.useLayoutEffect(() => {
     nav.setOptions({
-      title: `${t(`date.fullmon.${m}`, MONTHS[m])} ${TT.year}`,
+      title: `${t(`date.fullmon.${m}`, MONTHS[m])} ${year}`,
       sheetNav: { onPrev: () => step(-1), onNext: () => step(1),
                   prevOff: m === 0, nextOff: m === 11 },
     });
@@ -105,7 +124,7 @@ export default function Timetable() {
               : t("month.beginning_note", "Beginning times. Maghrib is prayed at its listed time.")}</Note>
             <Note>{t("month.12_hour_note",
               "Times shown in 12-hour format without am/pm, as on the printed timetable.")}</Note>
-            <Note>{`${t("times.source", "Source")}: ${TT.source}`}</Note>
+            <Note>{`${t("times.source", "Source")}: ${sourceFor(year) || ""}`}</Note>
           </View>}
         renderItem={({ item: d, index }) => {
           const date = new Date(d.iso + "T00:00:00");
