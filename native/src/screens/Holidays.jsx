@@ -32,16 +32,28 @@ function dayMaps() {
   return { shut, evt };
 }
 
-/* Called at render, not read at import — two of these four are theme colours
- * and the key would otherwise describe the light calendar on a dark one. */
-const KEY = () => ({ open: C.line, shut: "#C25B5B", ev: "#C6A24C", today: C.brand600 });
+/* Called at render, not read at import — three of these four are theme colours
+ * and the key would otherwise describe the light calendar on a dark one.
+ *
+ * `open` is the odd one: the other three name a colour the grid actually
+ * paints, but an open day is simply a plain cell, so its swatch is a SAMPLE of
+ * one — the cell's own fill inside a border. The website does the same
+ * (.hp-key is background:var(--card) inside border:var(--line)); this drew it
+ * hollow, so on the dark page the swatch was the page seen through a 1.34:1
+ * outline and the most common state in the calendar had no legible key at all.
+ * The border is the hint grey now: 3.2:1 on light, 6:1 on dark.
+ *
+ * `today` follows the cell it describes, which is the filled plum — it named
+ * brand-600 and so drew a pale pink ring against a saturated plum cell. */
+const KEY = () => ({ open: C.hint, shut: "#C25B5B", ev: "#C6A24C", today: C.plumFill });
 
-function Key({ colour, label, hollow }) {
+function Key({ colour, label, hollow, fill }) {
   const { fs } = useApp();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <View style={{ width: 11, height: 11, borderRadius: 3, borderWidth: hollow ? 1.5 : 0,
-                     borderColor: colour, backgroundColor: hollow ? "transparent" : colour }} />
+                     borderColor: colour,
+                     backgroundColor: fill || (hollow ? "transparent" : colour) }} />
       <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted }}>{label}</Text>
     </View>);
 }
@@ -218,10 +230,14 @@ export default function Holidays() {
 
         <Heading>{t("hol.the_year_at_a_glance", "The year at a glance")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14, marginBottom: 11 }}>
-          <Key colour={KEY().open} hollow label={t("hol.madrasah_open", "Madrasah open")} />
+          <Key colour={KEY().open} hollow fill={C.card}
+            label={t("hol.madrasah_open", "Madrasah open")} />
           <Key colour={KEY().shut} label={t("hol.closed", "Closed")} />
           <Key colour={KEY().ev} label={t("hol.islamic_date", "Islamic date")} />
-          <Key colour={KEY().today} hollow label={t("hol.today", "Today")} />
+          {/* SOLID, not hollow: .hp-key.k-today is background AND border-color
+              set to the same plum, and today's cell in the grid is filled, so
+              an outlined swatch described a cell the calendar never draws. */}
+          <Key colour={KEY().today} label={t("hol.today", "Today")} />
         </View>
       </View>
 

@@ -15,7 +15,7 @@ import Svg, { Circle, Line, Path, G, Polygon, Rect, Defs, RadialGradient, Stop, 
 import { Magnetometer } from "expo-sensors";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW, LIGHT } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, TopBar, Heading, Card, Note, tap } from "../ui";
@@ -143,26 +143,28 @@ export default function Qibla({ navigation }) {
           <Animated.View style={{ width: DIAL, height: DIAL, transform: [{ rotate }] }}>
             <Svg width={DIAL} height={DIAL} viewBox="0 0 100 100">
               <Defs>
+                {/* The dial is an instrument and keeps its shape in both themes:
+                    a face barely distinct from the card, defined by the rim
+                    hairline rather than by its fill. Light is 1.04 and 1.07
+                    against the card; dark is 1.03 and 1.08 — the same dial,
+                    seated as a well instead of a disc. */}
                 <RadialGradient id="face" cx="50%" cy="45%" r="72%">
-                  <Stop offset="0" stopColor="#FFFFFF" />
-                  <Stop offset="1" stopColor="#F6F2E6" />
+                  <Stop offset="0" stopColor={dual("#FFFFFF", "#1E0715")} />
+                  <Stop offset="1" stopColor={dual("#F6F2E6", "#120409")} />
                 </RadialGradient>
               </Defs>
               {/* .dial-ring is a radial gradient from white to #F6F2E6 at 72%,
                   inside a single hairline — not a flat card fill.
-                  THE DIAL FACE IS CREAM IN BOTH THEMES: it is an instrument,
-                  the way a real compass has a pale face, and it is the one
-                  surface in the app that does not follow the page. So its
-                  markings are taken from LIGHT in both themes too — read from
-                  C they would inverted with everything else, and the dark
-                  theme drew a salmon N and pale grey W/E/S on cream. */}
-              <Circle cx="50" cy="50" r="49.5" fill="url(#face)" stroke={LIGHT.line} strokeWidth="0.5" />
+                  The face follows the theme, so everything drawn on it does
+                  too — a cream dial on a dark page was a lamp in the middle of
+                  the screen. */}
+              <Circle cx="50" cy="50" r="49.5" fill="url(#face)" stroke={C.line} strokeWidth="0.5" />
               {/* .ticks i — 72 hairlines in #D8D0BB, every one the same. The
                   app made every sixth one long and PLUM, which turned a
                   compass face into a decorated plum dial. */}
               {Array.from({ length: 72 }, (_, i) => {
                 const a = rad(i * 5), r1 = 48.2, r2 = 45.4;
-                return <Line key={i} stroke="#D8D0BB" strokeWidth="0.45"
+                return <Line key={i} stroke={dual("#D8D0BB", "#4A2D3E")} strokeWidth="0.45"
                              x1={50 + r1 * Math.sin(a)} y1={50 - r1 * Math.cos(a)}
                              x2={50 + r2 * Math.sin(a)} y2={50 - r2 * Math.cos(a)} />;
               })}
@@ -174,7 +176,7 @@ export default function Qibla({ navigation }) {
                 return (
                   <SvgText key={ltr} x={50 + r * Math.sin(a)} y={50 - r * Math.cos(a) + 2.4}
                            fontSize="6.4" fontWeight="700" textAnchor="middle"
-                           fill={ltr === "N" ? LIGHT.danger : LIGHT.muted}>{ltr}</SvgText>);
+                           fill={ltr === "N" ? C.danger : C.muted}>{ltr}</SvgText>);
               })}
               {/* .needle — ONE gold arrow with a thin gold stem at 55%, and the
                   kaaba tile on the rim at its head. The app drew a plum
@@ -184,7 +186,14 @@ export default function Qibla({ navigation }) {
                 <Polygon points="50,9 57,32 50,28 43,32" fill={C.gold} />
                 <Line x1="50" y1="28" x2="50" y2="84" stroke={C.gold} strokeWidth="1.25" opacity="0.55" />
               </G>
-              <Circle cx="50" cy="50" r="2.75" fill={C.brand800} stroke="rgba(255,255,255,.9)" strokeWidth="1.5" />
+              {/* The pivot is a DARK dot inside a light ring on the cream face;
+                  invert the face and the dot disappears into it, leaving the
+                  ring alone as a white donut — the loudest thing on the dial
+                  after the needle, which is not what a pivot is. On dark it
+                  becomes a gold dot in a dark ring instead, the same gold the
+                  needle is, so the needle and its pivot read as one piece. */}
+              <Circle cx="50" cy="50" r="2.75" fill={dual(C.brand800, C.gold)}
+                      stroke={dual("rgba(255,255,255,.9)", "rgba(0,0,0,.45)")} strokeWidth="1.5" />
             </Svg>
             {/* .kaaba — a 26px gold tile on the rim with the Kaʿbah in it. */}
             <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0,

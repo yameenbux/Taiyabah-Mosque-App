@@ -57,11 +57,11 @@ const ALLOWED = {
   "#6E656B": "Silver's dark end, same",
   "#7A5D14": "Gold's dark end, same",
   "#7C5E71": "Platinum's dark end, same",
-  /* The compass face is cream in BOTH themes, so what is drawn on it is
-     measured against cream, not against the page. */
-  "#D8D0BB": "the dial's 72 tick hairlines, on the cream dial face",
-  "#F6F2E6": "the dial face's outer stop, and the gold button's label",
-  "#FFFFFF": "the dial face's centre, and white on a filled plum control",
+  /* The compass dial used to be pinned to cream in both themes and needed
+     three exemptions here. It follows the theme now, through dual(), which
+     this check already skips — so only the OTHER uses of these two remain. */
+  "#F6F2E6": "the gold button's label, on a button that stays gold at night",
+  "#FFFFFF": "white on a filled plum control, and a switch's thumb",
   "#fff":    "white on a filled plum control",
 };
 
