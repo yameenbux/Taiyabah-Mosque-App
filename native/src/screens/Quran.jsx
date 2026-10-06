@@ -16,6 +16,7 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
+import { surah } from "../data/quran-index";
 import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, MenuRow, Press, Pill, Empty, tap } from "../ui";
 import { SHEETS } from "../Blocks";
 import IDX from "../data/quran-index.json";
@@ -151,9 +152,12 @@ export function Surah({ route, navigation }) {
   const n = route.params.n;
   useEffect(() => { setLastRead({ mode: "surah", surah: n }); }, [n]);
   const meta = IDX.surahs.find(s => s.n === n);
-  /* Required here rather than at the top of the file: 2.3MB of JSON should be
-   * parsed when somebody opens a surah, not when the app starts. */
-  const verses = useMemo(() => require("../data/quran-text.json")[n] || [], [n]);
+  /* ONE SŪRAH, not all 114. This used to require the whole 2.3MB file — late
+   * rather than at startup, which was the easy half of the problem, but the
+   * first sūrah anybody opened still parsed every other sūrah with it and
+   * froze the thread while it did. surah() reaches one generated file: 391
+   * bytes for al-Fātiḥah, 10KB for the median, 174KB for al-Baqarah. */
+  const verses = useMemo(() => surah(n), [n]);
 
   return (
     <FlatList
