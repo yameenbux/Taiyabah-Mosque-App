@@ -100,8 +100,14 @@ export function Screen({ children, scroll = true, pad = true, bg = C.paper, top 
 }
 
 /* The eight-point motif from the masjid's own artwork, used the same way the
- * web app uses it: very faint, behind a hero, never as decoration on its own. */
-export function Girih({ size = 190, color = "#FFFFFF", opacity = 0.035, style }) {
+ * web app uses it: behind a hero, never as decoration on its own.
+ *
+ * Gold at 9%, which is what .girih is on the website — not white at 3.5%,
+ * which is what this was. White on plum reads as a pale wash and pulls the
+ * whole hero lighter; gold on plum is the motif, and you only see it if you
+ * look. Same size and offset as the site, too: it was 215px at -70/-62 here
+ * against 190px at -46/-40 there, so the star sat further out and bigger. */
+export function Girih({ size = 190, color = C.gold, opacity = 0.09, style }) {
   return (
     <View pointerEvents="none" style={[{ position: "absolute", opacity }, style]}>
       <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -162,11 +168,16 @@ export function Hero({ lines = [], children, tall, minHeight }) {
    * back is worse than no arrow at all. */
   const canBack = nav?.getState?.()?.type === "stack" && nav.canGoBack();
   return (
-    <LinearGradient colors={[C.brand900, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-      style={{ paddingTop: insets.top + (tall ? 30 : 18), paddingBottom: tall ? 32 : 24,
+    /* The website's own hero: linear-gradient(180deg, brand-800, brand-900).
+       Straight down, and DARKER as it descends. This ran brand-900 to
+       brand-700 on the diagonal, so it got brighter and pinker towards the
+       bottom right — the single reason every screen read as a lighter, more
+       magenta app than the one it is copying. Padding is the site's 26/22/30. */
+    <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={{ paddingTop: insets.top + (tall ? 32 : 26), paddingBottom: tall ? 38 : 30,
                paddingHorizontal: 22, overflow: "hidden",
                minHeight, justifyContent: minHeight ? "center" : "flex-start" }}>
-      <Girih style={{ right: -70, top: -62 }} size={215} />
+      <Girih style={{ right: -46, top: -40 }} size={190} />
       {canBack && (
         <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"
           hitSlop={10}

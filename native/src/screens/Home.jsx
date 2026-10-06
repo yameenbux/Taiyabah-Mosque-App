@@ -137,9 +137,13 @@ export default function Home({ navigation }) {
   return (
     <Screen pad={false}>
       {/* ---- hero ------------------------------------------------------- */}
-      <LinearGradient colors={[C.brand900, C.brand800, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      {/* The website stacks two gradients here: .topbar runs brand-900 to
+          brand-800, then .hero runs brand-800 back down to brand-900. Straight
+          down, both of them. This was one diagonal ending on brand-700, so the
+          home screen finished brighter and pinker than the site's. */}
+      <LinearGradient colors={[C.brand900, C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingBottom: 22, overflow: "hidden", alignItems: rtl ? "flex-end" : "flex-start" }}>
-        <Girih style={{ right: -70, top: -22 }} size={215} />
+        <Girih style={{ right: -46, top: -40 }} size={190} />
         <View style={{ alignSelf: "stretch" }}>
           <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
         </View>
@@ -252,7 +256,11 @@ export default function Home({ navigation }) {
               return (
                 <View key={k} style={{ flex: 1, alignItems: "center", paddingVertical: 13,
                                        borderLeftWidth: i ? 1 : 0, borderLeftColor: C.line,
-                                       backgroundColor: isNext ? "rgba(198,162,76,.10)" : "transparent" }}>
+                                       /* .pcol[data-next="1"] on the website is plum at 7%,
+                                          not gold at 10%. Gold reads as a warm cream panel
+                                          and makes the strip look like it is marking
+                                          something else entirely. */
+                                       backgroundColor: isNext ? "rgba(119,33,87,.07)" : "transparent" }}>
                   <Ionicons name={k === "isha" ? "moon-outline" : "sunny-outline"} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
                     {t(`prayer.${k}`, NAMES[k].en)}</Text>
@@ -319,7 +327,10 @@ export default function Home({ navigation }) {
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.listen", "Listen")} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
           style={{ borderRadius: R.card, overflow: "hidden" }}>
-          <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
+              and ending on the BRIGHTER plum. This had it backwards and on the
+              wrong two colours. */}
+          <LinearGradient colors={[C.brand800, C.brand600]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.2 }}
             style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                      paddingHorizontal: 15, paddingVertical: 15, overflow: "hidden" }}>
             <View style={{ width: 40, height: 40, borderRadius: 14, alignItems: "center", justifyContent: "center",
