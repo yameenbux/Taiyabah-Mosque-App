@@ -13,19 +13,27 @@ import { useApp, LANGS } from "../store";
 import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P, Note, RowGroup, NavRow, Pill, Press, tap, open } from "../ui";
 
+/* TS_STEPS, exactly as the website has them: the same four multipliers and
+ * the same four names. The app had renamed the middle two "Default" and
+ * "Larger", and used 1.28 and 1.45 where the site uses 1.26 and 1.42 — so a
+ * reader who had chosen a size on the website got a different size here, and
+ * the one they had chosen was not on the list. */
 const SIZES = [
-  { v: 1.0,  k: "sysprefs.small",   t: "Small" },
-  { v: 1.12, k: "sysprefs.default", t: "Default" },
-  { v: 1.28, k: "sysprefs.large",   t: "Large" },
-  { v: 1.45, k: "sysprefs.larger",  t: "Larger" },
+  { v: 1.00, k: "sysprefs.small",       t: "Small" },
+  { v: 1.12, k: "sysprefs.medium",      t: "Medium" },
+  { v: 1.26, k: "sysprefs.large",       t: "Large" },
+  { v: 1.42, k: "sysprefs.extra_large", t: "Extra large" },
 ];
 
 export default function Prefs({ navigation }) {
   const { t, fs, lang, setLang, scale, setScale } = useApp();
   return (
     <Screen pad={false}>
+      {/* .ia-hero's title is "Display & Language". The app used the sheet
+          header's own title instead, so the bar said System Preferences and
+          the hero said it again directly underneath. */}
       <Hero ring={SHEETS.sysprefs?.ring}
-            lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
+            lines={[{ k: "sysprefs.display_language", t: "Display & Language", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
         <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
@@ -60,8 +68,9 @@ export default function Prefs({ navigation }) {
             {t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</Text>
         </View>
 
-        <Heading tag={t("sysprefs.display_language", "Display & language")}>
-          {t("sysprefs.language", "Language")}</Heading>
+        {/* No tag on the website: "Display & Language" is the hero's title,
+            not a note at the end of this rule. */}
+        <Heading>{t("sysprefs.language", "Language")}</Heading>
         <P muted>{t("sysprefs.choose_the_language_the_app",
           "Choose the language the app runs in. Packs download once and then work offline.")}</P>
         <Card gap={0} pad={0}>

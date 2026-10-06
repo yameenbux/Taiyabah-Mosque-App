@@ -232,7 +232,7 @@ export function Giving() {
             single card under it. Here each was its own gold-ruled heading, so
             one decision — how much, to what, how often — read as three parts
             of the page. */}
-        <Heading tag={t("giving.apple_google_pay", "Apple & Google Pay")}>
+        <Heading tag={t("sheet.apple_google_pay", "Apple & Google Pay")}>
           {t("giving.give_online", "Give online")}</Heading>
         <Card pad={14}>
           <GLab>{t("giving.what_it_is_for", "What it is for")}</GLab>
