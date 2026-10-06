@@ -17,3 +17,12 @@ ios/
 !package-lock.json
 .darkshots/
 ios-shots/
+
+# Comparison renders. compare-all.mjs writes one directory per run — the
+# default is .compare, and CMP_DIR puts it anywhere. 104MB of them were once
+# committed by accident, which is 104MB in every clone for ever. They are
+# evidence for a review, not source.
+.compare/
+cmp*/
+final/
+ios-shots/
