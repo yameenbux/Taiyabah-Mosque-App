@@ -4,12 +4,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { readView } from "../supabase";
+import { readList } from "../supabase";
 
-/* Notices come from `notices_live`, a view that exposes the notice text and
+/* Notices come from `notices_live`, a function that exposes the notice text and
  * nothing else — no author, no draft, no internal state. The table behind it
  * is deny-all. That is deliberate and it is why reading it with a public key
- * is safe. */
+ * is safe.
+ *
+ * It was a view until the app had to say which masjid it is for. A view takes
+ * no argument; the function does, and returns the same rows newest first. */
 export default function Notices() {
   const { t, fs } = useApp();
   const top = useSafeAreaInsets().top;
@@ -19,7 +22,7 @@ export default function Notices() {
 
   const load = useCallback(async () => {
     setBusy(true);
-    try { setRows(await readView("notices_live", { order: "created_at.desc", limit: "50" })); setErr(null); }
+    try { setRows(await readList("notices_live")); setErr(null); }
     catch (e) { setErr(e.message); }
     finally { setBusy(false); }
   }, []);

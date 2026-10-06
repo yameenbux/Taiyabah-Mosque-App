@@ -11,7 +11,7 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, RowGroup, NavRow, open } from "../ui";
 import { Field, Choice, Calendar, ErrorBox, Submit, Sent, isPhone } from "../form";
-import { rpc, readView } from "../supabase";
+import { rpc, readList } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
 
 const DEPOSIT_LINK = "https://book.stripe.com/3cIdR9cHOfyo5Jk7xcf3a06";
@@ -31,7 +31,9 @@ export default function HallHire({ navigation }) {
   const last  = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + HORIZON_DAYS); return d; }, []);
   useEffect(() => { setMonth(new Date(first.getFullYear(), first.getMonth(), 1)); }, [first]);
 
-  const loadTaken = () => readView("hall_availability", { select: "booking_date" })
+  /* The function, not the view: same booking_date rows, but it can be told
+     which masjid. */
+  const loadTaken = () => readList("hall_availability")
     .then(rows => setTaken(rows.map(r => r.booking_date)))
     .catch(() => {});          // a list we cannot read is not a reason to block the form
   useEffect(() => { loadTaken(); }, []);
