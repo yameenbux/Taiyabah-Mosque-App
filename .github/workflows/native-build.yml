@@ -8,17 +8,17 @@ name: Native app (Android)
 # forever. That is exactly what the first build did on a real phone.
 # `assembleRelease` bundles the JavaScript into the APK, so it runs on its own.
 #
-# It is still not for Play. Expo's generated project signs release with the
-# DEBUG keystore (see android/app/build.gradle), which makes an APK that
-# installs by hand but that Play would reject — which is the right shape while
-# the listing still belongs to the web app. When the native app is ready, this
-# grows a real signing step using the same two secrets the web app's build
-# already uses. Until then it cannot touch the listing even by accident.
+# IT IS NOT FOR PLAY, and cannot become so by accident. Two things see to
+# that. It signs with the DEBUG keystore, which Play refuses; and it builds the
+# .dev variant (TAIYABAH_VARIANT below, see native/app.config.js), so the
+# package id is com.taiyabahmasjid.app.dev rather than the one the listing owns.
+# The release that goes to Play is a separate workflow: native-release.yml.
 #
-# WHAT COMES OUT. app-debug.apk, attached to the run. Download it, allow
-# installs from the browser, open it. It sits alongside the Play version
-# rather than replacing it — different signing key, so Android treats them as
-# two apps, which is exactly what you want while comparing them.
+# WHAT COMES OUT. app-release.apk, attached to the run. Download it, allow
+# installs from the browser, open it. It sits alongside the real app rather
+# than replacing it — different package id AND a different signing key, so
+# Android treats them as two apps, which is what you want while comparing
+# them. The name on the home screen says "(test)".
 
 on:
   workflow_dispatch:
@@ -29,6 +29,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Everything this job builds is the sideload variant. app.config.js reads
+    # this and appends .dev to the package id.
+    env:
+      TAIYABAH_VARIANT: dev
     steps:
       - uses: actions/checkout@v4
 
@@ -42,12 +46,63 @@ jobs:
         working-directory: native
         run: npm ci
 
+      # Eight minutes of Gradle is a long time to find out a screen has a typo
+      # in it. Every source file goes through the project's own Babel config
+      # first, which costs seconds and fails loudly.
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+
+      # Not fatal — a key with no pack entry reads in English rather than
+      # breaking — but it should be visible in the log rather than found on
+      # somebody's phone after they have switched to Urdu.
+      - name: Check every component exists
+        working-directory: native
+        run: node scripts/check-refs.mjs
+
+      - name: Check every screen says what the website says
+        working-directory: native
+        run: node scripts/check-screens.mjs --strict
+
+      - name: Check every link points where the website points
+        working-directory: native
+        run: node scripts/check-links.mjs
+
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
+      - name: Which strings are still English only
+        working-directory: native
+        run: node scripts/check-i18n.mjs | head -40
+
+
+      # check-parity.mjs is deliberately NOT here: it drives a browser, and the
+      # APK build is not the place to acquire one. It runs before a hand-over —
+      # see native/README.md.
+
       # Expo generates the android/ project from app.json. It is not committed:
       # it is build output, and a stale copy in the repo is a whole class of
       # "works on my machine" that nobody needs.
       - name: Generate the Android project
         working-directory: native
         run: npx expo prebuild --platform android --no-install
+
+      # react-native-onesignal 5.4.3 declares its event listeners as codegen
+      # EventEmitter properties, and those exist ONLY under the New
+      # Architecture. Build it with the old one and the module loads, the
+      # listener setup calls a property that is not there, and the app dies on
+      # launch with "undefined is not a function" — a blank screen, no clue.
+      # app.json asks for it; this proves prebuild actually wrote it.
+      - name: Check the New Architecture is really on
+        working-directory: native/android
+        run: |
+          grep -n "newArchEnabled" gradle.properties || true
+          if ! grep -q "^newArchEnabled=true" gradle.properties; then
+            echo "::error::newArchEnabled is not true in android/gradle.properties."
+            echo "::error::OneSignal needs it; without it the app crashes on launch."
+            exit 1
+          fi
 
       - uses: actions/setup-java@v4
         with:

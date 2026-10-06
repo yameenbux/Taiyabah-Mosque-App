@@ -1,0 +1,179 @@
+name: Native app — does it actually run?
+
+# Builds the APK, boots a real Android emulator, installs it, and drives it:
+# taps every home tile and every menu row, checks after each one that a new
+# screen drew and that nothing landed in the crash log, and photographs the lot.
+#
+# This exists because "it compiled" and "it opens on a phone" are different
+# claims, and the first has been mistaken for the second here before: a debug
+# APK built cleanly, installed cleanly, and then sat on the splash screen for
+# ever because it had no JavaScript in it.
+
+on:
+  workflow_dispatch:
+  push:
+    # Also on the development branch: workflow_dispatch only works for files
+    # that have reached the default branch, and this run is most useful before
+    # that — it is what says whether the APK is worth handing over.
+    branches: [main, "claude/**"]
+    paths: ["native/**", ".github/workflows/native-smoke.yml"]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # The sideload variant, as the APK build uses — see native/app.config.js.
+    # Nothing here should ever be able to produce the real package id.
+    env:
+      TAIYABAH_VARIANT: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+      - name: Check every component exists
+        working-directory: native
+        run: node scripts/check-refs.mjs
+
+      - name: Check every screen says what the website says
+        working-directory: native
+        run: node scripts/check-screens.mjs --strict
+
+      - name: Check every link points where the website points
+        working-directory: native
+        run: node scripts/check-links.mjs
+
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
+
+      - name: Generate the Android project
+        working-directory: native
+        run: npx expo prebuild --platform android --no-install
+
+      # react-native-onesignal 5.4.3 declares its event listeners as codegen
+      # EventEmitter properties, and those exist ONLY under the New
+      # Architecture. Build it with the old one and the module loads, the
+      # listener setup calls a property that is not there, and the app dies on
+      # launch with "undefined is not a function" — a blank screen, no clue.
+      # app.json asks for it; this proves prebuild actually wrote it.
+      - name: Check the New Architecture is really on
+        working-directory: native/android
+        run: |
+          grep -n "newArchEnabled" gradle.properties || true
+          if ! grep -q "^newArchEnabled=true" gradle.properties; then
+            echo "::error::newArchEnabled is not true in android/gradle.properties."
+            echo "::error::OneSignal needs it; without it the app crashes on launch."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Two architectures, not four: arm64 for real phones and x86_64 for the
+      # emulator this job runs on. It roughly halves the native compile, which
+      # is the slow half of this workflow. The APK handed over for testing comes
+      # from the other workflow and still carries every architecture.
+      - name: Build the APK
+        working-directory: native/android
+        run: |
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon --stacktrace \
+            -PreactNativeArchitectures=arm64-v8a,x86_64 2>&1 | tee /tmp/gradle.log
+
+      - name: What Gradle actually said
+        if: failure()
+        run: |
+          grep -iE "what went wrong" -A6 /tmp/gradle.log | head -30 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
+
+      # The emulator needs hardware acceleration, and the runner's KVM device
+      # is root-only until this rule opens it up.
+      # So the artifact exists even if the run dies before its first screenshot.
+      - name: Somewhere to put the evidence
+        run: mkdir -p smoke-out
+
+      - name: Let the runner use KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # The icon check counts colours in a slice of a screenshot. Without this it
+      # found no tool, skipped itself, and the run passed — on a build where not
+      # one icon drew. A check that cannot run must not report success, so the
+      # script now fails when the tool is absent, and the tool is installed here.
+      - name: Something to look at pixels with
+        run: sudo apt-get install -y --no-install-recommends imagemagick
+
+      - name: Boot a phone and use the app
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          # 35, not 34, because that is what the app targets and Android 15
+          # changes what a targeting app gets: it is drawn edge to edge, under
+          # the status and navigation bars, whether it asked to be or not. On
+          # an API 34 emulator that change is invisible, so a layout that hides
+          # its own header behind the clock would pass here and fail on a real
+          # phone. The thing to test is the thing people will run.
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 4096M
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb wait-for-device
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+            node native/scripts/smoke.mjs native/android/app/build/outputs/apk/release/app-release.apk
+
+      # The screenshots are the point even when it passes: they are the first
+      # look at the app on a real Android screen rather than a web export.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-screens-${{ github.run_number }}
+          path: smoke-out/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+
+      # The APK that was actually driven, uploaded whatever the result.
+      #
+      # It used to be left out on the grounds that the "Native app (Android)"
+      # workflow builds a universal one and this is only arm64 + x86_64. That
+      # reasoning held right up until the evening GitHub's runner pool started
+      # refusing to pick jobs up: the run that proved the app works finished,
+      # and the separate run that produces something installable was cancelled
+      # three times without executing a step. Two runs, two chances to lose.
+      #
+      # It is also the stronger artifact. This is the exact binary that opened,
+      # drew its home screen and survived every tap — not a second build of the
+      # same commit that nothing has run. arm64-v8a covers every phone sold in
+      # roughly the last decade, so for testing by hand the difference is
+      # theoretical. The universal build is still what the other workflow makes,
+      # and Play gets an .aab that carries every architecture regardless.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: taiyabah-tested-apk-${{ github.run_number }}
+          path: native/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: warn
+          retention-days: 30

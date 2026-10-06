@@ -31,3 +31,9 @@ android.keystore
 *.keystore.b64
 *.aab
 *.apk
+
+# Screenshots from scripts/shots.mjs — a working artefact, not a deliverable.
+.shots/
+
+# Output of the emulator smoke run.
+smoke-out/

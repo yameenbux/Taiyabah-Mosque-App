@@ -18,6 +18,25 @@ export const C = {
   onAir:    "#3FBE73",
 };
 
+/* The website's --shadow, which thirty-one of its rules use:
+ *
+ *   0 1px 2px rgba(60,11,42,.06), 0 12px 30px -18px rgba(60,11,42,.35)
+ *
+ * A soft plum lift, not a grey drop. The app had NO shadow anywhere — not one
+ * shadow or elevation in any component — so every card, tile and panel sat
+ * flat on the paper while the website's float a little above it. That is not
+ * one screen looking different; it is all of them.
+ *
+ * React Native has no spread, so the second layer is approximated: the -18px
+ * spread pulls a 30px blur back to roughly a 10px one, offset 6 down. */
+export const SHADOW = {
+  shadowColor: "#3C0B2A",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.16,
+  shadowRadius: 10,
+  elevation: 3,
+};
+
 export const R = { card: 18, pill: 999, tile: 16 };
 
 /* The web app multiplies every size by --ts, defaulted to 1.12 because the
@@ -28,6 +47,7 @@ export const fs = n => Math.round(n * TS);
 export const F = {
   sans:        "HankenGrotesk",
   sansMedium:  "HankenGroteskMedium",
+  sansBold:    "HankenGroteskBold",
   display:     "Fraunces",          // the serif used for prayer names
   arabic:      "Amiri",             // scripture is set in Amiri, never a fallback
 };

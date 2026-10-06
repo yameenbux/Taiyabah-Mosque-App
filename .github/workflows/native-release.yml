@@ -1,0 +1,280 @@
+name: Native app bundle (Play)
+
+# Builds the React Native app in native/ into a SIGNED .aab for the Play
+# Console. This is the one that can change what the congregation has on their
+# phones, and the only workflow here that can.
+#
+# WHAT MAKES IT DIFFERENT FROM native-build.yml
+#
+#   native-build.yml  APK   com.taiyabahmasjid.app.dev   debug key   sideload
+#   this one          AAB   com.taiyabahmasjid.app       upload key  Play
+#
+# The .dev suffix on the test builds is what lets a test install sit next to
+# the real app instead of replacing it; see native/app.config.js. This build
+# deliberately has no suffix, because com.taiyabahmasjid.app is the package the
+# Play listing already belongs to — the one the old Trusted Web Activity used.
+# Uploading this REPLACES the web app for everybody who has it. There is no
+# way back from that, which is why it only ever runs when somebody asks it to.
+#
+# THE SIGNING KEY IS NOT IN THIS REPOSITORY and must never be. It is the same
+# upload key the TWA used, in the same two secrets:
+#
+#   ANDROID_KEYSTORE_BASE64   base64 of android.keystore
+#   ANDROID_KEYSTORE_PASSWORD the password protecting it
+#
+# It is not recoverable and not replaceable: Play will only accept an upload
+# signed by it, for ever. Do NOT generate a new one.
+#
+# IT HAS TO REACH main BEFORE ACTIONS WILL OFFER IT. GitHub only lists a
+# workflow_dispatch workflow once the file exists on the default branch, so
+# "Run workflow" will not appear for this until the branch is merged. That is
+# the right trade: the one build that can change what is on people's phones
+# should not be runnable from an unmerged branch.
+#
+# See store/ANDROID-RELEASE.md for the path through the Play Console.
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Version people see, e.g. 2.0.0'
+        required: true
+        default: '2.0.0'
+      versionCode:
+        description: 'Play version code — a whole number, HIGHER than the last upload (the TWA ended at 1)'
+        required: true
+        default: '2'
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      # EVERY OTHER CHECK HERE IS ABOUT PACKAGING. They read the manifest, the
+      # applicationId, the signature, the version code — and not one of them
+      # opens the app. On 5 October a bundle would have passed all of them
+      # while the app died before its first frame, because react-native-onesignal
+      # needed the New Architecture and nothing said so.
+      #
+      # The smoke run is the only thing in this repository that installs the
+      # app and taps through it. So a bundle cannot be cut from a commit it has
+      # not passed on. Not "a recent commit" — this one, by SHA, because the
+      # whole failure mode is a change that looks harmless.
+      #
+      # No run for this commit? Actions -> "Native app — does it actually run?"
+      # -> Run workflow, on this same ref, and come back when it is green.
+      - name: Has this exact commit been opened on a phone?
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          sha=${{ github.sha }}
+          n=$(gh api "repos/${{ github.repository }}/actions/workflows/native-smoke.yml/runs?head_sha=$sha&status=success" \
+                --jq '.total_count')
+          echo "successful smoke runs for $sha: $n"
+          if [ "${n:-0}" -lt 1 ]; then
+            echo "::error::No successful smoke run for $sha, so nothing has opened this build."
+            echo "::error::Run 'Native app — does it actually run?' on this ref first."
+            echo "::error::A bundle that packages correctly and crashes on launch passes"
+            echo "::error::every other check in this workflow."
+            exit 1
+          fi
+
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      # The same four checks the APK build runs. A release is the last moment
+      # anybody would want to discover a screen does not parse.
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+      - name: Check every component exists
+        working-directory: native
+        run: node scripts/check-refs.mjs
+      - name: Check every screen says what the website says
+        working-directory: native
+        run: node scripts/check-screens.mjs --strict
+      - name: Check every link points where the website points
+        working-directory: native
+        run: node scripts/check-links.mjs
+
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
+      # Play refuses a version code it has seen before, and the error arrives
+      # after the upload rather than before the build. Catch the obvious case
+      # here: the TWA's last production release was code 1.
+      - name: Set the version for this build
+        working-directory: native
+        env:
+          VNAME: ${{ inputs.versionName }}
+          VCODE: ${{ inputs.versionCode }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const c = JSON.parse(fs.readFileSync("app.json", "utf8"));
+            const code = Number(process.env.VCODE);
+            if (!Number.isInteger(code) || code < 2) {
+              console.error("::error::versionCode must be a whole number above 1 — the TWA shipped code 1.");
+              process.exit(1);
+            }
+            c.expo.version = process.env.VNAME;
+            c.expo.android.versionCode = code;
+            fs.writeFileSync("app.json", JSON.stringify(c, null, 2) + "\n");
+            console.log("building", c.expo.version, "code", code);
+          '
+
+      # No TAIYABAH_VARIANT here, on purpose: this is the real package.
+      - name: Generate the Android project
+        working-directory: native
+        run: npx expo prebuild --platform android --no-install
+
+      # Two things Play would reject, both cheap to check and both expensive to
+      # find out about after an upload:
+      #   - the wrong applicationId would create a SECOND listing rather than
+      #     updating this one, and there is no undoing a published package name
+      #   - since August 2025 an update must target API 35
+      - name: Check what we are about to build
+        working-directory: native/android
+        run: |
+          set -e
+          grep -nE "applicationId|targetSdkVersion|versionCode|versionName" app/build.gradle || true
+          id=$(grep -oE "applicationId ['\"][^'\"]+" app/build.gradle | head -1 | sed "s/.*['\"]//")
+          echo "applicationId: $id"
+          if [ "$id" != "com.taiyabahmasjid.app" ]; then
+            echo "::error::applicationId is '$id', expected com.taiyabahmasjid.app."
+            echo "::error::Uploading this would make a new listing, not update the existing one."
+            exit 1
+          fi
+          # react-native-onesignal 5.4.3 declares its event listeners as
+          # codegen EventEmitter properties, which exist only under the New
+          # Architecture. Without it the app dies on launch with "undefined is
+          # not a function" and shows a blank screen.
+          grep -n "newArchEnabled" gradle.properties || true
+          if ! grep -q "^newArchEnabled=true" gradle.properties; then
+            echo "::error::newArchEnabled is not true — the app would crash on launch."
+            exit 1
+          fi
+          target=$(grep -oE "targetSdkVersion ?= ?[0-9]+" gradle.properties build.gradle app/build.gradle 2>/dev/null \
+                   | grep -oE "[0-9]+$" | sort -n | tail -1)
+          echo "targetSdkVersion: ${target:-unknown}"
+          if [ -z "$target" ] || [ "$target" -lt 35 ]; then
+            echo "::error::targetSdkVersion is '${target:-unknown}', and Play requires 35 or above."
+            echo "::error::Set it in native/app.json under the expo-build-properties plugin."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Restore the signing key
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is not set. See the header of this workflow."
+            exit 1
+          fi
+          echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/android.keystore"
+          echo "keystore restored, $(stat -c%s "$RUNNER_TEMP/android.keystore") bytes"
+
+      # Expo's template signs release with the debug key. This swaps it for
+      # ours, reading the values from the environment so nothing is written to
+      # a file. It fails if the template is not the shape it expects.
+      - name: Sign release builds with the upload key
+        working-directory: native
+        run: node scripts/sign-release.mjs
+
+      - name: Build the app bundle
+        working-directory: native/android
+        env:
+          TAIYABAH_KEYSTORE: ${{ runner.temp }}/android.keystore
+          TAIYABAH_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          TAIYABAH_KEY_ALIAS: taiyabah
+          TAIYABAH_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -o pipefail
+          ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+
+      - name: What Gradle actually said
+        if: failure()
+        run: |
+          echo '## Gradle failed' >> "$GITHUB_STEP_SUMMARY"
+          sed -n '/FAILURE: Build failed/,$p' /tmp/gradle.log | head -40 >> "$GITHUB_STEP_SUMMARY" || true
+          grep -iE "what went wrong" -A6 /tmp/gradle.log | head -30 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
+          grep -iE "^e: |error: |Caused by:|Could not |keystore|OutOfMemory" /tmp/gradle.log | head -12 \
+            | while IFS= read -r line; do echo "::error::${line}"; done || true
+
+      # The failure this guards against is the quiet one. A debug-signed bundle
+      # builds perfectly, looks finished, and is rejected on upload — or worse,
+      # a future change silently stops applying the patch and nobody notices
+      # until the key no longer matches the listing. So: read the certificate
+      # back OUT of the finished file and prove it is the keystore's own.
+      - name: Prove it is signed with the upload key
+        env:
+          PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -e
+          aab=native/android/app/build/outputs/bundle/release/app-release.aab
+          ls -l "$aab"
+
+          fp () { grep -oE "SHA256: [0-9A-F:]+" | head -1 | sed 's/SHA256: //'; }
+          want=$(keytool -list -v -keystore "$RUNNER_TEMP/android.keystore" \
+                   -alias taiyabah -storepass "$PW" | fp)
+          got=$(keytool -printcert -jarfile "$aab" | fp)
+
+          echo "upload key in the keystore: $want"
+          echo "certificate on the bundle:  $got"
+
+          if [ -z "$got" ]; then
+            echo "::error::The bundle carries no signature at all."
+            exit 1
+          fi
+          if [ "$got" != "$want" ]; then
+            echo "::error::The bundle is NOT signed with the upload key. Play will reject it."
+            echo "::error::scripts/sign-release.mjs did not take effect."
+            exit 1
+          fi
+          # store/ANDROID-RELEASE.md records the upload key as F5:7F:73:…:6E.
+          # Fingerprints are public; this only confirms the secret still holds
+          # the key the listing was set up with, and not some other keystore.
+          case "$want" in
+            F5:7F:73:*:6E) echo "matches the upload key recorded in store/ANDROID-RELEASE.md" ;;
+            *) echo "::error::This keystore is not the one the listing uses (expected F5:7F:73:…:6E)."
+               echo "::error::Play only ever accepts the original upload key. Do not continue."
+               exit 1 ;;
+          esac
+
+      - name: What to do with it
+        run: |
+          {
+            echo '## Ready to upload'
+            echo ''
+            echo "Version **${{ inputs.versionName }}**, code **${{ inputs.versionCode }}**, package \`com.taiyabahmasjid.app\`."
+            echo ''
+            echo 'Download `taiyabah-play-${{ github.run_number }}` below, then Play Console →'
+            echo '**Test and release → Internal testing → Create new release** → upload the `.aab`.'
+            echo ''
+            echo 'This REPLACES the web app for everyone. Internal testing first, then a staged'
+            echo 'rollout. Update the Data safety form before promoting — see store/ANDROID-RELEASE.md.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taiyabah-play-${{ github.run_number }}
+          path: native/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 90

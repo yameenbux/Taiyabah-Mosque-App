@@ -1,0 +1,3576 @@
+{
+ "about": {
+  "title": {
+   "k": "about.about_us",
+   "t": "About us"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "about.established_at_the_end_of",
+      "t": "Established at the end of 1967",
+      "w": "eyebrow"
+     },
+     {
+      "k": "about.one_of_the_first_masjids",
+      "t": "One of the first masjids in Bolton.",
+      "w": "title"
+     },
+     {
+      "k": "about.the_name_taiyabah_from_the",
+      "t": "The name *Taiyabah* — from the Arabic _Tayyab_, meaning purity — was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb, author of _Fazaail-e-Amaal_.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "about.history",
+    "t": "History",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "about.the_masjid_was_originally_located",
+      "t": "The masjid was originally located in Canning Street, where Moulana Faruq Desai was appointed as its first Imam."
+     },
+     {
+      "type": "p",
+      "k": "about.in_february_1988_to_accommodate",
+      "t": "In February 1988, to accommodate the growing community, the present building on Blackburn Road was purchased — formerly a Congregational Sunday School. The first Imam in the new masjid was Qari Yakub Nanjee Saheb, followed by Qari Farook Saheb."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "about.watch_the_masjid_s_story",
+     "t": "Watch the masjid’s story"
+    },
+    "sub": {
+     "k": "about.history_new_build_journey",
+     "t": "History & new build journey"
+    },
+    "href": "https://www.youtube.com/watch?v=N7wFXynmLHM",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "heading",
+    "k": "about.founders",
+    "t": "Founders",
+    "tag": {
+     "k": "about.amongst_others",
+     "t": "Amongst others"
+    }
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "list",
+      "items": [
+       {
+        "k": "about.late_haji_ahmed_hakim",
+        "t": "Late Haji Ahmed Hakim",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.late_haji_ibrahim_jamal",
+        "t": "Late Haji Ibrahim Jamal",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.late_haji_ismail_lekroo",
+        "t": "Late Haji Ismail Lekroo",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.late_hafiz_adam_matadar",
+        "t": "Late Hafiz Adam Matadar",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.late_haji_bashir_chadat",
+        "t": "Late Haji Bashir Chadat",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.haji_ismail_kekha",
+        "t": "Haji Ismail Kekha",
+        "note": null,
+        "now": false
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "about.ulema",
+    "t": "Ulema",
+    "tag": {
+     "k": "about.imaamat_at_the_masjid",
+     "t": "Imaamat at the masjid"
+    }
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "list",
+      "items": [
+       {
+        "k": "about.moulana_ibrahim_kaba_saheb",
+        "t": "Moulana Ibrahim Kaba Saheb",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.moulana_hashim_saheb",
+        "t": "Moulana Hashim Saheb",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.qari_yakub_nanji_saheb",
+        "t": "Qari Yakub Nanji Saheb",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.qari_farooq_saheb",
+        "t": "Qari Farooq Saheb",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.moulana_mehboob_saheb",
+        "t": "Moulana Mehboob Saheb",
+        "note": {
+         "k": "about.chorley",
+         "t": "Chorley"
+        },
+        "now": false
+       },
+       {
+        "k": "about.moulana_imran_suba_saheb",
+        "t": "Moulana Imran Suba Saheb",
+        "note": null,
+        "now": false
+       },
+       {
+        "k": "about.mufti_faiyaz_saheb",
+        "t": "Mufti Faiyaz Saheb",
+        "note": {
+         "k": "about.present_imam",
+         "t": "Present Imam"
+        },
+        "now": true
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "about.the_future",
+    "t": "The future",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "about.plans_are_in_the_works",
+      "t": "Plans are in the works to give the community a safe and welcoming space for learning, socialising and conducting ceremonies — and an educational resource for young and old alike."
+     },
+     {
+      "type": "chips",
+      "items": [
+       {
+        "k": "about.large_prayer_hall",
+        "t": "Large prayer hall"
+       },
+       {
+        "k": "about.modern_ablution_areas",
+        "t": "Modern ablution areas"
+       },
+       {
+        "k": "about.integrated_kitchen",
+        "t": "Integrated kitchen"
+       },
+       {
+        "k": "about.additional_lecture_rooms",
+        "t": "Additional lecture rooms"
+       },
+       {
+        "k": "about.wi_fi_video_streaming",
+        "t": "Wi-Fi & video streaming"
+       },
+       {
+        "k": "about.educational_centre_library",
+        "t": "Educational centre & library"
+       }
+      ]
+     },
+     {
+      "type": "p",
+      "k": "about.the_masjid_also_intends_to",
+      "t": "The masjid also intends to invest further in Islamic education, supporting the community in matters including marriage and burial practices, and to establish an Islamic educational and cultural centre and library."
+     }
+    ]
+   },
+   {
+    "type": "cta",
+    "k": "about.support_the_new_build",
+    "t": "Support the new build",
+    "id": "ab-donate"
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569",
+     "31a Draycott Street, Bolton BL1 8HD"
+    ]
+   }
+  ]
+ },
+ "membership": {
+  "title": {
+   "k": "member.membership",
+   "t": "Membership"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "member.masjid_membership",
+      "t": "Masjid Membership",
+      "w": "title"
+     },
+     {
+      "k": "member.check_whether_this_years_fee",
+      "t": "Check whether this year’s fee is paid, and when the next one is due.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "member.membership_2",
+     "t": "Membership"
+    },
+    "h": {
+     "k": "member.checking_online_comes_soon",
+     "t": "Checking online comes soon"
+    },
+    "ps": [
+     {
+      "k": "member.you_will_be_able_to_sign_in",
+      "t": "You will be able to sign in here and see whether this year’s fee has been received and the date the next one falls due. Until that is connected, the office holds the record and can tell you in a moment."
+     },
+     {
+      "t": "*The office takes calls between 5pm and 7pm.*"
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "heading",
+    "k": "member.what_membership_covers",
+    "t": "What it will show",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "member.this_year",
+       "t": "This year"
+      },
+      "v": {
+       "k": "member.whether_the_fee_has_been",
+       "t": "Whether the fee has been received, and the date it was paid."
+      }
+     },
+     {
+      "k": {
+       "k": "member.next_due",
+       "t": "Next due"
+      },
+      "v": {
+       "k": "member.the_date_the_next_years",
+       "t": "The date the next year’s fee falls due, so it does not come as a surprise."
+      }
+     },
+     {
+      "k": {
+       "k": "member.how_to_pay",
+       "t": "How to pay"
+      },
+      "v": {
+       "k": "member.at_the_office_by_transfer",
+       "t": "At the office, by bank transfer, or by card — the details are on the Donate screen."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "member.masjid_office_5_7pm",
+     "t": "Masjid office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "contact": {
+  "title": {
+   "k": "contact.contact_us",
+   "t": "Contact us"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "contact.taiyabah_masjid",
+      "t": "Taiyabah Masjid",
+      "w": "sub"
+     },
+     {
+      "k": "contact.bolton_central_islamic_society",
+      "t": "Bolton Central Islamic Society",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "contact.address",
+       "t": "Address"
+      },
+      "v": {
+       "t": "31a Draycott Street\nBolton BL1 8HD"
+      },
+      "href": "https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD",
+      "icon": "location",
+      "id": null,
+      "static": false
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "contact.telephone",
+       "t": "Telephone"
+      },
+      "v": {
+       "t": "01204 535 997"
+      },
+      "href": "tel:01204535997",
+      "icon": "call",
+      "id": null,
+      "static": false
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "contact.email",
+       "t": "Email"
+      },
+      "v": {
+       "k": "contact.info_taiyabahmasjid_com",
+       "t": "info@taiyabahmasjid.com"
+      },
+      "href": "mailto:info@taiyabahmasjid.com",
+      "icon": "mail",
+      "id": null,
+      "static": false
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "contact.website",
+       "t": "Website"
+      },
+      "v": {
+       "k": "contact.taiyabahmasjid_com",
+       "t": "taiyabahmasjid.com"
+      },
+      "href": "https://www.taiyabahmasjid.com/",
+      "icon": "globe",
+      "id": null,
+      "static": false
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "contact.radio_frequency",
+       "t": "Radio frequency"
+      },
+      "v": {
+       "k": "contact.454_1000_mhz",
+       "t": "454.1000 MHz"
+      },
+      "href": null,
+      "icon": "radio",
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "note",
+    "k": "contact.please_do_not_call_the",
+    "t": "Please do not call the masjid during Salah times."
+   },
+   {
+    "type": "social",
+    "items": [
+     {
+      "href": "https://www.instagram.com/taiyabahmasjid/",
+      "label": "Instagram"
+     },
+     {
+      "href": "https://twitter.com/TaiyabahMasjid",
+      "label": "X"
+     },
+     {
+      "href": "https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw",
+      "label": "YouTube"
+     }
+    ]
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "marriagedeath": {
+  "title": {
+   "k": "marriagedeath.birth_marriage_death",
+   "t": "Birth, Marriage & Death"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "marriagedeath.life_stage_services",
+      "t": "Life-stage services",
+      "w": "title"
+     },
+     {
+      "k": "marriagedeath.guidance_and_support_from_the",
+      "t": "Guidance and support from the masjid across life’s most significant moments.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "marriagedeath.birth",
+     "t": "Birth"
+    },
+    "sub": {
+     "k": "marriagedeath.guidance_for_new_arrivals_including",
+     "t": "Guidance for new arrivals, including circumcision"
+    },
+    "href": null,
+    "id": "md-birth",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "marriagedeath.islamic_marriage_at_taiyabah",
+     "t": "Islamic Marriage at Taiyabah"
+    },
+    "sub": {
+     "k": "marriagedeath.nikah_based_on_authentic_islamic",
+     "t": "Nikāḥ, based on authentic Islamic tradition"
+    },
+    "href": null,
+    "id": "md-marriage",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "marriagedeath.importance_of_an_islamic_will",
+     "t": "Importance of an Islamic Will"
+    },
+    "sub": {
+     "k": "marriagedeath.wasiyyah_why_and_how_to",
+     "t": "Wasiyyah — why and how to prepare one"
+    },
+    "href": null,
+    "id": "md-will",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "marriagedeath.funeral_service",
+     "t": "Funeral Service"
+    },
+    "sub": {
+     "k": "marriagedeath.janazah_guidance_and_support",
+     "t": "Janāzah guidance and support"
+    },
+    "href": null,
+    "id": "md-funeral",
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "funeral": {
+  "title": {
+   "k": "funeral.funeral_services",
+   "t": "Funeral Services"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "الجَنَازَة",
+      "w": "arabic"
+     },
+     {
+      "k": "funeral.funeral_services_2",
+      "t": "Funeral Services",
+      "w": "title"
+     },
+     {
+      "k": "funeral.taiyabah_masjid_supports_families",
+      "t": "Taiyabah Masjid supports families through every part of an Islamic funeral, from the first phone call to the burial.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "urgent",
+    "lab": {
+     "k": "funeral.if_someone_has_just_passed",
+     "t": "If someone has just passed away"
+    },
+    "h": {
+     "k": "funeral.ring_bcom_first",
+     "t": "Ring BCoM first"
+    },
+    "ps": [
+     {
+      "k": "funeral.bolton_council_of_mosques_runs",
+      "t": "Bolton Council of Mosques runs the borough’s Muslim funeral service and will liaise with the council and the hospital on your behalf. They answer out of hours. Once they are involved, the masjid will arrange everything set out below."
+     }
+    ],
+    "nums": [
+     {
+      "who": {
+       "k": "funeral.bcom_office_hours",
+       "t": "BCoM · office hours"
+      },
+      "no": {
+       "t": "01204 363 680"
+      },
+      "href": "tel:01204363680"
+     },
+     {
+      "who": {
+       "k": "funeral.bcom_out_of_hours",
+       "t": "BCoM · out of hours"
+      },
+      "no": {
+       "t": "01204 392 919"
+      },
+      "href": "tel:01204392919"
+     },
+     {
+      "who": {
+       "k": "funeral.taiyabah_masjid_office",
+       "t": "Taiyabah Masjid office"
+      },
+      "no": {
+       "t": "01204 535 997"
+      },
+      "href": "tel:01204535997"
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "funeral.what_the_masjid_provides",
+    "t": "What the masjid provides",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "funeral.everything_here_is_arranged_by",
+      "t": "Everything here is arranged by the masjid. If you are unsure what is needed or in what order, ring the office and someone will talk you through it."
+     }
+    ]
+   },
+   {
+    "type": "sub",
+    "t": "Ghusl — washing"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_ritual_washing_of_the",
+    "t": "The ritual washing of the deceased, carried out at the masjid according to Islamic practice."
+   },
+   {
+    "type": "sub",
+    "t": "Kafn — shrouding"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_shroud_is_provided_and",
+    "t": "The shroud is provided and the deceased is prepared in the proper manner."
+   },
+   {
+    "type": "sub",
+    "t": "Janāzah prayer"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_funeral_prayer_is_held",
+    "t": "The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend."
+   },
+   {
+    "type": "sub",
+    "t": "Transportation"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_deceased_is_transported_between",
+    "t": "The deceased is transported between the hospital, the masjid and the cemetery."
+   },
+   {
+    "type": "sub",
+    "t": "Fridge service"
+   },
+   {
+    "type": "p",
+    "k": "funeral.refrigerated_preservation_at_the_masjid",
+    "t": "Refrigerated preservation at the masjid where there is a wait before the burial can take place."
+   },
+   {
+    "type": "sub",
+    "t": "Burial co-ordination"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_masjid_arranges_the_burial",
+    "t": "The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to."
+   },
+   {
+    "type": "sub",
+    "t": "Feeding & kitchenextra cost"
+   },
+   {
+    "type": "p",
+    "k": "funeral.catering_for_mourners_can_be",
+    "t": "Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided."
+   },
+   {
+    "type": "sub",
+    "t": "Bereavement support"
+   },
+   {
+    "type": "p",
+    "k": "funeral.the_imams_are_available_to",
+    "t": "The imams are available to the family afterwards, for guidance and for the questions that come later."
+   },
+   {
+    "type": "heading",
+    "k": "funeral.where_bcom_fits_in",
+    "t": "Where BCoM fits in",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "funeral.a_death_has_to_be",
+      "t": "A death has to be registered, and the hospital or coroner has to release the deceased, before a burial can go ahead. Bolton Council of Mosques handles that side — liaising with the council and the hospital — which is why they are the first call. The masjid then takes care of the ghusl, the kafn, the janāzah and the burial itself."
+     },
+     {
+      "type": "p",
+      "k": "funeral.you_do_not_need_to",
+      "t": "You do not need to work out who does what. Ring either number and you will be pointed the right way."
+     }
+    ]
+   },
+   {
+    "type": "advisory",
+    "h": {
+     "k": "funeral.before_you_make_arrangements",
+     "t": "Before you make arrangements"
+    },
+    "ps": [
+     {
+      "k": "funeral.please_check_with_the_office",
+      "t": "Please check with the office before making arrangements. What can be provided depends on the circumstances and on when the deceased is released. Nothing here should be taken as confirmed for a particular funeral until the masjid has spoken to you."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "funeral.wasiyyah_why_and_how",
+     "t": "Wasiyyah — why and how to prepare one"
+    },
+    "sub": {
+     "k": "funeral.importance_of_an_islamic_will",
+     "t": "Importance of an Islamic Will"
+    },
+    "href": null,
+    "id": "fs-to-will",
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "will": {
+  "title": {
+   "k": "will.islamic_will",
+   "t": "Islamic Will"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "الوَصِيَّة",
+      "w": "arabic"
+     },
+     {
+      "k": "will.the_importance_of_an_islamic",
+      "t": "The Importance of an Islamic Will",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "مَا حَقُّ امْرِئٍ مُسْلِمٍ لَهُ شَيْءٌ يُوصِي فِيهِ يَبِيتُ لَيْلَتَيْنِ إِلَّا وَوَصِيَّتُهُ مَكْتُوبَةٌ عِنْدَهُ"
+   },
+   {
+    "type": "p",
+    "k": "will.a_muslim_who_has_something",
+    "t": "“A Muslim who has something to leave behind should not let two nights pass without having his will written and kept ready.”"
+   },
+   {
+    "type": "p",
+    "k": "will.the_prophet_sahih_al_bukhari",
+    "t": "The Prophet ﷺ · Ṣaḥīḥ al-Bukhārī & Ṣaḥīḥ Muslim"
+   },
+   {
+    "type": "p",
+    "t": "كُتِبَ عَلَيْكُمْ إِذَا حَضَرَ أَحَدَكُمُ الْمَوْتُ إِنْ تَرَكَ خَيْرًا الْوَصِيَّةُ"
+   },
+   {
+    "type": "p",
+    "k": "will.when_death_approaches_one_of",
+    "t": "“When death approaches one of you, and you leave behind good, it is prescribed that you make a bequest — a duty upon those mindful of Allah.”"
+   },
+   {
+    "type": "p",
+    "k": "will.qur_an_surah_al_baqarah",
+    "t": "Qur’an · Sūrah al-Baqarah, 2:180"
+   },
+   {
+    "type": "heading",
+    "k": "will.why_it_matters",
+    "t": "Why it matters",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "will.when_a_muslim_passes_away",
+      "t": "When a Muslim passes away without having made their wishes clear, their estate is left to be settled according to the default rules of the country they lived in — which may not reflect Islamic guidance on how a person’s wealth should be distributed."
+     },
+     {
+      "type": "p",
+      "k": "will.an_islamic_will_sets_out",
+      "t": "An Islamic will sets out, in your own words, while you are able to:"
+     },
+     {
+      "type": "ticks",
+      "ordered": false,
+      "items": [
+       {
+        "k": "will.who_is_entitled_to_benefit",
+        "t": "Who is entitled to benefit from your estate, and in what shares"
+       },
+       {
+        "k": "will.how_your_property_and_other",
+        "t": "How your property and other assets should be dealt with"
+       },
+       {
+        "k": "will.who_you_trust_to_carry",
+        "t": "Who you trust to carry this out on your behalf — your executors"
+       },
+       {
+        "k": "will.any_funeral_wishes_you_would",
+        "t": "Any funeral wishes you would like to be followed"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "will.distributing_your_estate",
+    "t": "Distributing your estate",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "will.islamic_inheritance_follows_fixed_shares",
+      "t": "Islamic inheritance follows fixed shares (Farā’iḍ) set out in the Qur’an for specific family members. A will does not override these shares, but it lets you address anything the fixed shares do not cover — for example, up to a third of your estate may be left to people or causes outside your Islamic heirs, such as a charitable gift."
+     },
+     {
+      "type": "p",
+      "k": "will.because_these_calculations_depend_on",
+      "t": "Because these calculations depend on your own family circumstances, they are best worked through individually with the imam or a solicitor experienced in Islamic wills — rather than estimated in general terms here."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "will.a_gift_that_continues",
+    "t": "A gift that continues",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "will.some_choose_to_include_a",
+      "t": "Some choose to include a charitable bequest in their will as a final, lasting act of Ṣadaqah. If you would like to consider including a gift to Taiyabah Masjid, let the solicitor helping you write your will know, or ask the office about adding a codicil if you already have a will in place."
+     }
+    ]
+   },
+   {
+    "type": "advisory",
+    "h": {
+     "k": "will.general_information_not_advice",
+     "t": "General information, not advice"
+    },
+    "ps": [
+     {
+      "k": "will.this_page_is_a_starting",
+      "t": "This page is a starting point, not legal, financial or religious advice for your own circumstances. UK inheritance tax and probate rules are detailed and change over time — please speak to a qualified solicitor to write your will, and to the imam for guidance on the Islamic shares that apply to your family."
+     }
+    ]
+   },
+   {
+    "type": "link",
+    "t": "Speak to the imam · call the main office 01204 535 997 ›",
+    "href": "tel:01204535997"
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "birth": {
+  "title": {
+   "k": "birth.birth",
+   "t": "Birth"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "وِلَادَة",
+      "w": "arabic"
+     },
+     {
+      "k": "birth.guidance_for_new_arrivals",
+      "t": "Guidance for New Arrivals",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "birth.congratulations_on_the_arrival_of",
+      "t": "Congratulations on the arrival of your child. This section brings together guidance and services relevant to a newborn."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "birth.circumcision_khitan",
+    "t": "Circumcision (Khitān)",
+    "tag": null
+   },
+   {
+    "type": "warn",
+    "t": "Taiyabah Masjid does not provide this service directly."
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "birth.circumcision_can_be_arranged_through",
+      "t": "Circumcision can be arranged through the *Bolton Council of Mosques (BCoM)*, which runs a long-established weekly clinic performed by experienced NHS doctors."
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "birth.age_range",
+       "t": "Age range"
+      },
+      "v": {
+       "k": "birth.2_weeks_18_months",
+       "t": "2 weeks – 18 months"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "birth.2_weeks_6_months",
+       "t": "2 weeks – 6 months"
+      },
+      "v": {
+       "t": "£180"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "birth.6_12_months",
+       "t": "6 – 12 months"
+      },
+      "v": {
+       "t": "£250"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "birth.12_18_months",
+       "t": "12 – 18 months"
+      },
+      "v": {
+       "t": "£300"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "note",
+    "k": "birth.bcom_does_not_circumcise_babies",
+    "t": "BCoM does not circumcise babies over 18 months old."
+   },
+   {
+    "type": "link",
+    "t": "Call BCoM to book · option 4 01204 363 680 ›",
+    "href": "tel:01204363680"
+   },
+   {
+    "type": "note",
+    "t": "Office hours 9am–3pm · admin@thebcom.org · 1 Vicarage Street, Bolton BL3 5LE. A service of Bolton Council of Mosques, independent of Taiyabah Masjid."
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "education": {
+  "title": {
+   "k": "edu.education",
+   "t": "Education"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "edu.classes_for_adults",
+      "t": "Classes for adults",
+      "w": "title"
+     },
+     {
+      "k": "edu.classes_and_workshops_at_the",
+      "t": "Classes and workshops at the masjid for adults, alongside the children’s madrasah.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "edu.every_course_below_is_open",
+      "t": "Every course below is open to adults aged 16 and over, taught at the masjid, with men’s and women’s sessions run separately. Places are limited and registration is required — you cannot simply turn up."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.arabic_classes",
+     "t": "Arabic Classes"
+    },
+    "sub": {
+     "k": "edu.one_evening_a_week_7",
+     "t": "One evening a week · 7–8pm · 15 places"
+    },
+    "href": null,
+    "id": "ed-arabic",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.ghusl_workshop",
+     "t": "Ghusl Workshop"
+    },
+    "sub": {
+     "k": "edu.one_off_session_run_periodically",
+     "t": "One-off session · run periodically · 15 places"
+    },
+    "href": null,
+    "id": "ed-ghusl",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.more_courses",
+     "t": "More courses"
+    },
+    "sub": {
+     "k": "edu.tajweed_seerah_a_womens_circle",
+     "t": "Tajweed, Seerah, a women’s circle — tell the office what you’d like taught"
+    },
+    "href": null,
+    "id": null,
+    "soon": {
+     "k": "edu.coming_soon",
+     "t": "Coming soon"
+    }
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.masjid_office_5_7pm",
+     "t": "Masjid office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "eduarabic": {
+  "title": {
+   "k": "edu.arabic_classes",
+   "t": "Arabic Classes"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "العَرَبِيَّة",
+      "w": "arabic"
+     },
+     {
+      "k": "edu.evening_arabic_for_adults",
+      "t": "Evening Arabic for adults, taught at the masjid — from the alphabet upward.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "edu.time",
+       "t": "Time"
+      },
+      "v": {
+       "k": "edu.7_8pm",
+       "t": "7–8pm"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "edu.places",
+       "t": "Places"
+      },
+      "v": {
+       "t": "15"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "edu.registration",
+     "t": "Registration"
+    },
+    "h": {
+     "k": "edu.registration_opens_shortly",
+     "t": "Registration opens shortly"
+    },
+    "ps": [
+     {
+      "k": "edu.places_are_limited_to_fifteen",
+      "t": "Places are limited to fifteen per class and go in the order people sign up. Ring the office to put your name down in the meantime."
+     },
+     {
+      "t": "*The office takes calls between 5pm and 7pm.*"
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "edu.the_aim_is_to_get",
+      "t": "The aim is to get you reading and understanding the language of the Qur’an, not only reciting it. Classes start from the alphabet, so no previous study is assumed — and they run after the madrasah finishes, when the building is already open."
+     }
+    ]
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "edu.when",
+       "t": "When"
+      },
+      "v": {
+       "k": "edu.one_evening_a_week_7_00",
+       "t": "One evening a week, 7:00–8:00pm."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.who_for",
+       "t": "Who for"
+      },
+      "v": {
+       "k": "edu.adults_aged_16_and_over_mens",
+       "t": "Adults aged 16 and over. Men’s and women’s classes are taught separately."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.places_2",
+       "t": "Places"
+      },
+      "v": {
+       "k": "edu.fifteen_per_class_small_on",
+       "t": "Fifteen per class. Small on purpose — a language class stops working much beyond that."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.level",
+       "t": "Level"
+      },
+      "v": {
+       "k": "edu.complete_beginners_are_welcome",
+       "t": "Complete beginners are welcome. Say roughly where you are when you register and you will be placed accordingly."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.signing_up",
+       "t": "Signing up"
+      },
+      "v": {
+       "k": "edu.required_you_cannot_simply_turn",
+       "t": "Required — you cannot simply turn up. Places go in the order they are taken; after fifteen, the rest join a waiting list."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.masjid_office_5_7pm",
+     "t": "Masjid office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "edughusl": {
+  "title": {
+   "k": "edu.ghusl_workshop",
+   "t": "Ghusl Workshop"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "الغُسْل",
+      "w": "arabic"
+     },
+     {
+      "k": "edu.how_to_wash_and_prepare",
+      "t": "How to wash and prepare a body for burial — a duty that falls on the community, and one most people have never been shown.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "edu.format",
+       "t": "Format"
+      },
+      "v": {
+       "k": "edu.one_session",
+       "t": "One session"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "edu.places_3",
+       "t": "Places"
+      },
+      "v": {
+       "t": "15"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "edu.registration_2",
+     "t": "Registration"
+    },
+    "h": {
+     "k": "edu.registration_opens_shortly_2",
+     "t": "Registration opens shortly"
+    },
+    "ps": [
+     {
+      "k": "edu.sessions_are_announced_when_they",
+      "t": "Sessions are announced when they are scheduled. Ring the office to be told about the next one."
+     },
+     {
+      "t": "*The office takes calls between 5pm and 7pm.*"
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "edu.washing_the_body_of_someone",
+      "t": "Washing the body of someone who has died is a farḍ kifāyah — an obligation on the community as a whole rather than on any one person. As long as enough people can do it, the duty is discharged for everyone. Where nobody can, it falls on everyone."
+     },
+     {
+      "type": "p",
+      "k": "edu.in_practice_most_families_discover",
+      "t": "In practice most families discover, in the worst week of their lives, that they do not know how and do not know who to ask. This workshop exists so that fewer families are in that position — and so that when it happens on your street, someone nearby can step in."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "edu.what_the_workshop_covers",
+    "t": "What the workshop covers",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "ticks",
+      "ordered": false,
+      "items": [
+       {
+        "k": "edu.what_happens_in_the_hours",
+        "t": "What happens in the hours after a death, and who to ring first"
+       },
+       {
+        "k": "edu.what_is_needed_and_where",
+        "t": "What is needed, and where the masjid keeps it"
+       },
+       {
+        "k": "edu.the_washing_itself_taken_through",
+        "t": "The washing itself, taken through step by step"
+       },
+       {
+        "k": "edu.shrouding_the_kafan_and_how",
+        "t": "Shrouding — the kafan, and how it is prepared"
+       },
+       {
+        "k": "edu.the_adab_of_it_modesty",
+        "t": "The adab of it: modesty, gentleness, and holding your tongue afterwards"
+       },
+       {
+        "k": "edu.what_follows_janazah_prayer_and",
+        "t": "What follows — janāzah prayer, and the burial"
+       }
+      ]
+     },
+     {
+      "type": "p",
+      "k": "edu.it_is_taught_at_the",
+      "t": "It is taught at the masjid, which has its own mortuary, so what you are shown is what you would actually be doing in the room."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "edu.practical_details",
+    "t": "Practical details",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "edu.who_for_2",
+       "t": "Who for"
+      },
+      "v": {
+       "k": "edu.adults_aged_16_and_over_sessions",
+       "t": "Adults aged 16 and over. Men’s and women’s sessions are run separately, because men wash men and women wash women."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.when_2",
+       "t": "When"
+      },
+      "v": {
+       "k": "edu.a_one_off_session_run",
+       "t": "A one-off session, run periodically rather than to a fixed timetable. Register and the office will tell you when the next one is."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.places_4",
+       "t": "Places"
+      },
+      "v": {
+       "k": "edu.fifteen_per_session_after_that",
+       "t": "Fifteen per session. After that, names go on the list for the session after."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.experience",
+       "t": "Experience"
+      },
+      "v": {
+       "k": "edu.none_expected_most_people_who",
+       "t": "None expected. Most people who come have never done it. Those who have are welcome too — the masjid needs more of you."
+      }
+     },
+     {
+      "k": {
+       "k": "edu.cost",
+       "t": "Cost"
+      },
+      "v": {
+       "k": "edu.ring_the_office_to_confirm",
+       "t": "Ring the office to confirm."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "advisory",
+    "h": {
+     "k": "edu.if_you_need_help_now",
+     "t": "If you need help now"
+    },
+    "ps": [
+     {
+      "k": "edu.if_you_have_had_a",
+      "t": "If you have had a bereavement and need help now, this is not the screen you want — the masjid’s funeral service is available around the clock. Ring the office, or open Birth, Marriage & Death from the menu."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "edu.masjid_office_5_7pm",
+     "t": "Masjid office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "curriculum": {
+  "title": {
+   "k": "madrasah.what_is_taught",
+   "t": "What is taught"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "cur.our_curriculum",
+      "t": "Our Curriculum",
+      "w": "title"
+     },
+     {
+      "k": "cur.what_students_learn_at_the",
+      "t": "What students learn at the madrasah.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "القرآن وقراءة العربية"
+   },
+   {
+    "type": "sub",
+    "k": "cur.quran_reading_arabic",
+    "t": "Qur’an & Reading Arabic"
+   },
+   {
+    "type": "ticks",
+    "ordered": false,
+    "items": [
+     {
+      "k": "cur.safar_qaidah",
+      "t": "Safar Qaidah"
+     },
+     {
+      "k": "cur.safar_tajweed_rules",
+      "t": "Safar Tajweed Rules"
+     },
+     {
+      "k": "cur.juz_amma",
+      "t": "Juz ’Amma"
+     },
+     {
+      "k": "cur.quran",
+      "t": "Qur’an"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "الدراسات الإسلامية"
+   },
+   {
+    "type": "sub",
+    "k": "cur.islamic_studies",
+    "t": "Islamic Studies"
+   },
+   {
+    "type": "ticks",
+    "ordered": false,
+    "items": [
+     {
+      "k": "cur.iman",
+      "t": "Iman"
+     },
+     {
+      "k": "cur.fiqh",
+      "t": "Fiqh"
+     },
+     {
+      "k": "cur.seerah",
+      "t": "Seerah"
+     },
+     {
+      "k": "cur.aqaid",
+      "t": "Aqaid"
+     },
+     {
+      "k": "cur.hadith",
+      "t": "Hadith"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "القرآن والتفسير"
+   },
+   {
+    "type": "sub",
+    "k": "cur.quran_tafseer",
+    "t": "Qur’an & Tafseer"
+   },
+   {
+    "type": "ticks",
+    "ordered": false,
+    "items": [
+     {
+      "k": "cur.memorising_short_surahs",
+      "t": "Memorising Short Surahs"
+     },
+     {
+      "k": "cur.understanding_short_surahs",
+      "t": "Understanding Short Surahs"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "الحفظ"
+   },
+   {
+    "type": "sub",
+    "k": "cur.memorisation",
+    "t": "Memorisation"
+   },
+   {
+    "type": "ticks",
+    "ordered": false,
+    "items": [
+     {
+      "k": "cur.an_nasihah_surah_dua",
+      "t": "An Nasihah Surah & Dua"
+     }
+    ]
+   },
+   {
+    "type": "note",
+    "k": "cur.class_times_fees_and_how",
+    "t": "Class times, fees and how to apply are under Admissions & Fees."
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "advice": {
+  "title": {
+   "k": "advice.imams_advice",
+   "t": "Imams’ Advice"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "advice.imams_advice",
+      "t": "Imams’ Advice",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "advice.many_in_the_community_turn",
+      "t": "Many in the community turn to the masjid for guidance on matters affecting their day-to-day lives. Our imams are able to advise on a range of subjects, including marriage, bereavement, family matters, and general Islamic guidance."
+     },
+     {
+      "type": "p",
+      "k": "advice.if_you_would_like_to",
+      "t": "If you would like to arrange a time to speak with one of the imams, please contact the main office to make an appointment."
+     }
+    ]
+   },
+   {
+    "type": "link",
+    "t": "Call the main office to book 01204 535 997 ›",
+    "href": "tel:01204535997"
+   },
+   {
+    "type": "note",
+    "k": "advice.appointments_are_arranged_through_the",
+    "t": "Appointments are arranged through the office, so the imam can make time to see you properly rather than in passing."
+   },
+   {
+    "type": "heading",
+    "k": "advice.or_write_to_them",
+    "t": "Or write to them",
+    "tag": null
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "advice.questions",
+     "t": "Questions"
+    },
+    "h": {
+     "k": "advice.written_questions_are_not_being",
+     "t": "Written questions are not being taken just now"
+    },
+    "ps": [
+     {
+      "k": "advice.please_ring_the_office_and_an_imam",
+      "t": "Please ring the office on the number above and somebody will arrange a time for you to speak to an imam."
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "madrasah": {
+  "title": {
+   "k": "madrasah.madrasah",
+   "t": "Madrasah"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "مَدْرَسَة",
+      "w": "sub"
+     },
+     {
+      "k": "madrasah.teaching_the_community_s_children",
+      "t": "Teaching the community’s children",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "madrasah.admissions_fees",
+     "t": "Admissions & Fees"
+    },
+    "sub": {
+     "k": "madrasah.fees_class_times_and_attendance",
+     "t": "Fees, class times and attendance"
+    },
+    "href": null,
+    "id": "mdr-go-admissions",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "madrasah.apply_for_a_place",
+     "t": "Apply for a place"
+    },
+    "sub": {
+     "k": "madrasah.the_admission_form_for_this_year",
+     "t": "The admission form for this year's classes"
+    },
+    "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
+    "id": "mdr-go-apply",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "madrasah.holiday_planner",
+     "t": "Holiday Planner"
+    },
+    "sub": {
+     "k": "madrasah.term_dates_and_closures",
+     "t": "Term dates and closures"
+    },
+    "href": null,
+    "id": "mdr-go-holidays",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "portals.madrasah_portal",
+     "t": "Madrasah Portal"
+    },
+    "sub": {
+     "k": "madrasah.sign_in_registers_still_being_built",
+     "t": "Sign in · registers and pupil records still being built"
+    },
+    "href": "https://taiyabahwebsite.ysbdesigns.uk/portal/",
+    "id": "mdr-go-portal",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "madrasah.what_is_taught",
+     "t": "What is taught"
+    },
+    "sub": {
+     "k": "madrasah.the_curriculum_the_madrasah_teaches",
+     "t": "The curriculum the madrasah teaches"
+    },
+    "href": null,
+    "id": "mdr-go-curriculum",
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "madmissions": {
+  "title": {
+   "k": "adm.admissions_fees",
+   "t": "Admissions & Fees"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "adm.madrasah_admissions",
+      "t": "Madrasah Admissions",
+      "w": "title"
+     },
+     {
+      "k": "adm.fees_class_times_and_what",
+      "t": "Fees, class times and what the madrasah asks of students and parents — everything worth knowing before you apply.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "adm.applications",
+     "t": "Applications"
+    },
+    "h": {
+     "k": "adm.apply_for_a_place",
+     "t": "Apply for a place"
+    },
+    "ps": [
+     {
+      "k": "adm.the_form_asks_for_your_child",
+      "t": "The form asks for your child's details and the class you are applying for, and shows which classes are open and when applications close."
+     },
+     {
+      "t": "*The office takes admission queries between 5pm and 7pm.*"
+     }
+    ],
+    "tone": "plum",
+    "cta": {
+     "t": "Open the application form ↗",
+     "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
+     "id": "ad-apply"
+    }
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "adm.the_madrasah_has_taught_the",
+      "t": "The madrasah has taught the community’s children since 1967, from age 4 through to Hifz and the Alimiyyah course. Everything below applies to every student, and submitting an application means agreeing to it."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "adm.fees",
+    "t": "Fees",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.all_classes",
+       "t": "All classes"
+      },
+      "v": {
+       "k": "adm.10_per_week",
+       "t": "£10 / week"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.hifz",
+       "t": "Hifz"
+      },
+      "v": {
+       "k": "adm.14_per_week",
+       "t": "£14 / week"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.admission_fee_one_off",
+       "t": "Admission fee · one-off"
+      },
+      "v": {
+       "k": "adm.20",
+       "t": "£20"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "adm.the_admission_fee_is_payable",
+      "t": "The admission fee is payable once your child has been granted a place. Fees are collected through the madrasah office or the parent portal, and are payable whether or not your child attends. Fees are reviewed each year — please confirm the current rate with the office when you apply."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "adm.class_times",
+    "t": "Class times",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.all_classes_monday_to_friday",
+       "t": "All classes · Monday to Friday"
+      },
+      "v": {
+       "k": "adm.5_00_7_00pm",
+       "t": "5:00–7:00pm"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.hifz_monday_to_friday",
+       "t": "Hifz · Monday to Friday"
+      },
+      "v": {
+       "k": "adm.5_00_7_30pm",
+       "t": "5:00–7:30pm"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "adm.hifz_saturday",
+       "t": "Hifz · Saturday"
+      },
+      "v": {
+       "k": "adm.9_00_11_00am",
+       "t": "9:00–11:00am"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "adm.attendance",
+    "t": "Attendance",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "adm.attendance_is_taken_seriously",
+      "t": "Attendance is taken seriously, because a class only works if the children in it are there. The madrasah expects at least 90% attendance across the year, and a child consistently below that by the end of a term will lose their place."
+     },
+     {
+      "type": "ticks",
+      "ordered": false,
+      "items": [
+       {
+        "k": "adm.lateness_counts_towards_the_attendance",
+        "t": "Lateness counts towards the attendance figure"
+       },
+       {
+        "k": "adm.ring_the_office_on_the_day",
+        "t": "Ring the office on the day, between 5pm and 7pm"
+       },
+       {
+        "k": "adm.tell_us_if_your_child_will_be_late",
+        "t": "Tell us if your child will be late, not only if absent"
+       },
+       {
+        "k": "adm.absence_not_reported_on_the_day",
+        "t": "Absence not reported on the day is recorded as unauthorised"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "adm.term_dates_and_holidays",
+    "t": "Term dates and holidays",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "adm.the_madrasah_follows_the_school",
+      "t": "The madrasah follows the school term dates recommended by Bolton Council, so holidays should be arranged outside term time wherever possible."
+     },
+     {
+      "type": "p",
+      "k": "adm.if_you_must_travel_during",
+      "t": "If you must travel during term, collect a Holiday Absence Form from the madrasah office and return it three weeks before you travel. Without it, the absence is unauthorised. A handwritten letter is not accepted in place of the form."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "t": "Holiday Planner ›"
+    },
+    "sub": {
+     "k": "adm.holiday_planner",
+     "t": "Holiday Planner"
+    },
+    "href": null,
+    "id": "ad-to-holidays",
+    "soon": null
+   },
+   {
+    "type": "heading",
+    "k": "adm.uniform_and_appearance",
+    "t": "Uniform and appearance",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "adm.boys",
+       "t": "Boys"
+      },
+      "v": {
+       "k": "adm.jubba_and_topi",
+       "t": "Jubba and topi."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.girls",
+       "t": "Girls"
+      },
+      "v": {
+       "k": "adm.abaya_and_burkhi",
+       "t": "Abaya and burkhi, long enough to cover the chest and hair."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.hair",
+       "t": "Hair"
+      },
+      "v": {
+       "k": "adm.a_haircut_acceptable_in_islam",
+       "t": "A haircut acceptable in Islam. Mohicans, mullets and unblended number 0 or 1 back and sides are not permitted — the hair must be equal."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.high_vis",
+       "t": "High-vis"
+      },
+      "v": {
+       "k": "adm.compulsory_for_children_up_to",
+       "t": "Compulsory for children up to Year 6 (ages 3–11) from November to March, while it is dark during madrasah hours."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.if_not_followed",
+       "t": "If not followed"
+      },
+      "v": {
+       "k": "adm.children_arriving_without_the_correct",
+       "t": "Children arriving without the correct uniform, or with an unacceptable hairstyle, are sent home."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "heading",
+    "k": "adm.day_to_day",
+    "t": "Day to day",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "adm.toilet",
+       "t": "Toilet"
+      },
+      "v": {
+       "k": "adm.please_make_sure_your_child",
+       "t": "Please make sure your child has been before leaving home. If there is an accident during madrasah, you will be called to collect them."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.concerns",
+       "t": "Concerns"
+      },
+      "v": {
+       "k": "adm.raise_anything_with_the_office",
+       "t": "Raise anything with the office manager rather than the teacher. It will be handled confidentially."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.policies",
+       "t": "Policies"
+      },
+      "v": {
+       "k": "adm.students_and_parents_are_expected",
+       "t": "Students and parents are expected to follow all current madrasah policies. Copies are available from the office on request."
+      }
+     },
+     {
+      "k": {
+       "k": "adm.proof_of_age",
+       "t": "Proof of age"
+      },
+      "v": {
+       "k": "adm.a_birth_certificate_valid_passport",
+       "t": "A birth certificate, valid passport or ID card is needed once a place has been confirmed."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "heading",
+    "k": "adm.after_you_apply",
+    "t": "After you apply",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "adm.submitting_an_application_does_not",
+      "t": "Submitting an application does not mean your child has been granted a place. Classes fill quickly, and where a class is already full, applicants are added to a waiting list and contacted when a space comes up. Admission to Hifz is additionally subject to the headteacher’s approval."
+     },
+     {
+      "type": "p",
+      "k": "adm.you_will_need_a_working",
+      "t": "You will need a working email address: it is how the office reaches you, and how you will sign in to the parent portal once your child has a place."
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "adm.madrasah_office_5_7pm",
+     "t": "Madrasah office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "adm.email_the_office",
+     "t": "Email the office"
+    },
+    "sub": {
+     "t": "admin@taiyabahmasjid.com"
+    },
+    "href": "mailto:admin@taiyabahmasjid.com",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "holidays": {
+  "title": {
+   "k": "hol.holiday_planner",
+   "t": "Holiday Planner"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "hol.madrasah_2026_27",
+      "t": "Madrasah · 2026/27",
+      "w": "title"
+     },
+     {
+      "k": "hol.every_day_the_madrasah_is",
+      "t": "Every day the madrasah is closed this year, alongside the Islamic dates — so you can plan a trip without it costing your child their attendance.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "p",
+    "t": "—"
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "hol.the_madrasah_teaches_180_days",
+      "t": "The madrasah teaches 180 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "hol.the_year_at_a_glance",
+    "t": "The year at a glance",
+    "tag": null
+   },
+   {
+    "type": "p",
+    "k": "hol.madrasah_open",
+    "t": "Madrasah open"
+   },
+   {
+    "type": "p",
+    "k": "hol.closed",
+    "t": "Closed"
+   },
+   {
+    "type": "p",
+    "k": "hol.islamic_date",
+    "t": "Islamic date"
+   },
+   {
+    "type": "p",
+    "k": "hol.today",
+    "t": "Today"
+   },
+   {
+    "type": "heading",
+    "k": "hol.when_the_madrasah_is_closed",
+    "t": "When the madrasah is closed",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": []
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "hol.the_two_long_breaks",
+      "t": "The two long breaks — Ramadhan (33 days) and the summer (40 days) — are when a family trip costs nothing in attendance. Everything else is a week or less."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "hol.islamic_dates_this_year",
+    "t": "Islamic dates this year",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": []
+   },
+   {
+    "type": "advisory",
+    "h": {
+     "k": "hol.these_dates_are_estimates",
+     "t": "These dates are estimates"
+    },
+    "ps": [
+     {
+      "k": "hol.the_islamic_calendar_follows_the",
+      "t": "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand. The madrasah’s closure dates above are fixed and were set by the madrasah itself."
+     }
+    ]
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "hol.before_you_book",
+     "t": "Before you book"
+    },
+    "h": {
+     "k": "hol.term_time_travel_needs_a_form",
+     "t": "Term-time travel needs a form, three weeks ahead"
+    },
+    "ps": [
+     {
+      "k": "hol.the_madrasah_follows_boltons_term",
+      "t": "The madrasah follows Bolton Council’s term dates and expects holidays to be taken outside them. If you must travel during term, collect a *Holiday Absence Form* from the office and return it three weeks before you go."
+     },
+     {
+      "k": "hol.without_it_the_absence_is",
+      "t": "Without it the absence is unauthorised, and it counts against the 90% your child needs to keep their place. A handwritten letter is not accepted."
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "heading",
+    "k": "hol.reporting_an_absence",
+    "t": "Reporting an absence",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "ticks",
+      "ordered": false,
+      "items": [
+       {
+        "k": "hol.ring_the_office_on_the_day",
+        "t": "Ring the office on the day, between 5pm and 7pm"
+       },
+       {
+        "k": "hol.tell_us_about_lateness_too",
+        "t": "Tell us about lateness too, not only absence"
+       },
+       {
+        "k": "hol.unreported_absence_is_recorded_as",
+        "t": "Unreported absence is recorded as unauthorised"
+       },
+       {
+        "k": "hol.below_90_by_the_end",
+        "t": "Below 90% by the end of a term means losing the place"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "hol.fees_uniform_attendance",
+     "t": "Fees, uniform, attendance"
+    },
+    "sub": {
+     "k": "hol.admissions_guidelines",
+     "t": "Admissions & guidelines"
+    },
+    "href": null,
+    "id": "hp-to-admissions",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "adm.madrasah_office_5_7pm",
+     "t": "Madrasah office · 5pm–7pm"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "giving": {
+  "title": {
+   "k": "giving.sadaqah_lillah",
+   "t": "Sadaqah & Lillah"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "giving.support_the_masjid",
+      "t": "Support the masjid",
+      "w": "eyebrow"
+     },
+     {
+      "t": "صَدَقَة",
+      "w": "arabic"
+     },
+     {
+      "k": "giving.give_to_taiyabah_masjid",
+      "t": "Give to Taiyabah Masjid",
+      "w": "title"
+     },
+     {
+      "k": "giving.every_prayer_held_here",
+      "t": "Every prayer held here, every child taught, every janāzah carried out rests on what the community gives. This page is for the masjid itself — its upkeep, its running, and the work it does in Bolton.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "giving.where_your_giving_goes",
+    "t": "Where your giving goes",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "giving.keeping_the_doors_open",
+       "t": "Keeping the doors open"
+      },
+      "v": {
+       "k": "giving.heating_lighting_water_and_insurance",
+       "t": "Heating, lighting, water and insurance. The masjid is open for five prayers a day, every day of the year, and that is the bill behind it."
+      }
+     },
+     {
+      "k": {
+       "k": "giving.the_madrasah",
+       "t": "The madrasah"
+      },
+      "v": {
+       "k": "giving.teaching_the_children_of_the",
+       "t": "Teaching the children of the community, as it has since 1967. Fees do not cover it."
+      }
+     },
+     {
+      "k": {
+       "k": "giving.janazah_and_burial",
+       "t": "Janāzah and burial"
+      },
+      "v": {
+       "k": "giving.the_mortuary_the_ghusl_facilities",
+       "t": "The mortuary, the ghusl facilities and the help given to families at the hardest time. The masjid does not charge for this."
+      }
+     },
+     {
+      "k": {
+       "k": "giving.repairs_and_upkeep",
+       "t": "Repairs and upkeep"
+      },
+      "v": {
+       "k": "giving.a_building_used_this_heavily",
+       "t": "A building used this heavily needs work done on it, and most of it is not the sort anybody notices until it fails."
+      }
+     },
+     {
+      "k": {
+       "k": "giving.the_food_bank_and_outreach",
+       "t": "The food bank and outreach"
+      },
+      "v": {
+       "k": "giving.serving_people_in_bolton_who",
+       "t": "Serving people in Bolton who need it, Muslim and non-Muslim alike."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "heading",
+    "k": "giving.give_online",
+    "t": "Give online",
+    "tag": {
+     "k": "giving.apple_google_pay",
+     "t": "Apple & Google Pay"
+    }
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "giving.what_it_is_for",
+      "t": "What it is for"
+     },
+     {
+      "type": "chips",
+      "items": [
+       {
+        "k": "giving.the_masjid",
+        "t": "The masjid",
+        "sub": {
+         "k": "giving.general",
+         "t": "General"
+        }
+       },
+       {
+        "k": "giving.sadaqah",
+        "t": "Sadaqah",
+        "sub": {
+         "k": "giving.voluntary",
+         "t": "Voluntary"
+        }
+       },
+       {
+        "k": "giving.lillah",
+        "t": "Lillah",
+        "sub": {
+         "k": "giving.for_allah",
+         "t": "For Allah"
+        }
+       }
+      ]
+     },
+     {
+      "type": "note",
+      "k": "giving.the_general_fund_upkeep_running",
+      "t": "The general fund — upkeep, running costs, and the masjid’s work in Bolton."
+     },
+     {
+      "type": "note",
+      "k": "giving.voluntary_charity_given_as_and",
+      "t": "Voluntary charity, given as and when you wish."
+     },
+     {
+      "type": "note",
+      "k": "giving.given_purely_for_the_sake",
+      "t": "Given purely for the sake of Allah, with nothing expected in return."
+     },
+     {
+      "type": "p",
+      "k": "giving.zakat_is_not_taken_here",
+      "t": "*Zakāt is not taken here.* It has its own categories — please ring the office on 01204 535 997."
+     },
+     {
+      "type": "p",
+      "k": "giving.how_often",
+      "t": "How often"
+     },
+     {
+      "type": "chips",
+      "items": [
+       {
+        "k": "giving.one_off",
+        "t": "One-off",
+        "sub": {
+         "k": "giving.a_single_gift",
+         "t": "A single gift"
+        }
+       },
+       {
+        "k": "giving.monthly",
+        "t": "Monthly",
+        "sub": {
+         "k": "giving.until_you_stop",
+         "t": "Until you stop"
+        }
+       },
+       {
+        "k": "giving.friday_pay",
+        "t": "Friday Pay",
+        "sub": {
+         "k": "giving.jumuah",
+         "t": "Jumuʿah"
+        }
+       }
+      ]
+     },
+     {
+      "type": "note",
+      "k": "giving.taken_once_a_month_from",
+      "t": "Taken once a month from the day you set it up, until you stop it. You can cancel any time from the receipt Stripe emails you."
+     },
+     {
+      "type": "note",
+      "k": "giving.a_weekly_gift_for_jumuah",
+      "t": "A weekly gift for Jumuʿah. Stripe takes it every seven days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop it any time."
+     },
+     {
+      "type": "p",
+      "k": "giving.amount",
+      "t": "Amount"
+     },
+     {
+      "type": "chips",
+      "items": [
+       {
+        "t": "£5",
+        "sub": {
+         "t": ""
+        }
+       },
+       {
+        "t": "£10",
+        "sub": {
+         "t": ""
+        }
+       },
+       {
+        "t": "£25",
+        "sub": {
+         "t": ""
+        }
+       },
+       {
+        "t": "£50",
+        "sub": {
+         "t": ""
+        }
+       },
+       {
+        "t": "£100",
+        "sub": {
+         "t": ""
+        }
+       },
+       {
+        "k": "giving.other",
+        "t": "Other",
+        "sub": {
+         "k": "giving.you_choose",
+         "t": "You choose"
+        }
+       }
+      ]
+     },
+     {
+      "type": "p",
+      "k": "giving.gift_aid_if_you_are",
+      "t": "*Gift Aid:* if you are a UK taxpayer, tick *Yes* on the payment page and the masjid reclaims *25p for every £1* at no cost to you. You will need to give your name and home address there."
+     },
+     {
+      "type": "cta",
+      "t": "Donate £25",
+      "sub": {
+       "t": "Card · Apple Pay · Google Pay"
+      },
+      "href": "https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b?client_reference_id=general",
+      "id": "gv-cta"
+     },
+     {
+      "type": "note",
+      "k": "giving.opens_the_masjid_s_secure",
+      "t": "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "giving.or_transfer_directly",
+    "t": "Or transfer directly",
+    "tag": {
+     "k": "giving.tap_to_copy",
+     "t": "Tap to copy"
+    }
+   },
+   {
+    "type": "bank",
+    "items": [
+     {
+      "k": {
+       "k": "giving.account_name",
+       "t": "Account name"
+      },
+      "v": {
+       "k": "giving.bolton_central_islamic_society_bcis",
+       "t": "Bolton Central Islamic Society (BCIS)"
+      }
+     },
+     {
+      "k": {
+       "k": "giving.bank",
+       "t": "Bank"
+      },
+      "v": {
+       "k": "giving.hsbc",
+       "t": "HSBC"
+      }
+     },
+     {
+      "k": {
+       "k": "giving.sort_code",
+       "t": "Sort code"
+      },
+      "v": {
+       "t": "40-04-15"
+      }
+     },
+     {
+      "k": {
+       "k": "giving.account_number",
+       "t": "Account number"
+      },
+      "v": {
+       "t": "02320258"
+      }
+     }
+    ]
+   },
+   {
+    "type": "note",
+    "k": "giving.please_use_your_surname_as",
+    "t": "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it."
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "collect": {
+  "title": {
+   "k": "collect.charity_collections",
+   "t": "Charity Collections"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "collect.collections_chanda",
+      "t": "Collections · Chanda",
+      "w": "eyebrow"
+     },
+     {
+      "k": "collect.collect_for_your_cause",
+      "t": "Collect for your cause at Taiyabah Masjid",
+      "w": "title"
+     },
+     {
+      "k": "collect.charities_and_institutes_are_welcome",
+      "t": "Charities and institutes are welcome to collect here. Fill this in and the masjid office will contact your trustee to confirm a date. Nothing on this screen books a day — it is a request, and the masjid will be in touch.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "rules",
+    "h": {
+     "k": "collect.rules_for_collection",
+     "t": "Rules for collection"
+    },
+    "items": [
+     {
+      "k": "collect.collection_starts_after_zohr",
+      "t": "Collection starts *after Zohr salah* and ends *after Isha salah*."
+     },
+     {
+      "k": "collect.announcements_elaan_are_made_without",
+      "t": "Announcements (elāan) are made *without the microphone*."
+     },
+     {
+      "k": "collect.announcements_are_only_allowed_after",
+      "t": "Announcements are only allowed *after Asr and after Isha*, and must last *no more than two minutes*."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "collect.before_you_fill_this_in",
+    "t": "Before you fill this in",
+    "tag": null
+   },
+   {
+    "type": "dl",
+    "items": [
+     {
+      "k": {
+       "k": "collect.notice",
+       "t": "Notice"
+      },
+      "v": {
+       "t": "The masjid needs at least 14 days’ notice, and takes requests up to a year ahead."
+      }
+     },
+     {
+      "k": {
+       "k": "collect.one_a_day",
+       "t": "One a day"
+      },
+      "v": {
+       "k": "collect.only_one_collection_is_allowed",
+       "t": "Only one collection is allowed on any given day, so an early request has the best chance of the date you want."
+      }
+     },
+     {
+      "k": {
+       "k": "collect.the_trustee_is_rung",
+       "t": "The trustee is rung"
+      },
+      "v": {
+       "k": "collect.the_masjid_rings_the_trustee",
+       "t": "The masjid rings the trustee or manager you name — somebody other than the collector — to check the collection is genuine before confirming."
+      }
+     }
+    ],
+    "card": true
+   },
+   {
+    "type": "callout",
+    "lab": {
+     "k": "collect.requests",
+     "t": "Requests"
+    },
+    "h": {
+     "k": "collect.requests_by_phone_for_now",
+     "t": "Requests are taken by phone for now"
+    },
+    "ps": [
+     {
+      "k": "collect.this_form_is_not_open",
+      "t": "This form is not open yet. Please ring the number below and the masjid will take the details."
+     }
+    ],
+    "tone": "plum",
+    "cta": null
+   },
+   {
+    "type": "p",
+    "k": "collect.need_help_with_this_form",
+    "t": "Need help with this form?"
+   },
+   {
+    "type": "link",
+    "t": "Rafik Patel — 07951 795 465",
+    "href": "tel:+447951795465"
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "hallhire": {
+  "title": {
+   "k": "hallhire.hall_room_hire",
+   "t": "Hall / Room Hire"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "hallhire.taiyabah_centre",
+      "t": "Taiyabah Centre",
+      "w": "title"
+     },
+     {
+      "k": "hallhire.available_for_hire_for_community",
+      "t": "Available for hire, for community and family events.",
+      "w": "sub"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.halls_available",
+       "t": "Halls available"
+      },
+      "v": {
+       "t": "3"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.kitchens_available",
+       "t": "Kitchens available"
+      },
+      "v": {
+       "t": "2"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "link",
+    "t": "Taiyabah Centre · get directions Astley Street, Bolton BL1 8EH ›",
+    "href": "https://maps.apple.com/?q=Taiyabah+Centre+Astley+Street+Bolton+BL1+8EH"
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "hallhire.taiyabah_centre_a_separate_building",
+      "t": "Taiyabah Centre — a separate building owned by the masjid — offers three halls and two kitchens for hire, suitable for a range of community and family occasions."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "hallhire.book_the_hall",
+    "t": "Book the hall",
+    "tag": null
+   },
+   {
+    "type": "notice",
+    "k": "hallhire.deposit_books_the_date",
+    "t": "*Paying the £100 deposit books the date.* Choose your day, fill in the short form and pay — the date is yours as soon as the deposit goes through, with nobody to wait for. It is held for you for thirty minutes while you pay."
+   },
+   {
+    "type": "heading",
+    "k": "hallhire.charges",
+    "t": "Charges",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "hallhire.hire_is_whole_day_2",
+      "t": "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day."
+     },
+     {
+      "type": "p",
+      "k": "hallhire.monday_to_thursday",
+      "t": "Monday – Thursday"
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.one_hall_2",
+       "t": "1 hall"
+      },
+      "v": {
+       "t": "£350"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.two_halls_2",
+       "t": "2 halls"
+      },
+      "v": {
+       "t": "£500"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.three_halls_2",
+       "t": "3 halls"
+      },
+      "v": {
+       "t": "£600"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "p",
+      "k": "hallhire.friday_saturday_sunday",
+      "t": "Friday, Saturday & Sunday"
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.two_halls_3",
+       "t": "2 halls"
+      },
+      "v": {
+       "t": "£600"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.three_halls_3",
+       "t": "3 halls"
+      },
+      "v": {
+       "t": "£700"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "note",
+      "k": "hallhire.no_one_hall_rate_weekend",
+      "t": "There is no one-hall rate at the weekend."
+     },
+     {
+      "type": "p",
+      "k": "hallhire.kitchen_on_its_own",
+      "t": "Kitchen on its own"
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.kitchen_hire",
+       "t": "Kitchen hire"
+      },
+      "v": {
+       "t": "£125"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utility_charge",
+       "t": "Utility charge"
+      },
+      "v": {
+       "k": "hallhire.per_person_45p",
+       "t": "45p per person"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "p",
+      "k": "hallhire.if_they_apply",
+      "t": "If they apply"
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utensils_only_if_used",
+       "t": "Utensils, only if used"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.utility_charge_if_you_cook",
+       "t": "Utility charge, if you cook in the kitchen"
+      },
+      "v": {
+       "k": "hallhire.per_person_45p_2",
+       "t": "45p per person"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "hallhire.damage_to_the_venue",
+       "t": "Damage to the venue"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "note",
+      "k": "hallhire.deposit_paid_online",
+      "t": "*£100 deposit, paid online when you book.* That is what reserves the date — nothing else holds it. It is not refundable if you cancel, but it is refunded in full if the masjid cannot give you the date."
+     },
+     {
+      "type": "note",
+      "k": "hallhire.balance_due_30_days",
+      "t": "The *balance* is due 30 days before your booking date and is paid at the office: cash, or bank transfer to *Bolton Central Islamic Society*."
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "sheet.sort_code",
+       "t": "Sort code"
+      },
+      "v": {
+       "t": "30-99-50"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "sheet.account_number",
+       "t": "Account number"
+      },
+      "v": {
+       "t": "59286668"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "hallhire.terms_of_hire",
+    "t": "Terms of hire",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "sub",
+      "k": "hallhire.t1_h",
+      "t": "Use in accordance with Islamic rulings"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t1_p",
+      "t": "Any hire agreement is subject to the venue being used in accordance with Islamic rulings. This includes, but is not limited to, no music being played on the premises. Agreeing to this is a condition of booking."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t2_h",
+      "t": "Deposit and balance"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t2_p1",
+      "t": "A *£100 deposit* reserves your date. *The date is not held until the deposit is paid, and the deposit is paid online when you book.* Nothing else holds a date."
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t2_p2",
+      "t": "The *full balance is due 30 days before* your booking date, and is paid at the office in cash or by bank transfer. It is not a fixed amount — it depends on how many halls you take, the day of the week, and whether the utensils or the utility charge apply — so the office confirms the figure when it calls you."
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t2_p3",
+      "t": "The deposit is *not refundable if you cancel*. It *is refunded in full* if the masjid cannot give you the date — if we decline the booking, or if two payments reach us for the same day. You will not be left out of pocket for something that was not your doing."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t3_h",
+      "t": "Cleaning is included, and we do it"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t3_p",
+      "t": "Cleaning is included in the hire charge and is carried out by Taiyabah Centre cleaners only. Please do not arrange your own cleaners. You are still responsible for taking away anything you brought in, and for leaving the venue in a reasonable state."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t4_h",
+      "t": "Utensils and the utility charge"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t4_p",
+      "t": "If you use the masjid’s utensils, a charge of *£100* applies. If you cook your own food in the kitchen, a utility charge of *45p per person* applies. Neither is charged unless it applies to your booking — the office confirms the final figure when it calls you."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t5_h",
+      "t": "Access on the day"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t5_p",
+      "t": "A caretaker will be in touch before the day of your booking to arrange access to the venue. Please make sure the contact details you give us are ones you can be reached on."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t6_h",
+      "t": "How far ahead you can book"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t6_p",
+      "t": "Bookings can be made up to 12 months in advance. Dates beyond that are not available to book and cannot be provisionally held."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t7_h",
+      "t": "Cancelling or moving your booking"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t7_p1",
+      "t": "The *£100 deposit is not refundable if you cancel*, including if you cancel the same day you booked. Anything you have paid beyond the deposit is refunded if you cancel *more than 30 days before* your booked date. Inside 30 days the balance is not refundable — but we will move your booking to another date instead, once, subject to what is free. Ring the office as early as you can: the sooner we know, the more likely we can offer the date you want."
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t7_p2",
+      "t": "If *the masjid* cancels or cannot honour your date, everything you have paid is refunded in full, deposit included."
+     },
+     {
+      "type": "sub",
+      "k": "hallhire.t8_h",
+      "t": "Damage to the venue"
+     },
+     {
+      "type": "note",
+      "k": "hallhire.t8_p",
+      "t": "The person named on the booking is responsible for the condition the venue is left in, including anything done by their guests. Where damage has been caused, a charge of *£100* applies. This is separate from the cleaning and waste-removal charges above."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "hallhire.hall_bookings",
+    "t": "Hall bookings",
+    "tag": null
+   },
+   {
+    "type": "note",
+    "k": "hallhire.ring_the_office_or_team",
+    "t": "Ring the office, or any of the booking team directly."
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "hallhire.call_the_main_office",
+     "t": "Call the main office"
+    },
+    "sub": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "t": "Rafiq I Patel"
+    },
+    "sub": {
+     "t": "07951 795465"
+    },
+    "href": "tel:07951795465",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "t": "Mustaq Adam"
+    },
+    "sub": {
+     "t": "07909 973776"
+    },
+    "href": "tel:07909973776",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "t": "Alibhai Khotiwala"
+    },
+    "sub": {
+     "t": "07729 297676"
+    },
+    "href": "tel:07729297676",
+    "id": null,
+    "soon": null
+   },
+   {
+    "type": "foot",
+    "lines": [
+     "Bolton Central Islamic Society · Registered charity 1041569"
+    ]
+   }
+  ]
+ },
+ "marriage": {
+  "title": {
+   "k": "marriage.marriage",
+   "t": "Marriage"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "نِكَاح",
+      "w": "arabic"
+     },
+     {
+      "k": "marriage.nikah_islamic_marriage",
+      "t": "Nikāḥ — Islamic Marriage",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "marriage.for_many_couples_an_islamic",
+      "t": "For many couples, an Islamic ceremony carries a significance that a civil registration alone does not provide. Taiyabah Masjid is able to conduct this Nikāḥ on your behalf, in keeping with authentic Islamic practice — both parties giving their free and informed consent, and the groom presenting a dowry (mahr) to the bride as part of the contract."
+     }
+    ]
+   },
+   {
+    "type": "advisory",
+    "h": {
+     "k": "marriage.please_also_register_your_marriage",
+     "t": "Please also register your marriage legally"
+    },
+    "ps": [
+     {
+      "k": "marriage.a_nikah_performed_at_the",
+      "t": "A Nikāḥ performed at the masjid is not, by itself, a marriage recognised under UK law. We strongly encourage every couple to additionally complete a separate civil marriage — this protects both partners’ legal rights, including around property and inheritance, should the need ever arise."
+     }
+    ]
+   },
+   {
+    "type": "heading",
+    "k": "nikah.the_nikah_fee",
+    "t": "The nikāḥ fee",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "nikah.same_whatever_the_day",
+      "t": "The same whatever the day and whatever the time."
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "nikah.members_of_the_masjid",
+       "t": "Members of the masjid"
+      },
+      "v": {
+       "t": "£100"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "nikah.non_members",
+       "t": "Non-members"
+      },
+      "v": {
+       "t": "£200"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "note",
+      "k": "nikah.pay_in_cash_or_transfer",
+      "t": "Pay in cash at the masjid office, by bank transfer to *Bolton Central Islamic Society*, or online below."
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "sheet.sort_code",
+       "t": "Sort code"
+      },
+      "v": {
+       "t": "30-99-50"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     },
+     {
+      "type": "kv",
+      "k": {
+       "k": "sheet.account_number",
+       "t": "Account number"
+      },
+      "v": {
+       "t": "59286668"
+      },
+      "href": null,
+      "icon": null,
+      "id": null,
+      "static": true
+     }
+    ]
+   },
+   {
+    "type": "card",
+    "blocks": [
+     {
+      "type": "p",
+      "k": "marriage.requirements_such_as_documentation_witnesses",
+      "t": "Requirements such as documentation, witnesses and available dates are best confirmed directly with the masjid. To discuss your circumstances or arrange a booking, please get in touch."
+     }
+    ]
+   },
+   {
+    "type": "link",
+    "t": "Call the main office 01204 535 997 ›",
+    "href": "tel:01204535997"
+   },
+   {
+    "type": "note",
+    "k": "marriage.specific_requirements_documentation_witnesses_",
+    "t": "Specific requirements — documentation, witnesses and timings — are best discussed directly with the office when you call."
+   }
+  ]
+ }
+}
