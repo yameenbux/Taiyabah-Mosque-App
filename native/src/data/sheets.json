@@ -686,76 +686,108 @@
     ]
    },
    {
-    "type": "sub",
-    "t": "Ghusl — washing"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_ritual_washing_of_the",
-    "t": "The ritual washing of the deceased, carried out at the masjid according to Islamic practice."
-   },
-   {
-    "type": "sub",
-    "t": "Kafn — shrouding"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_shroud_is_provided_and",
-    "t": "The shroud is provided and the deceased is prepared in the proper manner."
-   },
-   {
-    "type": "sub",
-    "t": "Janāzah prayer"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_funeral_prayer_is_held",
-    "t": "The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend."
-   },
-   {
-    "type": "sub",
-    "t": "Transportation"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_deceased_is_transported_between",
-    "t": "The deceased is transported between the hospital, the masjid and the cemetery."
-   },
-   {
-    "type": "sub",
-    "t": "Fridge service"
-   },
-   {
-    "type": "p",
-    "k": "funeral.refrigerated_preservation_at_the_masjid",
-    "t": "Refrigerated preservation at the masjid where there is a wait before the burial can take place."
-   },
-   {
-    "type": "sub",
-    "t": "Burial co-ordination"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_masjid_arranges_the_burial",
-    "t": "The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to."
-   },
-   {
-    "type": "sub",
-    "t": "Feeding & kitchenextra cost"
-   },
-   {
-    "type": "p",
-    "k": "funeral.catering_for_mourners_can_be",
-    "t": "Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided."
-   },
-   {
-    "type": "sub",
-    "t": "Bereavement support"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_imams_are_available_to",
-    "t": "The imams are available to the family afterwards, for guidance and for the questions that come later."
+    "type": "items",
+    "items": [
+     {
+      "h": {
+       "k": "funeral.ghusl_washing",
+       "t": "Ghusl — washing"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_ritual_washing_of_the",
+       "t": "The ritual washing of the deceased, carried out at the masjid according to Islamic practice."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 22a7 7 0 0 0 7-7c0-4-7-11-7-11S5 11 5 15a7 7 0 0 0 7 7z\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.kafn_shrouding",
+       "t": "Kafn — shrouding"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_shroud_is_provided_and",
+       "t": "The shroud is provided and the deceased is prepared in the proper manner."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7c3-2 6-2 9 0s6 2 9 0\"></path><path d=\"M3 12c3-2 6-2 9 0s6 2 9 0\"></path><path d=\"M3 17c3-2 6-2 9 0s6 2 9 0\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.janazah_prayer",
+       "t": "Janāzah prayer"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_funeral_prayer_is_held",
+       "t": "The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 21V12a8 8 0 0 1 16 0v9\"></path><path d=\"M12 4a3 3 0 0 1 3 3c0 1.5-3 3-3 3s-3-1.5-3-3a3 3 0 0 1 3-3z\"></path><path d=\"M2 21h20\"></path><path d=\"M9 21v-4a3 3 0 0 1 6 0v4\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.transportation",
+       "t": "Transportation"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_deceased_is_transported_between",
+       "t": "The deceased is transported between the hospital, the masjid and the cemetery."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"1\" y=\"7\" width=\"15\" height=\"10\" rx=\"2\"></rect><path d=\"M16 10h4l3 3v4h-7z\"></path><circle cx=\"6\" cy=\"19\" r=\"2\"></circle><circle cx=\"18\" cy=\"19\" r=\"2\"></circle></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.fridge_service",
+       "t": "Fridge service"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.refrigerated_preservation_at_the_masjid",
+       "t": "Refrigerated preservation at the masjid where there is a wait before the burial can take place."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"2\"></rect><path d=\"M4 11h16\"></path><path d=\"M8 6.5v2\"></path><path d=\"M8 14.5v2\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.burial_co_ordination",
+       "t": "Burial co-ordination"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_masjid_arranges_the_burial",
+       "t": "The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"4\" width=\"14\" height=\"17\" rx=\"2\"></rect><path d=\"M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1\"></path><path d=\"M9 11l2 2 4-4\"></path><path d=\"M9 17h6\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.feeding_kitchen",
+       "t": "Feeding & kitchen"
+      },
+      "tag": {
+       "k": "funeral.extra_cost",
+       "t": "extra cost"
+      },
+      "p": {
+       "k": "funeral.catering_for_mourners_can_be",
+       "t": "Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 8h1a4 4 0 0 1 0 8h-1\"></path><path d=\"M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z\"></path><path d=\"M6 1v3\"></path><path d=\"M10 1v3\"></path><path d=\"M14 1v3\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.bereavement_support",
+       "t": "Bereavement support"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_imams_are_available_to",
+       "t": "The imams are available to the family afterwards, for guidance and for the questions that come later."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z\"></path></svg>"
+     }
+    ]
    },
    {
     "type": "heading",

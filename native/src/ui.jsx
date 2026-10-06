@@ -517,6 +517,49 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
   );
 }
 
+/* .fs-item — one of the eight things the masjid does for a funeral: a card
+ * with a 36px #F0E9ED chip holding a hand-drawn glyph, a 14.5px BOLD title
+ * with an optional gold tag beside it, and a 13px muted line under it. These
+ * had been flattened into alternating headings and paragraphs, so eight cards
+ * read as sixteen loose lines on the one screen a family opens on the worst
+ * day of their life. */
+export function Items({ items }) {
+  const { fs, tx, rtl } = useApp();
+  return (
+    <View style={{ gap: 10, marginTop: 12 }}>
+      {items.map((it, i) => (
+        <View key={i} style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "flex-start",
+                                gap: 12, padding: 14, borderRadius: 14, backgroundColor: C.card,
+                                borderWidth: 1, borderColor: C.line }, SHADOW]}>
+          <View style={{ width: 36, height: 36, borderRadius: 11, alignItems: "center",
+                         justifyContent: "center", backgroundColor: "#F0E9ED" }}>
+            {it.svg ? <SvgXml xml={it.svg} width={19} height={19} color={C.brand600} />
+                    : <Ionicons name="ellipse-outline" size={19} color={C.brand600} />}
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                           flexWrap: "wrap", gap: 7 }}>
+              <Rich style={{ fontFamily: F.sansBold, fontSize: fs(14.5), color: C.ink,
+                             textAlign: rtl ? "right" : "left" }}>{tx(it.h)}</Rich>
+              {!!it.tag && (
+                /* .fs-extra — 9.5px bold uppercase in #8A6A18 on an 18% gold
+                   fill. It had been run straight onto the end of the title
+                   with nothing between, so one card read "Feeding &
+                   kitchenextra cost". */
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.76,
+                               textTransform: "uppercase", color: "#8A6A18", overflow: "hidden",
+                               backgroundColor: "rgba(198,162,76,.18)", borderRadius: 5,
+                               paddingHorizontal: 6, paddingVertical: 2 }}>{tx(it.tag)}</Text>)}
+            </View>
+            {!!it.p && <Rich style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21),
+                                      color: C.muted, marginTop: 4,
+                                      textAlign: rtl ? "right" : "left" }}>{tx(it.p)}</Rich>}
+          </View>
+        </View>))}
+    </View>
+  );
+}
+
 export function Call({ k, v, href, onPress, icon }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);

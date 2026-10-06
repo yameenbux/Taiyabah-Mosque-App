@@ -214,6 +214,28 @@ const out = await page.evaluate(ids => {
       }
 
       /* a card is a container: recurse ------------------------------------ */
+      /* .fs-grid — the eight things the masjid does for a funeral ----------
+       *
+       * Each .fs-item is a CARD: a 36px #F0E9ED chip with a hand-drawn glyph,
+       * a 14.5px bold title, sometimes a gold "extra cost" tag beside it, and
+       * a 13px muted line under it. The walker was flattening them into
+       * alternating sub/p blocks, so eight cards became sixteen loose
+       * paragraphs — and because the title's two spans were concatenated with
+       * nothing between them, one of them read "Feeding & kitchenextra cost".
+       */
+      if (has(c, "fs-grid")) {
+        const items = [...c.querySelectorAll(".fs-item")].map(it => {
+          const h = it.querySelector("h4 span:not(.fs-extra)");
+          const tag = it.querySelector(".fs-extra");
+          const body = it.querySelector("p");
+          const ico = it.querySelector(".ic svg");
+          return { h: h ? str(h) : null, tag: tag ? str(tag) : null,
+                   p: body ? str(body) : null,
+                   svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null };
+        }).filter(x => x.h);
+        if (items.length) { blocks.push(node("items", { items })); continue; }
+      }
+
       /* the stat strip -----------------------------------------------------
        *
        * .hh-facts: equal columns divided by a hairline, each a 10.5px

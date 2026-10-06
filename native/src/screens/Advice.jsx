@@ -63,19 +63,14 @@ export default function Advice({ navigation }) {
       <View style={{ paddingHorizontal: 16 }}>
         <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
 
-        {open === false ? (
-          <>
-            <Heading>{t("advice.questions", "Questions")}</Heading>
-            <Notice>{t("advice.not_taking_written",
-              "The masjid is not taking written questions at the moment.")}</Notice>
-            <RowGroup>
-              <NavRow icon="call-outline" label={t("advice.call_the_main_office_to", "Call the main office to book")}
-                      sub="01204 535 997 · 5pm to 7pm" href="tel:01204535997" />
-              <NavRow icon="mail-outline" label={t("advice.or_write_to_them", "Or write to them")}
-                      sub="info@taiyabahmasjid.com" href="mailto:info@taiyabahmasjid.com" />
-            </RowGroup>
-          </>
-        ) : (
+        {/* WHEN WRITTEN QUESTIONS ARE CLOSED, THE WEBSITE'S OWN PROSE IS THE
+            CLOSED STATE — "Written questions are not being taken just now",
+            in the plum panel, with the office number above it. The app drew
+            all of that from the sheet and then added a second "Questions"
+            heading, a second notice saying the same sentence, and a second
+            copy of the same phone number, so the screen said it twice and
+            ended with the charity line in the middle. */}
+        {open === false ? null : (
           <>
             <Heading>{t("advice.ask_a_question", "Ask a question")}</Heading>
             {/* Why the form asks for everything it asks for, and what will and
