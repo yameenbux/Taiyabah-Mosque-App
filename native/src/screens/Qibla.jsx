@@ -10,14 +10,15 @@
  * direction for Bolton (118°).
  */
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Animated, Easing } from "react-native";
-import Svg, { Circle, Line, Path, G } from "react-native-svg";
+import { View, Text, Animated, Easing, Pressable } from "react-native";
+import Svg, { Circle, Line, Path, G, Polygon, Rect, Defs, RadialGradient, Stop, Text as SvgText } from "react-native-svg";
 import { Magnetometer } from "expo-sensors";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R } from "../theme";
+import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Card, Note, CTA, RowGroup, KV, Pill } from "../ui";
+import { LinearGradient } from "expo-linear-gradient";
+import { Screen, TopBar, Heading, Card, Note, CTA, tap } from "../ui";
 
 const KAABA  = { lat: 21.4224779, lon: 39.8251832 };
 const MASJID = { lat: 53.5869, lon: -2.4361 };
@@ -38,11 +39,17 @@ function kmTo(lat, lon) {
 
 const DIAL = 268;
 
-export default function Qibla() {
-  const { t, fs } = useApp();
+export default function Qibla({ navigation }) {
+  const { t, fs, rtl } = useApp();
   const [from, setFrom] = useState({ ...MASJID, mine: false });
   const [heading, setHeading] = useState(null);
   const [denied, setDenied] = useState(false);
+  /* The website does not read the compass until you ask it to — that is what
+     "Use my phone's compass" is for. The app subscribed to the magnetometer
+     the moment the screen opened, which left that button, once it was drawn,
+     with nothing to do. It does what it says now, and the sensor is off until
+     somebody wants it. */
+  const [live, setLive] = useState(false);
   const spin = useRef(new Animated.Value(0)).current;
   const last = useRef(0);
 
@@ -53,9 +60,10 @@ export default function Qibla() {
    * from a phone jitters by several degrees and a needle that twitches reads as
    * broken rather than as precise. */
   useEffect(() => {
+    if (!live) { setHeading(null); return; }
     let sub;
     Magnetometer.isAvailableAsync().then(ok => {
-      if (!ok) return;
+      if (!ok) { setHeading(null); setLive(false); return; }
       Magnetometer.setUpdateInterval(120);
       const window = [];
       sub = Magnetometer.addListener(({ x, y }) => {
@@ -70,7 +78,7 @@ export default function Qibla() {
       });
     }).catch(() => {});
     return () => sub?.remove();
-  }, []);
+  }, [live]);
 
   /* Animate along the short way round, so turning past north does not send the
    * dial the long way about. */
@@ -98,73 +106,147 @@ export default function Qibla() {
   const aligned = heading !== null && Math.abs(((qibla - heading + 540) % 360) - 180) < 4;
 
   return (
-    <Screen pad={false}>
-      <Hero lines={[{ t: t("sheet.qibla_direction", "Qibla direction"), w: "title" },
-                    { t: t("sheet.hold_the_phone_flat_compasses",
-                           "Hold the phone flat. Compasses drift near metal, cars and speakers \u2014 turn in a figure of eight to settle it."), w: "sub" }]} />
-      <View style={{ paddingHorizontal: 16 }}>
-        <View style={{ alignItems: "center", marginTop: 22 }}>
+    /* Qibla is one of the website's seven PAGES, not a sheet: it wears the app
+       bar — the wordmark, the society's name and the bell — and names itself
+       in a section heading, "Qibla direction ——— From the masjid". The app
+       gave it a plum hero instead and moved the calibration sentence up into
+       it, so the screen announced itself twice and the instruction arrived
+       before there was anything to calibrate. */
+    <Screen pad={false} bg={C.paper}>
+      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+        <TopBar navigation={navigation} />
+      </LinearGradient>
+      <View style={{ paddingHorizontal: 16, paddingTop: 6 }}>
+        <Heading tag={from.mine ? t("qibla.your_location", "Your location")
+                                : t("sheet.from_the_masjid", "From the masjid")}>
+          {t("sheet.qibla_direction", "Qibla direction")}</Heading>
+
+        {/* .qcard — the dial, the reading, the button and the note are ONE
+            card, padded 20/16/16 and centred. These were loose on the paper
+            with the button below a separate table. */}
+        <Card pad={0} style={{ paddingTop: 20, paddingHorizontal: 16, paddingBottom: 16, alignItems: "center" }}>
           <Animated.View style={{ width: DIAL, height: DIAL, transform: [{ rotate }] }}>
             <Svg width={DIAL} height={DIAL} viewBox="0 0 100 100">
-              <Circle cx="50" cy="50" r="48" fill={C.card} stroke={C.line} strokeWidth="0.8" />
-              <Circle cx="50" cy="50" r="38" fill="none" stroke={C.line} strokeWidth="0.5" />
-              {/* 72 ticks, every sixth one long — the same dial the web app drew
-                  with 72 absolutely positioned divs. */}
+              <Defs>
+                <RadialGradient id="face" cx="50%" cy="45%" r="72%">
+                  <Stop offset="0" stopColor="#FFFFFF" />
+                  <Stop offset="1" stopColor="#F6F2E6" />
+                </RadialGradient>
+              </Defs>
+              {/* .dial-ring is a radial gradient from white to #F6F2E6 at 72%,
+                  inside a single hairline — not a flat card fill. */}
+              <Circle cx="50" cy="50" r="49.5" fill="url(#face)" stroke={C.line} strokeWidth="0.5" />
+              {/* .ticks i — 72 hairlines in #D8D0BB, every one the same. The
+                  app made every sixth one long and PLUM, which turned a
+                  compass face into a decorated plum dial. */}
               {Array.from({ length: 72 }, (_, i) => {
-                const a = rad(i * 5), major = i % 6 === 0;
-                const r1 = 48, r2 = 48 - (major ? 5 : 2.6);
-                return <Line key={i} stroke={major ? C.brand600 : C.line} strokeWidth={major ? 0.8 : 0.5}
-                             opacity={major ? 0.85 : 0.75}
+                const a = rad(i * 5), r1 = 48.2, r2 = 45.4;
+                return <Line key={i} stroke="#D8D0BB" strokeWidth="0.45"
                              x1={50 + r1 * Math.sin(a)} y1={50 - r1 * Math.cos(a)}
                              x2={50 + r2 * Math.sin(a)} y2={50 - r2 * Math.cos(a)} />;
               })}
-              {/* The Qibla mark on the rim. */}
+              {/* .cardinal — N, E, S and W at 12px bold in the muted grey, N in
+                  the danger red. The app drew none of them, so the dial could
+                  not be read as a compass at all. */}
+              {[["N", 0], ["E", 90], ["S", 180], ["W", 270]].map(([ltr, deg]) => {
+                const a = rad(deg), r = 41;
+                return (
+                  <SvgText key={ltr} x={50 + r * Math.sin(a)} y={50 - r * Math.cos(a) + 2.4}
+                           fontSize="6.4" fontWeight="700" textAnchor="middle"
+                           fill={ltr === "N" ? C.danger : C.muted}>{ltr}</SvgText>);
+              })}
+              {/* .needle — ONE gold arrow with a thin gold stem at 55%, and the
+                  kaaba tile on the rim at its head. The app drew a plum
+                  two-tone needle instead, so the only gold on the dial was a
+                  mark the needle never met. */}
               <G rotation={qibla} origin="50, 50">
-                <Path d="M50 1.5 L53.4 9 L46.6 9 Z" fill={C.gold} />
-                <Line x1="50" y1="9" x2="50" y2="17" stroke={C.gold} strokeWidth="0.9" />
+                <Polygon points="50,9 57,32 50,28 43,32" fill={C.gold} />
+                <Line x1="50" y1="28" x2="50" y2="84" stroke={C.gold} strokeWidth="1.25" opacity="0.55" />
               </G>
-              {/* North. */}
-              <G rotation={0} origin="50, 50">
-                <Line x1="50" y1="12" x2="50" y2="20" stroke={C.muted} strokeWidth="0.7" />
-              </G>
-              {/* The needle. */}
-              <G rotation={qibla} origin="50, 50">
-                <Path d="M50 14 L55 50 L50 56 L45 50 Z" fill={aligned ? C.onAir : C.brand600} />
-                <Path d="M50 86 L46.5 50 L50 44 L53.5 50 Z" fill="rgba(124,110,119,.35)" />
-              </G>
-              <Circle cx="50" cy="50" r="4.2" fill={C.card} stroke={aligned ? C.onAir : C.brand600} strokeWidth="1.1" />
+              <Circle cx="50" cy="50" r="2.75" fill={C.brand800} stroke="rgba(255,255,255,.9)" strokeWidth="1.5" />
             </Svg>
+            {/* .kaaba — a 26px gold tile on the rim with the Kaʿbah in it. */}
+            <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0,
+                           transform: [{ rotate: `${qibla}deg` }] }}>
+              <View style={{ position: "absolute", top: -2, left: DIAL / 2 - 13, width: 26, height: 26,
+                             borderRadius: 7, backgroundColor: C.gold, alignItems: "center",
+                             justifyContent: "center", ...SHADOW }}>
+                <Svg width={16} height={16} viewBox="0 0 24 24">
+                  <Rect x="4" y="6" width="16" height="14" rx="1.5" fill="#0C3B2A" />
+                  <Rect x="4" y="10" width="16" height="2.6" fill="#C6A24C" />
+                </Svg>
+              </View>
+            </View>
           </Animated.View>
 
-          <View style={{ alignItems: "center", marginTop: 18, gap: 4 }}>
-            <Text style={{ fontFamily: F.display, fontSize: fs(44), color: C.ink }}>{qibla.toFixed(0)}°</Text>
-            {/* The website says what the number is measured from and how far it
-                is, under the number itself. Alone, "118°" says neither. */}
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, textAlign: "center" }}>
-              {t("sheet.from_true_north_5_042", "from true north · 5,042 km to Makkah")}</Text>
-            {aligned
-              ? <Pill tone="live">{t("qibla.facing", "You are facing the Qibla")}</Pill>
-              : heading === null
-                ? <Pill>{t("qibla.no_compass", "No compass on this phone — dial is north-up")}</Pill>
-                : <Pill tone="gold">{t("qibla.turn_until", "Turn until the needle meets the mark")}</Pill>}
+          {/* .qbig is 40px at weight 600 over a 12.5px muted line. */}
+          <View style={{ alignItems: "center", marginTop: 10 }}>
+            <Text style={{ fontFamily: F.display, fontSize: fs(40), lineHeight: fs(44), color: C.ink }}>
+              {qibla.toFixed(0)}°</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, marginTop: 4,
+                           textAlign: "center" }}>
+              {from.mine
+                ? `${t("qibla.from_true_north", "from true north")} · ${Math.round(km).toLocaleString("en-GB")} km ${t("qibla.to_makkah", "to Makkah")}`
+                : t("sheet.from_true_north_5_042", "from true north · 5,042 km to Makkah")}</Text>
           </View>
-        </View>
 
-        <RowGroup style={{ marginTop: 24 }}>
-          <KV k={t("sheet.bearing", "Bearing")}
-              v={from.mine ? `${qibla.toFixed(1)}° ${t("qibla.true", "true")}`
-                           : t("sheet.118_true", "118° true")} />
-          <KV k={t("sheet.from_the_masjid", "From the masjid")}
-              v={`${qibla.toFixed(1)}° ${t("qibla.true", "true")}`} />
-          <KV k={t("sheet.distance", "Distance")}
-              v={from.mine ? `${Math.round(km).toLocaleString("en-GB")} km`
-                           : t("sheet.5_042_km", "5,042 km")} />
-          <KV k={t("sheet.measured_from", "Measured from")}
-              v={from.mine ? t("qibla.your_location", "Your location") : t("sheet.taiyabah_masjid", "Taiyabah Masjid")} />
-        </RowGroup>
+          {/* .enable — a brand-700 to brand-800 gradient at 13px of radius,
+              15px semibold cream, full width. Once it is on, the website
+              swaps it for a #F0E9ED panel with plum text and no lift. */}
+          <Pressable onPress={() => { tap(); setLive(v => !v); }}
+            style={({ pressed }) => [{ width: "100%", marginTop: 12, borderRadius: 13, overflow: "hidden",
+                                       opacity: pressed ? 0.9 : 1 },
+                                     live ? { borderWidth: 1, borderColor: C.line } : SHADOW]}>
+            {live ? (
+              <View style={{ paddingVertical: 14, alignItems: "center", backgroundColor: "#F0E9ED" }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.brand600 }}>
+                  {t("qibla.compass_on", "Compass on")}</Text>
+              </View>
+            ) : (
+              <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                style={{ paddingVertical: 14, alignItems: "center" }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
+                  {t("sheet.use_my_phone_s_compass", "Use my phone's compass")}</Text>
+              </LinearGradient>)}
+          </Pressable>
+
+          {/* .qnote — 11.5px muted, inside the card under the button, which is
+              where it means something. It had been hoisted into the hero. */}
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(18), color: C.muted,
+                         marginTop: 11, textAlign: "center" }}>
+            {live && heading === null
+              ? t("qibla.no_compass", "No compass on this phone — dial is north-up")
+              : t("sheet.hold_the_phone_flat_compasses",
+                  "Hold the phone flat. Compasses drift near metal, cars and speakers — turn in a figure-of-eight to calibrate.")}
+          </Text>
+        </Card>
+
+        {/* .qhelp — THREE rows, not four. "From the masjid" is the section
+            tag at the top of the screen, not a row of its own. */}
+        <Card pad={0} style={{ marginTop: 14, paddingHorizontal: 15, paddingVertical: 4 }}>
+          {[[t("sheet.bearing", "Bearing"),
+             /* From the masjid this is the website's own line, so it reads in
+                the reader's language and in their numerals; from the reader's
+                own position it has to be computed. */
+             from.mine ? `${qibla.toFixed(1)}° ${t("qibla.true", "true")}`
+                       : t("sheet.118_true", "118° true")],
+            [t("sheet.distance", "Distance"),
+             from.mine ? `${Math.round(km).toLocaleString("en-GB")} km` : t("sheet.5_042_km", "5,042 km")],
+            [t("sheet.measured_from", "Measured from"),
+             from.mine ? t("qibla.your_location", "Your location") : t("sheet.taiyabah_masjid", "Taiyabah Masjid")],
+          ].map(([k, v], i) => (
+            <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                   justifyContent: "space-between", paddingVertical: 12,
+                                   borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
+              {/* .qh-k is 12px uppercase tracked .1em; .qh-v 14.5px at 600. */}
+              <Text style={{ fontFamily: F.sans, fontSize: fs(12), letterSpacing: 1.2,
+                             textTransform: "uppercase", color: C.muted }}>{k}</Text>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{v}</Text>
+            </View>))}
+        </Card>
 
         {!from.mine && (
-          <CTA label={t("qibla.use_my_location", "Use my location instead")} onPress={locate} tone="gold" />
+          <CTA label={t("qibla.use_my_location", "Use my location instead")} onPress={locate} compact />
         )}
         {denied && (
           <View style={{ marginTop: 11 }}>
@@ -172,18 +254,14 @@ export default function Qibla() {
               "Location is turned off for this app, so the bearing is the one from the masjid. Within Bolton the difference is a fraction of a degree.")}</Note>
           </View>)}
 
-        <Card style={{ marginTop: 18 }}>
-          <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
-            <Ionicons name="magnet-outline" size={18} color={C.muted} style={{ marginTop: 1 }} />
-            <Note>{t("qibla.calibrate",
-              "A phone compass is thrown off by anything magnetic — a car, a radiator, a metal table. If the needle wanders, move away from it and wave the phone in a figure of eight.")}</Note>
-          </View>
-        </Card>
-        {/* The website ends this screen by saying what a phone compass is not.
-            Leaving it off overstates what the needle can promise. */}
-        <Note>{t("sheet.a_phone_compass_is_a",
-          "A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.")}</Note>
-
+        {/* .qfoot — what a phone compass is not, centred at 11.5px. The magnet
+            card above it was the app's own: the website says the same thing in
+            .qnote, inside the card, which it now does here too. */}
+        <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(18.5), color: C.muted,
+                       textAlign: "center", marginTop: 14, marginHorizontal: 6 }}>
+          {t("sheet.a_phone_compass_is_a",
+             "A phone compass is a guide, not a survey instrument. If in doubt, follow the mihrab in the masjid.")}
+        </Text>
       </View>
     </Screen>
   );

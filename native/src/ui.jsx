@@ -293,7 +293,11 @@ export function Heading({ children, tag }) {
       <Text numberOfLines={1}
             style={{ flexShrink: 1, fontFamily: F.display, fontSize: fs(17), color: C.ink }}>{children}</Text>
       <View style={{ flex: 1, minWidth: 8, height: 1, backgroundColor: C.line }} />
-      {!!tag && <Pill>{tag}</Pill>}
+      {/* .sec-h .tag is plain 11px muted text — no fill, no radius. Drawing it
+          as a pill turned a quiet note at the end of a rule ("From the
+          masjid", "Tap to copy", "Apple & Google Pay") into something that
+          looks like a status badge you could press. */}
+      {!!tag && <Text style={{ flexShrink: 0, fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>{tag}</Text>}
     </View>
   );
 }
