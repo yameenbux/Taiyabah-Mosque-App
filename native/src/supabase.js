@@ -5,6 +5,20 @@
  * them are deny-all. The secret key never comes near an app anyone installs.
  */
 const URL = "https://phenbhmobxwyvdeshvqw.supabase.co";
+
+/* WHICH MASJID THIS APP IS FOR, named rather than assumed.
+ *
+ * The database used to work it out on its own, because there was only one
+ * masjid to work out. The function behind that, sole_masjid(), now REFUSES
+ * when there is more than one rather than guessing — guessing wrong would put
+ * one masjid's notices in front of another's congregation, or file a hall
+ * booking against the wrong building.
+ *
+ * It is injected once, in rpc() and readList() below, rather than written at
+ * each call site. A call site that forgets it is the whole failure mode, so
+ * there is nowhere to forget it. The web app keeps the same value in
+ * SUPA.masjid and the Worker in its publish_notice payload. */
+export const MASJID = "taiyabah";
 const ANON = "sb_publishable_mOPuQKVP8WCTGGJdQK1yJw_e0MSu3_W";
 
 const HEAD = { apikey: ANON, Authorization: `Bearer ${ANON}`, "Content-Type": "application/json" };
@@ -19,15 +33,24 @@ async function go(path, init, ms = 12000) {
   } finally { clearTimeout(timer); }
 }
 
-/* A fetch rather than the full client: the app reads a handful of public views
- * and calls a handful of functions, and the SDK is 100KB to do what one
- * request does. */
-export async function readView(view, { select = "*", order, limit } = {}) {
-  const q = new URLSearchParams({ select });
-  if (order) q.set("order", order);
-  if (limit) q.set("limit", String(limit));
-  const res = await go(`${view}?${q}`, { method: "GET" });
-  if (!res.ok) throw new Error(`${view}: ${res.status}`);
+/* A fetch rather than the full client: the app reads a handful of lists and
+ * calls a handful of functions, and the SDK is 100KB to do what one request
+ * does.
+ *
+ * THESE WERE VIEW READS AND ARE NOW FUNCTION CALLS. A view cannot take an
+ * argument, so notices_live and hall_availability as views had to work out
+ * which masjid on their own — and stop with an error the day there is more
+ * than one. The functions of the same name take the slug. They return the
+ * same shape, so the screens below are unchanged apart from the call itself.
+ *
+ * Ordering is no longer passed: notices_live already returns newest first,
+ * which is what the old order=created_at.desc asked for. */
+export async function readList(fn, args = {}) {
+  const res = await go(`rpc/${fn}`, {
+    method: "POST",
+    body: JSON.stringify({ p_masjid: MASJID, ...args }),
+  });
+  if (!res.ok) throw new Error(`${fn}: ${res.status}`);
   return res.json();
 }
 
@@ -37,7 +60,14 @@ export async function readView(view, { select = "*", order, limit } = {}) {
  * when something is wrong. So where it gives a sentence, we show that sentence
  * rather than an apology over the top of it. */
 export async function rpc(fn, payload) {
-  const res = await go(`rpc/${fn}`, { method: "POST", body: JSON.stringify({ payload }) });
+  /* The masjid goes in here, once, for every write the app makes. Each of
+     these functions resolves it with masjid_or_sole(payload->>'masjid'): the
+     slug when it is given, and otherwise the old guess that now raises. A
+     caller may still override it by passing its own `masjid`. */
+  const res = await go(`rpc/${fn}`, {
+    method: "POST",
+    body: JSON.stringify({ payload: { masjid: MASJID, ...payload } }),
+  });
   const body = await res.text();
   if (res.ok) { try { return { ok: true, data: JSON.parse(body) || {} }; } catch { return { ok: true, data: {} }; } }
   let message = null;

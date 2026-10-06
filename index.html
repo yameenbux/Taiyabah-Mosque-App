@@ -8999,6 +8999,14 @@ const arabicForDisplay = t => String(t).replace(UNRENDERABLE_MARKS, "");
 const SUPA = {
   url: "https://phenbhmobxwyvdeshvqw.supabase.co",
   key: "sb_publishable_mOPuQKVP8WCTlBF2Qa1DVw_r_Tra5OO",
+  /* WHICH MASJID THIS APP IS FOR, named rather than assumed.
+     The database used to work it out on its own, because there was only one
+     masjid to work out. The function that answers "which one?" now REFUSES
+     when there is more than one rather than guessing — guessing wrong would
+     put one masjid's notices in front of another's congregation. So every
+     call that reads or writes a masjid's data has to say which, and this is
+     where this app says it. The website keeps the same value in cfg.MASJID. */
+  masjid: "taiyabah",
 };
 /* The Supabase dashboard shows the URL with /rest/v1/ on the end; pasting it
    verbatim yields .../rest/v1/rest/v1/... and an error that says nothing
@@ -9077,8 +9085,14 @@ function bkHireLong(){
    loads, every day stays "not published": the calendar must never say a date
    is free when it has no way of knowing. */
 function bkLoadAvailability(){
-  return fetch(`${supaBase()}/rest/v1/hall_availability?select=booking_date`, {
-    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key },
+  /* THE RPC, NOT THE VIEW — same reason as the notices list above. The
+     function returns rows of booking_date exactly as the view did, so the
+     handler below does not change. */
+  return fetch(`${supaBase()}/rest/v1/rpc/hall_availability`, {
+    method: "POST",
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ p_masjid: SUPA.masjid }),
   }).then(r => {
     if(!r.ok) throw new Error("availability " + r.status);
     return r.json();
@@ -9570,8 +9584,15 @@ function loadNotices(){
     if(Array.isArray(cached)){ NT.items = cached; NT.stale = true; renderNotices(); ntAfterLoad(false); }
   }
 
-  return fetch(`${supaBase()}/rest/v1/notices_live?select=*`, {
-    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key },
+  /* THE RPC, NOT THE VIEW. notices_live also exists as a view, and the view
+     cannot name a masjid — it works out which one on its own and stops with an
+     error the day there is more than one. The function takes the slug and
+     returns the same shape, so everything below is unchanged. */
+  return fetch(`${supaBase()}/rest/v1/rpc/notices_live`, {
+    method: "POST",
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ p_masjid: SUPA.masjid }),
   }).then(r => {
     if(!r.ok) throw new Error("notices " + r.status);
     return r.json();
