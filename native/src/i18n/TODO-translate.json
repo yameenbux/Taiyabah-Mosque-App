@@ -6,6 +6,7 @@
  "firstrun.turn_on": "Turn them on",
  "firstrun.not_now": "Not now",
  "firstrun.later": "You can change this any time under Notifications.",
+ "offline.still_works": "No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.",
  "time.in_min": "in {n} min",
  "time.in_hm": "in {h}h {m}m",
  "time.in_h": "in {h}h",
