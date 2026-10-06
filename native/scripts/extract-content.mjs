@@ -311,8 +311,15 @@ const out = await page.evaluate(ids => {
        * agree", is a consent nobody gave. */
       if (has(c, "cc-rules")) {
         const h = c.querySelector("h3,h4");
+        /* .cc-ver — "VERSION 2026-09-14 · YOU ARE AGREEING TO THIS VERSION",
+           10.5px uppercase in gold-bright directly under the heading. The
+           request sends rules_version, so the screen has to name the same
+           thing the record stores: agreeing to "the rules" with no version is
+           not a consent to anything in particular. */
+        const ver = c.querySelector(".cc-ver");
         blocks.push(node("rules", {
           h: h ? str(h) : null,
+          ver: ver ? str(ver) : null,
           items: [...c.querySelectorAll("li")].map(li => {
             const sp = [...li.children].find(x => x.tagName === "SPAN" && !x.classList.contains("tick"));
             return sp ? str(sp) : str(li);
@@ -431,6 +438,28 @@ const out = await page.evaluate(ids => {
        * Only the hh- flavour was matched, and it was folded in with .md-row,
        * which is the OPPOSITE shape: a 14.5px title over a muted sub. So the
        * number came out small and grey underneath a large black label. */
+      /* .cc-help — ONE card, not two blocks. The question sits at 13px in
+         ink at weight 700 and the number three pixels under it, plum and
+         bold, with no chip and no chevron: it is a line you can ring, not a
+         menu row that takes you somewhere. Falling through to the generic
+         handlers split it into a loose paragraph and a full-width navigation
+         card, so the quietest thing on the form became the loudest. */
+      if (has(c, "cc-help")) {
+        const t1 = c.querySelector(".cc-help-t");
+        const a = c.querySelector("a");
+        const keyed = a && !KEY(a) && a.querySelector("[data-i18n]");
+        blocks.push(node("help", {
+          ...(t1 ? str(t1) : str(c)),
+          /* The anchor is "<keyed>Rafik Patel</keyed> &mdash; <latin>07951
+             795 465</latin>": the name translates, the number must not. t2
+             is the keyed part's English, so the app can swap just that out
+             of the flattened line and leave the digits alone. */
+          link: a ? { ...str(a), ...(keyed ? { k2: KEY(keyed), t2: str(keyed).t } : {}),
+                      href: a.getAttribute("href") } : null,
+        }));
+        continue;
+      }
+
       if (/\b(wl|ia|hh|bt|mg)-call\b/.test(c.className || "") || has(c, "hh-addr")) {
         /* $= missed every phone number on the site: .hh-call-v also carries
            .tnum for the lining figures, so the class attribute ends "tnum". */
@@ -504,7 +533,14 @@ const out = await page.evaluate(ids => {
       if (/^h[1-6]$/.test(tag) || tag === "b" || tag === "strong") { blocks.push(node("sub", str(c))); continue; }
 
       if (tag === "a") {
-        blocks.push(node("link", { ...str(c), href: c.getAttribute("href") })); continue;
+        /* An anchor whose words are split across spans has no key of its own
+           — "Rafik Patel — 07951 795 465" is collect.rafik_patel plus a
+           number marked data-i18n-latin. Taking the anchor's text alone left
+           that key unused, so the name was untranslatable while the line
+           looked complete. Carry the first keyed span's key with it. */
+        const keyed = !KEY(c) && c.querySelector("[data-i18n]");
+        blocks.push(node("link", { ...str(c), ...(keyed ? { k2: KEY(keyed), t2: str(keyed).t } : {}),
+                                   href: c.getAttribute("href") })); continue;
       }
 
       /* anything else is a wrapper */

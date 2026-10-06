@@ -3055,6 +3055,9 @@
      "k": "collect.rules_for_collection",
      "t": "Rules for collection"
     },
+    "ver": {
+     "t": "Version 2026-09-14 · you are agreeing to this version"
+    },
     "items": [
      {
       "k": "collect.collection_starts_after_zohr",
@@ -3133,14 +3136,15 @@
     "cta": null
    },
    {
-    "type": "p",
+    "type": "help",
     "k": "collect.need_help_with_this_form",
-    "t": "Need help with this form?"
-   },
-   {
-    "type": "link",
-    "t": "Rafik Patel — 07951 795 465",
-    "href": "tel:+447951795465"
+    "t": "Need help with this form?",
+    "link": {
+     "t": "Rafik Patel — 07951 795 465",
+     "k2": "collect.rafik_patel",
+     "t2": "Rafik Patel",
+     "href": "tel:+447951795465"
+    }
    },
    {
     "type": "foot",

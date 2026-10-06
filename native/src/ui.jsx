@@ -758,7 +758,7 @@ const CALLOUT_TONES = {
  * The dark panel the website uses for anything meant to be read rather than
  * skimmed (.cc-rules). A tick list in grey on cream, sitting directly above a
  * checkbox that says "I have read and agree", is a consent nobody gave. */
-export function Rules({ h, items }) {
+export function Rules({ h, ver, items }) {
   const { fs, tx, rtl } = useApp();
   const align = rtl ? "right" : "left";
   return (
@@ -768,8 +768,17 @@ export function Rules({ h, items }) {
     <LinearGradient colors={[C.brand600, C.brand900]} locations={[0, 0.72]}
       start={{ x: 0.9, y: 0 }} end={{ x: 0.1, y: 1 }}
       style={{ borderRadius: R.card, padding: 17, gap: 11, marginTop: 14 }}>
-      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(16), lineHeight: fs(23),
-                             color: C.cream, textAlign: align }}>{tx(h)}</Rich>}
+      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(17), lineHeight: fs(23),
+                             color: C.cream, marginBottom: ver ? -7 : 0,
+                             textAlign: align }}>{tx(h)}</Rich>}
+      {/* .cc-ver — which version is being agreed to, 10.5px uppercase in
+          gold-bright right under the heading. The request stores
+          rules_version, so the screen has to name the same thing the record
+          does; it was printed at the foot of the page instead, nowhere near
+          the rules or the box that agrees to them. */}
+      {!!ver && <Rich style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 0.84,
+                               textTransform: "uppercase", color: C.goldBright, marginBottom: 2,
+                               textAlign: align }}>{tx(ver)}</Rich>}
       {(items || []).map((it, i) => (
         <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 9,
                                alignItems: "flex-start" }}>
@@ -996,6 +1005,40 @@ export function Social({ items }) {
                  : <Ionicons name="globe-outline" size={19} color={C.brand600} />}
           </Pressable>);
       })}
+    </View>
+  );
+}
+
+/* A line whose words are split across spans — "Rafik Patel — 07951 795 465"
+ * — carries the key for the part that translates and the English of that part
+ * beside it, so the swap can be made inside the line and the digits left as
+ * they are. Translating the whole line would have put the phone number through
+ * the Urdu pack. */
+export function partly(tx, b) {
+  if (!b.k2 || !b.t2) return b.t;
+  const one = tx({ k: b.k2, t: b.t2 });
+  return one === b.t2 ? b.t : b.t.replace(b.t2, one);
+}
+
+/* .cc-help — the "Need help with this form?" card at the foot of the charity
+ * collections form, and the only block on the site shaped like this: a
+ * question in ink over a number in plum, 3px apart, in a quiet card with no
+ * chip, no chevron and nothing to say it leads anywhere except that it is the
+ * colour of a link. The app had been drawing the question as loose prose and
+ * the number as a full-width navigation row with a handset in a tile, which
+ * made the smallest thing on the screen the biggest. */
+export function Help({ t: label, link }) {
+  const { fs, tx } = useApp();
+  return (
+    <View style={{ marginTop: 18, paddingVertical: 13, paddingHorizontal: 15, borderRadius: 12,
+                   borderWidth: 1, borderColor: C.line, backgroundColor: C.card, gap: 3 }}>
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), lineHeight: fs(21), color: C.ink }}>
+        {label}</Text>
+      {!!link && (
+        <Press onPress={() => { tap(); open(link.href); }} style={{ alignSelf: "flex-start" }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), lineHeight: fs(21), color: C.brand600 }}>
+            {partly(tx, link)}</Text>
+        </Press>)}
     </View>
   );
 }

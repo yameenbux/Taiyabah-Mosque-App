@@ -17,7 +17,7 @@ import { View, Text } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Foot, Press, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Press, tap, open } from "../ui";
 import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent } from "../form";
 import { rpc, upload, isOpen } from "../supabase";
 import { longDate } from "../dates";
@@ -140,16 +140,15 @@ export default function Collect({ navigation }) {
         {/* The rules, in the masjid's own words. */}
         <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
 
-        {open_ === false ? (
-          <>
-            <Heading>{t("collect.apply", "Apply")}</Heading>
-            <Notice>{t("collect.requests_by_phone_for_now", "Requests are taken by phone for now")}</Notice>
-            <RowGroup>
-              <NavRow icon="call-outline" label={t("collect.rafik_patel", "Rafik Patel")}
-                      sub="07951 795 465" href="tel:07951795465" />
-            </RowGroup>
-          </>
-        ) : (
+        {/* WHEN THE FORM IS CLOSED, THE WEBSITE'S OWN PROSE IS THE CLOSED
+            STATE — the plum "Requests are taken by phone for now" panel and
+            the help row with Rafik Patel's number, both already drawn from
+            the sheet above. The app added an "Apply" heading, a second notice
+            carrying the same sentence and a second copy of the same number,
+            so the charity line ended up mid-screen with the whole message
+            repeating beneath it. The same duplication the imāms' advice
+            screen had. */}
+        {open_ === false ? null : (
           <>
             <Heading>{t("collect.before_you_fill_this_in", "Before you fill this in")}</Heading>
             <Note>{`${t("collect.the_masjid_needs_at_least", "The masjid needs at least")} ${NOTICE_DAYS} ${t("collect.days_notice_and_takes_requests", "days’ notice, and takes requests up to a year ahead.")}`}</Note>
@@ -273,7 +272,8 @@ export default function Collect({ navigation }) {
             <Submit label={t("collect.send_this_request", "Send this request")} sending={state.sending} onPress={send} />
           </>
         )}
-        <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
+        {/* The charity line is the last block of the sheet above and is already
+            drawn from it, so adding it again here printed it twice. */}
       </View>
     </Screen>
   );

@@ -96,8 +96,12 @@ for (const m of html.matchAll(/<main id="([\w-]+)"/g)) anchors.push([m.index, m[
 anchors.sort((a, b) => a[0] - b[0]);
 
 const prose = new Set();
+/* "k2" as well as "k": an anchor whose words are split across spans carries
+   its inner key there — collect.rafik_patel is one — and matching only "k"
+   reported it as a string the app did not have while it was sitting in the
+   data the app renders from. */
 for (const m of fs.readFileSync(path.join(root, "src/data/sheets.json"), "utf8")
-                 .matchAll(/"k"\s*:\s*"([^"]+)"/g)) prose.add(m[1]);
+                 .matchAll(/"k2?"\s*:\s*"([^"]+)"/g)) prose.add(m[1]);
 
 /* Everything the app says, anywhere. A string the app puts on a different
  * screen from the website is a layout difference, not a missing string, and

@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow, Advisory, Items } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow, Advisory, Items, Help, partly } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -148,8 +148,12 @@ function Block({ b, nav, inCard }) {
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
+    case "help":
+      return <Help t={tx(b)} link={b.link} />;
+
     case "link": {
-      const row = <NavRow icon={hrefIcon(b.href)} label={tx(b)} onPress={() => open(b.href)} />;
+      const row = <NavRow icon={hrefIcon(b.href)} label={b.k2 ? partly(tx, b) : tx(b)}
+                          onPress={() => open(b.href)} />;
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
@@ -205,7 +209,7 @@ function GroupKV({ b }) {
 function GroupRow({ b, nav }) {
   const { tx } = useApp();
   const route = b.id && ROUTE[b.id];
-  const label = b.type === "link" ? tx(b) : tx(b.label);
+  const label = b.type === "link" ? (b.k2 ? partly(tx, b) : tx(b)) : tx(b.label);
   return (
     <NavRow
       icon={route ? ICON[route] : hrefIcon(b.href)}
