@@ -26,30 +26,70 @@ export default function Prefs({ navigation }) {
       <Hero lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
+        <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
+        <P muted>{t("sysprefs.pick_the_size_that_reads",
+          "Pick the size that reads most easily. It applies everywhere in the app.")}</P>
+        {/* .ts-pick button: 12px of radius, 12/6 of padding, a line border,
+            and the chosen one FILLED brand-700 with cream on it. A plum tint
+            inside a plum outline reads as a hint rather than a choice. The
+            glyph is a single A at the size it sets, over an uppercase label. */}
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+          {SIZES.map(s => {
+            const on = Math.abs(scale - s.v) < 0.01;
+            return (
+              <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
+                style={{ flex: 1, minWidth: 0, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6,
+                         borderRadius: 12, borderWidth: 1,
+                         borderColor: on ? C.brand700 : C.line,
+                         backgroundColor: on ? C.brand700 : C.card }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: Math.round(14 * s.v),
+                               color: on ? C.cream : C.ink }}>A</Text>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 10, letterSpacing: 0.3,
+                               textTransform: "uppercase", marginTop: 3,
+                               color: on ? "#E7D9E2" : C.muted }}>{t(s.k, s.t)}</Text>
+              </Pressable>);
+          })}
+        </View>
+        {/* .ts-demo — one line on the paper, 12px radius, a line border. The
+            heading and the second paragraph above it were mine. */}
+        <View style={{ marginTop: 12, marginBottom: 10, paddingVertical: 13, paddingHorizontal: 15,
+                       borderRadius: 12, backgroundColor: C.paper, borderWidth: 1, borderColor: C.line }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(15), lineHeight: fs(23), color: C.ink }}>
+            {t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</Text>
+        </View>
+
         <Heading tag={t("sysprefs.display_language", "Display & language")}>
           {t("sysprefs.language", "Language")}</Heading>
-        <Note>{t("sysprefs.choose_the_language_the_app",
-          "Choose the language the app runs in. Packs download once and then work offline.")}</Note>
+        <P muted>{t("sysprefs.choose_the_language_the_app",
+          "Choose the language the app runs in. Packs download once and then work offline.")}</P>
         <Card gap={0} pad={0}>
           {LANGS.map((l, i) => {
             const on = l.code === lang;
+            const rtlScript = l.code === "ar" || l.code === "ur";
             return (
               <Press key={l.code} onPress={() => { tap(); setLang(l.code); }}
                 style={{ flexDirection: "row", alignItems: "center", gap: 12,
                          paddingHorizontal: 15, paddingVertical: 14,
                          borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{l.name}</Text>
-                  {/* Amiri is an Arabic face — it carries Urdu, but it has no
-                      Gujarati at all, so that one stays in the sans. */}
-                  <Text style={{ fontFamily: l.code === "ar" || l.code === "ur" ? F.arabic : F.sans,
-                                 fontSize: fs(l.code === "en" ? 12 : 15), color: C.muted, marginTop: 2,
-                                 textAlign: "left", alignSelf: "flex-start",
-                                 writingDirection: l.code === "ar" || l.code === "ur" ? "rtl" : "ltr" }}>
+                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                  {/* .sp-native is the PRIMARY line — 15.5px at weight 700 in
+                      ink — and the English name sits under it in the muted
+                      grey. This had them the other way about, so every row
+                      led in English and the script it offers was the note. */}
+                  <Text style={{ fontFamily: rtlScript ? F.arabic : F.sansBold,
+                                 fontSize: fs(rtlScript ? 16.5 : 15.5), color: C.ink,
+                                 alignSelf: "flex-start",
+                                 writingDirection: rtlScript ? "rtl" : "ltr" }}>
                     {l.native}</Text>
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted }}>{l.name}</Text>
                 </View>
-                {l.code !== "en" && <Pill>{t("sysprefs.not_yet_reviewed", "Being reviewed")}</Pill>}
-                {on && <Ionicons name="checkmark" size={20} color={C.brand600} />}
+                {/* .sp-state: a white tick on a filled brand-600 circle when
+                    this is the language in use, and nothing when it is not. */}
+                {on && (
+                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: C.brand600,
+                                 alignItems: "center", justifyContent: "center" }}>
+                    <Ionicons name="checkmark" size={14} color="#fff" />
+                  </View>)}
               </Press>);
           })}
         </Card>
@@ -57,32 +97,6 @@ export default function Prefs({ navigation }) {
           <Note>{t("sysprefs.lang_note",
             "The Urdu, Gujarati and Arabic wording has not yet been checked by a native speaker. Anything not yet translated shows in English rather than as a blank.")}</Note>
         </View>
-
-        <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
-        <P muted>{t("sysprefs.pick_the_size_that_reads",
-          "Pick the size that reads most easily. It applies everywhere in the app.")}</P>
-        <View style={{ flexDirection: "row", gap: 7, marginTop: 12 }}>
-          {SIZES.map(s => {
-            const on = Math.abs(scale - s.v) < 0.01;
-            return (
-              <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
-                style={{ flex: 1, alignItems: "center", paddingVertical: 13, borderRadius: 13,
-                         borderWidth: on ? 1.6 : 1, borderColor: on ? C.brand600 : C.line,
-                         backgroundColor: on ? "rgba(119,33,87,.07)" : C.card }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: Math.round(13 * s.v),
-                               color: on ? C.brand600 : C.ink }}>Aa</Text>
-                <Text style={{ fontFamily: F.sans, fontSize: 10.5, color: C.muted, marginTop: 3 }}>
-                  {t(s.k, s.t)}</Text>
-              </Pressable>);
-          })}
-        </View>
-        <Card style={{ marginTop: 13 }}>
-          <Text style={{ fontFamily: F.display, fontSize: fs(15), color: C.ink }}>
-            {t("sysprefs.sample_h", "A sample, at this size")}</Text>
-          <P muted>{t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</P>
-          <P muted>{t("sysprefs.sample",
-            "“And establish prayer and give zakāh and obey the Messenger — that you may receive mercy.”")}</P>
-        </Card>
 
         <Heading>{t("sysprefs.about_this_app", "About this app")}</Heading>
         <RowGroup>
