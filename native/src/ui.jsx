@@ -193,7 +193,7 @@ export function TopBar({ navigation, onBell, back }) {
  * of its own hero, so there was no bar, no title line and no Done — the hero
  * simply started at the status bar with one arrow in the corner.
  */
-export function SheetTop({ title, canBack, onBack, onDone }) {
+export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevOff, nextOff }) {
   const { t, fs, rtl } = useApp();
   const insets = useSafeAreaInsets();
   return (
@@ -210,9 +210,31 @@ export function SheetTop({ title, canBack, onBack, onDone }) {
                                      backgroundColor: pressed ? "rgba(255,255,255,.18)" : "rgba(255,255,255,.08)" })}>
           <Ionicons name={rtl ? "arrow-forward" : "arrow-back"} size={19} color={C.cream} />
         </Pressable>)}
-      {/* Every sheet overrides the stylesheet's centre with text-align:left. */}
+      {/* .sh-nav — the month timetable steps its months from inside the HEADER,
+          either side of the title, with the same 38px chrome as the back
+          square. The app had put that stepper in a hero of its own below,
+          which the website does not have on that sheet at all. */}
+      {!!onPrev && (
+        <Pressable onPress={() => { tap(); onPrev(); }} disabled={prevOff} accessibilityRole="button"
+          style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
+                                     justifyContent: "center", borderWidth: 1, opacity: prevOff ? 0.35 : 1,
+                                     borderColor: "rgba(255,255,255,.2)",
+                                     backgroundColor: pressed ? "rgba(255,255,255,.18)" : "rgba(255,255,255,.08)" })}>
+          <Ionicons name={rtl ? "chevron-forward" : "chevron-back"} size={20} color={C.cream} />
+        </Pressable>)}
+      {/* Every sheet overrides the stylesheet's centre with text-align:left —
+          except the month timetable, whose h3 keeps the stylesheet's centre
+          because it sits between two stepper buttons. */}
       <Text numberOfLines={1} style={{ flex: 1, fontFamily: F.display, fontSize: fs(15.5), color: C.cream,
-                                       textAlign: rtl ? "right" : "left" }}>{title}</Text>
+                                       textAlign: onPrev ? "center" : rtl ? "right" : "left" }}>{title}</Text>
+      {!!onNext && (
+        <Pressable onPress={() => { tap(); onNext(); }} disabled={nextOff} accessibilityRole="button"
+          style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
+                                     justifyContent: "center", borderWidth: 1, opacity: nextOff ? 0.35 : 1,
+                                     borderColor: "rgba(255,255,255,.2)",
+                                     backgroundColor: pressed ? "rgba(255,255,255,.18)" : "rgba(255,255,255,.08)" })}>
+          <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={20} color={C.cream} />
+        </Pressable>)}
       {!!onDone && (
         <Pressable onPress={() => { tap(); onDone(); }} accessibilityRole="button"
           style={({ pressed }) => ({ paddingVertical: 9, paddingHorizontal: 14, borderRadius: 999,

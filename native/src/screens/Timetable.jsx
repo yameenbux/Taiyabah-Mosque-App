@@ -8,8 +8,9 @@ import React, { useMemo, useRef, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
+import { useNavigation } from "@react-navigation/native";
 import { useApp } from "../store";
-import { Hero, Press, Note, tap } from "../ui";
+import { Press, Note, tap } from "../ui";
 import TT from "../data/timetable-2026.json";
 import { MON } from "../dates";
 import { pretty, nowLondon } from "../prayer";
@@ -27,6 +28,7 @@ const SETS = {
 
 export default function Timetable() {
   const { t, fs } = useApp();
+  const nav = useNavigation();
   const today = nowLondon();
   const [m, setM] = useState(today.getFullYear() === TT.year ? today.getMonth() : 0);
   const [mode, setMode] = useState("jamaat");
@@ -45,25 +47,21 @@ export default function Timetable() {
   };
   const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+  /* The month belongs in the SHEET HEADER: ‹ October 2026 › beside Done, which
+     is exactly what .sh-top holds on this sheet. The app gave it a hero of its
+     own, so the month was named twice — once as "Monthly timetable" in the bar
+     and again as "October 2026" below it — and the stepper sat in a band the
+     website does not draw here. */
+  React.useLayoutEffect(() => {
+    nav.setOptions({
+      title: `${t(`date.fullmon.${m}`, MONTHS[m])} ${TT.year}`,
+      sheetNav: { onPrev: () => step(-1), onNext: () => step(1),
+                  prevOff: m === 0, nextOff: m === 11 },
+    });
+  }, [nav, m, t]);
+
   return (
     <View style={{ flex: 1, backgroundColor: C.paper }}>
-      <Hero lines={[{ t: `${t(`date.fullmon.${m}`, MONTHS[m])} ${TT.year}`, w: "title" },
-                    { t: mode === "jamaat" ? t("sheet.jama_ah_times", "Jamāʿah times")
-                                            : t("sheet.beginning_times", "Beginning times"), w: "sub" }]}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 14 }}>
-          <Press onPress={() => step(-1)} style={{ padding: 9 }}>
-            <Ionicons name="chevron-back" size={19} color={m === 0 ? "rgba(220,187,99,.3)" : C.goldBright} />
-          </Press>
-          {/* The website steps a month at a time with a chevron either side of
-              its name, and that is all. A row of twelve letter chips was mine,
-              not the site's. */}
-          <Press onPress={() => step(1)} style={{ padding: 9 }}>
-            <Ionicons name="chevron-forward" size={19} color={m === 11 ? "rgba(220,187,99,.3)" : C.goldBright} />
-          </Press>
-        </View>
-
-      </Hero>
-
       {/* .sh-toggle: a strip on the CARD below the header with a hairline under
           it, two buttons at 9px of radius with a line border, and the active
           one filled brand-700 with cream on it. This was a gold pill floating
@@ -125,11 +123,16 @@ export default function Timetable() {
                            borderBottomWidth: 1, borderBottomColor: C.line,
                            backgroundColor: isToday ? "rgba(119,33,87,.13)"
                                           : friday ? "rgba(198,162,76,.10)" : "transparent" }}>
-              <View style={{ width: 34, paddingLeft: isToday ? 9 : 0,
-                             borderLeftWidth: isToday ? 3 : 0, borderLeftColor: C.brand600 }}>
+              {/* The bar is drawn INSIDE the cell rather than as a border, so
+                  it does not eat 12px of the column on today's row only —
+                  which was enough to break "MON" over two lines, on the one
+                  row a reader is looking for. */}
+              <View style={{ width: 40, paddingLeft: 9 }}>
+                {isToday && <View style={{ position: "absolute", left: 0, top: -9, bottom: -9, width: 3,
+                                           backgroundColor: C.brand600 }} />}
                 <Text style={{ fontFamily: F.sansBold, fontSize: fs(12.5), color: C.ink }}>{date.getDate()}</Text>
                 {/* .mt td.d small — uppercase, tracked, muted on every day. */}
-                <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), letterSpacing: 0.4,
+                <Text numberOfLines={1} style={{ fontFamily: F.sans, fontSize: fs(9.5), letterSpacing: 0.4,
                                textTransform: "uppercase", color: C.muted }}>
                   {t(`date.dow.${date.getDay()}`, ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()])}</Text>
               </View>

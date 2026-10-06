@@ -111,7 +111,8 @@ function Root() {
       <SheetTop title={options.title || ""}
                 canBack={navigation.canGoBack()}
                 onBack={() => navigation.goBack()}
-                onDone={navigation.canGoBack() ? () => navigation.goBack() : null} />
+                onDone={navigation.canGoBack() ? () => navigation.goBack() : null}
+                {...(options.sheetNav || {})} />
     ),
     contentStyle: { backgroundColor: C.paper },
   };
