@@ -15,7 +15,7 @@ every row in the table below reaches 9 before this is considered finished.
 | **Accessibility** | **3** | **9** | labels, roles, font-scale cap, TalkBack/VoiceOver pass |
 | Engineering quality | 6 | 9 | no tests at all; 12 pure functions with date/money arithmetic untested |
 | **Robustness** | **4** | **9** | no error boundary, no crash reporting, no offline detection |
-| Security & privacy | 7.5 | 9 | no rate limiting on 4 public write RPCs; leaked-password protection off |
+| Security & privacy | 8.5 | 9 | leaked-password protection off; 28 anon-executable definer functions to keep audited |
 | Performance & size | 6.5 | 9 | 436KB icon font for 15 icons; 2.3MB JSON parsed on the JS thread |
 | **Platform coverage** | **4** | **9** | Android only — iOS is roughly half the congregation |
 | **Operational sustainability** | **4** | **9** | timetable is a bundled 2026-only file; breaks 1 Jan 2027 |
@@ -59,10 +59,12 @@ Open questions to settle before building:
    render exception anywhere is a white screen with no recovery, and nobody
    would ever hear that it happened.
 3. **iOS build** — see above.
-4. **Rate-limit the four public write RPCs** (`request_hall_booking`,
-   `request_nikah_date`, `request_imam_advice`,
-   `request_charity_collection`). ~2 hours of SQL. They refuse a duplicate
-   date; nothing stops a script posting a thousand advice requests.
+4. ~~Rate-limit the public write RPCs.~~ **Already done, and I was wrong to
+   list it.** It is implemented as BEFORE INSERT triggers on the tables
+   rather than inside the RPC bodies, which is why grepping the function
+   source missed it. Seven write paths are covered, per masjid and per phone
+   *and* email over a rolling 24 hours: advice 3 a day, nikāḥ 5, hall 5,
+   collections 3, admissions 3, courses 5, food bank 3.
 5. **Home's missing-timetable state.** ~20 minutes. Prayer Times says "That
    date is outside the published timetable"; Home just drops the prayer card
    with no explanation.
