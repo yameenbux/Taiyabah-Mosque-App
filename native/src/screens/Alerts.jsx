@@ -16,9 +16,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Switch, Linking } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R } from "../theme";
+import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
@@ -49,8 +50,12 @@ function Row({ title, sub, badge, value, onChange, first }) {
       {/* Left to itself the track is almost the colour of the card, so all you
           can see is the knob — which read as a broken half-moon on a phone. */}
       <Switch value={value} onValueChange={onChange}
-              trackColor={{ false: C.line, true: "rgba(94,24,68,.45)" }}
-              thumbColor={value ? C.brand600 : "#f4f3f4"}
+              /* .switch: the track is #D9D2C0 off and brand-600 on, and the
+                 knob is plain white either way. This had a washed-out track
+                 with a GREEN knob on it — a colour that appears nowhere in
+                 this masjid's palette. */
+              trackColor={{ false: "#D9D2C0", true: C.brand600 }}
+              thumbColor="#FFFFFF"
               ios_backgroundColor={C.line} />
     </View>);
 }
@@ -116,11 +121,14 @@ export default function Alerts() {
         <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>
 
         {granted === false && (
-          <Press onPress={enable}
-            style={{ alignItems: "center", paddingVertical: 14, borderRadius: R.pill,
-                     backgroundColor: C.brand600, marginBottom: 14 }}>
-            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.cream }}>
-              {t("sheet.enable_notifications", "Enable notifications")}</Text>
+          /* .enable is a brand-700 to brand-800 gradient at 13px of radius
+             with the shared lift under it, not a flat brand-600 pill. */
+          <Press onPress={enable} style={{ marginBottom: 14, borderRadius: 13, overflow: "hidden", ...SHADOW }}>
+            <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+              style={{ alignItems: "center", paddingVertical: 14 }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
+                {t("sheet.enable_notifications", "Enable notifications")}</Text>
+            </LinearGradient>
           </Press>)}
 
         <Card gap={0} pad={0}>
@@ -165,10 +173,13 @@ export default function Alerts() {
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
         </Card>
 
+        {/* .save: filled brand-700, cream text, 12px of radius, 13px of
+           padding. An outlined pill reads as the secondary action, and on
+           this screen Save is the only thing that commits anything. */}
         <Press onPress={saveAll}
-          style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
-                   borderWidth: 1, borderColor: C.brand600, marginTop: 14 }}>
-          <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
+          style={{ alignItems: "center", paddingVertical: 13, borderRadius: 12,
+                   backgroundColor: C.brand700, marginTop: 14 }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), letterSpacing: 0.2, color: C.cream }}>
             {saved ? `${t("sheet.notifications_on", "Notifications on")} · ${t("sheet.change", "Change")}`
                    : t("sheet.save", "Save")}</Text>
         </Press>
