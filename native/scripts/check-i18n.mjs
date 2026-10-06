@@ -14,6 +14,31 @@ const I18N = path.resolve(SRC, "i18n");
 const packs = Object.fromEntries(["en", "ur", "gu", "ar"].map(c =>
   [c, JSON.parse(fs.readFileSync(path.join(I18N, `${c}.json`), "utf8"))]));
 
+/* No pack may carry HTML.
+ *
+ * The app renders *bold* and _italic_ and nothing else, so a <b> reaches the
+ * reader as four literal characters. The packs were lifted from the website,
+ * where these are data-i18n-html strings with real markup in them: English was
+ * converted when it was written, and the three translations were not. Thirty-six
+ * strings in each language — including the time under NEXT JAMĀʿAH on the home
+ * screen — showed "<b>1:05 pm</b>" to every Urdu, Gujarati and Arabic reader,
+ * and no check saw it because nothing was missing or empty. */
+{
+  let html = 0;
+  for (const [code, pack] of Object.entries(packs)) {
+    for (const [k, v] of Object.entries(pack)) {
+      if (typeof v === "string" && /<\/?[a-z][^>]*>/i.test(v)) {
+        if (html < 8) console.log(`  HTML IN A PACK  ${code}  ${k}  ::  ${v.slice(0, 60)}`);
+        html++;
+      }
+    }
+  }
+  if (html) {
+    console.log(`::error::${html} pack strings contain HTML. The app renders *bold* and _italic_, not tags.`);
+    process.exitCode = 1;
+  }
+}
+
 const files = [];
 (function walk(d) { for (const f of fs.readdirSync(d)) {
   const p = path.join(d, f);
