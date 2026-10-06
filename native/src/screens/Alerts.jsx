@@ -202,7 +202,7 @@ export default function Alerts() {
                   {t("alerts.nothing_arriving", "Reminders not arriving at all?")}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
                   {help.name
-                    ? `${help.name} ${t("alerts.phones_stop_apps", "phones stop apps running in the background to save battery, and a stopped app cannot receive anything. On this phone:")}`
+                    ? t("alerts.phones_stop_apps", "{brand} phones stop apps running in the background to save battery, and a stopped app cannot receive anything. On this phone:").replace("{brand}", help.name)
                     : t("alerts.phones_stop_apps_generic", "Android stops apps running in the background to save battery, and a stopped app cannot receive anything. On this phone:")}
                 </Text>
                 {help.steps.map((line, i) => (

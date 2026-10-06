@@ -112,7 +112,11 @@ const GROUPS = [
 ];
 
 export default function Help() {
-  const { t, fs } = useApp();
+  const { t, fs, rtl } = useApp();
+  /* Urdu and Arabic read right to left. Every line on this screen is prose
+   * rather than a label, so getting this wrong is not a cosmetic slip — it is
+   * a paragraph that starts in the wrong corner and reads as broken. */
+  const dir = { writingDirection: rtl ? "rtl" : "ltr", textAlign: rtl ? "right" : "left" };
   const [open_, setOpen] = useState(null);
   const help = React.useMemo(batteryHelp, []);
 
@@ -146,35 +150,37 @@ export default function Help() {
               return (
                 <Card key={item.k} pad={0} gap={0}>
                   <Press onPress={() => { tap(); setOpen(isOpen ? null : item.k); }}
-                    style={{ flexDirection: "row", alignItems: "center", gap: 10, padding: 14 }}>
-                    <Text style={{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(13.5),
-                                   color: C.ink, lineHeight: fs(20) }}>
+                    style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                             gap: 10, padding: 14 }}>
+                    <Text style={[{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(13.5),
+                                    color: C.ink, lineHeight: fs(20) }, dir]}>
                       {t(item.k, item.q)}</Text>
                     <Ionicons name={isOpen ? "chevron-up" : "chevron-down"} size={16} color={C.muted} />
                   </Press>
 
                   {isOpen && (
                     <View style={{ paddingHorizontal: 14, paddingBottom: 14, gap: 9 }}>
-                      {item.a.map((line, i) => (
-                        <Text key={i} style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
-                                               lineHeight: fs(20) }}>{line}</Text>))}
+                      {t(`${item.k}_a`, item.a.join("\n\n")).split("\n\n").map((line, i) => (
+                        <Text key={i} style={[{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
+                                                lineHeight: fs(20) }, dir]}>{line}</Text>))}
 
                       {/* The steps for this phone, not for a phone in general. */}
                       {item.device && !!help && (
                         <View style={{ gap: 6, marginTop: 2 }}>
-                          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                          <Text style={[{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }, dir]}>
                             {help.name
-                              ? `${t("help.on_your", "On your")} ${help.name} ${t("help.phone", "phone")}:`
-                              : `${t("help.on_this_phone", "On this phone")}:`}</Text>
+                              ? t("help.on_phone", "On your {brand} phone:").replace("{brand}", help.name)
+                              : t("help.on_this_phone", "On this phone:")}</Text>
                           {help.steps.map((line, i) => (
-                            <Text key={i} style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
-                                                   lineHeight: fs(20), paddingLeft: 10 }}>
+                            <Text key={i} style={[{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
+                                                    lineHeight: fs(20) }, dir,
+                                                    rtl ? { paddingRight: 10 } : { paddingLeft: 10 }]}>
                               {`${i + 1}.  ${line}`}</Text>))}
                         </View>)}
 
-                      {item.after?.map((line, i) => (
-                        <Text key={`x${i}`} style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
-                                                     lineHeight: fs(20) }}>{line}</Text>))}
+                      {!!item.after && t(`${item.k}_after`, item.after.join("\n\n")).split("\n\n").map((line, i) => (
+                        <Text key={`x${i}`} style={[{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
+                                                      lineHeight: fs(20) }, dir]}>{line}</Text>))}
 
                       {item.settings && Platform.OS !== "web" && (
                         <Press onPress={() => { tap(); Linking.openSettings().catch(() => {}); }}
@@ -198,7 +204,7 @@ export default function Help() {
 
         <Heading>{t("help.g_stuck", "Still stuck")}</Heading>
         <Card gap={10}>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, lineHeight: fs(20) }}>
+          <Text style={[{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, lineHeight: fs(20) }, dir]}>
             {t("help.stuck_body",
               "Say what you expected and what happened instead. The message carries which phone you are on and whether notifications are allowed, which is usually what settles it.")}</Text>
           <Press onPress={() => mailUs(t("help.subject", "Help with the app"))}
