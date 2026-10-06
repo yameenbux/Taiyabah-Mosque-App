@@ -7,8 +7,31 @@ from the assessment of the app as it stands at commit `c519a49`: 23 screens,
 **The bar is 9/10 on every front.** Not 9 on the weak ones and 6 on the rest —
 every row in the table below reaches 9 before this is considered finished.
 
-| Front | Now | Target | Gap |
-|---|---|---|---|
+| Front | Oct 6 am | Now | Target | What is still in the way |
+|---|---|---|---|---|
+| Content & substance | 9 | 9 | 9 | — |
+| Design & craft | 8.5 | 8.5 | 9 | tablet layout, landscape — both also count under platform |
+| Internationalisation | 7 | 7.5 | 9 | native-speaker review of ur/gu/ar; 11 keys still English in Urdu (was 45) |
+| Accessibility | 3 | 8 | 9 | a TalkBack pass on a handset — needs a person, not a commit |
+| Engineering quality | 6 | 8 | 9 | 31 tests and 11 checks, each proven to bite; no component or integration tests |
+| Robustness | 7 | 7 | 9 | **still no global offline detection** — confirmed, NetInfo appears nowhere |
+| Security & privacy | 8.5 | 8 | 9 | an ERROR-level advisory: `notices_live` and `hall_availability` are still SECURITY DEFINER **views**, orphaned now the app calls the functions; leaked-password protection still off |
+| **Performance & size** | 6.5 | **6.5** | 9 | untouched: 432KB of icon font for 15 glyphs, 2.28MB of Qurʼan JSON parsed on the JS thread |
+| **Platform coverage** | 4 | **4** | 9 | untouched: Android only, `supportsTablet: false`, no iOS target |
+| Operational sustainability | 4 | 8 | 9 | the 2027 timetable still has to be uploaded by the committee — an operational act, not code |
+| Store readiness | 7 | 7 | 9 | untouched: Data safety form (location + notifications), staged rollout, listing assets |
+
+**Below 7: two fronts, and both are untouched rather than half-done.**
+Platform coverage at 4 and Performance & size at 6.5. Everything else has
+moved or was already at or above 7.
+
+Re-rated 6 October 2026 against measured evidence rather than memory: the
+check and test counts come from `npm run check` and `npm test`, the icon font
+and Qurʼan sizes from the files themselves, the i18n figures from
+`check-i18n.mjs`, the absence of offline detection from a search of `src/`,
+and the security row from Supabase's own advisors.
+
+---|---|---|---|
 | Content & substance | 9 | 9 | — |
 | Design & craft | 8.5 | 9 | dark mode, tablet, landscape |
 | Internationalisation | 7 | 9 | native-speaker review of ur/gu/ar; 45 keys still English per language |
