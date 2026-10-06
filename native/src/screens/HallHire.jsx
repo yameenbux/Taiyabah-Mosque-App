@@ -142,7 +142,10 @@ export default function HallHire({ navigation }) {
     if (/no longer available/i.test(r.body || "")) {
       setState({ error: t("hallhire.gone",
         "Somebody took that date while this form was open. Please choose another — the calendar has been refreshed.") });
-      loadTaken(); setDate(null);
+      /* Back to the calendar, which is what the message tells them to do —
+         leaving them on the form with its date cleared would have left the
+         head reading an invalid date and no way back but Change. */
+      loadTaken(); setDate(null); setStep("pick");
       return;
     }
     setState({ error: r.message || t("hallhire.couldnt_send",
