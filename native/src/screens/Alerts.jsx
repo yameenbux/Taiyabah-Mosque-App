@@ -184,6 +184,7 @@ export default function Alerts() {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
               {t("sheet.remind_me", "Remind me")}</Text>
             <Press disabled={!alerts.jamaah} onPress={() => { tap(); setPickMins(true); }}
+              hitSlop={{ top: 7, bottom: 7, left: 4, right: 4 }}
               style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: dual("#fff", C.paper),
                        borderWidth: 1, borderColor: C.line, borderRadius: 9,
                        paddingHorizontal: 9, paddingVertical: 6 }}>

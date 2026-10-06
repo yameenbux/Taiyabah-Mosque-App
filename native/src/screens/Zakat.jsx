@@ -148,6 +148,7 @@ export default function Zakat() {
                  preferred" rather than "this one". */
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
                 accessibilityRole="radio" accessibilityState={{ selected: on }}
+                hitSlop={{ top: 2, bottom: 2, left: 0, right: 0 }}
                 style={{ flex: 1, alignItems: "center", paddingVertical: 11, paddingHorizontal: 6,
                          borderRadius: 11, borderWidth: 1,
                          borderColor: on ? C.pick : C.line,
@@ -196,6 +197,7 @@ export default function Zakat() {
                       { hour: "2-digit", minute: "2-digit" }))}</Text>
             {live.state !== "loading" && (
               <Press dim={false} onPress={() => { tap(); setTyped(false); load(); }}
+                hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                 style={{ paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
                          borderWidth: 1, borderColor: C.line, backgroundColor: C.card }}>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink }}>
@@ -215,7 +217,9 @@ export default function Zakat() {
                        justifyContent: "space-between", gap: 8, marginTop: 14, marginBottom: 6 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, flexShrink: 1 }}>
             {t("zakat.price_per_gram_today", "Price per gram today (£)")}</Text>
-          <Press dim={false} onPress={() => { tap(); open(standard === "gold"
+          <Press dim={false}
+            hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }}
+            onPress={() => { tap(); open(standard === "gold"
                    ? "https://www.bullionbypost.co.uk/gold-price/gold-price-per-gram/"
                    : "https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/"); }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
@@ -319,6 +323,7 @@ export default function Zakat() {
         </Card>
 
         <Press onPress={() => { tap(); setV({ cash: "", gold: "", silver: "", owed: "", stock: "", invest: "", debts: "" }); setPrice(""); }}
+          hitSlop={{ top: 4, bottom: 4, left: 0, right: 0 }}
           style={{ alignSelf: "center", marginTop: 14, flexDirection: "row", gap: 7, alignItems: "center",
                    paddingHorizontal: 15, paddingVertical: 9, borderRadius: R.pill, borderWidth: 1, borderColor: C.line }}>
           <Ionicons name="refresh-outline" size={15} color={C.muted} />

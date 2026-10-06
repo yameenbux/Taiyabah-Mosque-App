@@ -102,6 +102,24 @@ for (const n of out) {
 console.log(`\n  ${out.length} stops · ${named + unnamed} announced as a control ` +
             `(${unnamed} of them with no name) · ${texts} read as plain text`);
 console.log(`  Anything tappable that is NOT in that control count is announced as ` +
-            `plain text, so a listener never learns they can tap it.\n`);
+            `plain text, so a listener never learns they can tap it.`);
+
+/* TAP TARGETS. Apple asks for 44pt and Android for 48dp; 44 is the number
+ * both are satisfied by. This measures the drawn box, which is what a finger
+ * has to find — except where hitSlop has grown the touch area beyond the
+ * drawing, and the DOM cannot show that. Those are listed separately rather
+ * than silently passed, because "it has hitSlop" is a claim about the source
+ * that this measurement cannot check. */
+const boxes = await page.$$eval(
+  '[role="button"],[role="link"],[role="tab"],[role="radio"],[role="checkbox"],[role="switch"]',
+  els => els.map(e => {
+    const r = e.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height),
+             name: (e.innerText || e.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().slice(0, 40) };
+  }).filter(b => b.w > 0 && b.h > 0));
+const small = boxes.filter(b => b.w < 44 || b.h < 44);
+console.log(`  TAP TARGETS: ${boxes.length} measured, ${small.length} under 44pt`);
+for (const b of small) console.log(`    ${String(b.w).padStart(3)} x ${String(b.h).padStart(3)}   ${b.name || "(no words)"}`);
+console.log();
 await browser.close();
 srv.close();

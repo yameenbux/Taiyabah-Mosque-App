@@ -94,6 +94,7 @@ export default function Quran({ navigation }) {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7 }}>
           {Object.entries(MUSHAF.juzPage).map(([j, page]) => (
             <Press key={j} onPress={() => { tap(); navigation.navigate("Mushaf", { page }); }}
+              hitSlop={{ top: 1, bottom: 1, left: 0, right: 0 }}
               style={{ width: 46, height: 42, alignItems: "center", justifyContent: "center",
                        backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 12 }}>
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>

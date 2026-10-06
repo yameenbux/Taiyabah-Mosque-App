@@ -169,6 +169,10 @@ export function TopBar({ navigation, onBell, back }) {
       <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
         accessibilityLabel={t("a11y.notices", "Notices")}
         accessibilityRole="button"
+        /* Drawn 40x40 to match the website; hit as 44x44. Every one of
+           these is the website's own size, so the drawing is never changed
+           to reach 44 — hitSlop grows what the finger finds instead. */
+        hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
         /* .bellbtn is gold: a 10% gold fill inside a 30% gold border. This was
            a cream outline on nothing, which reads as a disabled control. */
         style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 11, alignItems: "center",
@@ -205,6 +209,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
         /* .sh-upback — 38px, 11px of radius, a white 20% hairline over a white
            8% fill. In RTL the website flips the arrow with scaleX(-1). */
         <Pressable onPress={() => { tap(); onBack(); }} accessibilityLabel="Back" accessibilityRole="button"
+          hitSlop={{ top: 3, bottom: 3, left: 3, right: 3 }}
           style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
                                      justifyContent: "center", borderWidth: 1,
                                      borderColor: "rgba(255,255,255,.2)",
@@ -217,6 +222,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
           which the website does not have on that sheet at all. */}
       {!!onPrev && (
         <Pressable onPress={() => { tap(); onPrev(); }} disabled={prevOff} accessibilityRole="button"
+          hitSlop={{ top: 3, bottom: 3, left: 3, right: 3 }}
           accessibilityLabel={t("a11y.previous_month", "Previous month")}
           style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
                                      justifyContent: "center", borderWidth: 1, opacity: prevOff ? 0.35 : 1,
@@ -231,6 +237,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
                                        textAlign: onPrev ? "center" : rtl ? "right" : "left" }}>{title}</Text>
       {!!onNext && (
         <Pressable onPress={() => { tap(); onNext(); }} disabled={nextOff} accessibilityRole="button"
+          hitSlop={{ top: 3, bottom: 3, left: 3, right: 3 }}
           accessibilityLabel={t("a11y.next_month", "Next month")}
           style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
                                      justifyContent: "center", borderWidth: 1, opacity: nextOff ? 0.35 : 1,
@@ -240,6 +247,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
         </Pressable>)}
       {!!onDone && (
         <Pressable onPress={() => { tap(); onDone(); }} accessibilityRole="button"
+          hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           style={({ pressed }) => ({ paddingVertical: 9, paddingHorizontal: 14, borderRadius: 999,
                                      borderWidth: 1, borderColor: "rgba(198,162,76,.45)",
                                      backgroundColor: pressed ? "rgba(198,162,76,.28)" : "rgba(198,162,76,.14)" })}>
@@ -1115,6 +1123,10 @@ export function PageFoot({ note }) {
                      textAlign: "center", marginTop: 12 }}>
         {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
       <Press onPress={() => { tap(); open("https://masjidone.co.uk"); }}
+             /* A 10.5px line of type is a 16pt target, the smallest in the
+                app. It sits under the charity line with nothing beneath it,
+                so there is room to grow downwards. */
+             hitSlop={{ top: 14, bottom: 14, left: 8, right: 8 }}
              style={{ flexDirection: "row", gap: 4, marginTop: 6 }}>
         <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: faint }}>
           {t("sheet.app_built_by", "Powered by")}</Text>
