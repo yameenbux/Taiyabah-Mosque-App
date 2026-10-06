@@ -186,7 +186,16 @@ export default function Collect({ navigation }) {
                    value={students.boarding} onChange={v => setStudents(s => ({ ...s, boarding: v.replace(/[^0-9]/g, "") }))} />
 
             <Heading>{t("collect.your_bmcc_certificate", "Your BMCC certificate")}</Heading>
-            <P muted>{t("collect.photo_or_scan_of_the", "Photo or scan of the certificate")}</P>
+            {/* WHO ISSUES IT, AND THAT WITHOUT IT THERE IS NO REQUEST. The
+                website says both here, before the file picker. The app asked
+                for a certificate without ever saying the masjid cannot take
+                the request without one, or who issues it — so somebody with
+                no certificate had no idea where to get one. */}
+            <Note>{t("collect.the_masjid_cannot_take_a",
+              "The masjid *cannot take a request without this*. Bolton Masjid Chanda Committee issues the certificate, and it must have been issued *within the last three months*.")}</Note>
+            <View style={{ marginTop: 8 }}>
+              <P muted>{t("collect.photo_or_scan_of_the", "Photo or scan of the certificate")}</P>
+            </View>
             <Press onPress={pick}
               style={{ borderWidth: 1, borderStyle: "dashed", borderColor: bad.file ? C.danger : C.line,
                        borderRadius: R.card, paddingVertical: 20, alignItems: "center", gap: 6,
@@ -235,8 +244,15 @@ export default function Collect({ navigation }) {
                 record of anything. */}
             <Note>{`${t("collect.version", "Version")} ${RULES_VERSION} · ` +
                    t("collect.you_are_agreeing_to_this", "you are agreeing to this version")}</Note>
+            {/* The website's declaration is made ON BEHALF OF the charity —
+                "I have read the rules for collection above and agree to them
+                on behalf of the charity or institute named on this form." The
+                app had shortened it to "I have read and agree to the rules
+                for collection", which drops the only clause that makes it a
+                declaration by the signatory for the body they represent. */}
             <Check value={agree} onChange={setAgree} bad={bad.agree}
-                   label={t("collect.i_have_read_and_agree", "I have read and agree to the rules for collection.")} />
+                   label={t("collect.i_have_read_the_rules",
+                     "I have read the *rules for collection* above and agree to them on behalf of the charity or institute named on this form.")} />
             <Check value={privacy} onChange={setPrivacy} bad={bad.privacy}
                    label={t("collect.i_understand_the_masjid_will",
                      "I understand the masjid will keep these details to arrange and check the collection.")} />

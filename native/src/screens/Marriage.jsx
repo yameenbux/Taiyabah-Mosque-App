@@ -210,6 +210,15 @@ export default function Marriage({ navigation }) {
         ) : (
           <>
             <Heading>{t("nikah.request_a_date", "Request a date")}</Heading>
+            {/* THE SENTENCE THAT SAYS A DATE IS NOT RESERVED. The website
+                opens the booking card with it, in a notice with an ⓘ, and
+                the app did not have it anywhere: a family could pick two days
+                on a calendar, send the form, and believe the masjid had their
+                date. It also says what the calendar is NOT showing — the
+                masjid's own diary — which is the thing the calendar most
+                looks like it is showing. */}
+            <Notice>{t("nikah.this_is_a_request_not",
+              "*This is a request, not a booking.* No date here is reserved, and nothing on this calendar shows what the masjid already has in the diary. Choose the day and prayer that would suit you, and the office will ring the person named on the request to confirm whether it can be done, go through the details, and take payment.")}</Notice>
             <P muted>{t("nikah.two_weeks_notice_minimum",
               "Two weeks’ notice minimum, and up to a year ahead.")}</P>
             {month && (

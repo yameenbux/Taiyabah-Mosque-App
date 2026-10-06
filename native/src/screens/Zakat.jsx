@@ -211,18 +211,36 @@ export default function Zakat() {
           )}
         </Card>
 
-        {/* What is NOT counted. Without it people total up their house and
-            their car and conclude they owe zakat they do not owe. */}
-        <Heading>{t("zakat.leave_these_out", "Leave these out")}</Heading>
-        <Card>
-          <Ticks items={[
-            t("zakat.the_home_you_live_in", "The home you live in"),
-            t("zakat.your_car_clothes_phone_and", "Your car, clothes, phone and furniture"),
-            t("zakat.tools_and_machinery_you_use", "Tools and machinery you use for work — unless you bought them to sell"),
-            t("zakat.a_property_you_rent_out", "A property you rent out — but rent you have saved does count"),
-            t("zakat.debts_you_are_owed_but", "Debts you are owed but do not expect to get back"),
-            t("zakat.anything_you_have_already_spent", "Anything you have already spent"),
+        {/* .zk-lists — ONE card holding both lists, "Include these" first in
+            plum and "Leave these out" under a hairline in the danger colour,
+            each an 11px uppercase heading tracked .14em over plain bullets.
+            The app had them as two separate cards in the other order, both
+            headed with a section rule, both set as green TICKS — which on
+            "Leave these out" says the opposite of what the list means. */}
+        <Heading>{t("zakat.what_counts", "What counts")}</Heading>
+        <Card pad={16}>
+          <ZList tone={C.brand600} head={t("zakat.include_these", "Include these")} items={[
+            t("zakat.cash_at_home_in_the", "Cash at home, in the bank, or in any savings account"),
+            /* THE ONE MOST PEOPLE MISS. "All gold and silver you own —
+               including jewellery you wear" was not in the app's list at all,
+               and jewellery you wear is the single most commonly forgotten
+               zakatable thing there is. */
+            t("zakat.all_gold_and_silver_you", "All gold and silver you own — *including jewellery you wear*"),
+            t("zakat.money_you_are_saving_for", "Money you are saving for something, like a wedding, a car or Hajj"),
+            t("zakat.money_people_owe_you_that", "Money people owe you that you expect to get back"),
+            t("zakat.goods_you_bought_in_order", "Goods you bought in order to sell them"),
+            t("zakat.shares_bought_to_trade_and", "Shares bought to trade, and cryptocurrency"),
           ]} />
+          <View style={{ marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: C.line }}>
+            <ZList tone={C.danger} head={t("zakat.leave_these_out", "Leave these out")} items={[
+              t("zakat.the_home_you_live_in", "The home you live in"),
+              t("zakat.your_car_clothes_phone_and", "Your car, clothes, phone and furniture"),
+              t("zakat.tools_and_machinery_you_use", "Tools and machinery you use for work — unless you bought them to sell"),
+              t("zakat.a_property_you_rent_out", "A property you rent out — but rent you have saved does count"),
+              t("zakat.debts_you_are_owed_but", "Debts you are owed but do not expect to get back"),
+              t("zakat.anything_you_have_already_spent", "Anything you have already spent"),
+            ]} />
+          </View>
         </Card>
 
         <Press onPress={() => { tap(); setV({ cash: "", gold: "", silver: "", owed: "", stock: "", invest: "", debts: "" }); setPrice(""); }}
@@ -233,21 +251,17 @@ export default function Zakat() {
             {t("zakat.clear_all", "Clear all")}</Text>
         </Press>
 
-        <Heading>{t("zakat.what_counts", "What counts")}</Heading>
-        <Card>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>
-            {t("zakat.include_these", "Include these")}</Text>
-          <Ticks items={[
-            { k: "zakat.cash_at_home_in_the", t: "Cash at home, in the bank, or in any savings account" },
-            { k: "zakat.money_you_are_saving_for", t: "Money you are saving for something, like a wedding, a car or Hajj" },
-            { k: "zakat.money_people_owe_you_that", t: "Money people owe you that you expect to get back" },
-            { k: "zakat.goods_you_bought_in_order", t: "Goods you bought in order to sell them" },
-            { k: "zakat.shares_bought_to_trade_and", t: "Shares bought to trade, and cryptocurrency" },
-          ]} />
-        </Card>
-
-        <Warn>{t("zakat.disclaimer",
-          "This is a guide, not a ruling. Zakat on a business, on a pension, or on property bought to let can be more involved — ask an imam if your situation is not a simple one.")}</Warn>
+        {/* .zk-disclaimer — the website's own words, which name the position
+            the calculator follows: "It follows the Hanafi position and uses
+            the price you enter." The app had written its own disclaimer
+            instead, which said neither. */}
+        <View style={{ marginTop: 18, marginBottom: 10, borderRadius: 12, padding: 13,
+                       backgroundColor: "#FBF0EB", borderWidth: 1, borderColor: "#EBCDBF" }}>
+          <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20.5), color: "#7C3A20",
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("zakat.this_is_a_guide_not",
+              "*This is a guide, not a ruling.* It follows the Hanafi position and uses the price you enter. Zakat can depend on your own circumstances, and scholars differ on things like pensions, shares and long-term debt. For anything you are unsure about, please ask the imam at the masjid.")}</Rich>
+        </View>
       </View>
     </Screen>
   );
@@ -281,5 +295,25 @@ function Line({ k, v, strong }) {
       <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: strong ? C.ink : C.muted }}>{k}</Text>
       <Text style={{ fontFamily: strong ? F.sansMedium : F.sans, fontSize: fs(13.5), color: C.ink }}>{v}</Text>
     </View>
+  );
+}
+
+/* .zk-lists — an 11px uppercase heading tracked .14em in plum or the danger
+ * colour, over plain bullets at 13.5px. Not green ticks: a tick beside "The
+ * home you live in" tells the reader the opposite of what the list says. */
+function ZList({ head, items, tone }) {
+  const { fs, rtl } = useApp();
+  return (
+    <>
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 1.54,
+                     textTransform: "uppercase", color: tone, marginBottom: 9,
+                     textAlign: rtl ? "right" : "left" }}>{head}</Text>
+      {items.map((x, i) => (
+        <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 8, marginBottom: 6 }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.ink }}>•</Text>
+          <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.ink,
+                         textAlign: rtl ? "right" : "left" }}>{x}</Rich>
+        </View>))}
+    </>
   );
 }

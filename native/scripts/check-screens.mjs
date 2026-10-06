@@ -57,9 +57,7 @@ const WONT_NEED = {
   "athkar.back_to_athkar":          "a back link; the app has a back arrow in the header",
   "bukhari.all_books":              "a back link; the app has a back arrow in the header",
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
-  "sheet.use_my_phone_s_compass":   "a browser needs a tap before it may read the compass; the app reads it on open",
   "hallhire.change":                "the website's form is two steps and this is its way back to the first; the app's is one page, so there is nothing to go back to",
-  "quran.the_familiar_indo_pak_page": "names the edition Indo-Pak; the masjid asked for it to be called the 13-Line Qurʼan throughout",
   "mushaf.not_installed_yet":        "the website shows this when the licensed pages have not been added; this app is served them",
   "mushaf.the_reader_is_ready":      "part of that same not-installed state",
   "mushaf.in_the_meantime_the_english": "part of that same not-installed state",
@@ -124,7 +122,15 @@ for (let i = 0; i < anchors.length; i++) {
   const [pos, name, tag] = anchors[i];
   if (!SCREENS[name]) continue;
   const body = sliceAt(pos, tag);
-  const keys = [...new Set([...body.matchAll(/data-i18n="([^"]+)"/g)].map(m => m[1]))]
+  /* data-i18n-html TOO. The website marks a sentence that contains <b> or
+     <i> with data-i18n-html, and this regex only matched data-i18n — so the
+     32 strings on the site that carry emphasis were invisible to a check
+     whose whole job is noticing a missing one. They are not a random 32:
+     they are the sentences the masjid chose to put weight on. One of them,
+     "The Hanafi school uses the silver nisab", had been silently replaced in
+     the app by a sentence about "most scholars" and this check said the
+     zakat screen was complete. */
+  const keys = [...new Set([...body.matchAll(/data-i18n(?:-html)?="([^"]+)"/g)].map(m => m[1]))]
     .filter(k => !NOT_OURS.test(k));
   /* Every screen's title is set in App.jsx, not in the screen itself. */
   const src = [...SCREENS[name], "App.jsx"]

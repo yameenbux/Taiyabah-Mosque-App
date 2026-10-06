@@ -7,10 +7,11 @@
  */
 import React, { useEffect, useMemo, useState } from "react";
 import { View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, RowGroup, NavRow, open } from "../ui";
-import { Field, Choice, Calendar, ErrorBox, Submit, Sent, isPhone } from "../form";
+import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, RowGroup, NavRow, open, Press, tap } from "../ui";
+import { Field, Choice, Calendar, Check, ErrorBox, Submit, Sent, isPhone } from "../form";
 import { rpc, readView } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
 
@@ -32,6 +33,7 @@ export default function HallHire({ navigation }) {
   const [who, setWho] = useState({ first: "", last: "", addr: "", phone: "" });
   const [state, setState] = useState({});
   const [touched, setTouched] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   const first = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + 1); return d; }, []);
   const last  = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + HORIZON_DAYS); return d; }, []);
@@ -48,18 +50,25 @@ export default function HallHire({ navigation }) {
   const hireOk = hire !== "halls1" || monThu;
 
   const bad = {
-    hire: touched && !hire, date: touched && !date,
+    hire: touched && !hire, date: touched && !date, agree: touched && !agree,
     first: touched && !who.first.trim(), last: touched && !who.last.trim(),
     addr: touched && !who.addr.trim(), phone: touched && !isPhone(who.phone),
   };
+  /* THE TERMS OF HIRE WERE NEVER AGREED TO. The website will not send this
+     form until "I have read and agree to the terms of hire, including use of
+     the venue in accordance with Islamic rulings" is ticked. The app had no
+     such box, so it took a £100 deposit for a venue whose conditions the
+     hirer had never been asked to accept. */
   const valid = hire && date && hireOk && who.first.trim() && who.last.trim() &&
-                who.addr.trim() && isPhone(who.phone);
+                who.addr.trim() && isPhone(who.phone) && agree;
 
   async function send() {
     setTouched(true);
     if (!valid) {
       setState({ error: !hireOk
         ? t("hallhire.one_hall_mon_thu", "One hall can only be hired Monday to Thursday. Pick another day, or take two halls.")
+        : !agree
+        ? t("hallhire.agree_first", "Please agree to the terms of hire before sending.")
         : t("hallhire.check_the_form", "Please choose what you need, a date, and fill in every box.") });
       return;
     }
@@ -192,10 +201,29 @@ export default function HallHire({ navigation }) {
         <Field label={t("hallhire.address_label", "Address")} type="multi" value={who.addr} bad={bad.addr}
                onChange={v => setWho(s => ({ ...s, addr: v }))} />
         <Field label={t("hallhire.contact_number", "Contact number")} type="tel" value={who.phone} bad={bad.phone}
-               hint={t("hallhire.phone_hint", "The caretaker will call you before the day to arrange access, so this must be a number that reaches you.")}
-               hint={t("hallhire.the_caretaker_will_call_you",
-                 "The caretaker will call you before the day to arrange access, so it must be a number that reaches you.")}
+               /* Two hint props on one field: the second silently won and the
+                  first key was dead. The website's wording is .bk-hint's. */
+               hint={t("hallhire.phone_hint",
+                 "The caretaker will call you before the day to arrange access, so this must be a number that reaches you.")}
                onChange={v => setWho(s => ({ ...s, phone: v }))} />
+
+        <Check value={agree} onChange={setAgree} bad={bad.agree}
+               label={t("hallhire.i_agree_to_the_terms_2",
+                 "I have read and agree to the terms of hire, including use of the venue in accordance with Islamic rulings.")} />
+
+        {/* .bk-hint — the website says what it keeps these details for, and
+            links the privacy notice, directly under the form. */}
+        <View style={{ marginTop: 10 }}>
+          <Note>{t("privacy.hall_details_kept",
+            "The masjid keeps these details to arrange your booking and for its accounts. Read the privacy notice.")}</Note>
+        </View>
+        <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
+          style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start",
+                   paddingVertical: 6 }}>
+          <Ionicons name="open-outline" size={14} color={C.brand600} />
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+            {t("privacy.read_the_privacy_notice", "Read the privacy notice")}</Text>
+        </Press>
 
         <ErrorBox>{state.error}</ErrorBox>
         <Submit label={t("hallhire.continue_to_deposit", "Continue to the deposit")}
