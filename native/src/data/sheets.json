@@ -23,7 +23,8 @@
       "t": "The name *Taiyabah* — from the Arabic _Tayyab_, meaning purity — was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb, author of _Fazaail-e-Amaal_.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "left"
    },
    {
     "type": "heading",
@@ -269,7 +270,8 @@
       "t": "Check whether this year’s fee is paid, and when the next one is due.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "callout",
@@ -377,7 +379,8 @@
       "t": "Bolton Central Islamic Society",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -511,7 +514,8 @@
       "t": "Guidance and support from the masjid across life’s most significant moments.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",
@@ -613,7 +617,8 @@
       "t": "Taiyabah Masjid supports families through every part of an Islamic funeral, from the first phone call to the burial.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "urgent",
@@ -826,7 +831,8 @@
       "t": "The Importance of an Islamic Will",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -988,7 +994,8 @@
       "t": "Guidance for New Arrivals",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1135,7 +1142,8 @@
       "t": "Classes and workshops at the masjid for adults, alongside the children’s madrasah.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1240,7 +1248,8 @@
       "t": "Evening Arabic for adults, taught at the masjid — from the alphabet upward.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "facts",
@@ -1397,7 +1406,8 @@
       "t": "How to wash and prepare a body for burial — a duty that falls on the community, and one most people have never been shown.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "facts",
@@ -1624,7 +1634,8 @@
       "t": "What students learn at the madrasah.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -1761,7 +1772,8 @@
       "t": "Imams’ Advice",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1849,7 +1861,8 @@
       "t": "Teaching the community’s children",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",
@@ -1963,7 +1976,8 @@
       "t": "Fees, class times and what the madrasah asks of students and parents — everything worth knowing before you apply.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "callout",
@@ -2391,7 +2405,8 @@
       "t": "Every day the madrasah is closed this year, alongside the Islamic dates — so you can plan a trip without it costing your child their attendance.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -2596,7 +2611,8 @@
       "t": "Every prayer held here, every child taught, every janāzah carried out rests on what the community gives. This page is for the masjid itself — its upkeep, its running, and the work it does in Bolton.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "heading",
@@ -2929,7 +2945,8 @@
       "t": "Charities and institutes are welcome to collect here. Fill this in and the masjid office will contact your trustee to confirm a date. Nothing on this screen books a day — it is a request, and the masjid will be in touch.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "rules",
@@ -3051,7 +3068,8 @@
       "t": "Available for hire, for community and family events.",
       "w": "sub"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "facts",
@@ -3535,7 +3553,8 @@
       "t": "Nikāḥ — Islamic Marriage",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -3685,7 +3704,8 @@
       "t": "Display & Language",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "heading",
@@ -3725,7 +3745,8 @@
       "t": "How would you like to read?",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",
@@ -3782,7 +3803,8 @@
       "t": "Morning, evening and after ṣalāh",
       "w": "title"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",

@@ -246,8 +246,8 @@ export function Ring({ xml }) {
   );
 }
 
-export function Hero({ lines = [], children, tall, minHeight, ring }) {
-  const { fs, tx } = useApp();
+export function Hero({ lines = [], children, tall, minHeight, ring, align = "center" }) {
+  const { fs, tx, rtl } = useApp();
   /* The hero no longer reaches behind the status bar and no longer carries a
    * back arrow of its own: SheetTop sits above it on every pushed screen, as
    * .sh-top does on the website, and that bar owns the inset, the title and
@@ -278,7 +278,8 @@ export function Hero({ lines = [], children, tall, minHeight, ring }) {
                                   textTransform: "uppercase", color: C.gold, marginBottom: 7 }
           : l.w === "title"   ? { fontFamily: F.display, fontSize: fs(23), lineHeight: fs(31), color: C.cream }
           : { fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21), color: "rgba(243,239,227,.8)", marginTop: 7 };
-        return <Rich key={i} style={[{ textAlign: "center" }, style]}>{text}</Rich>;
+        return <Rich key={i} style={[{ textAlign: align === "left" && !rtl ? "left"
+                                                 : align === "left" ? "right" : "center" }, style]}>{text}</Rich>;
       })}
       {children}
     </LinearGradient>
@@ -354,11 +355,14 @@ export function RowGroup({ children, style }) {
   );
 }
 
-export function Press({ children, onPress, disabled, style }) {
+export function Press({ children, onPress, disabled, dim = true, style }) {
   return (
+    /* `dim={false}` for a row that is inert but not greyed — the website fades
+       a disabled nav button or an out-of-range day, and never a "coming soon"
+       row, whose title and chip go muted on their own. */
     <Pressable onPress={onPress} disabled={disabled} android_ripple={{ color: "rgba(119,33,87,.10)" }}
       style={({ pressed }) => [{ backgroundColor: pressed && Platform.OS !== "android" ? "rgba(119,33,87,.07)" : "transparent",
-                                 opacity: disabled ? 0.45 : 1 }, style]}>
+                                 opacity: disabled && dim ? 0.45 : 1 }, style]}>
       {children}
     </Pressable>
   );
@@ -455,7 +459,11 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
   const { fs, rtl } = useApp();
   const act = soon ? null : (onPress || (href ? () => open(href) : null));
   return (
-    <Press onPress={act} disabled={!act}
+    /* A "coming soon" row is not greyed out on the website — only its TITLE
+       goes muted and its chip goes to the paper colour. Fading the whole row
+       to 45% took the sub-line with it, so the sentence saying what the course
+       would be was the hardest thing on the screen to read. */
+    <Press onPress={act} disabled={!act} dim={!soon}
       style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                 padding: 14, borderRadius: 15, marginTop: 12, backgroundColor: C.card,
                 borderWidth: 1, borderColor: C.line }, SHADOW]}>
@@ -470,7 +478,14 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
         {!!sub && <Rich style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17), color: C.muted,
                                  marginTop: 2, textAlign: rtl ? "right" : "left" }}>{sub}</Rich>}
       </View>
-      {soon ? <Pill>{soon}</Pill>
+      {/* .soon-tag is GOLD — 9.5px bold in the gold itself inside a 45% gold
+          hairline. It was the app's grey Pill, so "coming soon" read as
+          "disabled" rather than as something the masjid intends to do. */
+       soon ? <View style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.45)", borderRadius: R.pill,
+                             paddingHorizontal: 8, paddingVertical: 3 }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
+                               textTransform: "uppercase", color: C.gold }}>{soon}</Text>
+              </View>
             /* .dr-ext — a gold ↗ at 80%, which the website uses on every row
                that leaves the app, against .dr-ch's muted chevron for one
                that goes deeper. */

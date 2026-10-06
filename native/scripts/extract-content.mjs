@@ -133,6 +133,12 @@ const out = await page.evaluate(ids => {
             : null;
           hero.lines.push({ ...str(k), w: weight, ...(px ? { px } : {}) });
         }
+        /* Nine of the eleven sheet heroes are centred and .ab-hero is not —
+           it has no text-align at all, so About reads left like the page of
+           history it is. Centring every hero made that one page look like a
+           poster. The alignment travels with the hero rather than being
+           assumed. */
+        hero.align = getComputedStyle(c).textAlign === "center" ? "center" : "left";
         blocks.push(hero);
         continue;
       }

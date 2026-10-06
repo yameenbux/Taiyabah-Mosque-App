@@ -49,7 +49,7 @@ const ICON = {
 };
 
 function Block({ b, nav, inCard }) {
-  const { tx, fs } = useApp();
+  const { tx, fs, rtl } = useApp();
   switch (b.type) {
     case "hero":    return null;   // the hero is hoisted out of the scroll body
     case "heading": return <Heading tag={b.tag ? tx(b.tag) : null}>{tx(b)}</Heading>;
@@ -78,10 +78,14 @@ function Block({ b, nav, inCard }) {
       return (
         <View style={{ marginTop: 2 }}>
           {b.items.map((it, i) => (
-            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 9,
-                                   paddingVertical: 12,
+            <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                   gap: 8, flexWrap: "wrap", paddingVertical: 12,
                                    borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-              <Rich style={{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(14.5),
+              {/* .ab-list div is a wrapping flex row, so the note sits beside
+                  the name with 8px between — "Moulana Mehboob Saheb Chorley".
+                  flex:1 on the name pushed it to the far right instead, which
+                  made a place-name look like a column of its own. */}
+              <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), flexShrink: 1,
                              lineHeight: fs(21), color: C.ink }}>{tx(it)}</Rich>
               {!!it.note && (it.now
                 ? <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 1,
@@ -217,7 +221,7 @@ export function sheetScreen(id, { extra } = {}) {
     const body = sheet.blocks.filter(b => b.type !== "hero");
     return (
       <Screen pad={false}>
-        {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
+        {!!hero && <Hero lines={hero.lines} ring={sheet.ring} align={hero.align} />}
         <View style={{ paddingHorizontal: 16 }}>
           {extra?.top ? extra.top({ navigation }) : null}
           <Blocks blocks={body} nav={navigation} />
