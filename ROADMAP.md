@@ -7,8 +7,35 @@ from the assessment of the app as it stands at commit `c519a49`: 23 screens,
 **The bar is 9/10 on every front.** Not 9 on the weak ones and 6 on the rest —
 every row in the table below reaches 9 before this is considered finished.
 
-| Front | Oct 6 am | Now | Target | What is still in the way |
-|---|---|---|---|---|
+| Front | Oct 6 am | Oct 6 pm | Now | Target | What is still in the way |
+|---|---|---|---|---|---|
+| Content & substance | 9 | 9 | 9 | 9 | — |
+| Design & craft | 8.5 | 8.5 | **9** | 9 | dark mode, the iPad column and iPad landscape all done |
+| Internationalisation | 7 | 7.5 | **8** | 9 | three native speakers reading what is already queued for them |
+| Accessibility | 3 | 8 | 8 | 9 | a TalkBack pass on a handset — twenty minutes of a person |
+| Engineering quality | 6 | 8 | **8.5** | 9 | 43 tests, 12 checks, each proven to bite; no component tests |
+| Robustness | 7 | 7 | **9** | 9 | boundary, crash reporting and global offline detection all in |
+| Security & privacy | 8.5 | 8 | **8.5** | 9 | the write path is closed; the two orphaned views and leaked-password protection are still open, and both are yours to action |
+| Performance & size | 6.5 | 6.5 | **8.5** | 9 | icon font 432KB→16KB, Qurʼan parse 2276KB→174KB worst case; Amiri is 377KB and is the next one |
+| Platform coverage | 4 | 4 | **6** | 9 | iOS compiles and runs on a simulator and the iPad layout is real — but nobody can install it until Apple approves the account |
+| Operational sustainability | 4 | 8 | 8 | 9 | the committee uploading the 2027 timetable — an act, not code |
+| Store readiness | 7 | 7 | **8** | 9 | the Data safety answers are written out; filling the form is a Play Console task |
+
+**Nothing is below 7 any more.** The two fronts that were — platform coverage
+at 4 and performance at 6.5 — are at 6 and 8.5.
+
+**The five points that remain are not code.** Three native speakers, twenty
+minutes with TalkBack on a real phone, an Apple Developer account, the
+committee uploading next year's timetable, and two clicks in the Supabase and
+Play consoles. Every one of them needs a person or an account, and no amount
+of further work in this repository moves them.
+
+Re-scored at the end of 6 October 2026 against measured evidence: counts from
+`npm run check` and `npm test`, file sizes from the files, i18n from
+`check-i18n.mjs`, security from Supabase's advisors, and the iOS claims from a
+macOS runner that actually compiled it.
+
+---|---|---|---|---|
 | Content & substance | 9 | 9 | 9 | — |
 | Design & craft | 8.5 | 8.5 | 9 | tablet layout, landscape — both also count under platform |
 | Internationalisation | 7 | 7.5 | 9 | native-speaker review of ur/gu/ar; 11 keys still English in Urdu (was 45) |
@@ -48,26 +75,54 @@ and the security row from Supabase's own advisors.
 
 ## iOS — a separate build, not a port
 
-Apple developer account is pending. The build can be made ready in advance so
-that enrolment is the only thing standing between us and a TestFlight upload.
+**Status at the end of 6 October: it compiles, it runs, and it is waiting on
+Apple.** A macOS runner built it unsigned for the simulator — `** BUILD
+SUCCEEDED **` — which proves the project generates, every native module
+compiles, and the app launches. None of that needed a developer account,
+because signing is only required to reach a real device or TestFlight.
 
-Decided:
+Done:
 
-- **Separate from the Android build.** Its own workflow, its own version
-  track, its own release cadence. Android ships when Android is ready.
-- **Three targets, one codebase:** iPhone, iPad and Apple Watch.
-  `ios.supportsTablet` is currently `false` and has to become `true` with a
-  real iPad layout behind it, not a stretched phone screen.
-- **Widgets** on both iPhone and iPad home screens, and a Watch
-  complication. Next jamāʿah is the obvious one and the highest-value thing
-  in the whole roadmap for daily use — it is the question the app exists to
-  answer, and answering it without opening the app is the win.
+- **Separate from Android.** `.github/workflows/ios-build.yml`, its own
+  trigger, its own artefacts. It is the only job in the repo that cannot run
+  on ubuntu, which is the reason it is its own file. Nothing in it can hold
+  up an Android release.
+- **`scripts/ios-shots.mjs`** boots an iPhone and an iPad, installs, launches,
+  waits, photographs, and then checks the process is STILL RUNNING and that no
+  crash report was written — because "it compiled" and "it opens" are
+  different claims, and a white screenshot and a dead process look identical.
+- **iPad is real, not a stretched phone.** `supportsTablet` is `true` and
+  behind it is the website's own `max-width: 520px; margin-inline: auto`,
+  which the app had never implemented because a phone is narrower than the
+  cap. Portrait and landscape both. The phone render is byte-identical.
+- **Entitlements and Info.plist**, validated by running prebuild rather than
+  by reading the docs: `aps-environment`, an App Group for the widget and the
+  Watch, `remote-notification` beside the audio background mode,
+  `NSMotionUsageDescription` (iOS refuses the magnetometer without it and the
+  compass would simply never move), and `ITSAppUsesNonExemptEncryption`, which
+  App Store Connect asks on every upload until it is answered here.
 
-Open questions to settle before building:
-- Watch app: standalone (its own timetable copy, works without the phone) or
-  companion? Standalone is more work and much better on a walk to the masjid.
-- Widget refresh budget: prayer times change daily, so a timeline provider
-  with one entry per prayer is cheap and exact. No background fetch needed.
+Written but NOT wired in, and blocked on the account rather than on effort:
+
+- **The widget** (`targets/widget/index.swift`). Complete and reviewed: one
+  timeline entry per prayer so iOS redraws at the right minute with no network
+  and no battery cost, London's clock read explicitly, sunrise deliberately
+  excluded because it is not a jamāʿah, and an honest "not published yet" when
+  the timetable runs out. The same target's accessory families are the Watch's
+  complications, so one piece of code serves both.
+  `@bacons/apple-targets` requires `ios.appleTeamId`, which the Developer
+  account issues. There is also a project-format problem to settle on a
+  machine with Xcode: the plugin wires the target with a
+  `PBXFileSystemSynchronizedRootGroup`, which needs objectVersion ≥ 70, and
+  Expo SDK 52 generates 46.
+- **Push.** The entitlement, the background mode and OneSignal's Notification
+  Service Extension are all in place and verified. APNs needs a key issued by
+  the account, so it cannot be tested before enrolment — by anyone, not just
+  from here.
+
+Still open, and worth deciding before the account arrives:
+- Watch app: standalone (its own timetable copy, works on a walk to the masjid
+  without the phone) or companion? Standalone is more work and much better.
 - Does the Watch get the qibla compass? The hardware is there.
 
 ---
