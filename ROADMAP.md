@@ -14,7 +14,7 @@ every row in the table below reaches 9 before this is considered finished.
 | Internationalisation | 7 | 9 | native-speaker review of ur/gu/ar; 45 keys still English per language |
 | **Accessibility** | **3** | **9** | labels, roles, font-scale cap, TalkBack/VoiceOver pass |
 | Engineering quality | 6 | 9 | no tests at all; 12 pure functions with date/money arithmetic untested |
-| **Robustness** | **4** | **9** | no error boundary, no crash reporting, no offline detection |
+| Robustness | 7 | 9 | boundary and crash reporting done; still no global offline detection |
 | Security & privacy | 8.5 | 9 | leaked-password protection off; 28 anon-executable definer functions to keep audited |
 | Performance & size | 6.5 | 9 | 436KB icon font for 15 icons; 2.3MB JSON parsed on the JS thread |
 | **Platform coverage** | **4** | **9** | Android only — iOS is roughly half the congregation |
@@ -55,9 +55,17 @@ Open questions to settle before building:
    ~1 day. The app currently carries `timetable-2026.json`, 365 days,
    `2026-01-01 → 2026-12-31`. On 1 January 2027 the most-used feature in the
    app stops working and fixing it needs a code change and a store release.
-2. **Error boundary + crash reporting (Sentry).** ~half a day. Today a single
-   render exception anywhere is a white screen with no recovery, and nobody
-   would ever hear that it happened.
+2. ~~Error boundary + crash reporting.~~ **Done** (`3d83faf`). Two
+   boundaries — one inside every screen through react-navigation's
+   `screenLayout`, so the tab bar survives a fault and "Try again" has
+   somewhere to go back to, and one around the whole app. Reported to the
+   masjid's own Supabase (`app_crashes`, `report_app_crash()`) rather than to
+   a third-party crash service, which would have put a new data processor in
+   a privacy notice that names only Stripe and the masjid. Proved by making
+   Notices throw and rendering it.
+
+   Still open on that row: **no global offline detection.** Notices has its
+   own "can't reach the masjid" state; nothing else does.
 3. **iOS build** — see above.
 4. ~~Rate-limit the public write RPCs.~~ **Already done, and I was wrong to
    list it.** It is implemented as BEFORE INSERT triggers on the tables
