@@ -829,10 +829,14 @@ export function CTA({ label, sub, onPress, href, compact, tone = "brand", disabl
                                  transform: [{ scale: pressed ? 0.985 : 1 }] })}>
       <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         style={{ paddingVertical: compact ? 12 : 15, paddingHorizontal: 20, alignItems: "center" }}>
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(compact ? 14 : 15),
-                       color: tone === "gold" ? C.brand900 : C.cream }}>{label}</Text>
-        {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), marginTop: 2.5,
-                                 color: tone === "gold" ? "rgba(60,11,42,.72)" : "rgba(243,239,227,.72)" }}>{sub}</Text>}
+        <Text style={{ fontFamily: F.sansBold, fontSize: fs(compact ? 14 : 17), letterSpacing: 0.17,
+                       color: tone === "gold" ? C.brand900 : "#F6F2E6" }}>{label}</Text>
+        {/* .dc-sub — 11.5px UPPERCASE with .08em of tracking in GOLD-BRIGHT.
+            It was sentence case in a dimmed cream, which read as a caption
+            under the button rather than as what the button accepts. */}
+        {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), letterSpacing: 0.92,
+                                 textTransform: "uppercase", marginTop: 2.5, textAlign: "center",
+                                 color: tone === "gold" ? "rgba(60,11,42,.72)" : C.goldBright }}>{sub}</Text>}
       </LinearGradient>
     </Pressable>
   );
@@ -853,15 +857,17 @@ export function Bank({ items }) {
         <Press key={i} onPress={() => copy(i, tx(it.v))}
           style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
                    paddingVertical: 13, paddingHorizontal: 15 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted,
-                           textAlign: rtl ? "right" : "left" }}>{tx(it.k)}</Text>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), color: C.ink, marginTop: 1.5,
+          <View style={{ flex: 1, gap: 3 }}>
+            {/* .bk-k is 10.5px UPPERCASE with .12em of tracking and .bk-v is
+                16px at 600. Sentence case at 11.5 over 15 made a sort code
+                read as a sentence with a number after it. */}
+            <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.26,
+                           textTransform: "uppercase", color: C.muted,
+                           textAlign: rtl ? "right" : "left" }}>
+              {tx(it.k)}{copied === i ? ` · ${t("ui.copied", "copied")}` : ""}</Text>
+            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16), letterSpacing: 0.16, color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>{tx(it.v)}</Text>
           </View>
-          {copied === i
-            ? <Pill tone="live">{t("ui.copied", "Copied")}</Pill>
-            : <Ionicons name="copy-outline" size={17} color={C.muted} />}
         </Press>))}
     </RowGroup>
   );

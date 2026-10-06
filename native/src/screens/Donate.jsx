@@ -11,9 +11,10 @@ import React, { useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { C, F, R } from "../theme";
+import { C, F, R, SHADOW } from "../theme";
+import { LinearGradient } from "expo-linear-gradient";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap, GLab, GoldCTA, Rich } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap, GLab, GoldCTA, Rich, TopBar, Girih } from "../ui";
 import { SHEETS } from "../Blocks";
 
 const BANK = [
@@ -47,34 +48,68 @@ const PHASE = [
   { k: "sheet.decor",      t: "Decor" },
 ];
 
-export function NewBuild() {
-  const { t, fs } = useApp();
+export function NewBuild({ navigation }) {
+  const { t, fs, rtl } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[
-        { k: "sheet.current_appeal_phase_3_3", t: "Current appeal · Phase 3.3", w: "eyebrow" },
-        { k: "sheet.internal_fixtures_fittings", t: "Internal fixtures & fittings", w: "title" },
-        { k: "sheet.help_make_the_masjid_ready", t: "Help make the masjid ready for salah, Qurʼan and remembrance", w: "sub" },
-      ]} />
-      <View style={{ paddingHorizontal: 16 }}>
-        <Card style={{ marginTop: 16 }}>
-          <Text style={{ fontFamily: F.arabic, fontSize: fs(17), lineHeight: fs(30), color: C.ink,
-                         textAlign: "center" }}>
-            {t("sheet.whoever_builds_a_mosque_for",
-              "“Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.”")}
-          </Text>
-          <Note>{t("sheet.narrated_by_uthman_ibn_affan",
-            "Narrated by ʿUthmān ibn ʿAffān · Ṣaḥīḥ al-Bukhārī 450 · Ṣaḥīḥ Muslim 533")}</Note>
-        </Card>
+      {/* Donate is one of the website's seven PAGES, and its hero is the
+          HADITH — the Arabic in gold at 23px, right-aligned, over the English
+          in Fraunces and the chain of narration under a gold hairline. The
+          app put the appeal in the hero instead and dropped the Arabic
+          altogether, so the verse that is the whole reason for the page came
+          out as a quiet card below the fold. */}
+      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+        <TopBar navigation={navigation} />
+      </LinearGradient>
+      <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        style={{ paddingTop: 26, paddingHorizontal: 22, paddingBottom: 24, overflow: "hidden" }}>
+        <Girih style={{ right: -50, top: -44 }} size={220} opacity={0.09} />
+        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(46), color: C.goldBright,
+                       textAlign: "right", writingDirection: "rtl", marginBottom: 16 }}>
+          مَنْ بَنَى مَسْجِدًا لِلَّهِ بَنَى اللَّهُ لَهُ فِي الْجَنَّةِ مِثْلَهُ</Text>
+        <Rich style={{ fontFamily: F.display, fontSize: fs(16.5), lineHeight: fs(25.5), color: "#EDEFE9",
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("sheet.whoever_builds_a_mosque_for",
+            "“Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise.”")}
+        </Rich>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(11), letterSpacing: 0.66, color: "#A78F9E",
+                       marginTop: 12, paddingTop: 11, borderTopWidth: 1,
+                       borderTopColor: "rgba(198,162,76,.25)", textAlign: rtl ? "right" : "left" }}>
+          {t("sheet.narrated_by_uthman_ibn_affan",
+            "Narrated by ʿUthmān ibn ʿAffān · Ṣaḥīḥ al-Bukhārī 450 · Ṣaḥīḥ Muslim 533")}</Text>
+      </LinearGradient>
 
+      <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("sheet.where_the_build_is_now", "Where the build is now")}</Heading>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7 }}>
-          {PHASE.map(x => (
-            <View key={x.k} style={{ borderWidth: 1, borderColor: C.line, borderRadius: R.pill,
-                                   paddingHorizontal: 11, paddingVertical: 6, backgroundColor: C.card }}>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.brand600 }}>{t(x.k, x.t)}</Text>
-            </View>))}
-        </View>
+        {/* .card.phase — the appeal itself: a 10px uppercase plum tag tracked
+            .16em, the phase in Fraunces at 19, the sentence under it, and the
+            six needs as GOLD pills inside it. The app had the tag and the
+            title up in the hero and the pills loose on the paper, so the card
+            that says what the money is for did not exist. */}
+        <Card pad={16}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(10), letterSpacing: 1.6,
+                         textTransform: "uppercase", color: C.brand600, marginBottom: 8,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("sheet.current_appeal_phase_3_3", "Current appeal · Phase 3.3")}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: fs(19), lineHeight: fs(24), color: C.ink,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("sheet.internal_fixtures_fittings", "Internal fixtures & fittings")}</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(21.5), color: C.muted,
+                         marginTop: 8, textAlign: rtl ? "right" : "left" }}>
+            {t("sheet.help_make_the_masjid_ready",
+              "Help make the masjid ready for salah, Qurʼan and remembrance for generations to come.")}</Text>
+          {/* .needs span — a 16% gold fill inside a 30% gold border with the
+              label in #4A3B14. They were plum text on a white pill. */}
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 13 }}>
+            {PHASE.map(x => (
+              <View key={x.k} style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.3)",
+                                       backgroundColor: "rgba(198,162,76,.16)", borderRadius: R.pill,
+                                       paddingHorizontal: 11, paddingVertical: 5 }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: "#4A3B14" }}>
+                  {t(x.k, x.t)}</Text>
+              </View>))}
+          </View>
+        </Card>
 
         <Heading tag={t("sheet.apple_google_pay", "Apple & Google Pay")}>{t("sheet.give_now", "Give now")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -108,18 +143,24 @@ export function NewBuild() {
   );
 }
 
+/* .copyall — a FULL-WIDTH brand-700 to brand-800 button at 13px of radius
+ * with the label 15px bold in cream and the shared lift. It was a small
+ * outlined pill centred under the panel, which on the one screen where the
+ * details matter looked like a footnote rather than the thing to press. */
 function CopyAll() {
   const { t, fs } = useApp();
   const [done, setDone] = useState(false);
   const all = BANK.map(b => `${b.k.t}: ${b.v.t}`).join("\n");
   return (
-    <Press onPress={async () => { tap(); await Clipboard.setStringAsync(all); setDone(true); setTimeout(() => setDone(false), 1800); }}
-      style={{ marginTop: 11, alignSelf: "center", flexDirection: "row", alignItems: "center", gap: 7,
-               paddingHorizontal: 15, paddingVertical: 9, borderRadius: R.pill, borderWidth: 1, borderColor: C.line }}>
-      <Ionicons name={done ? "checkmark" : "copy-outline"} size={15} color={C.brand600} />
-      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
-        {done ? t("ui.copied", "Copied") : t("sheet.copy_all_details", "Copy all details")}</Text>
-    </Press>
+    <Pressable onPress={async () => { tap(); await Clipboard.setStringAsync(all); setDone(true); setTimeout(() => setDone(false), 2000); }}
+      style={({ pressed }) => [{ marginTop: 12, borderRadius: 13, overflow: "hidden",
+                                 opacity: pressed ? 0.9 : 1 }, SHADOW]}>
+      <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        style={{ paddingVertical: 14, alignItems: "center" }}>
+        <Text style={{ fontFamily: F.sansBold, fontSize: fs(15), color: C.cream }}>
+          {done ? t("ui.copied", "Copied") : t("sheet.copy_all_details", "Copy all details")}</Text>
+      </LinearGradient>
+    </Pressable>
   );
 }
 

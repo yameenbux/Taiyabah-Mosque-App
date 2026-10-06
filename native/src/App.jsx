@@ -155,7 +155,9 @@ function Root() {
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
-        <Stack.Screen name="NewBuild"  component={NewBuild}  options={{ ...sheet, title: t("nb.new_build", "New Build") }} />
+        {/* The donate page: one of the website's seven, so it wears the app
+            bar rather than a sheet header. */}
+        <Stack.Screen name="NewBuild"  component={NewBuild}  options={page} />
         <Stack.Screen name="Giving"    component={Giving}    options={{ ...sheet, title: t("giving.sadaqah_lillah", "Sadaqah & Lillah") }} />
 
         {/* services with a form behind them */}
