@@ -370,22 +370,32 @@ export function NavRow({ icon, label, sub, soon, onPress, href, value, right, to
 
 /* A label and a value on one line. Tapping one that has a link behind it does
  * the obvious thing; one without stays inert instead of pretending. */
-export function KV({ k, v, href, icon, onPress }) {
+export function KV({ k, v, href, icon, onPress, kind }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
   /* A row with somewhere to go — Address, Telephone — stacks its label over its
    * value and takes a chevron. A row that is only a fact — "All classes · £10 /
    * week" — is a table row, and reads as one: label left, figure right. */
   const table = !act && !icon;
-  if (table) return (
-    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
-                   paddingVertical: 13, paddingHorizontal: 15 }}>
-      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(20), color: C.muted,
-                     textAlign: rtl ? "right" : "left" }}>{k}</Rich>
-      <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), lineHeight: fs(20), color: C.ink,
-                     textAlign: rtl ? "left" : "right", maxWidth: "52%" }}>{v}</Rich>
-    </View>
-  );
+  if (table) {
+    /* .ad-r is the fee table — the label in INK and the figure 15px bold in
+       brand-600, because on a page of prices the money is the plum thing.
+       .bk-rate-line is the tariff — both sides 13.5px ink, the figure bold,
+       8px of padding rather than 12. .bt-row is the plain one. All three had
+       been drawing as a muted label with an ink value. */
+    const fee = kind === "fee", rate = kind === "rate";
+    return (
+      <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 12,
+                     paddingVertical: rate ? 8 : 12, paddingHorizontal: 16 }}>
+        <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(rate ? 13.5 : fee ? 13.5 : 13),
+                       lineHeight: fs(20), color: fee || rate ? C.ink : C.muted,
+                       textAlign: rtl ? "right" : "left" }}>{k}</Rich>
+        <Rich style={{ fontFamily: F.sansBold, fontSize: fs(rate ? 13.5 : 15), lineHeight: fs(20),
+                       color: fee ? C.brand600 : C.ink,
+                       textAlign: rtl ? "left" : "right", maxWidth: "52%" }}>{v}</Rich>
+      </View>
+    );
+  }
   return (
     <Press onPress={act} disabled={!act}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
@@ -414,6 +424,41 @@ export function KV({ k, v, href, icon, onPress }) {
  * folded in with .md-row, whose shape is the other way round — a 14.5px title
  * over a 12px muted sub — so on fourteen screens the label was large and black
  * and the phone number was small and grey beneath it. */
+/* .md-row — a card of its own, not a row in a grouped list: 15px of radius,
+ * 14 of padding, a hairline, the shared lift and 12px of air below the one
+ * before it. Its 40px chip at 12px of radius holds a hand-drawn SVG — a crib,
+ * two wedding bands, a shield with a tick — and the title is 15px BOLD over a
+ * 12px muted line. Twenty of these across five screens, every one of them
+ * flattened into one bordered group with hairlines between, titled 14.5px
+ * medium, with the nearest icon-font glyph in place of the drawing.
+ *
+ * A row with nothing behind it yet takes the paper chip and muted type the
+ * website gives .md-row.soon. */
+export function MenuRow({ label, sub, svg, icon, soon, onPress, href }) {
+  const { fs, rtl } = useApp();
+  const act = soon ? null : (onPress || (href ? () => open(href) : null));
+  return (
+    <Press onPress={act} disabled={!act}
+      style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
+                padding: 14, borderRadius: 15, marginTop: 12, backgroundColor: C.card,
+                borderWidth: 1, borderColor: C.line }, SHADOW]}>
+      <View style={{ width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center",
+                     backgroundColor: soon ? C.paper : "#F0E9ED" }}>
+        {svg ? <SvgXml xml={svg} width={20} height={20} color={soon ? C.muted : C.brand600} />
+             : <Ionicons name={icon || "chevron-forward-outline"} size={19} color={soon ? C.muted : C.brand600} />}
+      </View>
+      <View style={{ flex: 1 }}>
+        <Rich style={{ fontFamily: F.sansBold, fontSize: fs(15), color: soon ? C.muted : C.ink,
+                       textAlign: rtl ? "right" : "left" }}>{label}</Rich>
+        {!!sub && <Rich style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17), color: C.muted,
+                                 marginTop: 2, textAlign: rtl ? "right" : "left" }}>{sub}</Rich>}
+      </View>
+      {soon ? <Pill>{soon}</Pill>
+            : act ? <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} /> : null}
+    </Press>
+  );
+}
+
 export function Call({ k, v, href, onPress, icon }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
@@ -624,10 +669,30 @@ export function Urgent({ lab, h, ps, nums }) {
   );
 }
 
-export function Callout({ lab, h, ps, cta, tone = "plum" }) {
+export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
   const { fs, tx, rtl } = useApp();
   const c = CALLOUT_TONES[tone] || CALLOUT_TONES.plum;
   const align = rtl ? "right" : "left";
+  const body = ps || [];
+  /* .ad-apply — a FILLED brand-600 bar at 11px of radius, the label 13px bold
+     on the left and the ↗ hard right, 11/13 of padding. It was the shared
+     gradient pill with everything centred, which on a dark panel read as a
+     second paragraph rather than the thing to tap. */
+  const button = !cta ? null : (
+    <Pressable key="cta" onPress={() => cta.href && open(cta.href)}
+      style={({ pressed }) => ({ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                 justifyContent: "space-between", gap: 8,
+                                 marginTop: 10, marginBottom: 12, paddingVertical: 11, paddingHorizontal: 13,
+                                 borderRadius: 11, backgroundColor: C.brand600,
+                                 opacity: pressed ? 0.88 : 1 })}>
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: "#FFFFFF" }}>{tx(cta)}</Text>
+      <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "#FFFFFF" }}>↗</Text>
+    </Pressable>
+  );
+  /* The website puts it BETWEEN the paragraphs on admissions, so "The office
+     takes admission queries between 5pm and 7pm" is the last word before you
+     tap. Appending it at the end stranded that line above the button. */
+  const at = cta ? (typeof ctaAt === "number" ? ctaAt : body.length) : -1;
   const inner = (
     <>
       {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
@@ -635,11 +700,14 @@ export function Callout({ lab, h, ps, cta, tone = "plum" }) {
                                textAlign: align }}>{tx(lab)}</Text>}
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(15.5), lineHeight: fs(22.5),
                              color: c.dark ? c.head : C.ink, textAlign: align }}>{tx(h)}</Rich>}
-      {(ps || []).map((x, i) => c.dark
-        ? <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21.5),
-                                 color: c.body, marginTop: 8, textAlign: align }}>{tx(x)}</Rich>
-        : <P key={i} muted>{tx(x)}</P>)}
-      {!!cta && <CTA label={tx(cta)} href={cta.href} compact tone={tone === "gold" ? "gold" : "brand"} />}
+      {body.flatMap((x, i) => [
+        c.dark
+          ? <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21.5),
+                                   color: c.body, marginTop: 8, textAlign: align }}>{tx(x)}</Rich>
+          : <P key={i} muted>{tx(x)}</P>,
+        i + 1 === at ? button : null,
+      ])}
+      {at >= body.length ? button : null}
     </>
   );
   if (c.dark) return (

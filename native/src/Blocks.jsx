@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -115,7 +115,7 @@ function Block({ b, nav, inCard }) {
     }
 
     case "kv": {
-      const row = <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+      const row = <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} kind={b.kind} />;
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
@@ -127,6 +127,11 @@ function Block({ b, nav, inCard }) {
 
     case "row": {
       const route = b.id && ROUTE[b.id];
+      const go = route ? () => nav?.navigate(route) : b.href ? () => open(b.href) : null;
+      if (b.card)
+        return <MenuRow label={tx(b.label)} sub={b.sub ? tx(b.sub) : null} svg={b.svg}
+                        icon={route ? ICON[route] : hrefIcon(b.href)}
+                        soon={b.soon ? tx(b.soon) : null} onPress={go} />;
       const row = (
         <NavRow
           icon={route ? ICON[route] : hrefIcon(b.href)}
@@ -153,14 +158,21 @@ function Block({ b, nav, inCard }) {
 
 /* Successive rows and key/value pairs read as one grouped list rather than a
  * stack of separate cards — the difference between a settings screen and a
- * web page with a lot of boxes on it. */
+ * web page with a lot of boxes on it.
+ *
+ * EXCEPT .md-row, which the website really does draw as separate cards, each
+ * with its own radius, hairline and lift and 12px of air between. Grouping
+ * them was my idea, not the site's, and it overrode the one thing that said
+ * otherwise: on Birth/Marriage/Death, Education, the Qurʾān, the madrasah and
+ * the adhkār, four to five standalone cards became one bordered list. */
+const groupable = b => (b.type === "row" && !b.card) || b.type === "kv" || b.type === "link";
+
 function merge(blocks) {
   const out = [];
   for (const b of blocks) {
     const last = out[out.length - 1];
-    if ((b.type === "row" || b.type === "kv" || b.type === "link") && last && last.group &&
-        last.group[0].type !== "card") { last.group.push(b); continue; }
-    if (b.type === "row" || b.type === "kv" || b.type === "link") { out.push({ group: [b] }); continue; }
+    if (groupable(b) && last && last.group && last.group[0].type !== "card") { last.group.push(b); continue; }
+    if (groupable(b)) { out.push({ group: [b] }); continue; }
     out.push(b);
   }
   return out;
@@ -181,7 +193,7 @@ export function Blocks({ blocks, nav }) {
  * RowGroup above already is the card. */
 function GroupKV({ b }) {
   const { tx } = useApp();
-  return <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+  return <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} kind={b.kind} />;
 }
 function GroupRow({ b, nav }) {
   const { tx } = useApp();

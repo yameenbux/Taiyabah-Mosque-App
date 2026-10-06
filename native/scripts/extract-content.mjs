@@ -138,9 +138,23 @@ const out = await page.evaluate(ids => {
         const h = c.querySelector("h3,h4");
         const ps = [...c.querySelectorAll("p")].map(str).filter(p => p.t);
         const a = c.querySelector("a[href],button[id]");
+        /* WHERE the button sits matters. On admissions the website puts
+           "Open the application form" BETWEEN the explanation and "The office
+           takes admission queries between 5pm and 7pm", so the closing line
+           is the last word before you tap. The button was always appended at
+           the end instead, which left that sentence stranded above it. */
+        const after = a ? [...c.querySelectorAll("p")]
+          .filter(x => x.textContent.trim())
+          .findIndex(x => a.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING) : -1;
         blocks.push(node("callout", { lab: lab ? str(lab) : null, h: h ? str(h) : null, ps,
           tone: CALLOUTS[calloutClass],
-          cta: a ? { ...str(a), href: a.getAttribute("href") || null, id: a.id || null } : null }));
+          ctaAt: after < 0 ? ps.length : after,
+          /* The label is the anchor's own span, not the whole anchor: .dr-ext
+             holds a ↗ glyph, and taking the anchor's text swept it into the
+             words, so the button read "Open the application form ↗" and then
+             drew a second arrow of its own at the far end. */
+          cta: a ? { ...str(a.querySelector(":scope > span:not(.dr-ext)") || a),
+                     href: a.getAttribute("href") || null, id: a.id || null } : null }));
         continue;
       }
 
@@ -313,8 +327,19 @@ const out = await page.evaluate(ids => {
         const v = c.querySelector('[class*="-v"], :scope > .v, :scope > * > .v, :scope > .p');
         if (k && v) {
           const href = c.getAttribute("href") || null;
+          /* THREE DIFFERENT TABLE ROWS, not one.
+             .ad-r   — fees and class times: label 13.5px in INK, figure 15px
+                       bold in brand-600. The money is the plum thing.
+             .bt-row — the birth table: label 13px MUTED, value 15px bold ink.
+             .bk-rate-line — the hire tariff and the nikāḥ fees: both sides
+                       13.5px in ink, the figure bold, and the hairline runs
+                       UNDER the row rather than over it.
+             All three drew as one shape here: a muted label with an ink
+             value, so on admissions every fee lost its colour and every
+             label gained grey it should not have. */
+          const kind = has(c, "ad-r") ? "fee" : has(c, "bk-rate-line") ? "rate" : "plain";
           blocks.push(node("kv", {
-            k: str(k), v: str(v), href,
+            k: str(k), v: str(v), href, kind,
             icon: !href ? (/radio|frequency/i.test(k.textContent || "") ? "radio" : null)
                 : href.startsWith("tel:") ? "call"
                 : href.startsWith("mailto:") ? "mail"
@@ -363,8 +388,16 @@ const out = await page.evaluate(ids => {
       if (has(c, "md-row") || has(c, "ab-video") || has(c, "dr-row")) {
         const t1 = c.querySelector(".md-t1,.ab-v1");
         const t2 = c.querySelector(".md-t2,.ab-v2");
+        /* .md-row is a CARD of its own — 15px of radius, 14 of padding, a
+           hairline and the shared lift, 12px below the one before it — not a
+           row in a grouped list. And its 40px chip holds a hand-drawn SVG:
+           a crib, two wedding bands, a shield with a tick. Twenty of these
+           across five screens. */
+        const ico = c.querySelector(".md-ico svg");
         blocks.push(node("row", {
           label: t1 ? str(t1) : str(c), sub: t2 ? str(t2) : null,
+          card: has(c, "md-row"),
+          svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null,
           href: c.getAttribute("href") || null, id: c.id || null,
           soon: (() => { const t = c.querySelector(".soon-tag"); return t ? str(t) : (has(c, "soon") ? { t: "Coming soon" } : null); })(),
         }));

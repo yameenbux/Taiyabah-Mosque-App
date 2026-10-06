@@ -56,6 +56,8 @@
      "k": "about.history_new_build_journey",
      "t": "History & new build journey"
     },
+    "card": false,
+    "svg": null,
     "href": "https://www.youtube.com/watch?v=N7wFXynmLHM",
     "id": null,
     "soon": null
@@ -288,6 +290,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -387,6 +390,7 @@
        "t": "31a Draycott Street\nBolton BL1 8HD"
       },
       "href": "https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD",
+      "kind": "plain",
       "icon": "location",
       "id": null,
       "static": false
@@ -401,6 +405,7 @@
        "t": "01204 535 997"
       },
       "href": "tel:01204535997",
+      "kind": "plain",
       "icon": "call",
       "id": null,
       "static": false
@@ -416,6 +421,7 @@
        "t": "info@taiyabahmasjid.com"
       },
       "href": "mailto:info@taiyabahmasjid.com",
+      "kind": "plain",
       "icon": "mail",
       "id": null,
       "static": false
@@ -431,6 +437,7 @@
        "t": "taiyabahmasjid.com"
       },
       "href": "https://www.taiyabahmasjid.com/",
+      "kind": "plain",
       "icon": "globe",
       "id": null,
       "static": false
@@ -446,6 +453,7 @@
        "t": "454.1000 MHz"
       },
       "href": null,
+      "kind": "plain",
       "icon": "radio",
       "id": null,
       "static": true
@@ -513,6 +521,8 @@
      "k": "marriagedeath.guidance_for_new_arrivals_including",
      "t": "Guidance for new arrivals, including circumcision"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 19c0-3.5 2-6 3-8s.5-4-1-5.5\"></path> <circle cx=\"15\" cy=\"7\" r=\"2.3\"></circle> <path d=\"M6 19h14\"></path><path d=\"M11 19v-4a3 3 0 0 1 6 0v4\"></path> </svg>",
     "href": null,
     "id": "md-birth",
     "soon": null
@@ -527,6 +537,8 @@
      "k": "marriagedeath.nikah_based_on_authentic_islamic",
      "t": "Nikāḥ, based on authentic Islamic tradition"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <circle cx=\"8.5\" cy=\"15.5\" r=\"4.5\"></circle><circle cx=\"15.5\" cy=\"15.5\" r=\"4.5\"></circle> <path d=\"M12 4.5c1.4 0 2.5 1 2.5 2.2S13.4 9 12 9s-2.5-1-2.5-2.3S10.6 4.5 12 4.5Z\"></path> </svg>",
     "href": null,
     "id": "md-marriage",
     "soon": null
@@ -541,6 +553,8 @@
      "k": "marriagedeath.wasiyyah_why_and_how_to",
      "t": "Wasiyyah — why and how to prepare one"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z\"></path> <path d=\"M14 3v5h5\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h4\"></path> </svg>",
     "href": null,
     "id": "md-will",
     "soon": null
@@ -555,6 +569,8 @@
      "k": "marriagedeath.janazah_guidance_and_support",
      "t": "Janāzah guidance and support"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7l-8-4Z\"></path> <path d=\"M9 12l2 2 4-4\"></path> </svg>",
     "href": null,
     "id": "md-funeral",
     "soon": null
@@ -1009,6 +1025,7 @@
        "t": "2 weeks – 18 months"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1023,6 +1040,7 @@
        "t": "£180"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1037,6 +1055,7 @@
        "t": "£250"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1051,6 +1070,7 @@
        "t": "£300"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1128,6 +1148,8 @@
      "k": "edu.one_evening_a_week_7",
      "t": "One evening a week · 7–8pm · 15 places"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4.5c2.5-1.6 5.2-1.6 7.5 0v13c-2.3-1.6-5-1.6-7.5 0-2.5-1.6-5.2-1.6-7.5 0v-13c2.3-1.6 5-1.6 7.5 0z\"></path><path d=\"M12 4.5v13\"></path></svg>",
     "href": null,
     "id": "ed-arabic",
     "soon": null
@@ -1142,6 +1164,8 @@
      "k": "edu.one_off_session_run_periodically",
      "t": "One-off session · run periodically · 15 places"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z\"></path></svg>",
     "href": null,
     "id": "ed-ghusl",
     "soon": null
@@ -1156,6 +1180,8 @@
      "k": "edu.tajweed_seerah_a_womens_circle",
      "t": "Tajweed, Seerah, a women’s circle — tell the office what you’d like taught"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M12 8v8M8 12h8\"></path></svg>",
     "href": null,
     "id": null,
     "soon": {
@@ -1249,6 +1275,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -1403,6 +1430,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -1774,6 +1802,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": null
    },
    {
@@ -1815,6 +1844,8 @@
      "k": "madrasah.fees_class_times_and_attendance",
      "t": "Fees, class times and attendance"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v12.5H6z\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.5h6.4M8.8 15.6h4.4\"></path></svg>",
     "href": null,
     "id": "mdr-go-admissions",
     "soon": null
@@ -1829,6 +1860,8 @@
      "k": "madrasah.the_admission_form_for_this_year",
      "t": "The admission form for this year's classes"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v5.5\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.2h3.4M8.8 8.9h3\"></path><path d=\"m15.6 20.4-3 .6.6-3 5-5a1.7 1.7 0 0 1 2.4 2.4l-5 5Z\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
     "id": "mdr-go-apply",
     "soon": null
@@ -1843,6 +1876,8 @@
      "k": "madrasah.term_dates_and_closures",
      "t": "Term dates and closures"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M3.5 9.5h17M8.5 3.5v3M15.5 3.5v3\"></path></svg>",
     "href": null,
     "id": "mdr-go-holidays",
     "soon": null
@@ -1857,6 +1892,8 @@
      "k": "madrasah.sign_in_registers_still_being_built",
      "t": "Sign in · registers and pupil records still being built"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5\"></path><path d=\"M10 8.4 13.6 12 10 15.6\"></path><path d=\"M13.6 12H4.5\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/portal/",
     "id": "mdr-go-portal",
     "soon": null
@@ -1871,6 +1908,8 @@
      "k": "madrasah.the_curriculum_the_madrasah_teaches",
      "t": "The curriculum the madrasah teaches"
     },
+    "card": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.4v13\"></path><path d=\"M12 6.4C10.3 5 8.1 4.3 5.4 4.3A1.4 1.4 0 0 0 4 5.7v11.1a1.4 1.4 0 0 0 1.4 1.4c2.7 0 4.9.7 6.6 2.1\"></path><path d=\"M12 6.4c1.7-1.4 3.9-2.1 6.6-2.1A1.4 1.4 0 0 1 20 5.7v11.1a1.4 1.4 0 0 1-1.4 1.4c-2.7 0-4.9.7-6.6 2.1\"></path></svg>",
     "href": null,
     "id": "mdr-go-curriculum",
     "soon": null
@@ -1924,8 +1963,10 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": {
-     "t": "Open the application form ↗",
+     "k": "adm.open_the_application_form",
+     "t": "Open the application form",
      "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
      "id": "ad-apply"
     }
@@ -1960,6 +2001,7 @@
        "t": "£10 / week"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -1975,6 +2017,7 @@
        "t": "£14 / week"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -1990,6 +2033,7 @@
        "t": "£20"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2026,6 +2070,7 @@
        "t": "5:00–7:00pm"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2041,6 +2086,7 @@
        "t": "5:00–7:30pm"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2056,6 +2102,7 @@
        "t": "9:00–11:00am"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2426,6 +2473,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -2936,6 +2984,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": null
    },
    {
@@ -3065,6 +3114,7 @@
        "t": "£350"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3079,6 +3129,7 @@
        "t": "£500"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3093,6 +3144,7 @@
        "t": "£600"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3112,6 +3164,7 @@
        "t": "£600"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3126,6 +3179,7 @@
        "t": "£700"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3150,6 +3204,7 @@
        "t": "£125"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3165,6 +3220,7 @@
        "t": "45p per person"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3184,6 +3240,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3199,6 +3256,7 @@
        "t": "45p per person"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3213,6 +3271,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3237,6 +3296,7 @@
        "t": "30-99-50"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3251,6 +3311,7 @@
        "t": "59286668"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3495,6 +3556,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3509,6 +3571,7 @@
        "t": "£200"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3528,6 +3591,7 @@
        "t": "30-99-50"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3542,6 +3606,7 @@
        "t": "59286668"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
