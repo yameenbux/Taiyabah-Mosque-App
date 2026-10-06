@@ -340,6 +340,9 @@ export default function Home({ navigation }) {
                 <View style={{ flexDirection: "row", gap: 7 }}>
                   {[["chevron-back", -1], ["chevron-forward", 1]].map(([icon, step]) => (
                     <Press key={icon}
+                      accessibilityRole="button"
+                      accessibilityLabel={step < 0 ? t("a11y.previous_reminder", "Previous reminder")
+                                                   : t("a11y.next_reminder", "Next reminder")}
                       onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
                       style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
                                justifyContent: "center", borderWidth: 1,

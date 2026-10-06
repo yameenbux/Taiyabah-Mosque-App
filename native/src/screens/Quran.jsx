@@ -422,7 +422,8 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: mode === k ? C.goldBright : "rgba(243,239,227,.7)" }}>{lab}</Text>
           </Press>))}
-        <Press onPress={onClose} style={{ padding: 10 }}>
+        <Press onPress={onClose} style={{ padding: 10 }}
+          accessibilityRole="button" accessibilityLabel={t("a11y.close", "Close")}>
           <Ionicons name="close" size={22} color={C.cream} />
         </Press>
       </View>

@@ -148,7 +148,13 @@ export function Calendar({ month, onMonth, selected = [], taken = null, first, l
   const nav = (dir, off) => (
     /* .bk-nav — a 34px box at 10px of radius on the paper inside a hairline,
        not a bare chevron floating at the edge of the card. */
+    /* Icon-only, so it has to say what it is: with TalkBack on, a bare
+       chevron announces as "button" and nothing else. The website's own
+       aria-label, so the words match and the packs already carry them. */
     <Press onPress={() => !off && (tap(), onMonth(new Date(y, m + dir, 1)))} disabled={off}
+      accessibilityRole="button"
+      accessibilityLabel={dir < 0 ? t("a11y.previous_month", "Previous month")
+                                  : t("a11y.next_month", "Next month")}
       style={{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, borderColor: C.line,
                backgroundColor: C.paper, alignItems: "center", justifyContent: "center",
                opacity: off ? 0.35 : 1 }}>

@@ -6,6 +6,7 @@
  * better than the app visibly changing size or language a beat after it opens.
  */
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
+import { PixelRatio } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EN from "./i18n/en.json";
 
@@ -25,6 +26,20 @@ const KEY = "taiyabah.prefs.v1";
  * else and taken away by putting it where it already is. muFavs is the list you
  * build up on purpose. The web app keeps exactly these two, separately and for
  * the same reason, so a reader who uses both on the website finds both here. */
+/* What the phone itself asks for. 1 on anything that cannot say — the web
+ * export among them, where React Native applies no scale of its own. */
+const osFontScale = () => {
+  const n = PixelRatio.getFontScale?.();
+  return Number.isFinite(n) && n > 0 ? n : 1;
+};
+
+/* The ceiling. Past about 1.5 the prayer table stops fitting five columns on
+ * a phone and the tab bar's labels start to clip, so this is where the app
+ * stops growing text and the reader's own pinch-zoom would have to take over. */
+const SCALE_CEILING = 1.5;
+const wantedScale = chosen =>
+  Math.min(Math.max(osFontScale(), chosen || 1), SCALE_CEILING);
+
 const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null,
                    muMark: 0, muFavs: [],
                    /* The website's own five switches and its ten-minute default,
@@ -99,8 +114,24 @@ export function AppProvider({ children, fallback = null }) {
       t, tx,
       rtl: RTL.has(prefs.lang),
       /* Text size multiplies every size in the app, exactly as --ts did on the
-       * web. Arabic and Urdu need a touch more height to stay legible. */
-      fs: n => Math.round(n * prefs.scale),
+       * web. Arabic and Urdu need a touch more height to stay legible.
+       *
+       * THE TWO SCALES USED TO MULTIPLY. React Native applies the phone's own
+       * font setting on top of whatever fontSize it is given, and this app
+       * has a text-size control of its own because the website does. Somebody
+       * with Android set to its largest text and "Extra large" chosen here got
+       * 1.3 x 1.42 — nearly twice the designed size, on every screen, and the
+       * layouts do not survive it.
+       *
+       * So the bigger of the two wins rather than the product, capped at 1.5.
+       * Dividing by the phone's scale here cancels the one React Native is
+       * about to apply, leaving exactly `want`.
+       *
+       * It never renders SMALLER than the phone asked for. Somebody who has
+       * told Android they need large text has said something about their
+       * eyesight, and no in-app setting should quietly undo it; the control
+       * here can still take them above it. */
+      fs: n => Math.round(n * wantedScale(prefs.scale) / osFontScale()),
       setLang: lang => save({ ...prefs, lang }),
       setScale: scale => save({ ...prefs, scale }),
       setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),

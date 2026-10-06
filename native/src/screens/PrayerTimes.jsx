@@ -95,6 +95,7 @@ export default function PrayerTimes({ navigation }) {
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8,
                      paddingHorizontal: 16, paddingTop: 14 }}>
         <Press onPress={() => step(-1)}
+          accessibilityRole="button" accessibilityLabel={t("a11y.previous_day", "Previous day")}
           style={[{ width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center",
                     borderWidth: 1, borderColor: C.line, backgroundColor: C.card }, SHADOW]}>
           <Ionicons name={rtl ? "chevron-forward" : "chevron-back"} size={22} color={C.ink} />
@@ -111,6 +112,7 @@ export default function PrayerTimes({ navigation }) {
             {dayMonthYear(t, when)}</Text>
         </Press>
         <Press onPress={() => step(1)}
+          accessibilityRole="button" accessibilityLabel={t("a11y.next_day", "Next day")}
           style={[{ width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center",
                     borderWidth: 1, borderColor: C.line, backgroundColor: C.card }, SHADOW]}>
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={22} color={C.ink} />

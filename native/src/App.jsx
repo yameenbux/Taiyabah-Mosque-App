@@ -78,10 +78,15 @@ function Tabs() {
         headerShown: false,
         tabBarActiveTintColor: C.brand600,
         tabBarInactiveTintColor: C.muted,
+        /* THE BAR HAS TO GROW WITH THE TEXT. Its height was fixed while the
+           label scaled, so at the largest text size every label was sliced
+           through the middle — on the one piece of chrome somebody touches
+           all day. The base heights are what the design wants at normal size;
+           whatever the line gains beyond that is added to the bar. */
         tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6,
                        /* Urdu and Arabic glyphs hang well below the baseline; at
                           the Latin height their descenders are sliced off. */
-                       height: rtl ? 74 : 64 },
+                       height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14)) },
         tabBarLabelStyle: { fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
                             lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
                             includeFontPadding: false },

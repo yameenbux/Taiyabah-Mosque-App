@@ -216,6 +216,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
           which the website does not have on that sheet at all. */}
       {!!onPrev && (
         <Pressable onPress={() => { tap(); onPrev(); }} disabled={prevOff} accessibilityRole="button"
+          accessibilityLabel={t("a11y.previous_month", "Previous month")}
           style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
                                      justifyContent: "center", borderWidth: 1, opacity: prevOff ? 0.35 : 1,
                                      borderColor: "rgba(255,255,255,.2)",
@@ -229,6 +230,7 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
                                        textAlign: onPrev ? "center" : rtl ? "right" : "left" }}>{title}</Text>
       {!!onNext && (
         <Pressable onPress={() => { tap(); onNext(); }} disabled={nextOff} accessibilityRole="button"
+          accessibilityLabel={t("a11y.next_month", "Next month")}
           style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
                                      justifyContent: "center", borderWidth: 1, opacity: nextOff ? 0.35 : 1,
                                      borderColor: "rgba(255,255,255,.2)",

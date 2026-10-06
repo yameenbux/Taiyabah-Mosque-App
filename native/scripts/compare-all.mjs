@@ -113,6 +113,16 @@ const FACES = FONTS.map(f =>
 const newPage = async (url, side) => {
   const page = await browser.newPage({ viewport: { width: 414, height: 1500 }, deviceScaleFactor: 1.6 });
   await page.addInitScript(FREEZE(ts));
+  /* CMP_SCALE renders the native side at a chosen text size, so the biggest
+     one the app offers can be looked at rather than assumed to fit. */
+  if (side === "native" && process.env.CMP_SCALE)
+    await page.addInitScript(sc => {
+      const KEY = "taiyabah.prefs.v1";
+      try {
+        const cur = JSON.parse(window.localStorage.getItem(KEY) || "{}");
+        window.localStorage.setItem(KEY, JSON.stringify({ ...cur, scale: Number(sc) }));
+      } catch {}
+    }, process.env.CMP_SCALE);
   await page.goto(url, { waitUntil: "networkidle" }).catch(() => {});
   if (side === "native") {
     await page.addStyleTag({ content: FACES });
