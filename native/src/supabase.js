@@ -4,6 +4,8 @@
  * database as row-level security, which is why 63 tables have it on and 47 of
  * them are deny-all. The secret key never comes near an app anyone installs.
  */
+
+import { noteReach } from "./reach";
 const URL = "https://phenbhmobxwyvdeshvqw.supabase.co";
 
 /* WHICH MASJID THIS APP IS FOR, named rather than assumed.
@@ -29,7 +31,17 @@ async function go(path, init, ms = 12000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
   try {
-    return await fetch(`${URL}/rest/v1/${path}`, { ...init, signal: ctrl.signal, headers: HEAD });
+    const res = await fetch(`${URL}/rest/v1/${path}`, { ...init, signal: ctrl.signal, headers: HEAD });
+    /* We got an answer. Even a 400 means the masjid is there and talking, so
+       the app is NOT offline — it asked for something wrong, which is a
+       different problem and a different message. */
+    noteReach(true);
+    return res;
+  } catch (e) {
+    /* No answer at all: no route, DNS gone, or the 12 seconds ran out. This is
+       the only thing that means "cannot reach the masjid". */
+    noteReach(false);
+    throw e;
   } finally { clearTimeout(timer); }
 }
 

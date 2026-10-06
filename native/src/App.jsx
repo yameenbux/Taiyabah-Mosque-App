@@ -1,4 +1,5 @@
 import React from "react";
+import Offline from "./Offline";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -260,6 +261,9 @@ export default function App() {
       <Boundary>
         <AppProvider fallback={veil}>
           <Root />
+          {/* Over the app, under the first-run card, and never over a sheet it
+              would be explaining nothing about. */}
+          <Offline />
           <FirstRun />
         </AppProvider>
       </Boundary>
