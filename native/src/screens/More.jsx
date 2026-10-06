@@ -20,21 +20,30 @@
 import React from "react";
 import { View, Text, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path, Circle, Rect } from "react-native-svg";
+import Svg, { Path, Circle, Rect, SvgXml } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, Press, open, tap } from "../ui";
+import DRAWER from "../data/drawer.json";
+
+/* Each drawer row's own drawing, lifted from the website by
+ * scripts/extract-drawer.mjs and keyed by the row's translation key, so the
+ * markup that names a row also supplies its picture. The nearest glyph in an
+ * icon font is not the same thing: it gave Education a rosette where the site
+ * has a mortar board, Birth/Marriage/Death a branch diagram where it has a
+ * heart, and System Preferences a set of sliders where it has a globe. */
+const svgOf = (xml, colour) =>
+  xml ? xml.replace("<svg ", `<svg width="16" height="16" color="${colour}" `) : null;
 
 const MAPS = "https://maps.apple.com/?q=Taiyabah+Masjid+Draycott+Street+Bolton+BL1+8HD";
 const PORTAL = "https://taiyabahwebsite.ysbdesigns.uk/portal/";
-const PRIVACY = "https://taiyabahapp.ysbdesigns.uk/privacy.html";
 
 const GROUPS = [
   { k: "menu.resources", t: "Resources", rows: [
     { to: "Timetable", icon: "calendar-outline",   k: "menu.timetable",        t: "Full prayer timetable" },
-    { to: "Videos",    icon: "play-circle-outline", k: "about.videos_bayaans", t: "Videos & bayaans" },
+    { to: "Videos",    icon: "play-circle-outline", k: "marriage.videos_bayaans", t: "Videos & bayaans" },
     { soon: true,      icon: "airplane-outline",    k: "marriage.hajj_umrah",  t: "Hajj / Umrah" },
     { soon: true,      icon: "moon-outline",        k: "marriage.ramadan_2027", t: "Ramadan 2027" },
     { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
@@ -47,29 +56,33 @@ const GROUPS = [
       external: true },
   ]},
   { k: "marriage.the_masjid", t: "The masjid", rows: [
-    { to: "About",      icon: "information-circle-outline", k: "about.about_us",  t: "About us" },
-    { to: "Membership", icon: "card-outline",       k: "a11y.membership",         t: "Membership" },
+    { to: "About",      icon: "information-circle-outline", k: "menu.about",  t: "About us" },
+    { to: "Membership", icon: "card-outline",       k: "member.membership",        t: "Membership" },
     { href: MAPS,       icon: "location-outline",   k: "menu.location",       t: "Find us", external: true },
-    { to: "Contact",    icon: "call-outline",       k: "contact.contact_us",    t: "Contact us" },
+    { to: "Contact",    icon: "call-outline",       k: "menu.contact",          t: "Contact us" },
   ]},
   { k: "marriage.our_services", t: "Our services", rows: [
-    { to: "MarriageDeath", icon: "git-branch-outline", k: "marriagedeath.birth_marriage_death", t: "Birth, Marriage & Death" },
-    { to: "Advice",     icon: "chatbubbles-outline", k: "advice.imams_advice",  t: "Imams’ Advice" },
-    { to: "Education",  icon: "ribbon-outline",      k: "edu.education",        t: "Education" },
+    { to: "MarriageDeath", icon: "git-branch-outline", k: "marriage.birth_marriage_death", t: "Birth, Marriage & Death" },
+    { to: "Advice",     icon: "chatbubbles-outline", k: "marriage.imams_advice", t: "Imams’ Advice" },
+    { to: "Education",  icon: "ribbon-outline",      k: "marriage.education",   t: "Education" },
     { soon: true,       icon: "walk-outline",        k: "marriage.tours_visits", t: "Tours & Visits" },
   ]},
   { k: "menu.settings", t: "Settings", rows: [
     { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications", t: "Notifications" },
-    { href: PRIVACY,    icon: "shield-checkmark-outline", k: "privacy.privacy_notice", t: "Privacy notice", external: true },
-    { to: "Prefs",      icon: "options-outline",     k: "a11y.system_preferences", t: "System Preferences" },
+    /* The privacy notice is a sheet on the website and a screen here — the
+       app has had one all along, and System Preferences already pushed to it.
+       This row sent you out to the browser instead, so the same notice was
+       reached two different ways and one of them left the app. */
+    { to: "Privacy",    icon: "shield-checkmark-outline", k: "privacy.privacy_notice", t: "Privacy notice" },
+    { to: "Prefs",      icon: "options-outline",     k: "marriage.system_preferences", t: "System Preferences" },
     { to: "Help",       icon: "help-circle-outline", k: "help.title",             t: "Help" },
   ]},
 ];
 
 const SOCIAL = [
-  { href: "https://www.instagram.com/taiyabahmasjid/", label: "Instagram" },
-  { href: "https://twitter.com/TaiyabahMasjid", label: "X" },
-  { href: "https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw", label: "YouTube" },
+  { href: "https://www.instagram.com/taiyabahmasjid/", label: "Instagram", mark: "instagram" },
+  { href: "https://twitter.com/TaiyabahMasjid", label: "X", mark: "x" },
+  { href: "https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw", label: "YouTube", mark: "youtube" },
 ];
 
 export default function More({ navigation }) {
@@ -107,9 +120,11 @@ export default function More({ navigation }) {
           <Press key={sx.label} onPress={() => open(sx.href)} accessibilityLabel={sx.label}
             style={{ flex: 1, maxWidth: 110, height: 42, borderRadius: 13, alignItems: "center",
                      justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
-            <Ionicons name={/instagram/i.test(sx.href) ? "logo-instagram"
-                          : /youtube/i.test(sx.href) ? "logo-youtube" : "logo-twitter"}
-                      size={19} color={C.brand600} />
+            {/* Ionicons has no X mark, so "logo-twitter" was drawing the old
+                bird here — a different company's logo standing in for this
+                one. These are the website's own paths. */}
+            <SvgXml xml={svgOf(DRAWER.social[sx.mark], C.brand600).replace(/width="16" height="16"/, 'width="19" height="19"')}
+                    width={19} height={19} />
           </Press>))}
       </View>
 
@@ -141,7 +156,9 @@ function Row({ row, first, nav }) {
       {!row.soon && (
         <View style={{ width: 29, height: 29, borderRadius: 9, alignItems: "center",
                        justifyContent: "center", backgroundColor: "#F0E9ED" }}>
-          <Ionicons name={row.icon} size={16} color={C.brand600} />
+          {DRAWER.rows[row.k]
+            ? <SvgXml xml={svgOf(DRAWER.rows[row.k], C.brand600)} width={16} height={16} />
+            : <Ionicons name={row.icon} size={16} color={C.brand600} />}
         </View>)}
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: row.soon ? C.muted : C.ink,

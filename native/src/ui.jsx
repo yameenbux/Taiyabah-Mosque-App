@@ -1043,6 +1043,44 @@ export function Help({ t: label, link }) {
   );
 }
 
+/* The <footer> that closes the two scrolling tab pages, Home and Prayer
+ * Times. The website draws a 16px gold star, then — on Prayer Times only —
+ * the line naming the timetable the figures come from, then the charity
+ * registration and "Powered by MasjidOne", the last two a step smaller and
+ * in a lighter grey than the muted used everywhere else, with the credit
+ * underlined rather than coloured.
+ *
+ * Home had a 26px star at 75% opacity over an 11px charity line and a plum
+ * MasjidOne, so the ornament was half again too big and the credit read as
+ * something to press. Prayer Times had no footer at all: its "Times from the
+ * official 2026 Salah Timetable" sat left-aligned as an ordinary note and the
+ * charity line was missing from the screen entirely. */
+export function PageFoot({ note }) {
+  const { t, fs } = useApp();
+  const faint = "#A49AA0";
+  return (
+    <View style={{ alignItems: "center", marginTop: 26, paddingHorizontal: 6 }}>
+      <Svg width={16} height={16} viewBox="0 0 100 100">
+        <Polygon fill={C.gold} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
+      </Svg>
+      {!!note && (
+        <Text style={{ fontFamily: F.sans, fontSize: fs(11), lineHeight: fs(19), color: C.muted,
+                       textAlign: "center", marginTop: 8 }}>{note}</Text>)}
+      <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), lineHeight: fs(18), color: faint,
+                     textAlign: "center", marginTop: 12 }}>
+        {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
+      <Press onPress={() => { tap(); open("https://masjidone.co.uk"); }}
+             style={{ flexDirection: "row", gap: 4, marginTop: 6 }}>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: faint }}>
+          {t("sheet.app_built_by", "Powered by")}</Text>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted,
+                       borderBottomWidth: 1, borderBottomColor: "rgba(124,110,119,.3)" }}>
+          {t("sheet.masjidone", "MasjidOne")}</Text>
+      </Press>
+    </View>
+  );
+}
+
 export function Foot({ lines }) {
   const { fs } = useApp();
   return (

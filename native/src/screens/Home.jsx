@@ -13,7 +13,7 @@ import Svg, { Path, Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
-import { Screen, Girih, Press, Rich, TopBar, open, tap } from "../ui";
+import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import TT from "../data/timetable-2026.json";
@@ -383,20 +383,8 @@ export default function Home({ navigation }) {
             </Pressable>))}
         </View>
 
-        {/* ---- footer ---------------------------------------------------- */}
-        <View style={{ alignItems: "center", marginTop: 28, gap: 7 }}>
-          <Svg width={26} height={26} viewBox="0 0 100 100">
-            <Polygon fill={C.gold} opacity={0.75} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
-          </Svg>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, textAlign: "center" }}>
-            {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
-          <Press onPress={() => open("https://masjidone.co.uk")} style={{ flexDirection: "row", gap: 4, paddingVertical: 2 }}>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
-              {t("sheet.app_built_by", "Powered by")}</Text>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>
-              {t("sheet.masjidone", "MasjidOne")}</Text>
-          </Press>
-        </View>
+        <PageFoot />
+
       </View>
     </Screen>
   );

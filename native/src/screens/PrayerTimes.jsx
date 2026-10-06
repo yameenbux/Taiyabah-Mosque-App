@@ -10,9 +10,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, tap, TopBar } from "../ui";
+import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, PageFoot, tap, TopBar } from "../ui";
 import { dayFor, pretty, nowLondon, londonInstant, NAMES, ORDER, nextJamaah } from "../prayer";
-import { longDate, shortDate, hijri } from "../dates";
+import { dayMonthYear, fullDow, shortDate, hijri } from "../dates";
 
 /* How many days from today to the jumuʿah people mean when they say "next".
  *
@@ -74,7 +74,9 @@ export default function PrayerTimes({ navigation }) {
   const label = offset === 0 ? t("app.today", "Today")
               : offset === 1 ? t("times.tomorrow", "Tomorrow")
               : offset === -1 ? t("times.yesterday", "Yesterday")
-              : longDate(t, when);
+              /* Beyond yesterday/tomorrow the website names the DAY and
+                 nothing else — the date itself is the line underneath. */
+              : fullDow(t, when);
 
   return (
     <Screen pad={false}>
@@ -106,7 +108,7 @@ export default function PrayerTimes({ navigation }) {
             {/* .dn-sub is the Gregorian date alone. The Hijri date sits on the
                 home screen's hero on both the website and here, so naming it
                 again on this line only crowds the control. */}
-            {`${shortDate(t, when)} ${when.getFullYear()}`}</Text>
+            {dayMonthYear(t, when)}</Text>
         </Press>
         <Press onPress={() => step(1)}
           style={[{ width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center",
@@ -228,9 +230,6 @@ export default function PrayerTimes({ navigation }) {
               })}
             </Card>
 
-            <Note>{t("sheet.times_from_the_official_2026",
-              "Times from the official 2026 Salah Timetable")}</Note>
-
             {/* Maghrib is prayed the minute it begins. That is the masjid's
                 practice, and it looks like a data error unless it is said. */}
             <View style={{ marginTop: 11 }}>
@@ -270,6 +269,9 @@ export default function PrayerTimes({ navigation }) {
                   sub={t("times.remind_sub", "Be reminded before each jamāʿah")}
                   onPress={() => navigation.navigate("Alerts")} />
         </RowGroup>
+
+        <PageFoot note={t("sheet.times_from_the_official_2026",
+          "Times from the official 2026 Salah Timetable")} />
       </View>
     </Screen>
   );
