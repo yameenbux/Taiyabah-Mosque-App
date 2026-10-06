@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, Ticks, Warn, Press, Pill, open, tap } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Rich, Ticks, Warn, Press, Pill, open, tap } from "../ui";
 
 const NISAB = { silver: 612.36, gold: 87.48 };
 const RATE = 0.025;
@@ -40,31 +40,69 @@ export default function Zakat() {
 
   return (
     <Screen pad={false}>
+      {/* .zk-ar — مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ in gold at 25px above the
+          English, with the attribution under it at 10.5px UPPERCASE tracked
+          .12em. The Arabic was missing and the attribution was sentence case,
+          so the hadith arrived in translation only. */}
       <Hero lines={[
+        { t: "مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ", w: "arabic", px: 25 },
         { k: "zakat.charity_does_not_decrease_wealth", t: "“Charity does not decrease wealth.”", w: "title" },
-        { k: "zakat.the_prophet_sahih_muslim_2588", t: "The Prophet ﷺ · Ṣaḥīḥ Muslim 2588", w: "sub" },
-      ]} />
+      ]}>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.26,
+                       textTransform: "uppercase", color: "#BBA9B4", marginTop: 8,
+                       textAlign: "center" }}>
+          {t("zakat.the_prophet_sahih_muslim_2588", "The Prophet ﷺ · Ṣaḥīḥ Muslim 2588")}</Text>
+      </Hero>
       <View style={{ paddingHorizontal: 16 }}>
 
-        {/* Who owes zakat at all. The calculator asked people for their
-            savings without ever saying whether it applied to them. */}
-        <Heading>{t("zakat.new_to_zakat_start_here", "New to zakat? Start here")}</Heading>
-        <Card>
+        {/* .card.zk-explain — "New to zakat? Start here" is an h4 INSIDE the
+            card, not a section heading with a rule over it. */}
+        <Card pad={16}>
+          <Text style={{ fontFamily: F.display, fontSize: fs(16), color: C.ink, marginBottom: 9 }}>
+            {t("zakat.new_to_zakat_start_here", "New to zakat? Start here")}</Text>
+          {/* THE SENTENCE THAT SAYS WHAT ZAKAT IS was not here at all. It is
+              the first thing the website says on this screen, and the only
+              place the 2.5% appears before the calculator starts asking for
+              figures. */}
+          <P>{t("zakat.zakat_is_a_share_of",
+            "Zakat is a share of your savings given each year to those in need. It is *2.5%* — £2.50 out of every £100 you have kept for a whole year.")}</P>
           <P>{t("zakat.you_pay_it_if_all", "You pay it if all of these are true:")}</P>
-          <Ticks items={[
-            t("zakat.you_are_muslim_and_have", "You are Muslim and have reached the age of puberty"),
-            t("zakat.what_you_own_is_worth", "What you own is worth more than the *nisab* (the minimum amount, below)"),
-            t("zakat.you_have_owned_that_much", "You have owned that much for one full *lunar year*"),
-          ]} />
-          <Note>{t("zakat.pick_the_same_date_each",
-            "Pick the same date each Islamic year — many choose a day in Ramadan — and work out your zakat on that day every year.")}</Note>
+          {/* .zk-ul — plain BULLETS at 13.5px. They were green ticks, which
+              say "you have done this" where the website says "this must be
+              true of you". */}
+          <View style={{ marginTop: 9, marginLeft: 2 }}>
+            {[t("zakat.you_are_muslim_and_have", "You are Muslim and have reached the age of puberty"),
+              t("zakat.what_you_own_is_worth", "What you own is worth more than the *nisab* (the minimum amount, below)"),
+              t("zakat.you_have_owned_that_much", "You have owned that much for one full *lunar year*"),
+            ].map((x, i) => (
+              <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 8, marginBottom: 4 }}>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink }}>•</Text>
+                <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink,
+                               textAlign: rtl ? "right" : "left" }}>{x}</Rich>
+              </View>))}
+          </View>
+          {/* .zk-tip — a GOLD box, not a grey note. */}
+          <View style={{ marginTop: 11, borderRadius: 12, paddingVertical: 11, paddingHorizontal: 13,
+                         backgroundColor: "rgba(198,162,76,.14)", borderWidth: 1,
+                         borderColor: "rgba(198,162,76,.3)" }}>
+            <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19.5), color: "#7A6838",
+                           textAlign: rtl ? "right" : "left" }}>
+              {t("zakat.pick_the_same_date_each",
+                "Pick the same date each Islamic year — many choose a day in Ramadan — and work out your zakat on that day every year.")}</Rich>
+          </View>
         </Card>
 
-        <Heading tag="1">{t("zakat.1_the_nisab", "The nisab")}</Heading>
-        <P muted>{t("zakat.nisab_is_the_minimum_you",
-          "Nisab is the minimum you must own before zakat is due. It is fixed in gold and silver, so it moves with the price.")}</P>
+        {/* The website numbers these in the heading itself — "1 · The nisab" —
+            rather than hanging a "1" off the end of the rule, where it reads
+            as a count of something. */}
+        <Heading>{t("zakat.1_the_nisab", "1 · The nisab")}</Heading>
+        <Card pad={16}>
+        <Rich style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.muted,
+                       marginBottom: 12, textAlign: rtl ? "right" : "left" }}>
+          {t("zakat.nisab_is_the_minimum_you",
+            "Nisab is the minimum you must own before zakat is due. It is fixed in gold and silver, so its value in pounds changes with the metal price.")}</Rich>
 
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+        <View style={{ flexDirection: "row", gap: 7 }}>
           {/* The website's own labels, on the buttons themselves. They used to
               be composed from sheet.silver + " · 612.36g" here, and the
               website's zakat.silver_612_36g was given a home in a pair of
@@ -74,18 +112,30 @@ export default function Zakat() {
             ["gold", t("zakat.gold_87_48g", "Gold · 87.48g")]].map(([k, lab]) => {
             const on = standard === k;
             return (
+              /* .zk-seg button — on the PAPER in muted at 13px, and when
+                 chosen filled BRAND-700 with cream. It was a plum tint with
+                 plum text, which on a two-way switch reads as "slightly
+                 preferred" rather than "this one". */
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
-                style={{ flex: 1, alignItems: "center", paddingVertical: 12, borderRadius: 14,
-                         borderWidth: on ? 1.6 : 1, borderColor: on ? C.brand600 : C.line,
-                         backgroundColor: on ? "rgba(119,33,87,.07)" : C.card }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: on ? C.brand600 : C.ink }}>{lab}</Text>
+                style={{ flex: 1, alignItems: "center", paddingVertical: 11, paddingHorizontal: 6,
+                         borderRadius: 11, borderWidth: 1,
+                         borderColor: on ? C.brand700 : C.line,
+                         backgroundColor: on ? C.brand700 : C.paper }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13),
+                               color: on ? C.cream : C.muted }}>{lab}</Text>
               </Pressable>);
           })}
         </View>
-        <View style={{ marginTop: 10 }}>
-        <Note>{t("zakat.most_scholars_silver",
-          "Most scholars prefer the silver standard, because it is lower and so more people qualify to give.")}</Note>
-        </View>
+        {/* THE WEBSITE NAMES THE SCHOOL. "The Hanafi school uses the silver
+            nisab, which is lower — so more people qualify to give" had been
+            rewritten here as "Most scholars prefer the silver standard": a
+            vaguer claim about scholarship in general, in place of the
+            masjid's own statement of which school it follows. That is the
+            committee's to say, not the app's. */}
+        <Rich style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5), color: C.muted,
+                       marginTop: 10, textAlign: rtl ? "right" : "left" }}>
+          {t("zakat.the_hanafi_school_uses_the",
+            "The Hanafi school uses the *silver* nisab, which is lower — so more people qualify to give.")}</Rich>
 
         <Field label={t("zakat.price_per_gram_today", `Price per gram of ${standard} today (£)`)}
                value={price} onChange={x => setPrice(x.replace(/[^0-9.]/g, ""))} />
@@ -98,15 +148,19 @@ export default function Zakat() {
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
             {t("zakat.check_price", "Check today's price")}</Text>
         </Press>
-        <Card>
+        {/* .zk-result — a pale plum panel inside the nisab card, not a card
+            of its own sitting under it. */}
+        <View style={{ marginTop: 12, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14,
+                       backgroundColor: "#F0E9ED" }}>
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
             {out.nisab === null
               ? t("zakat.enter_today_s_price_to", "Enter today's price to see the nisab")
               : `${t("zakat.nisab_is", "Nisab is")} ${money(out.nisab)}`}
           </Text>
+        </View>
         </Card>
 
-        <Heading tag="2">{t("zakat.2_what_you_own", "What you own")}</Heading>
+        <Heading>{t("zakat.2_what_you_own", "2 · What you own")}</Heading>
         <Field label={t("zakat.cash_at_home_bank_savings", "Cash — at home, bank, savings (£)")} value={v.cash} onChange={x => set("cash", x)} />
         <Field label={t("zakat.gold_you_own_grams", "Gold you own (grams)")} value={v.gold} onChange={x => set("gold", x)} />
         <Field label={t("zakat.silver_you_own_grams", "Silver you own (grams)")} value={v.silver} onChange={x => set("silver", x)} />
@@ -118,7 +172,7 @@ export default function Zakat() {
           <Warn>{t("zakat.gsnote",
             "Enter a price per gram above, or the gold and silver you own cannot be valued.")}</Warn>)}
 
-        <Heading tag="3">{t("zakat.3_what_you_owe", "What you owe")}</Heading>
+        <Heading>{t("zakat.3_what_you_owe", "3 · What you owe")}</Heading>
         <Field label={t("zakat.debts_and_bills_due_now", "Debts and bills due now (£)")} value={v.debts} onChange={x => set("debts", x)} />
         <View style={{ marginTop: 9 }}>
           <Note>{t("zakat.include_what_you_owe_right",
