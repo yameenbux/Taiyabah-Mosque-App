@@ -1,0 +1,115 @@
+# The iOS app — does it actually build, and does it open?
+#
+# SEPARATE FROM ANDROID ON PURPOSE. Its own workflow, its own trigger, its own
+# artefacts. Android ships when Android is ready and nothing here can hold that
+# up, which is the whole point of keeping the two apart.
+#
+# WHY THIS CAN RUN WITHOUT AN APPLE DEVELOPER ACCOUNT. Signing is only needed
+# to run on a real device or reach TestFlight. Building for the SIMULATOR needs
+# no account, no certificate and no provisioning profile — so everything short
+# of distribution can be proved now, today, while the enrolment is pending:
+# that the iOS project generates, that every native module compiles against it,
+# that the app launches, and what it looks like when it does.
+#
+# What this does NOT prove, and no workflow can until the account exists:
+# push notifications (APNs needs a key from the account) and anything about
+# real hardware — the compass, the haptics, a physical Watch.
+
+name: iOS app — does it build and open?
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["native/**", ".github/workflows/ios-build.yml"]
+
+jobs:
+  ios:
+    # Xcode only exists on macOS runners. This is the one job in the repo that
+    # cannot run on ubuntu, and it is why iOS gets a workflow of its own.
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Which Xcode
+        run: xcodebuild -version && xcrun simctl list runtimes | head -20
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      # The same checks the Android workflow runs. A platform-specific job that
+      # skips them can go green on code the other platform would reject.
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+
+      - name: Unit tests
+        working-directory: native
+        run: node --import ./scripts/test-register.mjs --test "scripts/test/*.test.mjs"
+
+      - name: Generate the iOS project
+        working-directory: native
+        run: npx expo prebuild --platform ios --no-install --clean
+
+      - name: Pods
+        working-directory: native/ios
+        run: pod install --repo-update
+
+      # No -allowProvisioningUpdates, no team, no certificate: a simulator build
+      # is unsigned by design. CODE_SIGNING_ALLOWED=NO makes that explicit so
+      # the failure, if there is one, is a real compile error and not signing.
+      # The workspace and scheme are DISCOVERED, not guessed. expo prebuild
+      # names them from expo.name, and hard-coding "TaiyabahMasjid" here would
+      # be a build that fails the day somebody renames the app — for a reason
+      # that has nothing to do with the code.
+      - name: Find the workspace and scheme
+        id: xc
+        working-directory: native/ios
+        run: |
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME=$(xcodebuild -workspace "$WS" -list -json \
+                   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+                       const w=JSON.parse(s).workspace;
+                       const pick=w.schemes.find(x=>!/Pods|-tvOS|Tests$/.test(x))||w.schemes[0];
+                       process.stdout.write(pick);})')
+          echo "workspace=$WS"   >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME"  >> "$GITHUB_OUTPUT"
+          echo "Building $SCHEME from $WS"
+
+      # No team, no certificate, no provisioning profile: a simulator build is
+      # unsigned by design. CODE_SIGNING_ALLOWED=NO says so outright, so a
+      # failure here is a real compile error and never a signing one.
+      - name: Build for the simulator
+        working-directory: native/ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace "${{ steps.xc.outputs.workspace }}" \
+            -scheme "${{ steps.xc.outputs.scheme }}" \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      # "It compiled" and "it opens" are different claims — the Android smoke
+      # job exists because that difference has bitten this repo before.
+      - name: Boot a phone and a tablet, install, and photograph it
+        working-directory: native
+        run: node scripts/ios-shots.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-screenshots
+          path: native/.ios-shots/
+          if-no-files-found: warn
