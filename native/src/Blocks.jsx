@@ -129,7 +129,7 @@ function Block({ b, nav, inCard }) {
       const route = b.id && ROUTE[b.id];
       const go = route ? () => nav?.navigate(route) : b.href ? () => open(b.href) : null;
       if (b.card)
-        return <MenuRow label={tx(b.label)} sub={b.sub ? tx(b.sub) : null} svg={b.svg}
+        return <MenuRow label={tx(b.label)} sub={b.sub ? tx(b.sub) : null} svg={b.svg} ext={b.ext}
                         icon={route ? ICON[route] : hrefIcon(b.href)}
                         soon={b.soon ? tx(b.soon) : null} onPress={go} />;
       const row = (

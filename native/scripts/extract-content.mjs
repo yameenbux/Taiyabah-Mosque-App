@@ -32,6 +32,14 @@ const SHEETS = [
      own, not the website's prose — but its hero carries the globe medallion,
      and the only honest place to get that drawing is the website itself. */
   { id: "sysprefs", stopKey: "sysprefs.language" },
+  /* The Qurʾān and the adhkār are four views in one sheet — a mode picker, a
+     list, a reader, the muṣḥaf — and only the first is markup worth lifting;
+     the rest is built by script and is a native screen here. `only` takes the
+     hero plus that one subtree, so the mode rows come across with the
+     website's own drawings instead of being retyped with the nearest glyph in
+     an icon font. */
+  { id: "quran",  only: "#qd-mode-view" },
+  { id: "athkar", only: "#ak-mode-view" },
 ];
 
 const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
@@ -85,8 +93,9 @@ const out = await page.evaluate(ids => {
   };
   const str = el => { const k = KEY(el); const t = txt(el); return k ? { k, t } : { t }; };
 
-  function walk(el, blocks) {
+  function walk(el, blocks, onlyChild) {
     for (const c of el.children) {
+      if (onlyChild && c !== onlyChild) continue;
       const tag = c.tagName.toLowerCase();
 
       if (tag === "svg" || tag === "script" || tag === "style") continue;
@@ -102,11 +111,27 @@ const out = await page.evaluate(ids => {
           if (k.closest("svg")) continue;
           if (k.children.length && !KEY(k)) continue;
           const t = txt(k); if (!t) continue;
+          /* The scripture line in a hero is .wl-ar, .bt-ar or .mg-ar. Testing
+             for a literal class "arabic" caught all of them but one —
+             madrasah's, which carries only .wl-ar — so مَدْرَسَة came through
+             as an ordinary sub-line and drew at 13.5px in muted grey instead
+             of 28px in gold, above the one heading it belongs to. */
           const weight =
-            has(k, "arabic") ? "arabic" :
+            has(k, "arabic") || /(^|\s)[a-z]{2}-ar$/.test(k.className) ? "arabic" :
             /-(eyebrow|est|lab)$/.test(k.className) ? "eyebrow" :
             /-(en|lead)$/.test(k.className) ? "title" : "sub";
-          hero.lines.push({ ...str(k), w: weight });
+          /* .wl-ar is 28px, .bt-ar 25 and .mg-ar 26 — the website sizes each
+             line itself rather than setting them all the same. */
+          /* getComputedStyle gives the size AFTER --ts, the reader's own text
+             scale, has been applied — 31.36px for a 28px rule at 1.12. The
+             app applies its own scale with fs(), so the base is what travels;
+             keeping the computed figure would have scaled it twice. */
+          const ts = parseFloat(getComputedStyle(document.documentElement)
+            .getPropertyValue("--ts")) || 1;
+          const px = weight === "arabic"
+            ? Math.round((parseFloat((getComputedStyle(k).fontSize || "").replace("px", "")) || 0) / ts) || null
+            : null;
+          hero.lines.push({ ...str(k), w: weight, ...(px ? { px } : {}) });
         }
         blocks.push(hero);
         continue;
@@ -394,9 +419,14 @@ const out = await page.evaluate(ids => {
            a crib, two wedding bands, a shield with a tick. Twenty of these
            across five screens. */
         const ico = c.querySelector(".md-ico svg");
+        /* A row that leaves the app ends in .dr-ext — a gold ↗ — and one that
+           goes deeper ends in .dr-ch, a muted chevron. The app drew a chevron
+           on both, so "Apply for a place" and "Madrasah Portal" gave no sign
+           they were about to open a browser. */
+        const ext = !!c.querySelector(".dr-ext");
         blocks.push(node("row", {
           label: t1 ? str(t1) : str(c), sub: t2 ? str(t2) : null,
-          card: has(c, "md-row"),
+          card: has(c, "md-row"), ext,
           svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null,
           href: c.getAttribute("href") || null, id: c.id || null,
           soon: (() => { const t = c.querySelector(".soon-tag"); return t ? str(t) : (has(c, "soon") ? { t: "Coming soon" } : null); })(),
@@ -459,9 +489,17 @@ const out = await page.evaluate(ids => {
        them is a glyph in any icon font, so the app renders the website's own
        markup rather than guessing at the nearest lookalike. */
     const ring = sheet.querySelector('[class$="-ring"] svg');
+    const only = typeof spec === "object" && spec.only;
     const body = sheet.querySelector(".sh-body");
     const blocks = [];
-    if (body) walk(body, blocks);
+    if (only) {
+      const part = sheet.querySelector(only);
+      const hero = body && body.querySelector('section[class$="-hero"]');
+      /* The Qurʾān keeps its hero inside the mode view; the adhkār put theirs
+         beside it. Walking both unconditionally gave the Qurʾān two heroes. */
+      if (hero && !(part && part.contains(hero))) walk(hero.parentElement, blocks, hero);
+      if (part) walk(part, blocks);
+    } else if (body) walk(body, blocks);
     res[id] = { title: title ? str(title) : { t: id }, blocks };
     if (ring) res[id].ring = ring.outerHTML.replace(/\s+/g, " ").trim();
   }

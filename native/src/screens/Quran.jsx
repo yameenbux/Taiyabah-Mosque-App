@@ -16,9 +16,11 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, Press, Pill, Empty, tap } from "../ui";
+import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, MenuRow, Press, Pill, Empty, tap } from "../ui";
+import { SHEETS } from "../Blocks";
 import IDX from "../data/quran-index.json";
 import MUSHAF from "../data/mushaf.json";
+
 
 const HOST = "https://taiyabahapp.ysbdesigns.uk";
 const pageUrl = n => `${HOST}/quran/mushaf/${MUSHAF.id}/p/${n}.${MUSHAF.ext}`;
@@ -29,8 +31,18 @@ const pageUrl = n => `${HOST}/quran/mushaf/${MUSHAF.id}/p/${n}.${MUSHAF.ext}`;
  * masjid's own copy falls open at. */
 const COMMON = [18, 36, 55, 56, 67];
 
+/* The mode picker is the website's own markup: its wording, its order and its
+ * two drawings — an open book for the translation, a ruled page for the
+ * muṣḥaf. Only where each row goes is the app's business. */
+const MODE = (() => {
+  const b = SHEETS.quran?.blocks || [];
+  const rows = b.filter(x => x.type === "row");
+  if (rows.length !== 2) throw new Error(`quran: the website now has ${rows.length} mode rows, not 2`);
+  return { hero: b.find(x => x.type === "hero"), rows };
+})();
+
 export default function Quran({ navigation }) {
-  const { t, fs, lastRead } = useApp();
+  const { t, tx, fs, lastRead } = useApp();
   const resume = lastRead && (lastRead.mode === "mushaf"
     ? { label: `${t("mushaf.page", "Page")} ${lastRead.page}`, go: () => navigation.navigate("Mushaf", { page: lastRead.page }) }
     : { label: t(`surah.${lastRead.surah}.name`, IDX.surahs.find(s => s.n === lastRead.surah)?.nameEn || ""),
@@ -38,7 +50,10 @@ export default function Quran({ navigation }) {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "quran.how_would_you_like_to_read", t: "How would you like to read?", w: "title" }]} />
+      {/* .wl-ar — القرآن الكريم in gold at 28px above the question. It was
+          missing, so the one screen in the app whose subject is the Arabic
+          Qurʾān opened on a line of English with nothing above it. */}
+      <Hero lines={MODE.hero?.lines || []} />
       <View style={{ paddingHorizontal: 16 }}>
         {!!resume && (
           <RowGroup>
@@ -47,14 +62,16 @@ export default function Quran({ navigation }) {
                     sub={resume.label} onPress={resume.go} />
           </RowGroup>)}
 
-        <RowGroup>
-          <NavRow icon="book-outline" label={t("quran.13_line_qur_an", "13-Line Qurʼan")}
-                  sub={`${MUSHAF.pages} ${t("quran.mushaf_sub", "pages · needs a connection the first time")}`}
-                  onPress={() => navigation.navigate("Mushaf", {})} />
-          <NavRow icon="language-outline" label={t("quran.english_translation", "English translation")}
-                  sub={t("quran.all_114_s_rahs_with_an_english", "All 114 sūrahs, with the English beside the Arabic")}
-                  onPress={() => navigation.navigate("Surahs")} />
-        </RowGroup>
+        {/* Two separate .md-row CARDS, translation first, in the website's
+            own words and with its own drawings — not one bordered group with
+            the muṣḥaf on top and a sub-line ("848 pages · needs a connection
+            the first time") that was written here. That warning has moved
+            into the muṣḥaf itself, where somebody with no signal actually
+            meets it; a browser never needed one. */}
+        {MODE.rows.map((r, i) => (
+          <MenuRow key={i} label={tx(r.label)} sub={r.sub ? tx(r.sub) : null} svg={r.svg} ext={r.ext}
+                   onPress={() => navigation.navigate(i === 0 ? "Surahs" : "Mushaf", i === 0 ? undefined : {})} />
+        ))}
 
         <Heading>{t("quran.often_read", "Often read")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 9 }}>
@@ -192,6 +209,7 @@ export function Mushaf({ route, navigation }) {
   const [jump, setJump] = useState(false);
   const [land, setLand] = useState(false);
   const [toast, setToast] = useState(null);
+  const [failed, setFailed] = useState(() => new Set());
   const list = useRef(null);
   const pages = useMemo(() => Array.from({ length: MUSHAF.pages }, (_, i) => i + 1), []);
 
@@ -277,7 +295,24 @@ export function Mushaf({ route, navigation }) {
         windowSize={3}
         renderItem={({ item: n }) => (
           <View style={{ width, height, justifyContent: "center", backgroundColor: "#15060F" }}>
+            {/* 848 pages are streamed and then kept, so the first read of any
+                page needs signal. The website never had to say so — it cannot
+                be opened without a connection — and the app used to say it on
+                the row outside, which the website does not. Said here instead,
+                where somebody with no signal is looking at the page that will
+                not come, rather than guessing the app is broken. */}
+            {failed.has(n) && (
+              <View style={{ position: "absolute", left: 24, right: 24, alignItems: "center", gap: 6 }}>
+                <Ionicons name="cloud-offline-outline" size={26} color="rgba(243,239,227,.5)" />
+                <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), textAlign: "center",
+                               color: "rgba(243,239,227,.66)" }}>
+                  {t("mushaf.needs_signal",
+                     "This page has not been read before, so it needs a connection the first time. Once read, it stays on the phone.")}
+                </Text>
+              </View>)}
             <Image
+              onError={() => setFailed(f => new Set(f).add(n))}
+              onLoad={() => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; })}
               source={{ uri: pageUrl(n) }}
               /* Fitted to the whole window rather than to a fixed aspect, so the
                  same page fills the screen upright and sideways. */

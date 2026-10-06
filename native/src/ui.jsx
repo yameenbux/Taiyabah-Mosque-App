@@ -266,7 +266,11 @@ export function Hero({ lines = [], children, tall, minHeight, ring }) {
         const text = tx(l);
         if (!text) return null;
         const style =
-          l.w === "arabic"  ? { fontFamily: F.arabic, fontSize: fs(27), lineHeight: fs(46), color: C.goldBright }
+          /* The website sizes each scripture line itself — .wl-ar is 28px,
+             .mg-ar 26, .bt-ar 25, giving's 19 — rather than setting them all
+             the same, so the size travels with the line. */
+          l.w === "arabic"  ? { fontFamily: F.arabic, fontSize: fs(l.px || 28),
+                                lineHeight: fs((l.px || 28) * 1.4), color: C.goldBright }
           : l.w === "eyebrow" ? { fontFamily: F.sansMedium, fontSize: fs(10.5), letterSpacing: 1.6,
                                   textTransform: "uppercase", color: C.gold, marginBottom: 7 }
           : l.w === "title"   ? { fontFamily: F.display, fontSize: fs(23), lineHeight: fs(31), color: C.cream }
@@ -440,7 +444,7 @@ export function KV({ k, v, href, icon, onPress, kind }) {
  *
  * A row with nothing behind it yet takes the paper chip and muted type the
  * website gives .md-row.soon. */
-export function MenuRow({ label, sub, svg, icon, soon, onPress, href }) {
+export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
   const { fs, rtl } = useApp();
   const act = soon ? null : (onPress || (href ? () => open(href) : null));
   return (
@@ -460,6 +464,10 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href }) {
                                  marginTop: 2, textAlign: rtl ? "right" : "left" }}>{sub}</Rich>}
       </View>
       {soon ? <Pill>{soon}</Pill>
+            /* .dr-ext — a gold ↗ at 80%, which the website uses on every row
+               that leaves the app, against .dr-ch's muted chevron for one
+               that goes deeper. */
+            : ext ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.goldBright, opacity: 0.8 }}>↗</Text>
             : act ? <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} /> : null}
     </Press>
   );

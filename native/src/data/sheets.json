@@ -57,6 +57,7 @@
      "t": "History & new build journey"
     },
     "card": false,
+    "ext": false,
     "svg": null,
     "href": "https://www.youtube.com/watch?v=N7wFXynmLHM",
     "id": null,
@@ -522,6 +523,7 @@
      "t": "Guidance for new arrivals, including circumcision"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 19c0-3.5 2-6 3-8s.5-4-1-5.5\"></path> <circle cx=\"15\" cy=\"7\" r=\"2.3\"></circle> <path d=\"M6 19h14\"></path><path d=\"M11 19v-4a3 3 0 0 1 6 0v4\"></path> </svg>",
     "href": null,
     "id": "md-birth",
@@ -538,6 +540,7 @@
      "t": "Nikāḥ, based on authentic Islamic tradition"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <circle cx=\"8.5\" cy=\"15.5\" r=\"4.5\"></circle><circle cx=\"15.5\" cy=\"15.5\" r=\"4.5\"></circle> <path d=\"M12 4.5c1.4 0 2.5 1 2.5 2.2S13.4 9 12 9s-2.5-1-2.5-2.3S10.6 4.5 12 4.5Z\"></path> </svg>",
     "href": null,
     "id": "md-marriage",
@@ -554,6 +557,7 @@
      "t": "Wasiyyah — why and how to prepare one"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z\"></path> <path d=\"M14 3v5h5\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h4\"></path> </svg>",
     "href": null,
     "id": "md-will",
@@ -570,6 +574,7 @@
      "t": "Janāzah guidance and support"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7l-8-4Z\"></path> <path d=\"M9 12l2 2 4-4\"></path> </svg>",
     "href": null,
     "id": "md-funeral",
@@ -594,7 +599,8 @@
     "lines": [
      {
       "t": "الجَنَازَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 28
      },
      {
       "k": "funeral.funeral_services_2",
@@ -811,7 +817,8 @@
     "lines": [
      {
       "t": "الوَصِيَّة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 28
      },
      {
       "k": "will.the_importance_of_an_islamic",
@@ -972,7 +979,8 @@
     "lines": [
      {
       "t": "وِلَادَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 25
      },
      {
       "k": "birth.guidance_for_new_arrivals",
@@ -1149,6 +1157,7 @@
      "t": "One evening a week · 7–8pm · 15 places"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4.5c2.5-1.6 5.2-1.6 7.5 0v13c-2.3-1.6-5-1.6-7.5 0-2.5-1.6-5.2-1.6-7.5 0v-13c2.3-1.6 5-1.6 7.5 0z\"></path><path d=\"M12 4.5v13\"></path></svg>",
     "href": null,
     "id": "ed-arabic",
@@ -1165,6 +1174,7 @@
      "t": "One-off session · run periodically · 15 places"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z\"></path></svg>",
     "href": null,
     "id": "ed-ghusl",
@@ -1181,6 +1191,7 @@
      "t": "Tajweed, Seerah, a women’s circle — tell the office what you’d like taught"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M12 8v8M8 12h8\"></path></svg>",
     "href": null,
     "id": null,
@@ -1220,7 +1231,8 @@
     "lines": [
      {
       "t": "العَرَبِيَّة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 22
      },
      {
       "k": "edu.evening_arabic_for_adults",
@@ -1375,7 +1387,8 @@
     "lines": [
      {
       "t": "الغُسْل",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 22
      },
      {
       "k": "edu.how_to_wash_and_prepare",
@@ -1825,7 +1838,8 @@
     "lines": [
      {
       "t": "مَدْرَسَة",
-      "w": "sub"
+      "w": "arabic",
+      "px": 28
      },
      {
       "k": "madrasah.teaching_the_community_s_children",
@@ -1845,6 +1859,7 @@
      "t": "Fees, class times and attendance"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v12.5H6z\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.5h6.4M8.8 15.6h4.4\"></path></svg>",
     "href": null,
     "id": "mdr-go-admissions",
@@ -1861,6 +1876,7 @@
      "t": "The admission form for this year's classes"
     },
     "card": true,
+    "ext": true,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v5.5\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.2h3.4M8.8 8.9h3\"></path><path d=\"m15.6 20.4-3 .6.6-3 5-5a1.7 1.7 0 0 1 2.4 2.4l-5 5Z\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
     "id": "mdr-go-apply",
@@ -1877,6 +1893,7 @@
      "t": "Term dates and closures"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M3.5 9.5h17M8.5 3.5v3M15.5 3.5v3\"></path></svg>",
     "href": null,
     "id": "mdr-go-holidays",
@@ -1893,6 +1910,7 @@
      "t": "Sign in · registers and pupil records still being built"
     },
     "card": true,
+    "ext": true,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5\"></path><path d=\"M10 8.4 13.6 12 10 15.6\"></path><path d=\"M13.6 12H4.5\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/portal/",
     "id": "mdr-go-portal",
@@ -1909,6 +1927,7 @@
      "t": "The curriculum the madrasah teaches"
     },
     "card": true,
+    "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.4v13\"></path><path d=\"M12 6.4C10.3 5 8.1 4.3 5.4 4.3A1.4 1.4 0 0 0 4 5.7v11.1a1.4 1.4 0 0 0 1.4 1.4c2.7 0 4.9.7 6.6 2.1\"></path><path d=\"M12 6.4c1.7-1.4 3.9-2.1 6.6-2.1A1.4 1.4 0 0 1 20 5.7v11.1a1.4 1.4 0 0 1-1.4 1.4c-2.7 0-4.9.7-6.6 2.1\"></path></svg>",
     "href": null,
     "id": "mdr-go-curriculum",
@@ -2559,7 +2578,8 @@
      },
      {
       "t": "صَدَقَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 19
      },
      {
       "k": "giving.give_to_taiyabah_masjid",
@@ -3500,7 +3520,8 @@
     "lines": [
      {
       "t": "نِكَاح",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 26
      },
      {
       "k": "marriage.nikah_islamic_marriage",
@@ -3677,5 +3698,170 @@
    }
   ],
   "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M3.5 12h17\"></path> <path d=\"M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z\"></path> </svg>"
+ },
+ "quran": {
+  "title": {
+   "k": "quran.qur_an",
+   "t": "Qur'an"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "القرآن الكريم",
+      "w": "arabic",
+      "px": 28
+     },
+     {
+      "k": "quran.how_would_you_like_to_read",
+      "t": "How would you like to read?",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "quran.english_translation",
+     "t": "English Translation"
+    },
+    "sub": {
+     "k": "quran.all_114_s_rahs_with_an_english",
+     "t": "All 114 sūrahs, with the English beside the Arabic"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z\"></path><path d=\"M12 6.5v11.8\"></path></svg>",
+    "href": null,
+    "id": "qd-go-translation",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "quran.13_line_qur_an",
+     "t": "13-Line Qur'an"
+    },
+    "sub": {
+     "k": "quran.the_familiar_indo_pak_page",
+     "t": "The familiar Indo-Pak page, thirteen lines, for ḥifẓ"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4.5\" y=\"3.5\" width=\"15\" height=\"17\" rx=\"2\"></rect><path d=\"M7.6 8h8.8M7.6 11h8.8M7.6 14h8.8M7.6 17h5.4\"></path></svg>",
+    "href": null,
+    "id": "qd-go-mushaf",
+    "soon": null
+   }
+  ]
+ },
+ "athkar": {
+  "title": {
+   "k": "athkar.daily_athkar",
+   "t": "Daily Athkār"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "أَذْكَار",
+      "w": "arabic",
+      "px": 28
+     },
+     {
+      "k": "athkar.morning_evening_and_after_salah",
+      "t": "Morning, evening and after ṣalāh",
+      "w": "title"
+     }
+    ]
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.morning_evening",
+     "t": "Morning & Evening"
+    },
+    "sub": {
+     "k": "athkar.after_fajr_and_after_asr",
+     "t": "Once after Fajr and once after ʿAṣr"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M18.2 5.8l-1.6 1.6M7.4 16.6l-1.6 1.6\"></path></svg>",
+    "href": null,
+    "id": "ak-go-0",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.after_every_salah",
+     "t": "After Every Ṣalāh"
+    },
+    "sub": {
+     "k": "athkar.the_words_said_after_each",
+     "t": "The words said after each prayer"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.5 20.5v-7a7.5 7.5 0 0 1 15 0v7\"></path><path d=\"M3.5 20.5h17\"></path><path d=\"M12 6V3.4\"></path><circle cx=\"12\" cy=\"2.6\" r=\"0.9\" fill=\"currentColor\" stroke=\"none\"></circle></svg>",
+    "href": null,
+    "id": "ak-go-1",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.before_sleep",
+     "t": "Before Sleep"
+    },
+    "sub": {
+     "k": "athkar.what_to_say_on_going_to_bed",
+     "t": "What to say on going to bed"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 14.5A8.2 8.2 0 0 1 9.5 4 8.4 8.4 0 1 0 20 14.5Z\"></path></svg>",
+    "href": null,
+    "id": "ak-go-2",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.everyday_du_as",
+     "t": "Everyday Duʿās"
+    },
+    "sub": {
+     "k": "athkar.waking_eating_travelling_worry_rain",
+     "t": "Waking, eating, travelling, health, marriage, loss"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6.4 6.8a2.2 2.2 0 0 1 2.2-2.2h8.8a2.2 2.2 0 0 1 2.2 2.2v10.4a2.2 2.2 0 0 1-2.2 2.2H8.6a2.2 2.2 0 0 0-2.2 2.2Z\"></path><path d=\"M9.6 8.8h6.4\"></path><path d=\"M9.6 12h6.4\"></path><path d=\"M9.6 15.2h4.2\"></path></svg>",
+    "href": null,
+    "id": "ak-go-duas",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.du_as_from_the_qur_an",
+     "t": "Duʿās from the Qur'an"
+    },
+    "sub": {
+     "k": "athkar.the_forty_rabbana_du_as",
+     "t": "The forty Rabbanā duʿās"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z\"></path><path d=\"M12 6.5v11.8\"></path></svg>",
+    "href": null,
+    "id": "ak-go-rabbanas",
+    "soon": null
+   }
+  ]
  }
 }
