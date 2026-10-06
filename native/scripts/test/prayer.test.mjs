@@ -81,3 +81,35 @@ test("nowLondon returns London's wall clock", () => {
   const l = nowLondon(real);
   assert.equal(l.getHours(), 11);
 });
+
+/* ---- the year the timetable runs out ------------------------------------ *
+ * The bundled file covers 2026 and the masjid publishes one year at a time,
+ * so at midnight on 31 December the app is asked a question it cannot answer.
+ * The timetable now comes from the database with this file as the floor, which
+ * removes the cliff — but only if somebody uploads next year. These check the
+ * app is HONEST on the morning nobody has, rather than guessing a time and
+ * sending the congregation to the masjid an hour early.
+ */
+test("31 December still answers, including the roll into tomorrow", () => {
+  const nye = new Date(2026, 11, 31, 11, 0, 0);
+  const n = nextJamaah(nye);
+  assert.ok(n, "the last day of the bundled year must still work");
+  assert.equal(n.tomorrow, false);
+});
+
+test("the last night of the year does not invent 1 January", () => {
+  /* 23:30 on 31 December: every jamāʿah has gone, so the code rolls to
+     tomorrow — and tomorrow is not in the timetable. It must come back null,
+     which is what Home and Prayer Times turn into "that date is outside the
+     published timetable". Returning a guess here would put a wrong time on
+     the busiest screen in the app on New Year's Day. */
+  assert.equal(nextJamaah(new Date(2026, 11, 31, 23, 30, 0)), null);
+});
+
+test("1 January 2027 is null, not a crash and not a guess", () => {
+  for (const h of [0, 6, 13, 23]) {
+    assert.equal(nextJamaah(new Date(2027, 0, 1, h, 0, 0)), null,
+      `1 Jan 2027 at ${h}:00 should be null until the year is published`);
+    assert.equal(dayFor(new Date(2027, 0, 1, h, 0, 0)), null);
+  }
+});
