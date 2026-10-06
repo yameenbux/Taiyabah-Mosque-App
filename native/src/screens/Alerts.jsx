@@ -56,6 +56,12 @@ function Row({ title, sub, badge, value, onChange, first }) {
                  this masjid's palette. */
               trackColor={{ false: "#D9D2C0", true: C.brand600 }}
               thumbColor="#FFFFFF"
+              /* react-native-web ignores thumbColor once the switch is ON and
+                 uses its own teal, so the comparison screenshots showed a
+                 green knob the phone never draws. Android honours thumbColor
+                 for both states and ignores this prop; setting it only makes
+                 the web render tell the truth. */
+              activeThumbColor="#FFFFFF"
               ios_backgroundColor={C.line} />
     </View>);
 }
@@ -124,7 +130,13 @@ export default function Alerts() {
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>
 
-        <P muted style={{ marginTop: 2 }}>
+        {/* .alerts — the intro, the Enable button, every toggle and Save are
+            ONE card padded 16. They were three loose pieces on the paper with
+            only the toggles in a card, so the button that grants permission
+            and the button that saves the choices looked unrelated to the
+            choices between them. */}
+        <Card pad={16}>
+        <P style={{ fontSize: fs(13.5), lineHeight: fs(20), color: C.muted, marginBottom: 15 }}>
           {t("sheet.get_a_quiet_reminder_before",
             "Get a quiet reminder before each jamāʿah, plus masjid announcements — on this device.")}</P>
 
@@ -139,7 +151,13 @@ export default function Alerts() {
             </LinearGradient>
           </Press>)}
 
-        <Card gap={0} pad={0}>
+        {/* .toggles — HALF FADED and inert until notifications are granted.
+            The website will not let anybody set reminders that cannot be
+            delivered; the app let them be set and saved against a permission
+            that had been refused. */}
+        <View pointerEvents={granted === false ? "none" : "auto"}
+              style={{ opacity: granted === false ? 0.45 : 1 }}>
+        <View style={{ borderTopWidth: 1, borderTopColor: C.line }}>
           <Row first
             title={t("sheet.jama_ah_reminders", "Jamāʿah reminders")}
             sub={t("sheet.a_nudge_before_each_congregation", "A nudge before each congregation")}
@@ -200,18 +218,30 @@ export default function Alerts() {
           <Row title={t("sheet.surah_al_kahf", "Sūrah al-Kahf")}
             sub={t("sheet.friday_morning_reminder", "Friday morning, a reminder to read it")}
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
-        </Card>
+        </View>
 
         {/* .save: filled brand-700, cream text, 12px of radius, 13px of
            padding. An outlined pill reads as the secondary action, and on
            this screen Save is the only thing that commits anything. */}
-        <Press onPress={saveAll}
+        <Press onPress={saveAll} disabled={granted === false}
           style={{ alignItems: "center", paddingVertical: 13, borderRadius: 12,
                    backgroundColor: C.brand700, marginTop: 14 }}>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), letterSpacing: 0.2, color: C.cream }}>
             {saved ? `${t("sheet.notifications_on", "Notifications on")} · ${t("sheet.change", "Change")}`
                    : t("sheet.save", "Save")}</Text>
         </Press>
+        </View>
+
+        {/* .troublebtn — 12px semibold in the MUTED grey and UNDERLINED,
+            centred under the card. It was plum and unlined, which made a last
+            resort look like the next thing to press. */}
+        <Press onPress={() => { tap(); setDiag(d => !d); }}
+          style={{ alignSelf: "center", paddingVertical: 10, marginTop: 10 }}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted,
+                         textDecorationLine: "underline" }}>
+            {t("sheet.having_trouble", "Having trouble?")}</Text>
+        </Press>
+        </Card>
 
         {granted === false
           ? <Note>{t("alerts.turned_off", "Notifications are turned off for this app. Turn them on in Android settings and they will start straight away.")}</Note>
@@ -220,14 +250,10 @@ export default function Alerts() {
               ? t("alerts.none_set", "No reminders set.")
               : `${armed} ${t("alerts.scheduled", "reminders are scheduled on this phone.")}`}</Note>)}
 
-        {/* The website's diagnostics. When a reminder does not arrive, the
-            answer is almost always one of three things, and a person with no
-            way to check any of them simply decides the app does not work. */}
-        <Press onPress={() => { tap(); setDiag(d => !d); }}
-          style={{ alignItems: "center", paddingVertical: 11, marginTop: 14 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
-            {t("sheet.having_trouble", "Having trouble?")}</Text>
-        </Press>
+        {/* The website's diagnostics, opened from the link inside the card
+            above. When a reminder does not arrive the answer is almost always
+            one of three things, and a person with no way to check any of them
+            simply decides the app does not work. */}
 
         {diag && (
           <Card gap={10}>
