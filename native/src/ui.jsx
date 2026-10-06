@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
-import { C, F, R } from "./theme";
+import { C, F, R, SHADOW } from "./theme";
 import { useApp } from "./store";
 
 export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); };
@@ -241,7 +241,7 @@ export function Pill({ children, tone = "muted" }) {
 export function Card({ children, style, pad = 15, gap = 10 }) {
   return (
     <View style={[{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
-                    padding: pad, gap, marginTop: 12 }, style]}>{children}</View>
+                    padding: pad, gap, marginTop: 12 }, SHADOW, style]}>{children}</View>
   );
 }
 
@@ -252,7 +252,7 @@ export function RowGroup({ children, style }) {
   const rows = React.Children.toArray(children).filter(Boolean);
   return (
     <View style={[{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
-                    overflow: "hidden", marginTop: 12 }, style]}>
+                    overflow: "hidden", marginTop: 12 }, SHADOW, style]}>
       {rows.map((ch, i) => (
         <View key={i} style={{ borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>{ch}</View>
       ))}
@@ -432,7 +432,11 @@ export function Rules({ h, items }) {
   const { fs, tx, rtl } = useApp();
   const align = rtl ? "right" : "left";
   return (
-    <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+    /* .cc-rules is linear-gradient(155deg, brand-600 0%, brand-900 72%) — it
+       starts on the BRIGHT plum and runs down and to the left, reaching the
+       dark one short of the bottom. This was brand-700 straight down. */
+    <LinearGradient colors={[C.brand600, C.brand900]} locations={[0, 0.72]}
+      start={{ x: 0.9, y: 0 }} end={{ x: 0.1, y: 1 }}
       style={{ borderRadius: R.card, padding: 17, gap: 11, marginTop: 14 }}>
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(16), lineHeight: fs(23),
                              color: C.cream, textAlign: align }}>{tx(h)}</Rich>}

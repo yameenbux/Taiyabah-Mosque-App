@@ -79,7 +79,9 @@ export default function More({ navigation }) {
   return (
     <Screen pad={false}>
       {/* The drawer opens under the masjid's own wordmark on plum; so does this. */}
-      <LinearGradient colors={[C.brand900, C.brand700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+      {/* The website's drawer header is linear-gradient(brand-900, brand-800),
+          straight down — not brand-900 to brand-700 across. */}
+      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingTop: top + 12, paddingBottom: 14, paddingHorizontal: 16,
                  alignItems: rtl ? "flex-end" : "flex-start" }}>
         <Image source={require("../../assets/logo.png")}

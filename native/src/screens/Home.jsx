@@ -11,7 +11,7 @@ import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path, Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R } from "../theme";
+import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
@@ -254,6 +254,7 @@ export default function Home({ navigation }) {
               tag={t("home.beginning_jamaah", "Beginning & jamāʿah")} />
         {!!day && (
           <View style={{ flexDirection: "row", backgroundColor: C.card, borderRadius: R.card, borderWidth: 1,
+                         ...SHADOW,
                          borderColor: C.line, overflow: "hidden" }}>
             {ORDER.map((k, i) => {
               const isNext = next && k === next.key && !next.tomorrow;
@@ -369,7 +370,8 @@ export default function Home({ navigation }) {
             <Pressable key={x.k} onPress={() => { tap(); x.to ? navigation.navigate(x.to) : open(x.href); }}
               style={({ pressed }) => ({ flexBasis: "30.5%", flexGrow: 1, alignItems: "center", gap: 8,
                                          backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
-                                         borderRadius: R.tile, paddingVertical: 15, paddingHorizontal: 6,
+                                         borderRadius: 15, paddingTop: 15, paddingBottom: 13, paddingHorizontal: 6,
+                                         ...SHADOW,
                                          transform: [{ scale: pressed ? 0.97 : 1 }], opacity: pressed ? 0.9 : 1 })}>
               {/* the tinted chip the web tiles sit their glyph on */}
               <View style={{ width: 44, height: 44, borderRadius: 14, alignItems: "center",

@@ -36,6 +36,16 @@ const out = await page.evaluate(() => {
     bell: pick(document.querySelector(".bellbtn"),
       ["background","background-color","border","border-radius","color","width","height"]),
     hero: pick(document.querySelector("#tab-home .hero, .hero"), ["background-image","padding"]),
+    drawerHead: pick(document.querySelector("#drawer .dr-head, #drawer header, .dr-top"),
+      ["background-image","background-color","padding"]),
+    ccRules: pick(document.querySelector(".cc-rules"), ["background-image","background-color","border-radius","padding"]),
+    zkResult: pick(document.querySelector(".zk-result"), ["background-image","background-color","border-radius","padding"]),
+    tile: pick(document.querySelector(".tile"), ["background-color","border","border-radius","padding","box-shadow"]),
+    card: pick(document.querySelector(".card"), ["background-color","border","border-radius","padding","box-shadow"]),
+    secH: pick(document.querySelector(".sec-h h2, .sec-h h3"), ["font-family","font-size","color"]),
+    submit: pick(document.querySelector(".bk-submit, .gv-cta, .cc-submit"),
+      ["background-image","background-color","color","border-radius","padding"]),
+    pcolNext: pick(document.querySelector('.pcol[data-next="1"]'), ["background-color"]),
   };
 });
 console.log(JSON.stringify(out,null,1));
