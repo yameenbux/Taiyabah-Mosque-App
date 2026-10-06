@@ -189,7 +189,12 @@ const out = await page.evaluate(ids => {
           const dt = d.querySelector("dt"), dd = d.querySelector("dd");
           return dt && dd ? { k: str(dt), v: str(dd) } : null;
         }).filter(Boolean);
-        blocks.push(node("dl", { items, card: has(c, "card") }));
+        /* .gv-goes styles its own: the term 11.5px bold uppercase in
+           BRAND-600 and the definition 14px ink, against the plain list's
+           10.5px muted over 13.5. On the giving screen those five plum labels
+           are what makes it a list of what the money does. */
+        blocks.push(node("dl", { items, card: has(c, "card"),
+                                 kind: c.closest(".gv-goes") || has(c, "gv-goes") ? "goes" : "plain" }));
         continue;
       }
 

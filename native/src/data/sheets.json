@@ -334,7 +334,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "call",
@@ -1354,7 +1355,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "call",
@@ -1567,7 +1569,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "advisory",
@@ -2259,7 +2262,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "heading",
@@ -2311,7 +2315,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "heading",
@@ -2653,7 +2658,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "goes"
    },
    {
     "type": "heading",
@@ -2985,7 +2991,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "goes"
    },
    {
     "type": "callout",

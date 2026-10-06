@@ -60,7 +60,7 @@ function Block({ b, nav, inCard }) {
     case "notice":  return <Notice>{tx(b)}</Notice>;
     case "chips":   return <Chips items={b.items} />;
     case "ticks":   return <Ticks items={b.items} ordered={b.ordered} />;
-    case "dl":      return <DL items={b.items} />;
+    case "dl":      return <DL items={b.items} kind={b.kind} />;
     case "bank":    return <Bank items={b.items} />;
     case "social":  return <Social items={b.items} />;
     case "foot":    return <Foot lines={b.lines} />;

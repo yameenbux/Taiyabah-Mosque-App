@@ -515,8 +515,9 @@ export function Facts({ items }) {
   );
 }
 
-export function DL({ items }) {
+export function DL({ items, kind }) {
   const { fs, rtl, tx } = useApp();
+  const goes = kind === "goes";
   return (
     <Card gap={0} pad={0}>
       {items.map((it, i) => (
@@ -528,10 +529,12 @@ export function DL({ items }) {
            broke across four lines in half the width available to it. */
         <View key={i} style={{ paddingVertical: 12, paddingHorizontal: 15,
                                borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-          <Rich style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1,
-                         textTransform: "uppercase", color: C.muted, marginBottom: 5,
+          <Rich style={{ fontFamily: goes ? F.sansBold : F.sans, fontSize: fs(goes ? 11.5 : 10.5),
+                         letterSpacing: goes ? 1.15 : 1, textTransform: "uppercase",
+                         color: goes ? C.brand600 : C.muted, marginBottom: 5,
                          textAlign: rtl ? "right" : "left" }}>{tx(it.k)}</Rich>
-          <Rich style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink,
+          <Rich style={{ fontFamily: F.sans, fontSize: fs(goes ? 14 : 13.5),
+                         lineHeight: fs(goes ? 22.5 : 22), color: C.ink,
                          textAlign: rtl ? "right" : "left" }}>{tx(it.v)}</Rich>
         </View>))}
     </Card>
@@ -761,6 +764,50 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
                    borderRadius: 14, paddingVertical: 13, paddingHorizontal: 15, gap: 8, marginTop: 14 }}>
       {inner}
     </View>
+  );
+}
+
+/* .gv-lab — the label over each chooser on the giving screen: 11px BOLD,
+ * uppercase, .14em of tracking, muted, 18 above and 9 below. Each of these
+ * had been a section Heading with a gold rule, which made one decision read
+ * as three separate parts of the page. */
+export function GLab({ children }) {
+  const { fs, rtl } = useApp();
+  return (
+    <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 1.54,
+                   textTransform: "uppercase", color: C.muted, marginTop: 18, marginBottom: 9,
+                   textAlign: rtl ? "right" : "left" }}>{children}</Text>
+  );
+}
+
+/* .gv-cta — the one button in the app that takes money, and the only GOLD one
+ * on the site: a gold-bright to gold gradient with near-black text, 16px of
+ * radius and 15/18 of padding, the amount in Fraunces at 20 over a 10.5px
+ * uppercase line at 85%. It was drawing as the ordinary plum pill, so it
+ * looked like every other button in the app. */
+export function GoldCTA({ label, sub, href, onPress, disabled }) {
+  const { fs } = useApp();
+  const act = onPress || (href ? () => open(href) : null);
+  if (disabled || !act) return (
+    <View style={{ marginTop: 16, borderRadius: 16, paddingVertical: 15, paddingHorizontal: 18,
+                   alignItems: "center", gap: 3, backgroundColor: C.line }}>
+      <Text style={{ fontFamily: F.display, fontSize: fs(20), color: C.muted }}>{label}</Text>
+      {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 0.95,
+                               textTransform: "uppercase", color: C.muted }}>{sub}</Text>}
+    </View>
+  );
+  return (
+    <Pressable onPress={() => { tap(); act(); }}
+      style={({ pressed }) => [{ marginTop: 16, borderRadius: 16, overflow: "hidden",
+                                 opacity: pressed ? 0.9 : 1 }, SHADOW]}>
+      <LinearGradient colors={[C.goldBright, C.gold]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        style={{ paddingVertical: 15, paddingHorizontal: 18, alignItems: "center", gap: 3 }}>
+        <Text style={{ fontFamily: F.display, fontSize: fs(20), color: "#3A2A08" }}>{label}</Text>
+        {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 0.95,
+                                 textTransform: "uppercase", color: "#3A2A08", opacity: 0.85,
+                                 textAlign: "center" }}>{sub}</Text>}
+      </LinearGradient>
+    </Pressable>
   );
 }
 

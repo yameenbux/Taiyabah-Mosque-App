@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap, GLab, GoldCTA, Rich } from "../ui";
 import { SHEETS } from "../Blocks";
 
 const BANK = [
@@ -171,41 +171,70 @@ export function Giving() {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[
-        { k: "giving.support_the_masjid", t: "Support the masjid", w: "eyebrow" },
-        { k: "giving.give_to_taiyabah_masjid", t: "Give to Taiyabah Masjid", w: "title" },
-        { k: "giving.every_prayer_held_here", t: "Every prayer held here, every child taught, every janāzah carried out", w: "sub" },
-      ]} />
+      {/* The website's own hero, lifted whole: the eyebrow, صَدَقَة in gold
+          between it and the title, and the full standfirst. The Arabic line
+          was missing and the standfirst had been cut off halfway — it ends
+          "...rests on what the community gives. This page is for the masjid
+          itself — its upkeep, its running, and the work it does in Bolton",
+          which is the sentence that says what this page is NOT for. */}
+      <Hero lines={SHEETS.giving?.blocks.find(b => b.type === "hero")?.lines || []} />
       <View style={{ paddingHorizontal: 16 }}>
         {/* What the money actually pays for, in the masjid's own words. */}
         {!!goes && (
           <>
             <Heading>{t("giving.where_your_giving_goes", "Where your giving goes")}</Heading>
-            <DL items={goes.items} />
+            <DL items={goes.items} kind={goes.kind} />
           </>)}
 
-        <Heading>{t("giving.what_it_is_for", "What it is for")}</Heading>
-        <Options options={FUNDS} value={fund} onChange={setFund} />
-        <View style={{ marginTop: 10 }}><Note>{FUNDS.find(f => f.v === fund).note}</Note></View>
+        {/* "Give online" is one SECTION on the website, with its tag naming
+            what it takes, and the three choosers live together inside a
+            single card under it. Here each was its own gold-ruled heading, so
+            one decision — how much, to what, how often — read as three parts
+            of the page. */}
+        <Heading tag={t("giving.apple_google_pay", "Apple & Google Pay")}>
+          {t("giving.give_online", "Give online")}</Heading>
+        <Card pad={14}>
+          <GLab>{t("giving.what_it_is_for", "What it is for")}</GLab>
+          <Options options={FUNDS} value={fund} onChange={setFund} />
+          <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.ink,
+                         marginTop: 12 }}>{FUNDS.find(f => f.v === fund).note}</Text>
 
-        <Heading>{t("giving.how_often", "How often")}</Heading>
-        <Options options={FREQS} value={freq} onChange={setFreq} />
+          {/* .gv-zakat — the masjid saying, in the danger colour, that this is
+              not where zakāt goes. It is in the data and in all four language
+              packs; this screen simply never drew it, so somebody could give
+              their zakāt here and the app would take it. */}
+          <View style={{ marginTop: 11, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12,
+                         borderWidth: 1, borderColor: "rgba(180,83,47,.3)",
+                         backgroundColor: "rgba(180,83,47,.07)" }}>
+            <Rich style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21.5), color: C.danger }}>
+              {t("giving.zakat_is_not_taken_here",
+                 "*Zakāt is not taken here.* It has its own categories — please ring the office on 01204 535 997.")}
+            </Rich>
+          </View>
 
-        <Heading>{t("giving.amount", "Amount")}</Heading>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          <GLab>{t("giving.how_often", "How often")}</GLab>
+          <Options options={FREQS} value={freq} onChange={setFreq} />
+
+          <GLab>{t("giving.amount", "Amount")}</GLab>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {AMOUNTS.map(a => {
             const off = !LINKS[freq][a];
             const on = a === amt;
             return (
               <Pressable key={a} disabled={off} onPress={() => { tap(); setAmt(a); }}
-                style={({ pressed }) => ({ flexBasis: "30%", flexGrow: 1, alignItems: "center", paddingVertical: 13,
-                                           borderRadius: 14, borderWidth: on ? 1.6 : 1,
-                                           borderColor: on ? C.brand600 : C.line,
-                                           backgroundColor: on ? "rgba(119,33,87,.07)" : C.card,
+                style={({ pressed }) => ({ flexBasis: "30%", flexGrow: 1, minHeight: 62,
+                                           alignItems: "center", justifyContent: "center", gap: 2,
+                                           paddingVertical: 11, paddingHorizontal: 7,
+                                           borderRadius: 14, borderWidth: 1,
+                                           borderColor: on ? C.brand900 : C.line,
+                                           backgroundColor: on ? C.brand900 : C.card,
                                            opacity: off ? 0.38 : pressed ? 0.85 : 1 })}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16), color: on ? C.brand600 : C.ink }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), lineHeight: fs(17.5),
+                               color: on ? C.cream : C.ink }}>
                   {a === "other" ? t("giving.other", "Other") : `£${a}`}</Text>
-                {a === "other" && <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted }}>
+                {a === "other" && <Text style={{ fontFamily: F.sans, fontSize: fs(10), letterSpacing: 0.7,
+                                                 textTransform: "uppercase", lineHeight: fs(12.5),
+                                                 color: on ? C.goldBright : C.muted }}>
                   {t("giving.you_choose", "You choose")}</Text>}
               </Pressable>);
           })}
@@ -215,9 +244,15 @@ export function Giving() {
             changes shape as you switch frequency is a grid people think they
             misclicked. */}
 
-        <CTA label={label} href={href} disabled={!href}
+        {/* .gv-cta is GOLD — a gold-bright to gold gradient with near-black
+            text, 16px of radius, the amount in Fraunces at 20 over a 10.5px
+            uppercase line. It drew as the app's ordinary plum pill, so the
+            one button on the screen that takes money looked like every other
+            button in the app. */}
+        <GoldCTA label={label} href={href} disabled={!href}
              sub={href ? t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")
                        : t("giving.choose_another_amount", "Choose another amount, or use the bank details below")} />
+        </Card>
 
         <Heading tag={t("sheet.tap_to_copy", "Tap to copy")}>{t("sheet.or_transfer_directly", "Or transfer directly")}</Heading>
         <Bank items={BANK} />
@@ -232,6 +267,13 @@ export function Giving() {
   );
 }
 
+/* .gv-opt — a 14px-radius card, 11/7 of padding, at least 62px tall, with the
+ * title 14.5px BOLD over a 10px uppercase sub tracked .07em. Chosen, it fills
+ * brand-900 with cream and turns its sub GOLD-BRIGHT.
+ *
+ * Here the chosen one was a 7% plum tint with plum text and a grey sub, which
+ * on a screen where the choice decides where the money goes is the difference
+ * between "this is selected" and "this is slightly highlighted". */
 function Options({ options, value, onChange }) {
   const { fs } = useApp();
   return (
@@ -240,13 +282,17 @@ function Options({ options, value, onChange }) {
         const on = o.v === value;
         return (
           <Pressable key={o.v} onPress={() => { tap(); onChange(o.v); }}
-            style={({ pressed }) => ({ flex: 1, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6,
-                                       borderRadius: 14, borderWidth: on ? 1.6 : 1,
-                                       borderColor: on ? C.brand600 : C.line,
-                                       backgroundColor: on ? "rgba(119,33,87,.07)" : C.card,
+            style={({ pressed }) => ({ flex: 1, minHeight: 62, alignItems: "center", justifyContent: "center",
+                                       gap: 2, paddingVertical: 11, paddingHorizontal: 7,
+                                       borderRadius: 14, borderWidth: 1,
+                                       borderColor: on ? C.brand900 : C.line,
+                                       backgroundColor: on ? C.brand900 : C.card,
                                        opacity: pressed ? 0.85 : 1 })}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: on ? C.brand600 : C.ink }}>{o.t}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 1 }}>{o.s}</Text>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), lineHeight: fs(17.5),
+                           textAlign: "center", color: on ? C.cream : C.ink }}>{o.t}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(10), letterSpacing: 0.7, lineHeight: fs(12.5),
+                           textTransform: "uppercase", textAlign: "center",
+                           color: on ? C.goldBright : C.muted }}>{o.s}</Text>
           </Pressable>);
       })}
     </View>
