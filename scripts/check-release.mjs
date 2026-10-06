@@ -1009,9 +1009,26 @@ for (const f of ["index.html", "admin.html"]) {
     bad.push("the app no longer reads notices_live, so the Notices tab shows nothing");
   if (/rest\/v1\/notices\?/.test(app) || /from\("notices"\)/.test(app))
     bad.push("the app is reading the notices TABLE rather than the notices_live view — the view is what decides which columns the public gets");
-  /* The publishable key must never appear on a write to notices. */
-  const writes = [...app.matchAll(/method:\s*"(POST|PATCH|PUT|DELETE)"[\s\S]{0,400}?notices/g)];
-  if (writes.length)
+  /* The publishable key must never appear on a write to notices.
+     What counts as a write is the TABLE endpoint with a write method on it,
+     not a write method near the word "notices". It used to be the latter, on
+     the reasoning that the app only ever read notices_live with a GET, so any
+     POST in the area was a write. That stopped being true the day notices_live
+     became a function: PostgREST calls a function with POST, so the app's own
+     READ now matches, and the word it matched on was inside
+     `throw new Error("notices " + r.status)` — an error message.
+     A check that fires on an error message is not protecting anything, and one
+     that cries wolf on every release gets switched off. This asks the question
+     the comment above actually asks: does a write method point AT the table?
+     /rest/v1/notices is the table. /rest/v1/rpc/<anything> is a function, and
+     a function is the Worker's own write path on the service key or, here, a
+     read — which is why rpc is excluded rather than the whole URL ignored. */
+  const tableWrites = [...app.matchAll(/rest\/v1\/notices\b/g)].filter(m => {
+    if (/rpc\/$/.test(app.slice(Math.max(0, m.index - 4), m.index))) return false;
+    const around = app.slice(Math.max(0, m.index - 200), m.index + 300);
+    return /method:\s*"(POST|PATCH|PUT|DELETE)"/.test(around);
+  });
+  if (tableWrites.length)
     bad.push("the app appears to write to notices with the publishable key — anyone who opens the app could then post an announcement");
 
   if (sql) {
