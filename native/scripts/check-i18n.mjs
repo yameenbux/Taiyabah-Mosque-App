@@ -27,14 +27,27 @@ const used = new Map();
 for (const f of files) {
   const src = fs.readFileSync(f, "utf8");
   for (const m of src.matchAll(/\bt\(\s*"([a-z0-9_.]+)"/gi)) add(m[1], f);
-  for (const m of src.matchAll(/\bk:\s*"([a-z0-9_.]+)"/gi)) add(m[1], f);
+  /* A dotted name is a pack key. A bare word is a React list id — the chips on
+   * the prayer-times screen are k:"today", k:"fri", k:"month", and their labels
+   * are separate t() calls that ARE translated. Reporting those three for ever
+   * is worse than not checking them: four permanent false alarms are exactly
+   * where a real miss goes unnoticed. */
+  for (const m of src.matchAll(/\bk:\s*"([a-z0-9_.]+)"/gi)) if (m[1].includes(".")) add(m[1], f);
   /* t(`prayer.${k}`, …) and friends — the stems are checked by hand below. */
 }
-function add(k, f) { if (!used.has(k)) used.set(k, new Set()); used.get(k).add(path.relative(SRC, f)); }
+function add(k, f) {
+  /* A name ending in a dot is the literal half of a key built by
+   * concatenation — T("date.fulldow." + n). The whole keys it makes are in
+   * DYNAMIC below; the stem itself is not a key and never will be. */
+  if (k.endsWith(".")) return;
+  if (!used.has(k)) used.set(k, new Set()); used.get(k).add(path.relative(SRC, f));
+}
 
 /* Keys built at runtime from a variable. Expanded here so they are checked too. */
 const DYNAMIC = [
   ...["fajr", "sunrise", "zuhr", "asr", "maghrib", "isha"].map(p => `prayer.${p}`),
+  /* date.fulldow.<0-6>, built from the day number. */
+  ...Array.from({ length: 7 }, (_, i) => `date.fulldow.${i}`),
   ...Array.from({ length: 114 }, (_, i) => `surah.${i + 1}.name`),
 ];
 for (const k of DYNAMIC) add(k, "(built at runtime)");

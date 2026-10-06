@@ -16,14 +16,23 @@ export function monthYear(t, d) {
   return `${t(`date.fullmon.${d.getMonth()}`, MON[d.getMonth()])} ${d.getFullYear()}`;
 }
 
-/* "in 8h 35m". Built from parts rather than one sentence, so a pack only has
- * to carry the two unit words. */
+/* "in 8h 35m".
+ *
+ * It used to be glued together from an "in" and two unit words, on the grounds
+ * that a pack then only had to carry the units. That only works in English.
+ * Urdu puts the "in" last — ‌‌"45 منٹ میں", not "میں 45 منٹ" — and no amount of
+ * translating the word "in" on its own can move it there. So each shape is one
+ * sentence with the numbers dropped into it, and a pack can put them wherever
+ * its language puts them. This is the most-read line on the busiest screen;
+ * getting it backwards would be the first thing anybody noticed. */
 export function countdown(t, minutes) {
-  if (minutes < 60) return `${t("time.in", "in")} ${minutes} ${t("time.min", "min")}`;
+  if (minutes < 60)
+    return t("time.in_min", "in {n} min").replace("{n}", String(minutes));
   const h = Math.floor(minutes / 60), m = minutes % 60;
-  return m
-    ? `${t("time.in", "in")} ${h}${t("time.h", "h")} ${String(m).padStart(2, "0")}${t("time.m", "m")}`
-    : `${t("time.in", "in")} ${h}${t("time.h", "h")}`;
+  return (m
+    ? t("time.in_hm", "in {h}h {m}m").replace("{m}", String(m).padStart(2, "0"))
+    : t("time.in_h", "in {h}h")
+  ).replace("{h}", String(h));
 }
 
 /* The timetable stores the Hijri date as one English string — "23 Rabi al-Thani
