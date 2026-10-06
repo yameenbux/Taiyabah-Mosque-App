@@ -8,13 +8,13 @@
  * committee changes the copy on the website, one script run brings it here.
  */
 import React from "react";
-import { View } from "react-native";
-import { C } from "./theme";
+import { View, Text } from "react-native";
+import { C, F, R } from "./theme";
 import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -49,7 +49,7 @@ const ICON = {
 };
 
 function Block({ b, nav, inCard }) {
-  const { tx } = useApp();
+  const { tx, fs } = useApp();
   switch (b.type) {
     case "hero":    return null;   // the hero is hoisted out of the scroll body
     case "heading": return <Heading tag={b.tag ? tx(b.tag) : null}>{tx(b)}</Heading>;
@@ -70,13 +70,27 @@ function Block({ b, nav, inCard }) {
     case "advisory": return (
       <Warn>{[b.h, ...(b.ps || [])].filter(Boolean).map(tx).join("\n\n")}</Warn>);
 
+    /* The founders and the ulema. On the website this is .ab-list: each row is
+       14.5px at weight 600 with 12px above and below and a hairline between
+       them — not a gap. And .ab-now, the "PRESENT IMAM" tag, is a pill on
+       #EFE6EC, uppercase and tracked, which this did not draw at all. */
     case "list":
       return (
-        <View style={{ gap: 7, marginTop: 4 }}>
+        <View style={{ marginTop: 2 }}>
           {b.items.map((it, i) => (
-            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <P style={{ flex: 1 }}>{tx(it)}</P>
-              {!!it.note && <Note>{tx(it.note)}</Note>}
+            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 9,
+                                   paddingVertical: 12,
+                                   borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
+              <Rich style={{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(14.5),
+                             lineHeight: fs(21), color: C.ink }}>{tx(it)}</Rich>
+              {!!it.note && (it.now
+                ? <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 1,
+                                 textTransform: "uppercase", color: C.brand600,
+                                 backgroundColor: "#EFE6EC", borderRadius: R.pill,
+                                 paddingHorizontal: 8, paddingVertical: 3, overflow: "hidden" }}>
+                    {tx(it.note)}</Text>
+                : <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.muted }}>
+                    {tx(it.note)}</Text>)}
             </View>))}
         </View>
       );
