@@ -245,6 +245,7 @@ export default function Home({ navigation }) {
             <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)" }}>
               {t("app.sahih_muslim_854", "Ṣaḥīḥ Muslim 854")}</Text>
             <Pressable onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+              accessibilityRole="button"
               style={({ pressed }) => ({ marginTop: 8, borderRadius: R.pill, backgroundColor: C.goldBright,
                                          paddingHorizontal: 20, paddingVertical: 11,
                                          opacity: pressed ? 0.88 : 1 })}>
@@ -307,6 +308,11 @@ export default function Home({ navigation }) {
           </View>)}
 
         <Press onPress={() => { tap(); navigation.navigate("Timetable"); }}
+          accessibilityRole="button"
+          /* 11px of padding on a 13px line is a 35pt target, under the 44 both
+             platforms ask for. hitSlop grows what the finger hits without
+             moving the link away from the figures it sits under. */
+          hitSlop={{ top: 5, bottom: 5, left: 12, right: 12 }}
           style={{ alignSelf: rtl ? "flex-start" : "flex-end", paddingVertical: 11, paddingHorizontal: 4,
                    flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 4 }}>
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600 }}>
@@ -349,6 +355,9 @@ export default function Home({ navigation }) {
                       accessibilityLabel={step < 0 ? t("a11y.previous_reminder", "Previous reminder")
                                                    : t("a11y.next_reminder", "Next reminder")}
                       onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
+                      /* Drawn 30x26 because the website draws it 30x26; hit as
+                         44x44, which is what a finger actually needs. */
+                      hitSlop={{ top: 9, bottom: 9, left: 7, right: 7 }}
                       style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
                                justifyContent: "center", borderWidth: 1,
                                borderColor: "rgba(198,162,76,.45)" }}>
@@ -361,6 +370,7 @@ export default function Home({ navigation }) {
         {/* ---- Listen ---------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.listen", "Listen")} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
+          accessibilityRole="button"
           style={{ borderRadius: R.card, overflow: "hidden" }}>
           {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
               and ending on the BRIGHTER plum. This had it backwards and on the
@@ -398,6 +408,11 @@ export default function Home({ navigation }) {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {TILES.map(x => (
             <Pressable key={x.k} onPress={() => { tap(); x.to ? navigation.navigate(x.to) : open(x.href); }}
+              /* "link" is not decoration: a screen reader says "link" for
+                 something that leaves the app and "button" for something that
+                 does not, and Join WhatsApp leaving the app is worth being
+                 warned about before you tap it. */
+              accessibilityRole={x.to ? "button" : "link"}
               style={({ pressed }) => ({ flexBasis: "30.5%", flexGrow: 1, alignItems: "center", gap: 8,
                                          backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
                                          borderRadius: 15, paddingTop: 15, paddingBottom: 13, paddingHorizontal: 6,

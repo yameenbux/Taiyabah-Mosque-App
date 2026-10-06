@@ -168,6 +168,7 @@ export function TopBar({ navigation, onBell, back }) {
       </View>
       <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
         accessibilityLabel={t("a11y.notices", "Notices")}
+        accessibilityRole="button"
         /* .bellbtn is gold: a 10% gold fill inside a 30% gold border. This was
            a cream outline on nothing, which reads as a disabled control. */
         style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 11, alignItems: "center",
@@ -392,12 +393,18 @@ export function RowGroup({ children, style }) {
   );
 }
 
-export function Press({ children, onPress, disabled, dim = true, style }) {
+/* `...rest` is not tidiness. This took five props and dropped everything else
+ * on the floor, silently — so the fifteen accessibility props written on a
+ * <Press> across the app were thrown away before they reached the Pressable,
+ * and the screens that looked like they had been made accessible had not
+ * been. Nothing announced a role, because no role ever arrived. */
+export function Press({ children, onPress, disabled, dim = true, style, ...rest }) {
   return (
     /* `dim={false}` for a row that is inert but not greyed — the website fades
        a disabled nav button or an out-of-range day, and never a "coming soon"
        row, whose title and chip go muted on their own. */
     <Pressable onPress={onPress} disabled={disabled} android_ripple={{ color: "rgba(119,33,87,.10)" }}
+      {...rest}
       style={({ pressed }) => [{ backgroundColor: pressed && Platform.OS !== "android" ? "rgba(119,33,87,.07)" : "transparent",
                                  opacity: disabled && dim ? 0.45 : 1 }, style]}>
       {children}
@@ -415,6 +422,8 @@ export function NavRow({ icon, label, sub, soon, onPress, href, value, right, to
        tag down with it, so the one bright thing on those rows — the part that
        says the masjid intends to do this — went pale. */
     <Press onPress={act} disabled={!act || soon} dim={!soon}
+      accessibilityRole={href ? "link" : "button"}
+      accessibilityState={{ disabled: !act || !!soon }}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 14, paddingHorizontal: 15 }}>
       {!!icon && <IconChip icon={icon} muted={!!soon} />}
@@ -951,6 +960,8 @@ export function CTA({ label, sub, onPress, href, compact, tone = "brand", disabl
   const colors = tone === "gold" ? [C.goldBright, C.gold] : [C.ctaTop, C.ctaBot];
   return (
     <Pressable onPress={act} disabled={disabled || !act}
+      accessibilityRole={href ? "link" : "button"}
+      accessibilityState={{ disabled: !!disabled || !act }}
       style={({ pressed }) => ({ marginTop: 16, borderRadius: R.pill, overflow: "hidden",
                                  opacity: disabled ? 0.5 : pressed ? 0.88 : 1,
                                  transform: [{ scale: pressed ? 0.985 : 1 }] })}>
@@ -1135,6 +1146,7 @@ export function PanelLink({ label, href, onPress }) {
   const { fs } = useApp();
   return (
     <Pressable onPress={onPress || (() => open(href))}
+      accessibilityRole={href ? "link" : "button"}
       style={({ pressed }) => ({ borderRadius: 12, paddingVertical: 13, paddingHorizontal: 13,
                                  marginTop: 16, marginBottom: 10,
                                  backgroundColor: pressed ? C.tintPlumPress : C.tintPlum })}>
