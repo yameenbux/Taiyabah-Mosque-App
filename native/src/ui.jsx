@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
-import { C, F, R, SHADOW } from "./theme";
+import { C, F, R, SHADOW, dual } from "./theme";
 import { useApp } from "./store";
 
 export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); };
@@ -370,7 +370,7 @@ export function Card({ children, style, pad = 15, gap = 10 }) {
 export function IconChip({ icon, size = 38, glyph = 19, radius = 11, muted }) {
   return (
     <View style={{ width: size, height: size, borderRadius: radius, alignItems: "center",
-                   justifyContent: "center", backgroundColor: muted ? C.paper : "#F0E9ED" }}>
+                   justifyContent: "center", backgroundColor: muted ? C.paper : C.tintPlum }}>
       <Ionicons name={icon} size={glyph} color={muted ? C.muted : C.brand600} />
     </View>
   );
@@ -515,7 +515,7 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext, play 
           a play button must not be. */}
       <View style={{ width: play ? 36 : 40, height: play ? 36 : 40, borderRadius: play ? 10 : 12,
                      alignItems: "center", justifyContent: "center",
-                     backgroundColor: play ? C.brand800 : soon ? C.paper : "#F0E9ED" }}>
+                     backgroundColor: play ? C.brand800 : soon ? C.paper : C.tintPlum }}>
         {svg ? <SvgXml xml={svg} width={play ? 18 : 20} height={play ? 18 : 20}
                        color={play ? C.goldBright : soon ? C.muted : C.brand600} />
              : <Ionicons name={icon || "chevron-forward-outline"} size={play ? 18 : 19}
@@ -559,7 +559,7 @@ export function Items({ items }) {
                                 gap: 12, padding: 14, borderRadius: 14, backgroundColor: C.card,
                                 borderWidth: 1, borderColor: C.line }, SHADOW]}>
           <View style={{ width: 36, height: 36, borderRadius: 11, alignItems: "center",
-                         justifyContent: "center", backgroundColor: "#F0E9ED" }}>
+                         justifyContent: "center", backgroundColor: C.tintPlum }}>
             {it.svg ? <SvgXml xml={it.svg} width={19} height={19} color={C.brand600} />
                     : <Ionicons name="ellipse-outline" size={19} color={C.brand600} />}
           </View>
@@ -574,7 +574,7 @@ export function Items({ items }) {
                    with nothing between, so one card read "Feeding &
                    kitchenextra cost". */
                 <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.76,
-                               textTransform: "uppercase", color: "#8A6A18", overflow: "hidden",
+                               textTransform: "uppercase", color: dual("#8A6A18", C.goldInk), overflow: "hidden",
                                backgroundColor: "rgba(198,162,76,.18)", borderRadius: 5,
                                paddingHorizontal: 6, paddingVertical: 2 }}>{tx(it.tag)}</Text>)}
             </View>
@@ -701,11 +701,11 @@ export function Ticks({ items, ordered }) {
  * website does not have, so the heading stopped being a heading. */
 export function Advisory({ h, ps }) {
   const { fs, tx, rtl } = useApp();
-  const INK = "#7C3A20";
+  const INK = C.tintRoseInk;
   const align = rtl ? "right" : "left";
   return (
     <View style={{ marginTop: 12, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 15,
-                   backgroundColor: "#FBF0EB", borderWidth: 1, borderColor: "#EBCDBF" }}>
+                   backgroundColor: C.tintRose, borderWidth: 1, borderColor: C.tintRoseLine }}>
       {!!h && <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 1.1,
                              textTransform: "uppercase", color: INK, marginBottom: 7,
                              textAlign: align }}>{tx(h)}</Text>}
@@ -723,7 +723,7 @@ export function Warn({ children }) {
                    backgroundColor: "rgba(180,83,47,.07)", borderWidth: 1, borderColor: "rgba(180,83,47,.22)",
                    borderRadius: 13, padding: 13, marginTop: 12 }}>
       <Ionicons name="alert-circle-outline" size={18} color={C.danger} style={{ marginTop: 1 }} />
-      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: "#8A3E22",
+      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: dual("#8A3E22", C.danger),
                      textAlign: rtl ? "right" : "left" }}>{children}</Rich>
     </View>
   );
@@ -736,7 +736,7 @@ export function Notice({ children }) {
                    backgroundColor: "rgba(198,162,76,.11)", borderWidth: 1, borderColor: "rgba(198,162,76,.3)",
                    borderRadius: 13, padding: 13, marginTop: 12 }}>
       <Ionicons name="information-circle-outline" size={18} color={C.goldInk} style={{ marginTop: 1 }} />
-      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: "#5E4A12",
+      <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: dual("#5E4A12", C.goldInk),
                      textAlign: rtl ? "right" : "left" }}>{children}</Rich>
     </View>
   );
@@ -747,7 +747,11 @@ export function Notice({ children }) {
  * because somebody is reading it at three in the morning; "Who reads this" is
  * gold because it is a reassurance. Rendering both in the default plum makes
  * them look like the same kind of remark, which is the one thing they are not. */
-const CALLOUT_TONES = {
+/* A FUNCTION, not a const: read at module scope these colours would be looked
+ * up once at import, before anybody has chosen a theme, and this panel would
+ * stay cream-on-light-plum on seven screens however dark the rest went.
+ * scripts/check-theme.mjs is what catches that. */
+const CALLOUT_TONES = () => ({
   /* .ad-note is DARK — linear-gradient(180deg, brand-800, brand-900) with
    * cream on it, a gold-bright label and #CBB8C4 prose. It was a 4.5% plum
    * tint with ink text: the same words, but as a faint aside instead of the
@@ -759,7 +763,7 @@ const CALLOUT_TONES = {
             head: C.cream, body: "#CBB8C4" },
   danger: { bg: "rgba(180,83,47,.07)",  line: "rgba(180,83,47,.26)",  lab: C.danger },
   gold:   { bg: "rgba(198,162,76,.13)", line: "rgba(198,162,76,.42)", lab: C.goldInk },
-};
+});
 
 /* The funeral screen's first panel, and the loudest thing in the app.
  *
@@ -780,7 +784,7 @@ export function Rules({ h, ver, items }) {
     /* .cc-rules is linear-gradient(155deg, brand-600 0%, brand-900 72%) — it
        starts on the BRIGHT plum and runs down and to the left, reaching the
        dark one short of the bottom. This was brand-700 straight down. */
-    <LinearGradient colors={[C.brand600, C.brand900]} locations={[0, 0.72]}
+    <LinearGradient colors={[C.plumFill, C.brand900]} locations={[0, 0.72]}
       start={{ x: 0.9, y: 0 }} end={{ x: 0.1, y: 1 }}
       style={{ borderRadius: R.card, padding: 17, gap: 11, marginTop: 14 }}>
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(17), lineHeight: fs(23),
@@ -839,7 +843,8 @@ export function Urgent({ lab, h, ps, nums }) {
 
 export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
   const { fs, tx, rtl } = useApp();
-  const c = CALLOUT_TONES[tone] || CALLOUT_TONES.plum;
+  const tones = CALLOUT_TONES();
+  const c = tones[tone] || tones.plum;
   const align = rtl ? "right" : "left";
   const body = ps || [];
   /* .ad-apply — a FILLED brand-600 bar at 11px of radius, the label 13px bold
@@ -851,7 +856,7 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
       style={({ pressed }) => ({ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                                  justifyContent: "space-between", gap: 8,
                                  marginTop: 10, marginBottom: 12, paddingVertical: 11, paddingHorizontal: 13,
-                                 borderRadius: 11, backgroundColor: C.brand600,
+                                 borderRadius: 11, backgroundColor: C.plumFill,
                                  opacity: pressed ? 0.88 : 1 })}>
       <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: "#FFFFFF" }}>{tx(cta)}</Text>
       <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "#FFFFFF" }}>↗</Text>
@@ -939,7 +944,7 @@ export function GoldCTA({ label, sub, href, onPress, disabled }) {
 export function CTA({ label, sub, onPress, href, compact, tone = "brand", disabled }) {
   const { fs } = useApp();
   const act = onPress || (href ? () => open(href) : null);
-  const colors = tone === "gold" ? [C.goldBright, C.gold] : [C.brand700, C.brand900];
+  const colors = tone === "gold" ? [C.goldBright, C.gold] : [C.ctaTop, C.ctaBot];
   return (
     <Pressable onPress={act} disabled={disabled || !act}
       style={({ pressed }) => ({ marginTop: 16, borderRadius: R.pill, overflow: "hidden",
@@ -1015,7 +1020,7 @@ export function Social({ items }) {
                rather than the row of panels the website has. */
             style={({ pressed }) => ({ flex: 1, paddingVertical: 12, paddingHorizontal: 4, borderRadius: 12,
                                        alignItems: "center", justifyContent: "center",
-                                       backgroundColor: pressed ? "#E8DCE4" : "#F0E9ED" })}>
+                                       backgroundColor: pressed ? C.tintPlumPress : C.tintPlum })}>
             {key ? <SvgXml xml={SOCIAL_SVG[key]} width={19} height={19} color={C.brand600} />
                  : <Ionicons name="globe-outline" size={19} color={C.brand600} />}
           </Pressable>);
@@ -1119,8 +1124,6 @@ export function Empty({ icon = "leaf-outline", title, body }) {
   );
 }
 
-export const line = StyleSheet.create({ h: { height: 1, backgroundColor: C.line } }).h;
-
 /* .vd-all — a centred link that is a full-width #F0E9ED panel, radius 12,
  * 13px of padding, the label 13px semibold in brand-600. It was a row with a
  * chevron in a bordered group, which is a different piece of furniture. */
@@ -1130,7 +1133,7 @@ export function PanelLink({ label, href, onPress }) {
     <Pressable onPress={onPress || (() => open(href))}
       style={({ pressed }) => ({ borderRadius: 12, paddingVertical: 13, paddingHorizontal: 13,
                                  marginTop: 16, marginBottom: 10,
-                                 backgroundColor: pressed ? "#E8DCE4" : "#F0E9ED" })}>
+                                 backgroundColor: pressed ? C.tintPlumPress : C.tintPlum })}>
       <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600, textAlign: "center" }}>
         {label}
       </Text>

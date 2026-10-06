@@ -157,7 +157,7 @@ function Row({ row, first, nav }) {
           the card. */}
       {!row.soon && (
         <View style={{ width: 29, height: 29, borderRadius: 9, alignItems: "center",
-                       justifyContent: "center", backgroundColor: "#F0E9ED" }}>
+                       justifyContent: "center", backgroundColor: C.tintPlum }}>
           {DRAWER.rows[row.k]
             ? <SvgXml xml={svgOf(DRAWER.rows[row.k], C.brand600)} width={16} height={16} />
             : <Ionicons name={row.icon} size={16} color={C.brand600} />}

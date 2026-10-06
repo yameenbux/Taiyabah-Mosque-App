@@ -8,6 +8,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { PixelRatio } from "react-native";
 import { fontSize } from "./scale";
+import { setThemeMode } from "./theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EN from "./i18n/en.json";
 
@@ -34,7 +35,7 @@ const osFontScale = () => {
   return Number.isFinite(n) && n > 0 ? n : 1;
 };
 
-const DEFAULTS = { lang: "en", scale: 1.12, reminders: {}, favourites: [], lastRead: null,
+const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favourites: [], lastRead: null,
                    muMark: 0, muFavs: [],
                    /* The website's own five switches and its ten-minute default,
                     * so somebody who set this up on the website finds the same
@@ -76,6 +77,13 @@ export function AppProvider({ children, fallback = null }) {
 
   const value = useMemo(() => {
     if (!prefs) return null;
+
+    /* Applied HERE rather than in an effect, because an effect runs after the
+       children have already drawn — which would be one frame of the old
+       palette every time the app opens or the choice changes. Setting a
+       module variable during a memo is a side effect, but an idempotent one,
+       and it has to happen before anything reads C. */
+    setThemeMode(prefs.theme);
     const pack = prefs.lang !== "en" && PACKS[prefs.lang] ? PACKS[prefs.lang]() : null;
 
     /* One lookup, used everywhere.
@@ -128,6 +136,10 @@ export function AppProvider({ children, fallback = null }) {
       fs: n => fontSize(n, prefs.scale, osFontScale()),
       setLang: lang => save({ ...prefs, lang }),
       setScale: scale => save({ ...prefs, scale }),
+      /* Light or dark, chosen in System Preferences. Not the phone's setting:
+         the masjid's own screens are light, and somebody who wants the app
+         dark says so. */
+      setTheme: theme => save({ ...prefs, theme: theme === "dark" ? "dark" : "light" }),
       setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),
       /* Where the reader got to, so the Qur'an screen can offer it back rather
        * than making somebody scroll to page 300 again. */

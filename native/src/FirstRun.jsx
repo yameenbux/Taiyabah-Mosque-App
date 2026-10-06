@@ -87,7 +87,7 @@ export default function FirstRun() {
 
           <Press onPress={yes}
             style={{ alignItems: "center", paddingVertical: 14, borderRadius: R.pill,
-                     backgroundColor: C.brand600, marginTop: 4 }}>
+                     backgroundColor: C.plumFill, marginTop: 4 }}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), color: C.cream }}>
               {t("firstrun.turn_on", "Turn them on")}</Text>
           </Press>

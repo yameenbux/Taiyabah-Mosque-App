@@ -90,7 +90,7 @@ function Block({ b, nav, inCard }) {
               {!!it.note && (it.now
                 ? <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 1,
                                  textTransform: "uppercase", color: C.brand600,
-                                 backgroundColor: "#EFE6EC", borderRadius: R.pill,
+                                 backgroundColor: C.tintPlumPill, borderRadius: R.pill,
                                  paddingHorizontal: 8, paddingVertical: 3, overflow: "hidden" }}>
                     {tx(it.note)}</Text>
                 /* .ab-note is one of the five rules the website sets at 500

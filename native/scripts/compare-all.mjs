@@ -115,6 +115,16 @@ const newPage = async (url, side) => {
   await page.addInitScript(FREEZE(ts));
   /* CMP_SCALE renders the native side at a chosen text size, so the biggest
      one the app offers can be looked at rather than assumed to fit. */
+  /* CMP_THEME=dark renders the native side in dark mode, so it can be looked
+     at rather than reasoned about. */
+  if (side === "native" && process.env.CMP_THEME)
+    await page.addInitScript(th => {
+      const KEY = "taiyabah.prefs.v1";
+      try {
+        const cur = JSON.parse(window.localStorage.getItem(KEY) || "{}");
+        window.localStorage.setItem(KEY, JSON.stringify({ ...cur, theme: th }));
+      } catch {}
+    }, process.env.CMP_THEME);
   if (side === "native" && process.env.CMP_SCALE)
     await page.addInitScript(sc => {
       const KEY = "taiyabah.prefs.v1";

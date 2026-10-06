@@ -214,7 +214,7 @@ export default function Help() {
               "Say what you expected and what happened instead. The message carries which phone you are on and whether notifications are allowed, which is usually what settles it.")}</Text>
           <Press onPress={() => mailUs(t("help.subject", "Help with the app"))}
             style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
-                     backgroundColor: C.brand600 }}>
+                     backgroundColor: C.plumFill }}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), color: C.cream }}>
               {t("help.email_the_masjid", "Email the masjid")}</Text>
           </Press>

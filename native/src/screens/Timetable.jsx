@@ -92,8 +92,8 @@ export default function Timetable() {
           ["begins", t("sheet.beginning_times", "Beginning times")]].map(([k, lab]) => (
           <Press key={k} onPress={() => { tap(); setMode(k); }}
             style={{ flex: 1, alignItems: "center", paddingVertical: 8, borderRadius: 9, borderWidth: 1,
-                     borderColor: mode === k ? C.brand700 : C.line,
-                     backgroundColor: mode === k ? C.brand700 : C.card }}>
+                     borderColor: mode === k ? C.pick : C.line,
+                     backgroundColor: mode === k ? C.pick : C.card }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: mode === k ? C.cream : C.ink }}>{lab}</Text>
           </Press>))}

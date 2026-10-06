@@ -285,7 +285,7 @@ export default function HallHire({ navigation }) {
                         "We could not check whether {when} is free, so nothing has been booked. Please call the office and they will check for you."));
                 }}
                 style={{ paddingVertical: 9, paddingHorizontal: 16, borderRadius: 10,
-                         borderWidth: 1, borderColor: C.brand600, backgroundColor: C.brand600,
+                         borderWidth: 1, borderColor: C.plumFill, backgroundColor: C.plumFill,
                          opacity: blocked ? 0.4 : 1 }}>
                 <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: "#fff" }}>{actWord}</Text>
               </Press>

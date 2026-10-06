@@ -131,8 +131,8 @@ export default function PrayerTimes({ navigation }) {
             go: () => navigation.navigate("Timetable") }].map(c => (
           <Press key={c.k} disabled={c.off} onPress={() => { tap(); c.go(); }}
             style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: R.pill, borderWidth: 1,
-                     borderColor: c.on ? C.brand700 : C.line,
-                     backgroundColor: c.on ? C.brand700 : C.card,
+                     borderColor: c.on ? C.pick : C.line,
+                     backgroundColor: c.on ? C.pick : C.card,
                      opacity: c.off ? 0.35 : 1 }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: c.on ? C.cream : C.muted }}>{c.lab}</Text>
@@ -210,7 +210,7 @@ export default function PrayerTimes({ navigation }) {
                           <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
                                          textTransform: "uppercase", overflow: "hidden",
                                          color: isNow ? "#3A2C07" : C.brand600,
-                                         backgroundColor: isNow ? C.gold : "#EFE6EC",
+                                         backgroundColor: isNow ? C.gold : C.tintPlumPill,
                                          borderRadius: R.pill, paddingHorizontal: 7, paddingVertical: 3 }}>
                             {isNow ? t("times.now", "Now") : t("times.next", "Next")}</Text>)}
                       </View>

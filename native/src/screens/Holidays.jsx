@@ -8,7 +8,7 @@
  */
 import React, { useMemo, useRef, useEffect } from "react";
 import { View, Text, ScrollView, useWindowDimensions } from "react-native";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P } from "../ui";
@@ -32,7 +32,9 @@ function dayMaps() {
   return { shut, evt };
 }
 
-const KEY = { open: C.line, shut: "#C25B5B", ev: "#C6A24C", today: C.brand600 };
+/* Called at render, not read at import — two of these four are theme colours
+ * and the key would otherwise describe the light calendar on a dark one. */
+const KEY = () => ({ open: C.line, shut: "#C25B5B", ev: "#C6A24C", today: C.brand600 });
 
 function Key({ colour, label, hollow }) {
   const { fs } = useApp();
@@ -93,14 +95,15 @@ function Month({ y, m, shut, evt, todayISO, width }) {
                   a reader is hunting for. */}
               <View style={{ width: box - 4, height: box - 4, borderRadius: 8,
                              alignItems: "center", justifyContent: "center", borderWidth: 1,
-                             backgroundColor: isToday ? C.brand600
+                             backgroundColor: isToday ? C.plumFill
                                             : isShut ? "rgba(180,83,47,.14)" : C.paper,
                              borderColor: isToday ? C.brand600
                                         : isShut ? "rgba(180,83,47,.3)"
                                         : isEv ? C.gold : "transparent" }}>
                 <Text style={{ fontFamily: isToday || isEv ? F.sansBold : F.sans, fontSize: fs(11.5),
                                color: isToday ? C.cream
-                                    : isShut ? "#8E4126" : wknd ? C.muted : C.ink }}>{d}</Text>
+                                    : isShut ? dual("#8E4126", C.danger)
+                                    : wknd ? C.muted : C.ink }}>{d}</Text>
               </View>
             </View>);
         })}
@@ -215,10 +218,10 @@ export default function Holidays() {
 
         <Heading>{t("hol.the_year_at_a_glance", "The year at a glance")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14, marginBottom: 11 }}>
-          <Key colour={KEY.open} hollow label={t("hol.madrasah_open", "Madrasah open")} />
-          <Key colour={KEY.shut} label={t("hol.closed", "Closed")} />
-          <Key colour={KEY.ev} label={t("hol.islamic_date", "Islamic date")} />
-          <Key colour={KEY.today} hollow label={t("hol.today", "Today")} />
+          <Key colour={KEY().open} hollow label={t("hol.madrasah_open", "Madrasah open")} />
+          <Key colour={KEY().shut} label={t("hol.closed", "Closed")} />
+          <Key colour={KEY().ev} label={t("hol.islamic_date", "Islamic date")} />
+          <Key colour={KEY().today} hollow label={t("hol.today", "Today")} />
         </View>
       </View>
 

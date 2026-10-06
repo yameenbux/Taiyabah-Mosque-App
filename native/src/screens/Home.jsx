@@ -11,7 +11,7 @@ import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path, Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
@@ -61,8 +61,13 @@ const TILES = [
 /* The web app draws its own tile glyphs rather than using an icon set, and they
  * are part of how it looks — a prayer-bead tasbīḥ, two rings, a collection tin.
  * They are redrawn here from the same paths rather than swapped for the nearest
- * thing in Ionicons. */
-const GLYPH = {
+ * thing in Ionicons.
+ *
+ * A FUNCTION rather than a map of elements: WhatsApp's mark is a filled shape,
+ * so it is the one glyph that names a colour, and a JSX element built at module
+ * scope evaluates its props once at import — the plum would freeze to light and
+ * the mark would stay dark plum on a dark page. */
+const GLYPH = () => ({
   quran:   <><Path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z" /><Path d="M12 6.5v11.8" /></>,
   book:    <><Path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" /><Path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22" /><Path d="M8.5 8.5h6" /><Path d="M8.5 12h6" /></>,
   compass: <><Circle cx="12" cy="12" r="8.5" /><Path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z" /></>,
@@ -78,13 +83,13 @@ const GLYPH = {
     .map(([x,y],i)=><Circle key={i} cx={x} cy={y} r={0.95} />)}
     <Path d="M12 15.9v1.3" /><Circle cx="12" cy="18.7" r="1.5" /></>,
   whatsapp: <Path fill={C.brand600} stroke="none" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.27-.2-.57-.35M12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.4Z" />,
-};
+});
 
 function TileIcon({ name }) {
   return (
     <Svg width={23} height={23} viewBox="0 0 24 24" fill="none" stroke={C.brand600}
          strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-      {GLYPH[name]}
+      {GLYPH()[name]}
     </Svg>
   );
 }
@@ -319,13 +324,13 @@ export default function Home({ navigation }) {
                 <Polygon fill={C.gold} opacity={0.55} points="50,6 94,50 50,94 6,50" />
               </Svg>
               <Text style={{ flex: 1, fontFamily: F.arabic, fontSize: fs(18), lineHeight: fs(32),
-                             color: "#8A6A18", textAlign: rtl ? "left" : "right",
+                             color: dual("#8A6A18", C.goldInk), textAlign: rtl ? "left" : "right",
                              writingDirection: "rtl" }}>{rm.ar}</Text>
             </View>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: "#6B5410", marginTop: 8,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: dual("#6B5410", C.goldInk), marginTop: 8,
                            textAlign: rtl ? "right" : "left" }}>
               {t(`reminder.${rm.id}.t`, rm.t)}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: "#7A6838",
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: dual("#7A6838", C.goldInk),
                            marginTop: 3, textAlign: rtl ? "right" : "left" }}>
               {typeof rm.d === "function" ? rm.d(rmCtx) : t(`reminder.${rm.id}.d`, rm.d)}</Text>
             {reminders.length > 1 && (
@@ -360,7 +365,7 @@ export default function Home({ navigation }) {
           {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
               and ending on the BRIGHTER plum. This had it backwards and on the
               wrong two colours. */}
-          <LinearGradient colors={[C.brand800, C.brand600]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.2 }}
+          <LinearGradient colors={[C.brand800, C.plumFill]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.2 }}
             style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                      paddingHorizontal: 15, paddingVertical: 15, overflow: "hidden" }}>
             <View style={{ width: 40, height: 40, borderRadius: 14, alignItems: "center", justifyContent: "center",

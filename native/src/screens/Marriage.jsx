@@ -366,7 +366,7 @@ function Pay({ t }) {
       style={{ flexGrow: 1, flexShrink: 1, flexBasis: 150, alignItems: "center",
                paddingVertical: 12, paddingHorizontal: 10, borderRadius: 11,
                borderWidth: 1, borderColor: C.brand600,
-               backgroundColor: alt ? C.paper : C.brand600 }}>
+               backgroundColor: alt ? C.paper : C.plumFill }}>
       <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), textAlign: "center",
                      color: alt ? C.brand600 : "#FFFFFF" }}>{label}</Text>
     </Press>

@@ -15,7 +15,7 @@ import Svg, { Circle, Line, Path, G, Polygon, Rect, Defs, RadialGradient, Stop, 
 import { Magnetometer } from "expo-sensors";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, LIGHT } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, TopBar, Heading, Card, Note, tap } from "../ui";
@@ -149,8 +149,14 @@ export default function Qibla({ navigation }) {
                 </RadialGradient>
               </Defs>
               {/* .dial-ring is a radial gradient from white to #F6F2E6 at 72%,
-                  inside a single hairline — not a flat card fill. */}
-              <Circle cx="50" cy="50" r="49.5" fill="url(#face)" stroke={C.line} strokeWidth="0.5" />
+                  inside a single hairline — not a flat card fill.
+                  THE DIAL FACE IS CREAM IN BOTH THEMES: it is an instrument,
+                  the way a real compass has a pale face, and it is the one
+                  surface in the app that does not follow the page. So its
+                  markings are taken from LIGHT in both themes too — read from
+                  C they would inverted with everything else, and the dark
+                  theme drew a salmon N and pale grey W/E/S on cream. */}
+              <Circle cx="50" cy="50" r="49.5" fill="url(#face)" stroke={LIGHT.line} strokeWidth="0.5" />
               {/* .ticks i — 72 hairlines in #D8D0BB, every one the same. The
                   app made every sixth one long and PLUM, which turned a
                   compass face into a decorated plum dial. */}
@@ -168,7 +174,7 @@ export default function Qibla({ navigation }) {
                 return (
                   <SvgText key={ltr} x={50 + r * Math.sin(a)} y={50 - r * Math.cos(a) + 2.4}
                            fontSize="6.4" fontWeight="700" textAnchor="middle"
-                           fill={ltr === "N" ? C.danger : C.muted}>{ltr}</SvgText>);
+                           fill={ltr === "N" ? LIGHT.danger : LIGHT.muted}>{ltr}</SvgText>);
               })}
               {/* .needle — ONE gold arrow with a thin gold stem at 55%, and the
                   kaaba tile on the rim at its head. The app drew a plum
@@ -218,12 +224,12 @@ export default function Qibla({ navigation }) {
                                        opacity: pressed ? 0.9 : 1 },
                                      live ? { borderWidth: 1, borderColor: C.line } : SHADOW]}>
             {live ? (
-              <View style={{ paddingVertical: 14, alignItems: "center", backgroundColor: "#F0E9ED" }}>
+              <View style={{ paddingVertical: 14, alignItems: "center", backgroundColor: C.tintPlum }}>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.brand600 }}>
                   {t("qibla.compass_on", "Compass on")}</Text>
               </View>
             ) : (
-              <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+              <LinearGradient colors={[C.ctaTop, C.ctaBot]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
                 style={{ paddingVertical: 14, alignItems: "center" }}>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
                   {t("sheet.use_my_phone_s_compass", "Use my phone's compass")}</Text>

@@ -27,7 +27,7 @@ const SIZES = [
 ];
 
 export default function Prefs() {
-  const { t, fs, lang, setLang, scale, setScale } = useApp();
+  const { t, fs, lang, setLang, scale, setScale, theme, setTheme } = useApp();
   return (
     <Screen pad={false}>
       {/* .ia-hero's title is "Display & Language". The app used the sheet
@@ -36,6 +36,35 @@ export default function Prefs() {
       <Hero ring={SHEETS.sysprefs?.ring}
             lines={[{ k: "sysprefs.display_language", t: "Display & Language", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
+
+        {/* APPEARANCE, above text size: it is the setting that changes the
+            most and the one somebody opens this screen looking for. Light is
+            the default and the masjid's own — dark is offered, not assumed,
+            and the phone's own setting is deliberately not read: this is a
+            choice somebody makes, not one made for them. */}
+        <Heading>{t("sysprefs.appearance", "Appearance")}</Heading>
+        <P muted>{t("sysprefs.choose_how_the_app_looks",
+          "Choose how the app looks. Light is the usual setting; dark is easier on the eyes at night.")}</P>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+          {[{ v: "light", k: "sysprefs.light", t: "Light", icon: "sunny-outline" },
+            { v: "dark",  k: "sysprefs.dark",  t: "Dark",  icon: "moon-outline" }].map(m => {
+            const on = (theme || "light") === m.v;
+            return (
+              /* The same shape as the text-size buttons directly below, because
+                 they are the same kind of choice on the same screen. */
+              <Pressable key={m.v} onPress={() => { tap(); setTheme(m.v); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
+                style={{ flex: 1, alignItems: "center", gap: 5, paddingVertical: 13, paddingHorizontal: 6,
+                         borderRadius: 12, borderWidth: 1,
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.card }}>
+                <Ionicons name={m.icon} size={19} color={on ? C.cream : C.muted} />
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.3,
+                               textTransform: "uppercase",
+                               color: on ? C.pickInk : C.muted }}>{t(m.k, m.t)}</Text>
+              </Pressable>);
+          })}
+        </View>
 
         <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
         <P muted>{t("sysprefs.pick_the_size_that_reads",
@@ -51,13 +80,13 @@ export default function Prefs() {
               <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
                 style={{ flex: 1, minWidth: 0, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6,
                          borderRadius: 12, borderWidth: 1,
-                         borderColor: on ? C.brand700 : C.line,
-                         backgroundColor: on ? C.brand700 : C.card }}>
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.card }}>
                 <Text style={{ fontFamily: F.sansBold, fontSize: Math.round(14 * s.v),
                                color: on ? C.cream : C.ink }}>A</Text>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: 10, letterSpacing: 0.3,
                                textTransform: "uppercase", marginTop: 3,
-                               color: on ? "#E7D9E2" : C.muted }}>{t(s.k, s.t)}</Text>
+                               color: on ? C.pickInk : C.muted }}>{t(s.k, s.t)}</Text>
               </Pressable>);
           })}
         </View>
@@ -98,7 +127,7 @@ export default function Prefs() {
                 {/* .sp-state: a white tick on a filled brand-600 circle when
                     this is the language in use, and nothing when it is not. */}
                 {on && (
-                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: C.brand600,
+                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: C.plumFill,
                                  alignItems: "center", justifyContent: "center" }}>
                     <Ionicons name="checkmark" size={14} color="#fff" />
                   </View>)}

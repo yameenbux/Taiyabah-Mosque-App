@@ -19,7 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, TopBar, Heading, Card, Note, P, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
@@ -144,7 +144,7 @@ export default function Alerts() {
           /* .enable is a brand-700 to brand-800 gradient at 13px of radius
              with the shared lift under it, not a flat brand-600 pill. */
           <Press onPress={enable} style={{ marginBottom: 14, borderRadius: 13, overflow: "hidden", ...SHADOW }}>
-            <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+            <LinearGradient colors={[C.ctaTop, C.ctaBot]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
               style={{ alignItems: "center", paddingVertical: 14 }}>
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
                 {t("sheet.enable_notifications", "Enable notifications")}</Text>
@@ -177,7 +177,7 @@ export default function Alerts() {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
               {t("sheet.remind_me", "Remind me")}</Text>
             <Press disabled={!alerts.jamaah} onPress={() => { tap(); setPickMins(true); }}
-              style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#fff",
+              style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: dual("#fff", C.paper),
                        borderWidth: 1, borderColor: C.line, borderRadius: 9,
                        paddingHorizontal: 9, paddingVertical: 6 }}>
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink }}>
@@ -220,12 +220,12 @@ export default function Alerts() {
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
         </View>
 
-        {/* .save: filled brand-700, cream text, 12px of radius, 13px of
-           padding. An outlined pill reads as the secondary action, and on
-           this screen Save is the only thing that commits anything. */}
+        {/* .save: the filled interactive plum, cream text, 12px of radius,
+           13px of padding. An outlined pill reads as the secondary action,
+           and on this screen Save is the only thing that commits anything. */}
         <Press onPress={saveAll} disabled={granted === false}
           style={{ alignItems: "center", paddingVertical: 13, borderRadius: 12,
-                   backgroundColor: C.brand700, marginTop: 14 }}>
+                   backgroundColor: C.ctaTop, marginTop: 14 }}>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), letterSpacing: 0.2, color: C.cream }}>
             {saved ? `${t("sheet.notifications_on", "Notifications on")} · ${t("sheet.change", "Change")}`
                    : t("sheet.save", "Save")}</Text>

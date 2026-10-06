@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, P, Note, CTA, Bank, Foot, Pill, Press, DL, open, tap, GLab, GoldCTA, Rich, TopBar, Girih } from "../ui";
@@ -113,7 +113,7 @@ export function NewBuild({ navigation }) {
               <View key={x.k} style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.3)",
                                        backgroundColor: "rgba(198,162,76,.16)", borderRadius: R.pill,
                                        paddingHorizontal: 11, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: "#4A3B14" }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: dual("#4A3B14", C.goldInk) }}>
                   {t(x.k, x.t)}</Text>
               </View>))}
           </View>
@@ -162,7 +162,7 @@ function CopyAll() {
     <Pressable onPress={async () => { tap(); await Clipboard.setStringAsync(all); setDone(true); setTimeout(() => setDone(false), 2000); }}
       style={({ pressed }) => [{ marginTop: 12, borderRadius: 13, overflow: "hidden",
                                  opacity: pressed ? 0.9 : 1 }, SHADOW]}>
-      <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      <LinearGradient colors={[C.ctaTop, C.ctaBot]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingVertical: 14, alignItems: "center" }}>
         <Text style={{ fontFamily: F.sansBold, fontSize: fs(15), color: C.cream }}>
           {done ? t("ui.copied", "Copied") : t("sheet.copy_all_details", "Copy all details")}</Text>

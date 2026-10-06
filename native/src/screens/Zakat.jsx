@@ -9,7 +9,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { C, F, R } from "../theme";
+import { C, F, R, dual } from "../theme";
 import { useApp } from "../store";
 import { fetchMetalPrices } from "../metals";
 import { Screen, Hero, Heading, Card, P, Note, Rich, Ticks, Warn, Press, Pill, open, tap } from "../ui";
@@ -115,7 +115,7 @@ export default function Zakat() {
           <View style={{ marginTop: 11, borderRadius: 12, paddingVertical: 11, paddingHorizontal: 13,
                          backgroundColor: "rgba(198,162,76,.14)", borderWidth: 1,
                          borderColor: "rgba(198,162,76,.3)" }}>
-            <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19.5), color: "#7A6838",
+            <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19.5), color: dual("#7A6838", C.goldInk),
                            textAlign: rtl ? "right" : "left" }}>
               {t("zakat.pick_the_same_date_each",
                 "Pick the same date each Islamic year — many choose a day in Ramadan — and work out your zakat on that day every year.")}</Rich>
@@ -149,8 +149,8 @@ export default function Zakat() {
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
                 style={{ flex: 1, alignItems: "center", paddingVertical: 11, paddingHorizontal: 6,
                          borderRadius: 11, borderWidth: 1,
-                         borderColor: on ? C.brand700 : C.line,
-                         backgroundColor: on ? C.brand700 : C.paper }}>
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.paper }}>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13),
                                color: on ? C.cream : C.muted }}>{lab}</Text>
               </Pressable>);
@@ -174,12 +174,12 @@ export default function Zakat() {
         {live.state !== "idle" && (
           <View style={{ marginTop: 12, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 10,
                          flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8,
-                         backgroundColor: live.state === "failed" ? "#FBF0EB"
-                                        : live.stale ? "#FBF6E7"
-                                        : live.state === "ok" ? "#F0E9ED" : "transparent" }}>
+                         backgroundColor: live.state === "failed" ? C.tintRose
+                                        : live.stale ? C.tintGold
+                                        : live.state === "ok" ? C.tintPlum : "transparent" }}>
             <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18),
-                           color: live.state === "failed" ? "#7C3A20"
-                                : live.stale ? "#7A5C13"
+                           color: live.state === "failed" ? C.tintRoseInk
+                                : live.stale ? C.tintGoldInk
                                 : live.state === "ok" ? C.brand600 : C.muted,
                            textAlign: rtl ? "right" : "left" }}>
               {live.state === "loading"
@@ -226,7 +226,7 @@ export default function Zakat() {
         {/* .zk-result — a pale plum panel inside the nisab card, not a card
             of its own sitting under it. */}
         <View style={{ marginTop: 12, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14,
-                       backgroundColor: "#F0E9ED" }}>
+                       backgroundColor: C.tintPlum }}>
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
             {out.nisab === null
               ? t("zakat.enter_today_s_price_to", "Enter today’s price to see the nisab")
@@ -330,8 +330,8 @@ export default function Zakat() {
             the price you enter." The app had written its own disclaimer
             instead, which said neither. */}
         <View style={{ marginTop: 18, marginBottom: 10, borderRadius: 12, padding: 13,
-                       backgroundColor: "#FBF0EB", borderWidth: 1, borderColor: "#EBCDBF" }}>
-          <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20.5), color: "#7C3A20",
+                       backgroundColor: C.tintRose, borderWidth: 1, borderColor: C.tintRoseLine }}>
+          <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20.5), color: C.tintRoseInk,
                          textAlign: rtl ? "right" : "left" }}>
             {t("zakat.this_is_a_guide_not",
               "*This is a guide, not a ruling.* It follows the Hanafi position and uses the price you enter. Zakat can depend on your own circumstances, and scholars differ on things like pensions, shares and long-term debt. For anything you are unsure about, please ask the imam at the masjid.")}</Rich>

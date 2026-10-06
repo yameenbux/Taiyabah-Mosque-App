@@ -9,7 +9,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, ActivityIndicator, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R } from "./theme";
+import { C, F, R, dual } from "./theme";
 import { useApp } from "./store";
 import { Card, Note, Pill, Press, CTA, tap } from "./ui";
 import { monthYear, DOW } from "./dates";
@@ -97,7 +97,7 @@ export function Choice({ label, options, value, onChange }) {
               style={({ pressed }) => ({ flexGrow: 1, flexShrink: 1, flexBasis: "auto", minWidth: 88,
                                          paddingVertical: 10, paddingHorizontal: 12, borderRadius: 11,
                                          borderWidth: 1, borderColor: on ? C.brand600 : C.line,
-                                         backgroundColor: on ? C.brand600 : C.paper,
+                                         backgroundColor: on ? C.plumFill : C.paper,
                                          opacity: o.off ? 0.38 : pressed ? 0.85 : 1 })}>
               <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: on ? "#FFFFFF" : C.ink,
                              textAlign: "center" }}>{o.t}</Text>
@@ -118,7 +118,7 @@ export function Check({ label, value, onChange, bad }) {
       style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 11, alignItems: "flex-start", marginTop: 16,
                paddingVertical: 2 }}>
       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: value ? 0 : 1.6,
-                     borderColor: bad ? C.danger : C.line, backgroundColor: value ? C.brand600 : C.card,
+                     borderColor: bad ? C.danger : C.line, backgroundColor: value ? C.plumFill : C.card,
                      alignItems: "center", justifyContent: "center", marginTop: 1 }}>
         {value && <Ionicons name="checkmark" size={15} color={C.cream} />}
       </View>
@@ -218,7 +218,7 @@ export function Calendar({ month, onMonth, selected = [], taken = null, first, l
                   legend names were invisible. */}
               <View style={{ flex: 1, borderRadius: 10, borderWidth: 1, borderColor: edge,
                              borderStyle: state === "unoffered" ? "dashed" : "solid",
-                             backgroundColor: on ? C.brand600 : C.paper,
+                             backgroundColor: on ? C.plumFill : C.paper,
                              alignItems: "center", justifyContent: "center",
                              opacity: past ? 0.3 : state === "unoffered" ? 0.45 : 1 }}>
                 <Text style={{ fontFamily: on ? F.sansBold : F.sans, fontSize: fs(13),
@@ -254,7 +254,7 @@ export function ErrorBox({ children }) {
                    backgroundColor: "rgba(180,83,47,.08)", borderWidth: 1, borderColor: "rgba(180,83,47,.3)",
                    borderRadius: 13, padding: 13 }}>
       <Ionicons name="alert-circle" size={17} color={C.danger} style={{ marginTop: 1 }} />
-      <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: "#8A3E22" }}>
+      <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: dual("#8A3E22", C.danger) }}>
         {children}</Text>
     </View>
   );
