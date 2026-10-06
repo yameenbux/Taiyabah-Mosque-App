@@ -108,6 +108,10 @@ jobs:
         working-directory: native
         run: node scripts/check-links.mjs
 
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
       # Play refuses a version code it has seen before, and the error arrives
       # after the upload rather than before the build. Catch the obvious case
       # here: the TWA's last production release was code 1.

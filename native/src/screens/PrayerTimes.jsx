@@ -222,7 +222,11 @@ export default function PrayerTimes({ navigation }) {
           <NavRow icon="calendar-outline" label={t("menu.timetable", "Full prayer timetable")}
                   sub={t("times.whole_year", "Every day of 2026, month by month")}
                   onPress={() => navigation.navigate("Timetable")} />
-          <NavRow icon="notifications-outline" label={t("menu.notifications", "Notifications")}
+          {/* Gold, because .remind is a gold ribbon on the website rather than
+              another grey row. It is the one row here that offers something
+              instead of going somewhere. */}
+          <NavRow icon="notifications-outline" tone="gold"
+                  label={t("menu.notifications", "Notifications")}
                   sub={t("times.remind_sub", "Be reminded before each jamāʿah")}
                   onPress={() => navigation.navigate("Alerts")} />
         </RowGroup>

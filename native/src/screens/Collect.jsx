@@ -228,6 +228,13 @@ export default function Collect({ navigation }) {
                    value={trustee.email} bad={bad.temail} onChange={v => setTrustee(s => ({ ...s, email: v }))} />
 
             <Heading>{t("collect.agreement", "Agreement")}</Heading>
+            {/* Which version is being agreed to, as the website says it above
+                its own rules panel. It is sent with the request as
+                rules_version, so the record and the screen have to name the
+                same thing — agreeing to "the rules" with no version is not a
+                record of anything. */}
+            <Note>{`${t("collect.version", "Version")} ${RULES_VERSION} · ` +
+                   t("collect.you_are_agreeing_to_this", "you are agreeing to this version")}</Note>
             <Check value={agree} onChange={setAgree} bad={bad.agree}
                    label={t("collect.i_have_read_and_agree", "I have read and agree to the rules for collection.")} />
             <Check value={privacy} onChange={setPrivacy} bad={bad.privacy}

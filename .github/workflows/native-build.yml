@@ -68,6 +68,10 @@ jobs:
         working-directory: native
         run: node scripts/check-links.mjs
 
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
       - name: Which strings are still English only
         working-directory: native
         run: node scripts/check-i18n.mjs | head -40

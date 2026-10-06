@@ -118,13 +118,24 @@ const out = await page.evaluate(ids => {
         continue;
       }
 
-      /* callout (label + headline + prose) -------------------------------- */
-      if (has(c, "ad-note") || has(c, "nk-note") || has(c, "bk-note")) {
-        const lab = c.querySelector(".lab");
+      /* callout (label + headline + prose) --------------------------------
+       *
+       * Three colours, not one. The website paints this same shape plum for an
+       * ordinary aside, RED for .fs-urgent — "Ring BCoM first", which somebody
+       * is reading at three in the morning — and GOLD for .ia-conf, which is a
+       * reassurance about who reads a question. Until 6 October only the plum
+       * ones were recognised at all, so the other two reached the app as grey
+       * prose: the most urgent box on the site rendered as a paragraph. */
+      const CALLOUTS = { "ad-note": "plum", "nk-note": "plum", "bk-note": "plum",
+                         "ia-conf": "gold" };
+      const calloutClass = Object.keys(CALLOUTS).find(k => has(c, k));
+      if (calloutClass) {
+        const lab = c.querySelector(".lab, .u-lab");
         const h = c.querySelector("h3,h4");
         const ps = [...c.querySelectorAll("p")].map(str).filter(p => p.t);
         const a = c.querySelector("a[href],button[id]");
         blocks.push(node("callout", { lab: lab ? str(lab) : null, h: h ? str(h) : null, ps,
+          tone: CALLOUTS[calloutClass],
           cta: a ? { ...str(a), href: a.getAttribute("href") || null, id: a.id || null } : null }));
         continue;
       }
@@ -192,6 +203,57 @@ const out = await page.evaluate(ids => {
 
       /* "the masjid does not provide this directly" — a standing caveat ---- */
       if (/notprovided|not-provided/.test(c.className)) {
+        blocks.push(node("warn", str(c))); continue;
+      }
+
+      /* The rules somebody is agreeing to.
+       *
+       * The website gives these the dark panel it uses for anything meant to
+       * be READ rather than skimmed, and that is the point: a tick list in
+       * grey on cream, directly above a checkbox saying "I have read and
+       * agree", is a consent nobody gave. */
+      if (has(c, "cc-rules")) {
+        const h = c.querySelector("h3,h4");
+        blocks.push(node("rules", {
+          h: h ? str(h) : null,
+          items: [...c.querySelectorAll("li")].map(li => {
+            const sp = [...li.children].find(x => x.tagName === "SPAN" && !x.classList.contains("tick"));
+            return sp ? str(sp) : str(li);
+          }).filter(x => x.t),
+        }));
+        continue;
+      }
+
+      /* "If someone has just passed away — ring BCoM first."
+       *
+       * Not a tinted callout: a solid dark red panel with the numbers in it,
+       * and it is the first and loudest thing on the funeral screen because
+       * somebody opening that screen at three in the morning needs a phone
+       * number rather than an introduction. It carries TWO numbers, which is
+       * why it cannot be a callout — a callout keeps one link and the second
+       * would be dropped in silence. check-links.mjs caught exactly that. */
+      if (has(c, "fs-urgent")) {
+        const lab = c.querySelector(".u-lab");
+        const h = c.querySelector("h3,h4");
+        blocks.push(node("urgent", {
+          lab: lab ? str(lab) : null,
+          h: h ? str(h) : null,
+          ps: [...c.querySelectorAll("p")].map(str).filter(x => x.t),
+          nums: [...c.querySelectorAll("a.fs-num, .fs-num")].map(a => ({
+            who: a.querySelector(".who") ? str(a.querySelector(".who")) : null,
+            no: a.querySelector(".no") ? str(a.querySelector(".no")) : null,
+            href: a.getAttribute && a.getAttribute("href") || null,
+          })).filter(n => n.href),
+        }));
+        continue;
+      }
+
+      /* prose the website puts in a coloured box. Same words either way, but
+       * the box is what says "read this one". */
+      if (/\bzk-tip\b|\bcc-paid-note\b/.test(c.className)) {
+        blocks.push(node("notice", str(c))); continue;
+      }
+      if (/\bzk-disclaimer\b|\bcc-req\b/.test(c.className)) {
         blocks.push(node("warn", str(c))); continue;
       }
 

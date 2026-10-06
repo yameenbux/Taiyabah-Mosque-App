@@ -136,9 +136,14 @@ export default function Help() {
   }
 
   return (
-    <Screen>
-      <Hero lines={[t("help.title", "Help")]} />
-      <View style={{ padding: 16, gap: 14 }}>
+    <Screen pad={false}>
+      <Hero lines={[
+        { k: "help.eyebrow", t: "Taiyabah Masjid", w: "eyebrow" },
+        { k: "help.title", t: "Help", w: "title" },
+        { k: "help.hero_sub", t: "What to try first, before getting in touch.", w: "sub" },
+      ]} />
+      <View style={{ paddingHorizontal: 16, gap: 14 }}>
+        <View style={{ height: 14 }} />
         <Note>{t("help.intro",
           "The answer to most problems is here, and is quicker than waiting for a reply. If none of it helps, the masjid is at the bottom.")}</Note>
 

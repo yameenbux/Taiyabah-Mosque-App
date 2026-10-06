@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Note, Notice, RowGroup, NavRow, Foot, P } from "../ui";
+import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, Foot, P } from "../ui";
 import { Field, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
@@ -99,9 +99,16 @@ export default function Advice({ navigation }) {
               "You will not get an email confirming this was sent — your reference is shown on the next screen, so keep it.")}</Note>
             {/* Who sees it. For some of what people write here, this is the
                 single most important sentence on the screen. */}
-            <Heading>{t("advice.who_reads_this", "Who reads this")}</Heading>
-            <Note>{t("advice.what_you_write_here_is_read",
-              "What you write here is read by *the imams and by nobody else at the masjid* — not the office, not the committee, not an administrator. The imam answers you by email.")}</Note>
+            {/* Gold, as .ia-conf is on the website — and the website's own
+                stylesheet says why: gold rather than the plum .ad-note,
+                because .ad-note is the "this is shut" panel on these sheets
+                and this is a reassurance, not a refusal. As grey prose it read
+                as small print, which for some of what people write here is
+                exactly the wrong thing. */}
+            <Callout tone="gold"
+              h={{ k: "advice.who_reads_this", t: "Who reads this" }}
+              ps={[{ k: "advice.what_you_write_here_is_read",
+                     t: "What you write here is read by *the imams and by nobody else at the masjid* — not the office, not the committee, not an administrator. The imam answers you by email." }]} />
             <Note>{t("advice.if_this_is_urgent_please_ring",
               "If this is urgent, or you would rather speak to somebody, please ring the number above instead of writing.")}</Note>
             <Submit label={t("advice.send_this_to_the_imams", "Send this to the imams")}

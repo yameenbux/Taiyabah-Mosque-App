@@ -8,6 +8,7 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, P, Note, Ticks, Warn, Press, Pill, open, tap } from "../ui";
@@ -133,12 +134,18 @@ export default function Zakat() {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: C.muted, textAlign: "center" }}>
               {t("zakat.enter_your_amounts_above", "Enter your amounts above")}</Text>
           ) : out.over ? (
-            <View style={{ alignItems: "center", gap: 5 }}>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(12), letterSpacing: 1,
-                             textTransform: "uppercase", color: C.goldInk }}>
+            /* The dark plum panel the website gives this (.zk-result). The
+               figure is the answer the whole screen exists to produce, and on
+               cream it read as one more line in a list of sums. */
+            <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+              style={{ alignItems: "center", gap: 4, borderRadius: R.card,
+                       paddingVertical: 20, paddingHorizontal: 16 }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.5,
+                             textTransform: "uppercase", color: C.goldBright, textAlign: "center" }}>
                 {t("zakat.zakat_due_2_5", "Zakat due · 2.5%")}</Text>
-              <Text style={{ fontFamily: F.display, fontSize: fs(34), color: C.brand600 }}>{money(out.due)}</Text>
-            </View>
+              <Text style={{ fontFamily: F.display, fontSize: fs(38), lineHeight: fs(46),
+                             color: C.goldBright }}>{money(out.due)}</Text>
+            </LinearGradient>
           ) : (
             <View style={{ alignItems: "center", gap: 6 }}>
               <Pill>{t("zakat.below_nisab", "Below the nisab")}</Pill>

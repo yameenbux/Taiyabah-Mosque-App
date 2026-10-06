@@ -388,18 +388,93 @@ export function Notice({ children }) {
   );
 }
 
-export function Callout({ lab, h, ps, cta }) {
+/* The same shape in three colours, because on the website it is the same shape
+ * in three colours and the colour is the message. "Ring BCoM first" is red
+ * because somebody is reading it at three in the morning; "Who reads this" is
+ * gold because it is a reassurance. Rendering both in the default plum makes
+ * them look like the same kind of remark, which is the one thing they are not. */
+const CALLOUT_TONES = {
+  plum:   { bg: "rgba(119,33,87,.045)",  line: "rgba(119,33,87,.14)",  lab: C.brand600 },
+  danger: { bg: "rgba(180,83,47,.07)",   line: "rgba(180,83,47,.26)",  lab: C.danger },
+  gold:   { bg: "rgba(198,162,76,.11)",  line: "rgba(198,162,76,.32)", lab: C.goldInk },
+};
+
+/* The funeral screen's first panel, and the loudest thing in the app.
+ *
+ * Solid dark red rather than a tint, because on the website it is solid dark
+ * red: somebody opening this at three in the morning is not reading, they are
+ * looking for a number. The numbers are rows inside the panel and every one of
+ * them is here — a callout would have kept the first and dropped the second,
+ * which is precisely what happened before check-links.mjs noticed. */
+/* Rules somebody is about to agree to.
+ *
+ * The dark panel the website uses for anything meant to be read rather than
+ * skimmed (.cc-rules). A tick list in grey on cream, sitting directly above a
+ * checkbox that says "I have read and agree", is a consent nobody gave. */
+export function Rules({ h, items }) {
   const { fs, tx, rtl } = useApp();
+  const align = rtl ? "right" : "left";
   return (
-    <View style={{ backgroundColor: "rgba(119,33,87,.045)", borderWidth: 1, borderColor: "rgba(119,33,87,.14)",
+    <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={{ borderRadius: R.card, padding: 17, gap: 11, marginTop: 14 }}>
+      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(16), lineHeight: fs(23),
+                             color: C.cream, textAlign: align }}>{tx(h)}</Rich>}
+      {(items || []).map((it, i) => (
+        <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 9,
+                               alignItems: "flex-start" }}>
+          <Ionicons name="checkmark" size={15} color={C.goldBright} style={{ marginTop: 3 }} />
+          <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21),
+                         color: "rgba(243,239,227,.88)", textAlign: align }}>{tx(it)}</Rich>
+        </View>))}
+    </LinearGradient>
+  );
+}
+
+export function Urgent({ lab, h, ps, nums }) {
+  const { fs, tx, rtl } = useApp();
+  const align = rtl ? "right" : "left";
+  return (
+    <LinearGradient colors={["#7A2A18", "#5A1D10"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={{ borderRadius: R.card, padding: 17, gap: 9, marginTop: 14 }}>
+      {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
+                               textTransform: "uppercase", color: "#F0C9A8", textAlign: align }}>
+        {tx(lab)}</Text>}
+      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(18), lineHeight: fs(25),
+                             color: "#F3EFE3", textAlign: align }}>{tx(h)}</Rich>}
+      {(ps || []).map((x, i) => (
+        <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21),
+                               color: "#E6C8BA", textAlign: align }}>{tx(x)}</Rich>))}
+      <View style={{ gap: 8, marginTop: 5 }}>
+        {(nums || []).map((n, i) => (
+          <Press key={i} onPress={() => { tap(); open(n.href); }}
+            style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                     justifyContent: "space-between", gap: 10, paddingVertical: 11,
+                     paddingHorizontal: 13, borderRadius: 12,
+                     backgroundColor: "rgba(255,255,255,.1)",
+                     borderWidth: 1, borderColor: "rgba(255,255,255,.18)" }}>
+            {!!n.who && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 0.7,
+                                       textTransform: "uppercase", color: "#EFD3C4" }}>{tx(n.who)}</Text>}
+            {!!n.no && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16), color: "#F3EFE3" }}>
+              {tx(n.no)}</Text>}
+          </Press>))}
+      </View>
+    </LinearGradient>
+  );
+}
+
+export function Callout({ lab, h, ps, cta, tone = "plum" }) {
+  const { fs, tx, rtl } = useApp();
+  const c = CALLOUT_TONES[tone] || CALLOUT_TONES.plum;
+  return (
+    <View style={{ backgroundColor: c.bg, borderWidth: 1, borderColor: c.line,
                    borderRadius: R.card, padding: 15, gap: 8, marginTop: 14 }}>
       {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
-                               textTransform: "uppercase", color: C.brand600,
+                               textTransform: "uppercase", color: c.lab,
                                textAlign: rtl ? "right" : "left" }}>{tx(lab)}</Text>}
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(16), lineHeight: fs(23), color: C.ink,
                              textAlign: rtl ? "right" : "left" }}>{tx(h)}</Rich>}
       {(ps || []).map((p, i) => <P key={i} muted>{tx(p)}</P>)}
-      {!!cta && <CTA label={tx(cta)} href={cta.href} compact />}
+      {!!cta && <CTA label={tx(cta)} href={cta.href} compact tone={tone === "gold" ? "gold" : "brand"} />}
     </View>
   );
 }

@@ -287,6 +287,7 @@
       "t": "*The office takes calls between 5pm and 7pm.*"
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {
@@ -592,34 +593,53 @@
     ]
    },
    {
-    "type": "p",
-    "k": "funeral.if_someone_has_just_passed",
-    "t": "If someone has just passed away"
-   },
-   {
-    "type": "sub",
-    "k": "funeral.ring_bcom_first",
-    "t": "Ring BCoM first"
-   },
-   {
-    "type": "p",
-    "k": "funeral.bolton_council_of_mosques_runs",
-    "t": "Bolton Council of Mosques runs the borough’s Muslim funeral service and will liaise with the council and the hospital on your behalf. They answer out of hours. Once they are involved, the masjid will arrange everything set out below."
-   },
-   {
-    "type": "link",
-    "t": "BCoM · office hours 01204 363 680",
-    "href": "tel:01204363680"
-   },
-   {
-    "type": "link",
-    "t": "BCoM · out of hours 01204 392 919",
-    "href": "tel:01204392919"
-   },
-   {
-    "type": "link",
-    "t": "Taiyabah Masjid office 01204 535 997",
-    "href": "tel:01204535997"
+    "type": "urgent",
+    "lab": {
+     "k": "funeral.if_someone_has_just_passed",
+     "t": "If someone has just passed away"
+    },
+    "h": {
+     "k": "funeral.ring_bcom_first",
+     "t": "Ring BCoM first"
+    },
+    "ps": [
+     {
+      "k": "funeral.bolton_council_of_mosques_runs",
+      "t": "Bolton Council of Mosques runs the borough’s Muslim funeral service and will liaise with the council and the hospital on your behalf. They answer out of hours. Once they are involved, the masjid will arrange everything set out below."
+     }
+    ],
+    "nums": [
+     {
+      "who": {
+       "k": "funeral.bcom_office_hours",
+       "t": "BCoM · office hours"
+      },
+      "no": {
+       "t": "01204 363 680"
+      },
+      "href": "tel:01204363680"
+     },
+     {
+      "who": {
+       "k": "funeral.bcom_out_of_hours",
+       "t": "BCoM · out of hours"
+      },
+      "no": {
+       "t": "01204 392 919"
+      },
+      "href": "tel:01204392919"
+     },
+     {
+      "who": {
+       "k": "funeral.taiyabah_masjid_office",
+       "t": "Taiyabah Masjid office"
+      },
+      "no": {
+       "t": "01204 535 997"
+      },
+      "href": "tel:01204535997"
+     }
+    ]
    },
    {
     "type": "heading",
@@ -1223,6 +1243,7 @@
       "t": "*The office takes calls between 5pm and 7pm.*"
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {
@@ -1385,6 +1406,7 @@
       "t": "*The office takes calls between 5pm and 7pm.*"
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {
@@ -1749,6 +1771,7 @@
       "t": "Please ring the office on the number above and somebody will arrange a time for you to speak to an imam."
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {
@@ -1897,6 +1920,7 @@
       "t": "*The office takes admission queries between 5pm and 7pm.*"
      }
     ],
+    "tone": "plum",
     "cta": {
      "t": "Open the application form ↗",
      "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
@@ -2400,6 +2424,7 @@
       "t": "Without it the absence is unauthorised, and it counts against the 90% your child needs to keep their place. A handwritten letter is not accepted."
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {
@@ -2833,27 +2858,11 @@
     ]
    },
    {
-    "type": "sub",
-    "k": "collect.rules_for_collection",
-    "t": "Rules for collection"
-   },
-   {
-    "type": "p",
-    "k": "collect.version",
-    "t": "Version"
-   },
-   {
-    "type": "p",
-    "t": "2026-09-14"
-   },
-   {
-    "type": "p",
-    "k": "collect.you_are_agreeing_to_this",
-    "t": "· you are agreeing to this version"
-   },
-   {
-    "type": "ticks",
-    "ordered": false,
+    "type": "rules",
+    "h": {
+     "k": "collect.rules_for_collection",
+     "t": "Rules for collection"
+    },
     "items": [
      {
       "k": "collect.collection_starts_after_zohr",
@@ -2926,6 +2935,7 @@
       "t": "This form is not open yet. Please ring the number below and the masjid will take the details."
      }
     ],
+    "tone": "plum",
     "cta": null
    },
    {

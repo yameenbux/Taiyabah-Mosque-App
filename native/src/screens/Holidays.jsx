@@ -97,8 +97,12 @@ function ListRow({ name, sub, when, len, past, est, first }) {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
           <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.ink }}>{name}</Text>
           {est && (
-            <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), color: C.muted, borderWidth: 1,
-                           borderColor: C.line, borderRadius: R.pill, paddingHorizontal: 5,
+            /* Gold, as .hp-est is on the website. In grey it reads as a
+               disabled label rather than "this date is an estimate", which is
+               the one thing it is there to say. */
+            <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), color: C.goldInk, borderWidth: 1,
+                           borderColor: "rgba(198,162,76,.45)", backgroundColor: "rgba(198,162,76,.12)",
+                           borderRadius: R.pill, paddingHorizontal: 5,
                            paddingVertical: 1, overflow: "hidden" }}>{t("hol.est", "est.")}</Text>)}
         </View>
         {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 1 }}>{sub}</Text>}

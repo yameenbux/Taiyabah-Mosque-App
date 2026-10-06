@@ -54,6 +54,10 @@ jobs:
         working-directory: native
         run: node scripts/check-links.mjs
 
+      - name: Check every coloured box the website draws
+        working-directory: native
+        run: node scripts/check-boxes.mjs --strict
+
 
       - name: Generate the Android project
         working-directory: native

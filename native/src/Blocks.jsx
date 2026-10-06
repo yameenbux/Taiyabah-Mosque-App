@@ -14,8 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open,
-} from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -65,7 +64,9 @@ function Block({ b, nav, inCard }) {
     case "bank":    return <Bank items={b.items} />;
     case "social":  return <Social items={b.items} />;
     case "foot":    return <Foot lines={b.lines} />;
-    case "callout": return <Callout {...b} />;
+    case "callout": return <Callout {...b} />;   // b.tone comes from the extractor
+    case "urgent":  return <Urgent {...b} />;
+    case "rules":   return <Rules {...b} />;
     case "advisory": return (
       <Warn>{[b.h, ...(b.ps || [])].filter(Boolean).map(tx).join("\n\n")}</Warn>);
 
