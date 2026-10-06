@@ -104,7 +104,7 @@ export default function More({ navigation }) {
 
       {GROUPS.map(g => (
         <View key={g.k} style={{ marginTop: 22 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), letterSpacing: 1.6,
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10.5), letterSpacing: 1.6,
                          textTransform: "uppercase", color: C.muted, marginBottom: 9, marginHorizontal: 3,
                          textAlign: rtl ? "right" : "left" }}>{t(g.k, g.t)}</Text>
           <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
@@ -143,8 +143,10 @@ function Row({ row, first, nav }) {
   const { t, fs, rtl } = useApp();
   const act = row.soon ? null : row.to ? () => nav.navigate(row.to) : () => open(row.href);
   return (
-    <Press onPress={act} disabled={!act}
-      /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13. */
+    <Press onPress={act} disabled={!act} dim={false}
+      /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13.
+         .dr-row.soon mutes the TITLE and nothing else: the row keeps its
+         strength and the gold COMING SOON tag stays gold. */
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
                paddingVertical: 13, paddingHorizontal: 12,
                borderTopWidth: first ? 0 : 1, borderTopColor: C.line }}>
@@ -161,7 +163,7 @@ function Row({ row, first, nav }) {
             : <Ionicons name={row.icon} size={16} color={C.brand600} />}
         </View>)}
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: row.soon ? C.muted : C.ink,
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: row.soon ? C.muted : C.ink,
                        textAlign: rtl ? "right" : "left" }}>{t(row.k, row.t)}</Text>
         {!!row.note && (
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17.5), color: C.muted,

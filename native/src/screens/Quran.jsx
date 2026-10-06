@@ -82,7 +82,7 @@ export default function Quran({ navigation }) {
                 style={{ flexBasis: "47%", flexGrow: 1, backgroundColor: C.card, borderWidth: 1,
                          borderColor: C.line, borderRadius: R.tile, paddingVertical: 14, paddingHorizontal: 13 }}>
                 <Text style={{ fontFamily: F.arabic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
                   {t(`surah.${n}.name`, s.nameEn)}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 1 }}>
                   {s.ayahs} {t("quran.ayahs", "āyāt")}</Text>
@@ -96,7 +96,7 @@ export default function Quran({ navigation }) {
             <Press key={j} onPress={() => { tap(); navigation.navigate("Mushaf", { page }); }}
               style={{ width: 46, height: 42, alignItems: "center", justifyContent: "center",
                        backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 12 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>
             </Press>))}
         </View>
 
@@ -126,11 +126,11 @@ export function Surahs({ navigation }) {
           <View style={{ width: 36, height: 36, alignItems: "center", justifyContent: "center",
                          transform: [{ rotate: "45deg" }], borderWidth: 1, borderColor: C.line,
                          borderRadius: 7, backgroundColor: C.card }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600,
                            transform: [{ rotate: "-45deg" }] }}>{s.n}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>
               {t(`surah.${s.n}.name`, s.nameEn)}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 1.5,
@@ -188,7 +188,7 @@ export function Surah({ route, navigation }) {
           <View style={{ flexDirection: "row", gap: 9, marginTop: 11 }}>
             <View style={{ minWidth: 23, height: 23, borderRadius: 12, backgroundColor: "rgba(119,33,87,.09)",
                            alignItems: "center", justifyContent: "center", paddingHorizontal: 6 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>{vn}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.brand600 }}>{vn}</Text>
             </View>
             <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(23), color: C.muted }}>
               {en}</Text>
@@ -334,7 +334,7 @@ export function Mushaf({ route, navigation }) {
                          paddingVertical: 7, borderRadius: R.pill, backgroundColor: "rgba(220,187,99,.17)",
                          borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
             <Ionicons name="bookmark" size={13} color={C.goldBright} />
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.goldBright }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.goldBright }}>
               {t("mushaf.page", "Page")} {muMark}</Text>
           </View>
         </Press>)}
@@ -360,7 +360,7 @@ export function Mushaf({ route, navigation }) {
         <Press onPress={() => { tap(); setJump(j => !j); }}
           style={{ paddingHorizontal: 16, paddingVertical: 6, borderRadius: R.pill,
                    borderWidth: 1, borderColor: "rgba(220,187,99,.4)", alignItems: "center" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.cream }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.cream }}>
             {t("mushaf.page", "Page")} {page}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.6)" }}>
             {t("quran.juz", "Juzʼ")} {juz}</Text>
@@ -419,7 +419,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
             style={{ flex: 1, alignItems: "center", paddingVertical: 10, borderRadius: R.pill,
                      borderWidth: 1, borderColor: mode === k ? C.goldBright : "rgba(243,239,227,.22)",
                      backgroundColor: mode === k ? "rgba(220,187,99,.16)" : "transparent" }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: mode === k ? C.goldBright : "rgba(243,239,227,.7)" }}>{lab}</Text>
           </Press>))}
         <Press onPress={onClose} style={{ padding: 10 }}>
@@ -444,7 +444,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
         <Press onPress={() => typed && onPick(Number(typed))}
           style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: R.pill,
                    backgroundColor: "rgba(220,187,99,.18)", borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldBright }}>
             {t("bukhari.go", "Go")}</Text>
         </Press>
       </View>
@@ -455,7 +455,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
                  borderWidth: 1, borderColor: "rgba(243,239,227,.22)" }}>
         <Ionicons name={fav ? "heart" : "heart-outline"} size={16}
                   color={fav ? C.goldBright : "rgba(243,239,227,.7)"} />
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.cream }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.cream }}>
           {fav ? t("mushaf.remove_this_page", "Remove this page from favourites")
                : t("mushaf.add_this_page", "Add this page to favourites")}</Text>
       </Press>

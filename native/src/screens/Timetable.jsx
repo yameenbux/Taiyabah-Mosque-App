@@ -75,7 +75,7 @@ export default function Timetable() {
             style={{ flex: 1, alignItems: "center", paddingVertical: 8, borderRadius: 9, borderWidth: 1,
                      borderColor: mode === k ? C.brand700 : C.line,
                      backgroundColor: mode === k ? C.brand700 : C.card }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: mode === k ? C.cream : C.ink }}>{lab}</Text>
           </Press>))}
       </View>
@@ -87,7 +87,7 @@ export default function Timetable() {
         <Text style={{ width: 34, fontFamily: F.sans, fontSize: fs(9.5), color: C.muted }}>
           {t("sheet.date", "DATE")}</Text>
         {cols.map(([k, short]) => (
-          <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansMedium, fontSize: fs(9.5),
+          <Text key={k} style={{ flex: 1, textAlign: "center", fontFamily: F.sansSemi, fontSize: fs(9.5),
                                  letterSpacing: 0.4, color: C.muted, textTransform: "uppercase" }}>
             {t(`month.col.${k}`, short)}</Text>))}
       </View>
@@ -140,7 +140,7 @@ export default function Timetable() {
                 const v = (mode === "jamaat" ? d.jamaat : d.begins)[k];
                 return (
                   <Text key={k} style={{ flex: 1, textAlign: "center", fontSize: fs(12.5), color: C.ink,
-                                         fontFamily: isToday ? F.sansBold : F.sansMedium }}>
+                                         fontFamily: isToday ? F.sansBold : F.sansSemi }}>
                     {v ? pretty(v).replace(/ (am|pm)$/, "") : "—"}</Text>);
               })}
             </View>);

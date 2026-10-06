@@ -80,7 +80,7 @@ function Block({ item }) {
     <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
                    padding: 16, marginTop: 12 }}>
       {!!item.label && (
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.2,
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.2,
                        color: C.gold, marginBottom: 9 }}>{String(item.label).toUpperCase()}</Text>)}
       {!!ar && (
         <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
@@ -95,7 +95,7 @@ function Block({ item }) {
         {/* `times` is sometimes a count and sometimes a sentence — "3" but also
             "Once, morning and evening". Only a number gets the × . */}
         {!!item.times && (
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.brand600 }}>
             {/^\d+$/.test(String(item.times)) ? `×${item.times}` : item.times}</Text>)}
         {!!(item.source || item.ref || item.src) && (
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>

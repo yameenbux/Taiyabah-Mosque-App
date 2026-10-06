@@ -121,7 +121,7 @@ export default function Zakat() {
                          borderRadius: 11, borderWidth: 1,
                          borderColor: on ? C.brand700 : C.line,
                          backgroundColor: on ? C.brand700 : C.paper }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13),
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13),
                                color: on ? C.cream : C.muted }}>{lab}</Text>
               </Pressable>);
           })}
@@ -145,14 +145,14 @@ export default function Zakat() {
           style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start",
                    paddingVertical: 8 }}>
           <Ionicons name="open-outline" size={14} color={C.brand600} />
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
             {t("zakat.check_price", "Check today's price")}</Text>
         </Press>
         {/* .zk-result — a pale plum panel inside the nisab card, not a card
             of its own sitting under it. */}
         <View style={{ marginTop: 12, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14,
                        backgroundColor: "#F0E9ED" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.brand600, textAlign: "center" }}>
             {out.nisab === null
               ? t("zakat.enter_today_s_price_to", "Enter today's price to see the nisab")
               : `${t("zakat.nisab_is", "Nisab is")} ${money(out.nisab)}`}
@@ -196,7 +196,7 @@ export default function Zakat() {
             <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
               style={{ alignItems: "center", gap: 4, borderRadius: R.card,
                        paddingVertical: 20, paddingHorizontal: 16 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.5,
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.5,
                              textTransform: "uppercase", color: C.goldBright, textAlign: "center" }}>
                 {t("zakat.zakat_due_2_5", "Zakat due · 2.5%")}</Text>
               <Text style={{ fontFamily: F.display, fontSize: fs(38), lineHeight: fs(46),
@@ -247,7 +247,7 @@ export default function Zakat() {
           style={{ alignSelf: "center", marginTop: 14, flexDirection: "row", gap: 7, alignItems: "center",
                    paddingHorizontal: 15, paddingVertical: 9, borderRadius: R.pill, borderWidth: 1, borderColor: C.line }}>
           <Ionicons name="refresh-outline" size={15} color={C.muted} />
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.muted }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.muted }}>
             {t("zakat.clear_all", "Clear all")}</Text>
         </Press>
 
@@ -279,7 +279,7 @@ function Field({ label, value, onChange }) {
         keyboardType="decimal-pad" inputMode="decimal"
         placeholder="0" placeholderTextColor={C.line}
         onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
-        style={{ fontFamily: F.sansMedium, fontSize: fs(16), color: C.ink, backgroundColor: C.card,
+        style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: C.ink, backgroundColor: C.card,
                  borderWidth: focus ? 1.6 : 1, borderColor: focus ? C.brand600 : C.line,
                  borderRadius: 13, paddingHorizontal: 14, paddingVertical: 12,
                  textAlign: rtl ? "right" : "left" }} />
@@ -293,7 +293,7 @@ function Line({ k, v, strong }) {
     <View style={{ flexDirection: rtl ? "row-reverse" : "row", justifyContent: "space-between",
                    paddingVertical: 5 }}>
       <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: strong ? C.ink : C.muted }}>{k}</Text>
-      <Text style={{ fontFamily: strong ? F.sansMedium : F.sans, fontSize: fs(13.5), color: C.ink }}>{v}</Text>
+      <Text style={{ fontFamily: strong ? F.sansSemi : F.sans, fontSize: fs(13.5), color: C.ink }}>{v}</Text>
     </View>
   );
 }

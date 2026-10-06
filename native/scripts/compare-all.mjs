@@ -105,7 +105,7 @@ const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chr
  *
  * The same five files the APK carries are served here and declared under the
  * exact family names theme.js asks for. */
-const FONTS = ["HankenGrotesk", "HankenGroteskMedium", "HankenGroteskBold", "Fraunces", "Amiri"];
+const FONTS = ["HankenGrotesk", "HankenGroteskMedium", "HankenGroteskSemiBold", "HankenGroteskBold", "Fraunces", "Amiri"];
 const FACES = FONTS.map(f =>
   `@font-face{font-family:"${f}";src:url("/__fonts/${f}.ttf") format("truetype");font-display:block}`
 ).join("\n");

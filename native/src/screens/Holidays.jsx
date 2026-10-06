@@ -60,7 +60,7 @@ function Month({ y, m, shut, evt, todayISO, width }) {
         {t(`month.${m}`, MONTHS[m])} {y}</Text>
       <View style={{ flexDirection: "row" }}>
         {[1, 2, 3, 4, 5, 6, 0].map(i => (
-          <Text key={i} style={{ width: box, textAlign: "center", fontFamily: F.sansMedium,
+          <Text key={i} style={{ width: box, textAlign: "center", fontFamily: F.sansSemi,
                                  fontSize: fs(10), color: C.muted }}>
             {t(`dow.${i}`, DOW[i]).slice(0, 1)}</Text>))}
       </View>
@@ -249,7 +249,7 @@ export default function Holidays() {
         <View style={{ backgroundColor: "rgba(119,33,87,.045)", borderWidth: 1,
                        borderColor: "rgba(119,33,87,.14)", borderRadius: R.card,
                        padding: 15, gap: 7, marginTop: 14, marginBottom: 10 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>
             {t("hol.these_dates_are_estimates", "These dates are estimates")}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: C.muted }}>
             {t("hol.the_islamic_calendar_follows_the", "The Islamic calendar follows the moon, so the exact day is confirmed by sighting and can fall a day either side of what is shown here. These are calculated from the Umm al-Qurā calendar and are shown so you can plan — the masjid announces the confirmed date for Ramadhan and each Eid beforehand.")}</Text>

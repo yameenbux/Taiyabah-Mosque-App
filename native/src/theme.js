@@ -46,7 +46,12 @@ export const fs = n => Math.round(n * TS);
 
 export const F = {
   sans:        "HankenGrotesk",
-  sansMedium:  "HankenGroteskMedium",
+  sansMedium:  "HankenGroteskMedium",   // 500 — the website uses it in five rules
+  /* 600, and the website's commonest weight by a distance: 99 rules against
+     93 at 700 and 5 at 500. The app bundled 400/500/700 only, so every one of
+     those 99 was drawing at 500 — a step light on almost every label, value
+     and row title in the app at once. */
+  sansSemi:    "HankenGroteskSemiBold",
   sansBold:    "HankenGroteskBold",
   display:     "Fraunces",          // the serif used for prayer names
   arabic:      "Amiri",             // scripture is set in Amiri, never a fallback

@@ -94,7 +94,7 @@ export default function FirstRun() {
 
           <Press onPress={() => { tap(); close(); }}
             style={{ alignItems: "center", paddingVertical: 11 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.muted }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.muted }}>
               {t("firstrun.not_now", "Not now")}</Text>
           </Press>
 

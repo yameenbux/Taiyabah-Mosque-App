@@ -51,7 +51,7 @@ export default function Videos() {
                              shadowOffset: { width: 0, height: 1 } }} />
             </View>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), lineHeight: fs(18.5), color: C.ink,
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), lineHeight: fs(18.5), color: C.ink,
                              textAlign: rtl ? "right" : "left" }}>
                 {t(`video.${v.id}.t`, v.t)}</Text>
               <Text style={{ fontFamily: F.sans, fontSize: fs(11), letterSpacing: 0.66,

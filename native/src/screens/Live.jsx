@@ -151,13 +151,17 @@ export default function Live({ navigation }) {
           {[[t("about.radio_frequency", "Radio frequency"), t("about.454_1000_mhz", "454.1000 MHz"), null],
             [t("about.videos_bayaans", "Videos & bayaans"), t("about.watch", "Watch ›"),
              () => navigation.navigate("Videos")]].map(([k, v, go], i) => (
-            <Press key={i} onPress={go} disabled={!go}
+            /* The radio frequency is a line of information, not a control
+               that has been switched off — Press fades a disabled child to
+               45% by default, so the one number on this card people write
+               down was the palest thing on the screen. */
+            <Press key={i} onPress={go} disabled={!go} dim={false}
               style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                        justifyContent: "space-between", paddingVertical: 13,
                        borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
               <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), letterSpacing: 1.15,
                              textTransform: "uppercase", color: C.muted }}>{k}</Text>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5),
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5),
                              color: go ? C.brand600 : C.ink }}>{v}</Text>
             </Press>))}
         </Card>

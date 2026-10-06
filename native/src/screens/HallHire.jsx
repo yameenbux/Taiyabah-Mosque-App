@@ -221,7 +221,7 @@ export default function HallHire({ navigation }) {
           style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start",
                    paddingVertical: 6 }}>
           <Ionicons name="open-outline" size={14} color={C.brand600} />
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
             {t("privacy.read_the_privacy_notice", "Read the privacy notice")}</Text>
         </Press>
 

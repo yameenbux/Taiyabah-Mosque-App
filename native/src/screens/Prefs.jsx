@@ -54,7 +54,7 @@ export default function Prefs({ navigation }) {
                          backgroundColor: on ? C.brand700 : C.card }}>
                 <Text style={{ fontFamily: F.sansBold, fontSize: Math.round(14 * s.v),
                                color: on ? C.cream : C.ink }}>A</Text>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: 10, letterSpacing: 0.3,
+                <Text style={{ fontFamily: F.sansSemi, fontSize: 10, letterSpacing: 0.3,
                                textTransform: "uppercase", marginTop: 3,
                                color: on ? "#E7D9E2" : C.muted }}>{t(s.k, s.t)}</Text>
               </Pressable>);

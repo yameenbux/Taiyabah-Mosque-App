@@ -72,7 +72,7 @@ export function P({ children, muted, center, style }) {
 
 export function Sub({ children }) {
   const { fs, rtl } = useApp();
-  return <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(15), color: C.ink,
+  return <Rich style={{ fontFamily: F.sansSemi, fontSize: fs(15), color: C.ink,
                         marginTop: 4, marginBottom: 2, textAlign: rtl ? "right" : "left" }}>{children}</Rich>;
 }
 
@@ -162,7 +162,7 @@ export function TopBar({ navigation, onBell, back }) {
             else rows[rows.length - 1] = (rows[rows.length - 1] + " " + w).trim();
             return rows;
           }, [""]).map((line, i) => (
-            <Text key={i} style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.5,
+            <Text key={i} style={{ fontFamily: F.sansSemi, fontSize: fs(10), letterSpacing: 1.5,
                                    color: C.cream, textTransform: "uppercase",
                                    textAlign: rtl ? "right" : "left" }}>{line}</Text>))}
       </View>
@@ -303,7 +303,7 @@ export function Hero({ lines = [], children, tall, minHeight, ring, align = "cen
         const style =
           l.w === "arabic"  ? { fontFamily: F.arabic, fontSize: fs(px),
                                 lineHeight: fs(px * 1.9), color: col }
-          : l.w === "eyebrow" ? { fontFamily: F.sansMedium, fontSize: fs(px), letterSpacing: px * 0.16,
+          : l.w === "eyebrow" ? { fontFamily: F.sansSemi, fontSize: fs(px), letterSpacing: px * 0.16,
                                   textTransform: "uppercase", color: col, marginBottom: 7 }
           : l.w === "title"   ? { fontFamily: F.display, fontSize: fs(px),
                                   lineHeight: fs(px * 1.3), color: col }
@@ -344,7 +344,7 @@ export function Pill({ children, tone = "muted" }) {
   return (
     <View style={{ flexShrink: 0, backgroundColor: bg, borderRadius: R.pill,
                    paddingHorizontal: 9, paddingVertical: 3.5 }}>
-      <Text numberOfLines={1} style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), color: fg }}>{children}</Text>
+      <Text numberOfLines={1} style={{ fontFamily: F.sansSemi, fontSize: fs(10.5), color: fg }}>{children}</Text>
     </View>
   );
 }
@@ -403,17 +403,22 @@ export function NavRow({ icon, label, sub, soon, onPress, href, value, right, to
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
   return (
-    <Press onPress={act} disabled={!act || soon}
+    /* A "coming soon" row is NOT faded on the website: .md-row.soon and
+       .dr-row.soon mute the title and tint the chip, and leave the row and
+       its gold tag at full strength. Dimming the whole thing to 45% took the
+       tag down with it, so the one bright thing on those rows — the part that
+       says the masjid intends to do this — went pale. */
+    <Press onPress={act} disabled={!act || soon} dim={!soon}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 14, paddingHorizontal: 15 }}>
       {!!icon && <IconChip icon={icon} muted={!!soon} />}
       <View style={{ flex: 1 }}>
-        <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
+        <Rich style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink,
                        textAlign: rtl ? "right" : "left" }}>{label}</Rich>
         {!!sub && <Rich style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17.5), color: C.muted,
                                  marginTop: 2, textAlign: rtl ? "right" : "left" }}>{sub}</Rich>}
       </View>
-      {!!value && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.brand600 }}>{value}</Text>}
+      {!!value && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>{value}</Text>}
       {soon ? <Pill>{soon}</Pill> : right !== undefined ? right
         : act ? <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} /> : null}
     </Press>
@@ -464,7 +469,7 @@ export function KV({ k, v, href, icon, onPress, kind }) {
                        textTransform: "uppercase", color: C.muted,
                        textAlign: rtl ? "right" : "left" }}>{k}</Text>
         {/* .ct-v is 16.8px at 600 — bigger and heavier than this was. */}
-        <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(15), lineHeight: fs(21), color: C.ink,
+        <Rich style={{ fontFamily: F.sansSemi, fontSize: fs(15), lineHeight: fs(21), color: C.ink,
                        marginTop: 2, textAlign: rtl ? "right" : "left" }}>{v}</Rich>
       </View>
       {!!act && <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />}
@@ -663,7 +668,7 @@ export function Ticks({ items, ordered }) {
       {items.map((it, i) => (
         <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 9, alignItems: "flex-start" }}>
           {ordered
-            ? <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600, width: 16,
+            ? <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600, width: 16,
                              lineHeight: fs(21) }}>{i + 1}.</Text>
             : <Ionicons name="checkmark" size={16} color={C.brand600} style={{ marginTop: 3 }} />}
           <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21), color: C.ink,
@@ -796,7 +801,7 @@ export function Urgent({ lab, h, ps, nums }) {
   return (
     <LinearGradient colors={["#7A2A18", "#5A1D10"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       style={{ borderRadius: R.card, padding: 17, gap: 9, marginTop: 14 }}>
-      {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
+      {!!lab && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10), letterSpacing: 1.4,
                                textTransform: "uppercase", color: "#F0C9A8", textAlign: align }}>
         {tx(lab)}</Text>}
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(18), lineHeight: fs(25),
@@ -812,9 +817,9 @@ export function Urgent({ lab, h, ps, nums }) {
                      paddingHorizontal: 13, borderRadius: 12,
                      backgroundColor: "rgba(255,255,255,.1)",
                      borderWidth: 1, borderColor: "rgba(255,255,255,.18)" }}>
-            {!!n.who && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 0.7,
+            {!!n.who && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.7,
                                        textTransform: "uppercase", color: "#EFD3C4" }}>{tx(n.who)}</Text>}
-            {!!n.no && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16), color: "#F3EFE3" }}>
+            {!!n.no && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: "#F3EFE3" }}>
               {tx(n.no)}</Text>}
           </Press>))}
       </View>
@@ -848,7 +853,7 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
   const at = cta ? (typeof ctaAt === "number" ? ctaAt : body.length) : -1;
   const inner = (
     <>
-      {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
+      {!!lab && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10), letterSpacing: 1.4,
                                textTransform: "uppercase", color: c.lab, marginBottom: 7,
                                textAlign: align }}>{tx(lab)}</Text>}
       {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(15.5), lineHeight: fs(22.5),
@@ -968,7 +973,7 @@ export function Bank({ items }) {
                            textTransform: "uppercase", color: C.muted,
                            textAlign: rtl ? "right" : "left" }}>
               {tx(it.k)}{copied === i ? ` · ${t("ui.copied", "copied")}` : ""}</Text>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16), letterSpacing: 0.16, color: C.ink,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16), letterSpacing: 0.16, color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>{tx(it.v)}</Text>
           </View>
         </Press>))}
@@ -1116,7 +1121,7 @@ export function PanelLink({ label, href, onPress }) {
       style={({ pressed }) => ({ borderRadius: 12, paddingVertical: 13, paddingHorizontal: 13,
                                  marginTop: 16, marginBottom: 10,
                                  backgroundColor: pressed ? "#E8DCE4" : "#F0E9ED" })}>
-      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600, textAlign: "center" }}>
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600, textAlign: "center" }}>
         {label}
       </Text>
     </Pressable>

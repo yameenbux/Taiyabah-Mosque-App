@@ -173,14 +173,14 @@ export default function Collect({ navigation }) {
                    value={org.phone} bad={bad.phone} onChange={v => setOrg(s => ({ ...s, phone: v }))} />
             <Field label={t("collect.email", "Email")} type="email"
                    value={org.email} bad={bad.email} onChange={v => setOrg(s => ({ ...s, email: v }))} />
-            <Field label={`${t("collect.charity_number_if_you_have", "Charity number")} ${t("collect.if_you_have_one", "— if you have one")}`}
-                   required={false}
+            <Field label={t("collect.charity_number_if_you_have", "Charity number")}
+                   required={false} opt={t("collect.if_you_have_one", "— if you have one")}
                    hint={t("collect.leave_this_empty_if_the", "Leave this empty if the institute is not registered.")}
                    value={org.number} onChange={v => setOrg(s => ({ ...s, number: v }))} />
-            <Field label={`${t("collect.students_altogether", "Students altogether")} ${t("collect.optional", "— optional")}`}
-                   type="num" required={false}
+            <Field label={t("collect.students_altogether", "Students altogether")}
+                   type="num" required={false} opt={t("collect.optional", "— optional")}
                    value={students.total} onChange={v => setStudents(s => ({ ...s, total: v.replace(/[^0-9]/g, "") }))} />
-            <Field label={t("collect.of_those_boarding", "Of those, boarding")} type="num" required={false}
+            <Field label={t("collect.of_those_boarding", "Of those, boarding")} type="num" required={false} opt={t("collect.optional", "— optional")}
                    hint={t("collect.if_your_madrasah_or_school", "If your madrasah or school has boarders.")}
                    value={students.boarding} onChange={v => setStudents(s => ({ ...s, boarding: v.replace(/[^0-9]/g, "") }))} />
 
@@ -199,7 +199,7 @@ export default function Collect({ navigation }) {
               style={{ borderWidth: 1, borderStyle: "dashed", borderColor: bad.file ? C.danger : C.line,
                        borderRadius: R.card, paddingVertical: 20, alignItems: "center", gap: 6,
                        backgroundColor: C.card }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.brand600 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>
                 {file ? file.name : t("collect.choose_a_file", "Choose a file")}</Text>
               <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, textAlign: "center",
                              paddingHorizontal: 20 }}>
@@ -257,7 +257,7 @@ export default function Collect({ navigation }) {
                      "I understand the masjid will keep these details to arrange and check the collection.")} />
             <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
               style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
                 {t("privacy.read_the_privacy_notice", "Read the privacy notice")}</Text>
             </Press>
             <Field label={t("collect.signed_type_your_full_name", "Signed — type your full name")}

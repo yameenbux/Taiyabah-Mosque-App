@@ -103,7 +103,7 @@ export default function PrayerTimes({ navigation }) {
           style={[{ flex: 1, paddingVertical: 7, paddingHorizontal: 10, borderRadius: 12,
                     alignItems: "center", borderWidth: 1, borderColor: C.line,
                     backgroundColor: C.card }, SHADOW]}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), color: C.ink }}>{label}</Text>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), color: C.ink }}>{label}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 1 }}>
             {/* .dn-sub is the Gregorian date alone. The Hijri date sits on the
                 home screen's hero on both the website and here, so naming it
@@ -132,7 +132,7 @@ export default function PrayerTimes({ navigation }) {
                      borderColor: c.on ? C.brand700 : C.line,
                      backgroundColor: c.on ? C.brand700 : C.card,
                      opacity: c.off ? 0.35 : 1 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: c.on ? C.cream : C.muted }}>{c.lab}</Text>
           </Press>))}
       </View>
@@ -200,7 +200,7 @@ export default function PrayerTimes({ navigation }) {
                         here, which on Urdu and Arabic ran off the row. */}
                     <View style={{ flex: 1, gap: 1 }}>
                       <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8 }}>
-                        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(16),
+                        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16),
                                        color: sun ? C.muted : C.ink }}>
                           {t(`prayer.${k}`, NAMES[k].en)}</Text>
                         {(isNow || isNext) && (
@@ -220,10 +220,10 @@ export default function PrayerTimes({ navigation }) {
                         600, and only .row.is-next .jam turns plum. Every
                         jamāʿah figure was plum here, so the column that is
                         meant to say "this one is next" said it six times. */}
-                    <Text style={{ minWidth: 64, textAlign: rtl ? "left" : "right", fontFamily: F.sans,
+                    <Text style={{ minWidth: 64, textAlign: rtl ? "left" : "right", fontFamily: F.sansMedium,
                                    fontSize: fs(16), color: C.muted }}>{pretty(day.begins[k])}</Text>
                     <Text style={{ minWidth: 64, textAlign: rtl ? "left" : "right",
-                                   fontFamily: jamaat ? F.sansMedium : F.sans, fontSize: fs(16),
+                                   fontFamily: jamaat ? F.sansSemi : F.sans, fontSize: fs(16),
                                    color: !jamaat ? C.line : isNext ? C.brand600 : C.ink }}>
                       {jamaat ? pretty(jamaat) : "—"}</Text>
                   </View>);
@@ -248,7 +248,7 @@ export default function PrayerTimes({ navigation }) {
                                              paddingHorizontal: 15, paddingVertical: 13,
                                              borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
                         <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), color: C.ink }}>{lab}</Text>
-                        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), color: C.brand600 }}>
+                        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), color: C.brand600 }}>
                           {pretty(day.jummah[k])}</Text>
                       </View>) : null)}
                 </Card>

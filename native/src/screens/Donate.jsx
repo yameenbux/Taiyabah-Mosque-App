@@ -105,7 +105,7 @@ export function NewBuild({ navigation }) {
               <View key={x.k} style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.3)",
                                        backgroundColor: "rgba(198,162,76,.16)", borderRadius: R.pill,
                                        paddingHorizontal: 11, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: "#4A3B14" }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: "#4A3B14" }}>
                   {t(x.k, x.t)}</Text>
               </View>))}
           </View>
@@ -120,7 +120,7 @@ export function NewBuild({ navigation }) {
                                          alignItems: "center", gap: 3,
                                          transform: [{ scale: pressed ? 0.98 : 1 }] })}>
               <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.ink }}>{x.amt}</Text>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1,
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1,
                              textTransform: "uppercase", color: C.goldInk }}>{t(x.k, x.label)}</Text>
             </Pressable>))}
         </View>

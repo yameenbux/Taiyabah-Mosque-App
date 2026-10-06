@@ -25,8 +25,8 @@ const KB = {
   multi: { multiline: true, autoCapitalize: "sentences" },
 };
 
-export function Field({ label, hint, value, onChange, type = "text", bad, required, placeholder }) {
-  const { fs, rtl } = useApp();
+export function Field({ label, opt, hint, value, onChange, type = "text", bad, required, placeholder }) {
+  const { t, fs, rtl } = useApp();
   const [focus, setFocus] = useState(false);
   const multi = type === "multi";
   return (
@@ -40,7 +40,16 @@ export function Field({ label, hint, value, onChange, type = "text", bad, requir
         <Text style={{ fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
                        textTransform: "uppercase",
                        color: bad ? C.danger : C.muted }}>{label}</Text>
-        {required === false && <Pill>optional</Pill>}
+        {/* .cc-opt — the website appends the aside to the LABEL in the same
+            line: "CHARITY NUMBER — if you have one", the second half dropping
+            the uppercase and the tracking and sitting at 500 in the muted
+            grey. A pill saying "optional" beside it is a different thing: it
+            reads as a status badge on the field rather than as part of what
+            the field is asking for, and it loses the wording — "if you have
+            one" says something "optional" does not. */}
+        {required === false && (
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted }}>
+            {opt || t("collect.optional", "— optional")}</Text>)}
       </View>
       <TextInput
         value={value} onChangeText={onChange}
@@ -251,7 +260,7 @@ export function Submit({ label, sending, onPress, disabled }) {
     <View style={{ marginTop: 18, borderRadius: R.pill, backgroundColor: C.brand800, paddingVertical: 16,
                    alignItems: "center", flexDirection: "row", justifyContent: "center", gap: 9 }}>
       <ActivityIndicator color={C.cream} size="small" />
-      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), color: C.cream }}>
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), color: C.cream }}>
         {t("hallhire.sending", "Sending…")}</Text>
     </View>);
   return <CTA label={label} onPress={onPress} disabled={disabled} />;
@@ -275,7 +284,7 @@ export function Sent({ title, body, reference, extra }) {
                        borderColor: C.line, borderRadius: 13, paddingHorizontal: 20, paddingVertical: 13 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), letterSpacing: 1.2, textTransform: "uppercase",
                          color: C.muted }}>{t("ui.reference", "Reference")}</Text>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(19), color: C.brand600, marginTop: 3 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(19), color: C.brand600, marginTop: 3 }}>
             {reference}</Text>
         </View>)}
       {extra}

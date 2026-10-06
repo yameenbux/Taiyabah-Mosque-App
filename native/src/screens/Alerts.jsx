@@ -37,7 +37,7 @@ function Row({ title, sub, badge, value, onChange, first }) {
                    gap: 12, paddingHorizontal: 15, paddingVertical: 13 }}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{title}</Text>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink }}>{title}</Text>
           {!!badge && (
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: .8,
                            textTransform: "uppercase", color: C.danger, borderWidth: 1,
@@ -146,7 +146,7 @@ export default function Alerts() {
           <Press onPress={enable} style={{ marginBottom: 14, borderRadius: 13, overflow: "hidden", ...SHADOW }}>
             <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
               style={{ alignItems: "center", paddingVertical: 14 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
                 {t("sheet.enable_notifications", "Enable notifications")}</Text>
             </LinearGradient>
           </Press>)}
@@ -180,7 +180,7 @@ export default function Alerts() {
               style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#fff",
                        borderWidth: 1, borderColor: C.line, borderRadius: 9,
                        paddingHorizontal: 9, paddingVertical: 6 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink }}>
                 {t(`sheet.${alerts.mins}_min`, `${alerts.mins} min`)}</Text>
               <Ionicons name="chevron-down" size={13} color={C.muted} />
             </Press>
@@ -237,7 +237,7 @@ export default function Alerts() {
             resort look like the next thing to press. */}
         <Press onPress={() => { tap(); setDiag(d => !d); }}
           style={{ alignSelf: "center", paddingVertical: 10, marginTop: 10 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted,
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.muted,
                          textDecorationLine: "underline" }}>
             {t("sheet.having_trouble", "Having trouble?")}</Text>
         </Press>
@@ -264,7 +264,7 @@ export default function Alerts() {
                 the phone can undo that, so the steps are for THEIR phone. */}
             {!!help && (
               <View style={{ gap: 7 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                   {t("alerts.nothing_arriving", "Reminders not arriving at all?")}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
                   {help.name
@@ -279,7 +279,7 @@ export default function Alerts() {
                 <Press onPress={() => { tap(); Linking.openSettings().catch(() => {}); }}
                   style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                            borderWidth: 1, borderColor: C.line, marginTop: 3 }}>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                  <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                     {t("alerts.open_app_settings", "Open this app's settings")}</Text>
                 </Press>
               </View>)}
@@ -289,7 +289,7 @@ export default function Alerts() {
             <Press onPress={async () => { tap(); setWho(await whoAmI()); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("alerts.show_this_device_id", "Show this device's notification id")}</Text>
             </Press>
             {!!who && (
@@ -305,19 +305,19 @@ export default function Alerts() {
             <Press onPress={async () => { tap(); await rearm({}); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.send_my_categories_again", "Send my categories again")}</Text>
             </Press>
             <Press onPress={() => { tap(); open(`mailto:admin@taiyabahmasjid.com?subject=${encodeURIComponent("App notifications")}&body=${encodeURIComponent(`Permission: ${granted}\nScheduled: ${armed}\nJamaah: ${alerts.jamaah ? alerts.mins + " min" : "off"}\nKahf: ${alerts.kahf}`)}`); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.send_this_report_to_the", "Send this report to the masjid")}</Text>
             </Press>
             <Press onPress={async () => { tap(); await Notifications.cancelAllScheduledNotificationsAsync(); await rearm({}); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.reset_reload_the_app", "Reset & reload the app")}</Text>
             </Press>
             <Note>{t("sheet.this_clears_the_app_s",
@@ -327,7 +327,7 @@ export default function Alerts() {
             <Press onPress={() => { tap(); nav.navigate("Help"); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("alerts.more_answers", "More answers in Help")}</Text>
             </Press>
           </Card>)}

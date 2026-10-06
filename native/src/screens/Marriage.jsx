@@ -237,7 +237,7 @@ export default function Marriage({ navigation }) {
               {!!d1 && (
                 <Press onPress={() => { tap(); setD1(null); setD2(null); }}
                   style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+                  <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
                     {t("nikah.start_again", "Start again")}</Text>
                 </Press>)}
             </View>
@@ -307,7 +307,7 @@ export default function Marriage({ navigation }) {
             <ErrorBox>{state.error}</ErrorBox>
             <Press onPress={() => { tap(); open("https://taiyabahapp.ysbdesigns.uk/privacy.html"); }}
               style={{ alignSelf: "flex-start", paddingVertical: 8 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
                 {t("privacy.read_the_privacy_notice", "Read the privacy notice")}</Text>
             </Press>
             <Note>{t("nikah.nothing_is_sent_until_you", "Nothing is sent until you press this.")}</Note>

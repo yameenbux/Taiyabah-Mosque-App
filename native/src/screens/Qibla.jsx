@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
-import { Screen, TopBar, Heading, Card, Note, CTA, tap } from "../ui";
+import { Screen, TopBar, Heading, Card, Note, tap } from "../ui";
 
 const KAABA  = { lat: 21.4224779, lon: 39.8251832 };
 const MASJID = { lat: 53.5869, lon: -2.4361 };
@@ -92,12 +92,27 @@ export default function Qibla({ navigation }) {
                             useNativeDriver: true }).start();
   }, [heading, spin]);
 
-  const locate = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") { setDenied(true); return; }
-    const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    setFrom({ lat: pos.coords.latitude, lon: pos.coords.longitude, mine: true });
-  };
+  /* The website asks the browser for a position as the screen opens and
+   * silently keeps the masjid's bearing if it is refused — there is no button
+   * for it, because within Bolton the difference is a fraction of a degree and
+   * nobody should have to press something to get a number that was already
+   * right. The app had made it a second plum button under the table, so the
+   * screen carried two large buttons where the website has one.
+   *
+   * So: ask once, on open, exactly as the site does. A refusal sets the note
+   * that explains which bearing is being shown and why. */
+  useEffect(() => {
+    let gone = false;
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") { if (!gone) setDenied(true); return; }
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        if (!gone) setFrom({ lat: pos.coords.latitude, lon: pos.coords.longitude, mine: true });
+      } catch { if (!gone) setDenied(true); }
+    })();
+    return () => { gone = true; };
+  }, []);
 
   const rotate = spin.interpolate({ inputRange: [-360, 360], outputRange: ["-360deg", "360deg"] });
   /* With a compass, the needle sits at the bearing relative to where the phone
@@ -199,13 +214,13 @@ export default function Qibla({ navigation }) {
                                      live ? { borderWidth: 1, borderColor: C.line } : SHADOW]}>
             {live ? (
               <View style={{ paddingVertical: 14, alignItems: "center", backgroundColor: "#F0E9ED" }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.brand600 }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.brand600 }}>
                   {t("qibla.compass_on", "Compass on")}</Text>
               </View>
             ) : (
               <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
                 style={{ paddingVertical: 14, alignItems: "center" }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
                   {t("sheet.use_my_phone_s_compass", "Use my phone's compass")}</Text>
               </LinearGradient>)}
           </Pressable>
@@ -241,13 +256,10 @@ export default function Qibla({ navigation }) {
               {/* .qh-k is 12px uppercase tracked .1em; .qh-v 14.5px at 600. */}
               <Text style={{ fontFamily: F.sans, fontSize: fs(12), letterSpacing: 1.2,
                              textTransform: "uppercase", color: C.muted }}>{k}</Text>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{v}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink }}>{v}</Text>
             </View>))}
         </Card>
 
-        {!from.mine && (
-          <CTA label={t("qibla.use_my_location", "Use my location instead")} onPress={locate} compact />
-        )}
         {denied && (
           <View style={{ marginTop: 11 }}>
             <Note>{t("qibla.denied",

@@ -127,7 +127,7 @@ export default function Bukhari({ navigation }) {
               when the search above it is. */}
           <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8,
                          marginTop: 9, marginBottom: 12 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.muted }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.muted }}>
               {t("bukhari.go_to", "Go to hadith")}</Text>
             <TextInput
               value={num}
@@ -139,7 +139,7 @@ export default function Bukhari({ navigation }) {
             <Press onPress={goTo}
               style={{ paddingHorizontal: 14, paddingVertical: 9, borderRadius: 10,
                        borderWidth: 1, borderColor: C.line, backgroundColor: C.card }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600 }}>
                 {t("bukhari.go", "Go")}</Text>
             </Press>
             {busy && <ActivityIndicator color={C.brand600} />}
@@ -190,7 +190,7 @@ export default function Bukhari({ navigation }) {
           <Text style={{ width: 28, textAlign: rtl ? "left" : "right", fontFamily: F.sansBold,
                          fontSize: fs(12), color: C.brand600 }}>{b.n}</Text>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>{b.name}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted,
                            textAlign: rtl ? "right" : "left" }}>
@@ -243,7 +243,7 @@ export function BukhariBook({ route }) {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }}>
             <View style={{ backgroundColor: "rgba(198,162,76,.16)", borderRadius: R.pill,
                            paddingHorizontal: 9, paddingVertical: 3 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.goldInk }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.goldInk }}>
                 {t("bukhari.hadith", "Ḥadīth")} {h.n}</Text>
             </View>
           </View>

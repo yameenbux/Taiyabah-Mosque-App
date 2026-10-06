@@ -85,7 +85,7 @@ function Block({ b, nav, inCard }) {
                   the name with 8px between — "Moulana Mehboob Saheb Chorley".
                   flex:1 on the name pushed it to the far right instead, which
                   made a place-name look like a column of its own. */}
-              <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), flexShrink: 1,
+              <Rich style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), flexShrink: 1,
                              lineHeight: fs(21), color: C.ink }}>{tx(it)}</Rich>
               {!!it.note && (it.now
                 ? <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 1,
@@ -93,6 +93,8 @@ function Block({ b, nav, inCard }) {
                                  backgroundColor: "#EFE6EC", borderRadius: R.pill,
                                  paddingHorizontal: 8, paddingVertical: 3, overflow: "hidden" }}>
                     {tx(it.note)}</Text>
+                /* .ab-note is one of the five rules the website sets at 500
+                   rather than 600 — it is a quiet aside beside a name. */
                 : <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.muted }}>
                     {tx(it.note)}</Text>)}
             </View>))}

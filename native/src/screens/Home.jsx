@@ -174,7 +174,7 @@ export default function Home({ navigation }) {
 
         {!!ramadan && (
           <View style={{ alignItems: "center", marginTop: 10 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldBright,
                            textAlign: "center" }}>
               {ramadan.days === 0 ? t("ramadan.begins_today", "Ramadan begins today")
                : ramadan.days === 1 ? t("ramadan.begins_tomorrow", "Ramadan begins tomorrow")
@@ -188,7 +188,7 @@ export default function Home({ navigation }) {
 
         {next ? (
           <>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.5,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.5,
                            color: C.goldBright, marginTop: 20, textTransform: "uppercase" }}>
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
@@ -197,14 +197,14 @@ export default function Home({ navigation }) {
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
               {pretty(next.at)}</Text>
 
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
                            marginTop: 10, flexWrap: "wrap" }}>
               <View style={{ borderWidth: 1, borderColor: "rgba(220,187,99,.45)", borderRadius: R.pill,
                              paddingHorizontal: 13, paddingVertical: 6 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.goldBright }}>{countdown}</Text>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.goldBright }}>{countdown}</Text>
               </View>
               <Rich style={{ fontFamily: F.sans, fontSize: fs(13), color: "#D0BFCA" }}>
                 {t("times.beginning_time", "Beginning time *{t}*").replace("{t}", pretty(next.begins)) +
@@ -239,7 +239,7 @@ export default function Home({ navigation }) {
               style={({ pressed }) => ({ marginTop: 8, borderRadius: R.pill, backgroundColor: C.goldBright,
                                          paddingHorizontal: 20, paddingVertical: 11,
                                          opacity: pressed ? 0.88 : 1 })}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.brand900 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.brand900 }}>
                 {t("app.give_this_jumu_ah", "Give this Jumuʿah")}</Text>
             </Pressable>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: "rgba(243,239,227,.66)", marginTop: 2 }}>
@@ -269,11 +269,11 @@ export default function Home({ navigation }) {
                   <Ionicons name={k === "isha" ? "moon-outline" : "sunny-outline"} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
                     {t(`prayer.${k}`, NAMES[k].en)}</Text>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
+                  <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
                     {pretty(day.begins[k]).replace(/ (am|pm)$/, "")}</Text>
                   <View style={{ backgroundColor: "rgba(119,33,87,.09)", borderRadius: R.pill,
                                  paddingHorizontal: 7, paddingVertical: 2, marginTop: 5 }}>
-                    <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), color: C.brand600 }}>
+                    <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10.5), color: C.brand600 }}>
                       {pretty(day.jamaat[k]).replace(/ (am|pm)$/, "")}</Text>
                   </View>
                 </View>);
@@ -282,7 +282,7 @@ export default function Home({ navigation }) {
         <Press onPress={() => { tap(); navigation.navigate("Timetable"); }}
           style={{ alignSelf: rtl ? "flex-start" : "flex-end", paddingVertical: 11, paddingHorizontal: 4,
                    flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 4 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600 }}>
             {t("home.full_timetable", "Full timetable ›").replace(/\s*›\s*$/, "")}</Text>
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={14} color={C.brand600} />
         </Press>
@@ -300,7 +300,7 @@ export default function Home({ navigation }) {
                              color: "#8A6A18", textAlign: rtl ? "left" : "right",
                              writingDirection: "rtl" }}>{rm.ar}</Text>
             </View>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: "#6B5410", marginTop: 8,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: "#6B5410", marginTop: 8,
                            textAlign: rtl ? "right" : "left" }}>
               {t(`reminder.${rm.id}.t`, rm.t)}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: "#7A6838",
@@ -346,7 +346,7 @@ export default function Home({ navigation }) {
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), letterSpacing: 1.3,
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), letterSpacing: 1.3,
                              textTransform: "uppercase", color: C.cream,
                              textAlign: rtl ? "right" : "left" }}>
                 {t("home.listen_live", "Listen live")}</Text>
@@ -378,7 +378,7 @@ export default function Home({ navigation }) {
                              justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
                 <TileIcon name={x.icon} />
               </View>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
                 {t(x.k, x.t)}</Text>
             </Pressable>))}
         </View>

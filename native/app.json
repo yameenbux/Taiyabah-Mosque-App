@@ -50,6 +50,7 @@
           "fonts": [
             "./assets/fonts/HankenGrotesk.ttf",
             "./assets/fonts/HankenGroteskMedium.ttf",
+            "./assets/fonts/HankenGroteskSemiBold.ttf",
             "./assets/fonts/HankenGroteskBold.ttf",
             "./assets/fonts/Fraunces.ttf",
             "./assets/fonts/Amiri.ttf",
