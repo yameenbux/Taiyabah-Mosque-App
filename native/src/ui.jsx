@@ -864,23 +864,33 @@ export function Bank({ items }) {
   );
 }
 
+/* The three marks the website draws itself. Ionicons has no X — only the old
+ * bird, which is a different company's logo and has not been Twitter's mark
+ * since 2023. These are the website's own paths. */
+const SOCIAL_SVG = {
+  instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.53 3h3.06l-6.69 7.64L21.75 21h-6.16l-4.83-6.3L5.24 21H2.18l7.15-8.17L2.25 3h6.32l4.36 5.77L17.53 3Zm-1.07 16.13h1.7L7.62 4.78H5.8l10.66 14.35Z"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26.2 26.2 0 0 0 2 12a26.2 26.2 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26.2 26.2 0 0 0 22 12a26.2 26.2 0 0 0-.4-4.8ZM10.1 14.9V9.1l5.05 2.9-5.05 2.9Z"/></svg>',
+};
+
 export function Social({ items }) {
   return (
-    <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
+    <View style={{ flexDirection: "row", gap: 9, marginTop: 22, marginHorizontal: 6 }}>
       {items.map((it, i) => {
-        const name = /instagram/i.test(it.href) ? "logo-instagram"
-                   : /youtube/i.test(it.href) ? "logo-youtube"
-                   : /twitter|x\.com/i.test(it.href) ? "logo-twitter" : "globe-outline";
+        const key = /instagram/i.test(it.href) ? "instagram"
+                  : /youtube/i.test(it.href) ? "youtube"
+                  : /twitter|x\.com/i.test(it.href) ? "x" : null;
         return (
           <Pressable key={i} onPress={() => open(it.href)} accessibilityLabel={it.label}
             /* .dr-social a — a wide rounded rectangle filled #F0E9ED with no
                border, 12px of radius, 12px of vertical padding. These were
                42px outlined circles, which read as three small icon buttons
                rather than the row of panels the website has. */
-            style={({ pressed }) => ({ flex: 1, paddingVertical: 12, borderRadius: 12,
+            style={({ pressed }) => ({ flex: 1, paddingVertical: 12, paddingHorizontal: 4, borderRadius: 12,
                                        alignItems: "center", justifyContent: "center",
-                                       backgroundColor: pressed ? "#E6DAE1" : "#F0E9ED" })}>
-            <Ionicons name={name} size={19} color={C.brand600} />
+                                       backgroundColor: pressed ? "#E8DCE4" : "#F0E9ED" })}>
+            {key ? <SvgXml xml={SOCIAL_SVG[key]} width={19} height={19} color={C.brand600} />
+                 : <Ionicons name="globe-outline" size={19} color={C.brand600} />}
           </Pressable>);
       })}
     </View>

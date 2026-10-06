@@ -129,11 +129,20 @@ function Row({ row, first, nav }) {
   const act = row.soon ? null : row.to ? () => nav.navigate(row.to) : () => open(row.href);
   return (
     <Press onPress={act} disabled={!act}
-      style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
-               paddingVertical: 14, paddingHorizontal: 15,
+      /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13. */
+      style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
+               paddingVertical: 13, paddingHorizontal: 12,
                borderTopWidth: first ? 0 : 1, borderTopColor: C.line }}>
-      <Ionicons name={row.icon} size={19} color={row.soon ? C.line : C.brand600}
-                style={{ width: 24, textAlign: "center" }} />
+      {/* .dr-row.soon has NO icon at all on the website — not a greyed one.
+          A row with nothing behind it yet does not get a glyph, and its label
+          starts where the others' icons do. And .dr-ico is a 29px #F0E9ED
+          square at 9px of radius with a 16px glyph, not a bare 19px mark on
+          the card. */}
+      {!row.soon && (
+        <View style={{ width: 29, height: 29, borderRadius: 9, alignItems: "center",
+                       justifyContent: "center", backgroundColor: "#F0E9ED" }}>
+          <Ionicons name={row.icon} size={16} color={C.brand600} />
+        </View>)}
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: row.soon ? C.muted : C.ink,
                        textAlign: rtl ? "right" : "left" }}>{t(row.k, row.t)}</Text>
@@ -143,10 +152,13 @@ function Row({ row, first, nav }) {
             {t(row.note.k, row.note.t)}</Text>)}
       </View>
       {row.soon
-        ? <View style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.55)", borderRadius: R.pill,
-                         paddingHorizontal: 10, paddingVertical: 3.5 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(9.5), letterSpacing: 0.9,
-                           textTransform: "uppercase", color: C.goldInk }}>
+        /* .soon-tag — 9.5px BOLD in the gold itself inside a 45% gold
+           hairline, 3/8 of padding. It was medium weight in the darker
+           gold-ink inside a 55% border. */
+        ? <View style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.45)", borderRadius: R.pill,
+                         paddingHorizontal: 8, paddingVertical: 3 }}>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
+                           textTransform: "uppercase", color: C.gold }}>
               {t("marriage.coming_soon", "Coming soon")}</Text>
           </View>
         : row.external
