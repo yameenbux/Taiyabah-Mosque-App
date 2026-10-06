@@ -23,20 +23,17 @@
  * this app opens on a dark hero and a red bar across one is a fault, not a
  * notice. It never takes a touch.
  */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "./theme";
 import { COLUMN } from "./layout";
 import { useApp } from "./store";
-import { onReach, offline } from "./reach";
+import { useOffline } from "./reach";
 
 export default function Offline() {
   const { t, fs } = useApp();
-  const [down, setDown] = useState(offline());
-
-  useEffect(() => onReach(() => setDown(offline())), []);
-  if (!down) return null;
+  if (!useOffline()) return null;
 
   return (
     <View pointerEvents="none"

@@ -18,6 +18,7 @@ import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
 import { C, F, R, SHADOW, dual } from "./theme";
 import { COLUMN } from "./layout";
+import { useOffline } from "./reach";
 import { useApp } from "./store";
 
 export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); };
@@ -102,7 +103,14 @@ export function Screen({ children, scroll = true, pad = true, bg = C.paper, top 
      — and a screen added later gets it without anybody remembering to. On a
      phone the cap is wider than the glass and changes nothing at all; the
      before-and-after at 414px is pixel-identical. */
-  const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top, paddingBottom: insets.bottom + 30,
+  /* ROOM FOR THE OFFLINE BAR. It floats over the scroll, so without this it
+     covers whatever the last thing on the screen happens to be — the bottom
+     row of service tiles on Home, the charity line on System Preferences, an
+     input on the zakāt calculator. Padding is added only while the bar is
+     actually showing, so nothing moves for anybody with a connection. */
+  const down = useOffline();
+  const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
+                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
   if (!scroll)
     return (

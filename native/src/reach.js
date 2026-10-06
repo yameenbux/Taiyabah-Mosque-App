@@ -17,6 +17,8 @@
  * It stays quiet until something has actually failed. A fresh install that has
  * not asked for anything yet is not "offline"; it is simply unasked.
  */
+import { useEffect, useState } from "react";
+
 let state = "unknown";          // unknown | reachable | unreachable
 let failures = 0;
 const listeners = new Set();
@@ -47,3 +49,12 @@ export function onReach(fn) {
 
 /* For tests, and for a screen that wants to start over after a manual retry. */
 export function resetReach() { state = "unknown"; failures = 0; }
+
+/* The hook lives here rather than beside the bar, because the bar is not the
+ * only thing that needs the answer: Screen has to leave room at the bottom of
+ * every scroll for a bar that is about to cover the last thing on it. */
+export function useOffline() {
+  const [down, setDown] = useState(offline());
+  useEffect(() => onReach(() => setDown(offline())), []);
+  return down;
+}
