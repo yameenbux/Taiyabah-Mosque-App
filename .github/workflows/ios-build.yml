@@ -36,7 +36,11 @@ jobs:
     # Xcode only exists on macOS runners. This is the one job in the repo that
     # cannot run on ubuntu, and it is why iOS gets a workflow of its own.
     runs-on: macos-15
-    timeout-minutes: 60
+    # A cold React Native iOS build compiles every pod — boost, folly, hermes,
+    # React core — and that is comfortably 45 minutes on a fresh runner. 60 was
+    # cutting it close enough that a slow queue would have killed a build that
+    # was about to pass.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -67,9 +71,25 @@ jobs:
         working-directory: native
         run: npx expo prebuild --platform ios --no-install --clean
 
+      # Compiling every pod from cold is the whole cost of this job. The cache
+      # goes in AFTER prebuild, because prebuild --clean deletes ios/ and would
+      # throw away anything restored before it.
+      - name: Cache Pods
+        uses: actions/cache@v4
+        with:
+          path: |
+            native/ios/Pods
+            ~/Library/Caches/CocoaPods
+          # Keyed on the lockfile: the pods are a function of the JS
+          # dependencies, so they only need rebuilding when those move.
+          key: pods-${{ runner.os }}-${{ hashFiles('native/package-lock.json') }}
+          restore-keys: pods-${{ runner.os }}-
+
       - name: Pods
         working-directory: native/ios
-        run: pod install --repo-update
+        # --repo-update only when the cache missed; it refreshes the whole spec
+        # repo and is minutes on its own.
+        run: pod install || pod install --repo-update
 
       # No -allowProvisioningUpdates, no team, no certificate: a simulator build
       # is unsigned by design. CODE_SIGNING_ALLOWED=NO makes that explicit so
