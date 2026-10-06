@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
+import { COLUMN } from "./layout";
 import { AppProvider, useApp } from "./store";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
@@ -83,7 +84,12 @@ function Tabs() {
            through the middle — on the one piece of chrome somebody touches
            all day. The base heights are what the design wants at normal size;
            whatever the line gains beyond that is added to the bar. */
+        /* The bar follows the column. The website pins .tabbar to the same
+           max-width:520px with margin-inline:auto, so on an iPad the tabs sit
+           under the content they belong to instead of stretching the full
+           width of the glass with four icons marooned in the middle. */
         tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6,
+                       width: "100%", maxWidth: COLUMN, alignSelf: "center",
                        /* Urdu and Arabic glyphs hang well below the baseline; at
                           the Latin height their descenders are sliced off. */
                        height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14)) },

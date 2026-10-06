@@ -17,6 +17,7 @@ import * as Haptics from "expo-haptics";
 import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
 import { C, F, R, SHADOW, dual } from "./theme";
+import { COLUMN } from "./layout";
 import { useApp } from "./store";
 
 export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); };
@@ -96,8 +97,18 @@ export function Arabic({ children, size = 26, center = true }) {
 export function Screen({ children, scroll = true, pad = true, bg = C.paper, top = 0, ...rest }) {
   const insets = useSafeAreaInsets();
   const style = { backgroundColor: bg };
-  const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top, paddingBottom: insets.bottom + 30 };
-  if (!scroll) return <View style={[{ flex: 1 }, style]} {...rest}>{children}</View>;
+  /* THE COLUMN. Every screen in the app goes through here, so the website's
+     own max-width:520px lands everywhere at once rather than screen by screen
+     — and a screen added later gets it without anybody remembering to. On a
+     phone the cap is wider than the glass and changes nothing at all; the
+     before-and-after at 414px is pixel-identical. */
+  const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top, paddingBottom: insets.bottom + 30,
+                  width: "100%", maxWidth: COLUMN, alignSelf: "center" };
+  if (!scroll)
+    return (
+      <View style={[{ flex: 1, alignItems: "center" }, style]} {...rest}>
+        <View style={{ flex: 1, width: "100%", maxWidth: COLUMN }}>{children}</View>
+      </View>);
   return (
     <ScrollView style={[{ flex: 1 }, style]} contentContainerStyle={inner}
                 /* the platform's own overscroll, which is half of why a list

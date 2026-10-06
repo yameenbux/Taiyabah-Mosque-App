@@ -111,7 +111,12 @@ const FACES = FONTS.map(f =>
 ).join("\n");
 
 const newPage = async (url, side) => {
-  const page = await browser.newPage({ viewport: { width: 414, height: 1500 }, deviceScaleFactor: 1.6 });
+  /* CMP_W / CMP_H render at another size, so an iPad can be looked at rather
+     than reasoned about. The default is the phone these shots have always
+     been taken at, so every existing comparison is unchanged. */
+  const page = await browser.newPage({
+    viewport: { width: Number(process.env.CMP_W) || 414, height: Number(process.env.CMP_H) || 1500 },
+    deviceScaleFactor: Number(process.env.CMP_W) ? 1 : 1.6 });
   await page.addInitScript(FREEZE(ts));
   /* CMP_SCALE renders the native side at a chosen text size, so the biggest
      one the app offers can be looked at rather than assumed to fit. */
