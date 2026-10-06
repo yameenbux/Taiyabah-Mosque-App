@@ -5,12 +5,13 @@
  * rate is 2.5% of what is left after debts. Nothing is sent anywhere — every
  * figure stays on the phone.
  */
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
+import { fetchMetalPrices } from "../metals";
 import { Screen, Hero, Heading, Card, P, Note, Rich, Ticks, Warn, Press, Pill, open, tap } from "../ui";
 
 const NISAB = { silver: 612.36, gold: 87.48 };
@@ -21,6 +22,29 @@ export default function Zakat() {
   const { t, fs, rtl } = useApp();
   const [standard, setStandard] = useState("silver");
   const [price, setPrice] = useState("");
+  /* THE WEBSITE LOOKS THE PRICE UP AND FILLS THE BOX IN. The app shipped with
+     an empty box and a link to a bullion site, so the one thing this screen
+     exists to tell you — whether you are over the nisab — needed a trip
+     somewhere else first. Four states, as the site has: fetching, a live
+     figure with the time it came from, a remembered one marked as such, and
+     only then "please enter it below". */
+  const [live, setLive] = useState({ state: "loading" });
+  const [typed, setTyped] = useState(false);     // don't overwrite what they typed
+
+  const load = useCallback(async () => {
+    setLive({ state: "loading" });
+    const r = await fetchMetalPrices();
+    setLive(r ? { state: "ok", ...r } : { state: "failed" });
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  /* The figure follows the standard: switching silver → gold puts the gold
+     price in, unless a price has been typed by hand. */
+  useEffect(() => {
+    if (live.state !== "ok" || typed) return;
+    const p = live[standard];
+    if (Number.isFinite(p)) setPrice(p.toFixed(2));
+  }, [live, standard, typed]);
   const [v, setV] = useState({ cash: "", gold: "", silver: "", owed: "", stock: "", invest: "", debts: "" });
   const set = (k, x) => setV(s => ({ ...s, [k]: x.replace(/[^0-9.]/g, "") }));
   const n = k => Number(v[k]) || 0;
@@ -143,6 +167,42 @@ export default function Zakat() {
           {t("zakat.the_hanafi_school_uses_the",
             "The Hanafi school uses the *silver* nisab, which is lower — so more people qualify to give.")}</Rich>
 
+        {/* .zk-live — idle shows nothing; loading is a muted line; ok is a
+            plum-tinted line naming the metal, the price and the time with a
+            Refresh beside it; stale is the same in gold saying "last known";
+            failed is the rose panel with Try again. */}
+        {live.state !== "idle" && (
+          <View style={{ marginTop: 12, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 10,
+                         flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8,
+                         backgroundColor: live.state === "failed" ? "#FBF0EB"
+                                        : live.stale ? "#FBF6E7"
+                                        : live.state === "ok" ? "#F0E9ED" : "transparent" }}>
+            <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18),
+                           color: live.state === "failed" ? "#7C3A20"
+                                : live.stale ? "#7A5C13"
+                                : live.state === "ok" ? C.brand600 : C.muted,
+                           textAlign: rtl ? "right" : "left" }}>
+              {live.state === "loading"
+                ? t("zakat.fetching_price", "Fetching today’s price…")
+                : live.state === "failed"
+                ? t("zakat.price_fetch_failed", "Couldn’t fetch today’s price — please enter it below.")
+                : (live.stale
+                    ? t("zakat.last_known_price", "Last known {metal} price · £{p}/g · from {at}")
+                    : t("zakat.live_price", "Live {metal} price · £{p}/g · updated {at}"))
+                    .replace("{metal}", t(`zakat.metal.${standard}`, standard))
+                    .replace("{p}", (live[standard] || 0).toFixed(2))
+                    .replace("{at}", live.at.toLocaleTimeString("en-GB",
+                      { hour: "2-digit", minute: "2-digit" }))}</Text>
+            {live.state !== "loading" && (
+              <Press dim={false} onPress={() => { tap(); setTyped(false); load(); }}
+                style={{ paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
+                         borderWidth: 1, borderColor: C.line, backgroundColor: C.card }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink }}>
+                  {live.state === "failed" ? t("zakat.try_again", "Try again")
+                                           : t("zakat.refresh", "Refresh")}</Text>
+              </Press>)}
+          </View>)}
+
         {/* .zk-l is a flex ROW: the label on the left and "check price" on the
             right of the same line, plum and bold, with no icon. The app made
             it a row of its own underneath with an open-in-browser glyph, so a
@@ -162,7 +222,7 @@ export default function Zakat() {
           </Press>
         </View>
         <Money value={price} placeholder="e.g. 0.85"
-               onChange={x => setPrice(x.replace(/[^0-9.]/g, ""))} />
+               onChange={x => { setTyped(true); setPrice(x.replace(/[^0-9.]/g, "")); }} />
         {/* .zk-result — a pale plum panel inside the nisab card, not a card
             of its own sitting under it. */}
         <View style={{ marginTop: 12, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14,
