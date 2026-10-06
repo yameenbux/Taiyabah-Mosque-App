@@ -150,7 +150,7 @@ export default function Home({ navigation }) {
       </LinearGradient>
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingBottom: 22, overflow: "hidden", alignItems: rtl ? "flex-end" : "flex-start" }}>
-        <Girih style={{ right: -46, top: -40 }} size={190} />
+        <Girih style={{ right: -46, top: -40 }} size={230} />
 
         <View style={{ paddingHorizontal: 20, alignSelf: "stretch",
                        alignItems: rtl ? "flex-end" : "flex-start" }}>

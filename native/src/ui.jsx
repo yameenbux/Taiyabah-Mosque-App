@@ -107,7 +107,7 @@ export function Screen({ children, scroll = true, pad = true, bg = C.paper, top 
  * whole hero lighter; gold on plum is the motif, and you only see it if you
  * look. Same size and offset as the site, too: it was 215px at -70/-62 here
  * against 190px at -46/-40 there, so the star sat further out and bigger. */
-export function Girih({ size = 190, color = C.gold, opacity = 0.09, style }) {
+export function Girih({ size = 230, color = C.gold, opacity = 0.08, style }) {
   return (
     <View pointerEvents="none" style={[{ position: "absolute", opacity }, style]}>
       <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -124,8 +124,12 @@ export function TopBar({ navigation, onBell }) {
   const { t, fs, rtl } = useApp();
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
-                   paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: 16 }}>
+    /* .topbar: padding 14px 20px, and a 1px gold hairline along the bottom at
+       25% — the line that separates it from the hero. Without it the two
+       plums run together and the bar stops reading as a bar. */
+    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 11,
+                   paddingTop: insets.top + 14, paddingBottom: 14, paddingHorizontal: 20,
+                   borderBottomWidth: 1, borderBottomColor: "rgba(198,162,76,.25)" }}>
       <Image source={require("../assets/logo.png")}
              style={{ width: 62, height: 44, resizeMode: "contain" }} />
       <View style={{ width: 1, height: 30, backgroundColor: "rgba(243,239,227,.22)" }} />
@@ -144,10 +148,12 @@ export function TopBar({ navigation, onBell }) {
       </View>
       <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
         accessibilityLabel={t("a11y.notices", "Notices")}
+        /* .bellbtn is gold: a 10% gold fill inside a 30% gold border. This was
+           a cream outline on nothing, which reads as a disabled control. */
         style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 11, alignItems: "center",
                                    justifyContent: "center", borderWidth: 1,
-                                   borderColor: "rgba(243,239,227,.25)",
-                                   backgroundColor: pressed ? "rgba(198,162,76,.2)" : "transparent" })}>
+                                   borderColor: "rgba(198,162,76,.3)",
+                                   backgroundColor: pressed ? "rgba(198,162,76,.24)" : "rgba(198,162,76,.1)" })}>
         <Ionicons name="notifications-outline" size={19} color={C.goldBright} />
       </Pressable>
     </View>
@@ -177,7 +183,7 @@ export function Hero({ lines = [], children, tall, minHeight }) {
       style={{ paddingTop: insets.top + (tall ? 32 : 26), paddingBottom: tall ? 38 : 30,
                paddingHorizontal: 22, overflow: "hidden",
                minHeight, justifyContent: minHeight ? "center" : "flex-start" }}>
-      <Girih style={{ right: -46, top: -40 }} size={190} />
+      <Girih style={{ right: -46, top: -40 }} size={230} />
       {canBack && (
         <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"
           hitSlop={10}
