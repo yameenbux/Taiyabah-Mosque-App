@@ -354,13 +354,19 @@ export function DL({ items }) {
   return (
     <Card gap={0} pad={0}>
       {items.map((it, i) => (
-        <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "flex-start", gap: 12,
-                               paddingVertical: 12, paddingHorizontal: 15,
+        /* The website STACKS these: dt is 10.5px uppercase with .1em of
+           tracking in the muted grey, and dd sits under it at 13.5px in ink
+           across the full width. Side by side with the value pinned right at
+           52% turned every answer into a ragged right-aligned column, and a
+           sentence as long as "At the office, by bank transfer, or by card"
+           broke across four lines in half the width available to it. */
+        <View key={i} style={{ paddingVertical: 12, paddingHorizontal: 15,
                                borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-          <Rich style={{ flex: 1, fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(20), color: C.muted,
+          <Rich style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1,
+                         textTransform: "uppercase", color: C.muted, marginBottom: 5,
                          textAlign: rtl ? "right" : "left" }}>{tx(it.k)}</Rich>
-          <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), lineHeight: fs(20), color: C.ink,
-                         textAlign: rtl ? "left" : "right", maxWidth: "52%" }}>{tx(it.v)}</Rich>
+          <Rich style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.ink,
+                         textAlign: rtl ? "right" : "left" }}>{tx(it.v)}</Rich>
         </View>))}
     </Card>
   );
@@ -431,9 +437,17 @@ export function Notice({ children }) {
  * gold because it is a reassurance. Rendering both in the default plum makes
  * them look like the same kind of remark, which is the one thing they are not. */
 const CALLOUT_TONES = {
-  plum:   { bg: "rgba(119,33,87,.045)",  line: "rgba(119,33,87,.14)",  lab: C.brand600 },
-  danger: { bg: "rgba(180,83,47,.07)",   line: "rgba(180,83,47,.26)",  lab: C.danger },
-  gold:   { bg: "rgba(198,162,76,.11)",  line: "rgba(198,162,76,.32)", lab: C.goldInk },
+  /* .ad-note is DARK — linear-gradient(180deg, brand-800, brand-900) with
+   * cream on it, a gold-bright label and #CBB8C4 prose. It was a 4.5% plum
+   * tint with ink text: the same words, but as a faint aside instead of the
+   * panel the website uses to say "this part is not open yet". It appears on
+   * membership, advice, holidays, admissions, both education sheets and
+   * collect, so one wrong tone was wrong on seven screens.
+   * .ia-conf, the gold one, is a 13% fill inside a 42% border. */
+  plum:   { dark: true, grad: [C.brand800, C.brand900], lab: C.goldBright,
+            head: C.cream, body: "#CBB8C4" },
+  danger: { bg: "rgba(180,83,47,.07)",  line: "rgba(180,83,47,.26)",  lab: C.danger },
+  gold:   { bg: "rgba(198,162,76,.13)", line: "rgba(198,162,76,.42)", lab: C.goldInk },
 };
 
 /* The funeral screen's first panel, and the loudest thing in the app.
@@ -506,16 +520,31 @@ export function Urgent({ lab, h, ps, nums }) {
 export function Callout({ lab, h, ps, cta, tone = "plum" }) {
   const { fs, tx, rtl } = useApp();
   const c = CALLOUT_TONES[tone] || CALLOUT_TONES.plum;
+  const align = rtl ? "right" : "left";
+  const inner = (
+    <>
+      {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
+                               textTransform: "uppercase", color: c.lab, marginBottom: 7,
+                               textAlign: align }}>{tx(lab)}</Text>}
+      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(15.5), lineHeight: fs(22.5),
+                             color: c.dark ? c.head : C.ink, textAlign: align }}>{tx(h)}</Rich>}
+      {(ps || []).map((x, i) => c.dark
+        ? <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21.5),
+                                 color: c.body, marginTop: 8, textAlign: align }}>{tx(x)}</Rich>
+        : <P key={i} muted>{tx(x)}</P>)}
+      {!!cta && <CTA label={tx(cta)} href={cta.href} compact tone={tone === "gold" ? "gold" : "brand"} />}
+    </>
+  );
+  if (c.dark) return (
+    <LinearGradient colors={c.grad} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={{ borderRadius: 15, paddingVertical: 16, paddingHorizontal: 15, marginTop: 14 }}>
+      {inner}
+    </LinearGradient>
+  );
   return (
     <View style={{ backgroundColor: c.bg, borderWidth: 1, borderColor: c.line,
-                   borderRadius: R.card, padding: 15, gap: 8, marginTop: 14 }}>
-      {!!lab && <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10), letterSpacing: 1.4,
-                               textTransform: "uppercase", color: c.lab,
-                               textAlign: rtl ? "right" : "left" }}>{tx(lab)}</Text>}
-      {!!h && <Rich style={{ fontFamily: F.display, fontSize: fs(16), lineHeight: fs(23), color: C.ink,
-                             textAlign: rtl ? "right" : "left" }}>{tx(h)}</Rich>}
-      {(ps || []).map((p, i) => <P key={i} muted>{tx(p)}</P>)}
-      {!!cta && <CTA label={tx(cta)} href={cta.href} compact tone={tone === "gold" ? "gold" : "brand"} />}
+                   borderRadius: 14, paddingVertical: 13, paddingHorizontal: 15, gap: 8, marginTop: 14 }}>
+      {inner}
     </View>
   );
 }
