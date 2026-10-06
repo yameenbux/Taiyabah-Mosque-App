@@ -10,7 +10,7 @@
     "ios": "expo run:ios",
     "content": "node scripts/extract-content.mjs && node scripts/build-i18n.mjs && node scripts/import-content.mjs && node scripts/build-data.mjs",
     "test": "node --import ./scripts/test-register.mjs --test \"scripts/test/*.test.mjs\"",
-    "check": "node scripts/parse-check.mjs && node scripts/check-theme.mjs && node scripts/check-contrast.mjs && node scripts/check-refs.mjs && node scripts/check-screens.mjs --strict && node scripts/check-links.mjs && node scripts/check-boxes.mjs --strict && node scripts/check-i18n.mjs --strict && node scripts/check-extract.mjs --strict && node scripts/check-english.mjs --strict && node scripts/check-a11y.mjs --strict"
+    "check": "node scripts/parse-check.mjs && node scripts/check-theme.mjs && node scripts/check-contrast.mjs && node scripts/check-refs.mjs && node scripts/check-screens.mjs --strict && node scripts/check-links.mjs && node scripts/check-boxes.mjs --strict && node scripts/check-i18n.mjs --strict && node scripts/check-extract.mjs --strict && node scripts/check-english.mjs --strict && node scripts/check-a11y.mjs --strict && node scripts/check-icons.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
