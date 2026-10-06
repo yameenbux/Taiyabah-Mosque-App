@@ -8,7 +8,7 @@
  */
 import React, { useMemo, useRef, useEffect } from "react";
 import { View, Text, ScrollView, useWindowDimensions } from "react-native";
-import { C, F, R } from "../theme";
+import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P } from "../ui";
@@ -73,14 +73,23 @@ function Month({ y, m, shut, evt, todayISO, width }) {
           const wknd = dw === 0 || dw === 6;
           return (
             <View key={i} style={{ width: box, height: box, alignItems: "center", justifyContent: "center" }}>
-              <View style={{ width: box - 4, height: box - 4, borderRadius: 6,
-                             alignItems: "center", justifyContent: "center",
-                             backgroundColor: isShut ? "rgba(194,91,91,.18)" : "transparent",
-                             borderWidth: isToday ? 1.5 : 0, borderColor: KEY.today }}>
-                <Text style={{ fontFamily: isToday ? F.sansBold : F.sans, fontSize: fs(11.5),
-                               color: isShut ? "#9C3F3F" : wknd ? C.muted : C.ink }}>{d}</Text>
-                {isEv && <View style={{ position: "absolute", bottom: 1, width: 4, height: 4,
-                                        borderRadius: 2, backgroundColor: KEY.ev }} />}
+              {/* .hp-d — every cell sits on the PAPER with a transparent
+                  hairline; a closed day is a 14% danger fill with a 30% danger
+                  border, an Islamic date is marked by a GOLD BORDER on the
+                  cell rather than a dot under the number, and TODAY is filled
+                  brand-600 with cream. The app outlined today instead of
+                  filling it, which on a grid of twelve months is the one cell
+                  a reader is hunting for. */}
+              <View style={{ width: box - 4, height: box - 4, borderRadius: 8,
+                             alignItems: "center", justifyContent: "center", borderWidth: 1,
+                             backgroundColor: isToday ? C.brand600
+                                            : isShut ? "rgba(180,83,47,.14)" : C.paper,
+                             borderColor: isToday ? C.brand600
+                                        : isShut ? "rgba(180,83,47,.3)"
+                                        : isEv ? C.gold : "transparent" }}>
+                <Text style={{ fontFamily: isToday || isEv ? F.sansBold : F.sans, fontSize: fs(11.5),
+                               color: isToday ? C.cream
+                                    : isShut ? "#8E4126" : wknd ? C.muted : C.ink }}>{d}</Text>
               </View>
             </View>);
         })}
@@ -92,11 +101,12 @@ function ListRow({ name, sub, when, len, past, est, first }) {
   const { fs, t } = useApp();
   return (
     <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: C.line, flexDirection: "row",
-                   alignItems: "center", gap: 10, paddingHorizontal: 15, paddingVertical: 12,
+                   alignItems: "baseline", gap: 10, paddingHorizontal: 15, paddingVertical: 12,
                    opacity: past ? .45 : 1 }}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, minWidth: 0 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.ink }}>{name}</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(19.5), color: C.ink,
+                         flexShrink: 1 }}>{name}</Text>
           {est && (
             /* Gold, as .hp-est is on the website. In grey it reads as a
                disabled label rather than "this date is an estimate", which is
@@ -106,12 +116,15 @@ function ListRow({ name, sub, when, len, past, est, first }) {
                            borderRadius: R.pill, paddingHorizontal: 5,
                            paddingVertical: 1, overflow: "hidden" }}>{t("hol.est", "est.")}</Text>)}
         </View>
-        {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 1 }}>{sub}</Text>}
+        {!!sub && <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 2 }}>{sub}</Text>}
       </View>
-      <View style={{ alignItems: "flex-end" }}>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.ink }}>{when}</Text>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>{len}</Text>
-      </View>
+      {/* .hp-r is THREE columns on one baseline — the name, the dates, and
+          the length in a 52px column at the right. Stacking the length under
+          the dates put "5 days" where a second date would be, so two rows ran
+          together and the eye had to re-find the right-hand edge on each. */}
+      <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, textAlign: "right" }}>{when}</Text>
+      <Text style={{ minWidth: 52, fontFamily: F.sans, fontSize: fs(11), color: C.muted,
+                     textAlign: "right" }}>{len}</Text>
     </View>);
 }
 
@@ -159,21 +172,30 @@ export default function Holidays() {
 
   return (
     <Screen pad={false}>
-      <Hero ring={SHEETS.holidays?.ring} lines={[
-        { k: "hol.holiday_planner", t: "Holiday Planner", w: "title" },
-        { k: "hol.sub", t: "Term dates, closures and the Islamic dates for the year — so you can plan a trip without it costing your child their attendance.", w: "sub" },
-      ]} />
+      {/* The website's own hero: "Madrasah · 2026/27" — which names the year
+          the planner is for — over its own standfirst. The app used the sheet
+          header's title again, so the bar and the hero both said "Holiday
+          Planner" and the academic year was nowhere on the screen, and its
+          standfirst had been rewritten from "Every day the madrasah is closed
+          this year, alongside the Islamic dates" to "Term dates, closures and
+          the Islamic dates for the year". */}
+      <Hero ring={SHEETS.holidays?.ring}
+            lines={SHEETS.holidays?.blocks.find(b => b.type === "hero")?.lines || []} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: 14,
-                       padding: 14, borderRadius: R.tile, borderWidth: 1,
-                       borderColor: status.open ? "rgba(74,124,89,.35)" : "rgba(194,91,91,.35)",
-                       backgroundColor: status.open ? "rgba(74,124,89,.08)" : "rgba(194,91,91,.08)" }}>
-          <View style={{ width: 9, height: 9, borderRadius: 5,
-                         backgroundColor: status.open ? "#4A7C59" : "#C25B5B" }} />
+        {/* .hp-today is an ordinary CARD — the dot carries the colour, not
+            the panel. A green wash behind "Madrasah is open today" made an
+            everyday fact look like a status alert, and on a closed day the
+            same panel turned red for what is only a holiday. */}
+        <View style={[{ flexDirection: "row", alignItems: "flex-start", gap: 11, marginTop: 14,
+                        paddingVertical: 15, paddingHorizontal: 14, borderRadius: 15,
+                        backgroundColor: C.card, borderWidth: 1, borderColor: C.line }, SHADOW]}>
+          <View style={{ width: 10, height: 10, borderRadius: 5, marginTop: 5,
+                         backgroundColor: status.open ? "#3F7D58" : C.danger }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.ink }}>{status.title}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, marginTop: 2 }}>{status.detail}</Text>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), color: C.ink }}>{status.title}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: C.muted,
+                           marginTop: 3 }}>{status.detail}</Text>
           </View>
         </View>
 
