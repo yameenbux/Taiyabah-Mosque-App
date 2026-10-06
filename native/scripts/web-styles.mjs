@@ -46,6 +46,18 @@ const out = await page.evaluate(() => {
     submit: pick(document.querySelector(".bk-submit, .gv-cta, .cc-submit"),
       ["background-image","background-color","color","border-radius","padding"]),
     pcolNext: pick(document.querySelector('.pcol[data-next="1"]'), ["background-color"]),
+    /* the contact rows: the label, the value, and the tinted chip the glyph sits on */
+    kvLabel: pick(document.querySelector(".ct-row .ct-k, .ct-k"),
+      ["font-size","font-weight","letter-spacing","text-transform","color"]),
+    kvValue: pick(document.querySelector(".ct-row .ct-v, .ct-v"), ["font-size","font-weight","color"]),
+    kvIcon: pick(document.querySelector(".ct-row .ct-ic, .ct-ic"),
+      ["background-color","border-radius","width","height","color"]),
+    social: pick(document.querySelector(".so-btn, .ct-social a, .dr-social a"),
+      ["background-color","border","border-radius","width","height","padding","color"]),
+    sheetTitle: pick(document.querySelector("#ct-scrim h1, #ct-scrim .sh-t, .sh-hero h1, .sh-hero .sh-t"),
+      ["font-family","font-size","font-weight","color","text-align"]),
+    sheetEyebrow: pick(document.querySelector("#ct-scrim .eyebrow, .sh-hero .eyebrow"),
+      ["font-size","letter-spacing","text-transform","color"]),
   };
 });
 console.log(JSON.stringify(out,null,1));

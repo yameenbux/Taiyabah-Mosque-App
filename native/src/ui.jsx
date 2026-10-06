@@ -317,12 +317,21 @@ export function KV({ k, v, href, icon, onPress }) {
     <Press onPress={act} disabled={!act}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 13, paddingHorizontal: 15 }}>
-      {!!icon && <Ionicons name={icon} size={19} color={C.brand600} style={{ width: 22, textAlign: "center" }} />}
+      {!!icon && (
+        <View style={{ width: 38, height: 38, borderRadius: 12, alignItems: "center",
+                       justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
+          <Ionicons name={icon} size={18} color={C.brand600} />
+        </View>)}
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), letterSpacing: 0.3, color: C.muted,
+        {/* .ct-k is 11.76px, uppercase, 1.41px of tracking, in C.muted — not
+            sentence case with a third of that tracking. The label is what
+            tells you this is a record rather than a sentence. */}
+        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.4,
+                       textTransform: "uppercase", color: C.muted,
                        textAlign: rtl ? "right" : "left" }}>{k}</Text>
-        <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), lineHeight: fs(20), color: C.ink,
-                       marginTop: 1.5, textAlign: rtl ? "right" : "left" }}>{v}</Rich>
+        {/* .ct-v is 16.8px at 600 — bigger and heavier than this was. */}
+        <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(15), lineHeight: fs(21), color: C.ink,
+                       marginTop: 2, textAlign: rtl ? "right" : "left" }}>{v}</Rich>
       </View>
       {!!act && <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />}
     </Press>
@@ -551,16 +560,20 @@ export function Bank({ items }) {
 
 export function Social({ items }) {
   return (
-    <View style={{ flexDirection: "row", justifyContent: "center", gap: 14, marginTop: 20 }}>
+    <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
       {items.map((it, i) => {
         const name = /instagram/i.test(it.href) ? "logo-instagram"
                    : /youtube/i.test(it.href) ? "logo-youtube"
                    : /twitter|x\.com/i.test(it.href) ? "logo-twitter" : "globe-outline";
         return (
           <Pressable key={i} onPress={() => open(it.href)} accessibilityLabel={it.label}
-            style={({ pressed }) => ({ width: 42, height: 42, borderRadius: 21, alignItems: "center",
-                                       justifyContent: "center", borderWidth: 1, borderColor: C.line,
-                                       backgroundColor: pressed ? "rgba(119,33,87,.08)" : C.card })}>
+            /* .dr-social a — a wide rounded rectangle filled #F0E9ED with no
+               border, 12px of radius, 12px of vertical padding. These were
+               42px outlined circles, which read as three small icon buttons
+               rather than the row of panels the website has. */
+            style={({ pressed }) => ({ flex: 1, paddingVertical: 12, borderRadius: 12,
+                                       alignItems: "center", justifyContent: "center",
+                                       backgroundColor: pressed ? "#E6DAE1" : "#F0E9ED" })}>
             <Ionicons name={name} size={19} color={C.brand600} />
           </Pressable>);
       })}
