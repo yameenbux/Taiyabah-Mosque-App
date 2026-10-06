@@ -137,16 +137,20 @@ export default function Home({ navigation }) {
   return (
     <Screen pad={false}>
       {/* ---- hero ------------------------------------------------------- */}
-      {/* The website stacks two gradients here: .topbar runs brand-900 to
-          brand-800, then .hero runs brand-800 back down to brand-900. Straight
-          down, both of them. This was one diagonal ending on brand-700, so the
-          home screen finished brighter and pinker than the site's. */}
-      <LinearGradient colors={[C.brand900, C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      {/* TWO gradients, as the website has them, not one spread over both.
+          .topbar runs brand-900 to brand-800 over its own height; .hero then
+          STARTS AGAIN at brand-800 and runs down to brand-900. Merging them
+          into a single 900-800-900 meant the top of the hero was still near
+          brand-900 where the site is already at brand-800 — measurably
+          #400c2d against the website's #491034 — which also made the girih
+          stand out, because it was being drawn on a darker ground. */}
+      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        style={{ alignSelf: "stretch" }}>
+        <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
+      </LinearGradient>
+      <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingBottom: 22, overflow: "hidden", alignItems: rtl ? "flex-end" : "flex-start" }}>
         <Girih style={{ right: -46, top: -40 }} size={190} />
-        <View style={{ alignSelf: "stretch" }}>
-          <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
-        </View>
 
         <View style={{ paddingHorizontal: 20, alignSelf: "stretch",
                        alignItems: rtl ? "flex-end" : "flex-start" }}>
