@@ -11,7 +11,7 @@ import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet, Image
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Polygon } from "react-native-svg";
+import Svg, { Polygon, SvgXml } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Clipboard from "expo-clipboard";
@@ -171,19 +171,79 @@ export function TopBar({ navigation, onBell, back }) {
   );
 }
 
-export function Hero({ lines = [], children, tall, minHeight }) {
-  const { fs, tx, rtl } = useApp();
+/* THE SHEET HEADER, WHICH THIS APP DID NOT HAVE.
+ *
+ * Every one of the website's 28 sheets opens under the same bar: a plum
+ * gradient running brand-900 to brand-800 — the opposite direction to the hero
+ * below it, which is what makes the two read as separate pieces rather than
+ * one long wash — with the sheet's title in Fraunces at 15.5px on the left and
+ * a gold "Done" pill on the right. A 38px rounded square holding a left arrow
+ * appears only when the sheet was opened from another sheet.
+ *
+ * The app had none of it. A pushed screen drew a bare chevron floating on top
+ * of its own hero, so there was no bar, no title line and no Done — the hero
+ * simply started at the status bar with one arrow in the corner.
+ */
+export function SheetTop({ title, canBack, onBack, onDone }) {
+  const { t, fs, rtl } = useApp();
   const insets = useSafeAreaInsets();
-  /* These screens draw their own hero behind the status bar, so they carry no
-   * platform header — and with it no back arrow. The swipe-back gesture still
-   * works, but an arrow you can see is not optional: plenty of people never
-   * learn the gesture, and a screen with no visible way out is the single
-   * loudest "this was a website" tell there is. */
-  const nav = useNavigation();
-  /* Only on a pushed screen. Inside a tab, canGoBack() is true as soon as you
-   * have visited another tab, and an arrow that takes you sideways rather than
-   * back is worse than no arrow at all. */
-  const canBack = nav?.getState?.()?.type === "stack" && nav.canGoBack();
+  return (
+    <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
+               paddingTop: insets.top + 14, paddingBottom: 14, paddingHorizontal: 14 }}>
+      {canBack && (
+        /* .sh-upback — 38px, 11px of radius, a white 20% hairline over a white
+           8% fill. In RTL the website flips the arrow with scaleX(-1). */
+        <Pressable onPress={() => { tap(); onBack(); }} accessibilityLabel="Back" accessibilityRole="button"
+          style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 11, alignItems: "center",
+                                     justifyContent: "center", borderWidth: 1,
+                                     borderColor: "rgba(255,255,255,.2)",
+                                     backgroundColor: pressed ? "rgba(255,255,255,.18)" : "rgba(255,255,255,.08)" })}>
+          <Ionicons name={rtl ? "arrow-forward" : "arrow-back"} size={19} color={C.cream} />
+        </Pressable>)}
+      {/* Every sheet overrides the stylesheet's centre with text-align:left. */}
+      <Text numberOfLines={1} style={{ flex: 1, fontFamily: F.display, fontSize: fs(15.5), color: C.cream,
+                                       textAlign: rtl ? "right" : "left" }}>{title}</Text>
+      {!!onDone && (
+        <Pressable onPress={() => { tap(); onDone(); }} accessibilityRole="button"
+          style={({ pressed }) => ({ paddingVertical: 9, paddingHorizontal: 14, borderRadius: 999,
+                                     borderWidth: 1, borderColor: "rgba(198,162,76,.45)",
+                                     backgroundColor: pressed ? "rgba(198,162,76,.28)" : "rgba(198,162,76,.14)" })}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: C.goldBright }}>
+            {t("vids.done", "Done")}
+          </Text>
+        </Pressable>)}
+    </LinearGradient>
+  );
+}
+
+/* The hero medallion: a 52px circle filled gold at 16% inside a gold 40%
+ * hairline, the drawing inside it 26px in gold-bright, 16px of clearance
+ * beneath. Eight of the website's heroes carry one and the app carried none,
+ * so those heroes opened on a line of type with nothing above it.
+ *
+ * The drawing is the website's own SVG, rendered as-is. Every one is bespoke —
+ * a house, a bank card, a calendar, a globe, a speech bubble, a crib, two
+ * wedding bands — and picking the nearest glyph out of an icon font would have
+ * put a different picture on seven screens. */
+export function Ring({ xml }) {
+  if (!xml) return null;
+  return (
+    <View style={{ width: 52, height: 52, borderRadius: 26, alignSelf: "center", marginBottom: 16,
+                   alignItems: "center", justifyContent: "center", borderWidth: 1,
+                   borderColor: "rgba(198,162,76,.4)", backgroundColor: "rgba(198,162,76,.16)" }}>
+      <SvgXml xml={xml} width={26} height={26} color={C.goldBright} />
+    </View>
+  );
+}
+
+export function Hero({ lines = [], children, tall, minHeight, ring }) {
+  const { fs, tx } = useApp();
+  /* The hero no longer reaches behind the status bar and no longer carries a
+   * back arrow of its own: SheetTop sits above it on every pushed screen, as
+   * .sh-top does on the website, and that bar owns the inset, the title and
+   * the way out. The floating chevron this used to draw in the corner was
+   * invented here — the website has no such thing anywhere. */
   return (
     /* The website's own hero: linear-gradient(180deg, brand-800, brand-900).
        Straight down, and DARKER as it descends. This ran brand-900 to
@@ -191,20 +251,11 @@ export function Hero({ lines = [], children, tall, minHeight }) {
        bottom right — the single reason every screen read as a lighter, more
        magenta app than the one it is copying. Padding is the site's 26/22/30. */
     <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-      style={{ paddingTop: insets.top + (tall ? 32 : 26), paddingBottom: tall ? 38 : 30,
+      style={{ paddingTop: tall ? 32 : 26, paddingBottom: tall ? 38 : 30,
                paddingHorizontal: 22, overflow: "hidden",
                minHeight, justifyContent: minHeight ? "center" : "flex-start" }}>
       <Girih style={{ right: -46, top: -40 }} size={230} />
-      {canBack && (
-        <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"
-          hitSlop={10}
-          style={({ pressed }) => ({ position: "absolute", left: 12, top: insets.top + 6,
-                                     width: 40, height: 40, borderRadius: 20, alignItems: "center",
-                                     justifyContent: "center", zIndex: 2,
-                                     backgroundColor: pressed ? "rgba(243,239,227,.16)" : "transparent" })}>
-          <Ionicons name={rtl ? "chevron-forward" : "chevron-back"} size={25} color={C.cream} />
-        </Pressable>)}
-      <View style={{ height: canBack ? 34 : 0 }} />
+      <Ring xml={ring} />
       {lines.map((l, i) => {
         const text = tx(l);
         if (!text) return null;
@@ -259,6 +310,21 @@ export function Card({ children, style, pad = 15, gap = 10 }) {
 /* A card whose rows are themselves the content — the row owns its own padding
  * so a pressed row fills the full width of the card, with no inset gutter
  * giving the game away. */
+/* Every icon chip on the website — .ct-ico, .md-ico, .dr-ico, .fs-item .ic and
+ * the whole .*-call-ico family — is the same thing: a rounded square filled a
+ * SOLID #F0E9ED with a brand-600 glyph on it. Not a translucent plum tint, and
+ * never gold: there is no gold chip anywhere on the site. The tints here were
+ * each a shade or two light, and because the fill was translucent they changed
+ * colour depending on whether the row sat on card or on paper. */
+export function IconChip({ icon, size = 38, glyph = 19, radius = 11, muted }) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: radius, alignItems: "center",
+                   justifyContent: "center", backgroundColor: muted ? C.paper : "#F0E9ED" }}>
+      <Ionicons name={icon} size={glyph} color={muted ? C.muted : C.brand600} />
+    </View>
+  );
+}
+
 export function RowGroup({ children, style }) {
   const rows = React.Children.toArray(children).filter(Boolean);
   return (
@@ -288,11 +354,7 @@ export function NavRow({ icon, label, sub, soon, onPress, href, value, right, to
     <Press onPress={act} disabled={!act || soon}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 14, paddingHorizontal: 15 }}>
-      {!!icon && (
-        <View style={{ width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center",
-                       backgroundColor: tone === "gold" ? "rgba(198,162,76,.15)" : "rgba(119,33,87,.08)" }}>
-          <Ionicons name={icon} size={18} color={tone === "gold" ? C.goldInk : C.brand600} />
-        </View>)}
+      {!!icon && <IconChip icon={icon} muted={!!soon} />}
       <View style={{ flex: 1 }}>
         <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
                        textAlign: rtl ? "right" : "left" }}>{label}</Rich>
@@ -328,11 +390,7 @@ export function KV({ k, v, href, icon, onPress }) {
     <Press onPress={act} disabled={!act}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 13, paddingHorizontal: 15 }}>
-      {!!icon && (
-        <View style={{ width: 38, height: 38, borderRadius: 12, alignItems: "center",
-                       justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
-          <Ionicons name={icon} size={18} color={C.brand600} />
-        </View>)}
+      {!!icon && <IconChip icon={icon} />}
       <View style={{ flex: 1 }}>
         {/* .ct-k is 11.76px, uppercase, 1.41px of tracking, in C.muted — not
             sentence case with a third of that tracking. The label is what
@@ -343,6 +401,34 @@ export function KV({ k, v, href, icon, onPress }) {
         {/* .ct-v is 16.8px at 600 — bigger and heavier than this was. */}
         <Rich style={{ fontFamily: F.sansMedium, fontSize: fs(15), lineHeight: fs(21), color: C.ink,
                        marginTop: 2, textAlign: rtl ? "right" : "left" }}>{v}</Rich>
+      </View>
+      {!!act && <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />}
+    </Press>
+  );
+}
+
+/* "Ring the office" — the one row on a page that exists to be tapped.
+ *
+ * A card of its own at 15px of radius with 15/14 of padding, a #F0E9ED chip,
+ * a 10.5px uppercase label and the number under it at 16px BOLD. It had been
+ * folded in with .md-row, whose shape is the other way round — a 14.5px title
+ * over a 12px muted sub — so on fourteen screens the label was large and black
+ * and the phone number was small and grey beneath it. */
+export function Call({ k, v, href, onPress }) {
+  const { fs, rtl } = useApp();
+  const act = onPress || (href ? () => open(href) : null);
+  return (
+    <Press onPress={act} disabled={!act}
+      style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
+                marginTop: 14, paddingVertical: 15, paddingHorizontal: 14, borderRadius: 15,
+                backgroundColor: C.card, borderWidth: 1, borderColor: C.line }, SHADOW]}>
+      <IconChip icon={href?.startsWith("tel:") ? "call-outline" : "open-outline"} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Rich style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.05,
+                       textTransform: "uppercase", color: C.muted,
+                       textAlign: rtl ? "right" : "left" }}>{k}</Rich>
+        <Rich style={{ fontFamily: F.sansBold, fontSize: fs(16), lineHeight: fs(22), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>{v}</Rich>
       </View>
       {!!act && <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />}
     </Press>
@@ -645,3 +731,20 @@ export function Empty({ icon = "leaf-outline", title, body }) {
 }
 
 export const line = StyleSheet.create({ h: { height: 1, backgroundColor: C.line } }).h;
+
+/* .vd-all — a centred link that is a full-width #F0E9ED panel, radius 12,
+ * 13px of padding, the label 13px semibold in brand-600. It was a row with a
+ * chevron in a bordered group, which is a different piece of furniture. */
+export function PanelLink({ label, href, onPress }) {
+  const { fs } = useApp();
+  return (
+    <Pressable onPress={onPress || (() => open(href))}
+      style={({ pressed }) => ({ borderRadius: 12, paddingVertical: 13, paddingHorizontal: 13,
+                                 marginTop: 16, marginBottom: 10,
+                                 backgroundColor: pressed ? "#E8DCE4" : "#F0E9ED" })}>
+      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600, textAlign: "center" }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}

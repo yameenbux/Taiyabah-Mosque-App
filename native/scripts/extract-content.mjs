@@ -315,10 +315,30 @@ const out = await page.evaluate(ids => {
         continue;
       }
 
-      /* a navigation / call row ------------------------------------------- */
-      if (has(c, "md-row") || has(c, "hh-call") || has(c, "ab-video") || has(c, "dr-row")) {
-        const t1 = c.querySelector(".md-t1,.hh-call-k,.ab-v1");
-        const t2 = c.querySelector(".md-t2,.hh-call-v,.ab-v2");
+      /* "ring the office" ---------------------------------------------------
+       *
+       * Eighteen of these across the site, in five differently-prefixed but
+       * otherwise identical flavours: a small uppercase label — MASJID OFFICE
+       * 5PM-7PM — over the number itself at 16px bold, in a card of its own.
+       * Only the hh- flavour was matched, and it was folded in with .md-row,
+       * which is the OPPOSITE shape: a 14.5px title over a muted sub. So the
+       * number came out small and grey underneath a large black label. */
+      if (/\b(wl|ia|hh|bt|mg)-call\b/.test(c.className || "")) {
+        /* $= missed every phone number on the site: .hh-call-v also carries
+           .tnum for the lining figures, so the class attribute ends "tnum". */
+        const k = c.querySelector('[class*="-call-k"]');
+        const v = c.querySelector('[class*="-call-v"]');
+        blocks.push(node("call", {
+          k: k ? str(k) : str(c), v: v ? str(v) : null,
+          href: c.getAttribute("href") || null,
+        }));
+        continue;
+      }
+
+      /* a navigation row ---------------------------------------------------- */
+      if (has(c, "md-row") || has(c, "ab-video") || has(c, "dr-row")) {
+        const t1 = c.querySelector(".md-t1,.ab-v1");
+        const t2 = c.querySelector(".md-t2,.ab-v2");
         blocks.push(node("row", {
           label: t1 ? str(t1) : str(c), sub: t2 ? str(t2) : null,
           href: c.getAttribute("href") || null, id: c.id || null,
@@ -376,10 +396,17 @@ const out = await page.evaluate(ids => {
     const sheet = document.getElementById(id);
     if (!sheet) { res[id] = { missing: true }; continue; }
     const title = sheet.querySelector(".sh-top h3");
+    /* The medallion above eight of the heroes: a 52px gold-ringed circle with
+       a line drawing in it. The drawings are hand-made SVGs — a house, a card,
+       a calendar, a globe, a speech bubble, a crib, two rings — and not one of
+       them is a glyph in any icon font, so the app renders the website's own
+       markup rather than guessing at the nearest lookalike. */
+    const ring = sheet.querySelector('[class$="-ring"] svg');
     const body = sheet.querySelector(".sh-body");
     const blocks = [];
     if (body) walk(body, blocks);
     res[id] = { title: title ? str(title) : { t: id }, blocks };
+    if (ring) res[id].ring = ring.outerHTML.replace(/\s+/g, " ").trim();
   }
   return res;
 }, SHEETS);

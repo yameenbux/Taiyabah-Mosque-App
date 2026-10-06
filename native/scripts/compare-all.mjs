@@ -30,7 +30,10 @@ const TYPES = { ".js":"text/javascript",".html":"text/html",".ttf":"font/ttf",".
   ".webmanifest":"application/manifest+json",".woff2":"font/woff2",".jpg":"image/jpeg",".jpeg":"image/jpeg" };
 const serve = (root, port, spa) => new Promise(res => {
   const s = http.createServer((q, r) => {
-    let p = path.join(root, decodeURIComponent(q.url.split("?")[0]));
+    const u = decodeURIComponent(q.url.split("?")[0]);
+    let p = u.startsWith("/__fonts/")
+      ? path.resolve(import.meta.dirname, "../assets/fonts", path.basename(u))
+      : path.join(root, u);
     if (!fs.existsSync(p)) { if (spa) p = path.join(root, "index.html"); else { r.statusCode = 404; r.end(); return; } }
     if (fs.statSync(p).isDirectory()) p = path.join(p, "index.html");
     r.setHeader("Content-Type", TYPES[path.extname(p)] || "application/octet-stream");
@@ -83,10 +86,32 @@ const webSrv = await serve(ROOT, 4291, false);
 const natSrv = await serve(DIST, 4292, true);
 const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
 
-const newPage = async url => {
+/* THE NATIVE SIDE HAD NO FONTS.
+ *
+ * On a device the five text faces are registered by the expo-font config
+ * plugin before a line of JavaScript runs — they are built into the APK, not
+ * fetched. `expo export --platform web` knows nothing about that plugin, so
+ * the bundle it writes has no @font-face at all and the browser drew every
+ * word of the native side in its default SERIF. Months of these screenshots
+ * were comparing Hanken Grotesk against whatever Chromium falls back to, so
+ * any reading of weight or letterform taken off them was worthless.
+ *
+ * The same five files the APK carries are served here and declared under the
+ * exact family names theme.js asks for. */
+const FONTS = ["HankenGrotesk", "HankenGroteskMedium", "HankenGroteskBold", "Fraunces", "Amiri"];
+const FACES = FONTS.map(f =>
+  `@font-face{font-family:"${f}";src:url("/__fonts/${f}.ttf") format("truetype");font-display:block}`
+).join("\n");
+
+const newPage = async (url, side) => {
   const page = await browser.newPage({ viewport: { width: 414, height: 1500 }, deviceScaleFactor: 1.6 });
   await page.addInitScript(FREEZE(ts));
   await page.goto(url, { waitUntil: "networkidle" }).catch(() => {});
+  if (side === "native") {
+    await page.addStyleTag({ content: FACES });
+    await page.evaluate(fs => Promise.all(fs.map(f => document.fonts.load(`16px "${f}"`))), FONTS);
+    await page.evaluate(() => document.fonts.ready);
+  }
   await page.waitForTimeout(2600);
   return page;
 };
@@ -118,9 +143,17 @@ const tapByText = async (page, rx) => {
 };
 
 const results = [];
-for (const [name, rx, where] of SCREENS) {
+/* CMP_ONLY=videos,membership renders just those, so a single screen can be
+   re-measured in seconds instead of re-shooting all 25. */
+const ONLY = (process.env.CMP_ONLY || "").split(",").map(x => x.trim()).filter(Boolean);
+const PICK = ONLY.length ? SCREENS.filter(s => ONLY.includes(s[0])) : SCREENS;
+if (ONLY.length && PICK.length !== ONLY.length)
+  throw new Error("CMP_ONLY names a screen that is not in the list: " +
+                  ONLY.filter(o => !SCREENS.some(s => s[0] === o)).join(", "));
+
+for (const [name, rx, where] of PICK) {
   for (const side of ["web", "native"]) {
-    const page = await newPage(side === "web" ? "http://localhost:4291/index.html" : "http://localhost:4292/");
+    const page = await newPage(side === "web" ? "http://localhost:4291/index.html" : "http://localhost:4292/", side);
     if (side === "native") await clearFirstRun(page);
     let ok = true;
     if (rx) {
@@ -150,4 +183,4 @@ for (const [name, rx, where] of SCREENS) {
 await browser.close(); webSrv.close(); natSrv.close();
 if (results.length) { console.log("\nnotes:"); for (const r of results) console.log(r); }
 console.log(`\nboth apps pinned to ${new Date(ts).toString()}`);
-console.log(`${SCREENS.length} screens, web and native, in ${OUT}`);
+console.log(`${PICK.length} screens, web and native, in ${OUT}`);

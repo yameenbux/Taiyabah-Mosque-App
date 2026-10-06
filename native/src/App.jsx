@@ -10,7 +10,9 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
 import { AppProvider, useApp } from "./store";
+import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
+import SHEETS from "./data/sheets.json";
 import Opening from "./Opening";
 import FirstRun from "./FirstRun";
 import { startPush } from "./push";
@@ -90,19 +92,34 @@ function Tabs() {
 }
 
 function Root() {
-  const { t, fs, lang } = useApp();
+  const { t, tx, fs, lang } = useApp();
 
-  const pushed = {
-    headerStyle: { backgroundColor: C.paper },
-    headerTintColor: C.brand600,
-    headerTitleStyle: { fontFamily: F.display, fontSize: fs(17), color: C.ink },
-    headerShadowVisible: false,
-    headerBackTitleVisible: false,
+  /* EVERY PUSHED SCREEN WEARS THE WEBSITE'S SHEET HEADER.
+   *
+   * There used to be two presets: `pushed`, a platform header in paper with an
+   * ink title, and `bare`, no header at all. Neither is anything the website
+   * does. Its sheets — all 28 of them — open under one plum bar carrying the
+   * title and a Done pill, and `bare` screens were left drawing a chevron on
+   * top of their own hero with no title line at all.
+   *
+   * The ← appears only when there is a sheet behind this one, which is what
+   * navRenderUpBack() decides on the website and what canGoBack() decides
+   * here. Done leaves the same way the arrow does, because on the website it
+   * closes the sheet and there is nowhere else for it to go. */
+  const sheet = {
+    header: ({ navigation, options }) => (
+      <SheetTop title={options.title || ""}
+                canBack={navigation.canGoBack()}
+                onBack={() => navigation.goBack()}
+                onDone={navigation.canGoBack() ? () => navigation.goBack() : null} />
+    ),
     contentStyle: { backgroundColor: C.paper },
   };
-  /* Screens that draw their own hero behind the status bar have no header at
-   * all; the platform's swipe-back still works, which is the part that matters. */
-  const bare = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
+  /* Qibla, Alerts, Donate and Live are not sheets on the website: they are
+   * four of its seven PAGES, and a page wears the app bar — the logo, the
+   * society's name and the bell — not a sheet header. They draw their own. */
+  const page = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
+  const pushed = sheet, bare = sheet;
 
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
@@ -122,7 +139,7 @@ function Root() {
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}
-        <Stack.Screen name="Athkar"    component={Athkar}    options={bare} />
+        <Stack.Screen name="Athkar"    component={Athkar}    options={{ ...sheet, title: t("athkar.daily_athkar", "Daily Athkār") }} />
         <Stack.Screen name="AthkarSet" component={AthkarSet}
           options={({ route }) => ({ ...pushed,
             title: [t("athkar.morning_evening", "Morning & Evening"),
@@ -132,31 +149,32 @@ function Root() {
         <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("rabbanas.40_rabbana", "40 Rabbanā") }} />
 
         {/* the masjid */}
-        <Stack.Screen name="Qibla"     component={Qibla}     options={bare} />
-        <Stack.Screen name="Live"      component={Live}      options={bare} />
-        <Stack.Screen name="Videos"    component={Videos}    options={bare} />
-        <Stack.Screen name="Timetable" component={Timetable} options={bare} />
+        <Stack.Screen name="Qibla"     component={Qibla}     options={page} />
+        <Stack.Screen name="Live"      component={Live}      options={page} />
+        <Stack.Screen name="Videos"    component={Videos}    options={{ ...sheet, title: t("vids.videos_bayaans", "Videos & bayaans") }} />
+        <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
-        <Stack.Screen name="Holidays"  component={Holidays}  options={bare} />
-        <Stack.Screen name="NewBuild"  component={NewBuild}  options={bare} />
-        <Stack.Screen name="Giving"    component={Giving}    options={bare} />
+        <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
+        <Stack.Screen name="NewBuild"  component={NewBuild}  options={{ ...sheet, title: t("nb.new_build", "New Build") }} />
+        <Stack.Screen name="Giving"    component={Giving}    options={{ ...sheet, title: t("giving.sadaqah_lillah", "Sadaqah & Lillah") }} />
 
         {/* services with a form behind them */}
-        <Stack.Screen name="Marriage"  component={Marriage}  options={bare} />
-        <Stack.Screen name="HallHire"  component={HallHire}  options={bare} />
-        <Stack.Screen name="Advice"    component={Advice}    options={bare} />
-        <Stack.Screen name="Collect"   component={Collect}   options={bare} />
+        <Stack.Screen name="Marriage"  component={Marriage}  options={{ ...sheet, title: t("marriage.marriage", "Marriage") }} />
+        <Stack.Screen name="HallHire"  component={HallHire}  options={{ ...sheet, title: t("hallhire.hall_room_hire", "Hall / Room Hire") }} />
+        <Stack.Screen name="Advice"    component={Advice}    options={{ ...sheet, title: t("advice.imams_advice", "Imams’ Advice") }} />
+        <Stack.Screen name="Collect"   component={Collect}   options={{ ...sheet, title: t("collect.charity_collections", "Charity Collections") }} />
 
         {/* settings */}
-        <Stack.Screen name="Alerts"  component={Alerts}  options={bare} />
-        <Stack.Screen name="Prefs"   component={Prefs}   options={bare} />
-        <Stack.Screen name="Portal"  component={Portal}  options={bare} />
-        <Stack.Screen name="Privacy" component={Privacy} options={bare} />
-        <Stack.Screen name="Help"    component={Help}    options={bare} />
+        <Stack.Screen name="Alerts"  component={Alerts}  options={page} />
+        <Stack.Screen name="Prefs"   component={Prefs}   options={{ ...sheet, title: t("sysprefs.system_preferences", "System Preferences") }} />
+        <Stack.Screen name="Portal"  component={Portal}  options={{ ...sheet, title: t("portals.madrasah_portal", "Madrasah Portal") }} />
+        <Stack.Screen name="Privacy" component={Privacy} options={{ ...sheet, title: t("privacy.privacy_notice", "Privacy notice") }} />
+        <Stack.Screen name="Help"    component={Help}    options={{ ...sheet, title: t("help.title", "Help") }} />
 
         {/* the masjid's own prose, straight from the website */}
         {Object.entries(SHEET).map(([name, id]) => (
-          <Stack.Screen key={name} name={name} component={sheetScreen(id)} options={bare} />
+          <Stack.Screen key={name} name={name} component={sheetScreen(id)}
+            options={{ ...sheet, title: tx(SHEETS[id]?.title) }} />
         ))}
       </Stack.Navigator>
     </NavigationContainer>

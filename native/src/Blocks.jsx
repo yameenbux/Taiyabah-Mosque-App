@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -119,6 +119,9 @@ function Block({ b, nav, inCard }) {
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
+    case "call":
+      return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} />;
+
     case "row": {
       const route = b.id && ROUTE[b.id];
       const row = (
@@ -199,7 +202,7 @@ export function sheetScreen(id, { extra } = {}) {
     const body = sheet.blocks.filter(b => b.type !== "hero");
     return (
       <Screen pad={false}>
-        {!!hero && <Hero lines={hero.lines} />}
+        {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
         <View style={{ paddingHorizontal: 16 }}>
           {extra?.top ? extra.top({ navigation }) : null}
           <Blocks blocks={body} nav={navigation} />
