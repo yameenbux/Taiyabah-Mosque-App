@@ -15,7 +15,28 @@
  * used here rather than discovering that again.
  */
 import { Platform } from "react-native";
-import { OneSignal, LogLevel } from "react-native-onesignal";
+
+/* Loaded when it is first needed, not when this file is.
+ *
+ * react-native-onesignal reaches for TurboModuleRegistry.getEnforcing the
+ * moment it is imported, and react-native-web has no TurboModuleRegistry — so
+ * a plain top-level import takes the whole web bundle down before a single
+ * screen renders. Every function below already refuses to act on web; this
+ * makes the IMPORT refuse too.
+ *
+ * Not academic. The web export is what scripts/shots.mjs photographs, and that
+ * is how a layout gets looked at before an APK is built. It had rendered blank
+ * since the day push was wired in and nothing said so, which is why the Help
+ * screen's empty hero reached a phone instead of a screenshot. */
+let SDK = null;
+function sdk() {
+  if (Platform.OS === "web") return null;
+  if (!SDK) {
+    const m = require("react-native-onesignal");
+    SDK = { OneSignal: m.OneSignal, LogLevel: m.LogLevel };
+  }
+  return SDK;
+}
 
 const APP_ID = "2506fafe-179d-401c-b9e3-a0f320d68857";
 const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
@@ -26,6 +47,7 @@ export function startPush() {
   if (started || Platform.OS === "web") return;
   started = true;
   try {
+    const { OneSignal, LogLevel } = sdk();
     OneSignal.Debug.setLogLevel(LogLevel.None);
     OneSignal.initialize(APP_ID);
   } catch (e) {
@@ -39,12 +61,12 @@ export function startPush() {
 /* The system dialog, raised by OneSignal so it knows the answer. Returns what
  * the person actually chose rather than what we hoped for. */
 export async function askPush() {
-  try { return await OneSignal.Notifications.requestPermission(true); }
+  try { return await sdk().OneSignal.Notifications.requestPermission(true); }
   catch { return false; }
 }
 
 export async function hasPush() {
-  try { return await OneSignal.Notifications.getPermissionAsync(); }
+  try { return await sdk().OneSignal.Notifications.getPermissionAsync(); }
   catch { return false; }
 }
 
@@ -54,7 +76,7 @@ export async function hasPush() {
 async function waitForId(tries = 6) {
   for (let i = 0; i < tries; i++) {
     try {
-      const id = await OneSignal.User.getOnesignalId();
+      const id = await sdk().OneSignal.User.getOnesignalId();
       if (id) return id;
     } catch { /* not ready */ }
     await new Promise(r => setTimeout(r, 1200 * (i + 1)));
@@ -104,7 +126,9 @@ export async function syncTags(alerts) {
  * real person who signed up through the masjid's website, and "testing the
  * push" by sending to all of them is a mistake that cannot be taken back. */
 export async function whoAmI() {
+  if (Platform.OS === "web") return { user: null, sub: null, optedIn: false };
   try {
+    const { OneSignal } = sdk();
     const user = await OneSignal.User.getOnesignalId();
     const sub = await OneSignal.User.pushSubscription.getIdAsync();
     const optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
@@ -117,8 +141,8 @@ export async function whoAmI() {
 /* Nothing from the masjid wanted, so stop being a subscriber rather than stay
  * one who is sent nothing. */
 export async function optOut() {
-  try { OneSignal.User.pushSubscription.optOut(); } catch {}
+  try { sdk().OneSignal.User.pushSubscription.optOut(); } catch {}
 }
 export async function optIn() {
-  try { OneSignal.User.pushSubscription.optIn(); } catch {}
+  try { sdk().OneSignal.User.pushSubscription.optIn(); } catch {}
 }

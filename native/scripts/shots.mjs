@@ -33,6 +33,21 @@ page.on("console", m => { if (m.type() === "error") errors.push(m.text().slice(0
 await page.goto("http://localhost:4173/", { waitUntil: "networkidle" });
 await page.waitForTimeout(2500);
 
+/* The first-run offer appears 1.4s after launch and covers the bottom half of
+ * whatever is behind it. Every shot after it is a photograph of the same card,
+ * which is how a run can finish "successfully" and tell you nothing. The smoke
+ * runner clears it for the same reason. */
+for (let i = 0; i < 12; i++) {
+  const notNow = page.getByText(/^Not now$/).first();
+  if (await notNow.isVisible().catch(() => false)) {
+    await notNow.click({ timeout: 2000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    process.stdout.write("  cleared the first-run offer\n");
+    break;
+  }
+  await page.waitForTimeout(300);
+}
+
 const shot = async name => {
   await page.waitForTimeout(650);
   await page.screenshot({ path: path.join(OUT, name + ".png") });
@@ -49,6 +64,18 @@ const tapText = async (text, { exact = false } = {}) => {
     const el = all.nth(i);
     if (!(await el.isVisible())) continue;
     try { await el.click({ timeout: 2500 }); await page.waitForTimeout(500); return; } catch {}
+    /* The words are often a text node inside the thing that actually takes the
+     * tap — a tab, or a row with its own press handler — and clicking the text
+     * itself does nothing. The tab bar is exactly this: visible, matched, and
+     * inert. So try what encloses it before giving up. */
+    for (const role of ['[role="tab"]', '[role="button"]', "button", "a"]) {
+      try {
+        const owner = el.locator("xpath=ancestor-or-self::*").filter({ has: page.locator(role) });
+        const anc = el.locator(`xpath=ancestor-or-self::*[@role="${role.replace(/[^a-z]/g, "")}"]`).first();
+        await anc.click({ timeout: 1500 }); await page.waitForTimeout(500); return;
+      } catch {}
+    }
+    try { await el.click({ timeout: 1500, force: true }); await page.waitForTimeout(500); return; } catch {}
   }
   throw new Error(`nothing tappable for ${text}`);
 };
@@ -109,7 +136,7 @@ const MENU = [
   ["27-about", /^About us$/], ["28-membership", /^Membership$/], ["29-contact", /^Contact us$/],
   ["20-lifestages", /^Birth, Marriage & Death$/], ["25-advice", /^Imams. Advice$/],
   ["26-education", /^Education$/], ["33-alerts", /^Notifications$/],
-  ["32-prefs", /^System Preferences$/],
+  ["32-prefs", /^System Preferences$/], ["37-help", /^Help$/],
 ];
 for (const [name, label] of MENU) {
   try { await toMenu(); await tapText(label); await shot(name); }
