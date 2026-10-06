@@ -342,7 +342,11 @@ export function Heading({ children, tag }) {
 export function Pill({ children, tone = "muted" }) {
   const { fs } = useApp();
   const bg = tone === "gold" ? "rgba(198,162,76,.16)" : tone === "live" ? "rgba(63,190,115,.15)" : "rgba(124,110,119,.12)";
-  const fg = tone === "gold" ? C.goldInk : tone === "live" ? "#1F7A46" : C.muted;
+  /* The live green is the one ink here that is not already a token: dark
+     green on a green tint, and the tint is translucent, so on a dark card
+     both go dark together. C.onAir is the same green at the lit end. */
+  const fg = tone === "gold" ? C.goldInk
+           : tone === "live" ? dual("#1F7A46", C.onAir) : C.muted;
   return (
     <View style={{ flexShrink: 0, backgroundColor: bg, borderRadius: R.pill,
                    paddingHorizontal: 9, paddingVertical: 3.5 }}>

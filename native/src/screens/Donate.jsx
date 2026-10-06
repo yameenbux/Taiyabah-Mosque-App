@@ -130,7 +130,14 @@ export function NewBuild({ navigation }) {
               {/* .t-amt is the SANS at 20px weight 700, not the serif. */}
               <Text style={{ fontFamily: F.sansBold, fontSize: fs(20), color: C.ink }}>{x.amt}</Text>
               <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.7,
-                             textTransform: "uppercase", color: x.ink }}>{t(x.k, x.label)}</Text>
+                             /* The tier's own metal either way: `ink` is the dark end,
+                                which the website puts on cream, and `line` is the pale end
+                                it draws the border with. On the dark card the dark end
+                                reads about 3.1:1 — below what a label needs — and the pale
+                                end reads 8:1, so Bronze stays bronze and becomes legible
+                                rather than becoming grey. */
+                             textTransform: "uppercase",
+                             color: dual(x.ink, x.line) }}>{t(x.k, x.label)}</Text>
             </Pressable>))}
         </View>
 
@@ -274,7 +281,7 @@ export function Giving() {
                                            alignItems: "center", justifyContent: "center", gap: 2,
                                            paddingVertical: 11, paddingHorizontal: 7,
                                            borderRadius: 14, borderWidth: 1,
-                                           borderColor: on ? C.brand900 : C.line,
+                                           borderColor: on ? dual(C.brand900, C.pick) : C.line,   /* the ring is what reads as chosen at night */
                                            backgroundColor: on ? C.brand900 : C.card,
                                            opacity: off ? 0.38 : pressed ? 0.85 : 1 })}>
                 <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), lineHeight: fs(17.5),
@@ -332,7 +339,15 @@ function Options({ options, value, onChange }) {
             style={({ pressed }) => ({ flex: 1, minHeight: 62, alignItems: "center", justifyContent: "center",
                                        gap: 2, paddingVertical: 11, paddingHorizontal: 7,
                                        borderRadius: 14, borderWidth: 1,
-                                       borderColor: on ? C.brand900 : C.line,
+                                       /* The chosen one is a DARK WELL, which is what the
+                                          website does and what keeps cream at 17:1 on it.
+                                          On the dark page that well is 1.09:1 against the
+                                          card, so on its own it would not read as chosen at
+                                          all — the ring is what says so, and it is the same
+                                          plum as every other chosen control in the app.
+                                          Filling it with that plum instead would drop the
+                                          gold sub-label to 3.64:1, so the fill stays. */
+                                       borderColor: on ? dual(C.brand900, C.pick) : C.line,
                                        backgroundColor: on ? C.brand900 : C.card,
                                        opacity: pressed ? 0.85 : 1 })}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), lineHeight: fs(17.5),
