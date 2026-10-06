@@ -66,23 +66,28 @@ jobs:
       # No -allowProvisioningUpdates, no team, no certificate: a simulator build
       # is unsigned by design. CODE_SIGNING_ALLOWED=NO makes that explicit so
       # the failure, if there is one, is a real compile error and not signing.
-      # The workspace and scheme are DISCOVERED, not guessed. expo prebuild
-      # names them from expo.name, and hard-coding "TaiyabahMasjid" here would
-      # be a build that fails the day somebody renames the app — for a reason
-      # that has nothing to do with the code.
+      # The workspace holds EVERY CocoaPods scheme as well as the app's, and
+      # picking the first that is not literally called "Pods" picked `boost`
+      # — which built, and succeeded, and produced no .app at all. The app's
+      # scheme is the .xcodeproj's own basename, which is what expo prebuild
+      # derives from expo.name, so take it from there and assert it exists
+      # rather than discovering something plausible.
       - name: Find the workspace and scheme
         id: xc
         working-directory: native/ios
         run: |
+          set -euo pipefail
           WS=$(ls -d *.xcworkspace | head -1)
-          SCHEME=$(xcodebuild -workspace "$WS" -list -json \
-                   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
-                       const w=JSON.parse(s).workspace;
-                       const pick=w.schemes.find(x=>!/Pods|-tvOS|Tests$/.test(x))||w.schemes[0];
-                       process.stdout.write(pick);})')
-          echo "workspace=$WS"   >> "$GITHUB_OUTPUT"
-          echo "scheme=$SCHEME"  >> "$GITHUB_OUTPUT"
-          echo "Building $SCHEME from $WS"
+          SCHEME=$(basename "$(ls -d *.xcodeproj | head -1)" .xcodeproj)
+          echo "workspace=$WS"  >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          echo "Building scheme '$SCHEME' from '$WS'"
+          # If that scheme is not in the workspace, fail HERE with a list,
+          # rather than building something else and failing three steps later
+          # on a missing .app.
+          xcodebuild -workspace "$WS" -list | sed -n '/Schemes:/,$p' > /tmp/schemes.txt
+          grep -qx "        $SCHEME" /tmp/schemes.txt || {
+            echo "scheme '$SCHEME' is not in the workspace. It has:"; cat /tmp/schemes.txt; exit 1; }
 
       # No team, no certificate, no provisioning profile: a simulator build is
       # unsigned by design. CODE_SIGNING_ALLOWED=NO says so outright, so a
