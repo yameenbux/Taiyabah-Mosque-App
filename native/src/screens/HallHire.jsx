@@ -22,7 +22,13 @@ export default function HallHire({ navigation }) {
   const [hire, setHire] = useState(null);
   const [month, setMonth] = useState(null);
   const [date, setDate] = useState(null);
-  const [taken, setTaken] = useState([]);
+  /* null until the office's bookings have actually arrived — NOT an empty
+     list. The website's bkDayFree() returns null while BK.taken is null and
+     every day draws "unknown", grey and unringed; only once the rows land
+     does a day go green. Starting at [] here meant the whole month came up
+     green the moment the screen opened, and a date could be chosen on the
+     strength of it a second before the real answer arrived. */
+  const [taken, setTaken] = useState(null);
   const [who, setWho] = useState({ first: "", last: "", addr: "", phone: "" });
   const [state, setState] = useState({});
   const [touched, setTouched] = useState(false);
@@ -82,12 +88,28 @@ export default function HallHire({ navigation }) {
   }
 
   const sheet = SHEETS.hallhire;
-  const hero = sheet?.blocks.find(b => b.type === "hero");
-  /* The website's own "Book the hall" heading and its deposit notice are
-   * reproduced below, immediately above the form they introduce — so they are
-   * dropped here rather than appearing twice, once orphaned. */
-  const prose = (sheet?.blocks || []).filter(b =>
-    b.type !== "hero" && b.k !== "hallhire.book_the_hall" &&
+  const all = sheet?.blocks || [];
+  const hero = all.find(b => b.type === "hero");
+  /* THE FORM GOES WHERE THE WEBSITE PUTS IT.
+   *
+   * The website's order is: the stat strip, the address, what the Centre is,
+   * then "Book the hall" with the deposit notice and the form under it, and
+   * only THEN the charges, the terms of hire and the booking team's numbers.
+   *
+   * Everything that was not the hero used to be rendered in one run before
+   * the form, so the whole tariff — three tables of it — sat between the
+   * description and the thing you came to do, and a person scrolled past
+   * every price twice to reach the calendar.
+   *
+   * The split is the website's own "Book the hall" heading: above it is the
+   * introduction, below it is what follows the form. The heading and its
+   * deposit notice are drawn by hand just above the form, so they are left
+   * out of both runs rather than appearing twice. */
+  const cut = all.findIndex(b => b.k === "hallhire.book_the_hall");
+  if (cut < 0) throw new Error("hall hire: the 'Book the hall' heading has gone from the website");
+  const intro = all.slice(0, cut).filter(b => b.type !== "hero");
+  const after = all.slice(cut).filter(b =>
+    b.k !== "hallhire.book_the_hall" &&
     !(b.type === "notice" && b.k === "hallhire.deposit_books_the_date"));
 
   if (state.sent)
@@ -113,26 +135,24 @@ export default function HallHire({ navigation }) {
 
   return (
     <Screen pad={false}>
-      {!!hero && <Hero lines={hero.lines} />}
+      {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
-        <Blocks blocks={prose} nav={navigation} />
-
-        {/* Where the hall actually is, and how to get to it — the website puts
-            this above the form, and without it the booking form asks people to
-            commit to a venue the app never names. */}
-        <RowGroup>
-          <NavRow icon="location-outline"
-                  label={t("hallhire.taiyabah_centre_get_directions", "Taiyabah Centre · get directions")}
-                  sub={t("hallhire.astley_street_bolton_bl1_8eh", "Astley Street, Bolton BL1 8EH")}
-                  href="https://maps.google.com/?q=Astley+Street,+Bolton+BL1+8EH" />
-        </RowGroup>
-        <Note>{t("hallhire.hire_is_whole_day",
-          "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day.")}</Note>
+        {/* The address card is the website's own .hh-addr block, which the
+            extractor now lifts — it used to be typed out again here, as a
+            nav row, under a hand-written Google Maps link that pointed at a
+            different map from the one the website opens. */}
+        <Blocks blocks={intro} nav={navigation} />
 
         <Heading>{t("hallhire.book_the_hall", "Book the hall")}</Heading>
         <Notice>{t("hallhire.deposit_books_the_date",
           "*Paying the £100 deposit books the date.* Choose your day, fill in the short form and pay — the date is yours as soon as the deposit goes through, with nobody to wait for. It is held for you for thirty minutes while you pay.")}</Notice>
 
+        {/* The whole booking block — the label, the options, the legend, the
+            calendar and the two notes under it — is ONE .card.bk-card on the
+            website, padded 14. Here each piece sat loose on the paper with
+            the calendar in a card of its own, so the controls read as five
+            unrelated things rather than one form. */}
+        <Card pad={14}>
         <Choice label={t("hallhire.what_do_you_need", "What do you need?")} value={hire} onChange={setHire}
                 options={[
                   { v: "halls1", t: t("hallhire.one_hall", "1 hall"), s: t("hallhire.mon_thu_only", "Mon–Thu only") },
@@ -143,14 +163,24 @@ export default function HallHire({ navigation }) {
         {bad.hire && <ErrorBox>{t("hallhire.choose_what_you_need", "Please choose what you need.")}</ErrorBox>}
 
         {month && (
-          <View style={{ marginTop: 4 }}>
-            <Calendar month={month} onMonth={setMonth} first={first} last={last}
-                      selected={date ? [date] : []} taken={taken}
-                      onPick={key => setDate(key === date ? null : key)} />
-          </View>)}
+          <Calendar month={month} onMonth={setMonth} first={first} last={last}
+                    selected={date ? [date] : []} taken={taken}
+                    /* The website closes off the days it does not sell rather
+                       than taking the booking and refusing it afterwards: one
+                       hall is Monday to Thursday, so Friday to Sunday come up
+                       dashed and faded when one hall is chosen. */
+                    offered={d => hire !== "halls1" || [1, 2, 3, 4].includes(d.getDay())}
+                    onPick={key => setDate(key === date ? null : key)} />)}
+        {/* Two .bk-horizon lines under the calendar on the website, both
+            11.5px muted and centred. The second one — what the hire actually
+            includes — was only in the charges card further down, where
+            somebody choosing a date never reads it. */}
         <View style={{ marginTop: 9 }}>
           <Note>{t("hallhire.bookings_up_to_12_months", "Bookings can be made up to 12 months ahead.")}</Note>
+          <Note>{t("hallhire.hire_is_whole_day",
+            "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day.")}</Note>
         </View>
+        </Card>
         {!hireOk && <ErrorBox>{t("hallhire.one_hall_mon_thu",
           "One hall can only be hired Monday to Thursday. Pick another day, or take two halls.")}</ErrorBox>}
         {bad.date && hireOk && <ErrorBox>{t("hallhire.pick_a_date", "Please pick a date.")}</ErrorBox>}
@@ -170,7 +200,11 @@ export default function HallHire({ navigation }) {
         <ErrorBox>{state.error}</ErrorBox>
         <Submit label={t("hallhire.continue_to_deposit", "Continue to the deposit")}
                 sending={state.sending} onPress={send} />
-        <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
+
+        {/* Charges, terms of hire and the booking team's four numbers — which
+            on the website come AFTER the form, not between the description
+            and it. The sheet's own foot block ends the page. */}
+        <Blocks blocks={after} nav={navigation} />
       </View>
     </Screen>
   );

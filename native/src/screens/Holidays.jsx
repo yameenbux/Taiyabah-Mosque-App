@@ -10,6 +10,7 @@ import React, { useMemo, useRef, useEffect } from "react";
 import { View, Text, ScrollView, useWindowDimensions } from "react-native";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
+import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P } from "../ui";
 import { nowLondon } from "../prayer";
 import { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS } from "../madrasah-data";
@@ -158,7 +159,7 @@ export default function Holidays() {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[
+      <Hero ring={SHEETS.holidays?.ring} lines={[
         { k: "hol.holiday_planner", t: "Holiday Planner", w: "title" },
         { k: "hol.sub", t: "Term dates, closures and the Islamic dates for the year — so you can plan a trip without it costing your child their attendance.", w: "sub" },
       ]} />

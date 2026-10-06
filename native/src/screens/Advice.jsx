@@ -59,7 +59,7 @@ export default function Advice({ navigation }) {
 
   return (
     <Screen pad={false}>
-      {!!hero && <Hero lines={hero.lines} />}
+      {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
         <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
 

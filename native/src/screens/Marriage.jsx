@@ -167,7 +167,7 @@ export default function Marriage({ navigation }) {
 
   return (
     <Screen pad={false}>
-      {!!sheet && <Hero lines={sheet.blocks.find(b => b.type === "hero")?.lines || []} />}
+      {!!sheet && <Hero lines={sheet.blocks.find(b => b.type === "hero")?.lines || []} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
         {/* The masjid's own words about nikāḥ, lifted from the website. */}
         {!!sheet && <Blocks blocks={sheet.blocks.filter(b => b.type !== "hero")} nav={navigation} />}

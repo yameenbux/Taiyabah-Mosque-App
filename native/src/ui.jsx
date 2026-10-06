@@ -414,7 +414,7 @@ export function KV({ k, v, href, icon, onPress }) {
  * folded in with .md-row, whose shape is the other way round — a 14.5px title
  * over a 12px muted sub — so on fourteen screens the label was large and black
  * and the phone number was small and grey beneath it. */
-export function Call({ k, v, href, onPress }) {
+export function Call({ k, v, href, onPress, icon }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
   return (
@@ -422,7 +422,7 @@ export function Call({ k, v, href, onPress }) {
       style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                 marginTop: 14, paddingVertical: 15, paddingHorizontal: 14, borderRadius: 15,
                 backgroundColor: C.card, borderWidth: 1, borderColor: C.line }, SHADOW]}>
-      <IconChip icon={href?.startsWith("tel:") ? "call-outline" : "open-outline"} />
+      <IconChip icon={`${icon || (href?.startsWith("tel:") ? "call" : "open")}-outline`} />
       <View style={{ flex: 1, gap: 2 }}>
         <Rich style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.05,
                        textTransform: "uppercase", color: C.muted,
@@ -432,6 +432,27 @@ export function Call({ k, v, href, onPress }) {
       </View>
       {!!act && <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />}
     </Press>
+  );
+}
+
+/* .hh-facts — the stat strip at the top of hall hire, Arabic classes and the
+ * ghusl workshop: equal columns divided by a hairline, each a 10.5px uppercase
+ * label over a 28px figure in brand-600. Rendered as a plain card it came out
+ * as two ordinary table rows, with the number — the only thing anybody opens
+ * that panel to read — at 13.5px in grey. */
+export function Facts({ items }) {
+  const { fs, tx } = useApp();
+  return (
+    <Card gap={0} pad={0} style={{ flexDirection: "row" }}>
+      {items.map((it, i) => (
+        <View key={i} style={{ flex: 1, alignItems: "center", gap: 4, paddingVertical: 16, paddingHorizontal: 8,
+                               borderRightWidth: i < items.length - 1 ? 1 : 0, borderRightColor: C.line }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 0.84,
+                         textTransform: "uppercase", color: C.muted, textAlign: "center" }}>{tx(it.k)}</Text>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(it.small ? 20 : 28), color: C.brand600,
+                         textAlign: "center" }}>{tx(it.v)}</Text>
+        </View>))}
+    </Card>
   );
 }
 

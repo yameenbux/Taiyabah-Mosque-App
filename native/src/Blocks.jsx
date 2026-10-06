@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -119,8 +119,11 @@ function Block({ b, nav, inCard }) {
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
+    case "facts":
+      return <Facts items={b.items} />;
+
     case "call":
-      return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} />;
+      return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
 
     case "row": {
       const route = b.id && ROUTE[b.id];

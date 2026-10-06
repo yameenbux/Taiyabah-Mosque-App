@@ -10,6 +10,7 @@ import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp, LANGS } from "../store";
+import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P, Note, RowGroup, NavRow, Pill, Press, tap, open } from "../ui";
 
 const SIZES = [
@@ -23,7 +24,8 @@ export default function Prefs({ navigation }) {
   const { t, fs, lang, setLang, scale, setScale } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
+      <Hero ring={SHEETS.sysprefs?.ring}
+            lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
         <Heading>{t("sysprefs.text_size", "Text size")}</Heading>

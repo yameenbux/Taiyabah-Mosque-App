@@ -28,6 +28,10 @@ const SHEETS = [
   /* The nikāḥ and hall-hire screens are hand-written native forms, so only the
    * prose above the form comes across — stop at the heading where it starts. */
   { id: "marriage", stopKey: "nikah.request_a_date" },
+  /* System Preferences is a hand-written screen — the settings are the app's
+     own, not the website's prose — but its hero carries the globe medallion,
+     and the only honest place to get that drawing is the website itself. */
+  { id: "sysprefs", stopKey: "sysprefs.language" },
 ];
 
 const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
@@ -160,6 +164,22 @@ const out = await page.evaluate(ids => {
       }
 
       /* a card is a container: recurse ------------------------------------ */
+      /* the stat strip -----------------------------------------------------
+       *
+       * .hh-facts: equal columns divided by a hairline, each a 10.5px
+       * uppercase label over a 28px brand-600 figure. On hall hire, Arabic
+       * classes and the ghusl workshop. As a plain card it came out as two
+       * ordinary table rows — "Halls available 3" — and the number, which is
+       * the only thing anybody opens that panel to read, was 13.5px grey. */
+      if (has(c, "hh-facts")) {
+        const items = [...c.querySelectorAll(".hh-row")].map(r => {
+          const k = r.querySelector(".hh-k"), v = r.querySelector(".hh-v");
+          return { k: k ? str(k) : null, v: v ? str(v) : null,
+                   small: !!(v && /font-size:\s*20px/.test(v.getAttribute("style") || "")) };
+        }).filter(x => x.k && x.v);
+        if (items.length) { blocks.push(node("facts", { items })); continue; }
+      }
+
       if (has(c, "card")) {
         const inner = [];
         /* a plain list-of-divs card, e.g. the founders */
@@ -323,7 +343,7 @@ const out = await page.evaluate(ids => {
        * Only the hh- flavour was matched, and it was folded in with .md-row,
        * which is the OPPOSITE shape: a 14.5px title over a muted sub. So the
        * number came out small and grey underneath a large black label. */
-      if (/\b(wl|ia|hh|bt|mg)-call\b/.test(c.className || "")) {
+      if (/\b(wl|ia|hh|bt|mg)-call\b/.test(c.className || "") || has(c, "hh-addr")) {
         /* $= missed every phone number on the site: .hh-call-v also carries
            .tnum for the lining figures, so the class attribute ends "tnum". */
         const k = c.querySelector('[class*="-call-k"]');
@@ -331,6 +351,10 @@ const out = await page.evaluate(ids => {
         blocks.push(node("call", {
           k: k ? str(k) : str(c), v: v ? str(v) : null,
           href: c.getAttribute("href") || null,
+          /* .hh-addr carries a map pin, not the phone handset every other
+             one of these has. Guessing from the href gave it the generic
+             "opens elsewhere" box instead. */
+          icon: has(c, "hh-addr") ? "location" : "call",
         }));
         continue;
       }
