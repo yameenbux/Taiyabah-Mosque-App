@@ -140,9 +140,17 @@ jobs:
         working-directory: native
         run: node scripts/ios-shots.mjs
 
+      # The directory used to be .ios-shots, with a dot, and upload-artifact
+      # skips hidden files unless told otherwise — so the build passed, both
+      # simulators were photographed, and the artifact came out empty with
+      # nothing but a warning to say why. Renamed rather than papered over
+      # with include-hidden-files, because a screenshots folder has no reason
+      # to be hidden in the first place.
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ios-screenshots
-          path: native/.ios-shots/
-          if-no-files-found: warn
+          path: native/ios-shots/
+          # An empty artifact here means the photographs did not happen, and
+          # that should be loud rather than a warning nobody reads.
+          if-no-files-found: error

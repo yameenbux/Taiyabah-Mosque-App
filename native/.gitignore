@@ -16,3 +16,4 @@ ios/
 !package.json
 !package-lock.json
 .darkshots/
+ios-shots/
