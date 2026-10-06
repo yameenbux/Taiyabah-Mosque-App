@@ -494,7 +494,7 @@ export function KV({ k, v, href, icon, onPress, kind }) {
  *
  * A row with nothing behind it yet takes the paper chip and muted type the
  * website gives .md-row.soon. */
-export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
+export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext, play }) {
   const { fs, rtl } = useApp();
   const act = soon ? null : (onPress || (href ? () => open(href) : null));
   return (
@@ -506,10 +506,18 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext }) {
       style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                 padding: 14, borderRadius: 15, marginTop: 12, backgroundColor: C.card,
                 borderWidth: 1, borderColor: C.line }, SHADOW]}>
-      <View style={{ width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center",
-                     backgroundColor: soon ? C.paper : "#F0E9ED" }}>
-        {svg ? <SvgXml xml={svg} width={20} height={20} color={soon ? C.muted : C.brand600} />
-             : <Ionicons name={icon || "chevron-forward-outline"} size={19} color={soon ? C.muted : C.brand600} />}
+      {/* .ab-play is the one tile on the site that is not the shared chip:
+          36px at 10px of radius, FILLED brand-800 with the mark in
+          gold-bright, because it is the only row that starts a video. Drawn
+          as the ordinary chip it came out pale pink, which is the one thing
+          a play button must not be. */}
+      <View style={{ width: play ? 36 : 40, height: play ? 36 : 40, borderRadius: play ? 10 : 12,
+                     alignItems: "center", justifyContent: "center",
+                     backgroundColor: play ? C.brand800 : soon ? C.paper : "#F0E9ED" }}>
+        {svg ? <SvgXml xml={svg} width={play ? 18 : 20} height={play ? 18 : 20}
+                       color={play ? C.goldBright : soon ? C.muted : C.brand600} />
+             : <Ionicons name={icon || "chevron-forward-outline"} size={play ? 18 : 19}
+                         color={play ? C.goldBright : soon ? C.muted : C.brand600} />}
       </View>
       <View style={{ flex: 1 }}>
         <Rich style={{ fontFamily: F.sansBold, fontSize: fs(15), color: soon ? C.muted : C.ink,

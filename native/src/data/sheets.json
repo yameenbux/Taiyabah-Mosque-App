@@ -63,9 +63,10 @@
      "k": "about.history_new_build_journey",
      "t": "History & new build journey"
     },
-    "card": false,
+    "card": true,
     "ext": false,
-    "svg": null,
+    "play": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M8 5v14l11-7z\"></path></svg>",
     "href": "https://www.youtube.com/watch?v=N7wFXynmLHM",
     "id": null,
     "soon": null

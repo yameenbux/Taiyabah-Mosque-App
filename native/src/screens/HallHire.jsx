@@ -14,6 +14,8 @@ import { Screen, Hero, Heading, Card, P, Note, Notice, CTA, Foot, Pill, RowGroup
 import { Field, Choice, Calendar, Check, ErrorBox, Submit, Sent, isPhone } from "../form";
 import { rpc, readView } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
+import { nowLondon } from "../prayer";
+import { longDate } from "../dates";
 
 const DEPOSIT_LINK = "https://book.stripe.com/3cIdR9cHOfyo5Jk7xcf3a06";
 const HORIZON_DAYS = 365;      // bookings up to 12 months ahead
@@ -34,9 +36,23 @@ export default function HallHire({ navigation }) {
   const [state, setState] = useState({});
   const [touched, setTouched] = useState(false);
   const [agree, setAgree] = useState(false);
+  /* The website is a THREE-VIEW flow, not one long scroll: choose what and
+     when, then a card confirming the day with its availability and a Book
+     button, then the form — headed by what you chose, with a Change button
+     back. bkShowView() switches between them. The app put the whole form
+     under the calendar, so somebody was asked for their address before the
+     app had told them whether the date was even free. */
+  const [step, setStep] = useState("pick");      // "pick" | "form"
+  const [why, setWhy] = useState(null);          // .bk-msg — why a date cannot be booked
 
-  const first = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + 1); return d; }, []);
-  const last  = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + HORIZON_DAYS); return d; }, []);
+  /* The website's hall calendar opens at today0() — the deposit books the date
+     outright, so a same-day booking is a real thing it sells. The app started
+     at today + 1 and greyed today out, which quietly refused a booking the
+     masjid would have taken. And a plain new Date() reads the phone's
+     timezone; every other calendar in the app uses London, as the masjid
+     does. */
+  const first = useMemo(() => { const d = nowLondon(); d.setHours(0,0,0,0); return d; }, []);
+  const last  = useMemo(() => { const d = nowLondon(); d.setHours(0,0,0,0); d.setDate(d.getDate() + HORIZON_DAYS); return d; }, []);
   useEffect(() => { setMonth(new Date(first.getFullYear(), first.getMonth(), 1)); }, [first]);
 
   const loadTaken = () => readView("hall_availability", { select: "booking_date" })
@@ -48,6 +64,43 @@ export default function HallHire({ navigation }) {
    * rather than left for the office to catch. */
   const monThu = date ? [1, 2, 3, 4].includes(new Date(date + "T12:00:00").getDay()) : true;
   const hireOk = hire !== "halls1" || monThu;
+
+  /* bkDayFree(): true free, false taken, NULL not known yet — three answers,
+     not two. "We could not check" and "it is taken" are very different things
+     to be told, and the website tells them apart. */
+  const free = taken === null ? null : date ? !taken.includes(date) : null;
+
+  /* bkHireLong() — what you chose, in words, for the card and the form head. */
+  const HIRE_LABEL = {
+    halls1: () => t("hallhire.one_hall", "1 hall"),
+    halls2: () => t("hallhire.two_halls", "2 halls"),
+    halls3: () => t("hallhire.three_halls", "3 halls"),
+    kitchen: () => t("hallhire.kitchen_only", "Kitchen only"),
+  };
+  const hireLong = !hire ? ""
+    : hire === "kitchen" ? t("hallhire.kitchen_only", "Kitchen only")
+    : HIRE_LABEL[hire]() + t("hallhire.kitchen_and_cleaning_included", ", kitchen and cleaning included");
+
+  /* .bk-sub — the sentence above the day card. It says what you have chosen,
+     or why this date cannot be taken. The app had the Monday-to-Thursday rule
+     only as an error box after you had tried to send. */
+  const sub = !hire ? t("hallhire.choose_what_you_need_first",
+                        "Choose what you need — halls, or the kitchen on its own — to book this date.")
+    : !hireOk ? t("hallhire.one_hall_mon_thu_explain",
+                  "One hall is only available Monday to Thursday. On Friday, Saturday and Sunday the smallest booking is two halls.")
+    : free === null ? t("hallhire.could_not_check",
+                        "We could not check availability just now. The office can confirm on the phone.")
+    : hireLong + t("hallhire.hire_is_for_the_whole_day", ". Hire is for the whole day.");
+
+  const stateWord = free === true ? t("hallhire.available", "Available")
+                  : free === false ? t("hallhire.booked", "Booked")
+                                   : t("hallhire.not_published", "Not published");
+  /* "Book" rather than "Request": the deposit confirms the date outright and
+     nobody agrees it afterwards. "Ask" stays for a date we cannot see. */
+  const actWord = free === true ? t("hallhire.book", "Book")
+                : free === false ? t("hallhire.booked", "Booked")
+                                 : t("hallhire.ask", "Ask");
+  const blocked = free === false || (free === true && (!agree || !hire || !hireOk));
 
   const bad = {
     hire: touched && !hire, date: touched && !date, agree: touched && !agree,
@@ -69,7 +122,7 @@ export default function HallHire({ navigation }) {
         ? t("hallhire.one_hall_mon_thu", "One hall can only be hired Monday to Thursday. Pick another day, or take two halls.")
         : !agree
         ? t("hallhire.agree_first", "Please agree to the terms of hire before sending.")
-        : t("hallhire.check_the_form", "Please choose what you need, a date, and fill in every box.") });
+        : t("hallhire.check_the_form", "Please check the highlighted boxes and try again.") });
       return;
     }
     setState({ sending: true });
@@ -184,15 +237,91 @@ export default function HallHire({ navigation }) {
             11.5px muted and centred. The second one — what the hire actually
             includes — was only in the charges card further down, where
             somebody choosing a date never reads it. */}
+        {/* .bk-horizon is centred on the website — both lines. */}
         <View style={{ marginTop: 9 }}>
-          <Note>{t("hallhire.bookings_up_to_12_months", "Bookings can be made up to 12 months ahead.")}</Note>
-          <Note>{t("hallhire.hire_is_whole_day",
+          <Note center>{t("hallhire.bookings_up_to_12_months", "Bookings can be made up to 12 months ahead.")}</Note>
+          <Note center>{t("hallhire.hire_is_whole_day",
             "Every hall booking includes the kitchen and the cleaning. Hire is for the whole day.")}</Note>
         </View>
         </Card>
-        {!hireOk && <ErrorBox>{t("hallhire.one_hall_mon_thu",
-          "One hall can only be hired Monday to Thursday. Pick another day, or take two halls.")}</ErrorBox>}
-        {bad.date && hireOk && <ErrorBox>{t("hallhire.pick_a_date", "Please pick a date.")}</ErrorBox>}
+        {bad.hire && !hire && <ErrorBox>{t("hallhire.choose_what_you_need", "Please choose what you need.")}</ErrorBox>}
+
+        {/* ---- the chosen day -------------------------------------------- *
+            .bk-when, .bk-sub, .bk-session and .bk-agree-wrap: the website
+            shows none of this until a date is picked, and then shows the day
+            with its availability and a Book button BEFORE it asks for a name.
+            The app went from the calendar straight into the form, so somebody
+            typed their address without ever being told whether the date was
+            free. */}
+        {!!date && step === "pick" && (
+          <View style={{ marginTop: 16 }}>
+            <Text style={{ fontFamily: F.display, fontSize: fs(16), color: C.ink, marginBottom: 10 }}>
+              {longDate(t, new Date(date + "T12:00:00"))}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20),
+                           color: C.muted, marginBottom: 10 }}>{sub}</Text>
+
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10,
+                           paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12,
+                           borderWidth: 1, borderColor: C.line, backgroundColor: C.paper }}>
+              <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.ink }}>
+                  {t("hallhire.whole_day", "Whole day")}</Text>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 2 }}>
+                  {stateWord}</Text>
+              </View>
+              {/* .bk-act — a filled brand-600 pill, 13px bold, faded to 40%
+                  when the date cannot be taken from here. */}
+              <Press dim={false} disabled={blocked}
+                onPress={() => {
+                  tap();
+                  if (free === true) { setWhy(null); setStep("form"); }
+                  else setWhy(free === false
+                    ? t("hallhire.already_booked_on",
+                        "The venue is already booked on {when}. The office may be able to suggest another date.")
+                    : t("hallhire.could_not_check_date",
+                        "We could not check whether {when} is free, so nothing has been booked. Please call the office and they will check for you."));
+                }}
+                style={{ paddingVertical: 9, paddingHorizontal: 16, borderRadius: 10,
+                         borderWidth: 1, borderColor: C.brand600, backgroundColor: C.brand600,
+                         opacity: blocked ? 0.4 : 1 }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: "#fff" }}>{actWord}</Text>
+              </Press>
+            </View>
+
+            {/* .bk-msg — reached when a date cannot be booked from here.
+                Already taken and "we could not check" are very different
+                situations for the person reading it. */}
+            {!!why && (
+              <View style={{ marginTop: 10, paddingVertical: 11, paddingHorizontal: 13, borderRadius: 11,
+                             backgroundColor: C.paper, borderWidth: 1, borderColor: C.line }}>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: C.ink }}>
+                  {why.replace("{when}", longDate(t, new Date(date + "T12:00:00")))}{" "}
+                  <Text style={{ color: C.brand600 }} onPress={() => open("tel:01204535997")}>01204 535 997</Text>
+                </Text>
+              </View>)}
+
+            {/* .bk-agree-wrap is hidden with everything else until a date is
+                picked — the terms belong beside the Book button, not four
+                screens down past the form. */}
+            <View style={{ marginTop: 12 }}>
+              <Check value={agree} onChange={setAgree} bad={bad.agree}
+                     label={t("hallhire.i_agree_to_the_terms_2",
+                       "I have read and agree to the terms of hire, including use of the venue in accordance with Islamic rulings.")} />
+            </View>
+          </View>)}
+
+        {/* ---- the form ---------------------------------------------------- *
+            .bk-form is hidden until Book is pressed, and opens under
+            .bk-form-head: what you chose at 13.5px bold over the day in the
+            muted grey, a hairline under both, and a Change button back to the
+            calendar. */}
+        {step === "form" && (<>
+        <View style={{ marginTop: 16, paddingBottom: 10, marginBottom: 4,
+                       borderBottomWidth: 1, borderBottomColor: C.line, gap: 2 }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), color: C.ink }}>{hireLong}</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted }}>
+            {longDate(t, new Date(date + "T12:00:00"))} {t("hallhire.dot_whole_day", "· whole day")}</Text>
+        </View>
 
         <Field label={t("hallhire.first_name", "First name")} type="name" value={who.first} bad={bad.first}
                onChange={v => setWho(s => ({ ...s, first: v }))} />
@@ -206,10 +335,6 @@ export default function HallHire({ navigation }) {
                hint={t("hallhire.phone_hint",
                  "The caretaker will call you before the day to arrange access, so this must be a number that reaches you.")}
                onChange={v => setWho(s => ({ ...s, phone: v }))} />
-
-        <Check value={agree} onChange={setAgree} bad={bad.agree}
-               label={t("hallhire.i_agree_to_the_terms_2",
-                 "I have read and agree to the terms of hire, including use of the venue in accordance with Islamic rulings.")} />
 
         {/* .bk-hint — the website says what it keeps these details for, and
             links the privacy notice, directly under the form. */}
@@ -228,6 +353,15 @@ export default function HallHire({ navigation }) {
         <ErrorBox>{state.error}</ErrorBox>
         <Submit label={t("hallhire.continue_to_deposit", "Continue to the deposit")}
                 sending={state.sending} onPress={send} />
+        {/* .bk-back — a full-width outlined button on the paper, muted, that
+            returns to the calendar without losing what was typed. */}
+        <Press dim={false} onPress={() => { tap(); setStep("pick"); }}
+          style={{ marginTop: 8, paddingVertical: 10, borderRadius: 11, borderWidth: 1,
+                   borderColor: C.line, backgroundColor: C.paper, alignItems: "center" }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
+            {t("hallhire.change", "Change")}</Text>
+        </Press>
+        </>)}
 
         {/* Charges, terms of hire and the booking team's four numbers — which
             on the website come AFTER the form, not between the description

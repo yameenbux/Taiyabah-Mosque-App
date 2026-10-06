@@ -164,14 +164,13 @@ export default function Marriage({ navigation }) {
       })),
     });
     if (r.ok) { setState({ sent: true, reference: r.data.reference }); return; }
-    setState({ error: r.message || t("nikah.couldnt_send",
-      "That didn't send. Please try again, or ring the office on 01204 535 997 between 5pm and 7pm.") });
+    setState({ error: r.message || t("nikah.couldnt_send", "That didn't send. Please try again, or ring the office on 01204 535 997.") });
   }
 
   if (state.sent)
     return (
       <Screen>
-        <Sent title={t("nikah.request_sent", "Your request is with the office")}
+        <Sent title={t("nikah.request_sent", "Request sent")}
               body={t("nikah.theyll_ring_you",
                 "Somebody will ring the number you gave to confirm the date and the time. Nothing is booked until they do.")}
               reference={state.reference} />

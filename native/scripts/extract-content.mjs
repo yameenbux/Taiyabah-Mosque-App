@@ -485,7 +485,13 @@ const out = await page.evaluate(ids => {
            row in a grouped list. And its 40px chip holds a hand-drawn SVG:
            a crib, two wedding bands, a shield with a tick. Twenty of these
            across five screens. */
-        const ico = c.querySelector(".md-ico svg");
+        const ico = c.querySelector(".md-ico svg, .ab-play svg");
+        /* .ab-play is NOT the shared chip. Every other row on the site puts
+           its glyph in a 40px #F0E9ED square in plum; this one is a 36px tile
+           FILLED brand-800 with the play mark in gold-bright, because it is
+           the only row that starts a video. Folded in with the rest it came
+           out pale pink, which is the one thing a play button must not be. */
+        const play = has(c, "ab-video");
         /* A row that leaves the app ends in .dr-ext — a gold ↗ — and one that
            goes deeper ends in .dr-ch, a muted chevron. The app drew a chevron
            on both, so "Apply for a place" and "Madrasah Portal" gave no sign
@@ -493,7 +499,7 @@ const out = await page.evaluate(ids => {
         const ext = !!c.querySelector(".dr-ext");
         blocks.push(node("row", {
           label: t1 ? str(t1) : str(c), sub: t2 ? str(t2) : null,
-          card: has(c, "md-row"), ext,
+          card: has(c, "md-row") || play, ext, ...(play ? { play: true } : {}),
           svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null,
           href: c.getAttribute("href") || null, id: c.id || null,
           soon: (() => { const t = c.querySelector(".soon-tag"); return t ? str(t) : (has(c, "soon") ? { t: "Coming soon" } : null); })(),

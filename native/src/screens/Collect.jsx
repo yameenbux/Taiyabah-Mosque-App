@@ -72,7 +72,7 @@ export default function Collect({ navigation }) {
     if (r.canceled || !r.assets?.length) return;
     const f = r.assets[0];
     if (!TYPES[f.mimeType]) return setState({ error: t("collect.that_file_type", "That file type is not accepted. JPG, PNG, WEBP or PDF.") });
-    if (f.size > MAX) return setState({ error: t("collect.that_file_is_too_big", "That file is larger than 5 MB. A photo taken at a smaller size will do.") });
+    if (f.size > MAX) return setState({ error: t("collect.that_file_is_too_big", "That file is too big. The largest the masjid can take is 5 MB — a photo taken on a phone usually is.") });
     setState({}); setBad(b => ({ ...b, file: false })); setFile(f);
   };
 
@@ -90,7 +90,7 @@ export default function Collect({ navigation }) {
       need.certDate = true;
     setBad(need);
     if (Object.values(need).some(Boolean))
-      return setState({ error: t("collect.check_the_form", "Please fill in every box and attach the certificate.") });
+      return setState({ error: t("collect.check_the_form", "Please fill in every question, choose a date at least two weeks away, and tick both boxes.") });
 
     setState({ sending: true });
     try {
@@ -116,14 +116,14 @@ export default function Collect({ navigation }) {
       });
       setState({ done: r });
     } catch (e) {
-      setState({ error: e.message || t("collect.couldnt_send", "That did not send. Please check your connection and try again.") });
+      setState({ error: e.message || t("collect.couldnt_send", "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.") });
     }
   };
 
   if (state.done)
     return (
       <Screen>
-        <Sent title={t("collect.request_sent", "Your request is with the office")}
+        <Sent title={t("collect.request_sent", "Your request has been sent")}
               body={t("collect.the_office_will_ring_the_trustee",
                 "The office rings the trustee to confirm before anything is agreed. Keep your reference.")}>
           {!!state.done?.reference && (

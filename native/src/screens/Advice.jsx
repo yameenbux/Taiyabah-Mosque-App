@@ -41,8 +41,7 @@ export default function Advice({ navigation }) {
       subject: v.subject.trim(), question: v.question.trim(),
     });
     if (r.ok) { setState({ sent: true, reference: r.data.reference }); return; }
-    setState({ error: r.message || t("advice.couldnt_send",
-      "That didn't send. Please try again, or ask at the masjid office.") });
+    setState({ error: r.message || t("advice.couldnt_send", "That didn't send. Please try again, or ring the office on 01204 535 997.") });
   }
 
   const sheet = SHEETS.advice;

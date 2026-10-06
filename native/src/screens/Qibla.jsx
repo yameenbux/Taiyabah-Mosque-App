@@ -200,8 +200,13 @@ export default function Qibla({ navigation }) {
               {qibla.toFixed(0)}°</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, marginTop: 4,
                            textAlign: "center" }}>
+              {/* The website's own string is the WHOLE line with the distance
+                  dropped into it — "from true north · {km} km to Makkah" —
+                  so a language can put the number where it belongs. Gluing
+                  three fragments together here made the order English's. */}
               {from.mine
-                ? `${t("qibla.from_true_north", "from true north")} · ${Math.round(km).toLocaleString("en-GB")} km ${t("qibla.to_makkah", "to Makkah")}`
+                ? t("qibla.from_true_north", "from true north · {km} km to Makkah")
+                    .replace("{km}", Math.round(km).toLocaleString("en-GB"))
                 : t("sheet.from_true_north_5_042", "from true north · 5,042 km to Makkah")}</Text>
           </View>
 
@@ -230,7 +235,12 @@ export default function Qibla({ navigation }) {
           <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(18), color: C.muted,
                          marginTop: 11, textAlign: "center" }}>
             {live && heading === null
-              ? t("qibla.no_compass", "No compass on this phone — dial is north-up")
+              /* The website says what to DO about it, with the bearing in the
+                  sentence. "dial is north-up" describes the screen; it does
+                  not help somebody standing in a room trying to face Makkah. */
+              ? t("qibla.no_compass",
+                  "This device has no compass. Face {d}° using a compass app, or follow the mihrab in the masjid.")
+                  .replace("{d}", qibla.toFixed(0))
               : t("sheet.hold_the_phone_flat_compasses",
                   "Hold the phone flat. Compasses drift near metal, cars and speakers — turn in a figure-of-eight to calibrate.")}
           </Text>
