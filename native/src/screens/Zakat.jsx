@@ -65,7 +65,13 @@ export default function Zakat() {
           "Nisab is the minimum you must own before zakat is due. It is fixed in gold and silver, so it moves with the price.")}</P>
 
         <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
-          {[["silver", `${t("sheet.silver", "Silver")} · 612.36g`], ["gold", `${t("sheet.gold", "Gold")} · 87.48g`]].map(([k, lab]) => {
+          {/* The website's own labels, on the buttons themselves. They used to
+              be composed from sheet.silver + " · 612.36g" here, and the
+              website's zakat.silver_612_36g was given a home in a pair of
+              inert pills underneath — so the screen said Silver · 612.36g and
+              Gold · 87.48g twice, once tappable and once not. */}
+          {[["silver", t("zakat.silver_612_36g", "Silver · 612.36g")],
+            ["gold", t("zakat.gold_87_48g", "Gold · 87.48g")]].map(([k, lab]) => {
             const on = standard === k;
             return (
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
@@ -77,10 +83,6 @@ export default function Zakat() {
           })}
         </View>
         <View style={{ marginTop: 10 }}>
-        <View style={{ flexDirection: "row", gap: 8, marginBottom: 9 }}>
-          <Pill>{t("zakat.silver_612_36g", "Silver · 612.36g")}</Pill>
-          <Pill>{t("zakat.gold_87_48g", "Gold · 87.48g")}</Pill>
-        </View>
         <Note>{t("zakat.most_scholars_silver",
           "Most scholars prefer the silver standard, because it is lower and so more people qualify to give.")}</Note>
         </View>

@@ -83,7 +83,16 @@ export function AppProvider({ children, fallback = null }) {
     const t = (key, english) => (key && pack && pack[key]) || english || (key && EN[key]) || "";
     /* Blocks carry {k, t}: the key to translate by and the English to fall back
      * on. This is the form almost every call in the app actually uses. */
-    const tx = o => (o ? t(o.k, o.t) : "");
+    /* A block from the website is {k, t} and goes through the lookup. A plain
+     * string has already been through it — t("zakat.you_are_muslim_and_have",
+     * "…") — and is simply the answer.
+     *
+     * This used to take only the first shape, and returned NOTHING for the
+     * second: t(undefined, undefined). Three ticks on the zakat screen drew as
+     * three ticks with no words beside them, and the Help hero drew as an
+     * empty plum band, and neither failed any check because nothing threw.
+     * A component should not care which of the two it was handed. */
+    const tx = o => (typeof o === "string" ? o : o ? t(o.k, o.t) : "");
 
     return {
       ...prefs,
