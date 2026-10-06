@@ -53,7 +53,7 @@ export function Field({ label, opt, hint, value, onChange, type = "text", bad, r
       </View>
       <TextInput
         value={value} onChangeText={onChange}
-        placeholder={placeholder} placeholderTextColor={C.line}
+        placeholder={placeholder} placeholderTextColor={C.hint}
         onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
         {...(KB[type] || KB.text)}
         /* The website's input sits on the PAPER inside a plain hairline at

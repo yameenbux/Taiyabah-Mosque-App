@@ -143,17 +143,26 @@ export default function Zakat() {
           {t("zakat.the_hanafi_school_uses_the",
             "The Hanafi school uses the *silver* nisab, which is lower — so more people qualify to give.")}</Rich>
 
-        <Field label={t("zakat.price_per_gram_today", `Price per gram of ${standard} today (£)`)}
-               value={price} onChange={x => setPrice(x.replace(/[^0-9.]/g, ""))} />
-        <Press onPress={() => open(standard === "gold"
-                 ? "https://www.bullionbypost.co.uk/gold-price/gold-price-per-gram/"
-                 : "https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/")}
-          style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start",
-                   paddingVertical: 8 }}>
-          <Ionicons name="open-outline" size={14} color={C.brand600} />
-          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
-            {t("zakat.check_price", "check price")}</Text>
-        </Press>
+        {/* .zk-l is a flex ROW: the label on the left and "check price" on the
+            right of the same line, plum and bold, with no icon. The app made
+            it a row of its own underneath with an open-in-browser glyph, so a
+            quiet aside beside the label became a second control. And the
+            website's placeholder is "e.g. 0.85" — a worked example of the
+            shape, which matters on a field where somebody could reasonably
+            type the price per ounce. */}
+        <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline",
+                       justifyContent: "space-between", gap: 8, marginTop: 14, marginBottom: 6 }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, flexShrink: 1 }}>
+            {t("zakat.price_per_gram_today", "Price per gram today (£)")}</Text>
+          <Press dim={false} onPress={() => { tap(); open(standard === "gold"
+                   ? "https://www.bullionbypost.co.uk/gold-price/gold-price-per-gram/"
+                   : "https://www.bullionbypost.co.uk/silver-price/silver-price-per-gram/"); }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600 }}>
+              {t("zakat.check_price", "check price")}</Text>
+          </Press>
+        </View>
+        <Money value={price} placeholder="e.g. 0.85"
+               onChange={x => setPrice(x.replace(/[^0-9.]/g, ""))} />
         {/* .zk-result — a pale plum panel inside the nisab card, not a card
             of its own sitting under it. */}
         <View style={{ marginTop: 12, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 14,
@@ -272,6 +281,25 @@ export default function Zakat() {
   );
 }
 
+/* The input on its own, for the one field whose label shares its line with a
+   link — the nisab price, where the website puts "check price" on the right
+   of .zk-l rather than under the box. */
+function Money({ value, onChange, placeholder = "0" }) {
+  const { fs, rtl } = useApp();
+  const [focus, setFocus] = useState(false);
+  return (
+    <TextInput
+      value={value} onChangeText={onChange}
+      keyboardType="decimal-pad" inputMode="decimal"
+      placeholder={placeholder} placeholderTextColor={C.hint}
+      onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+      style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: C.ink, backgroundColor: C.card,
+               borderWidth: focus ? 1.6 : 1, borderColor: focus ? C.brand600 : C.line,
+               borderRadius: 13, paddingHorizontal: 14, paddingVertical: 12,
+               textAlign: rtl ? "right" : "left" }} />
+  );
+}
+
 function Field({ label, value, onChange }) {
   const { fs, rtl } = useApp();
   const [focus, setFocus] = useState(false);
@@ -282,7 +310,7 @@ function Field({ label, value, onChange }) {
       <TextInput
         value={value} onChangeText={onChange}
         keyboardType="decimal-pad" inputMode="decimal"
-        placeholder="0" placeholderTextColor={C.line}
+        placeholder="0" placeholderTextColor={C.hint}
         onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
         style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: C.ink, backgroundColor: C.card,
                  borderWidth: focus ? 1.6 : 1, borderColor: focus ? C.brand600 : C.line,

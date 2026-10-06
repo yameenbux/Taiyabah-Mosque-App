@@ -14,6 +14,11 @@ export const C = {
   ink:      "#261B22",
   muted:    "#7C6E77",
   line:     "#E4DECF",
+  /* A browser's own placeholder is about 54% black — a mid grey you can read.
+     The app had been using the HAIRLINE colour for placeholder text, so
+     "NK-26-0001" and "e.g. 0.85" — the two placeholders that tell somebody
+     what shape of thing to type — were very nearly invisible on the paper. */
+  hint:     "#9A8F95",
   danger:   "#B4532F",
   onAir:    "#3FBE73",
 };

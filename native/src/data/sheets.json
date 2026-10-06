@@ -483,7 +483,8 @@
    {
     "type": "note",
     "k": "contact.please_do_not_call_the",
-    "t": "Please do not call the masjid during Salah times."
+    "t": "Please do not call the masjid during Salah times.",
+    "center": true
    },
    {
     "type": "social",
@@ -2948,7 +2949,8 @@
      {
       "type": "note",
       "k": "giving.opens_the_masjid_s_secure",
-      "t": "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better."
+      "t": "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better.",
+      "center": true
      }
     ]
    },
@@ -3007,7 +3009,8 @@
    {
     "type": "note",
     "k": "giving.please_use_your_surname_as",
-    "t": "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it."
+    "t": "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it.",
+    "center": true
    },
    {
     "type": "foot",

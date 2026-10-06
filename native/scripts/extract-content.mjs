@@ -533,7 +533,15 @@ const out = await page.evaluate(ids => {
       if (tag === "p") {
         const t = txt(c); if (!t) continue;
         const cls = c.className;
-        blocks.push(node(/note$/.test(cls) || /hint/.test(cls) ? "note" : "p", str(c)));
+        /* Nine of the site's standing notes are CENTRED — .ct-note under the
+           contact card, the two .bk-horizon lines under the hall calendar,
+           .qfoot, .hh-foot. Taking only the words left every one of them
+           ranged left, which on a line that belongs to the card above it
+           reads as the start of a new paragraph. Read the real alignment
+           rather than guess it from the class. */
+        const mid = getComputedStyle(c).textAlign === "center";
+        blocks.push(node(/note$/.test(cls) || /hint/.test(cls) ? "note" : "p",
+                         { ...str(c), ...(mid ? { center: true } : {}) }));
         continue;
       }
       if (/^h[1-6]$/.test(tag) || tag === "b" || tag === "strong") { blocks.push(node("sub", str(c))); continue; }

@@ -54,8 +54,8 @@ function Block({ b, nav, inCard }) {
     case "hero":    return null;   // the hero is hoisted out of the scroll body
     case "heading": return <Heading tag={b.tag ? tx(b.tag) : null}>{tx(b)}</Heading>;
     case "sub":     return <Sub>{tx(b)}</Sub>;
-    case "p":       return <View style={{ marginTop: 9 }}><P>{tx(b)}</P></View>;
-    case "note":    return <View style={{ marginTop: 9 }}><Note>{tx(b)}</Note></View>;
+    case "p":       return <View style={{ marginTop: 9 }}><P center={b.center}>{tx(b)}</P></View>;
+    case "note":    return <View style={{ marginTop: 9 }}><Note center={b.center}>{tx(b)}</Note></View>;
     case "warn":    return <Warn>{tx(b)}</Warn>;
     case "notice":  return <Notice>{tx(b)}</Notice>;
     case "chips":   return <Chips items={b.items} />;

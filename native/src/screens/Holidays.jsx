@@ -52,7 +52,16 @@ function Month({ y, m, shut, evt, todayISO, width }) {
   for (let i = 0; i < lead; i++) cells.push(null);
   for (let d = 1; d <= days; d++) cells.push(d);
 
-  const box = (width - 32 - 26) / 7;
+  /* FLOOR, and explicit rows of seven. box was an exact seventh of the inner
+     width, so after React Native rounded each cell to the pixel grid the
+     seven of them could total a fraction more than the row — and flexWrap
+     then pushed the seventh onto the next line. Every month drew SIX columns
+     under a seven-letter header, which put every date in the year under the
+     wrong day name on the one screen whose entire job is saying which day
+     something falls on. */
+  const box = Math.floor((width - 32 - 26) / 7);
+  const rows = [];
+  for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
   return (
     <View style={{ width: width - 32, backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
                    borderRadius: R.tile, padding: 13, marginRight: 12 }}>
@@ -64,8 +73,10 @@ function Month({ y, m, shut, evt, todayISO, width }) {
                                  fontSize: fs(10), color: C.muted }}>
             {t(`dow.${i}`, DOW[i]).slice(0, 1)}</Text>))}
       </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 4 }}>
-        {cells.map((d, i) => {
+      <View style={{ marginTop: 4 }}>
+        {rows.map((row, r) => (
+        <View key={r} style={{ flexDirection: "row" }}>
+        {row.map((d, i) => {
           if (d === null) return <View key={i} style={{ width: box, height: box }} />;
           const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
           const dw = new Date(y, m, d).getDay();
@@ -93,6 +104,7 @@ function Month({ y, m, shut, evt, todayISO, width }) {
               </View>
             </View>);
         })}
+        </View>))}
       </View>
     </View>);
 }

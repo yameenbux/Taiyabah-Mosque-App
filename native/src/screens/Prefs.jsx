@@ -11,7 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp, LANGS } from "../store";
 import { SHEETS } from "../Blocks";
-import { Screen, Hero, Heading, Card, P, Note, RowGroup, NavRow, Pill, Press, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Press, tap, open } from "../ui";
+import Constants from "expo-constants";
 
 /* TS_STEPS, exactly as the website has them: the same four multipliers and
  * the same four names. The app had renamed the middle two "Default" and
@@ -25,7 +26,7 @@ const SIZES = [
   { v: 1.42, k: "sysprefs.extra_large", t: "Extra large" },
 ];
 
-export default function Prefs({ navigation }) {
+export default function Prefs() {
   const { t, fs, lang, setLang, scale, setScale } = useApp();
   return (
     <Screen pad={false}>
@@ -109,18 +110,22 @@ export default function Prefs({ navigation }) {
             "The Urdu, Gujarati and Arabic wording has not yet been checked by a native speaker. Anything not yet translated shows in English rather than as a blank.")}</Note>
         </View>
 
-        <Heading>{t("sysprefs.about_this_app", "About this app")}</Heading>
-        <RowGroup>
-          <NavRow icon="shield-checkmark-outline" label={t("privacy.privacy_notice", "Privacy notice")}
-                  onPress={() => navigation.navigate("Privacy")} />
-          <NavRow icon="information-circle-outline" label={t("about.about_us", "About us")}
-                  onPress={() => navigation.navigate("About")} />
-        </RowGroup>
+        {/* The website ends here, with the charity line under the language
+            card. An "About this app" section with Privacy notice and About us
+            was the app's own, and both are one tap away in the menu — the
+            same two rows, twice.
+
+            The version stays: somebody reporting a problem has to be able to
+            say which build they are on, and it is the only thing on this
+            screen the website could not have. It reads the manifest rather
+            than a number typed here, which had been stuck at 1.0.0 while the
+            app shipped as 2.0.0. */}
         <View style={{ marginTop: 14, alignItems: "center", gap: 3 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
-            Taiyabah Masjid · {t("collect.version", "Version")} 1.0.0</Text>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
             Bolton Central Islamic Society · Registered charity 1041569</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
+            Taiyabah Masjid · {t("collect.version", "Version")}{" "}
+            {Constants.expoConfig?.version || ""}</Text>
         </View>
       </View>
     </Screen>
