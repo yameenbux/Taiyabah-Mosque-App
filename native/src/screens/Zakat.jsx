@@ -147,6 +147,7 @@ export default function Zakat() {
                  plum text, which on a two-way switch reads as "slightly
                  preferred" rather than "this one". */
               <Pressable key={k} onPress={() => { tap(); setStandard(k); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
                 style={{ flex: 1, alignItems: "center", paddingVertical: 11, paddingHorizontal: 6,
                          borderRadius: 11, borderWidth: 1,
                          borderColor: on ? C.pick : C.line,

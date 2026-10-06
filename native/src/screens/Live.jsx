@@ -103,6 +103,8 @@ export default function Live({ navigation }) {
             triangle on it, which is the only solid gold circle in the app and
             read as a warning light rather than a play button. */}
         <Pressable onPress={toggle}
+          accessibilityRole="button"
+          accessibilityState={{ busy: state === "loading" }}
           style={({ pressed }) => ({ width: 96, height: 96, borderRadius: 48, marginTop: 22, marginBottom: 16,
                                      alignItems: "center", justifyContent: "center", borderWidth: 1,
                                      borderColor: "rgba(198,162,76,.5)",

@@ -123,6 +123,7 @@ export function NewBuild({ navigation }) {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {TIERS.map(x => (
             <Pressable key={x.label} onPress={() => open(x.href)}
+              accessibilityRole="link"
               style={({ pressed }) => ({ flexBasis: "47%", flexGrow: 1, borderRadius: R.card, borderWidth: 1,
                                          borderColor: x.line, backgroundColor: C.card, padding: 15,
                                          alignItems: "center", gap: 3,
@@ -166,7 +167,8 @@ function CopyAll() {
   const [done, setDone] = useState(false);
   const all = BANK.map(b => `${b.k.t}: ${b.v.t}`).join("\n");
   return (
-    <Pressable onPress={async () => { tap(); await Clipboard.setStringAsync(all); setDone(true); setTimeout(() => setDone(false), 2000); }}
+    <Pressable accessibilityRole="button"
+      onPress={async () => { tap(); await Clipboard.setStringAsync(all); setDone(true); setTimeout(() => setDone(false), 2000); }}
       style={({ pressed }) => [{ marginTop: 12, borderRadius: 13, overflow: "hidden",
                                  opacity: pressed ? 0.9 : 1 }, SHADOW]}>
       <LinearGradient colors={[C.ctaTop, C.ctaBot]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
@@ -277,6 +279,7 @@ export function Giving() {
             const on = a === amt;
             return (
               <Pressable key={a} disabled={off} onPress={() => { tap(); setAmt(a); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on, disabled: off }}
                 style={({ pressed }) => ({ flexBasis: "30%", flexGrow: 1, minHeight: 62,
                                            alignItems: "center", justifyContent: "center", gap: 2,
                                            paddingVertical: 11, paddingHorizontal: 7,
@@ -336,6 +339,7 @@ function Options({ options, value, onChange }) {
         const on = o.v === value;
         return (
           <Pressable key={o.v} onPress={() => { tap(); onChange(o.v); }}
+            accessibilityRole="radio" accessibilityState={{ selected: on }}
             style={({ pressed }) => ({ flex: 1, minHeight: 62, alignItems: "center", justifyContent: "center",
                                        gap: 2, paddingVertical: 11, paddingHorizontal: 7,
                                        borderRadius: 14, borderWidth: 1,

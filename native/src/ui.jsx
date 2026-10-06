@@ -404,6 +404,13 @@ export function Press({ children, onPress, disabled, dim = true, style, ...rest 
        a disabled nav button or an out-of-range day, and never a "coming soon"
        row, whose title and chip go muted on their own. */
     <Pressable onPress={onPress} disabled={disabled} android_ripple={{ color: "rgba(119,33,87,.10)" }}
+      /* A Press is a thing you press, so "button" is the right default and a
+         screen that needs otherwise says so — {...rest} is spread AFTER this,
+         so a caller passing "link", "radio" or "tab" wins. Defaulting beats
+         annotating seventy call sites one at a time and then missing the
+         seventy-first. */
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
       {...rest}
       style={({ pressed }) => [{ backgroundColor: pressed && Platform.OS !== "android" ? "rgba(119,33,87,.07)" : "transparent",
                                  opacity: disabled && dim ? 0.45 : 1 }, style]}>
@@ -866,6 +873,7 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
      second paragraph rather than the thing to tap. */
   const button = !cta ? null : (
     <Pressable key="cta" onPress={() => cta.href && open(cta.href)}
+      accessibilityRole={cta.href ? "link" : "button"}
       style={({ pressed }) => ({ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                                  justifyContent: "space-between", gap: 8,
                                  marginTop: 10, marginBottom: 12, paddingVertical: 11, paddingHorizontal: 13,
@@ -941,6 +949,7 @@ export function GoldCTA({ label, sub, href, onPress, disabled }) {
   );
   return (
     <Pressable onPress={() => { tap(); act(); }}
+      accessibilityRole={href ? "link" : "button"}
       style={({ pressed }) => [{ marginTop: 16, borderRadius: 16, overflow: "hidden",
                                  opacity: pressed ? 0.9 : 1 }, SHADOW]}>
       <LinearGradient colors={[C.goldBright, C.gold]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
@@ -1029,6 +1038,7 @@ export function Social({ items }) {
                   : /twitter|x\.com/i.test(it.href) ? "x" : null;
         return (
           <Pressable key={i} onPress={() => open(it.href)} accessibilityLabel={it.label}
+            accessibilityRole="link"
             /* .dr-social a — a wide rounded rectangle filled #F0E9ED with no
                border, 12px of radius, 12px of vertical padding. These were
                42px outlined circles, which read as three small icon buttons

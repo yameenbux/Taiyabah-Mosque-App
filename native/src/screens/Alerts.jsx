@@ -49,7 +49,14 @@ function Row({ title, sub, badge, value, onChange, first }) {
       </View>
       {/* Left to itself the track is almost the colour of the card, so all you
           can see is the knob — which read as a broken half-moon on a phone. */}
+      {/* The switch carries the row's words itself. Without this the title is
+          one stop and the switch is another, so a listener hears "Jamāʿah
+          reminders", swipes, and then hears "on" — with nothing saying what is
+          on, and the badge (URGENT, on Janāzah) lost between the two. React
+          Native gives Switch its own role and checked state; what it cannot
+          know is which line of text belongs to it. */}
       <Switch value={value} onValueChange={onChange}
+              accessibilityLabel={[title, badge, sub].filter(Boolean).join(". ")}
               /* .switch: the track is #D9D2C0 off and brand-600 on, and the
                  knob is plain white either way. This had a washed-out track
                  with a GREEN knob on it — a colour that appears nowhere in

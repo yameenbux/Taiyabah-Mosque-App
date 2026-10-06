@@ -44,10 +44,28 @@ for (let i = 0; i < 12; i++) {
   if (await b.isVisible().catch(() => false)) { await b.click().catch(() => {}); await page.waitForTimeout(500); break; }
   await page.waitForTimeout(250);
 }
-/* Anything other than Home is reached the way a finger would reach it. */
-if (screen !== "home") {
-  const target = page.getByText(new RegExp(screen, "i")).first();
-  if (await target.isVisible().catch(() => false)) { await target.click().catch(() => {}); await page.waitForTimeout(900); }
+/* Anything other than Home is reached the way a finger would reach it. The
+   text to tap is given on the command line, because a screen's NAME is not
+   what is written on the tile that opens it — guessing from the name silently
+   left me on Home and reporting Home's figures for three other screens. */
+const tapText = process.argv[3];
+const viaMenu = process.argv[4] === "menu";
+if (tapText) {
+  if (viaMenu) {
+    const more = page.getByText(/^More$/).last();
+    if (!await more.isVisible().catch(() => false)) throw new Error("could not find the More tab");
+    await more.click(); await page.waitForTimeout(900);
+  }
+  const rx = new RegExp(tapText);
+  const all = page.getByText(rx);
+  let hit = false;
+  for (let i = 0, n = await all.count(); i < n; i++) {
+    const el = all.nth(i);
+    if (await el.isVisible().catch(() => false)) { await el.click().catch(() => {}); hit = true; break; }
+  }
+  if (!hit) throw new Error(`nothing matching ${rx} was visible — the screen was never opened, ` +
+                            `and the figures below would have been whatever screen we were still on`);
+  await page.waitForTimeout(1100);
 }
 await page.waitForTimeout(600);
 

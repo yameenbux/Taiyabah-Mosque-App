@@ -94,6 +94,7 @@ export function Choice({ label, options, value, onChange }) {
           const on = o.v === value;
           return (
             <Pressable key={o.v} disabled={o.off} onPress={() => { tap(); onChange(o.v); }}
+              accessibilityRole="radio" accessibilityState={{ selected: on, disabled: !!o.off }}
               style={({ pressed }) => ({ flexGrow: 1, flexShrink: 1, flexBasis: "auto", minWidth: 88,
                                          paddingVertical: 10, paddingHorizontal: 12, borderRadius: 11,
                                          borderWidth: 1, borderColor: on ? C.brand600 : C.line,
@@ -211,6 +212,9 @@ export function Calendar({ month, onMonth, selected = [], taken = null, first, l
           return (
             <Pressable key={key} disabled={past || unoffered || isTaken || unknown}
               onPress={() => { tap(); onPick(key, date); }}
+              accessibilityRole="button"
+              accessibilityState={{ selected: on,
+                                    disabled: !!(past || unoffered || isTaken || unknown) }}
               style={{ width: "14.2857%", aspectRatio: 1, padding: 2 }}>
               {/* .bk-day — a square cell with its own border and paper fill,
                   10px of radius, and a 5px dot at the foot saying what it is.

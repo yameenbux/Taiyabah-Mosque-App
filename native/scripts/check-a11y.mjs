@@ -7,7 +7,14 @@
  * largest, and until this check existed the app had fifteen accessibility
  * props across twenty-three screens — six of them on one screen.
  *
- * What it looks for is the thing that actually breaks: a control with NOTHING
+ * It asks two things of every control. First, has it anything to announce?
+ * Second, does it say WHAT IT IS — because a control with no role is read out
+ * as plain text, and a listener is never told it can be tapped at all. Home
+ * had sixty-nine things on it and four that announced as controls; the other
+ * sixty-five, the service tiles among them, were prose as far as TalkBack was
+ * concerned.
+ *
+ * The first thing it looks for is a control with NOTHING
  * to announce. A button whose only child is an icon reads out as "button" and
  * nothing else, so the compass, the audio player, the month stepper and the
  * copy buttons were all unusable without sight. A control with words inside it
@@ -33,6 +40,8 @@ const PRESSABLE = new Set([
 ]);
 /* Things that draw a picture and say nothing. */
 const MUTE = new Set(["Ionicons", "Svg", "SvgXml", "Image", "Polygon", "Path", "Circle", "Rect"]);
+/* The ones with no role of their own, so each has to carry its own. */
+const RAW = new Set(["Pressable", "TouchableOpacity", "TouchableHighlight"]);
 
 const files = [];
 (function walk(d) {
@@ -95,7 +104,18 @@ for (const file of files.sort()) {
           findings.push({
             file: path.relative(root, file),
             line: n.openingElement.loc?.start.line,
-            tag,
+            tag, why: "has nothing to announce",
+          });
+        }
+        /* Press, NavRow, CTA and PanelLink set their own role and a call site
+           overrides it only when it is something other than a button. A raw
+           Pressable has no such default: silence there means the control is
+           announced as prose. */
+        if (RAW.has(tag) && !attrs.includes("accessibilityRole")) {
+          findings.push({
+            file: path.relative(root, file),
+            line: n.openingElement.loc?.start.line,
+            tag, why: "never says what it is — a listener is not told it can be tapped",
           });
         }
       }
@@ -104,6 +124,6 @@ for (const file of files.sort()) {
   })(ast.program.body);
 }
 
-for (const f of findings) console.log(`  ${f.file}:${f.line}  <${f.tag}> has nothing to announce`);
-console.log(`\n${findings.length} controls a screen reader cannot name`);
+for (const f of findings) console.log(`  ${f.file}:${f.line}  <${f.tag}> ${f.why}`);
+console.log(`\n${findings.length} control(s) a screen reader cannot name or cannot identify`);
 if (findings.length && process.argv.includes("--strict")) process.exit(1);

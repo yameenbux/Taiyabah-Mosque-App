@@ -36,6 +36,7 @@ export default function Videos() {
       <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 10 }}>
         {VIDEOS.map(v => (
           <Pressable key={v.id} onPress={() => open(`https://www.youtube.com/watch?v=${v.id}`)}
+            accessibilityRole="link"
             style={({ pressed }) => [{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                                        gap: 12, padding: 8, borderRadius: 14, borderWidth: 1,
                                        borderColor: C.line, backgroundColor: C.card,

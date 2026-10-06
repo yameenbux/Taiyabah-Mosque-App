@@ -229,6 +229,7 @@ export default function Qibla({ navigation }) {
               15px semibold cream, full width. Once it is on, the website
               swaps it for a #F0E9ED panel with plum text and no lift. */}
           <Pressable onPress={() => { tap(); setLive(v => !v); }}
+            accessibilityRole="button" accessibilityState={{ selected: live }}
             style={({ pressed }) => [{ width: "100%", marginTop: 12, borderRadius: 13, overflow: "hidden",
                                        opacity: pressed ? 0.9 : 1 },
                                      live ? { borderWidth: 1, borderColor: C.line } : SHADOW]}>

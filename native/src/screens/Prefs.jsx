@@ -78,6 +78,7 @@ export default function Prefs() {
             const on = Math.abs(scale - s.v) < 0.01;
             return (
               <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
                 style={{ flex: 1, minWidth: 0, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6,
                          borderRadius: 12, borderWidth: 1,
                          borderColor: on ? C.pick : C.line,
