@@ -79,6 +79,13 @@ const SCREENS = [
   ["education",  /^Education$/,               "menu"],
   ["alerts",     /^Notifications$/,           "menu"],
   ["prefs",      /^System Preferences$/,      "menu"],
+  /* The other three tabs and the live page. On the website all four wear the
+     same app bar as Home — the wordmark, the society's name and the bell —
+     so they belong in this list as much as any sheet does. */
+  ["times",      /^Prayer Times$/,            null],
+  ["notices",    /^Notices$/,                 null],
+  ["more",       /^More$/,                    null],
+  ["live",       /^Listen live$/,             "tile"],
 ];
 
 const ts = new Date(WHEN).getTime();
