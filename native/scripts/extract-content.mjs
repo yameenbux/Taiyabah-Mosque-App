@@ -111,27 +111,32 @@ const out = await page.evaluate(ids => {
           if (k.closest("svg")) continue;
           if (k.children.length && !KEY(k)) continue;
           const t = txt(k); if (!t) continue;
-          /* The scripture line in a hero is .wl-ar, .bt-ar or .mg-ar. Testing
-             for a literal class "arabic" caught all of them but one —
-             madrasah's, which carries only .wl-ar — so مَدْرَسَة came through
-             as an ordinary sub-line and drew at 13.5px in muted grey instead
-             of 28px in gold, above the one heading it belongs to. */
-          const weight =
-            has(k, "arabic") || /(^|\s)[a-z]{2}-ar$/.test(k.className) ? "arabic" :
-            /-(eyebrow|est|lab)$/.test(k.className) ? "eyebrow" :
-            /-(en|lead)$/.test(k.className) ? "title" : "sub";
-          /* .wl-ar is 28px, .bt-ar 25 and .mg-ar 26 — the website sizes each
-             line itself rather than setting them all the same. */
-          /* getComputedStyle gives the size AFTER --ts, the reader's own text
-             scale, has been applied — 31.36px for a 28px rule at 1.12. The
-             app applies its own scale with fs(), so the base is what travels;
-             keeping the computed figure would have scaled it twice. */
+          /* CLASSIFY A HERO LINE BY WHAT THE BROWSER COMPUTES, not by its
+             class name. The old rules keyed off suffixes — -en and -lead for
+             a title, -eyebrow, -est and -lab for an eyebrow — and the site
+             does not follow that pattern: contact's hero is .ct-name over
+             .ct-org, so BOTH came through as ordinary sub-lines and the
+             masjid's own name rendered at 13.5px in the muted grey.
+
+             A line set in Fraunces is a title. A small uppercase tracked line
+             is an eyebrow. Scripture is the Arabic face or a *-ar class.
+             Everything else is a sub. And each line carries its own size,
+             because the site sets them per hero: .ct-name is 24px, .hh-en 22,
+             .mg-en 19, .wl-en and .bt-en 18. */
+          const cs = getComputedStyle(k);
           const ts = parseFloat(getComputedStyle(document.documentElement)
             .getPropertyValue("--ts")) || 1;
-          const px = weight === "arabic"
-            ? Math.round((parseFloat((getComputedStyle(k).fontSize || "").replace("px", "")) || 0) / ts) || null
-            : null;
-          hero.lines.push({ ...str(k), w: weight, ...(px ? { px } : {}) });
+          const px = Math.round((parseFloat(cs.fontSize) || 0) / ts) || null;
+          const weight =
+            has(k, "arabic") || /(^|\s)[a-z]{2}-ar$/.test(k.className) ? "arabic" :
+            /Fraunces/i.test(cs.fontFamily) ? "title" :
+            cs.textTransform === "uppercase" ? "eyebrow" : "sub";
+          /* The colour too: .gv-eyebrow is gold and .ct-org is #BBA9B4, so
+             one rule for "the small line above the title" would have been
+             wrong on one of them whichever colour it picked. */
+          const col = (cs.color || "").replace(/\s/g, "");
+          hero.lines.push({ ...str(k), w: weight, ...(px ? { px } : {}),
+                            ...(col ? { col } : {}) });
         }
         /* Nine of the eleven sheet heroes are centred and .ab-hero is not —
            it has no text-align at all, so About reads left like the page of

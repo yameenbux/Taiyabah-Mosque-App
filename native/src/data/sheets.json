@@ -11,17 +11,23 @@
      {
       "k": "about.established_at_the_end_of",
       "t": "Established at the end of 1967",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 10,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "about.one_of_the_first_masjids",
       "t": "One of the first masjids in Bolton.",
-      "w": "title"
+      "w": "title",
+      "px": 23,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "about.the_name_taiyabah_from_the",
       "t": "The name *Taiyabah* — from the Arabic _Tayyab_, meaning purity — was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb, author of _Fazaail-e-Amaal_.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(213,199,208)"
      }
     ],
     "align": "left"
@@ -263,12 +269,16 @@
      {
       "k": "member.masjid_membership",
       "t": "Masjid Membership",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "member.check_whether_this_years_fee",
       "t": "Check whether this year’s fee is paid, and when the next one is due.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -372,12 +382,16 @@
      {
       "k": "contact.taiyabah_masjid",
       "t": "Taiyabah Masjid",
-      "w": "sub"
+      "w": "title",
+      "px": 24,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "contact.bolton_central_islamic_society",
       "t": "Bolton Central Islamic Society",
-      "w": "sub"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -507,12 +521,16 @@
      {
       "k": "marriagedeath.life_stage_services",
       "t": "Life-stage services",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "marriagedeath.guidance_and_support_from_the",
       "t": "Guidance and support from the masjid across life’s most significant moments.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -605,17 +623,22 @@
      {
       "t": "الجَنَازَة",
       "w": "arabic",
-      "px": 28
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "funeral.funeral_services_2",
       "t": "Funeral Services",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "funeral.taiyabah_masjid_supports_families",
       "t": "Taiyabah Masjid supports families through every part of an Islamic funeral, from the first phone call to the burial.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -856,12 +879,15 @@
      {
       "t": "الوَصِيَّة",
       "w": "arabic",
-      "px": 28
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "will.the_importance_of_an_islamic",
       "t": "The Importance of an Islamic Will",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -1019,12 +1045,15 @@
      {
       "t": "وِلَادَة",
       "w": "arabic",
-      "px": 25
+      "px": 25,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "birth.guidance_for_new_arrivals",
       "t": "Guidance for New Arrivals",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -1167,12 +1196,16 @@
      {
       "k": "edu.classes_for_adults",
       "t": "Classes for adults",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.classes_and_workshops_at_the",
       "t": "Classes and workshops at the masjid for adults, alongside the children’s madrasah.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -1273,12 +1306,15 @@
      {
       "t": "العَرَبِيَّة",
       "w": "arabic",
-      "px": 22
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.evening_arabic_for_adults",
       "t": "Evening Arabic for adults, taught at the masjid — from the alphabet upward.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -1431,12 +1467,15 @@
      {
       "t": "الغُسْل",
       "w": "arabic",
-      "px": 22
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.how_to_wash_and_prepare",
       "t": "How to wash and prepare a body for burial — a duty that falls on the community, and one most people have never been shown.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -1659,12 +1698,16 @@
      {
       "k": "cur.our_curriculum",
       "t": "Our Curriculum",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "cur.what_students_learn_at_the",
       "t": "What students learn at the madrasah.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -1802,7 +1845,9 @@
      {
       "k": "advice.imams_advice",
       "t": "Imams’ Advice",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -1886,12 +1931,15 @@
      {
       "t": "مَدْرَسَة",
       "w": "arabic",
-      "px": 28
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "madrasah.teaching_the_community_s_children",
       "t": "Teaching the community’s children",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -2001,12 +2049,16 @@
      {
       "k": "adm.madrasah_admissions",
       "t": "Madrasah Admissions",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "adm.fees_class_times_and_what",
       "t": "Fees, class times and what the madrasah asks of students and parents — everything worth knowing before you apply.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -2430,12 +2482,16 @@
      {
       "k": "hol.madrasah_2026_27",
       "t": "Madrasah · 2026/27",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "hol.every_day_the_madrasah_is",
       "t": "Every day the madrasah is closed this year, alongside the Islamic dates — so you can plan a trip without it costing your child their attendance.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -2626,22 +2682,29 @@
      {
       "k": "giving.support_the_masjid",
       "t": "Support the masjid",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(220,187,99)"
      },
      {
       "t": "صَدَقَة",
       "w": "arabic",
-      "px": 19
+      "px": 19,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "giving.give_to_taiyabah_masjid",
       "t": "Give to Taiyabah Masjid",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "giving.every_prayer_held_here",
       "t": "Every prayer held here, every child taught, every janāzah carried out rests on what the community gives. This page is for the masjid itself — its upkeep, its running, and the work it does in Bolton.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -2965,17 +3028,23 @@
      {
       "k": "collect.collections_chanda",
       "t": "Collections · Chanda",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "collect.collect_for_your_cause",
       "t": "Collect for your cause at Taiyabah Masjid",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "collect.charities_and_institutes_are_welcome",
       "t": "Charities and institutes are welcome to collect here. Fill this in and the masjid office will contact your trustee to confirm a date. Nothing on this screen books a day — it is a request, and the masjid will be in touch.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -3093,12 +3162,16 @@
      {
       "k": "hallhire.taiyabah_centre",
       "t": "Taiyabah Centre",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "hallhire.available_for_hire_for_community",
       "t": "Available for hire, for community and family events.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
     ],
     "align": "center"
@@ -3578,12 +3651,15 @@
      {
       "t": "نِكَاح",
       "w": "arabic",
-      "px": 26
+      "px": 26,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "marriage.nikah_islamic_marriage",
       "t": "Nikāḥ — Islamic Marriage",
-      "w": "title"
+      "w": "title",
+      "px": 19,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -3734,7 +3810,9 @@
      {
       "k": "sysprefs.display_language",
       "t": "Display & Language",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -3770,12 +3848,15 @@
      {
       "t": "القرآن الكريم",
       "w": "arabic",
-      "px": 28
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "quran.how_would_you_like_to_read",
       "t": "How would you like to read?",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"
@@ -3828,12 +3909,15 @@
      {
       "t": "أَذْكَار",
       "w": "arabic",
-      "px": 28
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "athkar.morning_evening_and_after_salah",
       "t": "Morning, evening and after ṣalāh",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
     ],
     "align": "center"

@@ -290,16 +290,25 @@ export function Hero({ lines = [], children, tall, minHeight, ring, align = "cen
       {lines.map((l, i) => {
         const text = tx(l);
         if (!text) return null;
+        /* SIZE AND COLOUR COME FROM THE WEBSITE, per line. Every hero on the
+           site sets its own: .ct-name is 24px and .hh-en 22, .mg-en 19,
+           .wl-en 18; the small line above a title is gold on giving and
+           #BBA9B4 on contact. One hard-coded rule per weight was wrong
+           somewhere whichever numbers it chose. */
+        const px = l.px || (l.w === "arabic" ? 28 : l.w === "title" ? 22
+                          : l.w === "eyebrow" ? 10.5 : 13.5);
+        const col = l.col || (l.w === "arabic" ? C.goldBright
+                            : l.w === "eyebrow" ? C.gold
+                            : l.w === "title" ? C.cream : "rgba(243,239,227,.8)");
         const style =
-          /* The website sizes each scripture line itself — .wl-ar is 28px,
-             .mg-ar 26, .bt-ar 25, giving's 19 — rather than setting them all
-             the same, so the size travels with the line. */
-          l.w === "arabic"  ? { fontFamily: F.arabic, fontSize: fs(l.px || 28),
-                                lineHeight: fs((l.px || 28) * 1.4), color: C.goldBright }
-          : l.w === "eyebrow" ? { fontFamily: F.sansMedium, fontSize: fs(10.5), letterSpacing: 1.6,
-                                  textTransform: "uppercase", color: C.gold, marginBottom: 7 }
-          : l.w === "title"   ? { fontFamily: F.display, fontSize: fs(23), lineHeight: fs(31), color: C.cream }
-          : { fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21), color: "rgba(243,239,227,.8)", marginTop: 7 };
+          l.w === "arabic"  ? { fontFamily: F.arabic, fontSize: fs(px),
+                                lineHeight: fs(px * 1.9), color: col }
+          : l.w === "eyebrow" ? { fontFamily: F.sansMedium, fontSize: fs(px), letterSpacing: px * 0.16,
+                                  textTransform: "uppercase", color: col, marginBottom: 7 }
+          : l.w === "title"   ? { fontFamily: F.display, fontSize: fs(px),
+                                  lineHeight: fs(px * 1.3), color: col }
+          : { fontFamily: F.sans, fontSize: fs(px), lineHeight: fs(px * 1.55),
+              color: col, marginTop: 7 };
         return <Rich key={i} style={[{ textAlign: align === "left" && !rtl ? "left"
                                                  : align === "left" ? "right" : "center" }, style]}>{text}</Rich>;
       })}
@@ -440,7 +449,10 @@ export function KV({ k, v, href, icon, onPress, kind }) {
     );
   }
   return (
-    <Press onPress={act} disabled={!act}
+    /* A row that is only a fact — "Radio frequency · 454.1000 MHz" — is inert,
+       not disabled. Press faded it to 45% because it had nowhere to go, so on
+       the contact screen the one row you cannot tap looked switched off. */
+    <Press onPress={act} disabled={!act} dim={false}
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                paddingVertical: 13, paddingHorizontal: 15 }}>
       {!!icon && <IconChip icon={icon} />}
@@ -563,8 +575,10 @@ export function Items({ items }) {
 export function Call({ k, v, href, onPress, icon }) {
   const { fs, rtl } = useApp();
   const act = onPress || (href ? () => open(href) : null);
+  /* Same as the key/value rows: a contact card with no link behind it — the
+     funeral sheet has one — is inert, not greyed out. */
   return (
-    <Press onPress={act} disabled={!act}
+    <Press onPress={act} disabled={!act} dim={false}
       style={[{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                 marginTop: 14, paddingVertical: 15, paddingHorizontal: 14, borderRadius: 15,
                 backgroundColor: C.card, borderWidth: 1, borderColor: C.line }, SHADOW]}>
