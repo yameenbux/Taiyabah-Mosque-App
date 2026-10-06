@@ -37,3 +37,8 @@ android.keystore
 
 # Output of the emulator smoke run.
 smoke-out/
+
+# Scratch output of scripts/compare-all.mjs — the two halves of each
+# comparison, rewritten on every run. The joined side-by-sides that are
+# actually worth keeping are committed under native/final/.
+.compare/
