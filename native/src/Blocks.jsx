@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow, Advisory } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -67,8 +67,8 @@ function Block({ b, nav, inCard }) {
     case "callout": return <Callout {...b} />;   // b.tone comes from the extractor
     case "urgent":  return <Urgent {...b} />;
     case "rules":   return <Rules {...b} />;
-    case "advisory": return (
-      <Warn>{[b.h, ...(b.ps || [])].filter(Boolean).map(tx).join("\n\n")}</Warn>);
+    case "advisory":
+      return <Advisory h={b.h} ps={b.ps} />;
 
     /* The founders and the ulema. On the website this is .ab-list: each row is
        14.5px at weight 600 with 12px above and below and a hairline between

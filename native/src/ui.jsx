@@ -50,7 +50,13 @@ export function Rich({ children, style, arabic }) {
   return (
     <Text style={base}>
       {parts.map((p, i) =>
-        p.startsWith("*") ? <Text key={i} style={{ fontFamily: arabic ? F.arabic : F.sansMedium }}>{p.slice(1, -1)}</Text>
+        /* <b> and <strong> are weight 700 in a browser, and that is what every
+           one of these was in the website's markup. Setting them in the 500
+           was indistinguishable from the 400 around them at 13px, so every
+           bold line in the app — "The office takes calls between 5pm and 7pm",
+           "Once the office has rung you and agreed your date" — simply was
+           not bold. */
+        p.startsWith("*") ? <Text key={i} style={{ fontFamily: arabic ? F.arabic : F.sansBold }}>{p.slice(1, -1)}</Text>
         : p.startsWith("_") ? <Text key={i} style={{ fontStyle: "italic" }}>{p.slice(1, -1)}</Text>
         : <Text key={i}>{p}</Text>)}
     </Text>
@@ -557,6 +563,32 @@ export function Ticks({ items, ordered }) {
 
 /* A standing caveat — "the masjid does not provide this directly". It has to
  * read as a caution without reading as an error. */
+/* .mg-advisory — "Please also register your marriage legally", which is the
+ * one thing on that screen a couple can get legally wrong. The website gives
+ * it a rose panel, #FBF0EB inside #EBCDBF at 14px of radius, with an 11px
+ * uppercase BOLD heading tracked .1em in #7C3A20 and the prose under it at
+ * 13px in the same brown. No icon.
+ *
+ * It was being flattened into the generic warning box: heading and body glued
+ * together with a blank line and set at the same weight, behind an ⓘ the
+ * website does not have, so the heading stopped being a heading. */
+export function Advisory({ h, ps }) {
+  const { fs, tx, rtl } = useApp();
+  const INK = "#7C3A20";
+  const align = rtl ? "right" : "left";
+  return (
+    <View style={{ marginTop: 12, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 15,
+                   backgroundColor: "#FBF0EB", borderWidth: 1, borderColor: "#EBCDBF" }}>
+      {!!h && <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 1.1,
+                             textTransform: "uppercase", color: INK, marginBottom: 7,
+                             textAlign: align }}>{tx(h)}</Text>}
+      {(ps || []).map((x, i) => (
+        <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: INK,
+                               marginTop: i ? 8 : 0, textAlign: align }}>{tx(x)}</Rich>))}
+    </View>
+  );
+}
+
 export function Warn({ children }) {
   const { fs, rtl } = useApp();
   return (

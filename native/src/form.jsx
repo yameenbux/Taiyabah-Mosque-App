@@ -31,8 +31,15 @@ export function Field({ label, hint, value, onChange, type = "text", bad, requir
   const multi = type === "multi";
   return (
     <View style={{ marginTop: 14 }}>
-      <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 6, marginBottom: 6 }}>
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: bad ? C.danger : C.ink }}>{label}</Text>
+      {/* .bk-field label — 12px BOLD, uppercase, .05em of tracking, in the
+          muted grey, 5px above the box. This was 12.5px medium in ink and
+          sentence case, which reads as a line of prose rather than a label,
+          and it is the same control on every form in the app: hall hire,
+          nikāḥ, the imāms' advice, charity collections. */}
+      <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 6, marginBottom: 5 }}>
+        <Text style={{ fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
+                       textTransform: "uppercase",
+                       color: bad ? C.danger : C.muted }}>{label}</Text>
         {required === false && <Pill>optional</Pill>}
       </View>
       <TextInput
@@ -40,10 +47,12 @@ export function Field({ label, hint, value, onChange, type = "text", bad, requir
         placeholder={placeholder} placeholderTextColor={C.line}
         onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
         {...(KB[type] || KB.text)}
-        style={{ fontFamily: F.sans, fontSize: fs(15), color: C.ink, backgroundColor: C.card,
+        /* The website's input sits on the PAPER inside a plain hairline at
+           11px of radius with 11/12 of padding — not on card at 13 with 14. */
+        style={{ fontFamily: F.sans, fontSize: fs(15), color: C.ink, backgroundColor: C.paper,
                  borderWidth: focus || bad ? 1.6 : 1,
                  borderColor: bad ? C.danger : focus ? C.brand600 : C.line,
-                 borderRadius: 13, paddingHorizontal: 14,
+                 borderRadius: 11, paddingHorizontal: 12,
                  paddingTop: multi ? 12 : 12, paddingBottom: multi ? 12 : 12,
                  minHeight: multi ? 108 : undefined,
                  textAlignVertical: multi ? "top" : "center",

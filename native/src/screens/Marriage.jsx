@@ -80,6 +80,18 @@ export default function Marriage({ navigation }) {
 
   const setP = (id, k, v) => setPeople(s => ({ ...s, [id]: { ...s[id], [k]: v } }));
   const sheet = SHEETS.marriage;
+  /* The website's nk-pay card sits between the rates card and the prose that
+     follows it. The rates card is the one holding the fee rows, so the split
+     is immediately after it. Paying happens AFTER the office has rung and
+     agreed a date, so it has to be reachable whether or not requests are
+     open — it stays outside that branch, as it was. */
+  const prose = (() => {
+    const bs = (sheet?.blocks || []).filter(b => b.type !== "hero");
+    const i = bs.findIndex(b => b.type === "card" &&
+                                (b.blocks || []).some(x => x.type === "kv" && x.kind === "rate"));
+    if (i < 0) throw new Error("nikah: the fee table has gone from the website");
+    return { before: bs.slice(0, i + 1), after: bs.slice(i + 1) };
+  })();
 
   /* What the family are agreeing to, resolved to the clock time published for
    * the day they picked. Times move through the year, and the office needs to
@@ -169,8 +181,16 @@ export default function Marriage({ navigation }) {
     <Screen pad={false}>
       {!!sheet && <Hero lines={sheet.blocks.find(b => b.type === "hero")?.lines || []} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
-        {/* The masjid's own words about nikāḥ, lifted from the website. */}
-        {!!sheet && <Blocks blocks={sheet.blocks.filter(b => b.type !== "hero")} nav={navigation} />}
+        {/* The masjid's own words about nikāḥ, lifted from the website —
+            split where the website puts the payment card, which is directly
+            under the fee table and above "Requirements such as documentation".
+            Rendering the whole run first and appending Pay at the very end
+            moved it below the request form, four screens further down, where
+            somebody who has just been rung by the office and told what to pay
+            would never look for it. */}
+        {!!sheet && <Blocks blocks={prose.before} nav={navigation} />}
+        <Pay t={t} />
+        {!!sheet && <Blocks blocks={prose.after} nav={navigation} />}
 
         {open === false ? (
           <>
@@ -286,11 +306,6 @@ export default function Marriage({ navigation }) {
           </>
         )}
 
-        {/* Outside the branch above, deliberately. Paying the fee happens AFTER
-            the office has rung and agreed a date, so it is needed most when
-            requests are closed — and it was inside the form, which is the one
-            case where it is not drawn at all. */}
-        <Pay t={t} />
         <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
       </View>
     </Screen>
@@ -333,32 +348,44 @@ function Pay({ t }) {
     open(link + (link.includes("?") ? "&" : "?") + "client_reference_id=" + encodeURIComponent(v));
   };
 
+  /* .np-btn — 13.5px bold at 11px of radius with 12/10 of padding, both
+     inside a brand-600 border; the member one filled, .np-alt on the paper
+     with plum text. They sit SIDE BY SIDE, flex:1 1 150px, and wrap only when
+     they will not fit. These were two full-width stadium pills stacked, which
+     made the second look like a second step rather than the other rate. */
+  const rate = (kind, label, alt) => (
+    <Press onPress={() => { tap(); go(kind); }}
+      style={{ flexGrow: 1, flexShrink: 1, flexBasis: 150, alignItems: "center",
+               paddingVertical: 12, paddingHorizontal: 10, borderRadius: 11,
+               borderWidth: 1, borderColor: C.brand600,
+               backgroundColor: alt ? C.paper : C.brand600 }}>
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), textAlign: "center",
+                     color: alt ? C.brand600 : "#FFFFFF" }}>{label}</Text>
+    </Press>
+  );
+
   return (
-    <>
-      <Heading>{t("nikah.pay_the_fee_online", "Pay the fee online")}</Heading>
-      <Card>
-        <P>{t("nikah.once_the_office_has_rung",
+    /* .nk-pay's heading is an h4 INSIDE the card — Fraunces at 16, no gold
+       rule beside it. It was a section Heading out on the paper, which
+       announced the card as a new part of the page rather than titling it. */
+    <Card>
+      <Text style={{ fontFamily: F.display, fontSize: fs(16), color: C.ink }}>
+        {t("nikah.pay_the_fee_online", "Pay the fee online")}</Text>
+      <>
+        <P style={{ fontSize: fs(12.5), lineHeight: fs(20.5), color: C.muted }}>
+          {t("nikah.once_the_office_has_rung",
           "*Once the office has rung you and agreed your date.* Paying does not book a date on its own — the masjid confirms what it can do first.")}</P>
         <Field label={t("nikah.your_reference", "Your reference")}
                value={ref} onChange={v => { setErr(""); setRef(tidyRef(v)); }}
                placeholder="NK-26-0001" autoCapitalize="characters" maxLength={11} />
-        <View style={{ gap: 9, marginTop: 4 }}>
-          <Press onPress={() => { tap(); go("member"); }}
-            style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill, backgroundColor: C.brand600 }}>
-            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.cream }}>
-              {t("nikah.member_pay_100", "Member — pay £100")}</Text>
-          </Press>
-          <Press onPress={() => { tap(); go("non_member"); }}
-            style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
-                     borderWidth: 1, borderColor: C.brand600 }}>
-            <Text style={{ fontFamily: F.sansBold, fontSize: fs(14), color: C.brand600 }}>
-              {t("nikah.non_member_pay_200", "Non-member — pay £200")}</Text>
-          </Press>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 11 }}>
+          {rate("member", t("nikah.member_pay_100", "Member — pay £100"))}
+          {rate("non_member", t("nikah.non_member_pay_200", "Non-member — pay £200"), true)}
         </View>
         <ErrorBox>{err}</ErrorBox>
         <Note>{t("nikah.your_reference_is_on_the",
           "Your reference is on the confirmation you were given when you sent your request, and the office can read it out. Pick the rate that applies to you — the office checks it, and will tell you if anything is owed or owed back.")}</Note>
-      </Card>
-    </>
+      </>
+    </Card>
   );
 }
