@@ -18,6 +18,13 @@ on:
     branches: [main, "claude/**"]
     paths: ["native/**", ".github/workflows/native-smoke.yml"]
 
+# This boots an emulator and drives the whole app, which is minutes
+# of a runner. Pushing three times in ten minutes should not run it three
+# times — the last push is the one that matters.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest

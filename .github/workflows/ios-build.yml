@@ -23,6 +23,14 @@ on:
     branches: [main, "claude/**"]
     paths: ["native/**", ".github/workflows/ios-build.yml"]
 
+# A macOS runner costs ten times what ubuntu does, and five of these
+# were once in flight at the same time on five commits of the same branch.
+# Only the newest is worth an answer; the rest are paying to tell us about
+# code nobody will ship.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ios:
     # Xcode only exists on macOS runners. This is the one job in the repo that
