@@ -76,10 +76,13 @@ export function Sub({ children }) {
                         marginTop: 4, marginBottom: 2, textAlign: rtl ? "right" : "left" }}>{children}</Rich>;
 }
 
-export function Note({ children }) {
+export function Note({ children, center }) {
   const { fs, rtl } = useApp();
-  return <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19), color: C.muted,
-                        textAlign: rtl ? "right" : "left" }}>{children}</Rich>;
+  /* .lv-note and .qfoot are centred where the rest are not, so the one that
+     closes a page reads as a note about the page rather than a last line of
+     its prose. */
+  return <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: C.muted,
+                        textAlign: center ? "center" : rtl ? "right" : "left" }}>{children}</Rich>;
 }
 
 export function Arabic({ children, size = 26, center = true }) {
