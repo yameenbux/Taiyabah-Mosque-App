@@ -27,14 +27,23 @@ const BANK = [
 
 /* ---------- the new build ------------------------------------------------- */
 
+/* Each tier is NAMED AFTER A METAL and the website colours it accordingly —
+   .t-bronze through .t-plat each set their own border and their own ink for
+   the name. The app drew all four with the same hairline and the same gold
+   ink, so Bronze, Silver, Gold and Platinum were four identical boxes with
+   different words in them. */
 const TIERS = [
-  { amt: "£250",   k: "sheet.bronze",   label: "Bronze",   href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
-  { amt: "£500",   k: "sheet.silver",   label: "Silver",   href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
-  { amt: "£1,000", k: "sheet.gold",     label: "Gold",     href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
+  { amt: "£250",   k: "sheet.bronze",   label: "Bronze",   line: "#D3A47C", ink: "#8E5730",
+    href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
+  { amt: "£500",   k: "sheet.silver",   label: "Silver",   line: "#C4BFC2", ink: "#6E656B",
+    href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
+  { amt: "£1,000", k: "sheet.gold",     label: "Gold",     line: "#D8BC72", ink: "#7A5D14",
+    href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
   /* £5,000, as the website says and as the Stripe link charges. This read
    * £2,500 against the same link, so the app was advertising half the amount
    * somebody would actually be asked for. */
-  { amt: "£5,000", k: "sheet.platinum", label: "Platinum", href: "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04?client_reference_id=newbuild" },
+  { amt: "£5,000", k: "sheet.platinum", label: "Platinum", line: "#B89FAF", ink: "#7C5E71",
+    href: "https://buy.stripe.com/28EbJ1cHOcmc5Jk04Kf3a04?client_reference_id=newbuild" },
 ];
 const ANY = "https://buy.stripe.com/6oU3cvbDK1Hy2x8g3If3a05?client_reference_id=newbuild";
 /* What phase 3.3 is actually paying for. Keyed, because a donor reading the
@@ -115,12 +124,13 @@ export function NewBuild({ navigation }) {
           {TIERS.map(x => (
             <Pressable key={x.label} onPress={() => open(x.href)}
               style={({ pressed }) => ({ flexBasis: "47%", flexGrow: 1, borderRadius: R.card, borderWidth: 1,
-                                         borderColor: C.line, backgroundColor: C.card, padding: 15,
+                                         borderColor: x.line, backgroundColor: C.card, padding: 15,
                                          alignItems: "center", gap: 3,
                                          transform: [{ scale: pressed ? 0.98 : 1 }] })}>
-              <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.ink }}>{x.amt}</Text>
-              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1,
-                             textTransform: "uppercase", color: C.goldInk }}>{t(x.k, x.label)}</Text>
+              {/* .t-amt is the SANS at 20px weight 700, not the serif. */}
+              <Text style={{ fontFamily: F.sansBold, fontSize: fs(20), color: C.ink }}>{x.amt}</Text>
+              <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.7,
+                             textTransform: "uppercase", color: x.ink }}>{t(x.k, x.label)}</Text>
             </Pressable>))}
         </View>
 

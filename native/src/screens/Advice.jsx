@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, Foot, P } from "../ui";
+import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, P } from "../ui";
 import { Field, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
@@ -107,7 +107,9 @@ export default function Advice({ navigation }) {
                     sending={state.sending} onPress={send} />
           </>
         )}
-        <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
+        {/* The charity line is the last block of the advice sheet and is drawn
+            from it above, so adding it again here printed it twice. The same
+            defect the charity collections screen had. */}
       </View>
     </Screen>
   );

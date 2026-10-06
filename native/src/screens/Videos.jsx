@@ -8,7 +8,7 @@ import React from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import { C, F, SHADOW } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, PanelLink, open } from "../ui";
+import { Screen, PanelLink, open } from "../ui";
 
 const VIDEOS = [
   { id: "gC7H_60vPFU", t: "New Build Update 2026",                        d: "New build" },
@@ -24,7 +24,9 @@ export default function Videos() {
   const { t, fs, rtl } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ t: t("vids.videos_bayaans", "Videos & bayaans"), w: "title" }]} />
+      {/* No hero on the website: the sheet header carries the title and the
+          list starts immediately. A plum band here said "Videos & bayaans"
+          directly under a bar already saying it. */}
       {/* .vd-list is a column of 10px-spaced ROWS: a 112px-wide thumbnail with
           9px of radius on the left, the title and its label stacked beside it,
           the whole thing an 8px-padded card at 14px of radius. This was a
