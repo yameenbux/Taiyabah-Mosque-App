@@ -14,6 +14,7 @@ import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
 import SHEETS from "./data/sheets.json";
 import Opening from "./Opening";
+import Boundary from "./Boundary";
 import FirstRun from "./FirstRun";
 import { startPush } from "./push";
 
@@ -69,6 +70,8 @@ function Tabs() {
   const { t, fs, rtl } = useApp();
   return (
     <Tab.Navigator
+      screenLayout={({ children, route }) => (
+        <Boundary screen={route?.name}>{children}</Boundary>)}
       screenListeners={{ tabPress: tick }}
       screenOptions={{
         headerShown: false,
@@ -126,7 +129,14 @@ function Root() {
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
     <NavigationContainer key={lang}>
-      <Stack.Navigator>
+      {/* layout is the one place react-navigation lets a wrapper sit INSIDE
+          each screen, which is what makes a fault recoverable: the header and
+          the tab bar survive it, so "Try again" has something to go back to.
+          Wrapping the navigator instead would take the whole app down with
+          whichever screen threw. */}
+      <Stack.Navigator
+        screenLayout={({ children, route }) => (
+          <Boundary screen={route?.name}>{children}</Boundary>)}>
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
 
         {/* reading */}
@@ -226,10 +236,15 @@ export default function App() {
     <SafeAreaProvider>
       {/* the hero is dark, so the clock and battery must be light */}
       <StatusBar style="light" />
-      <AppProvider fallback={veil}>
-        <Root />
-        <FirstRun />
-      </AppProvider>
+      {/* The outer one, for a fault outside any screen — in the provider, the
+          navigation container, the first-run card. Rarer, and the only thing
+          it can offer is a retry, but a retry beats a white screen. */}
+      <Boundary>
+        <AppProvider fallback={veil}>
+          <Root />
+          <FirstRun />
+        </AppProvider>
+      </Boundary>
       {/* Last, so it sits over the app — and only over it. The app is mounted
           and live underneath from the first frame; this never gates it, never
           takes a touch, and takes itself away on a timer whatever happens. */}
