@@ -14,14 +14,14 @@
  * and will take effect as soon as it is.
  */
 import React, { useEffect, useState } from "react";
-import { View, Text, Switch, Linking } from "react-native";
+import { View, Text, Switch, Linking, Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
+import { Screen, TopBar, Heading, Card, Note, P, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
 import { syncTags, optIn, optOut, whoAmI } from "../push";
@@ -66,6 +66,7 @@ export default function Alerts() {
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
   const [diag, setDiag] = useState(false);
+  const [pickMins, setPickMins] = useState(false);
   const nav = useNavigation();
   /* Worked out once from the manufacturer; it cannot change while the app is
    * open, and it is null on anything that is not Android. */
@@ -112,13 +113,20 @@ export default function Alerts() {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[
-        { k: "menu.notifications", t: "Notifications", w: "title" },
-        { k: "sheet.get_a_quiet_reminder_before",
-          t: "Get a quiet reminder before each jamāʿah, plus masjid announcements — on this device.", w: "sub" },
-      ]} />
+      {/* The website has no hero on this page — it is a page under the masjid's
+          own top bar, and the sentence that was in the hero's sub belongs
+          inside the card, above Enable, which is where the site puts it.
+          A hero here said "Notifications" and then the heading said "Prayer
+          alerts" directly underneath, which is the same screen named twice. */}
+      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+        <TopBar back onBell={() => nav.navigate("NoticesTab")} />
+      </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>
+
+        <P muted style={{ marginTop: 2 }}>
+          {t("sheet.get_a_quiet_reminder_before",
+            "Get a quiet reminder before each jamāʿah, plus masjid announcements — on this device.")}</P>
 
         {granted === false && (
           /* .enable is a brand-700 to brand-800 gradient at 13px of radius
@@ -137,27 +145,48 @@ export default function Alerts() {
             sub={t("sheet.a_nudge_before_each_congregation", "A nudge before each congregation")}
             value={!!alerts.jamaah} onChange={v => set({ jamaah: v })} />
 
-          {/* "Remind me [10 min] before jamāʿah", as one sentence the way the
-              website writes it, with the choices inline. */}
-          <View style={{ borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 15, paddingVertical: 13,
+          {/* .mins — ONE sentence with a select sitting inside it: "Remind me
+              [10 min] before jamāʿah". A row of five chips said the same thing
+              and read as a filter, so the sentence came apart.
+              The box is the website's select exactly: white, a line border,
+              9px of radius, 6/9 of padding, the value at weight 600 in ink.
+              Tapping it opens the list, which is what a select does on a
+              phone — there is no native control shaped like an HTML one. */}
+          <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 9,
+                         borderTopWidth: 1, borderTopColor: C.line,
+                         paddingHorizontal: 15, paddingTop: 12, paddingBottom: 12,
                          opacity: alerts.jamaah ? 1 : .45 }}>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, marginBottom: 9 }}>
-              {t("sheet.remind_me", "Remind me")} · {t("sheet.before_jamaah", "before jamāʿah")}</Text>
-            <View style={{ flexDirection: rtl ? "row-reverse" : "row", flexWrap: "wrap", gap: 7 }}>
-              {MINS.map(m => {
-                const on = alerts.mins === m;
-                return (
-                  <Press key={m} disabled={!alerts.jamaah} onPress={() => set({ mins: m })}
-                    style={{ paddingHorizontal: 13, paddingVertical: 7, borderRadius: R.pill,
-                             borderWidth: 1, borderColor: on ? C.brand600 : C.line,
-                             backgroundColor: on ? "rgba(94,24,68,.1)" : "transparent" }}>
-                    <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
-                                   color: on ? C.brand600 : C.muted }}>
-                      {t(`sheet.${m}_min`, `${m} min`)}</Text>
-                  </Press>);
-              })}
-            </View>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
+              {t("sheet.remind_me", "Remind me")}</Text>
+            <Press disabled={!alerts.jamaah} onPress={() => { tap(); setPickMins(true); }}
+              style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#fff",
+                       borderWidth: 1, borderColor: C.line, borderRadius: 9,
+                       paddingHorizontal: 9, paddingVertical: 6 }}>
+              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>
+                {t(`sheet.${alerts.mins}_min`, `${alerts.mins} min`)}</Text>
+              <Ionicons name="chevron-down" size={13} color={C.muted} />
+            </Press>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
+              {t("sheet.before_jamaah", "before jamāʿah")}</Text>
           </View>
+
+          <Modal transparent visible={pickMins} animationType="fade" onRequestClose={() => setPickMins(false)}>
+            <Press onPress={() => setPickMins(false)}
+              style={{ flex: 1, backgroundColor: "rgba(21,6,15,.5)", justifyContent: "flex-end" }}>
+              <View style={{ backgroundColor: C.card, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+                             paddingTop: 10, paddingBottom: 28 }}>
+                {MINS.map(m => (
+                  <Press key={m} onPress={() => { tap(); set({ mins: m }); setPickMins(false); }}
+                    style={{ paddingVertical: 15, paddingHorizontal: 22, flexDirection: "row",
+                             alignItems: "center", justifyContent: "space-between" }}>
+                    <Text style={{ fontFamily: alerts.mins === m ? F.sansBold : F.sans, fontSize: fs(15),
+                                   color: alerts.mins === m ? C.brand600 : C.ink }}>
+                      {t(`sheet.${m}_min`, `${m} min`)}</Text>
+                    {alerts.mins === m && <Ionicons name="checkmark" size={18} color={C.brand600} />}
+                  </Press>))}
+              </View>
+            </Press>
+          </Modal>
 
           <Row title={t("sheet.janazah", "Janāzah")} badge={t("sheet.urgent", "Urgent")}
             sub={t("sheet.funeral_prayer_announcements", "Funeral prayer announcements")}

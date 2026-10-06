@@ -120,9 +120,14 @@ export function Girih({ size = 230, color = C.gold, opacity = 0.08, style }) {
 /* The bar the web app carries above every tab: the masjid's own wordmark, the
  * society's name, and a bell that goes to Notices. It sits on the plum so it
  * runs into the hero below it rather than sitting on top of one. */
-export function TopBar({ navigation, onBell }) {
+export function TopBar({ navigation, onBell, back }) {
   const { t, fs, rtl } = useApp();
   const insets = useSafeAreaInsets();
+  const nav = useNavigation();
+  /* A pushed screen that wears the website's top bar still has to offer a way
+   * out. The website's own pages do not need one — they are tabs — so this is
+   * the one addition, and it is the arrow people look for. */
+  const canBack = back && nav?.canGoBack?.();
   return (
     /* .topbar: padding 14px 20px, and a 1px gold hairline along the bottom at
        25% — the line that separates it from the hero. Without it the two
@@ -130,6 +135,12 @@ export function TopBar({ navigation, onBell }) {
     <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 11,
                    paddingTop: insets.top + 14, paddingBottom: 14, paddingHorizontal: 20,
                    borderBottomWidth: 1, borderBottomColor: "rgba(198,162,76,.25)" }}>
+      {canBack && (
+        <Pressable onPress={() => { tap(); nav.goBack(); }} accessibilityLabel="Back" accessibilityRole="button"
+          hitSlop={10} style={({ pressed }) => ({ marginRight: -4, padding: 4, borderRadius: 18,
+                                                  backgroundColor: pressed ? "rgba(243,239,227,.16)" : "transparent" })}>
+          <Ionicons name={rtl ? "chevron-forward" : "chevron-back"} size={24} color={C.cream} />
+        </Pressable>)}
       <Image source={require("../assets/logo.png")}
              style={{ width: 62, height: 44, resizeMode: "contain" }} />
       <View style={{ width: 1, height: 30, backgroundColor: "rgba(243,239,227,.22)" }} />
