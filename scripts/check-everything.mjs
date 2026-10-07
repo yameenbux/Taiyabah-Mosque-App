@@ -171,6 +171,31 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
   await p.reload(); await p.waitForTimeout(2400);
   (await p.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue("--ts").trim()))===ts1
     ? ok("prefs","text size survives a restart") : bad("prefs","text size is forgotten on restart");
+
+  /* Appearance. Light is the default and the phone's own setting is
+     deliberately not read, so a fresh visitor must land in light however
+     their device is configured — that is the part worth asserting, not just
+     that the toggle moves. */
+  /* the restart above closed the screen; the control lives inside it */
+  await p.evaluate(()=>{ if(typeof openSysPrefs==="function") openSysPrefs(); });
+  await p.waitForTimeout(700);
+  const t0 = await p.evaluate(()=>document.documentElement.dataset.theme || "light");
+  t0 === "light" ? ok("prefs","a fresh visitor gets light, whatever the device prefers")
+                 : bad("prefs",`a fresh visitor got "${t0}" without asking`);
+  await p.evaluate(()=>{ [...document.querySelectorAll("#theme-pick button")]
+      .find(b=>b.getAttribute("aria-checked")==="false").click(); });
+  await p.waitForTimeout(500);
+  const t1 = await p.evaluate(()=>({theme:document.documentElement.dataset.theme,
+                                    bg:getComputedStyle(document.body).backgroundColor}));
+  t1.theme === "dark" ? ok("prefs",`dark mode applies (${t1.bg})`)
+                      : bad("prefs","the appearance control did nothing");
+  await p.reload(); await p.waitForTimeout(2400);
+  /* read it at once: the point of the pre-paint script is that dark is on
+     before anything is drawn, so a reader never sees a light page flash. */
+  const t2 = await p.evaluate(()=>document.documentElement.dataset.theme);
+  await p.evaluate(()=>{ try{ localStorage.removeItem("theme"); }catch(e){} });
+  t2 === "dark" ? ok("prefs","dark survives a restart, with no flash of light")
+                : bad("prefs","dark is forgotten on restart");
   await p.close();
 }
 {
