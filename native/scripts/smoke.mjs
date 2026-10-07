@@ -167,6 +167,29 @@ function auditWayOut(where, xml) {
   if (!out) damage.push(`${where}: no way back — no Back, Done or Close anywhere on the screen`);
 }
 
+/* uiautomator only reports what is on the glass, so auditing once at the top of
+ * a long screen leaves everything below the fold unseen — and "text is being
+ * cut off on the sides" was found partway down the nikāḥ form, which is six
+ * screens long. Each screen is therefore walked down a viewport at a time and
+ * audited at every stop, until it stops moving. */
+function auditDown(where, max = 5) {
+  let last = "";
+  for (let i = 0; i <= max; i++) {
+    let x;
+    try { x = dump(); } catch { return; }
+    auditScreen(i ? `${where} (scrolled ${i})` : where, x);
+    if (i === 0) auditWayOut(where, x);
+    /* "Has the screen moved?" — the length of the dump plus the last few bits
+       of text on it. Identical twice means the bottom, so there is no point
+       swiping at a screen that does not scroll. */
+    const key = x.length + "|" + (x.match(/text="[^"]{3,}"/g) || []).slice(-3).join("");
+    if (i && key === last) return;
+    last = key;
+    adb(["shell", "input", "swipe", "540", "1800", "540", "700", "320"]);
+    sleep(650);
+  }
+}
+
 const findIn = (list, want) =>
   list.find(n => (want instanceof RegExp ? want.test(n.label) : norm(n.label) === norm(want)));
 
@@ -544,7 +567,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
   if (stillHome) fail(`tapping "${label}" did nothing`);
   else { log("ok", `${label} → opened`); opened.tiles.push(label); }
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
-  { const x = dump(); auditScreen(label, x); auditWayOut(label, x); }
+  auditDown(label);
   const c = crashes();
   if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   back();
@@ -590,7 +613,7 @@ else {
     if (findIn(after, "Resources")) fail(`tapping "${label}" did nothing`);
     else { log("ok", `${label} → opened`); opened.rows.push(label); }
     shot("menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
-    { const x = dump(); auditScreen(label, x); auditWayOut(label, x); }
+    auditDown(label);
     const c = crashes();
     if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
     back();
@@ -607,7 +630,7 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
   shot("tab-" + tab.replace(/\s+/g, "-").toLowerCase());
   /* The tabs are screens too, and the first fault a person found on a phone —
      the Salam clipped off the top of the home hero — was on one of them. */
-  auditScreen("tab " + tab, dump());
+  auditDown("tab " + tab);
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   else { log("ok", `${tab} tab`); tabsOk.push(tab); }
