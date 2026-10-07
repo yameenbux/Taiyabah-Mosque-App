@@ -43,8 +43,36 @@ function withBackUnchanged(config) {
   });
 }
 
+/* NO STEP COUNTING, SO NO PHYSICAL ACTIVITY PERMISSION.
+ *
+ * expo-sensors is in this app for one thing: the magnetometer behind the qibla
+ * compass. Its library manifest declares ACTIVITY_RECOGNITION for a pedometer
+ * this app does not have, and the merge puts that permission into the bundle —
+ * where Play sees it, stops the upload, and asks which health features the app
+ * provides. The answer is none, and Google's own text says the fix is to take
+ * the permission out rather than declare features that do not exist.
+ *
+ * It also spares the congregation a "Taiyabah Masjid wants to track your
+ * physical activity" prompt for something it never asks the phone for.
+ *
+ * tools:node="remove" is the manifest merger's instruction to drop a node a
+ * library contributed. Nothing in the app calls Pedometer, so nothing breaks. */
+function withoutStepCounting(config) {
+  return withAndroidManifest(config, cfg => {
+    const manifest = cfg.modResults.manifest;
+    manifest.$["xmlns:tools"] = manifest.$["xmlns:tools"] || "http://schemas.android.com/tools";
+    const NAME = "android.permission.ACTIVITY_RECOGNITION";
+    manifest["uses-permission"] = manifest["uses-permission"] || [];
+    const already = manifest["uses-permission"].find(p => p.$ && p.$["android:name"] === NAME);
+    if (already) already.$["tools:node"] = "remove";
+    else manifest["uses-permission"].push({ $: { "android:name": NAME, "tools:node": "remove" } });
+    return cfg;
+  });
+}
+
 module.exports = function withApi36(config) {
   config = withBackUnchanged(config);
+  config = withoutStepCounting(config);
   return withGradleProperties(config, cfg => {
     const key = "android.suppressUnsupportedCompileSdk";
     cfg.modResults = cfg.modResults.filter(

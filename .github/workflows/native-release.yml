@@ -231,6 +231,44 @@ jobs:
           set -o pipefail
           ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
+      # EVERY PERMISSION THE BUNDLE ACTUALLY ASKS FOR, read from the merged
+      # manifest rather than from app.json.
+      #
+      # app.json lists six. The bundle Play refused on 7 October asked for
+      # ACTIVITY_RECOGNITION as well, because expo-sensors declares it for a
+      # pedometer this app does not have and the merger folded it in. Play saw
+      # a health permission, stopped the upload and asked which health features
+      # the app provides — the answer being none. Nothing here was looking at
+      # the merged list, so the first anybody knew was the Console.
+      #
+      # Printed as a notice every time, so the list is readable without the log,
+      # and failed on only for permissions that drag a declaration or a policy
+      # review behind them.
+      - name: What the bundle actually asks the phone for
+        working-directory: native/android
+        run: |
+          set -e
+          merged=$(find app/build/intermediates -name AndroidManifest.xml -path "*merged_manifest*" | head -1)
+          if [ -z "$merged" ]; then
+            echo "::warning::could not find the merged manifest — permissions not checked"
+            exit 0
+          fi
+          perms=$(grep -oE 'android.permission.[A-Z_]+' "$merged" | sort -u)
+          echo "$perms"
+          echo "::notice::permissions in the bundle: $(echo $perms | tr '\n' ' ')"
+          # Each of these makes Play ask for a declaration, a policy review, or
+          # both. None of them belongs in this app.
+          for bad in ACTIVITY_RECOGNITION CAMERA RECORD_AUDIO READ_CONTACTS \
+                     READ_SMS RECEIVE_SMS QUERY_ALL_PACKAGES REQUEST_INSTALL_PACKAGES \
+                     ACCESS_BACKGROUND_LOCATION MANAGE_EXTERNAL_STORAGE; do
+            if echo "$perms" | grep -q "android.permission.$bad$"; then
+              echo "::error::the bundle asks for $bad, which this app has no use for."
+              echo "::error::A library's manifest contributed it. Remove it with"
+              echo "::error::tools:node=\"remove\" in native/plugins/with-api-36.js."
+              exit 1
+            fi
+          done
+
       # assembleRelease rides along with the bundle because a .aab cannot be
       # installed on a phone, and the thing worth testing before an upload is
       # the REAL package — com.taiyabahmasjid.app, the production build, not
