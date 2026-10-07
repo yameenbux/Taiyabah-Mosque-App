@@ -134,6 +134,22 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
 
+      # app.json declares entitlements and Info.plist keys; prebuild writes
+      # them into a generated project; the build copies them into the .app.
+      # None of those steps fails loudly if one is dropped, and the losses are
+      # not cosmetic — a missing NSLocationWhenInUseUsageDescription does not
+      # warn, it kills the app the moment the Qibla screen asks for a fix, and
+      # a missing aps-environment makes push silently never arrive. The Android
+      # job already proves prebuild wrote what app.json asked for; this is the
+      # same assurance for iOS, read off the built artefact rather than the
+      # generated project, because what ships is the question.
+      - name: What app.json declares, the built app carries
+        working-directory: native
+        run: |
+          APP=$(find ios/build/Build/Products -maxdepth 2 -name '*.app' -print -quit)
+          test -n "$APP" || { echo "no .app was produced"; exit 1; }
+          node scripts/check-ios-config.mjs "$APP"
+
       # "It compiled" and "it opens" are different claims — the Android smoke
       # job exists because that difference has bitten this repo before.
       - name: Boot a phone and a tablet, install, and photograph it
