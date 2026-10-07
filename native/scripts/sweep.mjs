@@ -36,6 +36,10 @@ const WIDTH = Number(process.argv[2]) || 360;      // the narrow end of what peo
  * That is the state the nikāḥ form was photographed in, and sweeping at 1x
  * would never show it. */
 const SCALE = Number((process.argv.find(a => a.startsWith("--scale=")) || "").split("=")[1]) || 1;
+/* Light or dark. The app has both, the website has both, and a token that was
+ * split for one and forgotten in the other shows up as words the same colour as
+ * what is behind them — which no layout measurement would notice. */
+const THEME = (process.argv.find(a => a.startsWith("--theme=")) || "").split("=")[1] || "light";
 const DIST = path.resolve(import.meta.dirname, "../dist");
 if (!fs.existsSync(path.join(DIST, "index.html")))
   { console.error("no dist/ — run: npx expo export --platform web --output-dir dist"); process.exit(1); }
@@ -76,8 +80,8 @@ await page.route(/supabase\.co/, route => {
 
 /* Written before the app boots, so the first paint is already at this size —
  * the prefs live in AsyncStorage, which on the web is localStorage. */
-if (SCALE !== 1)
-  await page.addInitScript(`try { localStorage.setItem("taiyabah.prefs.v1", JSON.stringify({ scale: ${SCALE} })); } catch {}`);
+if (SCALE !== 1 || THEME !== "light")
+  await page.addInitScript(`try { localStorage.setItem("taiyabah.prefs.v1", JSON.stringify({ scale: ${SCALE}, theme: "${THEME}" })); } catch {}`);
 await page.goto("http://localhost:4174/", { waitUntil: "networkidle" });
 await page.waitForTimeout(2500);
 
@@ -125,6 +129,43 @@ const AUDIT = `() => {
     if (r.left < -1 && !scrollsX(el))
       push('starts left of the screen — "' + text + '" (' + Math.round(r.left) + ')');
   }
+  /* CAN THE WORDS BE READ AT ALL? A colour token split for light mode and left
+     behind in dark mode draws text the same colour as what is behind it, and no
+     measurement of boxes would ever notice. Anything under 3:1 is reported —
+     well below what WCAG asks of body text, so there are no judgement calls.
+     Gradients are skipped: the hero's background is a picture, not a colour, so
+     there is no single number to compare against. */
+  const lum = c => {
+    const m = c.match(/[\d.]+/g); if (!m) return null;
+    if (m.length > 3 && Number(m[3]) < 0.95) return null;     // translucent: unknowable
+    const [r, g, b] = m.slice(0, 3).map(v => { v = Number(v) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const behind = el => {
+    for (let p = el; p && p !== document.documentElement; p = p.parentElement) {
+      const s = getComputedStyle(p);
+      if (s.backgroundImage && s.backgroundImage !== "none") return "gradient";
+      const l = lum(s.backgroundColor);
+      if (l !== null) return l;
+    }
+    return lum(getComputedStyle(document.body).backgroundColor);
+  };
+  for (const el of document.querySelectorAll("div, span, p, h1, h2, h3, h4, a, button, label")) {
+    if (el.closest('[aria-hidden="true"]')) continue;
+    if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) continue;
+    const s = getComputedStyle(el);
+    if (s.visibility === "hidden" || s.display === "none" || Number(s.opacity) < 0.5) continue;
+    const fg = lum(s.color), bg = behind(el);
+    if (fg === null || bg === "gradient" || bg === null) continue;
+    const ratio = (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);
+    if (ratio < 3)
+      push('all but invisible — "' + el.textContent.trim().replace(/\s+/g, " ").slice(0, 40) +
+           '" at ' + ratio.toFixed(2) + ':1 (' + s.color + ' on the colour behind it)');
+  }
+
   /* Every pushed screen has to offer a way out. */
   const vis = el => el && el.getBoundingClientRect().width > 0 && !el.closest('[aria-hidden="true"]');
   const onTab = [...document.querySelectorAll('[role="tab"],[role="tablist"] *')].some(vis);
@@ -218,8 +259,8 @@ for (const [name, path_] of [["everyday duas", [/^Daily Adhk/, /^Everyday Du/]],
                              ["curriculum", [/^Madrasah$/, /What is taught|Curriculum/]],
                              /* The reader is the screen people spend the longest
                                 in and neither sweep had ever opened it. */
-                             ["quran reader", [/^Holy Qur.an$/, /^Al-F(a|ā)ti/]],
-                             ["bukhari book", [/al-Bukh/, /Revelation|Belief|^Book 1/]]]) {
+                             ["quran reader", [/^Holy Qur.an$/, /^Al-Kahf$/]],
+                             ["bukhari book", [/al-Bukh/, /Revelation|Belief|Faith/]]]) {
   try { await toHome(); for (const step of path_) await tapText(step); await page.waitForTimeout(500); await check(name); }
   catch (e) { problems.push(`${name}: could not open`); process.stdout.write("?"); }
 }
@@ -227,7 +268,7 @@ for (const [name, path_] of [["everyday duas", [/^Daily Adhk/, /^Everyday Du/]],
 await browser.close(); server.close();
 
 const seen = [...new Set(errors)];
-console.log(`\n\nswept ${screens} screens at ${WIDTH}px, text x${SCALE}`);
+console.log(`\n\nswept ${screens} screens at ${WIDTH}px, text x${SCALE}, ${THEME} mode`);
 console.log(seen.length ? "runtime errors:\n  ! " + seen.slice(0, 10).join("\n  ! ") : "no runtime errors");
 if (problems.length) {
   console.log(`\n${problems.length} problem(s):`);
