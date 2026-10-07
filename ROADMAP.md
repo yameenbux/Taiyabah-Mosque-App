@@ -13,10 +13,10 @@ every row in the table below reaches 9 before this is considered finished.
 | Design & craft | 8.5 | 8.5 | **9** | 9 | dark mode, the iPad column and iPad landscape all done |
 | Internationalisation | 7 | 7.5 | **8** | 9 | three native speakers reading what is already queued for them |
 | Accessibility | 3 | 8 | 8 | 9 | a TalkBack pass on a handset — twenty minutes of a person |
-| Engineering quality | 6 | 8 | **8.5** | 9 | 43 tests, 12 checks, each proven to bite; no component tests |
+| Engineering quality | 6 | 8 | **8.5** | 9 | 62 tests, 13 checks, each proven to bite; held at 8.5 rather than raised — a check that read its expectations from the thing it was checking passed a blank tab bar three times, so the count was never the weak part; no component tests |
 | Robustness | 7 | 7 | **9** | 9 | boundary, crash reporting and global offline detection all in |
 | Security & privacy | 8.5 | 8 | **8.5** | 9 | the write path is closed; the two orphaned views and leaked-password protection are still open, and both are yours to action |
-| Performance & size | 6.5 | 6.5 | **8.5** | 9 | icon font 432KB→16KB, Qurʼan parse 2276KB→174KB worst case; Amiri is 377KB and is the next one |
+| Performance & size | 6.5 | 6.5 | **8.5** | 9 | icon font 442KB→33KB (the 16KB first reported was a broken subset missing 55 glyphs, not a saving), Qurʼan parse 2276KB→174KB worst case; Amiri is 377KB and is the next one |
 | Platform coverage | 4 | 4 | **6** | 9 | iOS compiles and runs on a simulator and the iPad layout is real — but nobody can install it until Apple approves the account |
 | Operational sustainability | 4 | 8 | 8 | 9 | the committee uploading the 2027 timetable — an act, not code |
 | Store readiness | 7 | 7 | **8** | 9 | the Data safety answers are written out; filling the form is a Play Console task |

@@ -38,7 +38,7 @@
 import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { decode, colours } from "./png.mjs";
+import { decode, colours, ascii, palette } from "./png.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(root, "ios-shots");
@@ -91,22 +91,35 @@ for (const want of DEVICES) {
     sh("xcrun", ["simctl", "install", dev.udid, APP]);
     sh("xcrun", ["simctl", "launch", dev.udid, bundleId]);
 
-    /* Give the bundle time to load and the first screen time to draw. A
-       splash-screen screenshot proves nothing, which is the failure this whole
-       script exists to catch. */
-    await new Promise(r => setTimeout(r, 14000));
-
+    /* Wait for the screen to settle rather than for a fixed number of
+       seconds. A fixed wait is a guess that is either wasteful or wrong, and
+       on this job it was very nearly wrong: at fourteen seconds the iPad
+       scored twenty colours along its bottom edge against a threshold of ten,
+       which is the shape of a splash screen that had not finished. So keep
+       photographing until the screen looks laid out, and say how long it
+       took — a number that drifts upward is worth knowing about. */
     const shot = path.join(OUT, `${want.label}-home.png`);
-    sh("xcrun", ["simctl", "io", dev.udid, "screenshot", shot]);
+    const began = Date.now();
+    let img, whole = 0, strip = 0, waited = 0;
+    for (let attempt = 0; attempt < 12; attempt++) {
+      await new Promise(r => setTimeout(r, attempt === 0 ? 8000 : 4000));
+      sh("xcrun", ["simctl", "io", dev.udid, "screenshot", shot]);
+      img = decode(shot);
+      whole = colours(img);
+      strip = colours(img, 0, Math.round(img.height * 0.88), img.width, Math.round(img.height * 0.12));
+      waited = Math.round((Date.now() - began) / 1000);
+      if (whole >= 100 && strip >= 10) break;
+    }
     const bytes = fs.statSync(shot).size;
-    console.log(`  shot: ${path.basename(shot)} (${Math.round(bytes / 1024)} KB)`);
-
-    /* Did anything draw, and did the app get past its splash screen? */
-    const img = decode(shot);
-    const whole = colours(img);
-    const strip = colours(img, 0, Math.round(img.height * 0.88), img.width, Math.round(img.height * 0.12));
+    console.log(`  shot: ${path.basename(shot)} (${Math.round(bytes / 1024)} KB) after ${waited}s`);
     console.log(`  ink: ${whole} colours overall, ${strip} along the bottom ` +
                 `(${img.width}x${img.height})`);
+    console.log(`  palette: ${palette(img).join("  ")}`);
+
+    /* The artefact is uploaded, but the client that reads these logs cannot
+       follow GitHub's redirect to blob storage, so the picture is printed as
+       well. Dark to light, left to right, top to bottom. */
+    console.log(ascii(img, 30, 44).split("\n").map(l => "  | " + l).join("\n"));
     if (whole < 100) {
       console.error(`  FAIL  the screen holds ${whole} colours — that is a blank or flat ` +
                     `rectangle, not the app`);

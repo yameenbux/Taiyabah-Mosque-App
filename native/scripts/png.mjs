@@ -95,3 +95,43 @@ export function colours(img, x = 0, y = 0, w = img.width, h = img.height) {
   }
   return seen.size;
 }
+
+/**
+ * A coarse picture of an image, as text.
+ *
+ * CI artefacts are not always reachable from where the diagnosis happens — the
+ * GitHub client here refuses the redirect to blob storage — but the job log
+ * always is. So when a screenshot needs looking at rather than measuring, it
+ * can be printed. Brightness only; the ramp runs dark to light.
+ */
+export function ascii(img, cols = 32, rows = 56) {
+  const RAMP = " .:-=+*#%@";
+  const cw = img.width / cols, ch = img.height / rows;
+  const out = [];
+  for (let r = 0; r < rows; r++) {
+    let line = "";
+    for (let c = 0; c < cols; c++) {
+      /* One sample per cell from its middle: enough to see shape, and cheap. */
+      const x = Math.min(img.width - 1, Math.floor((c + 0.5) * cw));
+      const y = Math.min(img.height - 1, Math.floor((r + 0.5) * ch));
+      const i = (y * img.width + x) * img.channels;
+      const lum = (img.pixels[i] * 0.299 + img.pixels[i + 1] * 0.587 + img.pixels[i + 2] * 0.114) / 255;
+      line += RAMP[Math.min(RAMP.length - 1, Math.round(lum * (RAMP.length - 1)))];
+    }
+    out.push(line);
+  }
+  return out.join("\n");
+}
+
+/** The most common colours and what share of the image each covers. */
+export function palette(img, top = 6) {
+  const count = new Map();
+  const { pixels: p, channels: c } = img;
+  const total = img.width * img.height;
+  for (let i = 0; i < p.length; i += c) {
+    const k = (p[i] << 16) | (p[i + 1] << 8) | p[i + 2];
+    count.set(k, (count.get(k) || 0) + 1);
+  }
+  return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, top)
+    .map(([k, n]) => `#${k.toString(16).padStart(6, "0")} ${(100 * n / total).toFixed(1)}%`);
+}

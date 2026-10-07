@@ -17,7 +17,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
-import { decode, colours } from "../png.mjs";
+import { decode, colours, ascii, palette } from "../png.mjs";
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "png-test-"));
 const file = name => path.join(tmp, name);
@@ -141,4 +141,29 @@ test("a file that is not a PNG is refused rather than misread", () => {
   const bad = file("bad.png");
   fs.writeFileSync(bad, Buffer.from("this is not a png at all"));
   assert.throws(() => decode(bad), /not a PNG/);
+});
+
+test("the ascii view has the shape asked for and runs dark to light", () => {
+  const h = 40, w = 20;
+  /* Dark on the top half, light on the bottom — the way a screen with a dark
+     hero over cream content looks, which is what this is read for. */
+  const field = Array.from({ length: h }, (_, y) =>
+    Array(w * 3).fill(y < h / 2 ? 10 : 245));
+  const img = decode(write("half.png", field, 3, 0));
+  const art = ascii(img, 10, 8).split("\n");
+  assert.equal(art.length, 8, "wrong number of rows");
+  assert.ok(art.every(l => l.length === 10), "wrong number of columns");
+  assert.equal(art[0], " ".repeat(10), "a dark band should be the darkest character");
+  assert.equal(art[7], "@".repeat(10), "a light band should be the lightest character");
+});
+
+test("the palette names the dominant colour and its share", () => {
+  const h = 20, w = 10;
+  /* Three quarters one colour, one quarter another. */
+  const field = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w * 3 }, (_, i) =>
+      y < 15 ? [0x77, 0x21, 0x57][i % 3] : [0xF6, 0xF1, 0xE7][i % 3]));
+  const p = palette(decode(write("pal.png", field, 3, 0)), 2);
+  assert.match(p[0], /^#772157 75\.0%$/, `got ${p[0]}`);
+  assert.match(p[1], /^#f6f1e7 25\.0%$/, `got ${p[1]}`);
 });

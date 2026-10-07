@@ -425,9 +425,22 @@ function colours(png, x, y, w, h) {
 const tabShot = shot("tabbar");
 const iconCounts = [];
 let iconsDrew = 0, iconsChecked = 0;
+const tabNodes = nodes(dump());
 for (const tab of ["Home", "Prayer Times", "Notices", "More"]) {
-  const n = findIn(nodes(dump()), tab);
-  if (!n) continue;
+  /* The LOWEST match on the glass, not the first. findIn returns the first
+     node carrying the label, and a word like "Notices" appears on the screen
+     above as well as on the tab — so the box being measured was somewhere up
+     in the content, and reported the same 10 colours whether the tab's icon
+     drew or not. It passed the run where every tab icon was missing.
+     The tab bar is the bottom-most thing on the screen, so the largest y is
+     the tab without having to guess at a region. */
+  const matches = tabNodes.filter(x => norm(x.label) === norm(tab));
+  const n = matches.sort((a, b) => b.y - a.y)[0];
+  if (!n) {
+    fail(`the ${tab} tab could not be found on screen, so whether its icon drew ` +
+         `could not be checked — and an unrunnable check must not pass`);
+    continue;
+  }
   const w = 72, h = 52;
   const k = colours(tabShot, Math.max(0, Math.round(n.x - w / 2)),
                     Math.max(0, Math.round(n.y - n.h / 2 - h - 4)), w, h);
