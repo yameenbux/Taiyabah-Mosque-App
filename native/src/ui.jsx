@@ -252,8 +252,12 @@ export function SheetTop({ title, canBack, onBack, onDone, onPrev, onNext, prevO
       {/* Every sheet overrides the stylesheet's centre with text-align:left —
           except the month timetable, whose h3 keeps the stylesheet's centre
           because it sits between two stepper buttons. */}
-      <Text numberOfLines={1} style={{ flex: 1, fontFamily: F.display, fontSize: fs(15.5), color: C.cream,
-                                       textAlign: onPrev ? "center" : rtl ? "right" : "left" }}>{title}</Text>
+      {/* NOT one line. .sh-top h3 is flex:1 with no nowrap and no ellipsis, so
+          on the website a long title wraps and the bar grows under it. Held to
+          one line here, "Birth, Marriage & Death" became "Birth, Marriage & D…"
+          at the largest text size — 227px of words in 201px of bar. */}
+      <Text style={{ flex: 1, fontFamily: F.display, fontSize: fs(15.5), color: C.cream,
+                     textAlign: onPrev ? "center" : rtl ? "right" : "left" }}>{title}</Text>
       {!!onNext && (
         <Pressable onPress={() => { tap(); onNext(); }} disabled={nextOff} accessibilityRole="button"
           hitSlop={{ top: 3, bottom: 3, left: 3, right: 3 }}
@@ -354,9 +358,13 @@ export function Heading({ children, tag }) {
                    marginTop: 26, marginBottom: 11 }}>
       {/* The title gives way, never the tag. A long heading — "Viewing · Friday
           9 October 2026" — used to push the tag clean off the right edge, so
-          the one word explaining the two columns was cut in half. */}
-      <Text numberOfLines={1}
-            style={{ flexShrink: 1, fontFamily: F.display, fontSize: fs(17), color: C.ink }}>{children}</Text>
+          the one word explaining the two columns was cut in half.
+          It gives way by WRAPPING, not by truncating: .sec-h h2 is a flex item
+          with no nowrap and no ellipsis, so on the website "When the madrasah
+          is closed" takes two lines and the rule drops beside it. Held to one
+          line here it became "When the madrasah is clo…" at the largest text
+          size on a narrow phone. */}
+      <Text style={{ flexShrink: 1, fontFamily: F.display, fontSize: fs(17), color: C.ink }}>{children}</Text>
       <View style={{ flex: 1, minWidth: 8, height: 1, backgroundColor: C.line }} />
       {/* .sec-h .tag is plain 11px muted text — no fill, no radius. Drawing it
           as a pill turned a quiet note at the end of a rule ("From the
