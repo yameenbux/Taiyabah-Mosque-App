@@ -12,10 +12,21 @@
  * everything short of distribution can be proved while enrolment is pending.
  *
  * Runs on a macOS runner only — xcrun and simctl do not exist anywhere else.
+ *
+ * It used to stop at "the process is alive", which is a weaker claim than it
+ * sounds: an app stuck on its splash screen is alive, and so is one showing a
+ * white rectangle. So it reads the screenshot it just took. The tab bar sits
+ * at the bottom of every screen in this app on every device size, and a strip
+ * of flat colour there means the app never got past its splash.
+ *
+ * The thresholds are deliberately far below what a real screen produces — a
+ * drawn tab bar runs to hundreds of colours, a flat fill to one or two — so
+ * this fails on a genuinely broken screen and not on a rendering difference.
  */
 import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { decode, colours } from "./png.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(root, "ios-shots");
@@ -77,6 +88,22 @@ for (const want of DEVICES) {
     sh("xcrun", ["simctl", "io", dev.udid, "screenshot", shot]);
     const bytes = fs.statSync(shot).size;
     console.log(`  shot: ${path.basename(shot)} (${Math.round(bytes / 1024)} KB)`);
+
+    /* Did anything draw, and did the app get past its splash screen? */
+    const img = decode(shot);
+    const whole = colours(img);
+    const strip = colours(img, 0, Math.round(img.height * 0.88), img.width, Math.round(img.height * 0.12));
+    console.log(`  ink: ${whole} colours overall, ${strip} along the bottom ` +
+                `(${img.width}x${img.height})`);
+    if (whole < 100) {
+      console.error(`  FAIL  the screen holds ${whole} colours — that is a blank or flat ` +
+                    `rectangle, not the app`);
+      failures++;
+    } else if (strip < 10) {
+      console.error(`  FAIL  the bottom of the screen holds ${strip} colours, so the tab bar ` +
+                    `did not draw — the app is most likely still on its splash screen`);
+      failures++;
+    }
 
     /* Is it actually running, or did it launch and die? */
     const running = sh("xcrun", ["simctl", "spawn", dev.udid, "launchctl", "list"], { stdio: ["ignore","pipe","ignore"] })
