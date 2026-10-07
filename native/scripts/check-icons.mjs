@@ -2,14 +2,21 @@
  * Taiyabah Masjid — every icon the app draws is in the font it ships.
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
- * assets/fonts/ionicons.ttf is a SUBSET: 432KB of Ionicons cut to the 48
- * glyphs this app actually draws, which is 16KB. That is a good trade and a
- * dangerous one, because a glyph left out does not fail the build — it draws
- * an empty box on somebody's screen, and only on the one screen that uses it.
+ * assets/fonts/ionicons.ttf is a SUBSET: 442KB of Ionicons cut to the glyphs
+ * this app actually draws, which is 33KB. That is a good trade and a dangerous
+ * one, because a glyph left out does not fail the build — it draws nothing on
+ * somebody's screen, and only on the one screen that uses it.
  *
  * So this reads the shipped font's own character map and checks it against
  * every icon name the source can reach. Add an icon, forget to regenerate the
  * font, and the build stops here instead of shipping a blank square.
+ *
+ * MIND THE CIRCLE. This takes its list from icon-names.mjs, so it cannot catch
+ * a glyph that the extractor never saw — and that is exactly how a tab bar of
+ * four blank spaces got past three green runs. scripts/test/icons.test.mjs
+ * names drawn icons by hand, independently of the extractor, and the smoke
+ * test looks at real pixels on a real device. Those are the nets. This file
+ * only keeps the font and the extractor honest with each other.
  *
  * It parses the TTF directly rather than shelling out to fontTools, because
  * this has to run wherever the build runs and a Python dependency in CI is a
@@ -71,8 +78,8 @@ function codepoints(file) {
 const glyphMap = JSON.parse(fs.readFileSync(MAP, "utf8"));
 const wanted = JSON.parse(execFileSync("node", [path.join(root, "scripts/icon-names.mjs"), "--json"], { encoding: "utf8" }));
 
-/* Names the app passes to <Ionicons> that Ionicons has never heard of are the
- * app's OWN hand-drawn glyphs, which travel as SVG and not in this font. */
+/* The extractor already keeps only real Ionicons names; this stays as a belt
+ * for the day it learns to report the app's own hand-drawn SVG glyphs too. */
 const ionicons = wanted.filter(n => n in glyphMap);
 const have = codepoints(FONT);
 const missing = ionicons.filter(n => !have.has(glyphMap[n]));
