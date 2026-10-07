@@ -55,7 +55,11 @@ const TILES = [
   { to: "NewBuild", k: "tiles.donate",             t: "Donate",               icon: "heart" },
   { to: "Giving",   k: "giving.sadaqah_lillah",    t: "Sadaqah & Lillah",     icon: "box" },
   { to: "Collect",  k: "collect.charity_collections", t: "Charity Collections", icon: "tin" },
-  { href: "https://chat.whatsapp.com/", k: "tiles.join_whatsapp", t: "Join WhatsApp", icon: "whatsapp" },
+  /* THE WHOLE LINK, invite code and all. Without it this opened WhatsApp's own
+     front page and joined nothing — the one tile on the home screen that did
+     not work, and it looked identical to one that did. Same group as the
+     website's WHATSAPP_URL; if that changes, both change. */
+  { href: "https://chat.whatsapp.com/GUU82kvhjNmCXNksk5iRwm", k: "tiles.join_whatsapp", t: "Join WhatsApp", icon: "whatsapp" },
 ];
 
 /* The web app draws its own tile glyphs rather than using an icon set, and they
