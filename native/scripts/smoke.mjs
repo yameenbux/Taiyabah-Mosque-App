@@ -605,6 +605,9 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
   if (!n) { fail(`the ${tab} tab is not on screen`); continue; }
   tap(n);
   shot("tab-" + tab.replace(/\s+/g, "-").toLowerCase());
+  /* The tabs are screens too, and the first fault a person found on a phone —
+     the Salam clipped off the top of the home hero — was on one of them. */
+  auditScreen("tab " + tab, dump());
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   else { log("ok", `${tab} tab`); tabsOk.push(tab); }
@@ -617,6 +620,20 @@ if (late.length) fail("crashes in the log at the end:\n    " + late.slice(0, 8).
 
 try { fs.writeFileSync(path.join(OUT, "last-screen.xml"), dump()); } catch {}
 say(`\n${shots} screenshots in ${OUT}`);
+/* Damage found while walking the screens. Reported as failures, because every
+   one of these was found by a person holding a phone and should have been
+   found here — so it has to be decided BEFORE the exit below, not after it.
+   Each line is annotated as well as printed: the run log is served from a host
+   this environment cannot reach, so a finding that exists only in the log is a
+   finding nobody reads. */
+if (damage.length) {
+  const seen = new Set();
+  const uniq = damage.filter(d => !seen.has(d) && seen.add(d));
+  say(`\n${uniq.length} layout problem(s):`);
+  uniq.slice(0, 40).forEach((d, i) => { say("  · " + d); if (i < 12) annotate(d); });
+  fail(`${uniq.length} screen(s) draw text that is cut off, or offer no way back`);
+} else say("\nno clipped text and no screen without a way back");
+
 if (failures.length) {
   say(`\n${failures.length} problem(s):`);
   failures.forEach(f => say("  · " + f));
@@ -635,17 +652,6 @@ const tally = [
   `no crash or fatal JS error in logcat at any point`,
   `${shots} screenshots taken`,
 ];
-/* Damage found while walking the screens. Reported as failures, because every
-   one of these was found by a person holding a phone and should have been
-   found here. */
-if (damage.length) {
-  const seen = new Set();
-  const uniq = damage.filter(d => !seen.has(d) && seen.add(d));
-  say(`\n${uniq.length} layout problem(s):`);
-  for (const d of uniq.slice(0, 40)) say("  · " + d);
-  fail(`${uniq.length} screen(s) draw text that is cut off, or offer no way back`);
-} else say("\nno clipped text and no screen without a way back");
-
 say("\nwhat this run proved:");
 tally.forEach(t => say("  · " + t));
 notice("SMOKE PASSED — " + tally.join("; "));
