@@ -80,10 +80,20 @@ jobs:
           path: |
             native/ios/Pods
             ~/Library/Caches/CocoaPods
-          # Keyed on the lockfile: the pods are a function of the JS
-          # dependencies, so they only need rebuilding when those move.
-          key: pods-${{ runner.os }}-${{ hashFiles('native/package-lock.json') }}
-          restore-keys: pods-${{ runner.os }}-
+          # Keyed on the lockfile AND the build configuration. The pods are a
+          # function of the JS dependencies, but NOT only of them: hermes-engine
+          # resolves a prebuilt Hermes whose variant follows the configuration,
+          # and it lands inside this cached directory. Sharing one cache across
+          # configurations meant the switch to Release restored a Pods tree
+          # populated under Debug, pod install saw nothing to do, and the
+          # Release build linked the wrong Hermes. The app then segfaulted
+          # inside the engine's own hash map — EXC_BAD_ACCESS in
+          # hermes::vm::OrderedHashMap::insert, from a plain `new Map()` — which
+          # looks like a bug in this app and is not one.
+          # The configuration is in the key and in restore-keys, so a Debug
+          # cache can never be restored into a Release build again.
+          key: pods-${{ runner.os }}-release-${{ hashFiles('native/package-lock.json') }}
+          restore-keys: pods-${{ runner.os }}-release-
 
       - name: Pods
         working-directory: native/ios

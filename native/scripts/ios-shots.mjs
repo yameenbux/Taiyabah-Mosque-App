@@ -201,8 +201,8 @@ for (const want of DEVICES) {
         const out = sh("xcrun", ["simctl", "spawn", dev.udid, "log", "show", "--last", "4m",
                                  "--style", "compact",
                                  "--predicate", `processImagePath CONTAINS "${app.split("/").pop().replace(".app", "")}"`],
-                       { stdio: ["ignore", "pipe", "ignore"], maxBuffer: 32 * 1024 * 1024 })
-          .split("\n").filter(l => l.trim()).slice(-25);
+                       { stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 })
+          .split("\n").filter(l => l.trim()).slice(-80);
         if (out.length) {
           console.error("    what the device log says:");
           for (const l of out) console.error(`      ${l.slice(0, 220)}`);
