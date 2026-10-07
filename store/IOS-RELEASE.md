@@ -130,14 +130,76 @@ Spotlight, no splash screen, no app shortcuts.
 
 ---
 
+## The app itself is built — that part is no longer waiting
+
+This section used to say an iOS wrapper still had to be written, and to budget
+properly for it. That is out of date. The iOS app is the same React Native app
+as Android, not a `WKWebView` shell, and it compiles.
+
+**What has actually been proved**, on every push, by the `ios` job:
+
+- it builds on a macOS runner (Expo SDK 52, React Native 0.76.9);
+- it installs and launches on an **iPhone 16 Pro** and an **iPad Pro 13-inch**
+  simulator, and is still running fourteen seconds later with no crash report;
+- a screenshot is taken of each and checked for having actually drawn — see
+  `native/scripts/ios-shots.mjs`.
+
+**None of that needs an Apple account.** A simulator runs unsigned builds, so
+`CODE_SIGNING_ALLOWED=NO` is enough and no certificate or provisioning profile
+is involved. That is the whole reason this could be done while enrolment is
+pending.
+
+**What a simulator cannot prove**, and what therefore remains genuinely
+untested until there is an account and a device: push notifications, the
+widget and the Watch app, anything touching the keychain or App Groups across
+processes, and real performance on real hardware.
+
+### Already configured, waiting only to be signed
+
+`native/app.json` carries the iOS side: `supportsTablet`, the `aps-environment`
+entitlement, the `group.com.taiyabahmasjid.app` App Group, the
+`remote-notification` background mode, the location and motion usage strings
+(both written to say the coordinates never leave the phone, which is true —
+the Qibla screen keeps them in React state and never puts them in a request),
+and `ITSAppUsesNonExemptEncryption: false` so the export-compliance question
+does not stop every upload.
+
+The iPad is done rather than tolerated: the layout holds the website's own
+520-point column and centres it, instead of stretching a phone screen across a
+tablet.
+
+### The two things blocked on the account, and exactly why
+
+**The widget and the Watch complications.** The WidgetKit code is written —
+`native/targets/widget/index.swift`, one timeline entry per prayer, London
+clock stated explicitly, sunrise excluded because it is not a prayer, and the
+accessory families a Watch face needs. It is **not wired into the build**:
+`@bacons/apple-targets` is installed but deliberately left out of the plugins
+list, because it requires `ios.appleTeamId`, and a Team ID is issued only with
+a Developer account. Adding it with a placeholder would break the build that
+currently passes, for no gain.
+
+There is a second, smaller obstacle behind that one: an Xcode 16
+`PBXFileSystemSynchronizedRootGroup` needs project `objectVersion` 70 or
+higher, and Expo SDK 52 generates 46. Worth knowing before the first attempt,
+so the error is recognised rather than debugged from scratch.
+
+**Push notifications on iOS.** The app already carries OneSignal and the
+entitlement. What is missing is an **APNs authentication key** (a `.p8` from
+the Developer account), uploaded to OneSignal. Until that exists, an iOS build
+can ask for notification permission and will never receive one. Android is
+unaffected and already works.
+
 ## When the D-U-N-S clears
 
 1. Re-run Apple's D-U-N-S lookup. It has to pass before anything else.
 2. Enrol as Nonprofit, with a trustee as Account Holder.
-3. Build the iOS wrapper. A TWA has no iOS equivalent — iOS needs a `WKWebView`
-   shell, and Apple rejects anything that is only a website in a frame, so it
-   has to carry real native behaviour. Budget properly for this; it is not the
-   twenty minutes Bubblewrap took.
-4. App Store Connect listing. The text in `PLAY-LISTING.md` transfers; the
-   screenshots do not — Apple wants its own sizes.
-5. Submit. Review is typically 1–3 days.
+3. Take the **Team ID** from the account and put it in `native/app.json` as
+   `ios.appleTeamId`, then add `@bacons/apple-targets` to the plugins list.
+   That is what turns the widget and the Watch target on.
+4. Create an **APNs key** and upload it to OneSignal, then test a notification
+   to a real iPhone. Do not take Android's green as evidence for iOS.
+5. App Store Connect listing. The text in `PLAY-LISTING.md` transfers; the
+   screenshots do not — Apple wants its own sizes, and these can be taken from
+   the simulators the `ios` job already boots.
+6. Submit. Review is typically 1–3 days.
