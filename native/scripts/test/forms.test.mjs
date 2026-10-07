@@ -67,3 +67,28 @@ for (const site of callSites) {
       "the reference lives in r.data, not on the envelope");
   });
 }
+
+/* The one control a person must tick to agree to anything. */
+test("the form checkbox announces as a checkbox, not as a button", () => {
+  const src = fs.readFileSync(path.join(SRC, "form.jsx"), "utf8");
+  const check = src.slice(src.indexOf("export function Check("),
+                          src.indexOf("export function Calendar("));
+  assert.match(check, /accessibilityRole="checkbox"/,
+    "Press defaults to the button role, which says nothing about ticked or not");
+  assert.match(check, /accessibilityState=\{\{\s*checked:/,
+    "and a checkbox that never reports checked is worse than a button");
+});
+
+/* Sent takes title, body, reference and extra, and renders no children. The
+ * charity collection screen handed it the reference as a child, which is
+ * valid JSX, compiles, draws the success screen — and silently loses the one
+ * thing the office needs to find the request again. */
+test("no screen hands the success card children it will throw away", () => {
+  const offenders = [];
+  for (const file of files) {
+    const src = fs.readFileSync(file, "utf8");
+    if (src.includes("</Sent>")) offenders.push(path.relative(SRC, file));
+  }
+  assert.deepEqual(offenders, [],
+    "pass reference={...} and extra={...} — Sent does not render children");
+});

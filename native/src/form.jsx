@@ -120,7 +120,25 @@ export function Choice({ label, options, value, onChange }) {
 export function Check({ label, value, onChange, bad }) {
   const { fs, rtl } = useApp();
   return (
+    /* A CHECKBOX, and it has to say so. The website's is a real
+       <input type="checkbox">, which announces as "checkbox, not ticked" and
+       tells somebody using TalkBack both what it is and where it stands. This
+       drew the same square and the same tick but defaulted to Press's "button"
+       role with no checked state, so the one control a person must tick to
+       agree to anything — the privacy line on all four forms, the terms of
+       hire — announced as a button that gave no sign of having worked. */
     <Press onPress={() => { tap(); onChange(!value); }}
+      accessibilityRole="checkbox"
+      /* Both forms of the same fact. accessibilityState is what React Native
+         hands Android, and aria-checked is what the exported web build puts in
+         the DOM — react-native-web drops accessibilityState on a Pressable, so
+         without this the web build renders role="checkbox" with no checked
+         state at all, which is worse than no role: ARIA requires one. The web
+         build is also what the form tests read, and a test that cannot see the
+         box is ticked cannot tell a form that refused from one that was never
+         filled in. */
+      accessibilityState={{ checked: !!value }}
+      aria-checked={!!value}
       style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 11, alignItems: "flex-start", marginTop: 16,
                paddingVertical: 2 }}>
       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: value ? 0 : 1.6,

@@ -133,13 +133,15 @@ export default function Collect({ navigation }) {
   if (state.done)
     return (
       <Screen>
+        {/* reference IS A PROP. Handed to Sent as a child it was dropped on the
+            floor — Sent takes title, body, reference and extra and renders no
+            children — so a charity that applied was told "Keep your reference"
+            with no reference under it, and the office had nothing to look the
+            request up by. The other three forms pass the prop. */}
         <Sent title={t("collect.request_sent", "Your request has been sent")}
               body={t("collect.the_office_will_ring_the_trustee",
-                "The office rings the trustee to confirm before anything is agreed. Keep your reference.")}>
-          {!!state.done?.reference && (
-            <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.brand600, textAlign: "center" }}>
-              {state.done.reference}</Text>)}
-        </Sent>
+                "The office rings the trustee to confirm before anything is agreed. Keep your reference.")}
+              reference={state.done?.reference} />
       </Screen>
     );
 
