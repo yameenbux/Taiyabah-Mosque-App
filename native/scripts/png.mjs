@@ -135,3 +135,20 @@ export function palette(img, top = 6) {
   return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, top)
     .map(([k, n]) => `#${k.toString(16).padStart(6, "0")} ${(100 * n / total).toFixed(1)}%`);
 }
+
+/** The single most common colour, with its channels and the share it covers. */
+export function dominant(img) {
+  const count = new Map();
+  const { pixels: p, channels: c } = img;
+  for (let i = 0; i < p.length; i += c) {
+    const k = (p[i] << 16) | (p[i + 1] << 8) | p[i + 2];
+    count.set(k, (count.get(k) || 0) + 1);
+  }
+  let best = 0, n = 0;
+  for (const [k, v] of count) if (v > n) { best = k; n = v; }
+  return {
+    hex: `#${best.toString(16).padStart(6, "0")}`,
+    r: (best >> 16) & 255, g: (best >> 8) & 255, b: best & 255,
+    share: n / (img.width * img.height),
+  };
+}

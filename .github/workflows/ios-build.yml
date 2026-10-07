@@ -120,6 +120,13 @@ jobs:
       # No team, no certificate, no provisioning profile: a simulator build is
       # unsigned by design. CODE_SIGNING_ALLOWED=NO says so outright, so a
       # failure here is a real compile error and never a signing one.
+      # RELEASE, not Debug. A Debug build does not embed the JavaScript — it
+      # expects a Metro dev server on localhost:8081 — so on a runner with no
+      # Metro the app launches, stays alive, and shows the React Native error
+      # screen. Five green runs proved the native shell compiled and nothing
+      # else; the screenshots were 72% black with a red banner across them.
+      # Release runs the bundling phase, which is also what Android's smoke
+      # job has always done (assembleRelease) and why that one found real bugs.
       - name: Build for the simulator
         working-directory: native/ios
         run: |
@@ -127,7 +134,7 @@ jobs:
           xcodebuild \
             -workspace "${{ steps.xc.outputs.workspace }}" \
             -scheme "${{ steps.xc.outputs.scheme }}" \
-            -configuration Debug \
+            -configuration Release \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \

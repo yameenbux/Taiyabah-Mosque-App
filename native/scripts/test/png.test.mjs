@@ -17,7 +17,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
-import { decode, colours, ascii, palette } from "../png.mjs";
+import { decode, colours, ascii, palette, dominant } from "../png.mjs";
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "png-test-"));
 const file = name => path.join(tmp, name);
@@ -166,4 +166,23 @@ test("the palette names the dominant colour and its share", () => {
   const p = palette(decode(write("pal.png", field, 3, 0)), 2);
   assert.match(p[0], /^#772157 75\.0%$/, `got ${p[0]}`);
   assert.match(p[1], /^#f6f1e7 25\.0%$/, `got ${p[1]}`);
+});
+
+test("the dominant colour is what catches a React Native error screen", () => {
+  /* A wall of black with a red band across it: not blank, not a splash, and
+     it passed five green iOS runs because nothing was looking for it. */
+  const h = 100, w = 40;
+  const field = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w * 3 }, (_, i) =>
+      y >= 8 && y < 26 ? [0xD1, 0x19, 0x26][i % 3] : 0));
+  const top = dominant(decode(write("redbox.png", field, 3, 0)));
+  assert.equal(top.hex, "#000000");
+  assert.ok(top.share > 0.4, `black covered only ${(top.share * 100).toFixed(0)}%`);
+  assert.ok(top.r < 16 && top.g < 16 && top.b < 16, "should read as near-black");
+
+  /* And the app's own lightest surface must not trip the same rule. */
+  const cream = Array.from({ length: h }, () =>
+    Array.from({ length: w * 3 }, (_, i) => [0xF6, 0xF1, 0xE7][i % 3]));
+  const light = dominant(decode(write("cream.png", cream, 3, 0)));
+  assert.ok(!(light.r < 16 && light.g < 16 && light.b < 16), "cream must not read as black");
 });

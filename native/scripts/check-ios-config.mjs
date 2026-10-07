@@ -96,6 +96,22 @@ const check = (r, file, what, why) => {
   else { console.log(`  MISSING ${what}`); problems.push(`${path.basename(file)} has no ${what} — ${why}`); }
 };
 
+/* ---- is the JavaScript actually in there? ---- */
+/* The reason this check exists at all. A Debug build ships no main.jsbundle
+ * and expects a Metro dev server; with none running the app launches, stays
+ * alive, and draws the React Native error screen. Everything downstream — the
+ * screenshot, "still running after 14s", the entitlements above — passes on an
+ * app that has never executed a line of this project's code. */
+const bundle = path.join(app, "main.jsbundle");
+if (fs.existsSync(bundle)) {
+  console.log(`JavaScript: main.jsbundle is present (${Math.round(fs.statSync(bundle).size / 1024)}KB)\n`);
+} else {
+  problems.push("the app contains no main.jsbundle, so it has no JavaScript to run — " +
+                "it will launch, survive, and draw the React Native error screen. " +
+                "A Debug configuration does this; build Release.");
+  console.log("JavaScript: NO main.jsbundle\n");
+}
+
 /* ---- Info.plist, from inside the built bundle ---- */
 const info = path.join(app, "Info.plist");
 if (!fs.existsSync(info)) { console.error(`FAIL  ${app} contains no Info.plist`); process.exit(1); }

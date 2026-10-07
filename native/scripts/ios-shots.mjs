@@ -38,7 +38,7 @@
 import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { decode, colours, ascii, palette } from "./png.mjs";
+import { decode, colours, ascii, palette, dominant } from "./png.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(root, "ios-shots");
@@ -120,7 +120,22 @@ for (const want of DEVICES) {
        follow GitHub's redirect to blob storage, so the picture is printed as
        well. Dark to light, left to right, top to bottom. */
     console.log(ascii(img, 30, 44).split("\n").map(l => "  | " + l).join("\n"));
-    if (whole < 100) {
+    /* The React Native error screen: a wall of black with a red banner of
+       message text across it. It is what a build with no embedded JavaScript
+       draws, it is NOT blank and NOT a splash, so every other test here passes
+       on it — which is exactly what happened for five green runs. This app
+       never shows a black screen: the lightest theme is cream and the darkest
+       card is #24091A, nowhere near it. */
+    const top = dominant(img);
+    const nearBlack = top.r < 16 && top.g < 16 && top.b < 16;
+    if (nearBlack && top.share > 0.4) {
+      console.error(`  FAIL  ${Math.round(top.share * 100)}% of the screen is ${top.hex} — ` +
+                    `this app has no black screen, so that is the React Native error ` +
+                    `screen. The usual cause is a build with no embedded JavaScript ` +
+                    `(Debug rather than Release), which launches and survives and runs ` +
+                    `none of this project's code.`);
+      failures++;
+    } else if (whole < 100) {
       console.error(`  FAIL  the screen holds ${whole} colours — that is a blank or flat ` +
                     `rectangle, not the app`);
       failures++;
