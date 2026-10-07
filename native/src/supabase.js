@@ -5,7 +5,7 @@
  * them are deny-all. The secret key never comes near an app anyone installs.
  */
 
-import { noteReach } from "./reach";
+import { noteReach, setProbe } from "./reach";
 const URL = "https://phenbhmobxwyvdeshvqw.supabase.co";
 
 /* WHICH MASJID THIS APP IS FOR, named rather than assumed.
@@ -141,3 +141,10 @@ export async function upload(bucket, file, { ext = "bin", ms = 60000 } = {}) {
     return path;
   } finally { clearTimeout(timer); }
 }
+
+/* The question "is the masjid back yet", asked by reach.js while the answer is
+   no. A HEAD on the REST root is the cheapest thing that proves the round trip
+   — any status at all means the masjid is talking, and go() reports that
+   through the same noteReach every other request uses. Eight seconds rather
+   than twelve: this one is a poll, not somebody waiting on a screen. */
+setProbe(() => go("", { method: "HEAD" }, 8000));

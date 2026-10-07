@@ -158,10 +158,18 @@ export default function Home({ navigation }) {
         <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
       </LinearGradient>
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-        style={{ paddingBottom: 22, overflow: "hidden", alignItems: rtl ? "flex-end" : "flex-start" }}>
+        /* The website's own hero box: padding 26px 22px 30px. The top 26 was
+           missing here, and overflow:hidden is right above it — it is what
+           clips the girih — so the salām's line box began exactly at the clip
+           and the fatḥa, shadda and sukūn above the letters were sliced off.
+           Arabic diacritics sit higher than any Latin ascender, so this is the
+           one place where a missing top padding shows as damaged text rather
+           than as tight spacing. */
+        style={{ paddingTop: 26, paddingBottom: 30, overflow: "hidden",
+                 alignItems: rtl ? "flex-end" : "flex-start" }}>
         <Girih style={{ right: -46, top: -40 }} size={230} />
 
-        <View style={{ paddingHorizontal: 20, alignSelf: "stretch",
+        <View style={{ paddingHorizontal: 22, alignSelf: "stretch",
                        alignItems: rtl ? "flex-end" : "flex-start" }}>
         {/* The salām sits on one line, Arabic then transliteration, as the web
             app sets it. */}

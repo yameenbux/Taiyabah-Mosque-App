@@ -36,6 +36,7 @@ export function noteReach(ok) {
 function set(next) {
   if (next === state) return;
   state = next;
+  if (state === "unreachable") startProbing(); else stopProbing();
   for (const fn of listeners) { try { fn(state); } catch {} }
 }
 
@@ -47,8 +48,51 @@ export function onReach(fn) {
   return () => listeners.delete(fn);
 }
 
+/* ---------------------------------------------------------------------------
+   GETTING BACK.
+
+   Measuring from real requests answers "is the masjid there" honestly, and it
+   had one hole: nothing ever asked again. The only thing that could clear
+   "unreachable" was a request that happened to succeed, and a screen whose
+   request already failed does not repeat it. So a phone that lost signal for
+   five seconds in a lift — or simply started the app before the wifi had
+   associated — wore the bar until it was force-closed. Reported from a real
+   phone, on a desk, on wifi: "the connection error sticks to the screen and
+   cannot be removed."
+
+   So while the answer is "no", ask again. Gently: 5 seconds, then 10, 20, 40,
+   up to a minute, because a phone that is genuinely in a tunnel should not
+   have its battery emptied finding that out. The moment anything answers, the
+   probe stops and the bar goes with it.
+
+   The probe is injected rather than imported. supabase.js already imports this
+   module, so reaching back into it would be a cycle.
+   --------------------------------------------------------------------------- */
+let probe = null, timer = null, wait = 0;
+const FIRST = 5000, MAX = 60000;
+
+export function setProbe(fn) { probe = fn; }
+
+function stopProbing() { if (timer) { clearTimeout(timer); timer = null; } wait = 0; }
+
+function startProbing() {
+  if (!probe || timer) return;          // nothing to ask with, or already asking
+  wait = wait ? Math.min(wait * 2, MAX) : FIRST;
+  timer = setTimeout(async () => {
+    timer = null;
+    /* The probe reports through noteReach itself, like every other request,
+       so there is one path into this state machine and not two. */
+    try { await probe(); } catch { /* noteReach(false) already ran */ }
+    if (state === "unreachable") startProbing();
+  }, wait);
+}
+
+/* Coming back to the app is the other moment worth asking again: the phone has
+   usually been somewhere with signal since. */
+export function wokeUp() { if (state === "unreachable") { wait = 0; stopProbing(); startProbing(); } }
+
 /* For tests, and for a screen that wants to start over after a manual retry. */
-export function resetReach() { state = "unknown"; failures = 0; }
+export function resetReach() { state = "unknown"; failures = 0; stopProbing(); }
 
 /* The hook lives here rather than beside the bar, because the bar is not the
  * only thing that needs the answer: Screen has to leave room at the bottom of

@@ -209,12 +209,21 @@ export function Calendar({ month, onMonth, selected = [], taken = null, first, l
                       : isTaken ? "taken" : "free";
           const edge = on ? C.brand600 : state === "free" ? FREE : state === "taken" ? C.danger : C.line;
           const mark = state === "free" ? FREE : state === "taken" ? C.danger : null;
-          return (
-            <Pressable key={key} disabled={past || unoffered || isTaken || unknown}
+            /* DISABLED ONLY WHERE THE WEBSITE DISABLES: past, or a day this
+               hire is not offered on. Taken and unknown stay pressable, and
+               that is not a detail — this screen's own copy depends on it.
+               Pick a booked day and the panel says "Booked"; pick one whose
+               availability never came back and it says "We could not check
+               availability just now. The office can confirm on the phone" and
+               offers "Ask". Disabling those two made both states unreachable,
+               so on a phone that could not reach the masjid EVERY day in the
+               month was dead and no booking could be started at all. */
+            const off = past || unoffered;
+            return (
+            <Pressable key={key} disabled={off}
               onPress={() => { tap(); onPick(key, date); }}
               accessibilityRole="button"
-              accessibilityState={{ selected: on,
-                                    disabled: !!(past || unoffered || isTaken || unknown) }}
+              accessibilityState={{ selected: on, disabled: !!off }}
               style={{ width: "14.2857%", aspectRatio: 1, padding: 2 }}>
               {/* .bk-day — a square cell with its own border and paper fill,
                   10px of radius, and a 5px dot at the foot saying what it is.

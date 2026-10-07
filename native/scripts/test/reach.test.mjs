@@ -8,7 +8,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { noteReach, reach, offline, onReach, resetReach } from "../../src/reach.js";
+import { noteReach, reach, offline, onReach, resetReach, setProbe, wokeUp } from "../../src/reach.js";
 
 test("a fresh app is not offline — it is simply unasked", () => {
   resetReach();
@@ -68,4 +68,100 @@ test("a thrown listener cannot stop the others being told", () => {
   noteReach(false); noteReach(false);
   a(); b();
   assert.deepEqual(seen, ["unreachable"]);
+});
+
+
+/* ---- getting back ------------------------------------------------------
+   The reported bug, as a test. On a real phone on a desk on wifi the bar
+   "sticks to the screen and cannot be removed", because nothing ever asked
+   again: the only thing that could clear it was a request that happened to
+   succeed, and a screen whose request already failed does not repeat it. */
+
+test("while it cannot reach the masjid, it keeps asking", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  resetReach();
+  let asked = 0;
+  setProbe(async () => { asked += 1; });
+
+  noteReach(false); noteReach(false);
+  assert.equal(offline(), true, "two failures should raise it");
+  assert.equal(asked, 0, "but it should not ask instantly");
+
+  t.mock.timers.tick(5000);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(asked, 1, "first retry after five seconds");
+
+  t.mock.timers.tick(10000);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(asked, 2, "then backs off to ten");
+
+  /* stop the loop while the mock clock is still installed: tearing the
+     registry down first leaves this module holding a handle it thinks is live,
+     and the next test's probe never gets scheduled. */
+  resetReach();
+  setProbe(null);
+  t.mock.timers.reset();
+});
+
+test("the moment anything answers, it stops asking and the bar goes", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  resetReach();
+  let asked = 0;
+  /* a probe that succeeds, the way go() reports any answer at all */
+  setProbe(async () => { asked += 1; noteReach(true); });
+
+  noteReach(false); noteReach(false);
+  t.mock.timers.tick(5000);
+  await Promise.resolve(); await Promise.resolve();
+
+  assert.equal(offline(), false, "an answer clears it");
+  const soFar = asked;
+  t.mock.timers.tick(120000);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(asked, soFar, "and it must not keep polling a working connection");
+
+  /* stop the loop while the mock clock is still installed: tearing the
+     registry down first leaves this module holding a handle it thinks is live,
+     and the next test's probe never gets scheduled. */
+  resetReach();
+  setProbe(null);
+  t.mock.timers.reset();
+});
+
+test("coming back to the app asks again at once rather than waiting out the backoff", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  resetReach();
+  let asked = 0;
+  setProbe(async () => { asked += 1; });
+
+  noteReach(false); noteReach(false);
+  /* let it back off a long way */
+  for (const ms of [5000, 10000, 20000, 40000]) {
+    t.mock.timers.tick(ms);
+    await Promise.resolve(); await Promise.resolve();
+  }
+  const beforeWake = asked;
+
+  wokeUp();
+  t.mock.timers.tick(5000);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(asked, beforeWake + 1, "waking should reset the wait to five seconds");
+
+  /* stop the loop while the mock clock is still installed: tearing the
+     registry down first leaves this module holding a handle it thinks is live,
+     and the next test's probe never gets scheduled. */
+  resetReach();
+  setProbe(null);
+  t.mock.timers.reset();
+});
+
+test("with no probe registered it simply does not poll, and nothing throws", t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  resetReach();
+  setProbe(null);
+  noteReach(false); noteReach(false);
+  assert.equal(offline(), true);
+  t.mock.timers.tick(600000);
+  assert.equal(offline(), true, "still offline, still quiet");
+  t.mock.timers.reset();
 });

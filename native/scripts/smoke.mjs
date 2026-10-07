@@ -112,6 +112,61 @@ function nodes(xml) {
 }
 
 const norm = s => s.replace(/\s+/g, " ").replace(/[‘’ʼ]/g, "'").trim().toLowerCase();
+/* ---------- is anything damaged on this screen? --------------------------
+   nodes() keeps a centre and a size, because that is what tapping needs. This
+   keeps the edges, because the question here is whether anything ran off them.
+
+   Two signals, both exact rather than impressionistic:
+
+     · a text node ending in "…" — React Native writes that itself when it has
+       run out of room, so it is the app admitting the words did not fit;
+     · a box that starts left of the screen or ends right of it.
+
+   Reported for every screen the sweep opens, because "text is being cut off on
+   the sides" was found on a real phone and nothing in this suite was looking
+   for it. */
+function boxes(xml) {
+  const out = [];
+  for (const m of xml.matchAll(/<node\b[^>]*>/g)) {
+    const tag = m[0];
+    const b = tag.match(/\bbounds="\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]"/);
+    if (!b) continue;
+    const text = (tag.match(/\btext="([^"]*)"/) || [, ""])[1];
+    const desc = (tag.match(/\bcontent-desc="([^"]*)"/) || [, ""])[1];
+    const [, x1, y1, x2, y2] = b.map(Number);
+    out.push({ label: unescapeXml(text || desc).trim(), x1, y1, x2, y2 });
+  }
+  return out;
+}
+
+let SCREEN_W = 0;
+try { SCREEN_W = Number(adb(["shell", "wm", "size"]).match(/(\d+)x\d+/)?.[1] || 0); } catch {}
+
+const damage = [];
+function auditScreen(where, xml) {
+  if (!SCREEN_W) return;
+  const all = boxes(xml || dump());
+  const cut = all.filter(n => n.label && /[…]$|\.\.\.$/.test(n.label));
+  const over = all.filter(n => n.label && (n.x1 < 0 || n.x2 > SCREEN_W));
+  for (const n of cut)
+    damage.push(`${where}: text truncated — "${n.label.slice(0, 54)}"`);
+  for (const n of over)
+    damage.push(`${where}: runs off the screen (${n.x1}..${n.x2} of ${SCREEN_W}) — "${n.label.slice(0, 40)}"`);
+}
+
+/* Every pushed screen has to offer a way out. Qibla, the new-build appeal and
+   Listen Live each drew the app bar with no back arrow and no Done, so the
+   only way off them was the phone's own button — reported as "no back button".
+   A tab is exempt: the tab bar is its way out. */
+function auditWayOut(where, xml) {
+  const all = boxes(xml || dump());
+  const label = n => (n.label || "").toLowerCase();
+  const onTab = all.some(n => label(n) === "home") && all.some(n => label(n) === "more");
+  if (onTab) return;
+  const out = all.some(n => ["back", "done", "close"].includes(label(n)));
+  if (!out) damage.push(`${where}: no way back — no Back, Done or Close anywhere on the screen`);
+}
+
 const findIn = (list, want) =>
   list.find(n => (want instanceof RegExp ? want.test(n.label) : norm(n.label) === norm(want)));
 
@@ -489,6 +544,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
   if (stillHome) fail(`tapping "${label}" did nothing`);
   else { log("ok", `${label} → opened`); opened.tiles.push(label); }
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+  { const x = dump(); auditScreen(label, x); auditWayOut(label, x); }
   const c = crashes();
   if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   back();
@@ -534,6 +590,7 @@ else {
     if (findIn(after, "Resources")) fail(`tapping "${label}" did nothing`);
     else { log("ok", `${label} → opened`); opened.rows.push(label); }
     shot("menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+    { const x = dump(); auditScreen(label, x); auditWayOut(label, x); }
     const c = crashes();
     if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
     back();
@@ -578,6 +635,17 @@ const tally = [
   `no crash or fatal JS error in logcat at any point`,
   `${shots} screenshots taken`,
 ];
+/* Damage found while walking the screens. Reported as failures, because every
+   one of these was found by a person holding a phone and should have been
+   found here. */
+if (damage.length) {
+  const seen = new Set();
+  const uniq = damage.filter(d => !seen.has(d) && seen.add(d));
+  say(`\n${uniq.length} layout problem(s):`);
+  for (const d of uniq.slice(0, 40)) say("  · " + d);
+  fail(`${uniq.length} screen(s) draw text that is cut off, or offer no way back`);
+} else say("\nno clipped text and no screen without a way back");
+
 say("\nwhat this run proved:");
 tally.forEach(t => say("  · " + t));
 notice("SMOKE PASSED — " + tally.join("; "));

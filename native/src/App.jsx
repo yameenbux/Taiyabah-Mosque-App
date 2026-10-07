@@ -4,7 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Platform, View } from "react-native";
+import { Platform, View, AppState } from "react-native";
+import { wokeUp } from "./reach";
 import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -244,6 +245,14 @@ export default function App() {
        Neither blocks a frame: the bundled file is in memory from the start,
        so the app always has times to draw while this happens. */
     restoreTimetable().finally(() => { syncTimetable(); });
+
+    /* Coming back to the app is the moment worth asking again whether the
+       masjid is reachable. A phone that has been in a pocket has usually been
+       somewhere with signal since, and the offline bar should be gone before
+       anybody reads it. reach.js only acts on this while the answer is still
+       no, so on a working connection it costs nothing. */
+    const sub = AppState.addEventListener("change", s => { if (s === "active") wokeUp(); });
+    return () => { try { sub.remove(); } catch {} };
   }, []);
 
   /* Shown only while the settings store answers, which has its own ceiling in
