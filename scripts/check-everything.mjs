@@ -171,6 +171,31 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
   await p.reload(); await p.waitForTimeout(2400);
   (await p.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue("--ts").trim()))===ts1
     ? ok("prefs","text size survives a restart") : bad("prefs","text size is forgotten on restart");
+
+  /* Appearance. Light is the default and the phone's own setting is
+     deliberately not read, so a fresh visitor must land in light however
+     their device is configured — that is the part worth asserting, not just
+     that the toggle moves. */
+  /* the restart above closed the screen; the control lives inside it */
+  await p.evaluate(()=>{ if(typeof openSysPrefs==="function") openSysPrefs(); });
+  await p.waitForTimeout(700);
+  const t0 = await p.evaluate(()=>document.documentElement.dataset.theme || "light");
+  t0 === "light" ? ok("prefs","a fresh visitor gets light, whatever the device prefers")
+                 : bad("prefs",`a fresh visitor got "${t0}" without asking`);
+  await p.evaluate(()=>{ [...document.querySelectorAll("#theme-pick button")]
+      .find(b=>b.getAttribute("aria-checked")==="false").click(); });
+  await p.waitForTimeout(500);
+  const t1 = await p.evaluate(()=>({theme:document.documentElement.dataset.theme,
+                                    bg:getComputedStyle(document.body).backgroundColor}));
+  t1.theme === "dark" ? ok("prefs",`dark mode applies (${t1.bg})`)
+                      : bad("prefs","the appearance control did nothing");
+  await p.reload(); await p.waitForTimeout(2400);
+  /* read it at once: the point of the pre-paint script is that dark is on
+     before anything is drawn, so a reader never sees a light page flash. */
+  const t2 = await p.evaluate(()=>document.documentElement.dataset.theme);
+  await p.evaluate(()=>{ try{ localStorage.removeItem("theme"); }catch(e){} });
+  t2 === "dark" ? ok("prefs","dark survives a restart, with no flash of light")
+                : bad("prefs","dark is forgotten on restart");
   await p.close();
 }
 {
@@ -183,6 +208,34 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
                                    times:(document.body.innerText.match(/\d{1,2}:\d{2}/g)||[]).length}));
   r.tabs===4 ? ok("offline","the app still opens with no network") : bad("offline",`offline shell broken (${r.tabs} tabs)`);
   r.times>=5 ? ok("offline",`prayer times still shown offline (${r.times})`) : note("offline",`only ${r.times} times offline`);
+
+  /* The bar has to lead with what STILL WORKS. Telling somebody "you are
+     offline" and stopping invites them to put the phone away; most of this
+     app needs no signal at all. */
+  const ob = await p.evaluate(()=>{
+    const bar = document.getElementById("offline-bar");
+    if (!bar) return null;
+    window.scrollTo(0, document.body.scrollHeight);
+    const br = bar.getBoundingClientRect();
+    const last = [...document.querySelectorAll("body > *")].filter(e=>e.offsetParent && e!==bar).pop();
+    const lr = last ? last.getBoundingClientRect() : null;
+    return { hidden: bar.hidden, text: (document.getElementById("offline-text")||{}).textContent || "",
+             covers: lr ? lr.bottom > br.top : false,
+             taps: getComputedStyle(bar).pointerEvents };
+  });
+  if (!ob) bad("offline","there is no offline notice at all");
+  else {
+    !ob.hidden ? ok("offline","the offline notice appears") : bad("offline","offline, and nothing said so");
+    /* names the things that need no signal, and says they work */
+    const names = ["prayer times","qibla"].filter(w => ob.text.toLowerCase().includes(w));
+    (names.length === 2 && /still work/i.test(ob.text))
+      ? ok("offline",`it names what still works (${names.join(", ")})`)
+      : bad("offline",`it says "${ob.text.slice(0,48)}" rather than what still works`);
+    !ob.covers ? ok("offline","it does not cover the last thing on the page")
+               : bad("offline","the notice covers the end of the page");
+    ob.taps === "none" ? ok("offline","it never takes a touch")
+                       : bad("offline",`the notice swallows taps (pointer-events: ${ob.taps})`);
+  }
   await p.context().setOffline(false);
   await p.close();
 }

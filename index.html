@@ -28,6 +28,13 @@
      Leave it in place: removing it un-verifies the property. -->
 <meta name="google-site-verification" content="wNxPSYU7-eElYR1SsyKDetyU9wDUgH3pjFoUqN-_OLI" />
 <meta name="theme-color" content="#3C0B2A" />
+<!-- The theme is applied before the first paint. Waiting for the main script
+     would show a light page for a moment and then swap it, which is worse
+     than either theme on its own. Reads the same key prefStore writes, and
+     fails silently: a browser with storage blocked simply gets light. -->
+<script>(function(){try{var v=JSON.parse(localStorage.getItem("theme")||'"light"');
+if(v==="dark"){document.documentElement.dataset.theme="dark";
+var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#0E0309");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5" />
@@ -52,7 +59,12 @@
     --brand-900:#3C0B2A;    /* hero canvas */
     --brand-800:#4B1136;
     --brand-700:#5E1844;    /* raised on dark */
-    --brand-600:#772157;
+    --brand-600:#772157;    /* plum as TEXT */
+    /* Plum as a SURFACE. The same colour in light, a separate token because
+       on a dark ground one value cannot do both jobs: a fill has to sit
+       above the card, and text on that ground has to clear it. The native
+       app learnt this the expensive way and splits them the same way. */
+    --plum-fill:#772157;
     --gold:#C6A24C;
     --on-air:#3FBE73;
     --gold-bright:#DCBB63;--gold-ink:#7A5D14;--silver-ink:#6E656B;--bronze-ink:#8E5730;--muted-ink:#6E616A;
@@ -61,16 +73,122 @@
     --ink:#261B22;
     --muted:#7C6E77;
     --line:#E4DECF;
-    --danger:#B4532F;
+    --danger:#B4532F;      /* danger as TEXT */
+    --danger-fill:#B4532F; /* danger as a SURFACE — same in light, see --plum-fill */
+    /* Surfaces and inks that were written as literals. Tokenised at their
+       EXACT current values, so light mode cannot move; dark overrides below.
+       Three gold-backed inks (#1D1206, #3A2C07, #3A2A08) are deliberately NOT
+       here: they sit on gold, which stays gold, so they must stay dark. */
+    --tint-plum:#F0E9ED;
+    --tint-plum-pill:#EFE6EC;
+    --tint-plum-soft:#F7F1F5;
+    --tint-plum-faint:#F4EEF1;
+    --tint-plum-press:#E8DCE4;
+    --tint-rose:#FBF0EB;
+    --tint-rose-line:#EBCDBF;
+    --tint-gold:#FBF6E8;
+    --tint-gold-2:#FBF6E7;
+    --tint-gold-3:#F6F2E6;
+    --tint-gold-4:#F7F0DE;
+    --tint-warm:#EDE7D8;
+    --tint-warm-line:#D8D0BB;
+    --tint-warm-line-2:#D9D2C0;
+    --tint-gold-line:#E0CF9E;
+    --tint-gold-line-2:#E8DCBC;
+    --tint-green:#F1F7F3;
+    /* the translucent bar that floats over content */
+    --bar:rgba(252,250,243,.96);
+    /* the chosen control. Same value the picker used before, named so dark
+       can lift it — a chosen state has to stay visibly chosen. */
+    --pick:#5E1844;--pick-ink:#F3EFE3;--pick-ink-2:#E7D9E2;
+    --ink-rose:#7C3A20;
+    --ink-rose-2:#8E4126;
+    --ink-gold:#8A6A18;
+    --ink-gold-2:#4A3B14;
+    --ink-gold-3:#7A6838;
+    --ink-gold-4:#7A5C13;
+    --ink-muted-2:#A78F9E;
+    --ink-muted-3:#A49AA0;
+    --ink-muted-4:#947E8C;
+    --ink-muted-5:#7C5E71;
+    --ink-muted-6:#4A3C45;
     --radius:18px;
     --shadow:0 1px 2px rgba(60,11,42,.06), 0 12px 30px -18px rgba(60,11,42,.35);
     font-family:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  }
+
+  /* ---------------------------------------------------------------- dark --
+     A choice, not the system's. Light stays the normal setting and nobody is
+     moved to dark without asking for it; the toggle lives beside text size in
+     System Preferences.
+
+     These values are not new. They are the palette the native app's dark mode
+     was audited into — every pairing checked for contrast rather than picked
+     by eye — so the two apps are the same app in the dark as well as the
+     light. Where a token did two jobs, it was split above (--plum-fill,
+     --danger-fill), because one value cannot both sit above the card and be
+     read on it. */
+  :root[data-theme="dark"]{
+    --brand-900:#0E0309;   /* the hero goes darker still, not lighter */
+    --brand-800:#1B0613;
+    --brand-700:#2A0C1E;
+    --brand-600:#D79BBD;   /* plum as TEXT, carried up until it reads */
+    --plum-fill:#A5427D;   /* plum as a SURFACE, lifted off the card */
+    --gold:#DCBB63;
+    --gold-bright:#E8CC80;
+    --gold-ink:#E6C87A;    /* gold text sits on a DARK gold tint here */
+    --silver-ink:#C9C0C6;
+    --bronze-ink:#D79A6E;
+    --muted-ink:#B9A6B1;
+    --on-air:#3FBE73;      /* unchanged: it reads on both */
+    --paper:#160410;
+    --card:#24091A;
+    --ink:#F3EFE3;
+    --muted:#B9A6B1;
+    --line:#3C1E31;
+    --danger:#F0937A;      /* the warning's own words, lifted to read */
+    --danger-fill:#5E2419; /* and the surface it sits on, deepened */
+    --tint-plum:#42182F;
+    --tint-plum-pill:#42182F;
+    --tint-plum-soft:#42182F;
+    --tint-plum-faint:#42182F;
+    --tint-plum-press:#4E1E39;
+    --tint-rose:#431812;
+    --tint-rose-line:#5E2419;
+    --tint-gold:#352609;
+    --tint-gold-2:#352609;
+    --tint-gold-3:#352609;
+    --tint-gold-4:#352609;
+    --tint-warm:#2E2208;
+    --tint-warm-line:#4A3414;
+    --tint-warm-line-2:#4A3414;
+    --tint-gold-line:#5A4414;
+    --tint-gold-line-2:#5A4414;
+    --tint-green:#12301F;
+    --bar:rgba(36,9,26,.96);
+    /* carried UP, not down: the fill has to clear the card and the label has
+       to clear the fill. #E7D9E2 was picked against a dark plum and only
+       reaches 4.2:1 on this one, so both labels are the full cream. */
+    --pick:#A5427D;--pick-ink:#F3EFE3;--pick-ink-2:#F3EFE3;
+    --ink-rose:#F0937A;
+    --ink-rose-2:#F0937A;
+    --ink-gold:#E6C87A;
+    --ink-gold-2:#E6C87A;
+    --ink-gold-3:#E6C87A;
+    --ink-gold-4:#E6C87A;
+    --ink-muted-2:#B9A6B1;
+    --ink-muted-3:#B9A6B1;
+    --ink-muted-4:#B9A6B1;
+    --ink-muted-5:#B9A6B1;
+    --ink-muted-6:#B9A6B1;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 30px -18px rgba(0,0,0,.8);
+    color-scheme: dark;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none !important}
   .vis-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;
     left:16px;top:0;border:0;padding:0;margin:0}
-  html,body{background:#EDE7D8;color:var(--ink);-webkit-font-smoothing:antialiased}
+  html,body{background:var(--tint-warm);color:var(--ink);-webkit-font-smoothing:antialiased}
   /* Nothing in this app scrolls left and right except the three strips that
      say so. Anything else that overhangs is a bug, and it must not be
      draggable while somebody is trying to read down the page. */
@@ -239,12 +357,12 @@
   /* ---- Ramadan countdown ---- */
   .ram{margin:-8px 0 16px 2px;display:flex;flex-direction:column;gap:1px}
   .ram-t{font-size:calc(12.5px * var(--ts));font-weight:600;color:var(--gold-bright);letter-spacing:.01em}
-  .ram-n{font-size:calc(10px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:#947E8C}
+  .ram-n{font-size:calc(10px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted-4)}
 
   /* ---- salam greeting ---- */
   .salam{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
   .salam .ar{font-size:calc(25px * var(--ts));color:var(--gold-bright);line-height:1.5;letter-spacing:.5px}
-  .salam .tr{font-size:calc(10.5px * var(--ts));letter-spacing:.16em;text-transform:uppercase;color:#A78F9E}
+  .salam .tr{font-size:calc(10.5px * var(--ts));letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted-2)}
 
   .dv-lines{margin-top:12px;display:flex;flex-direction:column;gap:6px}
   .dvl{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
@@ -277,23 +395,23 @@
 
   /* ---- reminder ribbon ---- */
   .remind{margin:14px 16px 0;padding:13px 14px;border-radius:15px;
-    background:linear-gradient(180deg,#FBF6E8,#F7F0DE);border:1px solid #E8DCBC;
+    background:linear-gradient(180deg,var(--tint-gold),var(--tint-gold-4));border:1px solid var(--tint-gold-line-2);
     box-shadow:0 1px 2px rgba(60,11,42,.05)}
   .rm-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}
   .rm-mark{flex:0 0 auto;width:24px;height:24px;color:var(--gold)}
   .rm-mark svg{width:100%;height:100%;display:block}
-  .rm-ar{flex:1;min-width:0;font-size:calc(19px * var(--ts));color:#8A6A18;line-height:1.7;
+  .rm-ar{flex:1;min-width:0;font-size:calc(19px * var(--ts));color:var(--ink-gold);line-height:1.7;
     direction:rtl;text-align:right}
-  .rm-t{font-size:calc(14px * var(--ts));font-weight:700;color:#4A3B14;line-height:1.3}
-  .rm-d{font-size:calc(12.5px * var(--ts));color:#7A6838;line-height:1.5;margin-top:2px}
+  .rm-t{font-size:calc(14px * var(--ts));font-weight:700;color:var(--ink-gold-2);line-height:1.3}
+  .rm-d{font-size:calc(12.5px * var(--ts));color:var(--ink-gold-3);line-height:1.5;margin-top:2px}
   .rm-nav{display:flex;align-items:center;justify-content:space-between;
     margin-top:11px;padding-top:10px;border-top:1px solid rgba(198,162,76,.28)}
   .rm-dots{display:flex;gap:5px;align-items:center}
-  .rm-dots i{width:6px;height:6px;border-radius:50%;background:#E0CF9E;display:block}
+  .rm-dots i{width:6px;height:6px;border-radius:50%;background:var(--tint-gold-line);display:block}
   .rm-dots i[data-on="1"]{background:var(--gold);transform:scale(1.15)}
   .rm-arrows{display:flex;gap:7px}
   .rm-a{width:32px;height:32px;border-radius:9px;cursor:pointer;font:inherit;font-size:calc(18px * var(--ts));
-    line-height:1;color:#8A6A18;background:rgba(198,162,76,.14);
+    line-height:1;color:var(--ink-gold);background:rgba(198,162,76,.14);
     border:1px solid rgba(198,162,76,.4);display:grid;place-items:center;padding:0}
   .rm-a:active{background:rgba(198,162,76,.3)}
   .rm-a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -344,7 +462,7 @@
   table.mt td.d small{display:block;font-size:calc(9.5px * var(--ts));font-weight:500;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
   table.mt tr.fri td{background:rgba(198,162,76,.10)}
   table.mt tr.today td{background:rgba(119,33,87,.13);font-weight:700}
-  table.mt tr.today td.d{box-shadow:inset 3px 0 0 var(--brand-600)}
+  table.mt tr.today td.d{box-shadow:inset 3px 0 0 var(--plum-fill)}
   table.mt tr{cursor:pointer}
   .mt-foot{padding:14px 16px 26px;font-size:calc(11.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.6}
 
@@ -356,7 +474,7 @@
   .h-ar{font-size:calc(23px * var(--ts));line-height:2;text-align:right;color:var(--gold-bright);
     direction:rtl;margin-bottom:16px}
   .h-en{font-family:"Fraunces",Georgia,serif;font-size:calc(16.5px * var(--ts));line-height:1.55;color:#EDEFE9}
-  .h-src{font-size:calc(11px * var(--ts));letter-spacing:.06em;color:#A78F9E;margin-top:12px;
+  .h-src{font-size:calc(11px * var(--ts));letter-spacing:.06em;color:var(--ink-muted-2);margin-top:12px;
     padding-top:11px;border-top:1px solid rgba(198,162,76,.25)}
 
   .card.phase{padding:16px}
@@ -365,7 +483,7 @@
   .ph-h{font-family:"Fraunces",Georgia,serif;font-size:calc(19px * var(--ts));font-weight:600;line-height:1.25}
   .ph-p{font-size:calc(14px * var(--ts));line-height:1.55;color:var(--muted);margin-top:8px}
   .needs{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
-  .needs span{font-size:calc(12px * var(--ts));font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
+  .needs span{font-size:calc(12px * var(--ts));font-weight:600;color:var(--ink-gold-2);background:rgba(198,162,76,.16);
     border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
 
   .tiers{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -377,7 +495,7 @@
   .t-bronze{border-color:#D3A47C} .t-bronze .t-name{color:var(--bronze-ink)}
   .t-silver{border-color:#C4BFC2} .t-silver .t-name{color:var(--silver-ink)}
   .t-gold{border-color:#D8BC72}   .t-gold .t-name{color:var(--gold-ink)}
-  .t-plat{border-color:#B89FAF}   .t-plat .t-name{color:#7C5E71}
+  .t-plat{border-color:#B89FAF}   .t-plat .t-name{color:var(--ink-muted-5)}
   .tier:active{transform:translateY(1px)}
 
   .donate-cta{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:10px;
@@ -395,7 +513,7 @@
     cursor:pointer;background:none;border:none;border-top:1px solid var(--line);
     padding:13px 13px;border-radius:11px}
   .bk:first-child{border-top:none}
-  .bk:active{background:#F7F1F5}
+  .bk:active{background:var(--tint-plum-soft)}
   .bk-k{font-size:calc(10.5px * var(--ts));letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .bk-v{font-size:calc(16px * var(--ts));font-weight:600;color:var(--ink);letter-spacing:.01em}
   .bk[data-done="1"] .bk-k::after{content:" · copied";color:var(--brand-600);font-weight:700}
@@ -475,7 +593,7 @@
   .vd-item{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;
     cursor:pointer;padding:8px;border-radius:14px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
-  .vd-item[data-on="1"]{border-color:var(--gold);background:#FBF6E8}
+  .vd-item[data-on="1"]{border-color:var(--gold);background:var(--tint-gold)}
   .vd-thumb{flex:0 0 auto;width:112px;aspect-ratio:16/9;border-radius:9px;overflow:hidden;
     background:var(--brand-900);position:relative}
   .vd-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -489,7 +607,7 @@
   .vd-d{font-size:calc(11px * var(--ts));letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   .vd-all{display:block;text-align:center;text-decoration:none;margin:16px 0 26px;
     font-size:calc(13px * var(--ts));font-weight:600;color:var(--brand-600);
-    background:#F0E9ED;border-radius:12px;padding:13px}
+    background:var(--tint-plum);border-radius:12px;padding:13px}
 
   /* ---- zakat calculator ---- */
   .zk-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 24px;color:#F3EFE3;
@@ -505,7 +623,7 @@
   .zk-explain p+p{margin-top:9px}
   .zk-ul{margin:9px 0 0 2px;padding-left:18px}
   .zk-ul li{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--ink);margin-bottom:4px}
-  .zk-tip{margin-top:11px;font-size:calc(12.5px * var(--ts));line-height:1.55;color:#7A6838;
+  .zk-tip{margin-top:11px;font-size:calc(12.5px * var(--ts));line-height:1.55;color:var(--ink-gold-3);
     background:rgba(198,162,76,.14);border:1px solid rgba(198,162,76,.3);
     border-radius:10px;padding:10px 12px}
   .card.zk-card{padding:16px}
@@ -524,19 +642,19 @@
     font-variant-numeric:tabular-nums}
   .zk-f input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
   .zk-live{font-size:calc(12px * var(--ts));font-weight:600;line-height:1.5;margin-top:13px;
-    border-radius:10px;padding:9px 11px;background:#F0E9ED;color:var(--brand-600);
+    border-radius:10px;padding:9px 11px;background:var(--tint-plum);color:var(--brand-600);
     display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .zk-live[data-s="idle"]{display:none}
   .zk-live[data-s="loading"]{color:var(--muted)}
-  .zk-live[data-s="failed"]{background:var(--danger-bg,#FBF0EB);color:#7C3A20}
+  .zk-live[data-s="failed"]{background:var(--danger-bg,var(--tint-rose));color:var(--ink-rose)}
   /* A price from earlier is worth having and worth marking as earlier: told
      apart from today's, but not dressed up as a failure. */
-  .zk-live[data-s="stale"]{background:#FBF6E7;color:#7A5C13}
+  .zk-live[data-s="stale"]{background:var(--tint-gold-2);color:var(--ink-gold-4)}
   .zk-refresh{margin-left:auto;cursor:pointer;font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;
     color:inherit;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);
     border-radius:999px;padding:4px 10px}
   .zk-nisab{margin-top:13px;font-size:calc(14px * var(--ts));font-weight:600;color:var(--brand-600);
-    background:#F0E9ED;border-radius:11px;padding:12px 13px;line-height:1.5}
+    background:var(--tint-plum);border-radius:11px;padding:12px 13px;line-height:1.5}
   .zk-gsnote{font-size:calc(12px * var(--ts));color:var(--muted);margin-top:11px;line-height:1.5}
   .zk-result{margin-top:20px;border-radius:16px;overflow:hidden;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900));color:#F3EFE3;
@@ -562,8 +680,8 @@
   .zk-no{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
   .zk-lists ul{padding-left:18px}
   .zk-lists li{font-size:calc(13.5px * var(--ts));line-height:1.6;color:var(--ink);margin-bottom:6px}
-  .zk-disclaimer{font-size:calc(12.5px * var(--ts));line-height:1.65;color:#7C3A20;background:var(--danger-bg,#FBF0EB);
-    border:1px solid #EBCDBF;border-radius:12px;padding:13px;margin:18px 0 28px}
+  .zk-disclaimer{font-size:calc(12.5px * var(--ts));line-height:1.65;color:var(--ink-rose);background:var(--danger-bg,var(--tint-rose));
+    border:1px solid var(--tint-rose-line);border-radius:12px;padding:13px;margin:18px 0 28px}
 
   /* ---- 40 rabbana ---- */
   .rb-count{font-size:calc(11px * var(--ts));letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);
@@ -592,7 +710,7 @@
   .bk-legend>span{display:flex;align-items:center;gap:5px}
   .bk-dot{width:9px;height:9px;border-radius:50%;display:block;flex:0 0 auto}
   .bk-dot.free{background:#3F7D58}
-  .bk-dot.taken{background:var(--danger)}
+  .bk-dot.taken{background:var(--danger-fill)}
   .bk-dot.unknown{background:var(--line)}
   .bk-cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .bk-cal-head h4{flex:1;text-align:center;font-family:"Fraunces",Georgia,serif;font-size:calc(16px * var(--ts));font-weight:600}
@@ -607,11 +725,11 @@
   .bk-day[disabled]{opacity:.3;cursor:default}
   .bk-day[data-state="unoffered"]{opacity:.45;border-style:dashed}
   .bk-day[data-state="free"]{border-color:#3F7D58}
-  .bk-day[data-state="taken"]{border-color:var(--danger);color:var(--muted)}
-  .bk-day[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff;font-weight:700}
+  .bk-day[data-state="taken"]{border-color:var(--danger-fill);color:var(--muted)}
+  .bk-day[data-on="1"]{background:var(--plum-fill);border-color:var(--plum-fill);color:#fff;font-weight:700}
   .bk-day .bk-mark{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%}
   .bk-day[data-state="free"] .bk-mark{background:#3F7D58}
-  .bk-day[data-state="taken"] .bk-mark{background:var(--danger)}
+  .bk-day[data-state="taken"] .bk-mark{background:var(--danger-fill)}
   .bk-day[data-on="1"] .bk-mark{background:#fff}
   .bk-horizon{font-size:calc(11.5px * var(--ts));color:var(--muted);margin-top:10px;text-align:center}
 
@@ -621,7 +739,7 @@
   .bk-session{text-align:left;font:inherit;padding:12px 14px;border-radius:12px;cursor:pointer;
     border:1px solid var(--line);background:var(--paper);color:var(--ink);display:flex;
     align-items:center;gap:10px}
-  .bk-session[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .bk-session[data-on="1"]{background:var(--plum-fill);border-color:var(--plum-fill);color:#fff}
   .bk-session[disabled]{opacity:.55;cursor:default}
   /* A flex ITEM is not a flex container. These two spans ran together on one
      line — "Morning9:00 am – 4:00 pm" — on the hall's sessions since they were
@@ -639,7 +757,7 @@
   .bk-opt{flex:1 1 auto;min-width:88px;font:inherit;font-size:calc(13px * var(--ts));padding:10px 12px;border-radius:11px;
     cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);text-align:center}
   .bk-opt small{display:block;font-size:calc(10.5px * var(--ts));color:var(--muted);margin-top:2px}
-  .bk-opt[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .bk-opt[data-on="1"]{background:var(--plum-fill);border-color:var(--plum-fill);color:#fff}
   .bk-opt[data-on="1"] small{color:#EADFE6}
   /* Paying the deposit is the whole point of the screen, so it is said once
      at the top and again on the button, and nowhere in between. */
@@ -652,7 +770,7 @@
   .bk-msg{margin-top:10px;padding:11px 13px;border-radius:11px;background:var(--paper);
     border:1px solid var(--line);font-size:calc(12.5px * var(--ts));line-height:1.6}
   .bk-act{flex:0 0 auto;font:inherit;font-size:calc(13px * var(--ts));font-weight:700;padding:9px 16px;
-    border-radius:10px;cursor:pointer;border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+    border-radius:10px;cursor:pointer;border:1px solid var(--plum-fill);background:var(--plum-fill);color:#fff}
   .bk-act:disabled{opacity:.4;cursor:default}
   .bk-form-head{display:flex;flex-direction:column;gap:2px;padding-bottom:10px;margin-bottom:4px;
     border-bottom:1px solid var(--line)}
@@ -662,7 +780,7 @@
     border-radius:11px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--muted)}
   .bk-done .bk-pay{display:block;margin-top:12px;padding:13px;border-radius:12px;text-align:center;
     text-decoration:none;font-weight:700;font-size:calc(15px * var(--ts));
-    background:var(--brand-600);color:#fff}
+    background:var(--plum-fill);color:#fff}
   .bk-hold{margin-top:8px;font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.55}
   .bk-tel{color:var(--brand-600);font-weight:700;white-space:nowrap}
 
@@ -681,7 +799,7 @@
   .np-when{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.65;margin:5px 0 12px}
   .np-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
   .np-btn{flex:1 1 150px;font:inherit;font-size:calc(13.5px * var(--ts));font-weight:700;padding:12px 10px;
-    border-radius:11px;cursor:pointer;border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+    border-radius:11px;cursor:pointer;border:1px solid var(--plum-fill);background:var(--plum-fill);color:#fff}
   .np-btn.np-alt{background:var(--paper);color:var(--brand-600)}
   .bk-terms{padding:14px}
   .bk-term + .bk-term{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}
@@ -692,7 +810,7 @@
 
   .bk-agree{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:calc(12.5px * var(--ts));
     line-height:1.5;color:var(--ink);cursor:pointer}
-  .bk-agree input{margin-top:2px;flex:0 0 auto;width:17px;height:17px;accent-color:var(--brand-600)}
+  .bk-agree input{margin-top:2px;flex:0 0 auto;width:17px;height:17px;accent-color:var(--plum-fill)}
 
   .bk-form{margin-top:14px;display:grid;gap:11px}
   .bk-field label{display:block;font-size:calc(12px * var(--ts));font-weight:700;color:var(--muted);
@@ -700,13 +818,13 @@
   .bk-field input,.bk-field textarea{width:100%;box-sizing:border-box;font:inherit;font-size:calc(15px * var(--ts));
     padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink)}
   .bk-field textarea{resize:vertical}
-  .bk-field[data-bad="1"] input,.bk-field[data-bad="1"] textarea{border-color:var(--danger)}
+  .bk-field[data-bad="1"] input,.bk-field[data-bad="1"] textarea{border-color:var(--danger-fill)}
   .bk-hint{display:block;font-size:calc(11.5px * var(--ts));color:var(--muted);line-height:1.5;margin-top:5px}
   .bk-clabel + .bk-hint{margin:-2px 0 8px}
   .bk-err{font-size:calc(13px * var(--ts));line-height:1.55;color:var(--danger);background:rgba(155,44,44,.08);
     border:1px solid rgba(155,44,44,.3);border-radius:11px;padding:10px 12px}
   .bk-submit{font:inherit;font-size:calc(15px * var(--ts));font-weight:700;padding:14px;border:0;border-radius:12px;
-    background:var(--brand-600);color:#fff;cursor:pointer;width:100%}
+    background:var(--plum-fill);color:#fff;cursor:pointer;width:100%}
   .bk-submit:disabled{opacity:.55;cursor:default}
   .bk-done{margin-top:14px;padding:14px;border-radius:12px;background:var(--paper);
     border:1px solid var(--line);font-size:calc(13.5px * var(--ts));line-height:1.6;color:var(--ink)}
@@ -728,8 +846,8 @@
   .ts-pick .ts-a{font-weight:700}
   .ts-pick .ts-n{font-size:calc(10px * var(--ts));font-weight:600;letter-spacing:.03em;
     text-transform:uppercase;color:var(--muted)}
-  .ts-pick button[data-on="1"]{background:var(--brand-700);border-color:var(--brand-700);color:#F3EFE3}
-  .ts-pick button[data-on="1"] .ts-n{color:#E7D9E2}
+  .ts-pick button[data-on="1"]{background:var(--pick);border-color:var(--pick);color:var(--pick-ink)}
+  .ts-pick button[data-on="1"] .ts-n{color:var(--pick-ink-2)}
   .ts-demo{margin:0 0 22px;padding:13px 15px;border-radius:12px;
     background:var(--paper);border:1px solid var(--line);
     font-size:calc(15px * var(--ts));line-height:1.6;color:var(--ink)}
@@ -747,7 +865,7 @@
   .sp-en{font-size:calc(12.5px * var(--ts));color:var(--muted)}
   .sp-state{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;color:var(--muted)}
   .sp-state svg{width:19px;height:19px}
-  .sp-row[data-state="active"] .sp-state{color:#fff;background:var(--brand-600);border-radius:50%}
+  .sp-row[data-state="active"] .sp-state{color:#fff;background:var(--plum-fill);border-radius:50%}
   .sp-row[data-state="active"] .sp-state svg{width:14px;height:14px}
   .sp-row[data-state="downloading"] .sp-state{color:var(--brand-600)}
   .sp-spin{animation:sp-spin-anim .9s linear infinite;transform-origin:50% 50%}
@@ -763,7 +881,7 @@
   /* Selected reads as the brand purple with light text; the rest stay quiet.
      This said var(--brand), which the palette never defines — the declaration
      was dropped, leaving white text on an unpainted pill. */
-  .ak-tab.on{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .ak-tab.on{background:var(--plum-fill);border-color:var(--plum-fill);color:#fff}
   .ak-intro{font-size:calc(12.5px * var(--ts));color:var(--muted);line-height:1.6;margin:0 0 14px}
   .ak-extra{font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.55;margin-top:7px;
     padding-left:10px;border-left:2px solid var(--line)}
@@ -775,7 +893,7 @@
     padding:8px 5px;color:#F3EFE3;text-align:center;font:inherit;overflow:hidden;
     background:linear-gradient(165deg,var(--brand-700),var(--brand-900))}
   .du-tile:nth-child(3n+2){background:linear-gradient(165deg,var(--brand-800),var(--brand-900))}
-  .du-tile:nth-child(3n+3){background:linear-gradient(165deg,var(--brand-600),var(--brand-800))}
+  .du-tile:nth-child(3n+3){background:linear-gradient(165deg,var(--plum-fill),var(--brand-800))}
   .du-tile svg{width:21px;height:21px;color:var(--gold-bright);flex:0 0 auto}
   .du-tile .du-t{font-size:calc(10.5px * var(--ts));font-weight:700;line-height:1.25}
   .du-tile .du-c{font-size:calc(9px * var(--ts));font-weight:600;opacity:.65;letter-spacing:.03em}
@@ -795,7 +913,7 @@
   .qd-ayah:first-child{margin-top:0}
   .qd-ayah-ar{font-size:calc(22px * var(--ts));line-height:2.3;color:var(--ink);direction:rtl;text-align:right}
   .qd-ayah-n{display:inline-flex;width:22px;height:22px;border-radius:50%;
-    background:#F0E9ED;color:var(--brand-600);font-size:calc(11px * var(--ts));font-weight:700;
+    background:var(--tint-plum);color:var(--brand-600);font-size:calc(11px * var(--ts));font-weight:700;
     align-items:center;justify-content:center;margin-inline-start:6px;direction:ltr}
   .qd-ayah-en{font-size:calc(13px * var(--ts));color:var(--muted);line-height:1.55;margin-top:8px}
   .qd-legend-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line)}
@@ -831,15 +949,15 @@
   .wl-ul{margin:9px 0 0 2px;padding-left:18px}
   .wl-ul li{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--ink);margin-bottom:5px}
   .wl-advisory{margin-top:16px;border-radius:14px;padding:14px 15px;
-    background:var(--danger-bg,#FBF0EB);border:1px solid #EBCDBF}
+    background:var(--danger-bg,var(--tint-rose));border:1px solid var(--tint-rose-line)}
   .wl-adv-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-    color:#7C3A20;margin-bottom:7px}
-  .wl-advisory p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:#7C3A20}
+    color:var(--ink-rose);margin-bottom:7px}
+  .wl-advisory p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink-rose)}
   .wl-call{display:flex;align-items:center;gap:13px;text-decoration:none;margin-top:14px;
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
   .wl-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .wl-call-ico svg{width:19px;height:19px}
   .wl-call-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .wl-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -862,7 +980,7 @@
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
   .ia-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .ia-call-ico svg{width:19px;height:19px}
   .ia-call-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .ia-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -911,7 +1029,7 @@
     border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;font:inherit;color:inherit;
     cursor:pointer}
   .hh-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .hh-call-ico svg{width:19px;height:19px}
   .hh-call-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .hh-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -948,7 +1066,7 @@
   .hp-today .dot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;margin-top:5px;
     background:var(--line)}
   .hp-today.is-open .dot{background:#3F7D58}
-  .hp-today.is-shut .dot{background:var(--danger)}
+  .hp-today.is-shut .dot{background:var(--danger-fill)}
   .hp-today .t{display:block;font-size:calc(14.5px * var(--ts));font-weight:700;color:var(--ink)}
   .hp-today .d{display:block;font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--muted);margin-top:3px}
 
@@ -957,9 +1075,9 @@
   .hp-legend span{display:flex;align-items:center;gap:5px}
   .hp-key{width:9px;height:9px;border-radius:3px;display:block;flex:0 0 auto;background:var(--card);
     border:1px solid var(--line)}
-  .hp-key.k-shut{background:var(--danger);border-color:var(--danger)}
+  .hp-key.k-shut{background:var(--danger-fill);border-color:var(--danger-fill)}
   .hp-key.k-ev{background:var(--gold);border-color:var(--gold)}
-  .hp-key.k-today{background:var(--brand-600);border-color:var(--brand-600)}
+  .hp-key.k-today{background:var(--plum-fill);border-color:var(--plum-fill)}
   /* Twelve grids down a phone is a lot of scrolling, so they swipe sideways
      one month at a time and snap, the way a calendar is actually read. */
   .hp-months{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
@@ -975,9 +1093,9 @@
     color:var(--ink);background:var(--paper);border:1px solid transparent}
   .hp-d.is-pad{visibility:hidden}
   .hp-d.is-wknd{color:var(--muted)}
-  .hp-d.is-shut{background:rgba(180,83,47,.14);color:#8E4126;border-color:rgba(180,83,47,.3)}
+  .hp-d.is-shut{background:rgba(180,83,47,.14);color:var(--ink-rose-2);border-color:rgba(180,83,47,.3)}
   .hp-d.is-ev{border-color:var(--gold);font-weight:700}
-  .hp-d.is-today{background:var(--brand-600);color:#F3EFE3;font-weight:700;border-color:var(--brand-600)}
+  .hp-d.is-today{background:var(--plum-fill);color:#F3EFE3;font-weight:700;border-color:var(--plum-fill)}
   .hp-list{padding:2px 16px}
   .hp-r{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
   .hp-r:first-child{border-top:none}
@@ -987,7 +1105,7 @@
   .hp-r .w{font-size:calc(12px * var(--ts));color:var(--muted);white-space:nowrap;text-align:right}
   .hp-r .len{flex:0 0 auto;font-size:calc(11px * var(--ts));color:var(--muted);min-width:52px;text-align:right}
   .hp-est{display:inline-block;font-size:calc(9px * var(--ts));letter-spacing:.08em;text-transform:uppercase;
-    color:#8A6A18;background:rgba(198,162,76,.18);border-radius:5px;padding:1px 5px;margin-left:6px;
+    color:var(--ink-gold);background:rgba(198,162,76,.18);border-radius:5px;padding:1px 5px;margin-left:6px;
     vertical-align:1px}
 
   /* ---- home: today's five prayers at a glance ----
@@ -1014,7 +1132,7 @@
 
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
-    background:linear-gradient(100deg,var(--brand-800),var(--brand-600));color:#F3EFE3;
+    background:linear-gradient(100deg,var(--brand-800),var(--plum-fill));color:#F3EFE3;
     box-shadow:var(--shadow);position:relative;overflow:hidden;border:0;font:inherit;cursor:pointer;
     text-align:left}
   .lbanner .ring{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
@@ -1036,14 +1154,14 @@
   .tile{background:var(--card);border:1px solid var(--line);border-radius:15px;
     padding:15px 6px 13px;display:flex;flex-direction:column;align-items:center;gap:8px;
     box-shadow:var(--shadow);font:inherit;color:var(--ink);cursor:pointer;text-decoration:none}
-  .tile:active{background:#F4EEF1}
+  .tile:active{background:var(--tint-plum-faint)}
   .tile .t-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;
     background:rgba(119,33,87,.08);color:var(--brand-600)}
   .tile .t-ic svg{width:20px;height:20px}
   .tile .t-l{font-size:calc(11.5px * var(--ts));font-weight:600;line-height:1.3;text-align:center;color:var(--ink);
     overflow-wrap:anywhere}
   .tile .t-soon{font-size:calc(9px * var(--ts));letter-spacing:.07em;text-transform:uppercase;font-weight:700;
-    color:#8A6A18;background:rgba(198,162,76,.2);border-radius:5px;padding:2px 5px}
+    color:var(--ink-gold);background:rgba(198,162,76,.2);border-radius:5px;padding:2px 5px}
 
   /* ---- notices ---- */
   .nt-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;
@@ -1070,7 +1188,7 @@
   .nt-card h3{font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
     font-weight:600;line-height:1.25;margin:7px 0 5px}
   .nt-card p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);white-space:pre-wrap}
-  .nt-new{flex:0 0 auto;background:var(--danger);color:#fff;border-radius:999px;
+  .nt-new{flex:0 0 auto;background:var(--danger-fill);color:#fff;border-radius:999px;
     padding:2px 7px;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:.04em;
     text-transform:uppercase}
   .nt-stale{font-size:calc(12px * var(--ts));color:var(--muted);text-align:center;margin-top:12px}
@@ -1101,12 +1219,12 @@
   .fs-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
   .fs-item .ic{flex:0 0 auto;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .fs-item .ic svg{width:19px;height:19px}
   .fs-item h4{font-size:calc(14.5px * var(--ts));font-weight:700;color:var(--ink);display:flex;align-items:center;
     gap:7px;flex-wrap:wrap}
   .fs-item p{font-size:calc(13px * var(--ts));line-height:1.6;color:var(--muted);margin-top:4px}
-  .fs-extra{font-size:calc(9.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:#8A6A18;
+  .fs-extra{font-size:calc(9.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:var(--ink-gold);
     background:rgba(198,162,76,.18);border-radius:5px;padding:2px 6px;font-weight:700}
 
   /* ---- nikah date request ----
@@ -1116,7 +1234,7 @@
   .nk-mode{display:flex;gap:7px;margin-top:12px}
   .nk-mode button{flex:1;font:inherit;font-size:calc(13px * var(--ts));padding:9px 10px;border-radius:11px;cursor:pointer;
     border:1px solid var(--line);background:var(--paper);color:var(--ink)}
-  .nk-mode button[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+  .nk-mode button[data-on="1"]{background:var(--plum-fill);border-color:var(--plum-fill);color:#fff}
   .nk-picks{margin-top:12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);
     padding:2px 13px}
   .nk-picks .nk-p{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
@@ -1137,7 +1255,7 @@
   .nk-notice{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:13px;
     border-radius:12px;background:rgba(198,162,76,.13);border:1px solid rgba(198,162,76,.4);
     font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink)}
-  .nk-notice svg{flex:0 0 auto;width:18px;height:18px;color:#8A6A18;margin-top:1px}
+  .nk-notice svg{flex:0 0 auto;width:18px;height:18px;color:var(--ink-gold);margin-top:1px}
 
   /* ---- birth page ---- */
   .bt-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#F3EFE3;
@@ -1152,8 +1270,8 @@
   .bt-card{padding:16px}
   .bt-card p{font-size:calc(14px * var(--ts));line-height:1.65;color:var(--ink)}
   .bt-notprovided{display:flex;align-items:center;gap:9px;margin:0 0 12px;padding:11px 13px;
-    border-radius:11px;background:var(--danger-bg,#FBF0EB);border:1px solid #EBCDBF;
-    font-size:calc(13px * var(--ts));font-weight:600;color:#7C3A20}
+    border-radius:11px;background:var(--danger-bg,var(--tint-rose));border:1px solid var(--tint-rose-line);
+    font-size:calc(13px * var(--ts));font-weight:600;color:var(--ink-rose)}
   .bt-np-dot{width:7px;height:7px;border-radius:50%;background:#B4532F;flex:0 0 auto}
   .bt-list{padding:2px 15px;margin-top:12px}
   .bt-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;
@@ -1168,7 +1286,7 @@
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
   .bt-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .bt-call-ico svg{width:19px;height:19px}
   .bt-call-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .bt-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -1189,15 +1307,15 @@
   .ad-apply{display:flex;align-items:center;justify-content:space-between;gap:8px;
     margin:10px 0 12px;padding:11px 13px;border-radius:11px;text-decoration:none;
     font-weight:700;font-size:calc(13px * var(--ts));
-    background:var(--brand-600);color:#fff}
+    background:var(--plum-fill);color:#fff}
   /* One of these rows is a link out rather than a button, and arrived underlined
      in the browser's blue-ish default. It is the same row as the others. */
   a.md-row{text-decoration:none;color:inherit}
   a.md-row .md-t1,a.md-row .md-t2{text-decoration:none}
-  .md-row:active:not(.soon){background:#F1F7F3}
+  .md-row:active:not(.soon){background:var(--tint-green)}
   .md-row.soon{cursor:default}
   .md-ico{flex:0 0 auto;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .md-row.soon .md-ico{background:var(--paper);color:var(--muted)}
   .md-ico svg{width:20px;height:20px}
   .md-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -1224,7 +1342,7 @@
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
   .mg-call-ico{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .mg-call-ico svg{width:19px;height:19px}
   .mg-call-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .mg-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -1233,10 +1351,10 @@
   .mg-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
 
   .mg-advisory{margin-top:12px;border-radius:14px;padding:14px 15px;
-    background:var(--danger-bg,#FBF0EB);border:1px solid #EBCDBF}
+    background:var(--danger-bg,var(--tint-rose));border:1px solid var(--tint-rose-line)}
   .mg-adv-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-    color:#7C3A20;margin-bottom:7px}
-  .mg-advisory p{font-size:calc(13px * var(--ts));line-height:1.6;color:#7C3A20}
+    color:var(--ink-rose);margin-bottom:7px}
+  .mg-advisory p{font-size:calc(13px * var(--ts));line-height:1.6;color:var(--ink-rose)}
 
   /* ---- contact page ---- */
   .ct-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 24px;color:#F3EFE3;
@@ -1251,7 +1369,7 @@
   .ct-row:first-child{border-top:none}
   .ct-row:active:not(.static){background:rgba(119,33,87,.05)}
   .ct-ico{flex:0 0 auto;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .ct-ico svg{width:18px;height:18px}
   .ct-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .ct-k{font-size:calc(10.5px * var(--ts));letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -1281,7 +1399,7 @@
   .ab-list div:first-child{border-top:none}
   .ab-note{font-size:calc(11px * var(--ts));font-weight:500;color:var(--muted)}
   .ab-now{font-size:calc(9.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-    color:var(--brand-600);background:#EFE6EC;border-radius:999px;padding:3px 8px}
+    color:var(--brand-600);background:var(--tint-plum-pill);border-radius:999px;padding:3px 8px}
   .ab-video{display:flex;align-items:center;gap:12px;text-decoration:none;margin-top:12px;
     padding:13px 14px;border-radius:14px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -1292,7 +1410,7 @@
   .ab-v1{font-size:calc(14.5px * var(--ts));font-weight:600;color:var(--ink)}
   .ab-v2{font-size:calc(12px * var(--ts));color:var(--muted)}
   .ab-plans{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0}
-  .ab-plans span{font-size:calc(12px * var(--ts));font-weight:600;color:#4A3B14;background:rgba(198,162,76,.16);
+  .ab-plans span{font-size:calc(12px * var(--ts));font-weight:600;color:var(--ink-gold-2);background:rgba(198,162,76,.16);
     border:1px solid rgba(198,162,76,.3);border-radius:999px;padding:5px 11px}
   .ab-donate{width:100%;margin-top:20px;border:none;cursor:pointer;font:inherit;font-weight:700;
     font-size:calc(15px * var(--ts));color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
@@ -1342,7 +1460,7 @@
     text-decoration:none;cursor:pointer;background:none;border:none;
     padding:13px 8px;border-radius:11px;border-top:1px solid var(--line)}
   .dr-ico{flex:0 0 auto;width:29px;height:29px;border-radius:9px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .dr-ico svg{width:16px;height:16px}
   .dr-row:first-of-type{border-top:none}
   .dr-h + .dr-row{border-top:none}
@@ -1357,25 +1475,40 @@
     border-radius:999px;padding:3px 8px;white-space:nowrap}
   .dr-social{display:flex;gap:9px;margin:22px 6px 0}
   .dr-social a{flex:1;display:grid;place-items:center;text-decoration:none;
-    color:var(--brand-600);background:#F0E9ED;border-radius:12px;padding:12px 4px}
-  .dr-social a:active{background:#E8DCE4}
+    color:var(--brand-600);background:var(--tint-plum);border-radius:12px;padding:12px 4px}
+  .dr-social a:active{background:var(--tint-plum-press)}
   .dr-social svg{width:21px;height:21px;display:block}
   .dr-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:16px 6px 0}
 
   /* ---- bottom tab bar ---- */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:520px;margin-inline:auto;
     display:grid;grid-template-columns:repeat(4,1fr);
-    background:rgba(252,250,243,.96);backdrop-filter:blur(12px);
+    background:var(--bar);backdrop-filter:blur(12px);
     border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0)}
+  /* A quiet word when the masjid cannot be reached. It sits ABOVE the tab bar
+     rather than at the top, because every screen here opens on a dark hero and
+     a red bar across one reads as a fault rather than a notice. It never takes
+     a touch. */
+  .offline-bar{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom,0));
+    z-index:39;max-width:520px;margin-inline:auto;padding:0 16px;pointer-events:none}
+  .offline-bar[hidden]{display:none}
+  .offline-bar .ob-in{display:flex;align-items:center;gap:9px;
+    background:var(--tint-rose);border:1px solid var(--tint-rose-line);
+    border-radius:var(--radius);padding:10px 13px;box-shadow:var(--shadow)}
+  .offline-bar .ob-t{font-size:calc(12.5px * var(--ts));line-height:1.45;color:var(--ink-rose)}
+  .offline-bar svg{flex:none;width:17px;height:17px;stroke:var(--ink-rose);fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  /* and the last thing on the page is not hidden behind it */
+  :root[data-offline="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
   .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
     font:inherit;border:none;background:none;color:var(--muted);padding:9px 4px 8px}
   /* Something has been announced that this phone has not looked at yet. The
      ring is the tab bar's own colour, so the dot reads as a dot at any text
      size rather than smudging into the icon behind it. */
   .tab[data-new="1"]::after{content:"";position:absolute;top:7px;left:50%;margin-left:6px;
-    width:9px;height:9px;border-radius:50%;background:var(--danger);
-    box-shadow:0 0 0 2px rgba(252,250,243,.96)}
+    width:9px;height:9px;border-radius:50%;background:var(--danger-fill);
+    box-shadow:0 0 0 2px var(--bar)}
   .tab svg{width:22px;height:22px}
   .tab span{font-size:calc(10.5px * var(--ts));font-weight:600;letter-spacing:.02em}
   .tab[data-on="1"]{color:var(--brand-600)}
@@ -1444,7 +1577,7 @@
     display:grid;place-items:center}
   .mu-bm svg{width:19px;height:19px}
   /* filled once a page is kept, so the state is visible at a glance */
-  .mu-bm[data-set="1"]{color:var(--brand-600);border-color:var(--brand-600)}
+  .mu-bm[data-set="1"]{color:var(--brand-600);border-color:var(--plum-fill)}
   .mu-bm[data-set="1"] svg path{fill:currentColor}
   /* Saving a page used to be silent apart from the ribbon filling in, so there
      was nothing to say where the page had gone or how to get back to it. The
@@ -1456,19 +1589,19 @@
   /* The bookmark is the everyday one, so it is the one that carries the brand's
      colour where the reader's eye already goes. */
   .mu-mark{display:inline-flex;align-items:center;gap:5px;
-    border-color:var(--brand-600);color:var(--brand-600)}
+    border-color:var(--plum-fill);color:var(--brand-600)}
   .mu-mark svg{width:calc(12px * var(--ts));height:calc(12px * var(--ts));flex:0 0 auto}
   .mu-fav-add{width:100%;font:inherit;font-size:calc(12px * var(--ts));font-weight:700;cursor:pointer;
-    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--brand-600);
+    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--plum-fill);
     background:transparent;color:var(--brand-600)}
   .mu-saved{font:inherit;font-size:calc(11px * var(--ts));font-weight:700;cursor:pointer;
     line-height:1.25;padding:4px 11px;border-radius:999px;max-width:100%;
-    border:1px solid var(--brand-600);background:var(--card);color:var(--brand-600)}
+    border:1px solid var(--plum-fill);background:var(--card);color:var(--brand-600)}
   /* Floats off the bar like the panel does, so a confirmation never moves the
      page underneath it. */
   .mu-toast{position:absolute;left:10px;right:10px;top:100%;margin-top:6px;z-index:7;
     display:flex;align-items:center;gap:8px;padding:9px 8px 9px 11px;border-radius:12px;
-    background:var(--brand-600);color:#fff;font-size:calc(12px * var(--ts));font-weight:600;
+    background:var(--plum-fill);color:#fff;font-size:calc(12px * var(--ts));font-weight:600;
     box-shadow:0 14px 30px -10px rgba(60,11,42,.36)}
   .mu-toast-a{margin-inline-start:auto;flex:0 0 auto;font:inherit;font-weight:700;cursor:pointer;
     padding:6px 9px;border-radius:9px;border:1px solid rgba(255,255,255,.6);
@@ -1487,7 +1620,7 @@
     background:var(--card);color:var(--ink);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* the page you are already on is marked, so the list says where you are */
-  .mu-bm-item.is-here .mu-bm-go{border-color:var(--brand-600);color:var(--brand-600)}
+  .mu-bm-item.is-here .mu-bm-go{border-color:var(--plum-fill);color:var(--brand-600)}
   .mu-bm-x{flex:0 0 auto;font:inherit;font-size:calc(15px * var(--ts));line-height:1;
     cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
     background:var(--card);color:var(--muted)}
@@ -1571,16 +1704,16 @@
     font-weight:600;cursor:pointer;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
     background:var(--paper);color:var(--ink);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .ml-fav-item.is-here .ml-fav-go{border-color:var(--brand-600);color:var(--brand-600)}
+  .ml-fav-item.is-here .ml-fav-go{border-color:var(--plum-fill);color:var(--brand-600)}
   .ml-fav-x{flex:0 0 auto;font:inherit;font-size:calc(14px * var(--ts));line-height:1;cursor:pointer;
     padding:6px 9px;border-radius:9px;border:1px solid var(--line);
     background:var(--card);color:var(--muted)}
   .ml-fav-none{font-size:calc(12px * var(--ts));color:var(--muted);margin:2px}
   .ml-mark{width:100%;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;cursor:pointer;
     text-align:left;margin:0 0 10px;padding:8px 10px;border-radius:10px;
-    border:1px solid var(--brand-600);background:var(--brand-600);color:#fff}
+    border:1px solid var(--plum-fill);background:var(--plum-fill);color:#fff}
   .ml-fav-add{width:100%;font:inherit;font-size:calc(12px * var(--ts));font-weight:700;cursor:pointer;
-    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--brand-600);
+    margin:0 0 7px;padding:7px 9px;border-radius:9px;border:1px dashed var(--plum-fill);
     background:transparent;color:var(--brand-600)}
   .ml-where{flex:1;min-width:0;text-align:center;font-size:calc(12px * var(--ts));font-weight:600;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1592,7 +1725,7 @@
   .qcard{padding:20px 16px 16px;text-align:center}
   .dial{position:relative;width:min(74vw,270px);aspect-ratio:1;margin:2px auto 4px}
   .dial-ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--line);
-    background:radial-gradient(circle at 50% 45%, #fff, #F6F2E6 72%);
+    background:radial-gradient(circle at 50% 45%, #fff, var(--tint-gold-3) 72%);
     box-shadow:inset 0 2px 14px rgba(60,11,42,.06);transition:transform .18s linear}
   .cardinal{position:absolute;font-size:calc(12px * var(--ts));font-weight:700;color:var(--muted);letter-spacing:.06em}
   .cardinal.n{top:9px;left:50%;transform:translateX(-50%);color:var(--danger)}
@@ -1600,7 +1733,7 @@
   .cardinal.e{right:10px;top:50%;transform:translateY(-50%)}
   .cardinal.w{left:10px;top:50%;transform:translateY(-50%)}
   .ticks{position:absolute;inset:0}
-  .ticks i{position:absolute;left:50%;top:6px;width:1px;height:7px;background:#D8D0BB;
+  .ticks i{position:absolute;left:50%;top:6px;width:1px;height:7px;background:var(--tint-warm-line);
     transform-origin:50% calc(50vw);}
   .needle{position:absolute;inset:0;display:grid;place-items:start center;
     transition:transform .18s linear}
@@ -1661,7 +1794,7 @@
      each name whole on its own line is immune to that, and is shorter overall,
      because nothing wraps. */
   .cu-l{list-style:none;margin-top:12px}
-  .cu-l li{margin-top:7px;font-size:calc(15px * var(--ts));color:#4A3C45;line-height:1.45}
+  .cu-l li{margin-top:7px;font-size:calc(15px * var(--ts));color:var(--ink-muted-6);line-height:1.45}
   .cu-l li:first-child{margin-top:0}
   .cu-note{margin:15px 4px 0;font-size:calc(13px * var(--ts));color:var(--muted);line-height:1.6}
 
@@ -1716,7 +1849,7 @@
   /* The rules are the thing being agreed to, so they get the dark panel the
      app uses for anything it wants read rather than skimmed. */
   .cc-rules{margin:2px 0 6px;padding:16px 17px 17px;border-radius:var(--radius);
-    background:linear-gradient(155deg,var(--brand-600) 0%,var(--brand-900) 72%);color:#F3EFE3;
+    background:linear-gradient(155deg,var(--plum-fill) 0%,var(--brand-900) 72%);color:#F3EFE3;
     box-shadow:var(--shadow)}
   .cc-rules h4{font-family:"Fraunces",Georgia,serif;font-weight:600;
     font-size:calc(17px * var(--ts));margin-bottom:4px}
@@ -1748,7 +1881,7 @@
     font:inherit;font-weight:600;font-size:calc(13.5px * var(--ts));color:var(--brand-600);cursor:pointer}
   .cc-pick svg{width:18px;height:18px;flex:0 0 auto}
   .cc-pick:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  [data-bad="1"] .cc-pick{border-color:var(--danger);border-style:solid}
+  [data-bad="1"] .cc-pick{border-color:var(--danger-fill);border-style:solid}
   .cc-chosen{display:flex;align-items:center;gap:10px;margin-top:9px;padding:9px 10px;
     border:1px solid var(--line);border-radius:12px;background:var(--card)}
   .cc-chosen img{width:42px;height:42px;object-fit:cover;border-radius:8px;flex:0 0 auto;
@@ -1799,7 +1932,7 @@
   .pill{font-size:calc(9.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
     padding:3px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
   .pill.now{background:var(--gold);color:#3a2c07}
-  .pill.next{background:#EFE6EC;color:var(--brand-600)}
+  .pill.next{background:var(--tint-plum-pill);color:var(--brand-600)}
   .jummah{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px dashed var(--line);
     font-size:calc(13.5px * var(--ts));color:var(--ink)}
   .jummah b{font-weight:700}
@@ -1813,7 +1946,7 @@
   .enable{width:100%;border:none;cursor:pointer;font:inherit;font-weight:600;font-size:calc(15px * var(--ts));
     color:#F3EFE3;background:linear-gradient(180deg,var(--brand-700),var(--brand-800));
     padding:14px;border-radius:13px;box-shadow:var(--shadow);letter-spacing:.2px}
-  .enable[data-on="1"]{background:#F0E9ED;color:var(--brand-600);box-shadow:none;border:1px solid var(--line)}
+  .enable[data-on="1"]{background:var(--tint-plum);color:var(--brand-600);box-shadow:none;border:1px solid var(--line)}
   .toggles{margin-top:6px;opacity:.45;pointer-events:none;transition:opacity .25s}
   .toggles.unlocked{opacity:1;pointer-events:auto}
   .tg{display:flex;align-items:center;gap:12px;padding:13px 4px;border-top:1px solid var(--line)}
@@ -1825,9 +1958,9 @@
     border:1px solid rgba(180,83,47,.35);border-radius:999px;padding:2px 6px}
   .switch{--w:44px;position:relative;width:var(--w);height:26px;flex:0 0 auto}
   .switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
-  .switch .sl{position:absolute;inset:0;background:#D9D2C0;border-radius:99px;transition:.2s;pointer-events:none}
+  .switch .sl{position:absolute;inset:0;background:var(--tint-warm-line-2);border-radius:99px;transition:.2s;pointer-events:none}
   .switch .sl::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-  .switch input:checked + .sl{background:var(--brand-600)}
+  .switch input:checked + .sl{background:var(--plum-fill)}
   .switch input:checked + .sl::after{transform:translateX(18px)}
   .switch input:focus-visible + .sl{outline:2px solid var(--gold);outline-offset:2px}
   .mins{display:flex;align-items:center;gap:9px;padding:12px 4px 2px;border-top:1px solid var(--line);font-size:calc(13px * var(--ts));color:var(--muted)}
@@ -1839,7 +1972,7 @@
   .troublebtn{display:block;margin:10px auto 0;cursor:pointer;font:inherit;font-size:calc(12px * var(--ts));
     font-weight:600;color:var(--muted);background:none;border:none;text-decoration:underline}
   .diag{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
-  .diag pre{font-size:calc(10.5px * var(--ts));line-height:1.6;color:var(--ink);background:#F0E9ED;
+  .diag pre{font-size:calc(10.5px * var(--ts));line-height:1.6;color:var(--ink);background:var(--tint-plum);
     border-radius:10px;padding:11px;white-space:pre-wrap;word-break:break-word;
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   .diag-fix{width:100%;margin-top:10px;cursor:pointer;font:inherit;font-weight:700;font-size:calc(14px * var(--ts));
@@ -1854,7 +1987,7 @@
     border:0;border-bottom:1px solid var(--line);padding:13px 2px;cursor:pointer;font:inherit;
     color:var(--ink)}
   .qd-srow:last-child{border-bottom:0}
-  .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--brand-600);color:#fff;
+  .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--plum-fill);color:#fff;
     display:grid;place-items:center;font-size:calc(12px * var(--ts));font-weight:700}
   .qd-srow-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .qd-srow-en{font-size:calc(14.5px * var(--ts));font-weight:600}
@@ -1872,7 +2005,7 @@
   .done{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
     cursor:pointer;padding:14px 15px}
   .dn-ico{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
-    background:#F0E9ED;color:var(--brand-600)}
+    background:var(--tint-plum);color:var(--brand-600)}
   .dn-ico svg{width:18px;height:18px}
   .dn-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .dn-1{font-size:calc(14.5px * var(--ts));font-weight:700;color:var(--ink)}
@@ -1890,8 +2023,8 @@
     padding-bottom:1px}
   .flink:active{color:var(--brand-600)}
   footer .fr{margin-top:8px;font-size:calc(11px * var(--ts))}
-  footer .charity{margin-top:12px;font-size:calc(10.5px * var(--ts));color:#A49AA0}
-  footer .credit{margin-top:6px;font-size:calc(10.5px * var(--ts));color:#A49AA0}
+  footer .charity{margin-top:12px;font-size:calc(10.5px * var(--ts));color:var(--ink-muted-3)}
+  footer .credit{margin-top:6px;font-size:calc(10.5px * var(--ts));color:var(--ink-muted-3)}
   footer .credit a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(124,110,119,.3)}
 
   .nk-people{margin:18px 0 4px}
@@ -3686,6 +3819,12 @@
         </section>
 
         <div class="ab-wrap">
+          <div class="sec-h"><h2 data-i18n="sysprefs.appearance">Appearance</h2><span class="rule"></span></div>
+          <p class="sp-intro" data-i18n="sysprefs.choose_how_the_app_looks">Choose how the app looks. Light is the usual
+             setting; dark is easier on the eyes at night.</p>
+          <div class="ts-pick" id="theme-pick" role="radiogroup" aria-label="Appearance"
+               data-i18n-attr="aria-label:sysprefs.appearance"></div>
+
           <div class="sec-h"><h2 data-i18n="sysprefs.text_size">Text size</h2><span class="rule"></span></div>
           <p class="sp-intro" data-i18n="sysprefs.pick_the_size_that_reads">Pick the size that reads most easily. It applies everywhere in the app.</p>
           <div class="ts-pick" id="ts-pick" role="group" aria-label="Text size" data-i18n-attr="aria-label:a11y.text_size"></div>
@@ -5272,6 +5411,12 @@
   </div>
 </div>
 
+<div class="offline-bar" id="offline-bar" hidden role="status" aria-live="polite">
+  <div class="ob-in">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M6.5 18h11a3.5 3.5 0 0 0 .5-6.96A5.5 5.5 0 0 0 8.2 8.6"/><path d="M5.3 9.4A4 4 0 0 0 6.5 18"/></svg>
+    <span class="ob-t" id="offline-text" data-i18n="offline.still_works">No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.</span>
+  </div>
+</div>
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="home" data-on="1" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-9.5Z"/><path d="M9.5 21v-6h5v6"/></svg>
@@ -7775,6 +7920,7 @@ function setTextScale(i){
   prefStore.set(TS_KEY, i);
   applyTextScale(i);
   renderTextScale();
+  renderTheme();
 }
 /* Spelled out rather than looked up, so the key extractor can see all four —
    a t() call built from a variable is invisible to it and ships untranslated. */
@@ -7783,6 +7929,53 @@ function tsLabel(i){
   if(i === 1) return t("sysprefs.medium", "Medium");
   if(i === 2) return t("sysprefs.large", "Large");
   return t("sysprefs.extra_large", "Extra large");
+}
+
+/* ---- appearance ---------------------------------------------------------
+   A choice, not the system's. prefers-color-scheme is deliberately NOT read:
+   light is the masjid's own and stays the normal setting, and dark is offered
+   rather than assumed. The native app behaves identically, down to the keys,
+   so a translator fills these in once for both. */
+const THEME_KEY = "theme";
+function themeChoice(){
+  return prefStore.get(THEME_KEY, "light") === "dark" ? "dark" : "light";
+}
+function applyTheme(v){
+  document.documentElement.dataset.theme = v;
+  /* the browser chrome follows the hero, not the page */
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute("content", v === "dark" ? "#0E0309" : "#3C0B2A");
+}
+function setTheme(v){
+  prefStore.set(THEME_KEY, v);
+  applyTheme(v);
+  renderTheme();
+}
+/* Spelled out rather than looked up, so the key extractor can see both — a
+   t() call built from a variable is invisible to it and ships untranslated. */
+function themeLabel(v){
+  return v === "light" ? t("sysprefs.light", "Light") : t("sysprefs.dark", "Dark");
+}
+function renderTheme(){
+  const host = document.getElementById('theme-pick');
+  if(!host) return;
+  const cur = themeChoice();
+  host.innerHTML = "";
+  [{ v:"light", k:"sysprefs.light", glyph:"\u2600" },
+   { v:"dark",  k:"sysprefs.dark",  glyph:"\u263E" }].forEach(m => {
+    const b = document.createElement('button');
+    b.type = "button";
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", m.v === cur ? "true" : "false");
+    if (m.v === cur) b.dataset.on = "1";
+    const g = document.createElement('span');
+    g.className = "ts-a"; g.setAttribute("aria-hidden", "true"); g.textContent = m.glyph;
+    const n = document.createElement('span');
+    n.className = "ts-n"; n.setAttribute("data-i18n", m.k); n.textContent = themeLabel(m.v);
+    b.append(g, n);
+    b.addEventListener('click', () => setTheme(m.v));
+    host.appendChild(b);
+  });
 }
 
 function renderTextScale(){
@@ -7816,6 +8009,7 @@ function openSysPrefs(){
   document.body.style.overflow="hidden";
   document.querySelector('#sysprefs .sh-body').scrollTop=0;
   renderTextScale();
+  renderTheme();
   renderLangList();
 }
 function closeSysPrefs(){
@@ -9008,6 +9202,63 @@ const SUPA = {
      where this app says it. The website keeps the same value in cfg.MASJID. */
   masjid: "taiyabah",
 };
+/* ---------------------------------------------------------------------------
+   Can the app reach the masjid?
+
+   NOT "is there a network". A phone can hold four bars of a hotel wifi that
+   wants a login, and navigator.onLine calls that connected. The question worth
+   answering is narrower: did the last thing we asked the masjid for come back?
+   That is also true when the masjid's own server is down, which every network
+   API reports as online.
+
+   So both signals are used, and neither alone. The browser's offline event is
+   definitive when it fires — the machine says there is no network — while a
+   failed request to OUR OWN hosts catches the captive portal and the server
+   that is simply down. Other people's hosts are ignored on purpose: a CDN
+   having a bad morning is not the masjid being unreachable.
+
+   It stays quiet until something has actually failed. A tab that has not asked
+   for anything yet is not offline; it is unasked.
+   --------------------------------------------------------------------------- */
+const reach = (() => {
+  let state = "unknown";              // unknown | reachable | unreachable
+  let failures = 0;
+  const PATIENCE = 2;                 // one failure is a blip; two is a condition
+  const MINE = [SUPA.url, "https://taiyabah-sender.yameenbux.workers.dev"];
+
+  function set(next){
+    if (next === state) return;
+    state = next;
+    document.documentElement.dataset.offline = (state === "unreachable") ? "1" : "";
+    const bar = document.getElementById("offline-bar");
+    if (bar) bar.hidden = (state !== "unreachable");
+  }
+  function note(ok){
+    if (ok) { failures = 0; set("reachable"); return; }
+    failures += 1;
+    if (failures >= PATIENCE) set("unreachable");
+  }
+  const ours = u => { try { const h = String(u); return MINE.some(m => h.startsWith(m)); } catch(e){ return false; } };
+
+  /* One wrapper rather than a change at every call site, so a request added
+     later is covered without anyone remembering to cover it. */
+  const real = window.fetch.bind(window);
+  window.fetch = function(input, init){
+    const url = (typeof input === "string") ? input : (input && input.url) || "";
+    if (!ours(url)) return real(input, init);
+    return real(input, init).then(r => { note(true); return r; },
+                                  e => { note(false); throw e; });
+  };
+
+  addEventListener("offline", () => { failures = PATIENCE; set("unreachable"); });
+  /* Back on a network is not the same as the masjid answering, so this only
+     clears the bar and waits to be told otherwise by the next request. */
+  addEventListener("online", () => { failures = 0; set("unknown"); });
+  if (navigator.onLine === false) { failures = PATIENCE; set("unreachable"); }
+
+  return { note, state: () => state, offline: () => state === "unreachable" };
+})();
+
 /* The Supabase dashboard shows the URL with /rest/v1/ on the end; pasting it
    verbatim yields .../rest/v1/rest/v1/... and an error that says nothing
    useful. Normalise so either form works. */
