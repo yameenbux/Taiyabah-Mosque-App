@@ -75,8 +75,8 @@
         {
           "android": {
             "kotlinVersion": "1.9.25",
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36
           }
         }
       ],
@@ -106,7 +106,8 @@
             "./assets/notification-icon.png"
           ]
         }
-      ]
+      ],
+      "./plugins/with-api-36"
     ],
     "experiments": {
       "typedRoutes": false
