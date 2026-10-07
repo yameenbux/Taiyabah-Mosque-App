@@ -225,7 +225,25 @@ jobs:
           TAIYABAH_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           set -o pipefail
-          ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+          ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+
+      # assembleRelease rides along with the bundle because a .aab cannot be
+      # installed on a phone, and the thing worth testing before an upload is
+      # the REAL package — com.taiyabahmasjid.app, the production build, not
+      # the .dev variant the smoke job installs beside it.
+      #
+      # Mind the signature. This APK carries the UPLOAD key; Play re-signs with
+      # the app signing key before anyone downloads it. Same code, different
+      # signature, so a phone already holding the Play copy will refuse this
+      # one until that copy is uninstalled, and vice versa.
+      - name: Name the APK after the version, so two downloads are never confused
+        working-directory: native/android
+        run: |
+          apk=app/build/outputs/apk/release/app-release.apk
+          test -f "$apk" || { echo "::error::assembleRelease produced no APK"; exit 1; }
+          mkdir -p /tmp/out
+          cp "$apk" "/tmp/out/taiyabah-${{ inputs.versionName }}-code${{ inputs.versionCode }}.apk"
+          ls -la /tmp/out
 
       - name: What Gradle actually said
         if: failure()
@@ -295,4 +313,12 @@ jobs:
         with:
           name: taiyabah-play-${{ github.run_number }}
           path: native/android/app/build/outputs/bundle/release/app-release.aab
+
+      # The sideloadable one, separately, so the Play upload and the phone test
+      # are two different downloads and cannot be mixed up.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taiyabah-apk-${{ github.run_number }}
+          path: /tmp/out/*.apk
+          if-no-files-found: error
           retention-days: 90
