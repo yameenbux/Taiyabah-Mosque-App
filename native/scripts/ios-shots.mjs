@@ -15,13 +15,25 @@
  *
  * It used to stop at "the process is alive", which is a weaker claim than it
  * sounds: an app stuck on its splash screen is alive, and so is one showing a
- * white rectangle. So it reads the screenshot it just took. The tab bar sits
- * at the bottom of every screen in this app on every device size, and a strip
- * of flat colour there means the app never got past its splash.
+ * white rectangle. So it reads the screenshot it just took.
  *
- * The thresholds are deliberately far below what a real screen produces — a
- * drawn tab bar runs to hundreds of colours, a flat fill to one or two — so
- * this fails on a genuinely broken screen and not on a rendering difference.
+ * What it can claim is modest and worth stating exactly. simctl cannot tap, so
+ * this never gets past the first screen — at 14 seconds that is the first-run
+ * reminder offer, the same one the Android smoke job answers "Not now" to. The
+ * two thresholds say "a real screen drew", not "the right screen drew": a
+ * laid-out screen covers its full height in text and shape, a splash screen
+ * puts a logo in the middle and leaves the edges flat, and a dead launch
+ * leaves a single colour.
+ *
+ * Checking WHICH screen, and whether its icons drew, stays with the Android
+ * smoke job, which has uiautomator to find elements by name and can tap. Both
+ * platforms ship the same subsetted icon font and the same JavaScript, so the
+ * font is covered there for both.
+ *
+ * The thresholds are far below what a real screen produces, measured not
+ * guessed: the app at iPhone and iPad sizes gives 7198 and 11954 colours with
+ * 664 and 1122 along the bottom, a white screen gives 1 and 1, and a cream
+ * splash with an antialiased logo gives 90 and 1.
  */
 import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
@@ -100,8 +112,9 @@ for (const want of DEVICES) {
                     `rectangle, not the app`);
       failures++;
     } else if (strip < 10) {
-      console.error(`  FAIL  the bottom of the screen holds ${strip} colours, so the tab bar ` +
-                    `did not draw — the app is most likely still on its splash screen`);
+      console.error(`  FAIL  the screen is busy in the middle and flat along the bottom ` +
+                    `(${strip} colours) — that is the shape of a splash screen, not of a ` +
+                    `laid-out one, so the app most likely never finished starting`);
       failures++;
     }
 
