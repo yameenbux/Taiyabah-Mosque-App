@@ -37,7 +37,12 @@ export function Field({ label, opt, hint, value, onChange, type = "text", bad, r
           and it is the same control on every form in the app: hall hire,
           nikāḥ, the imāms' advice, charity collections. */}
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 6, marginBottom: 5 }}>
-        <Text style={{ fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
+        {/* flexShrink, because Yoga does not shrink a flex child by default and
+            the browser does. "ROUGHLY HOW MANY GUESTS (OPTIONAL)" at the largest
+            text size is 420px of capitals in 328px of phone: on the web build it
+            shrank and wrapped, on the phone it ran off the right edge and was
+            cut. The website's label is a block element and wraps. */}
+        <Text style={{ flexShrink: 1, fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
                        textTransform: "uppercase",
                        color: bad ? C.danger : C.muted }}>{label}</Text>
         {/* .cc-opt — the website appends the aside to the LABEL in the same
@@ -48,7 +53,7 @@ export function Field({ label, opt, hint, value, onChange, type = "text", bad, r
             the field is asking for, and it loses the wording — "if you have
             one" says something "optional" does not. */}
         {required === false && (
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted }}>
+          <Text style={{ flexShrink: 1, fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted }}>
             {opt || t("collect.optional", "— optional")}</Text>)}
       </View>
       <TextInput

@@ -56,6 +56,24 @@ const errors = [];
 page.on("pageerror", e => errors.push(String(e.message).split("\n")[0]));
 page.on("console", m => { if (m.type() === "error") errors.push(m.text().slice(0, 160)); });
 
+/* THE FORMS ONLY EXIST IF POSTGRES ANSWERS.
+ *
+ * isOpen() asks the masjid whether a form is taking requests, and this
+ * environment cannot reach supabase.co at all. So every sweep before this one
+ * measured the CLOSED state of the nikāḥ, hall booking, charity collection and
+ * imāms' advice screens — a phone number and an email row — and never saw one
+ * field of the four longest screens in the app. That is where the fault
+ * reported from a real phone was.
+ *
+ * A plain 200 is what the masjid says when a form is open. Nothing leaves this
+ * machine either way: the route answers every call, so no request_* function is
+ * ever really called. */
+await page.route(/supabase\.co/, route => {
+  const url = route.request().url();
+  route.fulfill({ status: 200, contentType: "application/json",
+                  body: /\/rpc\//.test(url) ? "{}" : "[]" });
+});
+
 /* Written before the app boots, so the first paint is already at this size —
  * the prefs live in AsyncStorage, which on the web is localStorage. */
 if (SCALE !== 1)
@@ -197,7 +215,11 @@ for (const [name, label] of MENU) {
 /* Three screens only reachable from inside another one. */
 for (const [name, path_] of [["everyday duas", [/^Daily Adhk/, /^Everyday Du/]],
                              ["rabbanas", [/^Daily Adhk/, /Rabban/]],
-                             ["curriculum", [/^Madrasah$/, /What is taught|Curriculum/]]]) {
+                             ["curriculum", [/^Madrasah$/, /What is taught|Curriculum/]],
+                             /* The reader is the screen people spend the longest
+                                in and neither sweep had ever opened it. */
+                             ["quran reader", [/^Holy Qur.an$/, /^Al-F(a|ā)ti/]],
+                             ["bukhari book", [/al-Bukh/, /Revelation|Belief|^Book 1/]]]) {
   try { await toHome(); for (const step of path_) await tapText(step); await page.waitForTimeout(500); await check(name); }
   catch (e) { problems.push(`${name}: could not open`); process.stdout.write("?"); }
 }

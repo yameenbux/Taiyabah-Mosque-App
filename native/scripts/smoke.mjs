@@ -142,11 +142,32 @@ function boxes(xml) {
 let SCREEN_W = 0;
 try { SCREEN_W = Number(adb(["shell", "wm", "size"]).match(/(\d+)x\d+/)?.[1] || 0); } catch {}
 
+/* WORDS THE APP MEANT TO END IN AN ELLIPSIS.
+ *
+ * React Native writes "…" when text runs out of room, which is what makes it a
+ * precise signal — except that some of the app's own strings end in one on
+ * purpose: "Search the Arabic…", "Loading…". The character is identical, so the
+ * only way to tell an author's ellipsis from the renderer's is to ask the app
+ * what it meant to say. The first run of this audit reported the Bukhārī search
+ * box as clipped text; it was the placeholder, written exactly like that. */
+const ownWords = new Set();
+try {
+  const dir = path.resolve(import.meta.dirname, "../src/i18n");
+  const collect = v => {
+    if (typeof v === "string") { const t = v.trim(); if (t.endsWith("…")) ownWords.add(t); }
+    else if (v && typeof v === "object") Object.values(v).forEach(collect);
+  };
+  for (const f of fs.readdirSync(dir))
+    if (f.endsWith(".json")) collect(JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+  collect(JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../src/data/sheets.json"), "utf8")));
+  say(`  ${ownWords.size} of the app's own strings end in an ellipsis on purpose`);
+} catch (e) { say("  (could not read the app's own strings: " + e.message.slice(0, 80) + ")"); }
+
 const damage = [];
 function auditScreen(where, xml) {
   if (!SCREEN_W) return;
   const all = boxes(xml || dump());
-  const cut = all.filter(n => n.label && /[…]$|\.\.\.$/.test(n.label));
+  const cut = all.filter(n => n.label && /[…]$|\.\.\.$/.test(n.label) && !ownWords.has(n.label));
   const over = all.filter(n => n.label && (n.x1 < 0 || n.x2 > SCREEN_W));
   for (const n of cut)
     damage.push(`${where}: text truncated — "${n.label.slice(0, 54)}"`);
@@ -172,7 +193,7 @@ function auditWayOut(where, xml) {
  * cut off on the sides" was found partway down the nikāḥ form, which is six
  * screens long. Each screen is therefore walked down a viewport at a time and
  * audited at every stop, until it stops moving. */
-function auditDown(where, max = 5) {
+function auditDown(where, max = 3) {
   let last = "";
   for (let i = 0; i <= max; i++) {
     let x;
@@ -634,6 +655,75 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   else { log("ok", `${tab} tab`); tabsOk.push(tab); }
+}
+
+/* ---------- the same app, at the largest text a phone can ask for --------- */
+
+/* Four of the six faults a person found on a Huawei were layout, and a phone
+ * set to its biggest text draws this app at 1.5x — src/scale.js takes the LARGER
+ * of the phone's own font setting and the one chosen in the app. Everything
+ * above ran at 1.0, which is not what that phone was doing, so the sweep could
+ * walk the whole app and still not see what was photographed.
+ *
+ * The screens with the most words on them are therefore opened again at
+ * font_scale 1.5. Not all of them: this is minutes of emulator, and the long
+ * forms, the timetable, the holiday list and the two giving screens are where
+ * the words are. */
+const BIG_TILES = ["Nikāḥ Services", "Hall Booking", "Charity Collections",
+                   "Donate", "Sadaqah & Lillah"];
+const BIG_ROWS  = ["Imams' Advice", "Full prayer timetable", "Holiday Planner", "Help"];
+try {
+  say("\nthe same app at the largest text size a phone can ask for (font_scale 1.5)");
+  adb(["shell", "settings", "put", "system", "font_scale", "1.5"]);
+  sleep(1500);
+  /* A font scale change recreates every activity. Restarting the app outright
+     is the honest version of what a person does: they change the setting in
+     Android and come back to the app. */
+  try { adb(["shell", "am", "force-stop", PKG]); } catch {}
+  sleep(1000);
+  launch();
+  sleep(5000);
+  clearFirstRun();
+  if (!findIn(nodes(dump()), "Home"))
+    fail("the app did not come back after the phone's text size was made bigger");
+  else {
+    log("ok", "the app reopened at the largest text size");
+    shot("big-home");
+    auditDown("big text · home");
+    for (const label of BIG_TILES) {
+      const n = seek(label);
+      if (!n) { fail(`big text: "${label}" is not on the home screen`); continue; }
+      tap(n);
+      shot("big-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+      auditDown("big text · " + label);
+      const c = crashes();
+      if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
+      back();
+      for (let i = 0; i < 2 && !findIn(nodes(dump()), "Home"); i++) back();
+    }
+    const moreBig = findIn(nodes(dump()), "More");
+    if (!moreBig) fail("big text: the More tab is not on screen");
+    else {
+      tap(moreBig);
+      for (const label of BIG_ROWS) {
+        const n = seek(label);
+        if (!n) { fail(`big text: menu row "${label}" is missing`); continue; }
+        tap(n);
+        shot("big-menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+        auditDown("big text · " + label);
+        const c = crashes();
+        if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
+        back();
+        for (let i = 0; i < 2 && !seek("Resources", { swipes: 3 }); i++) back();
+      }
+    }
+  }
+} catch (e) {
+  fail("the big-text pass stopped early: " + (e && e.message ? e.message : String(e)));
+} finally {
+  /* Left at 1.5 the next thing to use this emulator would be measuring a phone
+     nobody configured. */
+  try { adb(["shell", "settings", "put", "system", "font_scale", "1.0"]); } catch {}
 }
 
 /* ---------- verdict ------------------------------------------------------- */
