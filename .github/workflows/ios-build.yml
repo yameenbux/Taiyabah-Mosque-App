@@ -101,6 +101,34 @@ jobs:
         # repo and is minutes on its own.
         run: pod install || pod install --repo-update
 
+      # autolinking resolves react-native-onesignal for iOS — the podspec is
+      # found and the Podfile's app target calls use_native_modules! — but the
+      # app launched and died with
+      #   Invariant Violation: TurboModuleRegistry.getEnforcing('OneSignal')
+      #     could not be found
+      # which means OneSignal's NATIVE half was installed by its Expo plugin
+      # (AppDelegate hooks, the notification service extension) while the React
+      # Native module that JavaScript talks to was not. Every call site in
+      # src/push.js is already wrapped, so nothing in this app's own code can
+      # raise that; the native side running without its module can.
+      #
+      # So the lockfile is read rather than trusted. If the pod is missing, say
+      # so here, where the cause is, instead of three steps later as a
+      # segmentation fault inside Hermes.
+      - name: The OneSignal pod is actually installed
+        working-directory: native/ios
+        run: |
+          if grep -q "react-native-onesignal" Podfile.lock; then
+            echo "react-native-onesignal is in Podfile.lock:"
+            grep -n "react-native-onesignal\|OneSignalXCFramework" Podfile.lock | head
+          else
+            echo "::error::react-native-onesignal is NOT in Podfile.lock, so the app has"
+            echo "::error::OneSignal's native hooks and no module for JavaScript to call."
+            echo "--- pods actually installed ---"
+            sed -n '/PODS:/,/DEPENDENCIES:/p' Podfile.lock | head -60
+            exit 1
+          fi
+
       # No -allowProvisioningUpdates, no team, no certificate: a simulator build
       # is unsigned by design. CODE_SIGNING_ALLOWED=NO makes that explicit so
       # the failure, if there is one, is a real compile error and not signing.
