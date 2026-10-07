@@ -1,0 +1,217 @@
+# The iOS app — does it actually build, and does it open?
+#
+# SEPARATE FROM ANDROID ON PURPOSE. Its own workflow, its own trigger, its own
+# artefacts. Android ships when Android is ready and nothing here can hold that
+# up, which is the whole point of keeping the two apart.
+#
+# WHY THIS CAN RUN WITHOUT AN APPLE DEVELOPER ACCOUNT. Signing is only needed
+# to run on a real device or reach TestFlight. Building for the SIMULATOR needs
+# no account, no certificate and no provisioning profile — so everything short
+# of distribution can be proved now, today, while the enrolment is pending:
+# that the iOS project generates, that every native module compiles against it,
+# that the app launches, and what it looks like when it does.
+#
+# What this does NOT prove, and no workflow can until the account exists:
+# push notifications (APNs needs a key from the account) and anything about
+# real hardware — the compass, the haptics, a physical Watch.
+
+name: iOS app — does it build and open?
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["native/**", ".github/workflows/ios-build.yml"]
+
+# A macOS runner costs ten times what ubuntu does, and five of these
+# were once in flight at the same time on five commits of the same branch.
+# Only the newest is worth an answer; the rest are paying to tell us about
+# code nobody will ship.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    # Xcode only exists on macOS runners. This is the one job in the repo that
+    # cannot run on ubuntu, and it is why iOS gets a workflow of its own.
+    runs-on: macos-15
+    # A cold React Native iOS build compiles every pod — boost, folly, hermes,
+    # React core — and that is comfortably 45 minutes on a fresh runner. 60 was
+    # cutting it close enough that a slow queue would have killed a build that
+    # was about to pass.
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Which Xcode
+        run: xcodebuild -version && xcrun simctl list runtimes | head -20
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      # The same checks the Android workflow runs. A platform-specific job that
+      # skips them can go green on code the other platform would reject.
+      - name: Check every screen parses
+        working-directory: native
+        run: node scripts/parse-check.mjs
+
+      - name: Unit tests
+        working-directory: native
+        run: node --import ./scripts/test-register.mjs --test "scripts/test/*.test.mjs"
+
+      - name: Generate the iOS project
+        working-directory: native
+        run: npx expo prebuild --platform ios --no-install --clean
+
+      # Compiling every pod from cold is the whole cost of this job. The cache
+      # goes in AFTER prebuild, because prebuild --clean deletes ios/ and would
+      # throw away anything restored before it.
+      - name: Cache Pods
+        uses: actions/cache@v4
+        with:
+          path: |
+            native/ios/Pods
+            ~/Library/Caches/CocoaPods
+          # Keyed on the lockfile AND the build configuration. The pods are a
+          # function of the JS dependencies, but NOT only of them: hermes-engine
+          # resolves a prebuilt Hermes whose variant follows the configuration,
+          # and it lands inside this cached directory. Sharing one cache across
+          # configurations meant the switch to Release restored a Pods tree
+          # populated under Debug, pod install saw nothing to do, and the
+          # Release build linked the wrong Hermes. The app then segfaulted
+          # inside the engine's own hash map — EXC_BAD_ACCESS in
+          # hermes::vm::OrderedHashMap::insert, from a plain `new Map()` — which
+          # looks like a bug in this app and is not one.
+          # The configuration is in the key and in restore-keys, so a Debug
+          # cache can never be restored into a Release build again.
+          key: pods-${{ runner.os }}-release-${{ hashFiles('native/package-lock.json') }}
+          restore-keys: pods-${{ runner.os }}-release-
+
+      - name: Pods
+        working-directory: native/ios
+        # --repo-update only when the cache missed; it refreshes the whole spec
+        # repo and is minutes on its own.
+        run: pod install || pod install --repo-update
+
+      # autolinking resolves react-native-onesignal for iOS — the podspec is
+      # found and the Podfile's app target calls use_native_modules! — but the
+      # app launched and died with
+      #   Invariant Violation: TurboModuleRegistry.getEnforcing('OneSignal')
+      #     could not be found
+      # which means OneSignal's NATIVE half was installed by its Expo plugin
+      # (AppDelegate hooks, the notification service extension) while the React
+      # Native module that JavaScript talks to was not. Every call site in
+      # src/push.js is already wrapped, so nothing in this app's own code can
+      # raise that; the native side running without its module can.
+      #
+      # So the lockfile is read rather than trusted. If the pod is missing, say
+      # so here, where the cause is, instead of three steps later as a
+      # segmentation fault inside Hermes.
+      - name: The OneSignal pod is actually installed
+        working-directory: native/ios
+        run: |
+          if grep -q "react-native-onesignal" Podfile.lock; then
+            echo "react-native-onesignal is in Podfile.lock:"
+            grep -n "react-native-onesignal\|OneSignalXCFramework" Podfile.lock | head
+          else
+            echo "::error::react-native-onesignal is NOT in Podfile.lock, so the app has"
+            echo "::error::OneSignal's native hooks and no module for JavaScript to call."
+            echo "--- pods actually installed ---"
+            sed -n '/PODS:/,/DEPENDENCIES:/p' Podfile.lock | head -60
+            exit 1
+          fi
+
+      # No -allowProvisioningUpdates, no team, no certificate: a simulator build
+      # is unsigned by design. CODE_SIGNING_ALLOWED=NO makes that explicit so
+      # the failure, if there is one, is a real compile error and not signing.
+      # The workspace holds EVERY CocoaPods scheme as well as the app's, and
+      # picking the first that is not literally called "Pods" picked `boost`
+      # — which built, and succeeded, and produced no .app at all. The app's
+      # scheme is the .xcodeproj's own basename, which is what expo prebuild
+      # derives from expo.name, so take it from there and assert it exists
+      # rather than discovering something plausible.
+      - name: Find the workspace and scheme
+        id: xc
+        working-directory: native/ios
+        run: |
+          set -euo pipefail
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME=$(basename "$(ls -d *.xcodeproj | head -1)" .xcodeproj)
+          echo "workspace=$WS"  >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          echo "Building scheme '$SCHEME' from '$WS'"
+          # If that scheme is not in the workspace, fail HERE with a list,
+          # rather than building something else and failing three steps later
+          # on a missing .app.
+          xcodebuild -workspace "$WS" -list | sed -n '/Schemes:/,$p' > /tmp/schemes.txt
+          grep -qx "        $SCHEME" /tmp/schemes.txt || {
+            echo "scheme '$SCHEME' is not in the workspace. It has:"; cat /tmp/schemes.txt; exit 1; }
+
+      # No team, no certificate, no provisioning profile: a simulator build is
+      # unsigned by design. CODE_SIGNING_ALLOWED=NO says so outright, so a
+      # failure here is a real compile error and never a signing one.
+      # RELEASE, not Debug. A Debug build does not embed the JavaScript — it
+      # expects a Metro dev server on localhost:8081 — so on a runner with no
+      # Metro the app launches, stays alive, and shows the React Native error
+      # screen. Five green runs proved the native shell compiled and nothing
+      # else; the screenshots were 72% black with a red banner across them.
+      # Release runs the bundling phase, which is also what Android's smoke
+      # job has always done (assembleRelease) and why that one found real bugs.
+      - name: Build for the simulator
+        working-directory: native/ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace "${{ steps.xc.outputs.workspace }}" \
+            -scheme "${{ steps.xc.outputs.scheme }}" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      # app.json declares entitlements and Info.plist keys; prebuild writes
+      # them into a generated project; the build copies them into the .app.
+      # None of those steps fails loudly if one is dropped, and the losses are
+      # not cosmetic — a missing NSLocationWhenInUseUsageDescription does not
+      # warn, it kills the app the moment the Qibla screen asks for a fix, and
+      # a missing aps-environment makes push silently never arrive. The Android
+      # job already proves prebuild wrote what app.json asked for; this is the
+      # same assurance for iOS, read off the built artefact rather than the
+      # generated project, because what ships is the question.
+      - name: What app.json declares, the built app carries
+        working-directory: native
+        run: |
+          APP=$(find ios/build/Build/Products -maxdepth 2 -name '*.app' -print -quit)
+          test -n "$APP" || { echo "no .app was produced"; exit 1; }
+          node scripts/check-ios-config.mjs "$APP"
+
+      # "It compiled" and "it opens" are different claims — the Android smoke
+      # job exists because that difference has bitten this repo before.
+      - name: Boot a phone and a tablet, install, and photograph it
+        working-directory: native
+        run: node scripts/ios-shots.mjs
+
+      # The directory used to be .ios-shots, with a dot, and upload-artifact
+      # skips hidden files unless told otherwise — so the build passed, both
+      # simulators were photographed, and the artifact came out empty with
+      # nothing but a warning to say why. Renamed rather than papered over
+      # with include-hidden-files, because a screenshots folder has no reason
+      # to be hidden in the first place.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-screenshots
+          path: native/ios-shots/
+          # An empty artifact here means the photographs did not happen, and
+          # that should be loud rather than a warning nobody reads.
+          if-no-files-found: error

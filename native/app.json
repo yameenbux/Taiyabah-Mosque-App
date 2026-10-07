@@ -32,10 +32,22 @@
     },
     "ios": {
       "bundleIdentifier": "com.taiyabahmasjid.app",
-      "supportsTablet": false,
+      "supportsTablet": true,
       "infoPlist": {
         "UIBackgroundModes": [
-          "audio"
+          "audio",
+          "remote-notification"
+        ],
+        "NSLocationWhenInUseUsageDescription": "Taiyabah Masjid uses your location only to work out the Qibla direction from where you are. It is never stored and never sent anywhere.",
+        "NSMotionUsageDescription": "The Qibla compass uses the motion sensors to point towards Makkah.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
+      },
+      "buildNumber": "1",
+      "entitlements": {
+        "aps-environment": "production",
+        "com.apple.security.application-groups": [
+          "group.com.taiyabahmasjid.app"
         ]
       }
     },
@@ -50,6 +62,7 @@
           "fonts": [
             "./assets/fonts/HankenGrotesk.ttf",
             "./assets/fonts/HankenGroteskMedium.ttf",
+            "./assets/fonts/HankenGroteskSemiBold.ttf",
             "./assets/fonts/HankenGroteskBold.ttf",
             "./assets/fonts/Fraunces.ttf",
             "./assets/fonts/Amiri.ttf",

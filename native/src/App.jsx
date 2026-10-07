@@ -1,4 +1,5 @@
 import React from "react";
+import Offline from "./Offline";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -9,11 +10,16 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
+import { COLUMN } from "./layout";
 import { AppProvider, useApp } from "./store";
+import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
+import SHEETS from "./data/sheets.json";
 import Opening from "./Opening";
+import Boundary from "./Boundary";
 import FirstRun from "./FirstRun";
 import { startPush } from "./push";
+import { restoreTimetable, syncTimetable } from "./timetable";
 
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
@@ -67,15 +73,27 @@ function Tabs() {
   const { t, fs, rtl } = useApp();
   return (
     <Tab.Navigator
+      screenLayout={({ children, route }) => (
+        <Boundary screen={route?.name}>{children}</Boundary>)}
       screenListeners={{ tabPress: tick }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: C.brand600,
         tabBarInactiveTintColor: C.muted,
+        /* THE BAR HAS TO GROW WITH THE TEXT. Its height was fixed while the
+           label scaled, so at the largest text size every label was sliced
+           through the middle — on the one piece of chrome somebody touches
+           all day. The base heights are what the design wants at normal size;
+           whatever the line gains beyond that is added to the bar. */
+        /* The bar follows the column. The website pins .tabbar to the same
+           max-width:520px with margin-inline:auto, so on an iPad the tabs sit
+           under the content they belong to instead of stretching the full
+           width of the glass with four icons marooned in the middle. */
         tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6,
+                       width: "100%", maxWidth: COLUMN, alignSelf: "center",
                        /* Urdu and Arabic glyphs hang well below the baseline; at
                           the Latin height their descenders are sliced off. */
-                       height: rtl ? 74 : 64 },
+                       height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14)) },
         tabBarLabelStyle: { fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
                             lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
                             includeFontPadding: false },
@@ -90,39 +108,62 @@ function Tabs() {
 }
 
 function Root() {
-  const { t, fs, lang } = useApp();
+  const { t, tx, fs, lang } = useApp();
 
-  const pushed = {
-    headerStyle: { backgroundColor: C.paper },
-    headerTintColor: C.brand600,
-    headerTitleStyle: { fontFamily: F.display, fontSize: fs(17), color: C.ink },
-    headerShadowVisible: false,
-    headerBackTitleVisible: false,
+  /* EVERY PUSHED SCREEN WEARS THE WEBSITE'S SHEET HEADER.
+   *
+   * There used to be two presets: `pushed`, a platform header in paper with an
+   * ink title, and `bare`, no header at all. Neither is anything the website
+   * does. Its sheets — all 28 of them — open under one plum bar carrying the
+   * title and a Done pill, and `bare` screens were left drawing a chevron on
+   * top of their own hero with no title line at all.
+   *
+   * The ← appears only when there is a sheet behind this one, which is what
+   * navRenderUpBack() decides on the website and what canGoBack() decides
+   * here. Done leaves the same way the arrow does, because on the website it
+   * closes the sheet and there is nowhere else for it to go. */
+  const sheet = {
+    header: ({ navigation, options }) => (
+      <SheetTop title={options.title || ""}
+                canBack={navigation.canGoBack()}
+                onBack={() => navigation.goBack()}
+                onDone={navigation.canGoBack() ? () => navigation.goBack() : null}
+                {...(options.sheetNav || {})} />
+    ),
     contentStyle: { backgroundColor: C.paper },
   };
-  /* Screens that draw their own hero behind the status bar have no header at
-   * all; the platform's swipe-back still works, which is the part that matters. */
-  const bare = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
+  /* Qibla, Alerts, Donate and Live are not sheets on the website: they are
+   * four of its seven PAGES, and a page wears the app bar — the logo, the
+   * society's name and the bell — not a sheet header. They draw their own. */
+  const page = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
+  const pushed = sheet, bare = sheet;
 
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
     <NavigationContainer key={lang}>
-      <Stack.Navigator>
+      {/* layout is the one place react-navigation lets a wrapper sit INSIDE
+          each screen, which is what makes a fault recoverable: the header and
+          the tab bar survive it, so "Try again" has something to go back to.
+          Wrapping the navigator instead would take the whole app down with
+          whichever screen threw. */}
+      <Stack.Navigator
+        screenLayout={({ children, route }) => (
+          <Boundary screen={route?.name}>{children}</Boundary>)}>
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
 
         {/* reading */}
-        <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare, title: t("quran.qur_an", "Qurʼan") }} />
+        <Stack.Screen name="Quran"     component={Quran}    options={{ ...bare, title: t("quran.qur_an", "Qur'an") }} />
         <Stack.Screen name="Surahs"    component={Surahs}   options={{ ...pushed, title: t("quran.all_114_surahs", "All 114 sūrahs") }} />
         <Stack.Screen name="Surah"     component={Surah}    options={{ ...pushed, title: "" }} />
-        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.13_line_qur_an", "13-Line Qurʼan"),
+        <Stack.Screen name="Mushaf"    component={Mushaf}   options={{ ...pushed, title: t("quran.13_line_qur_an", "13-Line Qur'an"),
                                                                        headerStyle: { backgroundColor: "#15060F" },
                                                                        headerTintColor: C.goldBright,
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}
-        <Stack.Screen name="Athkar"    component={Athkar}    options={bare} />
+        <Stack.Screen name="Athkar"    component={Athkar}    options={{ ...sheet, title: t("athkar.daily_athkar", "Daily Athkār") }} />
         <Stack.Screen name="AthkarSet" component={AthkarSet}
           options={({ route }) => ({ ...pushed,
             title: [t("athkar.morning_evening", "Morning & Evening"),
@@ -132,31 +173,34 @@ function Root() {
         <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("rabbanas.40_rabbana", "40 Rabbanā") }} />
 
         {/* the masjid */}
-        <Stack.Screen name="Qibla"     component={Qibla}     options={bare} />
-        <Stack.Screen name="Live"      component={Live}      options={bare} />
-        <Stack.Screen name="Videos"    component={Videos}    options={bare} />
-        <Stack.Screen name="Timetable" component={Timetable} options={bare} />
+        <Stack.Screen name="Qibla"     component={Qibla}     options={page} />
+        <Stack.Screen name="Live"      component={Live}      options={page} />
+        <Stack.Screen name="Videos"    component={Videos}    options={{ ...sheet, title: t("vids.videos_bayaans", "Videos & bayaans") }} />
+        <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
-        <Stack.Screen name="Holidays"  component={Holidays}  options={bare} />
-        <Stack.Screen name="NewBuild"  component={NewBuild}  options={bare} />
-        <Stack.Screen name="Giving"    component={Giving}    options={bare} />
+        <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
+        {/* The donate page: one of the website's seven, so it wears the app
+            bar rather than a sheet header. */}
+        <Stack.Screen name="NewBuild"  component={NewBuild}  options={page} />
+        <Stack.Screen name="Giving"    component={Giving}    options={{ ...sheet, title: t("giving.sadaqah_lillah", "Sadaqah & Lillah") }} />
 
         {/* services with a form behind them */}
-        <Stack.Screen name="Marriage"  component={Marriage}  options={bare} />
-        <Stack.Screen name="HallHire"  component={HallHire}  options={bare} />
-        <Stack.Screen name="Advice"    component={Advice}    options={bare} />
-        <Stack.Screen name="Collect"   component={Collect}   options={bare} />
+        <Stack.Screen name="Marriage"  component={Marriage}  options={{ ...sheet, title: t("marriage.marriage", "Marriage") }} />
+        <Stack.Screen name="HallHire"  component={HallHire}  options={{ ...sheet, title: t("hallhire.hall_room_hire", "Hall / Room Hire") }} />
+        <Stack.Screen name="Advice"    component={Advice}    options={{ ...sheet, title: t("advice.imams_advice", "Imams’ Advice") }} />
+        <Stack.Screen name="Collect"   component={Collect}   options={{ ...sheet, title: t("collect.charity_collections", "Charity Collections") }} />
 
         {/* settings */}
-        <Stack.Screen name="Alerts"  component={Alerts}  options={bare} />
-        <Stack.Screen name="Prefs"   component={Prefs}   options={bare} />
-        <Stack.Screen name="Portal"  component={Portal}  options={bare} />
-        <Stack.Screen name="Privacy" component={Privacy} options={bare} />
-        <Stack.Screen name="Help"    component={Help}    options={bare} />
+        <Stack.Screen name="Alerts"  component={Alerts}  options={page} />
+        <Stack.Screen name="Prefs"   component={Prefs}   options={{ ...sheet, title: t("sysprefs.system_preferences", "System Preferences") }} />
+        <Stack.Screen name="Portal"  component={Portal}  options={{ ...sheet, title: t("portals.madrasah_portal", "Madrasah Portal") }} />
+        <Stack.Screen name="Privacy" component={Privacy} options={{ ...sheet, title: t("privacy.privacy_notice", "Privacy notice") }} />
+        <Stack.Screen name="Help"    component={Help}    options={{ ...sheet, title: t("help.title", "Help") }} />
 
         {/* the masjid's own prose, straight from the website */}
         {Object.entries(SHEET).map(([name, id]) => (
-          <Stack.Screen key={name} name={name} component={sheetScreen(id)} options={bare} />
+          <Stack.Screen key={name} name={name} component={sheetScreen(id)}
+            options={{ ...sheet, title: tx(SHEETS[id]?.title) }} />
         ))}
       </Stack.Navigator>
     </NavigationContainer>
@@ -194,6 +238,12 @@ export default function App() {
      * and does not subscribe anybody — it only makes the SDK ready, so that
      * when somebody does say yes there is something to say yes to. */
     startPush();
+
+    /* Restore what was downloaded last time FIRST, so a phone with no signal
+       already has the year it fetched before, then ask for anything newer.
+       Neither blocks a frame: the bundled file is in memory from the start,
+       so the app always has times to draw while this happens. */
+    restoreTimetable().finally(() => { syncTimetable(); });
   }, []);
 
   /* Shown only while the settings store answers, which has its own ceiling in
@@ -205,10 +255,18 @@ export default function App() {
     <SafeAreaProvider>
       {/* the hero is dark, so the clock and battery must be light */}
       <StatusBar style="light" />
-      <AppProvider fallback={veil}>
-        <Root />
-        <FirstRun />
-      </AppProvider>
+      {/* The outer one, for a fault outside any screen — in the provider, the
+          navigation container, the first-run card. Rarer, and the only thing
+          it can offer is a retry, but a retry beats a white screen. */}
+      <Boundary>
+        <AppProvider fallback={veil}>
+          <Root />
+          {/* Over the app, under the first-run card, and never over a sheet it
+              would be explaining nothing about. */}
+          <Offline />
+          <FirstRun />
+        </AppProvider>
+      </Boundary>
       {/* Last, so it sits over the app — and only over it. The app is mounted
           and live underneath from the first frame; this never gates it, never
           takes a touch, and takes itself away on a timer whatever happens. */}

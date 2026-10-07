@@ -136,7 +136,39 @@ donation, check it lands in Stripe carrying a reference.
 
 ---
 
-## Apple: blocked, and nothing to do yet
+## Apple: the enrolment is blocked, the app is not
+
+**The iOS app compiles and installs. It does not yet run.** That is a
+correction to what this file said a few hours ago, and the correction is the
+useful part.
+
+The job had been building `-configuration Debug`, which does not embed the
+JavaScript — it expects a Metro dev server that no CI runner has. So the app
+launched, stayed alive, wrote no crash report, and executed none of this
+project's code, and five runs went green on it. The screenshots were 72%
+black with a red error banner, and nothing was looking at them.
+
+Building Release fixed that and immediately found a real defect: the app
+crashes on launch, on both the iPhone and the iPad, with
+
+    Invariant Violation: TurboModuleRegistry.getEnforcing(...):
+      'OneSignal' could not be found.
+
+OneSignal's native half is in the build — its Expo plugin writes the
+AppDelegate hooks and the notification service extension — and the React
+Native module JavaScript talks to is not registered, although the pod IS in
+Podfile.lock and autolinking does resolve it. Every call site in src/push.js
+is wrapped and the guard added since never fires, so the import raising it is
+not this app's own. The next run prints the full stack, which names who asked.
+
+**None of this touches Android**, which is green: all 33 screens, every tile
+and menu row, and the tab bar icons drawing 4/4 on a real emulator.
+
+What still needs the Apple account regardless: push, the widget and the Watch
+app, which want a Team ID and an APNs key. `store/IOS-RELEASE.md` says what to
+do with each the day it clears.
+
+So what follows is about the account, and only the account.
 
 The D-U-N-S record was corrected and D&B confirmed it on 2 October — the
 street line had held the organisation's name and no street at all.

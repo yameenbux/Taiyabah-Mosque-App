@@ -61,6 +61,21 @@ const app = await browser.newPage({ viewport: { width: 414, height: 1400 } });
 await app.goto("http://localhost:4174/", { waitUntil: "networkidle" });
 await app.waitForTimeout(2500);
 
+/* THE FIRST-RUN CARD COVERS EVERYTHING BEHIND IT. It was added when push was
+ * wired in, months after this check was written, and nothing here dismissed
+ * it — so the home screen read fine through the scrim while every tap landed
+ * on the card. That is why the More menu came back 0 of 20 rows: not one of
+ * them was missing, the check simply never reached the screen. */
+for (let i = 0; i < 10; i++) {
+  const b = app.getByText(/^Not now$/).first();
+  if (await b.isVisible().catch(() => false)) {
+    await b.click().catch(() => {});
+    await app.waitForTimeout(500);
+    break;
+  }
+  await app.waitForTimeout(300);
+}
+
 /* React Native Web nests text in several wrappers, so a "leaf element" test
  * finds nothing. Walk the text nodes themselves and glue together the runs that
  * share a box — which is what a person reads as one line. */

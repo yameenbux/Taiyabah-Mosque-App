@@ -28,12 +28,29 @@ import { Platform } from "react-native";
  * is how a layout gets looked at before an APK is built. It had rendered blank
  * since the day push was wired in and nothing said so, which is why the Help
  * screen's empty hero reached a phone instead of a screenshot. */
-let SDK = null;
+/* It can also be absent on a phone, which is newer knowledge. An iOS build
+ * carried OneSignal's native half — the Expo plugin's AppDelegate hooks and
+ * the notification service extension — without the React Native module behind
+ * them, and the first import threw
+ *   Invariant Violation: TurboModuleRegistry.getEnforcing('OneSignal')
+ * Every caller below already catches, so this returning null is not what saves
+ * the app. It is that asking twice must not throw twice: the failure is
+ * remembered, said once, and after that push is simply a thing this build does
+ * not have. */
+let SDK = null, missing = false;
 function sdk() {
-  if (Platform.OS === "web") return null;
+  if (Platform.OS === "web" || missing) return null;
   if (!SDK) {
-    const m = require("react-native-onesignal");
-    SDK = { OneSignal: m.OneSignal, LogLevel: m.LogLevel };
+    try {
+      const m = require("react-native-onesignal");
+      if (!m?.OneSignal) throw new Error("the module loaded with no OneSignal in it");
+      SDK = { OneSignal: m.OneSignal, LogLevel: m.LogLevel };
+    } catch (e) {
+      missing = true;
+      console.warn("push: react-native-onesignal is not available in this build — " +
+                   String(e && e.message || e) + " — carrying on without notifications");
+      return null;
+    }
   }
   return SDK;
 }
@@ -47,7 +64,9 @@ export function startPush() {
   if (started || Platform.OS === "web") return;
   started = true;
   try {
-    const { OneSignal, LogLevel } = sdk();
+    const api = sdk();
+    if (!api) return;
+    const { OneSignal, LogLevel } = api;
     OneSignal.Debug.setLogLevel(LogLevel.None);
     OneSignal.initialize(APP_ID);
   } catch (e) {
@@ -61,12 +80,12 @@ export function startPush() {
 /* The system dialog, raised by OneSignal so it knows the answer. Returns what
  * the person actually chose rather than what we hoped for. */
 export async function askPush() {
-  try { return await sdk().OneSignal.Notifications.requestPermission(true); }
+  try { return await sdk()?.OneSignal.Notifications.requestPermission(true) ?? false; }
   catch { return false; }
 }
 
 export async function hasPush() {
-  try { return await sdk().OneSignal.Notifications.getPermissionAsync(); }
+  try { return await sdk()?.OneSignal.Notifications.getPermissionAsync() ?? false; }
   catch { return false; }
 }
 
@@ -76,7 +95,7 @@ export async function hasPush() {
 async function waitForId(tries = 6) {
   for (let i = 0; i < tries; i++) {
     try {
-      const id = await sdk().OneSignal.User.getOnesignalId();
+      const id = await sdk()?.OneSignal.User.getOnesignalId();
       if (id) return id;
     } catch { /* not ready */ }
     await new Promise(r => setTimeout(r, 1200 * (i + 1)));
@@ -141,8 +160,8 @@ export async function whoAmI() {
 /* Nothing from the masjid wanted, so stop being a subscriber rather than stay
  * one who is sent nothing. */
 export async function optOut() {
-  try { sdk().OneSignal.User.pushSubscription.optOut(); } catch {}
+  try { sdk()?.OneSignal.User.pushSubscription.optOut(); } catch {}
 }
 export async function optIn() {
-  try { sdk().OneSignal.User.pushSubscription.optIn(); } catch {}
+  try { sdk()?.OneSignal.User.pushSubscription.optIn(); } catch {}
 }

@@ -12,6 +12,16 @@ export function shortDate(t, d) {
   return `${t(`date.dow.${d.getDay()}`, DOW[d.getDay()].slice(0, 3))} ${d.getDate()} ` +
          `${t(`date.mon.${d.getMonth()}`, MON[d.getMonth()].slice(0, 3))}`;
 }
+/* "5 October 2026" — the date under the stepper on Prayer Times. The website
+ * writes the day, the full month and the year and leaves the weekday to the
+ * line above it, which already carries it. Using the long form in both put
+ * "Thursday" twice, one under the other. */
+export function dayMonthYear(t, d) {
+  return `${d.getDate()} ${t(`date.fullmon.${d.getMonth()}`, MON[d.getMonth()])} ${d.getFullYear()}`;
+}
+export function fullDow(t, d) {
+  return t(`date.fulldow.${d.getDay()}`, DOW[d.getDay()]);
+}
 export function monthYear(t, d) {
   return `${t(`date.fullmon.${d.getMonth()}`, MON[d.getMonth()])} ${d.getFullYear()}`;
 }

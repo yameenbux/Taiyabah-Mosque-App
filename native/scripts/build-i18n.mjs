@@ -16,6 +16,18 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 const OUT  = path.resolve(import.meta.dirname, "../src/i18n");
 fs.mkdirSync(OUT, { recursive: true });
 
+/* The app renders *bold* and _italic_; it does not parse HTML. The English
+ * from the markup comes through clean(), which converts them — but the
+ * lang/src packs and the strings lifted from script source have not had that
+ * pass, and 112 pack entries were carrying raw <b> and <i> tags that would
+ * have printed as tags on screen in Urdu, Gujarati and Arabic. */
+const tagsToMarkers = s => s
+  .replace(/<\s*(b|strong)\s*>([\s\S]*?)<\s*\/\s*\1\s*>/gi, (_, __, t) => "*" + t.trim() + "*")
+  .replace(/<\s*(i|em)\s*>([\s\S]*?)<\s*\/\s*\1\s*>/gi, (_, __, t) => "_" + t.trim() + "_")
+  .replace(/<br\s*\/?>/gi, "\n")
+  .replace(/<[^>]+>/g, "")
+  .replace(/[ \t]+/g, " ").trim();
+
 /* --- English, straight off the markup ------------------------------------ */
 const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
 const page = await browser.newPage();
@@ -55,6 +67,34 @@ const en = await page.evaluate(() => {
 });
 await browser.close();
 
+/* --- the website's own JavaScript ---------------------------------------- *
+ * Some of the site's wording is never in the markup: it is written by its
+ * scripts, as t("hallhire.book", "Book"). The extraction above aborts scripts
+ * and reads data-i18n attributes, so none of those strings reached the packs —
+ * the hall booking's whole availability flow, fifteen strings, plus the text
+ * size names on System Preferences, which had to be patched in by hand when
+ * they turned up missing in all four languages. This takes them from the
+ * source text instead, and only where the markup has not already given a
+ * better one. */
+{
+  const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  /* (?!\s*\+) — a string built by concatenation across lines would otherwise
+     be recorded as its first half: "It is four digits after the year," with
+     the rest lost. Better no entry than a truncated sentence. */
+  const re = /\bt\(\s*"([a-z0-9_.]+)"\s*,\s*"((?:[^"\\]|\\.)*)"(?!\s*\+)/g;
+  let found = 0;
+  for (const m of html.matchAll(re)) {
+    const k = m[1];
+    if (en[k]) continue;
+    /* The markup path runs clean(), which turns <b> into *bold* and <i> into
+       _italic_ — the two things the app's Rich renderer understands. A string
+       lifted from script source has had no such pass, so it would arrive
+       carrying tags the app would print literally. */
+    try { en[k] = tagsToMarkers(JSON.parse(`"${m[2]}"`)); found++; } catch {}
+  }
+  console.log(`${found} strings taken from the website's scripts`);
+}
+
 /* --- the three packs, as the web app already holds them ------------------ */
 const IDX = { ur: 0, gu: 1, ar: 2 };
 const packs = { ur: {}, gu: {}, ar: {} };
@@ -69,9 +109,28 @@ for (const f of fs.readdirSync(path.join(ROOT, "lang/src")).sort()) {
       /* " keep" is the pack's own marker for "show the English" — bank
        * details, phone numbers, proper nouns. Leaving the key out is exactly
        * right: the lookup falls through to English. */
-      if (typeof s === "string" && s.trim() && s.trim() !== "keep") { packs[code][k] = s.trim(); kept[code]++; }
+      if (typeof s === "string" && s.trim() && s.trim() !== "keep") { packs[code][k] = tagsToMarkers(s); kept[code]++; }
     }
   }
+}
+
+/* --- translations this app's own screens were given ---------------------- *
+ * The Help screen, the forms' own wording, the alerts: words the website does
+ * not have, translated for this app and held here in lang/src's own shape.
+ * They used to live only in the built packs, which meant a routine run of
+ * this script silently deleted 162 keys in three languages — 486 strings —
+ * and nothing would have said so until somebody switched to Urdu. */
+{
+  const extra = JSON.parse(fs.readFileSync(path.join(OUT, "app-extra.json"), "utf8"));
+  let n = 0;
+  for (const [k, v] of Object.entries(extra)) {
+    if (!Array.isArray(v)) continue;
+    for (const [code, i] of Object.entries(IDX)) {
+      const t = typeof v[i] === "string" ? v[i].trim() : "";
+      if (t && t !== "keep") { packs[code][k] = tagsToMarkers(t); n++; }
+    }
+  }
+  console.log(`${n} translations merged from app-extra.json`);
 }
 
 /* --- the strings this app introduced ------------------------------------- *

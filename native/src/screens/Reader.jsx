@@ -17,58 +17,50 @@ import { View, Text, SectionList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Press, Note } from "../ui";
+import { SHEETS } from "../Blocks";
+import { Screen, Hero, Press, Note, MenuRow } from "../ui";
 import ATHKAR from "../data/athkar.json";
 import DUAS from "../data/duas.json";
 import RABBANAS from "../data/rabbanas.json";
 
-/* ---------- the menu the web app opens on ------------------------------- */
-
-const MENU = [
-  { section: 0, k: "athkar.morning_evening", t: "Morning & Evening",
-    sk: "athkar.after_fajr_and_after_asr", st: "Once after Fajr and once after ʿAṣr", icon: "sunny-outline" },
-  { section: 1, k: "athkar.after_every_salah", t: "After Every Ṣalāh",
-    sk: "athkar.the_words_said_after_each", st: "The words said after each prayer", icon: "repeat-outline" },
-  { section: 2, k: "athkar.before_sleep", t: "Before Sleep",
-    sk: "athkar.what_to_say_on_going_to_bed", st: "What to say on going to bed", icon: "moon-outline" },
-  { to: "Duas", k: "athkar.everyday_du_as", t: "Everyday Duʿās",
-    sk: "athkar.waking_eating_travelling_worry_rain", st: "Waking, eating, travelling, health, marriage, loss",
-    icon: "heart-outline" },
-  { to: "Rabbanas", k: "athkar.du_as_from_the_qur_an", t: "Duʿās from the Qurʼan",
-    sk: "athkar.the_forty_rabbana_du_as", st: "The forty Rabbanā duʿās", icon: "sparkles-outline" },
+/* ---------- the menu the web app opens on -------------------------------
+ *
+ * The rows come from the website's own markup now — its wording, its order
+ * and its five hand-drawn glyphs (a sun, a minaret, a crescent, a page, an
+ * open book). They used to be retyped here with the nearest thing in an icon
+ * font, which put a repeat arrow on "After Every Ṣalāh", a heart on
+ * "Everyday Duʿās" and sparkles on the forty Rabbanā. Only where each row
+ * GOES is the app's business, and that is all this table says. */
+const GOES = [
+  n => ({ to: "AthkarSet", params: { n: 0 } }),
+  n => ({ to: "AthkarSet", params: { n: 1 } }),
+  n => ({ to: "AthkarSet", params: { n: 2 } }),
+  n => ({ to: "Duas" }),
+  n => ({ to: "Rabbanas" }),
 ];
 
 export function Athkar({ navigation }) {
-  const { t, fs, rtl } = useApp();
+  const { t, tx } = useApp();
+  const sheet = SHEETS.athkar;
+  const hero = sheet?.blocks.find(b => b.type === "hero");
+  const rows = (sheet?.blocks || []).filter(b => b.type === "row");
+  if (rows.length !== GOES.length)
+    throw new Error(`athkar: the website now has ${rows.length} rows, not ${GOES.length}`);
+
   return (
     <Screen pad={false}>
-      <Hero lines={[
-        { k: "athkar.daily_athkar", t: "Daily Athkār", w: "title" },
-        { k: "athkar.morning_evening_and_after_salah", t: "Morning, evening and after ṣalāh", w: "sub" },
-      ]} />
+      {/* .wl-ar then .wl-en — أَذْكَار in gold at 28px over "Morning, evening
+          and after ṣalāh". The app had no Arabic line at all and used the
+          sheet's header title, "Daily Athkār", as the hero instead, so the
+          screen said its own name twice and never said it in Arabic. */}
+      <Hero lines={hero?.lines || []} />
       <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-        <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
-                       overflow: "hidden" }}>
-          {MENU.map((m, i) => (
-            <Press key={m.k}
-              onPress={() => m.to ? navigation.navigate(m.to)
-                                  : navigation.navigate("AthkarSet", { n: m.section })}
-              style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
-                       paddingVertical: 14, paddingHorizontal: 15,
-                       borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-              <View style={{ width: 34, height: 34, borderRadius: 11, alignItems: "center",
-                             justifyContent: "center", backgroundColor: "rgba(119,33,87,.08)" }}>
-                <Ionicons name={m.icon} size={18} color={C.brand600} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
-                               textAlign: rtl ? "right" : "left" }}>{t(m.k, m.t)}</Text>
-                <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17.5), color: C.muted,
-                               marginTop: 2, textAlign: rtl ? "right" : "left" }}>{t(m.sk, m.st)}</Text>
-              </View>
-              <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} />
-            </Press>))}
-        </View>
+        {rows.map((r, i) => {
+          const go = GOES[i]();
+          return <MenuRow key={i} label={tx(r.label)} sub={r.sub ? tx(r.sub) : null}
+                          svg={r.svg} ext={r.ext}
+                          onPress={() => navigation.navigate(go.to, go.params)} />;
+        })}
         <View style={{ marginTop: 13 }}>
           <Note>{t("athkar.review_note", ATHKAR.reviewNote)}</Note>
         </View>
@@ -88,7 +80,7 @@ function Block({ item }) {
     <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1, borderColor: C.line,
                    padding: 16, marginTop: 12 }}>
       {!!item.label && (
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.2,
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.2,
                        color: C.gold, marginBottom: 9 }}>{String(item.label).toUpperCase()}</Text>)}
       {!!ar && (
         <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
@@ -103,7 +95,7 @@ function Block({ item }) {
         {/* `times` is sometimes a count and sometimes a sentence — "3" but also
             "Once, morning and evening". Only a number gets the × . */}
         {!!item.times && (
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.brand600 }}>
             {/^\d+$/.test(String(item.times)) ? `×${item.times}` : item.times}</Text>)}
         {!!(item.source || item.ref || item.src) && (
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
@@ -162,7 +154,6 @@ export const Duas = () => {
 export const Rabbanas = () => {
   const { t } = useApp();
   const list = Array.isArray(RABBANAS) ? RABBANAS : (RABBANAS.items || RABBANAS.rabbanas || []);
-  return <Collection note={t("rabbanas.the_du_as_of_the",
-      "The duʿās of the Qurʼan that begin “Our Lord…”, in the order they appear.")}
+  return <Collection note={t("rabbanas.the_du_as_of_the", "The duʿās of the Qur'an that begin “Our Lord…”, in the order they appear.")}
     groups={[{ title: t("rabbanas.40_rabbana", "40 Rabbanā"), data: list }]} />;
 };

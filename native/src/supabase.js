@@ -4,6 +4,8 @@
  * database as row-level security, which is why 63 tables have it on and 47 of
  * them are deny-all. The secret key never comes near an app anyone installs.
  */
+
+import { noteReach } from "./reach";
 const URL = "https://phenbhmobxwyvdeshvqw.supabase.co";
 
 /* WHICH MASJID THIS APP IS FOR, named rather than assumed.
@@ -29,7 +31,17 @@ async function go(path, init, ms = 12000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
   try {
-    return await fetch(`${URL}/rest/v1/${path}`, { ...init, signal: ctrl.signal, headers: HEAD });
+    const res = await fetch(`${URL}/rest/v1/${path}`, { ...init, signal: ctrl.signal, headers: HEAD });
+    /* We got an answer. Even a 400 means the masjid is there and talking, so
+       the app is NOT offline — it asked for something wrong, which is a
+       different problem and a different message. */
+    noteReach(true);
+    return res;
+  } catch (e) {
+    /* No answer at all: no route, DNS gone, or the 12 seconds ran out. This is
+       the only thing that means "cannot reach the masjid". */
+    noteReach(false);
+    throw e;
   } finally { clearTimeout(timer); }
 }
 
@@ -73,6 +85,21 @@ export async function rpc(fn, payload) {
   let message = null;
   try { const j = JSON.parse(body); if (j && j.message && /^[A-Z]/.test(j.message)) message = j.message; } catch {}
   return { ok: false, status: res.status, message, body };
+}
+
+/* The forms all take one `payload jsonb`, which is why rpc() wraps what it is
+ * given. Some older functions — prayer_year(p_year) among them, the one the
+ * website has always used — take named arguments instead, and PostgREST wants
+ * those at the top level rather than nested. Same door, different handle.
+ *
+ * Returns the function's own result or null; a caller that cannot reach the
+ * masjid is not in an error state, it simply has no answer yet. */
+export async function call(fn, args = {}) {
+  try {
+    const res = await go(`rpc/${fn}`, { method: "POST", body: JSON.stringify(args) });
+    if (!res.ok) return null;
+    return JSON.parse(await res.text());
+  } catch { return null; }
 }
 
 /* Is the office taking these requests at all? Asked of Postgres rather than a

@@ -157,7 +157,7 @@ export default function Help() {
                   <Press onPress={() => { tap(); setOpen(isOpen ? null : item.k); }}
                     style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                              gap: 10, padding: 14 }}>
-                    <Text style={[{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(13.5),
+                    <Text style={[{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5),
                                     color: C.ink, lineHeight: fs(20) }, dir]}>
                       {t(item.k, item.q)}</Text>
                     <Ionicons name={isOpen ? "chevron-up" : "chevron-down"} size={16} color={C.muted} />
@@ -172,7 +172,7 @@ export default function Help() {
                       {/* The steps for this phone, not for a phone in general. */}
                       {item.device && !!help && (
                         <View style={{ gap: 6, marginTop: 2 }}>
-                          <Text style={[{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }, dir]}>
+                          <Text style={[{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }, dir]}>
                             {help.name
                               ? t("help.on_phone", "On your {brand} phone:").replace("{brand}", help.name)
                               : t("help.on_this_phone", "On this phone:")}</Text>
@@ -191,7 +191,7 @@ export default function Help() {
                         <Press onPress={() => { tap(); Linking.openSettings().catch(() => {}); }}
                           style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                                    borderWidth: 1, borderColor: C.line, marginTop: 3 }}>
-                          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                             {t("alerts.open_app_settings", "Open this app's settings")}</Text>
                         </Press>)}
 
@@ -199,7 +199,7 @@ export default function Help() {
                         <Press onPress={() => mailUs(t(item.k, item.q))}
                           style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                                    borderWidth: 1, borderColor: C.line, marginTop: 3 }}>
-                          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                             {t("help.tell_the_masjid", "Tell the masjid")}</Text>
                         </Press>)}
                     </View>)}
@@ -214,7 +214,7 @@ export default function Help() {
               "Say what you expected and what happened instead. The message carries which phone you are on and whether notifications are allowed, which is usually what settles it.")}</Text>
           <Press onPress={() => mailUs(t("help.subject", "Help with the app"))}
             style={{ alignItems: "center", paddingVertical: 13, borderRadius: R.pill,
-                     backgroundColor: C.brand600 }}>
+                     backgroundColor: C.plumFill }}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), color: C.cream }}>
               {t("help.email_the_masjid", "Email the masjid")}</Text>
           </Press>
@@ -224,7 +224,7 @@ export default function Help() {
           <Press onPress={() => { tap(); open("tel:01204535997"); }}
             style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                      borderWidth: 1, borderColor: C.line }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
               {t("help.ring_the_masjid", "Ring the masjid")} · 01204 535 997 · 5pm to 7pm</Text>
           </Press>
         </Card>

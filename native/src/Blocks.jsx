@@ -14,7 +14,7 @@ import SHEETS from "./data/sheets.json";
 import { useApp } from "./store";
 import {
   Screen, Hero, Heading, Card, P, Note, Sub, DL, KV, Chips, Ticks, Warn, Notice,
-  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich } from "./ui";
+  Callout, CTA, Bank, Social, Foot, RowGroup, NavRow, open, Urgent, Rules, Rich, Call, Facts, MenuRow, Advisory, Items, Help, partly } from "./ui";
 
 /* The web app's internal links were element ids, because everything lived on
  * one page. Here they are routes. */
@@ -49,26 +49,26 @@ const ICON = {
 };
 
 function Block({ b, nav, inCard }) {
-  const { tx, fs } = useApp();
+  const { tx, fs, rtl } = useApp();
   switch (b.type) {
     case "hero":    return null;   // the hero is hoisted out of the scroll body
     case "heading": return <Heading tag={b.tag ? tx(b.tag) : null}>{tx(b)}</Heading>;
     case "sub":     return <Sub>{tx(b)}</Sub>;
-    case "p":       return <View style={{ marginTop: 9 }}><P>{tx(b)}</P></View>;
-    case "note":    return <View style={{ marginTop: 9 }}><Note>{tx(b)}</Note></View>;
+    case "p":       return <View style={{ marginTop: 9 }}><P center={b.center}>{tx(b)}</P></View>;
+    case "note":    return <View style={{ marginTop: 9 }}><Note center={b.center}>{tx(b)}</Note></View>;
     case "warn":    return <Warn>{tx(b)}</Warn>;
     case "notice":  return <Notice>{tx(b)}</Notice>;
     case "chips":   return <Chips items={b.items} />;
     case "ticks":   return <Ticks items={b.items} ordered={b.ordered} />;
-    case "dl":      return <DL items={b.items} />;
+    case "dl":      return <DL items={b.items} kind={b.kind} />;
     case "bank":    return <Bank items={b.items} />;
     case "social":  return <Social items={b.items} />;
     case "foot":    return <Foot lines={b.lines} />;
     case "callout": return <Callout {...b} />;   // b.tone comes from the extractor
     case "urgent":  return <Urgent {...b} />;
     case "rules":   return <Rules {...b} />;
-    case "advisory": return (
-      <Warn>{[b.h, ...(b.ps || [])].filter(Boolean).map(tx).join("\n\n")}</Warn>);
+    case "advisory":
+      return <Advisory h={b.h} ps={b.ps} />;
 
     /* The founders and the ulema. On the website this is .ab-list: each row is
        14.5px at weight 600 with 12px above and below and a hairline between
@@ -78,17 +78,23 @@ function Block({ b, nav, inCard }) {
       return (
         <View style={{ marginTop: 2 }}>
           {b.items.map((it, i) => (
-            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 9,
-                                   paddingVertical: 12,
+            <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                   gap: 8, flexWrap: "wrap", paddingVertical: 12,
                                    borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-              <Rich style={{ flex: 1, fontFamily: F.sansMedium, fontSize: fs(14.5),
+              {/* .ab-list div is a wrapping flex row, so the note sits beside
+                  the name with 8px between — "Moulana Mehboob Saheb Chorley".
+                  flex:1 on the name pushed it to the far right instead, which
+                  made a place-name look like a column of its own. */}
+              <Rich style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), flexShrink: 1,
                              lineHeight: fs(21), color: C.ink }}>{tx(it)}</Rich>
               {!!it.note && (it.now
                 ? <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 1,
                                  textTransform: "uppercase", color: C.brand600,
-                                 backgroundColor: "#EFE6EC", borderRadius: R.pill,
+                                 backgroundColor: C.tintPlumPill, borderRadius: R.pill,
                                  paddingHorizontal: 8, paddingVertical: 3, overflow: "hidden" }}>
                     {tx(it.note)}</Text>
+                /* .ab-note is one of the five rules the website sets at 500
+                   rather than 600 — it is a quiet aside beside a name. */
                 : <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.muted }}>
                     {tx(it.note)}</Text>)}
             </View>))}
@@ -115,12 +121,26 @@ function Block({ b, nav, inCard }) {
     }
 
     case "kv": {
-      const row = <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+      const row = <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} kind={b.kind} />;
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
+    case "items":
+      return <Items items={b.items} />;
+
+    case "facts":
+      return <Facts items={b.items} />;
+
+    case "call":
+      return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+
     case "row": {
       const route = b.id && ROUTE[b.id];
+      const go = route ? () => nav?.navigate(route) : b.href ? () => open(b.href) : null;
+      if (b.card)
+        return <MenuRow label={tx(b.label)} sub={b.sub ? tx(b.sub) : null} svg={b.svg} ext={b.ext} play={b.play}
+                        icon={route ? ICON[route] : hrefIcon(b.href)}
+                        soon={b.soon ? tx(b.soon) : null} onPress={go} />;
       const row = (
         <NavRow
           icon={route ? ICON[route] : hrefIcon(b.href)}
@@ -130,8 +150,12 @@ function Block({ b, nav, inCard }) {
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
+    case "help":
+      return <Help t={tx(b)} link={b.link} />;
+
     case "link": {
-      const row = <NavRow icon={hrefIcon(b.href)} label={tx(b)} onPress={() => open(b.href)} />;
+      const row = <NavRow icon={hrefIcon(b.href)} label={b.k2 ? partly(tx, b) : tx(b)}
+                          onPress={() => open(b.href)} />;
       return inCard ? row : <RowGroup>{row}</RowGroup>;
     }
 
@@ -147,14 +171,21 @@ function Block({ b, nav, inCard }) {
 
 /* Successive rows and key/value pairs read as one grouped list rather than a
  * stack of separate cards — the difference between a settings screen and a
- * web page with a lot of boxes on it. */
+ * web page with a lot of boxes on it.
+ *
+ * EXCEPT .md-row, which the website really does draw as separate cards, each
+ * with its own radius, hairline and lift and 12px of air between. Grouping
+ * them was my idea, not the site's, and it overrode the one thing that said
+ * otherwise: on Birth/Marriage/Death, Education, the Qurʾān, the madrasah and
+ * the adhkār, four to five standalone cards became one bordered list. */
+const groupable = b => (b.type === "row" && !b.card) || b.type === "kv" || b.type === "link";
+
 function merge(blocks) {
   const out = [];
   for (const b of blocks) {
     const last = out[out.length - 1];
-    if ((b.type === "row" || b.type === "kv" || b.type === "link") && last && last.group &&
-        last.group[0].type !== "card") { last.group.push(b); continue; }
-    if (b.type === "row" || b.type === "kv" || b.type === "link") { out.push({ group: [b] }); continue; }
+    if (groupable(b) && last && last.group && last.group[0].type !== "card") { last.group.push(b); continue; }
+    if (groupable(b)) { out.push({ group: [b] }); continue; }
     out.push(b);
   }
   return out;
@@ -175,12 +206,12 @@ export function Blocks({ blocks, nav }) {
  * RowGroup above already is the card. */
 function GroupKV({ b }) {
   const { tx } = useApp();
-  return <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+  return <KV k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} kind={b.kind} />;
 }
 function GroupRow({ b, nav }) {
   const { tx } = useApp();
   const route = b.id && ROUTE[b.id];
-  const label = b.type === "link" ? tx(b) : tx(b.label);
+  const label = b.type === "link" ? (b.k2 ? partly(tx, b) : tx(b)) : tx(b.label);
   return (
     <NavRow
       icon={route ? ICON[route] : hrefIcon(b.href)}
@@ -199,7 +230,7 @@ export function sheetScreen(id, { extra } = {}) {
     const body = sheet.blocks.filter(b => b.type !== "hero");
     return (
       <Screen pad={false}>
-        {!!hero && <Hero lines={hero.lines} />}
+        {!!hero && <Hero lines={hero.lines} ring={sheet.ring} align={hero.align} />}
         <View style={{ paddingHorizontal: 16 }}>
           {extra?.top ? extra.top({ navigation }) : null}
           <Blocks blocks={body} nav={navigation} />

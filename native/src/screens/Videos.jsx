@@ -6,10 +6,9 @@
  */
 import React from "react";
 import { View, Text, Image, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { C, F, R } from "../theme";
+import { C, F, SHADOW } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, NavRow, RowGroup, open } from "../ui";
+import { Screen, PanelLink, open } from "../ui";
 
 const VIDEOS = [
   { id: "gC7H_60vPFU", t: "New Build Update 2026",                        d: "New build" },
@@ -22,40 +21,50 @@ const VIDEOS = [
 const CHANNEL = "https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos";
 
 export default function Videos() {
-  const { t, fs } = useApp();
+  const { t, fs, rtl } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ t: t("vids.videos_bayaans", "Videos & bayaans"), w: "title" }]} />
-      <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 12 }}>
+      {/* No hero on the website: the sheet header carries the title and the
+          list starts immediately. A plum band here said "Videos & bayaans"
+          directly under a bar already saying it. */}
+      {/* .vd-list is a column of 10px-spaced ROWS: a 112px-wide thumbnail with
+          9px of radius on the left, the title and its label stacked beside it,
+          the whole thing an 8px-padded card at 14px of radius. This was a
+          stack of full-width posters with a 48px plum play button over each
+          one and the text underneath — three videos to a screen instead of
+          six, and a layout the website never shows anywhere. */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 10 }}>
         {VIDEOS.map(v => (
           <Pressable key={v.id} onPress={() => open(`https://www.youtube.com/watch?v=${v.id}`)}
-            style={({ pressed }) => ({ borderRadius: R.card, overflow: "hidden", borderWidth: 1,
+            accessibilityRole="link"
+            style={({ pressed }) => [{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                       gap: 12, padding: 8, borderRadius: 14, borderWidth: 1,
                                        borderColor: C.line, backgroundColor: C.card,
-                                       opacity: pressed ? 0.9 : 1,
-                                       transform: [{ scale: pressed ? 0.99 : 1 }] })}>
-            <View>
+                                       opacity: pressed ? 0.92 : 1 }, SHADOW]}>
+            <View style={{ width: 112, aspectRatio: 16 / 9, borderRadius: 9, overflow: "hidden",
+                           backgroundColor: C.brand900, alignItems: "center", justifyContent: "center" }}>
               <Image source={{ uri: `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg` }}
-                     style={{ width: "100%", aspectRatio: 16 / 9, backgroundColor: "#1A0A14" }} />
-              <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0,
-                             alignItems: "center", justifyContent: "center" }}>
-                <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: "rgba(60,11,42,.74)",
-                               alignItems: "center", justifyContent: "center" }}>
-                  <Ionicons name="play" size={22} color={C.cream} style={{ marginLeft: 3 }} />
-                </View>
-              </View>
+                     style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }} />
+              {/* .vd-thumb::after — a bare 11px white triangle with a drop
+                  shadow under it, centred on the thumbnail. */}
+              <View style={{ width: 0, height: 0, borderLeftWidth: 11, borderTopWidth: 7, borderBottomWidth: 7,
+                             borderLeftColor: "rgba(255,255,255,.92)", borderTopColor: "transparent",
+                             borderBottomColor: "transparent", marginLeft: 3,
+                             shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 3,
+                             shadowOffset: { width: 0, height: 1 } }} />
             </View>
-            <View style={{ padding: 13 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), lineHeight: fs(18.5), color: C.ink,
+                             textAlign: rtl ? "right" : "left" }}>
                 {t(`video.${v.id}.t`, v.t)}</Text>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 3 }}>
+              <Text style={{ fontFamily: F.sans, fontSize: fs(11), letterSpacing: 0.66,
+                             textTransform: "uppercase", color: C.muted,
+                             textAlign: rtl ? "right" : "left" }}>
                 {t(`video.${v.id}.d`, v.d)}</Text>
             </View>
           </Pressable>))}
 
-        <RowGroup>
-          <NavRow icon="logo-youtube" label={t("vids.see_the_full_channel_on", "See the full channel on YouTube")}
-                  onPress={() => open(CHANNEL)} />
-        </RowGroup>
+        <PanelLink label={t("vids.see_the_full_channel_on", "See the full channel on YouTube ›")} href={CHANNEL} />
       </View>
     </Screen>
   );

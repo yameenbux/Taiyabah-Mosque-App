@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, Foot, P } from "../ui";
+import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, P } from "../ui";
 import { Field, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
@@ -41,8 +41,7 @@ export default function Advice({ navigation }) {
       subject: v.subject.trim(), question: v.question.trim(),
     });
     if (r.ok) { setState({ sent: true, reference: r.data.reference }); return; }
-    setState({ error: r.message || t("advice.couldnt_send",
-      "That didn't send. Please try again, or ask at the masjid office.") });
+    setState({ error: r.message || t("advice.couldnt_send", "That didn't send. Please try again, or ring the office on 01204 535 997.") });
   }
 
   const sheet = SHEETS.advice;
@@ -59,30 +58,24 @@ export default function Advice({ navigation }) {
 
   return (
     <Screen pad={false}>
-      {!!hero && <Hero lines={hero.lines} />}
+      {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
         <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
 
-        {open === false ? (
-          <>
-            <Heading>{t("advice.questions", "Questions")}</Heading>
-            <Notice>{t("advice.not_taking_written",
-              "The masjid is not taking written questions at the moment.")}</Notice>
-            <RowGroup>
-              <NavRow icon="call-outline" label={t("advice.call_the_main_office_to", "Call the main office to book")}
-                      sub="01204 535 997 · 5pm to 7pm" href="tel:01204535997" />
-              <NavRow icon="mail-outline" label={t("advice.or_write_to_them", "Or write to them")}
-                      sub="info@taiyabahmasjid.com" href="mailto:info@taiyabahmasjid.com" />
-            </RowGroup>
-          </>
-        ) : (
+        {/* WHEN WRITTEN QUESTIONS ARE CLOSED, THE WEBSITE'S OWN PROSE IS THE
+            CLOSED STATE — "Written questions are not being taken just now",
+            in the plum panel, with the office number above it. The app drew
+            all of that from the sheet and then added a second "Questions"
+            heading, a second notice saying the same sentence, and a second
+            copy of the same phone number, so the screen said it twice and
+            ended with the charity line in the middle. */}
+        {open === false ? null : (
           <>
             <Heading>{t("advice.ask_a_question", "Ask a question")}</Heading>
             {/* Why the form asks for everything it asks for, and what will and
                 will not happen afterwards. The website says both; without them
                 the form looks nosy and its silence afterwards looks broken. */}
-            <Note>{t("advice.every_box_is_needed_so",
-              "Every box is needed: the imam has to know who he is answering, where to send his answer, and what the question is about.")}</Note>
+            <Note>{t("advice.every_box_is_needed_so", "Every box is needed: the imam has to know who he is answering, where to send his answer, and how to reach you if ringing would be kinder than writing.")}</Note>
             <Field label={t("advice.your_name", "Your name")} type="name" value={v.name} bad={bad.name}
                    onChange={x => setV(s => ({ ...s, name: x }))} />
             <Field label={t("advice.phone_number", "Phone number")} type="tel" value={v.phone} bad={bad.phone}
@@ -95,8 +88,7 @@ export default function Advice({ navigation }) {
             <Field label={t("advice.your_question", "Your question")} type="multi" value={v.question} bad={bad.question}
                    onChange={x => setV(s => ({ ...s, question: x }))} />
             <ErrorBox>{state.error}</ErrorBox>
-            <Note>{t("advice.you_will_get_no_email_confirming",
-              "You will not get an email confirming this was sent — your reference is shown on the next screen, so keep it.")}</Note>
+            <Note>{t("advice.you_will_get_no_email_confirming", "You will not get an email confirming this was sent — your reference is shown on this screen instead, so nothing about it lands in an inbox somebody else may read.")}</Note>
             {/* Who sees it. For some of what people write here, this is the
                 single most important sentence on the screen. */}
             {/* Gold, as .ia-conf is on the website — and the website's own
@@ -115,7 +107,9 @@ export default function Advice({ navigation }) {
                     sending={state.sending} onPress={send} />
           </>
         )}
-        <Foot lines={["Bolton Central Islamic Society · Registered charity 1041569"]} />
+        {/* The charity line is the last block of the advice sheet and is drawn
+            from it above, so adding it again here printed it twice. The same
+            defect the charity collections screen had. */}
       </View>
     </Screen>
   );

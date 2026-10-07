@@ -28,6 +28,18 @@ const SHEETS = [
   /* The nikāḥ and hall-hire screens are hand-written native forms, so only the
    * prose above the form comes across — stop at the heading where it starts. */
   { id: "marriage", stopKey: "nikah.request_a_date" },
+  /* System Preferences is a hand-written screen — the settings are the app's
+     own, not the website's prose — but its hero carries the globe medallion,
+     and the only honest place to get that drawing is the website itself. */
+  { id: "sysprefs", stopKey: "sysprefs.language" },
+  /* The Qurʾān and the adhkār are four views in one sheet — a mode picker, a
+     list, a reader, the muṣḥaf — and only the first is markup worth lifting;
+     the rest is built by script and is a native screen here. `only` takes the
+     hero plus that one subtree, so the mode rows come across with the
+     website's own drawings instead of being retyped with the nearest glyph in
+     an icon font. */
+  { id: "quran",  only: "#qd-mode-view" },
+  { id: "athkar", only: "#ak-mode-view" },
 ];
 
 const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
@@ -81,8 +93,9 @@ const out = await page.evaluate(ids => {
   };
   const str = el => { const k = KEY(el); const t = txt(el); return k ? { k, t } : { t }; };
 
-  function walk(el, blocks) {
+  function walk(el, blocks, onlyChild) {
     for (const c of el.children) {
+      if (onlyChild && c !== onlyChild) continue;
       const tag = c.tagName.toLowerCase();
 
       if (tag === "svg" || tag === "script" || tag === "style") continue;
@@ -98,12 +111,39 @@ const out = await page.evaluate(ids => {
           if (k.closest("svg")) continue;
           if (k.children.length && !KEY(k)) continue;
           const t = txt(k); if (!t) continue;
+          /* CLASSIFY A HERO LINE BY WHAT THE BROWSER COMPUTES, not by its
+             class name. The old rules keyed off suffixes — -en and -lead for
+             a title, -eyebrow, -est and -lab for an eyebrow — and the site
+             does not follow that pattern: contact's hero is .ct-name over
+             .ct-org, so BOTH came through as ordinary sub-lines and the
+             masjid's own name rendered at 13.5px in the muted grey.
+
+             A line set in Fraunces is a title. A small uppercase tracked line
+             is an eyebrow. Scripture is the Arabic face or a *-ar class.
+             Everything else is a sub. And each line carries its own size,
+             because the site sets them per hero: .ct-name is 24px, .hh-en 22,
+             .mg-en 19, .wl-en and .bt-en 18. */
+          const cs = getComputedStyle(k);
+          const ts = parseFloat(getComputedStyle(document.documentElement)
+            .getPropertyValue("--ts")) || 1;
+          const px = Math.round((parseFloat(cs.fontSize) || 0) / ts) || null;
           const weight =
-            has(k, "arabic") ? "arabic" :
-            /-(eyebrow|est|lab)$/.test(k.className) ? "eyebrow" :
-            /-(en|lead)$/.test(k.className) ? "title" : "sub";
-          hero.lines.push({ ...str(k), w: weight });
+            has(k, "arabic") || /(^|\s)[a-z]{2}-ar$/.test(k.className) ? "arabic" :
+            /Fraunces/i.test(cs.fontFamily) ? "title" :
+            cs.textTransform === "uppercase" ? "eyebrow" : "sub";
+          /* The colour too: .gv-eyebrow is gold and .ct-org is #BBA9B4, so
+             one rule for "the small line above the title" would have been
+             wrong on one of them whichever colour it picked. */
+          const col = (cs.color || "").replace(/\s/g, "");
+          hero.lines.push({ ...str(k), w: weight, ...(px ? { px } : {}),
+                            ...(col ? { col } : {}) });
         }
+        /* Nine of the eleven sheet heroes are centred and .ab-hero is not —
+           it has no text-align at all, so About reads left like the page of
+           history it is. Centring every hero made that one page look like a
+           poster. The alignment travels with the hero rather than being
+           assumed. */
+        hero.align = getComputedStyle(c).textAlign === "center" ? "center" : "left";
         blocks.push(hero);
         continue;
       }
@@ -134,9 +174,23 @@ const out = await page.evaluate(ids => {
         const h = c.querySelector("h3,h4");
         const ps = [...c.querySelectorAll("p")].map(str).filter(p => p.t);
         const a = c.querySelector("a[href],button[id]");
+        /* WHERE the button sits matters. On admissions the website puts
+           "Open the application form" BETWEEN the explanation and "The office
+           takes admission queries between 5pm and 7pm", so the closing line
+           is the last word before you tap. The button was always appended at
+           the end instead, which left that sentence stranded above it. */
+        const after = a ? [...c.querySelectorAll("p")]
+          .filter(x => x.textContent.trim())
+          .findIndex(x => a.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING) : -1;
         blocks.push(node("callout", { lab: lab ? str(lab) : null, h: h ? str(h) : null, ps,
           tone: CALLOUTS[calloutClass],
-          cta: a ? { ...str(a), href: a.getAttribute("href") || null, id: a.id || null } : null }));
+          ctaAt: after < 0 ? ps.length : after,
+          /* The label is the anchor's own span, not the whole anchor: .dr-ext
+             holds a ↗ glyph, and taking the anchor's text swept it into the
+             words, so the button read "Open the application form ↗" and then
+             drew a second arrow of its own at the far end. */
+          cta: a ? { ...str(a.querySelector(":scope > span:not(.dr-ext)") || a),
+                     href: a.getAttribute("href") || null, id: a.id || null } : null }));
         continue;
       }
 
@@ -146,7 +200,12 @@ const out = await page.evaluate(ids => {
           const dt = d.querySelector("dt"), dd = d.querySelector("dd");
           return dt && dd ? { k: str(dt), v: str(dd) } : null;
         }).filter(Boolean);
-        blocks.push(node("dl", { items, card: has(c, "card") }));
+        /* .gv-goes styles its own: the term 11.5px bold uppercase in
+           BRAND-600 and the definition 14px ink, against the plain list's
+           10.5px muted over 13.5. On the giving screen those five plum labels
+           are what makes it a list of what the money does. */
+        blocks.push(node("dl", { items, card: has(c, "card"),
+                                 kind: c.closest(".gv-goes") || has(c, "gv-goes") ? "goes" : "plain" }));
         continue;
       }
 
@@ -160,6 +219,44 @@ const out = await page.evaluate(ids => {
       }
 
       /* a card is a container: recurse ------------------------------------ */
+      /* .fs-grid — the eight things the masjid does for a funeral ----------
+       *
+       * Each .fs-item is a CARD: a 36px #F0E9ED chip with a hand-drawn glyph,
+       * a 14.5px bold title, sometimes a gold "extra cost" tag beside it, and
+       * a 13px muted line under it. The walker was flattening them into
+       * alternating sub/p blocks, so eight cards became sixteen loose
+       * paragraphs — and because the title's two spans were concatenated with
+       * nothing between them, one of them read "Feeding & kitchenextra cost".
+       */
+      if (has(c, "fs-grid")) {
+        const items = [...c.querySelectorAll(".fs-item")].map(it => {
+          const h = it.querySelector("h4 span:not(.fs-extra)");
+          const tag = it.querySelector(".fs-extra");
+          const body = it.querySelector("p");
+          const ico = it.querySelector(".ic svg");
+          return { h: h ? str(h) : null, tag: tag ? str(tag) : null,
+                   p: body ? str(body) : null,
+                   svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null };
+        }).filter(x => x.h);
+        if (items.length) { blocks.push(node("items", { items })); continue; }
+      }
+
+      /* the stat strip -----------------------------------------------------
+       *
+       * .hh-facts: equal columns divided by a hairline, each a 10.5px
+       * uppercase label over a 28px brand-600 figure. On hall hire, Arabic
+       * classes and the ghusl workshop. As a plain card it came out as two
+       * ordinary table rows — "Halls available 3" — and the number, which is
+       * the only thing anybody opens that panel to read, was 13.5px grey. */
+      if (has(c, "hh-facts")) {
+        const items = [...c.querySelectorAll(".hh-row")].map(r => {
+          const k = r.querySelector(".hh-k"), v = r.querySelector(".hh-v");
+          return { k: k ? str(k) : null, v: v ? str(v) : null,
+                   small: !!(v && /font-size:\s*20px/.test(v.getAttribute("style") || "")) };
+        }).filter(x => x.k && x.v);
+        if (items.length) { blocks.push(node("facts", { items })); continue; }
+      }
+
       if (has(c, "card")) {
         const inner = [];
         /* a plain list-of-divs card, e.g. the founders */
@@ -214,8 +311,15 @@ const out = await page.evaluate(ids => {
        * agree", is a consent nobody gave. */
       if (has(c, "cc-rules")) {
         const h = c.querySelector("h3,h4");
+        /* .cc-ver — "VERSION 2026-09-14 · YOU ARE AGREEING TO THIS VERSION",
+           10.5px uppercase in gold-bright directly under the heading. The
+           request sends rules_version, so the screen has to name the same
+           thing the record stores: agreeing to "the rules" with no version is
+           not a consent to anything in particular. */
+        const ver = c.querySelector(".cc-ver");
         blocks.push(node("rules", {
           h: h ? str(h) : null,
+          ver: ver ? str(ver) : null,
           items: [...c.querySelectorAll("li")].map(li => {
             const sp = [...li.children].find(x => x.tagName === "SPAN" && !x.classList.contains("tick"));
             return sp ? str(sp) : str(li);
@@ -293,8 +397,19 @@ const out = await page.evaluate(ids => {
         const v = c.querySelector('[class*="-v"], :scope > .v, :scope > * > .v, :scope > .p');
         if (k && v) {
           const href = c.getAttribute("href") || null;
+          /* THREE DIFFERENT TABLE ROWS, not one.
+             .ad-r   — fees and class times: label 13.5px in INK, figure 15px
+                       bold in brand-600. The money is the plum thing.
+             .bt-row — the birth table: label 13px MUTED, value 15px bold ink.
+             .bk-rate-line — the hire tariff and the nikāḥ fees: both sides
+                       13.5px in ink, the figure bold, and the hairline runs
+                       UNDER the row rather than over it.
+             All three drew as one shape here: a muted label with an ink
+             value, so on admissions every fee lost its colour and every
+             label gained grey it should not have. */
+          const kind = has(c, "ad-r") ? "fee" : has(c, "bk-rate-line") ? "rate" : "plain";
           blocks.push(node("kv", {
-            k: str(k), v: str(v), href,
+            k: str(k), v: str(v), href, kind,
             icon: !href ? (/radio|frequency/i.test(k.textContent || "") ? "radio" : null)
                 : href.startsWith("tel:") ? "call"
                 : href.startsWith("mailto:") ? "mail"
@@ -315,12 +430,77 @@ const out = await page.evaluate(ids => {
         continue;
       }
 
-      /* a navigation / call row ------------------------------------------- */
-      if (has(c, "md-row") || has(c, "hh-call") || has(c, "ab-video") || has(c, "dr-row")) {
-        const t1 = c.querySelector(".md-t1,.hh-call-k,.ab-v1");
-        const t2 = c.querySelector(".md-t2,.hh-call-v,.ab-v2");
+      /* "ring the office" ---------------------------------------------------
+       *
+       * Eighteen of these across the site, in five differently-prefixed but
+       * otherwise identical flavours: a small uppercase label — MASJID OFFICE
+       * 5PM-7PM — over the number itself at 16px bold, in a card of its own.
+       * Only the hh- flavour was matched, and it was folded in with .md-row,
+       * which is the OPPOSITE shape: a 14.5px title over a muted sub. So the
+       * number came out small and grey underneath a large black label. */
+      /* .cc-help — ONE card, not two blocks. The question sits at 13px in
+         ink at weight 700 and the number three pixels under it, plum and
+         bold, with no chip and no chevron: it is a line you can ring, not a
+         menu row that takes you somewhere. Falling through to the generic
+         handlers split it into a loose paragraph and a full-width navigation
+         card, so the quietest thing on the form became the loudest. */
+      if (has(c, "cc-help")) {
+        const t1 = c.querySelector(".cc-help-t");
+        const a = c.querySelector("a");
+        const keyed = a && !KEY(a) && a.querySelector("[data-i18n]");
+        blocks.push(node("help", {
+          ...(t1 ? str(t1) : str(c)),
+          /* The anchor is "<keyed>Rafik Patel</keyed> &mdash; <latin>07951
+             795 465</latin>": the name translates, the number must not. t2
+             is the keyed part's English, so the app can swap just that out
+             of the flattened line and leave the digits alone. */
+          link: a ? { ...str(a), ...(keyed ? { k2: KEY(keyed), t2: str(keyed).t } : {}),
+                      href: a.getAttribute("href") } : null,
+        }));
+        continue;
+      }
+
+      if (/\b(wl|ia|hh|bt|mg)-call\b/.test(c.className || "") || has(c, "hh-addr")) {
+        /* $= missed every phone number on the site: .hh-call-v also carries
+           .tnum for the lining figures, so the class attribute ends "tnum". */
+        const k = c.querySelector('[class*="-call-k"]');
+        const v = c.querySelector('[class*="-call-v"]');
+        blocks.push(node("call", {
+          k: k ? str(k) : str(c), v: v ? str(v) : null,
+          href: c.getAttribute("href") || null,
+          /* .hh-addr carries a map pin, not the phone handset every other
+             one of these has. Guessing from the href gave it the generic
+             "opens elsewhere" box instead. */
+          icon: has(c, "hh-addr") ? "location" : "call",
+        }));
+        continue;
+      }
+
+      /* a navigation row ---------------------------------------------------- */
+      if (has(c, "md-row") || has(c, "ab-video") || has(c, "dr-row")) {
+        const t1 = c.querySelector(".md-t1,.ab-v1");
+        const t2 = c.querySelector(".md-t2,.ab-v2");
+        /* .md-row is a CARD of its own — 15px of radius, 14 of padding, a
+           hairline and the shared lift, 12px below the one before it — not a
+           row in a grouped list. And its 40px chip holds a hand-drawn SVG:
+           a crib, two wedding bands, a shield with a tick. Twenty of these
+           across five screens. */
+        const ico = c.querySelector(".md-ico svg, .ab-play svg");
+        /* .ab-play is NOT the shared chip. Every other row on the site puts
+           its glyph in a 40px #F0E9ED square in plum; this one is a 36px tile
+           FILLED brand-800 with the play mark in gold-bright, because it is
+           the only row that starts a video. Folded in with the rest it came
+           out pale pink, which is the one thing a play button must not be. */
+        const play = has(c, "ab-video");
+        /* A row that leaves the app ends in .dr-ext — a gold ↗ — and one that
+           goes deeper ends in .dr-ch, a muted chevron. The app drew a chevron
+           on both, so "Apply for a place" and "Madrasah Portal" gave no sign
+           they were about to open a browser. */
+        const ext = !!c.querySelector(".dr-ext");
         blocks.push(node("row", {
           label: t1 ? str(t1) : str(c), sub: t2 ? str(t2) : null,
+          card: has(c, "md-row") || play, ext, ...(play ? { play: true } : {}),
+          svg: ico ? ico.outerHTML.replace(/\s+/g, " ").trim() : null,
           href: c.getAttribute("href") || null, id: c.id || null,
           soon: (() => { const t = c.querySelector(".soon-tag"); return t ? str(t) : (has(c, "soon") ? { t: "Coming soon" } : null); })(),
         }));
@@ -353,13 +533,28 @@ const out = await page.evaluate(ids => {
       if (tag === "p") {
         const t = txt(c); if (!t) continue;
         const cls = c.className;
-        blocks.push(node(/note$/.test(cls) || /hint/.test(cls) ? "note" : "p", str(c)));
+        /* Nine of the site's standing notes are CENTRED — .ct-note under the
+           contact card, the two .bk-horizon lines under the hall calendar,
+           .qfoot, .hh-foot. Taking only the words left every one of them
+           ranged left, which on a line that belongs to the card above it
+           reads as the start of a new paragraph. Read the real alignment
+           rather than guess it from the class. */
+        const mid = getComputedStyle(c).textAlign === "center";
+        blocks.push(node(/note$/.test(cls) || /hint/.test(cls) ? "note" : "p",
+                         { ...str(c), ...(mid ? { center: true } : {}) }));
         continue;
       }
       if (/^h[1-6]$/.test(tag) || tag === "b" || tag === "strong") { blocks.push(node("sub", str(c))); continue; }
 
       if (tag === "a") {
-        blocks.push(node("link", { ...str(c), href: c.getAttribute("href") })); continue;
+        /* An anchor whose words are split across spans has no key of its own
+           — "Rafik Patel — 07951 795 465" is collect.rafik_patel plus a
+           number marked data-i18n-latin. Taking the anchor's text alone left
+           that key unused, so the name was untranslatable while the line
+           looked complete. Carry the first keyed span's key with it. */
+        const keyed = !KEY(c) && c.querySelector("[data-i18n]");
+        blocks.push(node("link", { ...str(c), ...(keyed ? { k2: KEY(keyed), t2: str(keyed).t } : {}),
+                                   href: c.getAttribute("href") })); continue;
       }
 
       /* anything else is a wrapper */
@@ -376,10 +571,25 @@ const out = await page.evaluate(ids => {
     const sheet = document.getElementById(id);
     if (!sheet) { res[id] = { missing: true }; continue; }
     const title = sheet.querySelector(".sh-top h3");
+    /* The medallion above eight of the heroes: a 52px gold-ringed circle with
+       a line drawing in it. The drawings are hand-made SVGs — a house, a card,
+       a calendar, a globe, a speech bubble, a crib, two rings — and not one of
+       them is a glyph in any icon font, so the app renders the website's own
+       markup rather than guessing at the nearest lookalike. */
+    const ring = sheet.querySelector('[class$="-ring"] svg');
+    const only = typeof spec === "object" && spec.only;
     const body = sheet.querySelector(".sh-body");
     const blocks = [];
-    if (body) walk(body, blocks);
+    if (only) {
+      const part = sheet.querySelector(only);
+      const hero = body && body.querySelector('section[class$="-hero"]');
+      /* The Qurʾān keeps its hero inside the mode view; the adhkār put theirs
+         beside it. Walking both unconditionally gave the Qurʾān two heroes. */
+      if (hero && !(part && part.contains(hero))) walk(hero.parentElement, blocks, hero);
+      if (part) walk(part, blocks);
+    } else if (body) walk(body, blocks);
     res[id] = { title: title ? str(title) : { t: id }, blocks };
+    if (ring) res[id].ring = ring.outerHTML.replace(/\s+/g, " ").trim();
   }
   return res;
 }, SHEETS);

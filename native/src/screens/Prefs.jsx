@@ -10,46 +10,128 @@ import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp, LANGS } from "../store";
-import { Screen, Hero, Heading, Card, P, Note, RowGroup, NavRow, Pill, Press, tap, open } from "../ui";
+import { SHEETS } from "../Blocks";
+import { Screen, Hero, Heading, Card, P, Note, Press, tap, open } from "../ui";
+import Constants from "expo-constants";
 
+/* TS_STEPS, exactly as the website has them: the same four multipliers and
+ * the same four names. The app had renamed the middle two "Default" and
+ * "Larger", and used 1.28 and 1.45 where the site uses 1.26 and 1.42 — so a
+ * reader who had chosen a size on the website got a different size here, and
+ * the one they had chosen was not on the list. */
 const SIZES = [
-  { v: 1.0,  k: "sysprefs.small",   t: "Small" },
-  { v: 1.12, k: "sysprefs.default", t: "Default" },
-  { v: 1.28, k: "sysprefs.large",   t: "Large" },
-  { v: 1.45, k: "sysprefs.larger",  t: "Larger" },
+  { v: 1.00, k: "sysprefs.small",       t: "Small" },
+  { v: 1.12, k: "sysprefs.medium",      t: "Medium" },
+  { v: 1.26, k: "sysprefs.large",       t: "Large" },
+  { v: 1.42, k: "sysprefs.extra_large", t: "Extra large" },
 ];
 
-export default function Prefs({ navigation }) {
-  const { t, fs, lang, setLang, scale, setScale } = useApp();
+export default function Prefs() {
+  const { t, fs, lang, setLang, scale, setScale, theme, setTheme } = useApp();
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "sysprefs.system_preferences", t: "System Preferences", w: "title" }]} />
+      {/* .ia-hero's title is "Display & Language". The app used the sheet
+          header's own title instead, so the bar said System Preferences and
+          the hero said it again directly underneath. */}
+      <Hero ring={SHEETS.sysprefs?.ring}
+            lines={[{ k: "sysprefs.display_language", t: "Display & Language", w: "title" }]} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        <Heading tag={t("sysprefs.display_language", "Display & language")}>
-          {t("sysprefs.language", "Language")}</Heading>
-        <Note>{t("sysprefs.choose_the_language_the_app",
-          "Choose the language the app runs in. Packs download once and then work offline.")}</Note>
+        {/* APPEARANCE, above text size: it is the setting that changes the
+            most and the one somebody opens this screen looking for. Light is
+            the default and the masjid's own — dark is offered, not assumed,
+            and the phone's own setting is deliberately not read: this is a
+            choice somebody makes, not one made for them. */}
+        <Heading>{t("sysprefs.appearance", "Appearance")}</Heading>
+        <P muted>{t("sysprefs.choose_how_the_app_looks",
+          "Choose how the app looks. Light is the usual setting; dark is easier on the eyes at night.")}</P>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+          {[{ v: "light", k: "sysprefs.light", t: "Light", icon: "sunny-outline" },
+            { v: "dark",  k: "sysprefs.dark",  t: "Dark",  icon: "moon-outline" }].map(m => {
+            const on = (theme || "light") === m.v;
+            return (
+              /* The same shape as the text-size buttons directly below, because
+                 they are the same kind of choice on the same screen. */
+              <Pressable key={m.v} onPress={() => { tap(); setTheme(m.v); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
+                style={{ flex: 1, alignItems: "center", gap: 5, paddingVertical: 13, paddingHorizontal: 6,
+                         borderRadius: 12, borderWidth: 1,
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.card }}>
+                <Ionicons name={m.icon} size={19} color={on ? C.cream : C.muted} />
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.3,
+                               textTransform: "uppercase",
+                               color: on ? C.pickInk : C.muted }}>{t(m.k, m.t)}</Text>
+              </Pressable>);
+          })}
+        </View>
+
+        <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
+        <P muted>{t("sysprefs.pick_the_size_that_reads",
+          "Pick the size that reads most easily. It applies everywhere in the app.")}</P>
+        {/* .ts-pick button: 12px of radius, 12/6 of padding, a line border,
+            and the chosen one FILLED brand-700 with cream on it. A plum tint
+            inside a plum outline reads as a hint rather than a choice. The
+            glyph is a single A at the size it sets, over an uppercase label. */}
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+          {SIZES.map(s => {
+            const on = Math.abs(scale - s.v) < 0.01;
+            return (
+              <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
+                style={{ flex: 1, minWidth: 0, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6,
+                         borderRadius: 12, borderWidth: 1,
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.card }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: Math.round(14 * s.v),
+                               color: on ? C.cream : C.ink }}>A</Text>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: 10, letterSpacing: 0.3,
+                               textTransform: "uppercase", marginTop: 3,
+                               color: on ? C.pickInk : C.muted }}>{t(s.k, s.t)}</Text>
+              </Pressable>);
+          })}
+        </View>
+        {/* .ts-demo — one line on the paper, 12px radius, a line border. The
+            heading and the second paragraph above it were mine. */}
+        <View style={{ marginTop: 12, marginBottom: 10, paddingVertical: 13, paddingHorizontal: 15,
+                       borderRadius: 12, backgroundColor: C.paper, borderWidth: 1, borderColor: C.line }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(15), lineHeight: fs(23), color: C.ink }}>
+            {t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</Text>
+        </View>
+
+        {/* No tag on the website: "Display & Language" is the hero's title,
+            not a note at the end of this rule. */}
+        <Heading>{t("sysprefs.language", "Language")}</Heading>
+        <P muted>{t("sysprefs.choose_the_language_the_app",
+          "Choose the language the app runs in. Packs download once and then work offline.")}</P>
         <Card gap={0} pad={0}>
           {LANGS.map((l, i) => {
             const on = l.code === lang;
+            const rtlScript = l.code === "ar" || l.code === "ur";
             return (
               <Press key={l.code} onPress={() => { tap(); setLang(l.code); }}
                 style={{ flexDirection: "row", alignItems: "center", gap: 12,
                          paddingHorizontal: 15, paddingVertical: 14,
                          borderTopWidth: i ? 1 : 0, borderTopColor: C.line }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{l.name}</Text>
-                  {/* Amiri is an Arabic face — it carries Urdu, but it has no
-                      Gujarati at all, so that one stays in the sans. */}
-                  <Text style={{ fontFamily: l.code === "ar" || l.code === "ur" ? F.arabic : F.sans,
-                                 fontSize: fs(l.code === "en" ? 12 : 15), color: C.muted, marginTop: 2,
-                                 textAlign: "left", alignSelf: "flex-start",
-                                 writingDirection: l.code === "ar" || l.code === "ur" ? "rtl" : "ltr" }}>
+                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                  {/* .sp-native is the PRIMARY line — 15.5px at weight 700 in
+                      ink — and the English name sits under it in the muted
+                      grey. This had them the other way about, so every row
+                      led in English and the script it offers was the note. */}
+                  <Text style={{ fontFamily: rtlScript ? F.arabic : F.sansBold,
+                                 fontSize: fs(rtlScript ? 16.5 : 15.5), color: C.ink,
+                                 alignSelf: "flex-start",
+                                 writingDirection: rtlScript ? "rtl" : "ltr" }}>
                     {l.native}</Text>
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted }}>{l.name}</Text>
                 </View>
-                {l.code !== "en" && <Pill>{t("sysprefs.not_yet_reviewed", "Being reviewed")}</Pill>}
-                {on && <Ionicons name="checkmark" size={20} color={C.brand600} />}
+                {/* .sp-state: a white tick on a filled brand-600 circle when
+                    this is the language in use, and nothing when it is not. */}
+                {on && (
+                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: C.plumFill,
+                                 alignItems: "center", justifyContent: "center" }}>
+                    <Ionicons name="checkmark" size={14} color="#fff" />
+                  </View>)}
               </Press>);
           })}
         </Card>
@@ -58,44 +140,22 @@ export default function Prefs({ navigation }) {
             "The Urdu, Gujarati and Arabic wording has not yet been checked by a native speaker. Anything not yet translated shows in English rather than as a blank.")}</Note>
         </View>
 
-        <Heading>{t("sysprefs.text_size", "Text size")}</Heading>
-        <P muted>{t("sysprefs.pick_the_size_that_reads",
-          "Pick the size that reads most easily. It applies everywhere in the app.")}</P>
-        <View style={{ flexDirection: "row", gap: 7, marginTop: 12 }}>
-          {SIZES.map(s => {
-            const on = Math.abs(scale - s.v) < 0.01;
-            return (
-              <Pressable key={s.v} onPress={() => { tap(); setScale(s.v); }}
-                style={{ flex: 1, alignItems: "center", paddingVertical: 13, borderRadius: 13,
-                         borderWidth: on ? 1.6 : 1, borderColor: on ? C.brand600 : C.line,
-                         backgroundColor: on ? "rgba(119,33,87,.07)" : C.card }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: Math.round(13 * s.v),
-                               color: on ? C.brand600 : C.ink }}>Aa</Text>
-                <Text style={{ fontFamily: F.sans, fontSize: 10.5, color: C.muted, marginTop: 3 }}>
-                  {t(s.k, s.t)}</Text>
-              </Pressable>);
-          })}
-        </View>
-        <Card style={{ marginTop: 13 }}>
-          <Text style={{ fontFamily: F.display, fontSize: fs(15), color: C.ink }}>
-            {t("sysprefs.sample_h", "A sample, at this size")}</Text>
-          <P muted>{t("sysprefs.the_quick_brown_sample", "Bismillāh — this is how the app will read.")}</P>
-          <P muted>{t("sysprefs.sample",
-            "“And establish prayer and give zakāh and obey the Messenger — that you may receive mercy.”")}</P>
-        </Card>
+        {/* The website ends here, with the charity line under the language
+            card. An "About this app" section with Privacy notice and About us
+            was the app's own, and both are one tap away in the menu — the
+            same two rows, twice.
 
-        <Heading>{t("sysprefs.about_this_app", "About this app")}</Heading>
-        <RowGroup>
-          <NavRow icon="shield-checkmark-outline" label={t("privacy.privacy_notice", "Privacy notice")}
-                  onPress={() => navigation.navigate("Privacy")} />
-          <NavRow icon="information-circle-outline" label={t("about.about_us", "About us")}
-                  onPress={() => navigation.navigate("About")} />
-        </RowGroup>
+            The version stays: somebody reporting a problem has to be able to
+            say which build they are on, and it is the only thing on this
+            screen the website could not have. It reads the manifest rather
+            than a number typed here, which had been stuck at 1.0.0 while the
+            app shipped as 2.0.0. */}
         <View style={{ marginTop: 14, alignItems: "center", gap: 3 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
-            Taiyabah Masjid · {t("collect.version", "Version")} 1.0.0</Text>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
             Bolton Central Islamic Society · Registered charity 1041569</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
+            Taiyabah Masjid · {t("collect.version", "Version")}{" "}
+            {Constants.expoConfig?.version || ""}</Text>
         </View>
       </View>
     </Screen>

@@ -16,9 +16,12 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, Press, Pill, Empty, tap } from "../ui";
+import { surah } from "../data/quran-index";
+import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, MenuRow, Press, Pill, Empty, tap } from "../ui";
+import { SHEETS } from "../Blocks";
 import IDX from "../data/quran-index.json";
 import MUSHAF from "../data/mushaf.json";
+
 
 const HOST = "https://taiyabahapp.ysbdesigns.uk";
 const pageUrl = n => `${HOST}/quran/mushaf/${MUSHAF.id}/p/${n}.${MUSHAF.ext}`;
@@ -29,8 +32,18 @@ const pageUrl = n => `${HOST}/quran/mushaf/${MUSHAF.id}/p/${n}.${MUSHAF.ext}`;
  * masjid's own copy falls open at. */
 const COMMON = [18, 36, 55, 56, 67];
 
+/* The mode picker is the website's own markup: its wording, its order and its
+ * two drawings — an open book for the translation, a ruled page for the
+ * muṣḥaf. Only where each row goes is the app's business. */
+const MODE = (() => {
+  const b = SHEETS.quran?.blocks || [];
+  const rows = b.filter(x => x.type === "row");
+  if (rows.length !== 2) throw new Error(`quran: the website now has ${rows.length} mode rows, not 2`);
+  return { hero: b.find(x => x.type === "hero"), rows };
+})();
+
 export default function Quran({ navigation }) {
-  const { t, fs, lastRead } = useApp();
+  const { t, tx, fs, lastRead } = useApp();
   const resume = lastRead && (lastRead.mode === "mushaf"
     ? { label: `${t("mushaf.page", "Page")} ${lastRead.page}`, go: () => navigation.navigate("Mushaf", { page: lastRead.page }) }
     : { label: t(`surah.${lastRead.surah}.name`, IDX.surahs.find(s => s.n === lastRead.surah)?.nameEn || ""),
@@ -38,7 +51,10 @@ export default function Quran({ navigation }) {
 
   return (
     <Screen pad={false}>
-      <Hero lines={[{ k: "quran.how_would_you_like_to_read", t: "How would you like to read?", w: "title" }]} />
+      {/* .wl-ar — القرآن الكريم in gold at 28px above the question. It was
+          missing, so the one screen in the app whose subject is the Arabic
+          Qurʾān opened on a line of English with nothing above it. */}
+      <Hero lines={MODE.hero?.lines || []} />
       <View style={{ paddingHorizontal: 16 }}>
         {!!resume && (
           <RowGroup>
@@ -47,14 +63,16 @@ export default function Quran({ navigation }) {
                     sub={resume.label} onPress={resume.go} />
           </RowGroup>)}
 
-        <RowGroup>
-          <NavRow icon="book-outline" label={t("quran.13_line_qur_an", "13-Line Qurʼan")}
-                  sub={`${MUSHAF.pages} ${t("quran.mushaf_sub", "pages · needs a connection the first time")}`}
-                  onPress={() => navigation.navigate("Mushaf", {})} />
-          <NavRow icon="language-outline" label={t("quran.english_translation", "English translation")}
-                  sub={t("quran.all_114_s_rahs_with_an_english", "All 114 sūrahs, with the English beside the Arabic")}
-                  onPress={() => navigation.navigate("Surahs")} />
-        </RowGroup>
+        {/* Two separate .md-row CARDS, translation first, in the website's
+            own words and with its own drawings — not one bordered group with
+            the muṣḥaf on top and a sub-line ("848 pages · needs a connection
+            the first time") that was written here. That warning has moved
+            into the muṣḥaf itself, where somebody with no signal actually
+            meets it; a browser never needed one. */}
+        {MODE.rows.map((r, i) => (
+          <MenuRow key={i} label={tx(r.label)} sub={r.sub ? tx(r.sub) : null} svg={r.svg} ext={r.ext}
+                   onPress={() => navigation.navigate(i === 0 ? "Surahs" : "Mushaf", i === 0 ? undefined : {})} />
+        ))}
 
         <Heading>{t("quran.often_read", "Often read")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 9 }}>
@@ -65,7 +83,7 @@ export default function Quran({ navigation }) {
                 style={{ flexBasis: "47%", flexGrow: 1, backgroundColor: C.card, borderWidth: 1,
                          borderColor: C.line, borderRadius: R.tile, paddingVertical: 14, paddingHorizontal: 13 }}>
                 <Text style={{ fontFamily: F.arabic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
                   {t(`surah.${n}.name`, s.nameEn)}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 1 }}>
                   {s.ayahs} {t("quran.ayahs", "āyāt")}</Text>
@@ -77,9 +95,10 @@ export default function Quran({ navigation }) {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7 }}>
           {Object.entries(MUSHAF.juzPage).map(([j, page]) => (
             <Press key={j} onPress={() => { tap(); navigation.navigate("Mushaf", { page }); }}
+              hitSlop={{ top: 1, bottom: 1, left: 0, right: 0 }}
               style={{ width: 46, height: 42, alignItems: "center", justifyContent: "center",
                        backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 12 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>
             </Press>))}
         </View>
 
@@ -109,11 +128,11 @@ export function Surahs({ navigation }) {
           <View style={{ width: 36, height: 36, alignItems: "center", justifyContent: "center",
                          transform: [{ rotate: "45deg" }], borderWidth: 1, borderColor: C.line,
                          borderRadius: 7, backgroundColor: C.card }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.brand600,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600,
                            transform: [{ rotate: "-45deg" }] }}>{s.n}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink,
                            textAlign: rtl ? "right" : "left" }}>
               {t(`surah.${s.n}.name`, s.nameEn)}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 1.5,
@@ -133,9 +152,12 @@ export function Surah({ route, navigation }) {
   const n = route.params.n;
   useEffect(() => { setLastRead({ mode: "surah", surah: n }); }, [n]);
   const meta = IDX.surahs.find(s => s.n === n);
-  /* Required here rather than at the top of the file: 2.3MB of JSON should be
-   * parsed when somebody opens a surah, not when the app starts. */
-  const verses = useMemo(() => require("../data/quran-text.json")[n] || [], [n]);
+  /* ONE SŪRAH, not all 114. This used to require the whole 2.3MB file — late
+   * rather than at startup, which was the easy half of the problem, but the
+   * first sūrah anybody opened still parsed every other sūrah with it and
+   * froze the thread while it did. surah() reaches one generated file: 391
+   * bytes for al-Fātiḥah, 10KB for the median, 174KB for al-Baqarah. */
+  const verses = useMemo(() => surah(n), [n]);
 
   return (
     <FlatList
@@ -171,7 +193,7 @@ export function Surah({ route, navigation }) {
           <View style={{ flexDirection: "row", gap: 9, marginTop: 11 }}>
             <View style={{ minWidth: 23, height: 23, borderRadius: 12, backgroundColor: "rgba(119,33,87,.09)",
                            alignItems: "center", justifyContent: "center", paddingHorizontal: 6 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>{vn}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.brand600 }}>{vn}</Text>
             </View>
             <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(23), color: C.muted }}>
               {en}</Text>
@@ -192,6 +214,7 @@ export function Mushaf({ route, navigation }) {
   const [jump, setJump] = useState(false);
   const [land, setLand] = useState(false);
   const [toast, setToast] = useState(null);
+  const [failed, setFailed] = useState(() => new Set());
   const list = useRef(null);
   const pages = useMemo(() => Array.from({ length: MUSHAF.pages }, (_, i) => i + 1), []);
 
@@ -277,7 +300,24 @@ export function Mushaf({ route, navigation }) {
         windowSize={3}
         renderItem={({ item: n }) => (
           <View style={{ width, height, justifyContent: "center", backgroundColor: "#15060F" }}>
+            {/* 848 pages are streamed and then kept, so the first read of any
+                page needs signal. The website never had to say so — it cannot
+                be opened without a connection — and the app used to say it on
+                the row outside, which the website does not. Said here instead,
+                where somebody with no signal is looking at the page that will
+                not come, rather than guessing the app is broken. */}
+            {failed.has(n) && (
+              <View style={{ position: "absolute", left: 24, right: 24, alignItems: "center", gap: 6 }}>
+                <Ionicons name="cloud-offline-outline" size={26} color="rgba(243,239,227,.5)" />
+                <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), textAlign: "center",
+                               color: "rgba(243,239,227,.66)" }}>
+                  {t("mushaf.needs_signal",
+                     "This page has not been read before, so it needs a connection the first time. Once read, it stays on the phone.")}
+                </Text>
+              </View>)}
             <Image
+              onError={() => setFailed(f => new Set(f).add(n))}
+              onLoad={() => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; })}
               source={{ uri: pageUrl(n) }}
               /* Fitted to the whole window rather than to a fixed aspect, so the
                  same page fills the screen upright and sideways. */
@@ -299,7 +339,7 @@ export function Mushaf({ route, navigation }) {
                          paddingVertical: 7, borderRadius: R.pill, backgroundColor: "rgba(220,187,99,.17)",
                          borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
             <Ionicons name="bookmark" size={13} color={C.goldBright} />
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.goldBright }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.goldBright }}>
               {t("mushaf.page", "Page")} {muMark}</Text>
           </View>
         </Press>)}
@@ -325,7 +365,7 @@ export function Mushaf({ route, navigation }) {
         <Press onPress={() => { tap(); setJump(j => !j); }}
           style={{ paddingHorizontal: 16, paddingVertical: 6, borderRadius: R.pill,
                    borderWidth: 1, borderColor: "rgba(220,187,99,.4)", alignItems: "center" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.cream }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.cream }}>
             {t("mushaf.page", "Page")} {page}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.6)" }}>
             {t("quran.juz", "Juzʼ")} {juz}</Text>
@@ -338,7 +378,7 @@ export function Mushaf({ route, navigation }) {
         {/* The ribbon on the bar is the bookmark, and only the bookmark. */}
         <Press onPress={bookmark} style={{ padding: 8 }}
           accessibilityLabel={marked ? t("a11y.take_the_bookmark_off", "Take the bookmark off this page")
-                                     : t("a11y.bookmark_this_page", "Put your bookmark on this page")}>
+                                     : t("a11y.bookmark_this_page", "Bookmark this page")}>
           <Ionicons name={marked ? "bookmark" : "bookmark-outline"} size={19}
                     color={marked ? C.goldBright : "rgba(243,239,227,.65)"} />
         </Press>
@@ -384,10 +424,11 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
             style={{ flex: 1, alignItems: "center", paddingVertical: 10, borderRadius: R.pill,
                      borderWidth: 1, borderColor: mode === k ? C.goldBright : "rgba(243,239,227,.22)",
                      backgroundColor: mode === k ? "rgba(220,187,99,.16)" : "transparent" }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: mode === k ? C.goldBright : "rgba(243,239,227,.7)" }}>{lab}</Text>
           </Press>))}
-        <Press onPress={onClose} style={{ padding: 10 }}>
+        <Press onPress={onClose} style={{ padding: 10 }}
+          accessibilityRole="button" accessibilityLabel={t("a11y.close", "Close")}>
           <Ionicons name="close" size={22} color={C.cream} />
         </Press>
       </View>
@@ -409,7 +450,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
         <Press onPress={() => typed && onPick(Number(typed))}
           style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: R.pill,
                    backgroundColor: "rgba(220,187,99,.18)", borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldBright }}>
             {t("bukhari.go", "Go")}</Text>
         </Press>
       </View>
@@ -420,7 +461,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
                  borderWidth: 1, borderColor: "rgba(243,239,227,.22)" }}>
         <Ionicons name={fav ? "heart" : "heart-outline"} size={16}
                   color={fav ? C.goldBright : "rgba(243,239,227,.7)"} />
-        <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.cream }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.cream }}>
           {fav ? t("mushaf.remove_this_page", "Remove this page from favourites")
                : t("mushaf.add_this_page", "Add this page to favourites")}</Text>
       </Press>
@@ -428,7 +469,7 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
       {mode === "fav" && !muFavs.length
         ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "rgba(243,239,227,.55)",
                          textAlign: "center", paddingHorizontal: 30, paddingTop: 24 }}>
-            {t("mushaf.no_favourites_yet", "No favourites yet. Add a page and it will be listed here.")}</Text>
+            {t("mushaf.no_favourites_yet", "Nothing kept yet. The ribbon on the right keeps the page you are on.")}</Text>
         : <FlatList
             data={items}
             keyExtractor={(x, i) => String(i)}

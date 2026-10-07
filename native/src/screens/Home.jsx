@@ -11,12 +11,12 @@ import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path, Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
-import { Screen, Girih, Press, Rich, TopBar, open, tap } from "../ui";
+import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
-import TT from "../data/timetable-2026.json";
+import { dayRecord, allDays, onTimetable } from "../timetable";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
 
 /* Ramadan, counted down on the home screen for the month before it.
@@ -29,7 +29,7 @@ import { current as currentReminders, setReminderTranslator } from "../reminder"
 const RAM_WINDOW = 30;
 
 function ramadanIn(now) {
-  for (const [iso, d] of Object.entries(TT.days)) {
+  for (const [iso, d] of Object.entries(allDays())) {
     if (!/^1\s+Rama(d|dh)an/i.test(d.hijri || "")) continue;
     const [Y, M, D] = iso.split("-").map(Number);
     const when = new Date(Y, M - 1, D);
@@ -61,8 +61,13 @@ const TILES = [
 /* The web app draws its own tile glyphs rather than using an icon set, and they
  * are part of how it looks — a prayer-bead tasbīḥ, two rings, a collection tin.
  * They are redrawn here from the same paths rather than swapped for the nearest
- * thing in Ionicons. */
-const GLYPH = {
+ * thing in Ionicons.
+ *
+ * A FUNCTION rather than a map of elements: WhatsApp's mark is a filled shape,
+ * so it is the one glyph that names a colour, and a JSX element built at module
+ * scope evaluates its props once at import — the plum would freeze to light and
+ * the mark would stay dark plum on a dark page. */
+const GLYPH = () => ({
   quran:   <><Path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z" /><Path d="M12 6.5v11.8" /></>,
   book:    <><Path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" /><Path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22" /><Path d="M8.5 8.5h6" /><Path d="M8.5 12h6" /></>,
   compass: <><Circle cx="12" cy="12" r="8.5" /><Path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z" /></>,
@@ -78,13 +83,13 @@ const GLYPH = {
     .map(([x,y],i)=><Circle key={i} cx={x} cy={y} r={0.95} />)}
     <Path d="M12 15.9v1.3" /><Circle cx="12" cy="18.7" r="1.5" /></>,
   whatsapp: <Path fill={C.brand600} stroke="none" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.27-.2-.57-.35M12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.4Z" />,
-};
+});
 
 function TileIcon({ name }) {
   return (
     <Svg width={23} height={23} viewBox="0 0 24 24" fill="none" stroke={C.brand600}
          strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-      {GLYPH[name]}
+      {GLYPH()[name]}
     </Svg>
   );
 }
@@ -106,6 +111,10 @@ export default function Home({ navigation }) {
   setReminderTranslator(t, pretty);
 
   const ramadan = ramadanIn(now);
+
+  /* Re-read when a downloaded year lands. */
+  const [ttTick, setTtTick] = useState(0);
+  React.useEffect(() => onTimetable(() => setTtTick(n => n + 1)), []);
 
   const day = dayFor(now);
   const next = nextJamaah(now);
@@ -174,7 +183,7 @@ export default function Home({ navigation }) {
 
         {!!ramadan && (
           <View style={{ alignItems: "center", marginTop: 10 }}>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.goldBright,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldBright,
                            textAlign: "center" }}>
               {ramadan.days === 0 ? t("ramadan.begins_today", "Ramadan begins today")
                : ramadan.days === 1 ? t("ramadan.begins_tomorrow", "Ramadan begins tomorrow")
@@ -188,7 +197,7 @@ export default function Home({ navigation }) {
 
         {next ? (
           <>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), letterSpacing: 1.5,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.5,
                            color: C.goldBright, marginTop: 20, textTransform: "uppercase" }}>
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
@@ -197,14 +206,14 @@ export default function Home({ navigation }) {
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
               {pretty(next.at)}</Text>
 
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
                            marginTop: 10, flexWrap: "wrap" }}>
               <View style={{ borderWidth: 1, borderColor: "rgba(220,187,99,.45)", borderRadius: R.pill,
                              paddingHorizontal: 13, paddingVertical: 6 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.goldBright }}>{countdown}</Text>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.goldBright }}>{countdown}</Text>
               </View>
               <Rich style={{ fontFamily: F.sans, fontSize: fs(13), color: "#D0BFCA" }}>
                 {t("times.beginning_time", "Beginning time *{t}*").replace("{t}", pretty(next.begins)) +
@@ -236,10 +245,11 @@ export default function Home({ navigation }) {
             <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)" }}>
               {t("app.sahih_muslim_854", "Ṣaḥīḥ Muslim 854")}</Text>
             <Pressable onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+              accessibilityRole="button"
               style={({ pressed }) => ({ marginTop: 8, borderRadius: R.pill, backgroundColor: C.goldBright,
                                          paddingHorizontal: 20, paddingVertical: 11,
                                          opacity: pressed ? 0.88 : 1 })}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.brand900 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.brand900 }}>
                 {t("app.give_this_jumu_ah", "Give this Jumuʿah")}</Text>
             </Pressable>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: "rgba(243,239,227,.66)", marginTop: 2 }}>
@@ -269,20 +279,43 @@ export default function Home({ navigation }) {
                   <Ionicons name={k === "isha" ? "moon-outline" : "sunny-outline"} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
                     {t(`prayer.${k}`, NAMES[k].en)}</Text>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
+                  <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
                     {pretty(day.begins[k]).replace(/ (am|pm)$/, "")}</Text>
                   <View style={{ backgroundColor: "rgba(119,33,87,.09)", borderRadius: R.pill,
                                  paddingHorizontal: 7, paddingVertical: 2, marginTop: 5 }}>
-                    <Text style={{ fontFamily: F.sansMedium, fontSize: fs(10.5), color: C.brand600 }}>
+                    <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10.5), color: C.brand600 }}>
                       {pretty(day.jamaat[k]).replace(/ (am|pm)$/, "")}</Text>
                   </View>
                 </View>);
             })}
           </View>)}
+
+        {/* WHEN THERE ARE NO TIMES FOR TODAY, SAY SO. The timetable runs a
+            year at a time, and on the first morning of a year the masjid has
+            not published yet this card simply was not drawn — the prayer
+            times vanished off the home screen with no word of explanation,
+            which is the one thing this app must never do silently. Prayer
+            Times has said it all along; Home did not. */}
+        {!day && (
+          <View style={{ backgroundColor: C.card, borderRadius: R.card, borderWidth: 1,
+                         borderColor: C.line, padding: 15, ...SHADOW }}>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
+                           color: C.muted, textAlign: rtl ? "right" : "left" }}>
+              {t("times.off_timetable", "That date is outside the published timetable.")}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
+                           color: C.muted, marginTop: 7, textAlign: rtl ? "right" : "left" }}>
+              {t("home.times_coming", "The masjid publishes one year at a time. Times appear here as soon as the new timetable is out — please check at the masjid meanwhile.")}</Text>
+          </View>)}
+
         <Press onPress={() => { tap(); navigation.navigate("Timetable"); }}
+          accessibilityRole="button"
+          /* 11px of padding on a 13px line is a 35pt target, under the 44 both
+             platforms ask for. hitSlop grows what the finger hits without
+             moving the link away from the figures it sits under. */
+          hitSlop={{ top: 5, bottom: 5, left: 12, right: 12 }}
           style={{ alignSelf: rtl ? "flex-start" : "flex-end", paddingVertical: 11, paddingHorizontal: 4,
                    flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 4 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.brand600 }}>
             {t("home.full_timetable", "Full timetable ›").replace(/\s*›\s*$/, "")}</Text>
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={14} color={C.brand600} />
         </Press>
@@ -297,13 +330,13 @@ export default function Home({ navigation }) {
                 <Polygon fill={C.gold} opacity={0.55} points="50,6 94,50 50,94 6,50" />
               </Svg>
               <Text style={{ flex: 1, fontFamily: F.arabic, fontSize: fs(18), lineHeight: fs(32),
-                             color: "#8A6A18", textAlign: rtl ? "left" : "right",
+                             color: dual("#8A6A18", C.goldInk), textAlign: rtl ? "left" : "right",
                              writingDirection: "rtl" }}>{rm.ar}</Text>
             </View>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14), color: "#6B5410", marginTop: 8,
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: dual("#6B5410", C.goldInk), marginTop: 8,
                            textAlign: rtl ? "right" : "left" }}>
               {t(`reminder.${rm.id}.t`, rm.t)}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: "#7A6838",
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: dual("#7A6838", C.goldInk),
                            marginTop: 3, textAlign: rtl ? "right" : "left" }}>
               {typeof rm.d === "function" ? rm.d(rmCtx) : t(`reminder.${rm.id}.d`, rm.d)}</Text>
             {reminders.length > 1 && (
@@ -318,7 +351,13 @@ export default function Home({ navigation }) {
                 <View style={{ flexDirection: "row", gap: 7 }}>
                   {[["chevron-back", -1], ["chevron-forward", 1]].map(([icon, step]) => (
                     <Press key={icon}
+                      accessibilityRole="button"
+                      accessibilityLabel={step < 0 ? t("a11y.previous_reminder", "Previous reminder")
+                                                   : t("a11y.next_reminder", "Next reminder")}
                       onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
+                      /* Drawn 30x26 because the website draws it 30x26; hit as
+                         44x44, which is what a finger actually needs. */
+                      hitSlop={{ top: 9, bottom: 9, left: 7, right: 7 }}
                       style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
                                justifyContent: "center", borderWidth: 1,
                                borderColor: "rgba(198,162,76,.45)" }}>
@@ -331,11 +370,12 @@ export default function Home({ navigation }) {
         {/* ---- Listen ---------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.listen", "Listen")} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
+          accessibilityRole="button"
           style={{ borderRadius: R.card, overflow: "hidden" }}>
           {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
               and ending on the BRIGHTER plum. This had it backwards and on the
               wrong two colours. */}
-          <LinearGradient colors={[C.brand800, C.brand600]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.2 }}
+          <LinearGradient colors={[C.brand800, C.plumFill]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.2 }}
             style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
                      paddingHorizontal: 15, paddingVertical: 15, overflow: "hidden" }}>
             <View style={{ width: 40, height: 40, borderRadius: 14, alignItems: "center", justifyContent: "center",
@@ -346,7 +386,7 @@ export default function Home({ navigation }) {
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5), letterSpacing: 1.3,
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), letterSpacing: 1.3,
                              textTransform: "uppercase", color: C.cream,
                              textAlign: rtl ? "right" : "left" }}>
                 {t("home.listen_live", "Listen live")}</Text>
@@ -368,6 +408,11 @@ export default function Home({ navigation }) {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {TILES.map(x => (
             <Pressable key={x.k} onPress={() => { tap(); x.to ? navigation.navigate(x.to) : open(x.href); }}
+              /* "link" is not decoration: a screen reader says "link" for
+                 something that leaves the app and "button" for something that
+                 does not, and Join WhatsApp leaving the app is worth being
+                 warned about before you tap it. */
+              accessibilityRole={x.to ? "button" : "link"}
               style={({ pressed }) => ({ flexBasis: "30.5%", flexGrow: 1, alignItems: "center", gap: 8,
                                          backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
                                          borderRadius: 15, paddingTop: 15, paddingBottom: 13, paddingHorizontal: 6,
@@ -378,25 +423,13 @@ export default function Home({ navigation }) {
                              justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
                 <TileIcon name={x.icon} />
               </View>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
                 {t(x.k, x.t)}</Text>
             </Pressable>))}
         </View>
 
-        {/* ---- footer ---------------------------------------------------- */}
-        <View style={{ alignItems: "center", marginTop: 28, gap: 7 }}>
-          <Svg width={26} height={26} viewBox="0 0 100 100">
-            <Polygon fill={C.gold} opacity={0.75} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
-          </Svg>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, textAlign: "center" }}>
-            {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
-          <Press onPress={() => open("https://masjidone.co.uk")} style={{ flexDirection: "row", gap: 4, paddingVertical: 2 }}>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
-              {t("sheet.app_built_by", "Powered by")}</Text>
-            <Text style={{ fontFamily: F.sansMedium, fontSize: fs(11), color: C.brand600 }}>
-              {t("sheet.masjidone", "MasjidOne")}</Text>
-          </Press>
-        </View>
+        <PageFoot />
+
       </View>
     </Screen>
   );

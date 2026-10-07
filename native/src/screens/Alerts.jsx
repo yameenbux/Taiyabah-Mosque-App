@@ -19,7 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
-import { C, F, R, SHADOW } from "../theme";
+import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, TopBar, Heading, Card, Note, P, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
@@ -37,7 +37,7 @@ function Row({ title, sub, badge, value, onChange, first }) {
                    gap: 12, paddingHorizontal: 15, paddingVertical: 13 }}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(14.5), color: C.ink }}>{title}</Text>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink }}>{title}</Text>
           {!!badge && (
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: .8,
                            textTransform: "uppercase", color: C.danger, borderWidth: 1,
@@ -49,13 +49,26 @@ function Row({ title, sub, badge, value, onChange, first }) {
       </View>
       {/* Left to itself the track is almost the colour of the card, so all you
           can see is the knob — which read as a broken half-moon on a phone. */}
+      {/* The switch carries the row's words itself. Without this the title is
+          one stop and the switch is another, so a listener hears "Jamāʿah
+          reminders", swipes, and then hears "on" — with nothing saying what is
+          on, and the badge (URGENT, on Janāzah) lost between the two. React
+          Native gives Switch its own role and checked state; what it cannot
+          know is which line of text belongs to it. */}
       <Switch value={value} onValueChange={onChange}
+              accessibilityLabel={[title, badge, sub].filter(Boolean).join(". ")}
               /* .switch: the track is #D9D2C0 off and brand-600 on, and the
                  knob is plain white either way. This had a washed-out track
                  with a GREEN knob on it — a colour that appears nowhere in
                  this masjid's palette. */
               trackColor={{ false: "#D9D2C0", true: C.brand600 }}
               thumbColor="#FFFFFF"
+              /* react-native-web ignores thumbColor once the switch is ON and
+                 uses its own teal, so the comparison screenshots showed a
+                 green knob the phone never draws. Android honours thumbColor
+                 for both states and ignores this prop; setting it only makes
+                 the web render tell the truth. */
+              activeThumbColor="#FFFFFF"
               ios_backgroundColor={C.line} />
     </View>);
 }
@@ -124,7 +137,13 @@ export default function Alerts() {
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>
 
-        <P muted style={{ marginTop: 2 }}>
+        {/* .alerts — the intro, the Enable button, every toggle and Save are
+            ONE card padded 16. They were three loose pieces on the paper with
+            only the toggles in a card, so the button that grants permission
+            and the button that saves the choices looked unrelated to the
+            choices between them. */}
+        <Card pad={16}>
+        <P style={{ fontSize: fs(13.5), lineHeight: fs(20), color: C.muted, marginBottom: 15 }}>
           {t("sheet.get_a_quiet_reminder_before",
             "Get a quiet reminder before each jamāʿah, plus masjid announcements — on this device.")}</P>
 
@@ -132,14 +151,20 @@ export default function Alerts() {
           /* .enable is a brand-700 to brand-800 gradient at 13px of radius
              with the shared lift under it, not a flat brand-600 pill. */
           <Press onPress={enable} style={{ marginBottom: 14, borderRadius: 13, overflow: "hidden", ...SHADOW }}>
-            <LinearGradient colors={[C.brand700, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+            <LinearGradient colors={[C.ctaTop, C.ctaBot]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
               style={{ alignItems: "center", paddingVertical: 14 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), letterSpacing: 0.2, color: C.cream }}>
                 {t("sheet.enable_notifications", "Enable notifications")}</Text>
             </LinearGradient>
           </Press>)}
 
-        <Card gap={0} pad={0}>
+        {/* .toggles — HALF FADED and inert until notifications are granted.
+            The website will not let anybody set reminders that cannot be
+            delivered; the app let them be set and saved against a permission
+            that had been refused. */}
+        <View pointerEvents={granted === false ? "none" : "auto"}
+              style={{ opacity: granted === false ? 0.45 : 1 }}>
+        <View style={{ borderTopWidth: 1, borderTopColor: C.line }}>
           <Row first
             title={t("sheet.jama_ah_reminders", "Jamāʿah reminders")}
             sub={t("sheet.a_nudge_before_each_congregation", "A nudge before each congregation")}
@@ -159,10 +184,11 @@ export default function Alerts() {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
               {t("sheet.remind_me", "Remind me")}</Text>
             <Press disabled={!alerts.jamaah} onPress={() => { tap(); setPickMins(true); }}
-              style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#fff",
+              hitSlop={{ top: 7, bottom: 7, left: 4, right: 4 }}
+              style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: dual("#fff", C.paper),
                        borderWidth: 1, borderColor: C.line, borderRadius: 9,
                        paddingHorizontal: 9, paddingVertical: 6 }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink }}>
                 {t(`sheet.${alerts.mins}_min`, `${alerts.mins} min`)}</Text>
               <Ionicons name="chevron-down" size={13} color={C.muted} />
             </Press>
@@ -200,18 +226,30 @@ export default function Alerts() {
           <Row title={t("sheet.surah_al_kahf", "Sūrah al-Kahf")}
             sub={t("sheet.friday_morning_reminder", "Friday morning, a reminder to read it")}
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
-        </Card>
+        </View>
 
-        {/* .save: filled brand-700, cream text, 12px of radius, 13px of
-           padding. An outlined pill reads as the secondary action, and on
-           this screen Save is the only thing that commits anything. */}
-        <Press onPress={saveAll}
+        {/* .save: the filled interactive plum, cream text, 12px of radius,
+           13px of padding. An outlined pill reads as the secondary action,
+           and on this screen Save is the only thing that commits anything. */}
+        <Press onPress={saveAll} disabled={granted === false}
           style={{ alignItems: "center", paddingVertical: 13, borderRadius: 12,
-                   backgroundColor: C.brand700, marginTop: 14 }}>
+                   backgroundColor: C.ctaTop, marginTop: 14 }}>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), letterSpacing: 0.2, color: C.cream }}>
             {saved ? `${t("sheet.notifications_on", "Notifications on")} · ${t("sheet.change", "Change")}`
                    : t("sheet.save", "Save")}</Text>
         </Press>
+        </View>
+
+        {/* .troublebtn — 12px semibold in the MUTED grey and UNDERLINED,
+            centred under the card. It was plum and unlined, which made a last
+            resort look like the next thing to press. */}
+        <Press onPress={() => { tap(); setDiag(d => !d); }}
+          style={{ alignSelf: "center", paddingVertical: 10, marginTop: 10 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.muted,
+                         textDecorationLine: "underline" }}>
+            {t("sheet.having_trouble", "Having trouble?")}</Text>
+        </Press>
+        </Card>
 
         {granted === false
           ? <Note>{t("alerts.turned_off", "Notifications are turned off for this app. Turn them on in Android settings and they will start straight away.")}</Note>
@@ -220,14 +258,10 @@ export default function Alerts() {
               ? t("alerts.none_set", "No reminders set.")
               : `${armed} ${t("alerts.scheduled", "reminders are scheduled on this phone.")}`}</Note>)}
 
-        {/* The website's diagnostics. When a reminder does not arrive, the
-            answer is almost always one of three things, and a person with no
-            way to check any of them simply decides the app does not work. */}
-        <Press onPress={() => { tap(); setDiag(d => !d); }}
-          style={{ alignItems: "center", paddingVertical: 11, marginTop: 14 }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), color: C.brand600 }}>
-            {t("sheet.having_trouble", "Having trouble?")}</Text>
-        </Press>
+        {/* The website's diagnostics, opened from the link inside the card
+            above. When a reminder does not arrive the answer is almost always
+            one of three things, and a person with no way to check any of them
+            simply decides the app does not work. */}
 
         {diag && (
           <Card gap={10}>
@@ -238,7 +272,7 @@ export default function Alerts() {
                 the phone can undo that, so the steps are for THEIR phone. */}
             {!!help && (
               <View style={{ gap: 7 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                   {t("alerts.nothing_arriving", "Reminders not arriving at all?")}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
                   {help.name
@@ -253,7 +287,7 @@ export default function Alerts() {
                 <Press onPress={() => { tap(); Linking.openSettings().catch(() => {}); }}
                   style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                            borderWidth: 1, borderColor: C.line, marginTop: 3 }}>
-                  <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+                  <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                     {t("alerts.open_app_settings", "Open this app's settings")}</Text>
                 </Press>
               </View>)}
@@ -263,7 +297,7 @@ export default function Alerts() {
             <Press onPress={async () => { tap(); setWho(await whoAmI()); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("alerts.show_this_device_id", "Show this device's notification id")}</Text>
             </Press>
             {!!who && (
@@ -279,19 +313,19 @@ export default function Alerts() {
             <Press onPress={async () => { tap(); await rearm({}); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.send_my_categories_again", "Send my categories again")}</Text>
             </Press>
             <Press onPress={() => { tap(); open(`mailto:admin@taiyabahmasjid.com?subject=${encodeURIComponent("App notifications")}&body=${encodeURIComponent(`Permission: ${granted}\nScheduled: ${armed}\nJamaah: ${alerts.jamaah ? alerts.mins + " min" : "off"}\nKahf: ${alerts.kahf}`)}`); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.send_this_report_to_the", "Send this report to the masjid")}</Text>
             </Press>
             <Press onPress={async () => { tap(); await Notifications.cancelAllScheduledNotificationsAsync(); await rearm({}); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("sheet.reset_reload_the_app", "Reset & reload the app")}</Text>
             </Press>
             <Note>{t("sheet.this_clears_the_app_s",
@@ -301,7 +335,7 @@ export default function Alerts() {
             <Press onPress={() => { tap(); nav.navigate("Help"); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
                        borderWidth: 1, borderColor: C.line }}>
-              <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), color: C.ink }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.ink }}>
                 {t("alerts.more_answers", "More answers in Help")}</Text>
             </Press>
           </Card>)}

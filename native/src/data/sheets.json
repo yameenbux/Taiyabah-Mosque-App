@@ -11,19 +11,26 @@
      {
       "k": "about.established_at_the_end_of",
       "t": "Established at the end of 1967",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 10,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "about.one_of_the_first_masjids",
       "t": "One of the first masjids in Bolton.",
-      "w": "title"
+      "w": "title",
+      "px": 23,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "about.the_name_taiyabah_from_the",
       "t": "The name *Taiyabah* — from the Arabic _Tayyab_, meaning purity — was given by the late Hazrat Sheikh Moulana Mohammed Zakariyya Saheb, author of _Fazaail-e-Amaal_.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(213,199,208)"
      }
-    ]
+    ],
+    "align": "left"
    },
    {
     "type": "heading",
@@ -56,6 +63,10 @@
      "k": "about.history_new_build_journey",
      "t": "History & new build journey"
     },
+    "card": true,
+    "ext": false,
+    "play": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M8 5v14l11-7z\"></path></svg>",
     "href": "https://www.youtube.com/watch?v=N7wFXynmLHM",
     "id": null,
     "soon": null
@@ -259,14 +270,19 @@
      {
       "k": "member.masjid_membership",
       "t": "Masjid Membership",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "member.check_whether_this_years_fee",
       "t": "Check whether this year’s fee is paid, and when the next one is due.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "callout",
@@ -288,6 +304,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -330,20 +347,20 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "member.masjid_office_5_7pm",
      "t": "Masjid office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -351,7 +368,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2.5\"></rect><path d=\"M3 9.5h18\"></path><path d=\"M7 14h4\"></path></svg>"
  },
  "contact": {
   "title": {
@@ -365,14 +383,19 @@
      {
       "k": "contact.taiyabah_masjid",
       "t": "Taiyabah Masjid",
-      "w": "sub"
+      "w": "title",
+      "px": 24,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "contact.bolton_central_islamic_society",
       "t": "Bolton Central Islamic Society",
-      "w": "sub"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -387,6 +410,7 @@
        "t": "31a Draycott Street\nBolton BL1 8HD"
       },
       "href": "https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD",
+      "kind": "plain",
       "icon": "location",
       "id": null,
       "static": false
@@ -401,6 +425,7 @@
        "t": "01204 535 997"
       },
       "href": "tel:01204535997",
+      "kind": "plain",
       "icon": "call",
       "id": null,
       "static": false
@@ -416,6 +441,7 @@
        "t": "info@taiyabahmasjid.com"
       },
       "href": "mailto:info@taiyabahmasjid.com",
+      "kind": "plain",
       "icon": "mail",
       "id": null,
       "static": false
@@ -431,6 +457,7 @@
        "t": "taiyabahmasjid.com"
       },
       "href": "https://www.taiyabahmasjid.com/",
+      "kind": "plain",
       "icon": "globe",
       "id": null,
       "static": false
@@ -446,6 +473,7 @@
        "t": "454.1000 MHz"
       },
       "href": null,
+      "kind": "plain",
       "icon": "radio",
       "id": null,
       "static": true
@@ -455,7 +483,8 @@
    {
     "type": "note",
     "k": "contact.please_do_not_call_the",
-    "t": "Please do not call the masjid during Salah times."
+    "t": "Please do not call the masjid during Salah times.",
+    "center": true
    },
    {
     "type": "social",
@@ -494,14 +523,19 @@
      {
       "k": "marriagedeath.life_stage_services",
       "t": "Life-stage services",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "marriagedeath.guidance_and_support_from_the",
       "t": "Guidance and support from the masjid across life’s most significant moments.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",
@@ -513,6 +547,9 @@
      "k": "marriagedeath.guidance_for_new_arrivals_including",
      "t": "Guidance for new arrivals, including circumcision"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 19c0-3.5 2-6 3-8s.5-4-1-5.5\"></path> <circle cx=\"15\" cy=\"7\" r=\"2.3\"></circle> <path d=\"M6 19h14\"></path><path d=\"M11 19v-4a3 3 0 0 1 6 0v4\"></path> </svg>",
     "href": null,
     "id": "md-birth",
     "soon": null
@@ -527,6 +564,9 @@
      "k": "marriagedeath.nikah_based_on_authentic_islamic",
      "t": "Nikāḥ, based on authentic Islamic tradition"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <circle cx=\"8.5\" cy=\"15.5\" r=\"4.5\"></circle><circle cx=\"15.5\" cy=\"15.5\" r=\"4.5\"></circle> <path d=\"M12 4.5c1.4 0 2.5 1 2.5 2.2S13.4 9 12 9s-2.5-1-2.5-2.3S10.6 4.5 12 4.5Z\"></path> </svg>",
     "href": null,
     "id": "md-marriage",
     "soon": null
@@ -541,6 +581,9 @@
      "k": "marriagedeath.wasiyyah_why_and_how_to",
      "t": "Wasiyyah — why and how to prepare one"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z\"></path> <path d=\"M14 3v5h5\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h4\"></path> </svg>",
     "href": null,
     "id": "md-will",
     "soon": null
@@ -555,6 +598,9 @@
      "k": "marriagedeath.janazah_guidance_and_support",
      "t": "Janāzah guidance and support"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7l-8-4Z\"></path> <path d=\"M9 12l2 2 4-4\"></path> </svg>",
     "href": null,
     "id": "md-funeral",
     "soon": null
@@ -578,19 +624,26 @@
     "lines": [
      {
       "t": "الجَنَازَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "funeral.funeral_services_2",
       "t": "Funeral Services",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "funeral.taiyabah_masjid_supports_families",
       "t": "Taiyabah Masjid supports families through every part of an Islamic funeral, from the first phone call to the burial.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "urgent",
@@ -658,76 +711,108 @@
     ]
    },
    {
-    "type": "sub",
-    "t": "Ghusl — washing"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_ritual_washing_of_the",
-    "t": "The ritual washing of the deceased, carried out at the masjid according to Islamic practice."
-   },
-   {
-    "type": "sub",
-    "t": "Kafn — shrouding"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_shroud_is_provided_and",
-    "t": "The shroud is provided and the deceased is prepared in the proper manner."
-   },
-   {
-    "type": "sub",
-    "t": "Janāzah prayer"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_funeral_prayer_is_held",
-    "t": "The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend."
-   },
-   {
-    "type": "sub",
-    "t": "Transportation"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_deceased_is_transported_between",
-    "t": "The deceased is transported between the hospital, the masjid and the cemetery."
-   },
-   {
-    "type": "sub",
-    "t": "Fridge service"
-   },
-   {
-    "type": "p",
-    "k": "funeral.refrigerated_preservation_at_the_masjid",
-    "t": "Refrigerated preservation at the masjid where there is a wait before the burial can take place."
-   },
-   {
-    "type": "sub",
-    "t": "Burial co-ordination"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_masjid_arranges_the_burial",
-    "t": "The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to."
-   },
-   {
-    "type": "sub",
-    "t": "Feeding & kitchenextra cost"
-   },
-   {
-    "type": "p",
-    "k": "funeral.catering_for_mourners_can_be",
-    "t": "Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided."
-   },
-   {
-    "type": "sub",
-    "t": "Bereavement support"
-   },
-   {
-    "type": "p",
-    "k": "funeral.the_imams_are_available_to",
-    "t": "The imams are available to the family afterwards, for guidance and for the questions that come later."
+    "type": "items",
+    "items": [
+     {
+      "h": {
+       "k": "funeral.ghusl_washing",
+       "t": "Ghusl — washing"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_ritual_washing_of_the",
+       "t": "The ritual washing of the deceased, carried out at the masjid according to Islamic practice."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 22a7 7 0 0 0 7-7c0-4-7-11-7-11S5 11 5 15a7 7 0 0 0 7 7z\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.kafn_shrouding",
+       "t": "Kafn — shrouding"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_shroud_is_provided_and",
+       "t": "The shroud is provided and the deceased is prepared in the proper manner."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7c3-2 6-2 9 0s6 2 9 0\"></path><path d=\"M3 12c3-2 6-2 9 0s6 2 9 0\"></path><path d=\"M3 17c3-2 6-2 9 0s6 2 9 0\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.janazah_prayer",
+       "t": "Janāzah prayer"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_funeral_prayer_is_held",
+       "t": "The funeral prayer is held at the masjid. The office will confirm the time so that family and community can attend."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 21V12a8 8 0 0 1 16 0v9\"></path><path d=\"M12 4a3 3 0 0 1 3 3c0 1.5-3 3-3 3s-3-1.5-3-3a3 3 0 0 1 3-3z\"></path><path d=\"M2 21h20\"></path><path d=\"M9 21v-4a3 3 0 0 1 6 0v4\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.transportation",
+       "t": "Transportation"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_deceased_is_transported_between",
+       "t": "The deceased is transported between the hospital, the masjid and the cemetery."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"1\" y=\"7\" width=\"15\" height=\"10\" rx=\"2\"></rect><path d=\"M16 10h4l3 3v4h-7z\"></path><circle cx=\"6\" cy=\"19\" r=\"2\"></circle><circle cx=\"18\" cy=\"19\" r=\"2\"></circle></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.fridge_service",
+       "t": "Fridge service"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.refrigerated_preservation_at_the_masjid",
+       "t": "Refrigerated preservation at the masjid where there is a wait before the burial can take place."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"2\"></rect><path d=\"M4 11h16\"></path><path d=\"M8 6.5v2\"></path><path d=\"M8 14.5v2\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.burial_co_ordination",
+       "t": "Burial co-ordination"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_masjid_arranges_the_burial",
+       "t": "The masjid arranges the burial itself and co-ordinates with the cemetery so the family does not have to."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"4\" width=\"14\" height=\"17\" rx=\"2\"></rect><path d=\"M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1\"></path><path d=\"M9 11l2 2 4-4\"></path><path d=\"M9 17h6\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.feeding_kitchen",
+       "t": "Feeding & kitchen"
+      },
+      "tag": {
+       "k": "funeral.extra_cost",
+       "t": "extra cost"
+      },
+      "p": {
+       "k": "funeral.catering_for_mourners_can_be",
+       "t": "Catering for mourners can be arranged at Astley Hall. Masjid seating can also be provided."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 8h1a4 4 0 0 1 0 8h-1\"></path><path d=\"M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z\"></path><path d=\"M6 1v3\"></path><path d=\"M10 1v3\"></path><path d=\"M14 1v3\"></path></svg>"
+     },
+     {
+      "h": {
+       "k": "funeral.bereavement_support",
+       "t": "Bereavement support"
+      },
+      "tag": null,
+      "p": {
+       "k": "funeral.the_imams_are_available_to",
+       "t": "The imams are available to the family afterwards, for guidance and for the questions that come later."
+      },
+      "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z\"></path></svg>"
+     }
+    ]
    },
    {
     "type": "heading",
@@ -764,18 +849,17 @@
     ]
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "funeral.wasiyyah_why_and_how",
      "t": "Wasiyyah — why and how to prepare one"
     },
-    "sub": {
+    "v": {
      "k": "funeral.importance_of_an_islamic_will",
      "t": "Importance of an Islamic Will"
     },
     "href": null,
-    "id": "fs-to-will",
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -796,14 +880,19 @@
     "lines": [
      {
       "t": "الوَصِيَّة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "will.the_importance_of_an_islamic",
       "t": "The Importance of an Islamic Will",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -927,9 +1016,16 @@
     ]
    },
    {
-    "type": "link",
-    "t": "Speak to the imam · call the main office 01204 535 997 ›",
-    "href": "tel:01204535997"
+    "type": "call",
+    "k": {
+     "k": "will.speak_to_the_imam_call",
+     "t": "Speak to the imam · call the main office"
+    },
+    "v": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -950,14 +1046,19 @@
     "lines": [
      {
       "t": "وِلَادَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 25,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "birth.guidance_for_new_arrivals",
       "t": "Guidance for New Arrivals",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1003,6 +1104,7 @@
        "t": "2 weeks – 18 months"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1017,6 +1119,7 @@
        "t": "£180"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1031,6 +1134,7 @@
        "t": "£250"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1045,6 +1149,7 @@
        "t": "£300"
       },
       "href": null,
+      "kind": "plain",
       "icon": null,
       "id": null,
       "static": true
@@ -1057,9 +1162,16 @@
     "t": "BCoM does not circumcise babies over 18 months old."
    },
    {
-    "type": "link",
-    "t": "Call BCoM to book · option 4 01204 363 680 ›",
-    "href": "tel:01204363680"
+    "type": "call",
+    "k": {
+     "k": "birth.call_bcom_to_book_option",
+     "t": "Call BCoM to book · option 4"
+    },
+    "v": {
+     "t": "01204 363 680"
+    },
+    "href": "tel:01204363680",
+    "icon": "call"
    },
    {
     "type": "note",
@@ -1071,7 +1183,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 19c0-3.5 2-6 3-8s.5-4-1-5.5\"></path> <circle cx=\"15\" cy=\"7\" r=\"2.3\"></circle> <path d=\"M6 19h14\"></path><path d=\"M11 19v-4a3 3 0 0 1 6 0v4\"></path> </svg>"
  },
  "education": {
   "title": {
@@ -1085,14 +1198,19 @@
      {
       "k": "edu.classes_for_adults",
       "t": "Classes for adults",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.classes_and_workshops_at_the",
       "t": "Classes and workshops at the masjid for adults, alongside the children’s madrasah.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1114,6 +1232,9 @@
      "k": "edu.one_evening_a_week_7",
      "t": "One evening a week · 7–8pm · 15 places"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4.5c2.5-1.6 5.2-1.6 7.5 0v13c-2.3-1.6-5-1.6-7.5 0-2.5-1.6-5.2-1.6-7.5 0v-13c2.3-1.6 5-1.6 7.5 0z\"></path><path d=\"M12 4.5v13\"></path></svg>",
     "href": null,
     "id": "ed-arabic",
     "soon": null
@@ -1128,6 +1249,9 @@
      "k": "edu.one_off_session_run_periodically",
      "t": "One-off session · run periodically · 15 places"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z\"></path></svg>",
     "href": null,
     "id": "ed-ghusl",
     "soon": null
@@ -1142,6 +1266,9 @@
      "k": "edu.tajweed_seerah_a_womens_circle",
      "t": "Tajweed, Seerah, a women’s circle — tell the office what you’d like taught"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M12 8v8M8 12h8\"></path></svg>",
     "href": null,
     "id": null,
     "soon": {
@@ -1150,17 +1277,16 @@
     }
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "edu.masjid_office_5_7pm",
      "t": "Masjid office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -1181,20 +1307,24 @@
     "lines": [
      {
       "t": "العَرَبِيَّة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.evening_arabic_for_adults",
       "t": "Evening Arabic for adults, taught at the masjid — from the alphabet upward.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
-    "type": "card",
-    "blocks": [
+    "type": "facts",
+    "items": [
      {
-      "type": "kv",
       "k": {
        "k": "edu.time",
        "t": "Time"
@@ -1203,13 +1333,9 @@
        "k": "edu.7_8pm",
        "t": "7–8pm"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": true
      },
      {
-      "type": "kv",
       "k": {
        "k": "edu.places",
        "t": "Places"
@@ -1217,10 +1343,7 @@
       "v": {
        "t": "15"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": false
      }
     ]
    },
@@ -1244,6 +1367,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -1310,20 +1434,20 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "edu.masjid_office_5_7pm",
      "t": "Masjid office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -1344,20 +1468,24 @@
     "lines": [
      {
       "t": "الغُسْل",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "edu.how_to_wash_and_prepare",
       "t": "How to wash and prepare a body for burial — a duty that falls on the community, and one most people have never been shown.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
-    "type": "card",
-    "blocks": [
+    "type": "facts",
+    "items": [
      {
-      "type": "kv",
       "k": {
        "k": "edu.format",
        "t": "Format"
@@ -1366,13 +1494,9 @@
        "k": "edu.one_session",
        "t": "One session"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": false
      },
      {
-      "type": "kv",
       "k": {
        "k": "edu.places_3",
        "t": "Places"
@@ -1380,10 +1504,7 @@
       "v": {
        "t": "15"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": false
      }
     ]
    },
@@ -1407,6 +1528,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -1530,7 +1652,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "advisory",
@@ -1546,17 +1669,16 @@
     ]
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "edu.masjid_office_5_7pm",
      "t": "Masjid office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -1578,14 +1700,19 @@
      {
       "k": "cur.our_curriculum",
       "t": "Our Curriculum",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "cur.what_students_learn_at_the",
       "t": "What students learn at the madrasah.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -1720,9 +1847,12 @@
      {
       "k": "advice.imams_advice",
       "t": "Imams’ Advice",
-      "w": "title"
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -1740,9 +1870,16 @@
     ]
    },
    {
-    "type": "link",
-    "t": "Call the main office to book 01204 535 997 ›",
-    "href": "tel:01204535997"
+    "type": "call",
+    "k": {
+     "k": "advice.call_the_main_office_to",
+     "t": "Call the main office to book"
+    },
+    "v": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "icon": "call"
    },
    {
     "type": "note",
@@ -1772,6 +1909,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": null
    },
    {
@@ -1780,7 +1918,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z\"></path> </svg>"
  },
  "madrasah": {
   "title": {
@@ -1793,14 +1932,19 @@
     "lines": [
      {
       "t": "مَدْرَسَة",
-      "w": "sub"
+      "w": "arabic",
+      "px": 28,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "madrasah.teaching_the_community_s_children",
       "t": "Teaching the community’s children",
-      "w": "title"
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "row",
@@ -1812,6 +1956,9 @@
      "k": "madrasah.fees_class_times_and_attendance",
      "t": "Fees, class times and attendance"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v12.5H6z\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.5h6.4M8.8 15.6h4.4\"></path></svg>",
     "href": null,
     "id": "mdr-go-admissions",
     "soon": null
@@ -1826,6 +1973,9 @@
      "k": "madrasah.the_admission_form_for_this_year",
      "t": "The admission form for this year's classes"
     },
+    "card": true,
+    "ext": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3.5h8.5L19 8v5.5\"></path><path d=\"M14 3.5V8h5\"></path><path d=\"M8.8 12.2h3.4M8.8 8.9h3\"></path><path d=\"m15.6 20.4-3 .6.6-3 5-5a1.7 1.7 0 0 1 2.4 2.4l-5 5Z\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
     "id": "mdr-go-apply",
     "soon": null
@@ -1840,6 +1990,9 @@
      "k": "madrasah.term_dates_and_closures",
      "t": "Term dates and closures"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M3.5 9.5h17M8.5 3.5v3M15.5 3.5v3\"></path></svg>",
     "href": null,
     "id": "mdr-go-holidays",
     "soon": null
@@ -1854,6 +2007,9 @@
      "k": "madrasah.sign_in_registers_still_being_built",
      "t": "Sign in · registers and pupil records still being built"
     },
+    "card": true,
+    "ext": true,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5\"></path><path d=\"M10 8.4 13.6 12 10 15.6\"></path><path d=\"M13.6 12H4.5\"></path></svg>",
     "href": "https://taiyabahwebsite.ysbdesigns.uk/portal/",
     "id": "mdr-go-portal",
     "soon": null
@@ -1868,6 +2024,9 @@
      "k": "madrasah.the_curriculum_the_madrasah_teaches",
      "t": "The curriculum the madrasah teaches"
     },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.4v13\"></path><path d=\"M12 6.4C10.3 5 8.1 4.3 5.4 4.3A1.4 1.4 0 0 0 4 5.7v11.1a1.4 1.4 0 0 0 1.4 1.4c2.7 0 4.9.7 6.6 2.1\"></path><path d=\"M12 6.4c1.7-1.4 3.9-2.1 6.6-2.1A1.4 1.4 0 0 1 20 5.7v11.1a1.4 1.4 0 0 1-1.4 1.4c-2.7 0-4.9.7-6.6 2.1\"></path></svg>",
     "href": null,
     "id": "mdr-go-curriculum",
     "soon": null
@@ -1892,14 +2051,19 @@
      {
       "k": "adm.madrasah_admissions",
       "t": "Madrasah Admissions",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "adm.fees_class_times_and_what",
       "t": "Fees, class times and what the madrasah asks of students and parents — everything worth knowing before you apply.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "callout",
@@ -1921,8 +2085,10 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": {
-     "t": "Open the application form ↗",
+     "k": "adm.open_the_application_form",
+     "t": "Open the application form",
      "href": "https://taiyabahwebsite.ysbdesigns.uk/apply/",
      "id": "ad-apply"
     }
@@ -1957,6 +2123,7 @@
        "t": "£10 / week"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -1972,6 +2139,7 @@
        "t": "£14 / week"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -1987,6 +2155,7 @@
        "t": "£20"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2023,6 +2192,7 @@
        "t": "5:00–7:00pm"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2038,6 +2208,7 @@
        "t": "5:00–7:30pm"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2053,6 +2224,7 @@
        "t": "9:00–11:00am"
       },
       "href": null,
+      "kind": "fee",
       "icon": null,
       "id": null,
       "static": true
@@ -2119,17 +2291,16 @@
     ]
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "t": "Holiday Planner ›"
     },
-    "sub": {
+    "v": {
      "k": "adm.holiday_planner",
      "t": "Holiday Planner"
     },
     "href": null,
-    "id": "ad-to-holidays",
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "heading",
@@ -2191,7 +2362,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "heading",
@@ -2243,7 +2415,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "plain"
    },
    {
     "type": "heading",
@@ -2267,30 +2440,28 @@
     ]
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "adm.madrasah_office_5_7pm",
      "t": "Madrasah office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "adm.email_the_office",
      "t": "Email the office"
     },
-    "sub": {
+    "v": {
      "t": "admin@taiyabahmasjid.com"
     },
     "href": "mailto:admin@taiyabahmasjid.com",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -2298,7 +2469,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 3.5h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z\"></path><path d=\"M15 3.5v4h4\"></path><path d=\"M9 12.5h6M9 16h6\"></path></svg>"
  },
  "holidays": {
   "title": {
@@ -2312,14 +2484,19 @@
      {
       "k": "hol.madrasah_2026_27",
       "t": "Madrasah · 2026/27",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "hol.every_day_the_madrasah_is",
       "t": "Every day the madrasah is closed this year, alongside the Islamic dates — so you can plan a trip without it costing your child their attendance.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "p",
@@ -2425,6 +2602,7 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 2,
     "cta": null
    },
    {
@@ -2461,31 +2639,29 @@
     ]
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "hol.fees_uniform_attendance",
      "t": "Fees, uniform, attendance"
     },
-    "sub": {
+    "v": {
      "k": "hol.admissions_guidelines",
      "t": "Admissions & guidelines"
     },
     "href": null,
-    "id": "hp-to-admissions",
-    "soon": null
+    "icon": "call"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "adm.madrasah_office_5_7pm",
      "t": "Madrasah office · 5pm–7pm"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -2493,7 +2669,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"16\" rx=\"2\"></rect><path d=\"M3.5 9.5h17M8 3v4M16 3v4\"></path><path d=\"M8 13.5h2.2M13.8 13.5H16M8 17h2.2M13.8 17H16\"></path></svg>"
  },
  "giving": {
   "title": {
@@ -2507,23 +2684,32 @@
      {
       "k": "giving.support_the_masjid",
       "t": "Support the masjid",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(220,187,99)"
      },
      {
       "t": "صَدَقَة",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 19,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "giving.give_to_taiyabah_masjid",
       "t": "Give to Taiyabah Masjid",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "giving.every_prayer_held_here",
       "t": "Every prayer held here, every child taught, every janāzah carried out rests on what the community gives. This page is for the masjid itself — its upkeep, its running, and the work it does in Bolton.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "heading",
@@ -2585,7 +2771,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "goes"
    },
    {
     "type": "heading",
@@ -2762,7 +2949,8 @@
      {
       "type": "note",
       "k": "giving.opens_the_masjid_s_secure",
-      "t": "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better."
+      "t": "Opens the masjid’s secure donation page. Card payments carry a small processing fee — a bank transfer below reaches the masjid in full, if that suits you better.",
+      "center": true
      }
     ]
    },
@@ -2821,7 +3009,8 @@
    {
     "type": "note",
     "k": "giving.please_use_your_surname_as",
-    "t": "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it."
+    "t": "Please use your surname as the reference. If you are a UK taxpayer and want the masjid to claim Gift Aid on a transfer, ring the office — a declaration has to be held for it.",
+    "center": true
    },
    {
     "type": "foot",
@@ -2843,25 +3032,35 @@
      {
       "k": "collect.collections_chanda",
       "t": "Collections · Chanda",
-      "w": "eyebrow"
+      "w": "eyebrow",
+      "px": 11,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "collect.collect_for_your_cause",
       "t": "Collect for your cause at Taiyabah Masjid",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "collect.charities_and_institutes_are_welcome",
       "t": "Charities and institutes are welcome to collect here. Fill this in and the masjid office will contact your trustee to confirm a date. Nothing on this screen books a day — it is a request, and the masjid will be in touch.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "rules",
     "h": {
      "k": "collect.rules_for_collection",
      "t": "Rules for collection"
+    },
+    "ver": {
+     "t": "Version 2026-09-14 · you are agreeing to this version"
     },
     "items": [
      {
@@ -2917,7 +3116,8 @@
       }
      }
     ],
-    "card": true
+    "card": true,
+    "kind": "goes"
    },
    {
     "type": "callout",
@@ -2936,17 +3136,19 @@
      }
     ],
     "tone": "plum",
+    "ctaAt": 1,
     "cta": null
    },
    {
-    "type": "p",
+    "type": "help",
     "k": "collect.need_help_with_this_form",
-    "t": "Need help with this form?"
-   },
-   {
-    "type": "link",
-    "t": "Rafik Patel — 07951 795 465",
-    "href": "tel:+447951795465"
+    "t": "Need help with this form?",
+    "link": {
+     "t": "Rafik Patel — 07951 795 465",
+     "k2": "collect.rafik_patel",
+     "t2": "Rafik Patel",
+     "href": "tel:+447951795465"
+    }
    },
    {
     "type": "foot",
@@ -2968,20 +3170,24 @@
      {
       "k": "hallhire.taiyabah_centre",
       "t": "Taiyabah Centre",
-      "w": "title"
+      "w": "title",
+      "px": 22,
+      "col": "rgb(243,239,227)"
      },
      {
       "k": "hallhire.available_for_hire_for_community",
       "t": "Available for hire, for community and family events.",
-      "w": "sub"
+      "w": "sub",
+      "px": 13,
+      "col": "rgb(187,169,180)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
-    "type": "card",
-    "blocks": [
+    "type": "facts",
+    "items": [
      {
-      "type": "kv",
       "k": {
        "k": "hallhire.halls_available",
        "t": "Halls available"
@@ -2989,13 +3195,9 @@
       "v": {
        "t": "3"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": false
      },
      {
-      "type": "kv",
       "k": {
        "k": "hallhire.kitchens_available",
        "t": "Kitchens available"
@@ -3003,17 +3205,22 @@
       "v": {
        "t": "2"
       },
-      "href": null,
-      "icon": null,
-      "id": null,
-      "static": true
+      "small": false
      }
     ]
    },
    {
-    "type": "link",
-    "t": "Taiyabah Centre · get directions Astley Street, Bolton BL1 8EH ›",
-    "href": "https://maps.apple.com/?q=Taiyabah+Centre+Astley+Street+Bolton+BL1+8EH"
+    "type": "call",
+    "k": {
+     "k": "hallhire.taiyabah_centre_get_directions",
+     "t": "Taiyabah Centre · get directions"
+    },
+    "v": {
+     "k": "hallhire.astley_street_bolton_bl1_8eh",
+     "t": "Astley Street, Bolton BL1 8EH"
+    },
+    "href": "https://maps.apple.com/?q=Taiyabah+Centre+Astley+Street+Bolton+BL1+8EH",
+    "icon": "location"
    },
    {
     "type": "card",
@@ -3065,6 +3272,7 @@
        "t": "£350"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3079,6 +3287,7 @@
        "t": "£500"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3093,6 +3302,7 @@
        "t": "£600"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3112,6 +3322,7 @@
        "t": "£600"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3126,6 +3337,7 @@
        "t": "£700"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3150,6 +3362,7 @@
        "t": "£125"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3165,6 +3378,7 @@
        "t": "45p per person"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3184,6 +3398,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3199,6 +3414,7 @@
        "t": "45p per person"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3213,6 +3429,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3237,6 +3454,7 @@
        "t": "30-99-50"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3251,6 +3469,7 @@
        "t": "59286668"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3375,53 +3594,49 @@
     "t": "Ring the office, or any of the booking team directly."
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "k": "hallhire.call_the_main_office",
      "t": "Call the main office"
     },
-    "sub": {
+    "v": {
      "t": "01204 535 997"
     },
     "href": "tel:01204535997",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "t": "Rafiq I Patel"
     },
-    "sub": {
+    "v": {
      "t": "07951 795465"
     },
     "href": "tel:07951795465",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "t": "Mustaq Adam"
     },
-    "sub": {
+    "v": {
      "t": "07909 973776"
     },
     "href": "tel:07909973776",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
-    "type": "row",
-    "label": {
+    "type": "call",
+    "k": {
      "t": "Alibhai Khotiwala"
     },
-    "sub": {
+    "v": {
      "t": "07729 297676"
     },
     "href": "tel:07729297676",
-    "id": null,
-    "soon": null
+    "icon": "call"
    },
    {
     "type": "foot",
@@ -3429,7 +3644,8 @@
      "Bolton Central Islamic Society · Registered charity 1041569"
     ]
    }
-  ]
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 21V9l8-5 8 5v12\"></path><path d=\"M4 21h16\"></path><path d=\"M10 21v-6h4v6\"></path> </svg>"
  },
  "marriage": {
   "title": {
@@ -3442,14 +3658,19 @@
     "lines": [
      {
       "t": "نِكَاح",
-      "w": "arabic"
+      "w": "arabic",
+      "px": 26,
+      "col": "rgb(220,187,99)"
      },
      {
       "k": "marriage.nikah_islamic_marriage",
       "t": "Nikāḥ — Islamic Marriage",
-      "w": "title"
+      "w": "title",
+      "px": 19,
+      "col": "rgb(243,239,227)"
      }
-    ]
+    ],
+    "align": "center"
    },
    {
     "type": "card",
@@ -3498,6 +3719,7 @@
        "t": "£100"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3512,6 +3734,7 @@
        "t": "£200"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3531,6 +3754,7 @@
        "t": "30-99-50"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3545,6 +3769,7 @@
        "t": "59286668"
       },
       "href": null,
+      "kind": "rate",
       "icon": null,
       "id": null,
       "static": true
@@ -3562,14 +3787,233 @@
     ]
    },
    {
-    "type": "link",
-    "t": "Call the main office 01204 535 997 ›",
-    "href": "tel:01204535997"
+    "type": "call",
+    "k": {
+     "k": "marriage.call_the_main_office",
+     "t": "Call the main office"
+    },
+    "v": {
+     "t": "01204 535 997"
+    },
+    "href": "tel:01204535997",
+    "icon": "call"
    },
    {
     "type": "note",
     "k": "marriage.specific_requirements_documentation_witnesses_",
     "t": "Specific requirements — documentation, witnesses and timings — are best discussed directly with the office when you call."
+   }
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <circle cx=\"8.5\" cy=\"15.5\" r=\"4.5\"></circle><circle cx=\"15.5\" cy=\"15.5\" r=\"4.5\"></circle> <path d=\"M12 4.5c1.4 0 2.5 1 2.5 2.2S13.4 9 12 9s-2.5-1-2.5-2.3S10.6 4.5 12 4.5Z\"></path> </svg>"
+ },
+ "sysprefs": {
+  "title": {
+   "k": "sysprefs.system_preferences",
+   "t": "System Preferences"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "k": "sysprefs.display_language",
+      "t": "Display & Language",
+      "w": "title",
+      "px": 20,
+      "col": "rgb(243,239,227)"
+     }
+    ],
+    "align": "center"
+   },
+   {
+    "type": "heading",
+    "k": "sysprefs.text_size",
+    "t": "Text size",
+    "tag": null
+   },
+   {
+    "type": "p",
+    "k": "sysprefs.pick_the_size_that_reads",
+    "t": "Pick the size that reads most easily. It applies everywhere in the app."
+   },
+   {
+    "type": "p",
+    "k": "sysprefs.the_quick_brown_sample",
+    "t": "Bismillāh — this is how the app will read."
+   }
+  ],
+  "ring": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M3.5 12h17\"></path> <path d=\"M12 3.5a13 13 0 0 1 0 17a13 13 0 0 1 0-17Z\"></path> </svg>"
+ },
+ "quran": {
+  "title": {
+   "k": "quran.qur_an",
+   "t": "Qur'an"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "القرآن الكريم",
+      "w": "arabic",
+      "px": 28,
+      "col": "rgb(220,187,99)"
+     },
+     {
+      "k": "quran.how_would_you_like_to_read",
+      "t": "How would you like to read?",
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
+     }
+    ],
+    "align": "center"
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "quran.english_translation",
+     "t": "English Translation"
+    },
+    "sub": {
+     "k": "quran.all_114_s_rahs_with_an_english",
+     "t": "All 114 sūrahs, with the English beside the Arabic"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z\"></path><path d=\"M12 6.5v11.8\"></path></svg>",
+    "href": null,
+    "id": "qd-go-translation",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "quran.13_line_qur_an",
+     "t": "13-Line Qur'an"
+    },
+    "sub": {
+     "k": "quran.the_familiar_indo_pak_page",
+     "t": "The familiar Indo-Pak page, thirteen lines, for ḥifẓ"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4.5\" y=\"3.5\" width=\"15\" height=\"17\" rx=\"2\"></rect><path d=\"M7.6 8h8.8M7.6 11h8.8M7.6 14h8.8M7.6 17h5.4\"></path></svg>",
+    "href": null,
+    "id": "qd-go-mushaf",
+    "soon": null
+   }
+  ]
+ },
+ "athkar": {
+  "title": {
+   "k": "athkar.daily_athkar",
+   "t": "Daily Athkār"
+  },
+  "blocks": [
+   {
+    "type": "hero",
+    "lines": [
+     {
+      "t": "أَذْكَار",
+      "w": "arabic",
+      "px": 28,
+      "col": "rgb(220,187,99)"
+     },
+     {
+      "k": "athkar.morning_evening_and_after_salah",
+      "t": "Morning, evening and after ṣalāh",
+      "w": "title",
+      "px": 18,
+      "col": "rgb(243,239,227)"
+     }
+    ],
+    "align": "center"
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.morning_evening",
+     "t": "Morning & Evening"
+    },
+    "sub": {
+     "k": "athkar.after_fajr_and_after_asr",
+     "t": "Once after Fajr and once after ʿAṣr"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M18.2 5.8l-1.6 1.6M7.4 16.6l-1.6 1.6\"></path></svg>",
+    "href": null,
+    "id": "ak-go-0",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.after_every_salah",
+     "t": "After Every Ṣalāh"
+    },
+    "sub": {
+     "k": "athkar.the_words_said_after_each",
+     "t": "The words said after each prayer"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.5 20.5v-7a7.5 7.5 0 0 1 15 0v7\"></path><path d=\"M3.5 20.5h17\"></path><path d=\"M12 6V3.4\"></path><circle cx=\"12\" cy=\"2.6\" r=\"0.9\" fill=\"currentColor\" stroke=\"none\"></circle></svg>",
+    "href": null,
+    "id": "ak-go-1",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.before_sleep",
+     "t": "Before Sleep"
+    },
+    "sub": {
+     "k": "athkar.what_to_say_on_going_to_bed",
+     "t": "What to say on going to bed"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 14.5A8.2 8.2 0 0 1 9.5 4 8.4 8.4 0 1 0 20 14.5Z\"></path></svg>",
+    "href": null,
+    "id": "ak-go-2",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.everyday_du_as",
+     "t": "Everyday Duʿās"
+    },
+    "sub": {
+     "k": "athkar.waking_eating_travelling_worry_rain",
+     "t": "Waking, eating, travelling, health, marriage, loss"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6.4 6.8a2.2 2.2 0 0 1 2.2-2.2h8.8a2.2 2.2 0 0 1 2.2 2.2v10.4a2.2 2.2 0 0 1-2.2 2.2H8.6a2.2 2.2 0 0 0-2.2 2.2Z\"></path><path d=\"M9.6 8.8h6.4\"></path><path d=\"M9.6 12h6.4\"></path><path d=\"M9.6 15.2h4.2\"></path></svg>",
+    "href": null,
+    "id": "ak-go-duas",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.du_as_from_the_qur_an",
+     "t": "Duʿās from the Qur'an"
+    },
+    "sub": {
+     "k": "athkar.the_forty_rabbana_du_as",
+     "t": "The forty Rabbanā duʿās"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z\"></path><path d=\"M12 6.5v11.8\"></path></svg>",
+    "href": null,
+    "id": "ak-go-rabbanas",
+    "soon": null
    }
   ]
  }

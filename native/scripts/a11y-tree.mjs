@@ -1,0 +1,125 @@
+/**
+ * Taiyabah Masjid — what a screen reader would actually say.
+ * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
+ *
+ * Accessibility work is invisible in a screenshot: the screen looks identical
+ * before and after, which is the point and also why it is so easy to claim
+ * and so hard to show. This reads the ACCESSIBILITY TREE out of the web
+ * build — the same tree TalkBack and VoiceOver walk — and prints it the way
+ * it would be announced, so the work can be looked at rather than asserted.
+ *
+ * react-native-web maps accessibilityRole to the ARIA role and
+ * accessibilityState to aria-checked/selected, so what Chromium exposes here
+ * is what the phone exposes there.
+ *
+ *   node scripts/a11y-tree.mjs <screen>
+ */
+import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+const { chromium } = pw;
+import path from "node:path";
+import { createServer } from "node:http";
+import fs from "node:fs";
+
+const screen = process.argv[2] || "home";
+const ROOT = path.resolve(import.meta.dirname, "../dist");
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json",
+                ".png": "image/png", ".ttf": "font/ttf", ".css": "text/css" };
+const srv = createServer((req, res) => {
+  const u = decodeURIComponent(req.url.split("?")[0]);
+  let f = path.join(ROOT, u === "/" ? "index.html" : u);
+  if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(ROOT, "index.html");
+  res.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" });
+  fs.createReadStream(f).pipe(res);
+}).listen(4393);
+
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 414, height: 1200 } });
+await page.goto("http://localhost:4393/", { waitUntil: "networkidle" }).catch(() => {});
+await page.waitForTimeout(2200);
+
+/* The welcome sheet covers the app on a fresh profile, exactly as it does on
+   a fresh install; the comparison harness dismisses it the same way. */
+for (let i = 0; i < 12; i++) {
+  const b = page.getByText(/^Not now$/).first();
+  if (await b.isVisible().catch(() => false)) { await b.click().catch(() => {}); await page.waitForTimeout(500); break; }
+  await page.waitForTimeout(250);
+}
+/* Anything other than Home is reached the way a finger would reach it. The
+   text to tap is given on the command line, because a screen's NAME is not
+   what is written on the tile that opens it — guessing from the name silently
+   left me on Home and reporting Home's figures for three other screens. */
+const tapText = process.argv[3];
+const viaMenu = process.argv[4] === "menu";
+if (tapText) {
+  if (viaMenu) {
+    const more = page.getByText(/^More$/).last();
+    if (!await more.isVisible().catch(() => false)) throw new Error("could not find the More tab");
+    await more.click(); await page.waitForTimeout(900);
+  }
+  const rx = new RegExp(tapText);
+  const all = page.getByText(rx);
+  let hit = false;
+  for (let i = 0, n = await all.count(); i < n; i++) {
+    const el = all.nth(i);
+    if (await el.isVisible().catch(() => false)) { await el.click().catch(() => {}); hit = true; break; }
+  }
+  if (!hit) throw new Error(`nothing matching ${rx} was visible — the screen was never opened, ` +
+                            `and the figures below would have been whatever screen we were still on`);
+  await page.waitForTimeout(1100);
+}
+await page.waitForTimeout(600);
+
+/* Chromium's own accessibility tree, pruned to the things a screen reader
+   stops on. "generic" nodes are containers it walks straight past. */
+const snap = await page.accessibility.snapshot({ interestingOnly: true });
+const SKIP = new Set(["generic", "none", "presentation", "GenericContainer"]);
+const out = [];
+(function walk(n, depth) {
+  if (!n) return;
+  const role = n.role || "";
+  const name = (n.name || "").replace(/\s+/g, " ").trim();
+  if (!SKIP.has(role) && (name || role !== "text")) {
+    const state = [n.checked && `checked=${n.checked}`, n.selected && "selected",
+                   n.disabled && "disabled", n.pressed && `pressed=${n.pressed}`]
+                  .filter(Boolean).join(" ");
+    out.push({ depth, role, name, state });
+  }
+  (n.children || []).forEach(c => walk(c, depth + 1));
+})(snap, 0);
+
+/* A control a sighted user can tap but a listener cannot identify. */
+const TAPPABLE = new Set(["button", "link", "tab", "radio", "checkbox", "switch", "menuitem"]);
+let named = 0, unnamed = 0;
+for (const n of out) if (TAPPABLE.has(n.role)) (n.name ? named++ : unnamed++);
+const texts = out.filter(n => n.role === "text" && n.name).length;
+
+console.log(`\n  WHAT A SCREEN READER WALKS THROUGH ON "${screen}"\n`);
+for (const n of out) {
+  const label = n.name || "(no name)";
+  const role = n.role === "text" ? "" : `  [${n.role}${n.state ? " · " + n.state : ""}]`;
+  console.log("  " + "  ".repeat(Math.min(n.depth, 6)) + label + role);
+}
+console.log(`\n  ${out.length} stops · ${named + unnamed} announced as a control ` +
+            `(${unnamed} of them with no name) · ${texts} read as plain text`);
+console.log(`  Anything tappable that is NOT in that control count is announced as ` +
+            `plain text, so a listener never learns they can tap it.`);
+
+/* TAP TARGETS. Apple asks for 44pt and Android for 48dp; 44 is the number
+ * both are satisfied by. This measures the drawn box, which is what a finger
+ * has to find — except where hitSlop has grown the touch area beyond the
+ * drawing, and the DOM cannot show that. Those are listed separately rather
+ * than silently passed, because "it has hitSlop" is a claim about the source
+ * that this measurement cannot check. */
+const boxes = await page.$$eval(
+  '[role="button"],[role="link"],[role="tab"],[role="radio"],[role="checkbox"],[role="switch"]',
+  els => els.map(e => {
+    const r = e.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height),
+             name: (e.innerText || e.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().slice(0, 40) };
+  }).filter(b => b.w > 0 && b.h > 0));
+const small = boxes.filter(b => b.w < 44 || b.h < 44);
+console.log(`  TAP TARGETS: ${boxes.length} measured, ${small.length} under 44pt`);
+for (const b of small) console.log(`    ${String(b.w).padStart(3)} x ${String(b.h).padStart(3)}   ${b.name || "(no words)"}`);
+console.log();
+await browser.close();
+srv.close();
