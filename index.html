@@ -9232,6 +9232,7 @@ const reach = (() => {
     document.documentElement.dataset.offline = (state === "unreachable") ? "1" : "";
     const bar = document.getElementById("offline-bar");
     if (bar) bar.hidden = (state !== "unreachable");
+    if (state === "unreachable") startProbing(); else stopProbing();
   }
   function note(ok){
     if (ok) { failures = 0; set("reachable"); return; }
@@ -9250,7 +9251,35 @@ const reach = (() => {
                                   e => { note(false); throw e; });
   };
 
+  /* ASK AGAIN WHILE THE ANSWER IS NO.
+     The native app wore a stuck bar on a real phone for exactly the reason
+     this would: the only thing that could clear it was a request that happened
+     to succeed, and a screen whose request already failed does not repeat it.
+     The online event covers losing the network and getting it back; it does
+     NOT cover a captive portal being signed into, or the masjid's own server
+     coming back, and neither fires anything. So poll, gently — 5s then 10, 20,
+     40, to a minute — and stop the moment anything answers. */
+  let timer = null, wait = 0;
+  function stopProbing(){ if (timer) { clearTimeout(timer); timer = null; } wait = 0; }
+  function startProbing(){
+    if (timer) return;
+    wait = wait ? Math.min(wait * 2, 60000) : 5000;
+    timer = setTimeout(() => {
+      timer = null;
+      /* HEAD the REST root: any status at all proves the round trip, and this
+         goes through the same wrapper so it reports like everything else. */
+      fetch(`${SUPA.url}/rest/v1/`, { method: "HEAD", cache: "no-store" })
+        .catch(() => {})
+        .finally(() => { if (state === "unreachable") startProbing(); });
+    }, wait);
+  }
+
   addEventListener("offline", () => { failures = PATIENCE; set("unreachable"); });
+  /* Coming back to the tab is worth a fresh ask, at once rather than waiting
+     out the backoff. */
+  addEventListener("visibilitychange", () => {
+    if (!document.hidden && state === "unreachable") { stopProbing(); startProbing(); }
+  });
   /* Back on a network is not the same as the masjid answering, so this only
      clears the bar and waits to be told otherwise by the next request. */
   addEventListener("online", () => { failures = 0; set("unknown"); });
