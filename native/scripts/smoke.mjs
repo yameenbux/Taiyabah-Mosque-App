@@ -690,8 +690,24 @@ try {
     log("ok", "the app reopened at the largest text size");
     shot("big-home");
     auditDown("big text · home");
+    /* Getting back. The first run of this pass opened two screens and then
+       reported the last three tiles and the More tab "not on screen": it had
+       never left the second screen, because one BACK is not always enough and
+       everything after it was looking for the home screen from inside a form.
+       So: press back until the tab bar is there, then tap Home. */
+    const toHome = () => {
+      for (let i = 0; i < 6; i++) {
+        const n = nodes(dump());
+        const home = findIn(n, "Home"), more = findIn(n, "More");
+        if (home && more) { tap(home); return true; }
+        back();
+      }
+      return false;
+    };
     for (const label of BIG_TILES) {
-      const n = seek(label);
+      if (!toHome()) { fail(`big text: could not get back to the home screen before "${label}"`); break; }
+      /* The home screen is half as long again at this text size. */
+      const n = seek(label, { swipes: 14 });
       if (!n) { fail(`big text: "${label}" is not on the home screen`); continue; }
       tap(n);
       shot("big-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
@@ -699,14 +715,21 @@ try {
       const c = crashes();
       if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
       back();
-      for (let i = 0; i < 2 && !findIn(nodes(dump()), "Home"); i++) back();
     }
+    toHome();
     const moreBig = findIn(nodes(dump()), "More");
     if (!moreBig) fail("big text: the More tab is not on screen");
     else {
       tap(moreBig);
       for (const label of BIG_ROWS) {
-        const n = seek(label);
+        /* Back to the menu the same way: press back until the tab bar is there,
+           then tap More. */
+        for (let i = 0; i < 6 && !findIn(nodes(dump()), "Resources"); i++) {
+          const n = nodes(dump()), more = findIn(n, "More");
+          if (more && findIn(n, "Home")) { tap(more); break; }
+          back();
+        }
+        const n = seek(label, { swipes: 14 });
         if (!n) { fail(`big text: menu row "${label}" is missing`); continue; }
         tap(n);
         shot("big-menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
@@ -714,7 +737,6 @@ try {
         const c = crashes();
         if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
         back();
-        for (let i = 0; i < 2 && !seek("Resources", { swipes: 3 }); i++) back();
       }
     }
   }
