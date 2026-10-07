@@ -17,7 +17,7 @@
  * It stays quiet until something has actually failed. A fresh install that has
  * not asked for anything yet is not "offline"; it is simply unasked.
  */
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 let state = "unknown";          // unknown | reachable | unreachable
 let failures = 0;
@@ -96,9 +96,20 @@ export function resetReach() { state = "unknown"; failures = 0; stopProbing(); }
 
 /* The hook lives here rather than beside the bar, because the bar is not the
  * only thing that needs the answer: Screen has to leave room at the bottom of
- * every scroll for a bar that is about to cover the last thing on it. */
+ * every scroll for a bar that is about to cover the last thing on it.
+ *
+ * useSyncExternalStore, NOT useState with a subscription in an effect.
+ *
+ * The hand-rolled version read the state while rendering and only started
+ * listening afterwards, in an effect — and the app's first requests are already
+ * in flight by then. Open the app with no signal and the two failures that mean
+ * "unreachable" land in that gap: the state changes with nobody listening, the
+ * component holds the value it read a moment earlier, and the bar never
+ * appears at all. Measured in the real app, not reasoned about: state
+ * "unreachable", two listeners attached, no bar on the screen.
+ *
+ * This is the hook React provides for exactly that race — it subscribes first
+ * and reads afterwards, and re-reads on every change. */
 export function useOffline() {
-  const [down, setDown] = useState(offline());
-  useEffect(() => onReach(() => setDown(offline())), []);
-  return down;
+  return useSyncExternalStore(onReach, offline, offline);
 }
