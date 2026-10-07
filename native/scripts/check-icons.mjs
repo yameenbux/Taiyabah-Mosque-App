@@ -11,6 +11,13 @@
  * every icon name the source can reach. Add an icon, forget to regenerate the
  * font, and the build stops here instead of shipping a blank square.
  *
+ * One level below this one: a codepoint can be in the character map and map to
+ * a glyph with no outline, which this would pass and a phone would draw as a
+ * space. scripts/raster-icons.py renders every glyph and counts the ink — run
+ * by hand after regenerating the subset, kept out of CI because it needs
+ * Pillow. Last run: 103 of 103 drew, and a glyph deliberately left out drew
+ * nothing, which is what stops the check being vacuous.
+ *
  * MIND THE CIRCLE. This takes its list from icon-names.mjs, so it cannot catch
  * a glyph that the extractor never saw — and that is exactly how a tab bar of
  * four blank spaces got past three green runs. scripts/test/icons.test.mjs
