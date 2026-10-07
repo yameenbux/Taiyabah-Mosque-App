@@ -136,7 +136,18 @@ donation, check it lands in Stripe carrying a reference.
 
 ---
 
-## Apple: blocked, and nothing to do yet
+## Apple: the enrolment is blocked, the app is not
+
+**The iOS app is built.** It is the same React Native app as Android, not a
+web view in a frame, and on every push it compiles on a macOS runner and then
+installs, launches and draws on an iPhone 16 Pro and an iPad Pro 13-inch
+simulator. A simulator runs unsigned builds, so none of that needed an Apple
+account — which is why it could be done while enrolment waits. What it cannot
+cover is push notifications, the widget and the Watch app: those need a Team
+ID and an APNs key, and both come with the account. `store/IOS-RELEASE.md`
+says what to do with each the day it clears.
+
+So what follows is about the account, and only the account.
 
 The D-U-N-S record was corrected and D&B confirmed it on 2 October — the
 street line had held the organisation's name and no street at all.
