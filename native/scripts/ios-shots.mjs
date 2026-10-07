@@ -205,7 +205,14 @@ for (const want of DEVICES) {
           .split("\n").filter(l => l.trim()).slice(-80);
         if (out.length) {
           console.error("    what the device log says:");
-          for (const l of out) console.error(`      ${l.slice(0, 220)}`);
+          /* 220 characters cut the one line that matters in half: an Invariant
+             Violation says which module is missing and then, past the cut, the
+             stack that says who asked for it. The React Native lines are the
+             whole diagnosis, so they are printed whole. */
+          for (const l of out) {
+            const keep = /com\.facebook\.react|Invariant|Exception|Error|fatal/i.test(l) ? 4000 : 200;
+            console.error(`      ${l.slice(0, keep)}`);
+          }
         }
       } catch (e) { console.error(`    (device log unavailable: ${String(e.message).split("\n")[0]})`); }
       failures++;
