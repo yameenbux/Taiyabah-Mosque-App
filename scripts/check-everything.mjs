@@ -208,6 +208,34 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
                                    times:(document.body.innerText.match(/\d{1,2}:\d{2}/g)||[]).length}));
   r.tabs===4 ? ok("offline","the app still opens with no network") : bad("offline",`offline shell broken (${r.tabs} tabs)`);
   r.times>=5 ? ok("offline",`prayer times still shown offline (${r.times})`) : note("offline",`only ${r.times} times offline`);
+
+  /* The bar has to lead with what STILL WORKS. Telling somebody "you are
+     offline" and stopping invites them to put the phone away; most of this
+     app needs no signal at all. */
+  const ob = await p.evaluate(()=>{
+    const bar = document.getElementById("offline-bar");
+    if (!bar) return null;
+    window.scrollTo(0, document.body.scrollHeight);
+    const br = bar.getBoundingClientRect();
+    const last = [...document.querySelectorAll("body > *")].filter(e=>e.offsetParent && e!==bar).pop();
+    const lr = last ? last.getBoundingClientRect() : null;
+    return { hidden: bar.hidden, text: (document.getElementById("offline-text")||{}).textContent || "",
+             covers: lr ? lr.bottom > br.top : false,
+             taps: getComputedStyle(bar).pointerEvents };
+  });
+  if (!ob) bad("offline","there is no offline notice at all");
+  else {
+    !ob.hidden ? ok("offline","the offline notice appears") : bad("offline","offline, and nothing said so");
+    /* names the things that need no signal, and says they work */
+    const names = ["prayer times","qibla"].filter(w => ob.text.toLowerCase().includes(w));
+    (names.length === 2 && /still work/i.test(ob.text))
+      ? ok("offline",`it names what still works (${names.join(", ")})`)
+      : bad("offline",`it says "${ob.text.slice(0,48)}" rather than what still works`);
+    !ob.covers ? ok("offline","it does not cover the last thing on the page")
+               : bad("offline","the notice covers the end of the page");
+    ob.taps === "none" ? ok("offline","it never takes a touch")
+                       : bad("offline",`the notice swallows taps (pointer-events: ${ob.taps})`);
+  }
   await p.context().setOffline(false);
   await p.close();
 }

@@ -1486,6 +1486,21 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     background:var(--bar);backdrop-filter:blur(12px);
     border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0)}
+  /* A quiet word when the masjid cannot be reached. It sits ABOVE the tab bar
+     rather than at the top, because every screen here opens on a dark hero and
+     a red bar across one reads as a fault rather than a notice. It never takes
+     a touch. */
+  .offline-bar{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom,0));
+    z-index:39;max-width:520px;margin-inline:auto;padding:0 16px;pointer-events:none}
+  .offline-bar[hidden]{display:none}
+  .offline-bar .ob-in{display:flex;align-items:center;gap:9px;
+    background:var(--tint-rose);border:1px solid var(--tint-rose-line);
+    border-radius:var(--radius);padding:10px 13px;box-shadow:var(--shadow)}
+  .offline-bar .ob-t{font-size:calc(12.5px * var(--ts));line-height:1.45;color:var(--ink-rose)}
+  .offline-bar svg{flex:none;width:17px;height:17px;stroke:var(--ink-rose);fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  /* and the last thing on the page is not hidden behind it */
+  :root[data-offline="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
   .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
     font:inherit;border:none;background:none;color:var(--muted);padding:9px 4px 8px}
   /* Something has been announced that this phone has not looked at yet. The
@@ -5396,6 +5411,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   </div>
 </div>
 
+<div class="offline-bar" id="offline-bar" hidden role="status" aria-live="polite">
+  <div class="ob-in">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M6.5 18h11a3.5 3.5 0 0 0 .5-6.96A5.5 5.5 0 0 0 8.2 8.6"/><path d="M5.3 9.4A4 4 0 0 0 6.5 18"/></svg>
+    <span class="ob-t" id="offline-text" data-i18n="offline.still_works">No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.</span>
+  </div>
+</div>
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="home" data-on="1" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-9.5Z"/><path d="M9.5 21v-6h5v6"/></svg>
@@ -9181,6 +9202,63 @@ const SUPA = {
      where this app says it. The website keeps the same value in cfg.MASJID. */
   masjid: "taiyabah",
 };
+/* ---------------------------------------------------------------------------
+   Can the app reach the masjid?
+
+   NOT "is there a network". A phone can hold four bars of a hotel wifi that
+   wants a login, and navigator.onLine calls that connected. The question worth
+   answering is narrower: did the last thing we asked the masjid for come back?
+   That is also true when the masjid's own server is down, which every network
+   API reports as online.
+
+   So both signals are used, and neither alone. The browser's offline event is
+   definitive when it fires — the machine says there is no network — while a
+   failed request to OUR OWN hosts catches the captive portal and the server
+   that is simply down. Other people's hosts are ignored on purpose: a CDN
+   having a bad morning is not the masjid being unreachable.
+
+   It stays quiet until something has actually failed. A tab that has not asked
+   for anything yet is not offline; it is unasked.
+   --------------------------------------------------------------------------- */
+const reach = (() => {
+  let state = "unknown";              // unknown | reachable | unreachable
+  let failures = 0;
+  const PATIENCE = 2;                 // one failure is a blip; two is a condition
+  const MINE = [SUPA.url, "https://taiyabah-sender.yameenbux.workers.dev"];
+
+  function set(next){
+    if (next === state) return;
+    state = next;
+    document.documentElement.dataset.offline = (state === "unreachable") ? "1" : "";
+    const bar = document.getElementById("offline-bar");
+    if (bar) bar.hidden = (state !== "unreachable");
+  }
+  function note(ok){
+    if (ok) { failures = 0; set("reachable"); return; }
+    failures += 1;
+    if (failures >= PATIENCE) set("unreachable");
+  }
+  const ours = u => { try { const h = String(u); return MINE.some(m => h.startsWith(m)); } catch(e){ return false; } };
+
+  /* One wrapper rather than a change at every call site, so a request added
+     later is covered without anyone remembering to cover it. */
+  const real = window.fetch.bind(window);
+  window.fetch = function(input, init){
+    const url = (typeof input === "string") ? input : (input && input.url) || "";
+    if (!ours(url)) return real(input, init);
+    return real(input, init).then(r => { note(true); return r; },
+                                  e => { note(false); throw e; });
+  };
+
+  addEventListener("offline", () => { failures = PATIENCE; set("unreachable"); });
+  /* Back on a network is not the same as the masjid answering, so this only
+     clears the bar and waits to be told otherwise by the next request. */
+  addEventListener("online", () => { failures = 0; set("unknown"); });
+  if (navigator.onLine === false) { failures = PATIENCE; set("unreachable"); }
+
+  return { note, state: () => state, offline: () => state === "unreachable" };
+})();
+
 /* The Supabase dashboard shows the URL with /rest/v1/ on the end; pasting it
    verbatim yields .../rest/v1/rest/v1/... and an error that says nothing
    useful. Normalise so either form works. */
