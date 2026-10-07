@@ -48,6 +48,49 @@ fs.mkdirSync(OUT, { recursive: true });
 const sh = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...opts });
 
+/**
+ * Why the app died, printed into the job log.
+ *
+ * An .ips is two JSON documents one after the other: a header line, then the
+ * report. What matters is the exception, the termination reason — which is
+ * where a missing framework or a failed dynamic link says so in plain words —
+ * and the top of whichever thread crashed.
+ */
+function report(file) {
+  let head = {}, body = {};
+  try {
+    const text = fs.readFileSync(file, "utf8");
+    const nl = text.indexOf("\n");
+    head = JSON.parse(text.slice(0, nl));
+    body = JSON.parse(text.slice(nl + 1));
+  } catch (e) {
+    console.error(`    (could not read ${path.basename(file)}: ${e.message})`);
+    return;
+  }
+  const say = (k, v) => { if (v) console.error(`    ${k}: ${v}`); };
+  say("app", `${head.app_name || "?"} ${head.app_version || ""} (${head.bundleID || "?"})`);
+  say("exception", [body.exception?.type, body.exception?.signal, body.exception?.subtype]
+        .filter(Boolean).join(" "));
+  say("reason", body.termination?.reason || body.exception?.message);
+  say("namespace", body.termination?.namespace);
+  if (body.asi) for (const [lib, lines] of Object.entries(body.asi))
+    for (const l of lines) say(`runtime (${lib})`, l);
+  say("last exception", (body.legacyInfo?.exceptionMessage || "").trim());
+
+  /* The faulting thread's top frames, with the image each sits in, which is
+     usually the whole answer: our binary, Hermes, or something else entirely. */
+  const idx = body.faultingThread ?? 0;
+  const frames = body.threads?.[idx]?.frames || [];
+  const images = body.usedImages || [];
+  if (frames.length) {
+    console.error(`    thread ${idx} (faulting):`);
+    for (const f of frames.slice(0, 12)) {
+      const img = images[f.imageIndex] || {};
+      console.error(`      ${(img.name || "?").padEnd(22)} ${f.symbol || "0x" + (f.imageOffset ?? 0).toString(16)}`);
+    }
+  }
+}
+
 /* The .app the build step produced. Found rather than assumed, because the
    product name follows expo.name and this should not need editing when that
    changes. */
@@ -149,17 +192,39 @@ for (const want of DEVICES) {
     /* Is it actually running, or did it launch and die? */
     const running = sh("xcrun", ["simctl", "spawn", dev.udid, "launchctl", "list"], { stdio: ["ignore","pipe","ignore"] })
       .split("\n").some(l => l.includes(bundleId));
-    if (!running) { console.error(`  FAIL  ${bundleId} is not running — it launched and exited`); failures++; }
-    else console.log("  still running after 14s");
+    if (!running) {
+      console.error(`  FAIL  ${bundleId} is not running — it launched and exited`);
+      /* A React Native fatal does not reach the crash report as anything but
+         an abort; the message it printed on the way down is in the device log,
+         and that message is usually the entire diagnosis. */
+      try {
+        const out = sh("xcrun", ["simctl", "spawn", dev.udid, "log", "show", "--last", "4m",
+                                 "--style", "compact",
+                                 "--predicate", `processImagePath CONTAINS "${app.split("/").pop().replace(".app", "")}"`],
+                       { stdio: ["ignore", "pipe", "ignore"], maxBuffer: 32 * 1024 * 1024 })
+          .split("\n").filter(l => l.trim()).slice(-25);
+        if (out.length) {
+          console.error("    what the device log says:");
+          for (const l of out) console.error(`      ${l.slice(0, 220)}`);
+        }
+      } catch (e) { console.error(`    (device log unavailable: ${String(e.message).split("\n")[0]})`); }
+      failures++;
+    } else console.log("  still running");
 
     /* A crash log written in the last couple of minutes is the app falling
-       over on launch, which a screenshot of a white screen would not show. */
+       over on launch, which a screenshot of a white screen would not show.
+       Naming the file was useless from here — the report lives on the runner
+       and the artefact cannot be fetched — so the reason is printed instead. */
     const crashDir = `${process.env.HOME}/Library/Logs/DiagnosticReports`;
     if (fs.existsSync(crashDir)) {
       const recent = fs.readdirSync(crashDir)
         .filter(f => /Taiyabah|TaiyabahMasjid/i.test(f))
         .filter(f => Date.now() - fs.statSync(path.join(crashDir, f)).mtimeMs < 180000);
-      if (recent.length) { console.error(`  FAIL  crash report(s): ${recent.join(", ")}`); failures++; }
+      if (recent.length) {
+        console.error(`  FAIL  crash report(s): ${recent.join(", ")}`);
+        for (const f of recent.slice(0, 2)) report(path.join(crashDir, f));
+        failures++;
+      }
     }
   } catch (e) {
     console.error(`  FAIL  ${String(e.message).split("\n")[0]}`);
