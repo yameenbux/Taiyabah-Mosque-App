@@ -68,7 +68,7 @@ export function NewBuild({ navigation }) {
           altogether, so the verse that is the whole reason for the page came
           out as a quiet card below the fold. */}
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
-        <TopBar navigation={navigation} />
+        <TopBar back navigation={navigation} />
       </LinearGradient>
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingTop: 26, paddingHorizontal: 22, paddingBottom: 24, overflow: "hidden" }}>

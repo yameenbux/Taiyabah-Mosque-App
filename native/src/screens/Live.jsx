@@ -75,7 +75,7 @@ export default function Live({ navigation }) {
           it and .lv-hero is a BAND — 30/20/28 of padding, not a player filling
           58% of the screen with nothing under it. */}
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
-        <TopBar navigation={navigation} />
+        <TopBar back navigation={navigation} />
       </LinearGradient>
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingTop: 30, paddingHorizontal: 20, paddingBottom: 28,

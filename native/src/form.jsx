@@ -37,7 +37,12 @@ export function Field({ label, opt, hint, value, onChange, type = "text", bad, r
           and it is the same control on every form in the app: hall hire,
           nikāḥ, the imāms' advice, charity collections. */}
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 6, marginBottom: 5 }}>
-        <Text style={{ fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
+        {/* flexShrink, because Yoga does not shrink a flex child by default and
+            the browser does. "ROUGHLY HOW MANY GUESTS (OPTIONAL)" at the largest
+            text size is 420px of capitals in 328px of phone: on the web build it
+            shrank and wrapped, on the phone it ran off the right edge and was
+            cut. The website's label is a block element and wraps. */}
+        <Text style={{ flexShrink: 1, fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.6,
                        textTransform: "uppercase",
                        color: bad ? C.danger : C.muted }}>{label}</Text>
         {/* .cc-opt — the website appends the aside to the LABEL in the same
@@ -48,7 +53,7 @@ export function Field({ label, opt, hint, value, onChange, type = "text", bad, r
             the field is asking for, and it loses the wording — "if you have
             one" says something "optional" does not. */}
         {required === false && (
-          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted }}>
+          <Text style={{ flexShrink: 1, fontFamily: F.sansMedium, fontSize: fs(12), color: C.muted }}>
             {opt || t("collect.optional", "— optional")}</Text>)}
       </View>
       <TextInput
@@ -115,7 +120,25 @@ export function Choice({ label, options, value, onChange }) {
 export function Check({ label, value, onChange, bad }) {
   const { fs, rtl } = useApp();
   return (
+    /* A CHECKBOX, and it has to say so. The website's is a real
+       <input type="checkbox">, which announces as "checkbox, not ticked" and
+       tells somebody using TalkBack both what it is and where it stands. This
+       drew the same square and the same tick but defaulted to Press's "button"
+       role with no checked state, so the one control a person must tick to
+       agree to anything — the privacy line on all four forms, the terms of
+       hire — announced as a button that gave no sign of having worked. */
     <Press onPress={() => { tap(); onChange(!value); }}
+      accessibilityRole="checkbox"
+      /* Both forms of the same fact. accessibilityState is what React Native
+         hands Android, and aria-checked is what the exported web build puts in
+         the DOM — react-native-web drops accessibilityState on a Pressable, so
+         without this the web build renders role="checkbox" with no checked
+         state at all, which is worse than no role: ARIA requires one. The web
+         build is also what the form tests read, and a test that cannot see the
+         box is ticked cannot tell a form that refused from one that was never
+         filled in. */
+      accessibilityState={{ checked: !!value }}
+      aria-checked={!!value}
       style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 11, alignItems: "flex-start", marginTop: 16,
                paddingVertical: 2 }}>
       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: value ? 0 : 1.6,
@@ -209,12 +232,21 @@ export function Calendar({ month, onMonth, selected = [], taken = null, first, l
                       : isTaken ? "taken" : "free";
           const edge = on ? C.brand600 : state === "free" ? FREE : state === "taken" ? C.danger : C.line;
           const mark = state === "free" ? FREE : state === "taken" ? C.danger : null;
-          return (
-            <Pressable key={key} disabled={past || unoffered || isTaken || unknown}
+            /* DISABLED ONLY WHERE THE WEBSITE DISABLES: past, or a day this
+               hire is not offered on. Taken and unknown stay pressable, and
+               that is not a detail — this screen's own copy depends on it.
+               Pick a booked day and the panel says "Booked"; pick one whose
+               availability never came back and it says "We could not check
+               availability just now. The office can confirm on the phone" and
+               offers "Ask". Disabling those two made both states unreachable,
+               so on a phone that could not reach the masjid EVERY day in the
+               month was dead and no booking could be started at all. */
+            const off = past || unoffered;
+            return (
+            <Pressable key={key} disabled={off}
               onPress={() => { tap(); onPick(key, date); }}
               accessibilityRole="button"
-              accessibilityState={{ selected: on,
-                                    disabled: !!(past || unoffered || isTaken || unknown) }}
+              accessibilityState={{ selected: on, disabled: !!off }}
               style={{ width: "14.2857%", aspectRatio: 1, padding: 2 }}>
               {/* .bk-day — a square cell with its own border and paper fill,
                   10px of radius, and a 5px dot at the foot saying what it is.

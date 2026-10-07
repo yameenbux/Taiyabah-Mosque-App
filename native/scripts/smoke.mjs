@@ -112,6 +112,105 @@ function nodes(xml) {
 }
 
 const norm = s => s.replace(/\s+/g, " ").replace(/[‘’ʼ]/g, "'").trim().toLowerCase();
+/* ---------- is anything damaged on this screen? --------------------------
+   nodes() keeps a centre and a size, because that is what tapping needs. This
+   keeps the edges, because the question here is whether anything ran off them.
+
+   Two signals, both exact rather than impressionistic:
+
+     · a text node ending in "…" — React Native writes that itself when it has
+       run out of room, so it is the app admitting the words did not fit;
+     · a box that starts left of the screen or ends right of it.
+
+   Reported for every screen the sweep opens, because "text is being cut off on
+   the sides" was found on a real phone and nothing in this suite was looking
+   for it. */
+function boxes(xml) {
+  const out = [];
+  for (const m of xml.matchAll(/<node\b[^>]*>/g)) {
+    const tag = m[0];
+    const b = tag.match(/\bbounds="\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]"/);
+    if (!b) continue;
+    const text = (tag.match(/\btext="([^"]*)"/) || [, ""])[1];
+    const desc = (tag.match(/\bcontent-desc="([^"]*)"/) || [, ""])[1];
+    const [, x1, y1, x2, y2] = b.map(Number);
+    out.push({ label: unescapeXml(text || desc).trim(), x1, y1, x2, y2 });
+  }
+  return out;
+}
+
+let SCREEN_W = 0;
+try { SCREEN_W = Number(adb(["shell", "wm", "size"]).match(/(\d+)x\d+/)?.[1] || 0); } catch {}
+
+/* WORDS THE APP MEANT TO END IN AN ELLIPSIS.
+ *
+ * React Native writes "…" when text runs out of room, which is what makes it a
+ * precise signal — except that some of the app's own strings end in one on
+ * purpose: "Search the Arabic…", "Loading…". The character is identical, so the
+ * only way to tell an author's ellipsis from the renderer's is to ask the app
+ * what it meant to say. The first run of this audit reported the Bukhārī search
+ * box as clipped text; it was the placeholder, written exactly like that. */
+const ownWords = new Set();
+try {
+  const dir = path.resolve(import.meta.dirname, "../src/i18n");
+  const collect = v => {
+    if (typeof v === "string") { const t = v.trim(); if (t.endsWith("…")) ownWords.add(t); }
+    else if (v && typeof v === "object") Object.values(v).forEach(collect);
+  };
+  for (const f of fs.readdirSync(dir))
+    if (f.endsWith(".json")) collect(JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+  collect(JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../src/data/sheets.json"), "utf8")));
+  say(`  ${ownWords.size} of the app's own strings end in an ellipsis on purpose`);
+} catch (e) { say("  (could not read the app's own strings: " + e.message.slice(0, 80) + ")"); }
+
+const damage = [];
+function auditScreen(where, xml) {
+  if (!SCREEN_W) return;
+  const all = boxes(xml || dump());
+  const cut = all.filter(n => n.label && /[…]$|\.\.\.$/.test(n.label) && !ownWords.has(n.label));
+  const over = all.filter(n => n.label && (n.x1 < 0 || n.x2 > SCREEN_W));
+  for (const n of cut)
+    damage.push(`${where}: text truncated — "${n.label.slice(0, 54)}"`);
+  for (const n of over)
+    damage.push(`${where}: runs off the screen (${n.x1}..${n.x2} of ${SCREEN_W}) — "${n.label.slice(0, 40)}"`);
+}
+
+/* Every pushed screen has to offer a way out. Qibla, the new-build appeal and
+   Listen Live each drew the app bar with no back arrow and no Done, so the
+   only way off them was the phone's own button — reported as "no back button".
+   A tab is exempt: the tab bar is its way out. */
+function auditWayOut(where, xml) {
+  const all = boxes(xml || dump());
+  const label = n => (n.label || "").toLowerCase();
+  const onTab = all.some(n => label(n) === "home") && all.some(n => label(n) === "more");
+  if (onTab) return;
+  const out = all.some(n => ["back", "done", "close"].includes(label(n)));
+  if (!out) damage.push(`${where}: no way back — no Back, Done or Close anywhere on the screen`);
+}
+
+/* uiautomator only reports what is on the glass, so auditing once at the top of
+ * a long screen leaves everything below the fold unseen — and "text is being
+ * cut off on the sides" was found partway down the nikāḥ form, which is six
+ * screens long. Each screen is therefore walked down a viewport at a time and
+ * audited at every stop, until it stops moving. */
+function auditDown(where, max = 3) {
+  let last = "";
+  for (let i = 0; i <= max; i++) {
+    let x;
+    try { x = dump(); } catch { return; }
+    auditScreen(i ? `${where} (scrolled ${i})` : where, x);
+    if (i === 0) auditWayOut(where, x);
+    /* "Has the screen moved?" — the length of the dump plus the last few bits
+       of text on it. Identical twice means the bottom, so there is no point
+       swiping at a screen that does not scroll. */
+    const key = x.length + "|" + (x.match(/text="[^"]{3,}"/g) || []).slice(-3).join("");
+    if (i && key === last) return;
+    last = key;
+    adb(["shell", "input", "swipe", "540", "1800", "540", "700", "320"]);
+    sleep(650);
+  }
+}
+
 const findIn = (list, want) =>
   list.find(n => (want instanceof RegExp ? want.test(n.label) : norm(n.label) === norm(want)));
 
@@ -489,6 +588,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
   if (stillHome) fail(`tapping "${label}" did nothing`);
   else { log("ok", `${label} → opened`); opened.tiles.push(label); }
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+  auditDown(label);
   const c = crashes();
   if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   back();
@@ -534,6 +634,7 @@ else {
     if (findIn(after, "Resources")) fail(`tapping "${label}" did nothing`);
     else { log("ok", `${label} → opened`); opened.rows.push(label); }
     shot("menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+    auditDown(label);
     const c = crashes();
     if (c.length) { fail(`"${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
     back();
@@ -548,9 +649,103 @@ for (const tab of ["Prayer Times", "Notices", "Home"]) {
   if (!n) { fail(`the ${tab} tab is not on screen`); continue; }
   tap(n);
   shot("tab-" + tab.replace(/\s+/g, "-").toLowerCase());
+  /* The tabs are screens too, and the first fault a person found on a phone —
+     the Salam clipped off the top of the home hero — was on one of them. */
+  auditDown("tab " + tab);
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   else { log("ok", `${tab} tab`); tabsOk.push(tab); }
+}
+
+/* ---------- the same app, at the largest text a phone can ask for --------- */
+
+/* Four of the six faults a person found on a Huawei were layout, and a phone
+ * set to its biggest text draws this app at 1.5x — src/scale.js takes the LARGER
+ * of the phone's own font setting and the one chosen in the app. Everything
+ * above ran at 1.0, which is not what that phone was doing, so the sweep could
+ * walk the whole app and still not see what was photographed.
+ *
+ * The screens with the most words on them are therefore opened again at
+ * font_scale 1.5. Not all of them: this is minutes of emulator, and the long
+ * forms, the timetable, the holiday list and the two giving screens are where
+ * the words are. */
+const BIG_TILES = ["Nikāḥ Services", "Hall Booking", "Charity Collections",
+                   "Donate", "Sadaqah & Lillah"];
+const BIG_ROWS  = ["Imams' Advice", "Full prayer timetable", "Holiday Planner", "Help"];
+try {
+  say("\nthe same app at the largest text size a phone can ask for (font_scale 1.5)");
+  adb(["shell", "settings", "put", "system", "font_scale", "1.5"]);
+  sleep(1500);
+  /* A font scale change recreates every activity. Restarting the app outright
+     is the honest version of what a person does: they change the setting in
+     Android and come back to the app. */
+  try { adb(["shell", "am", "force-stop", PKG]); } catch {}
+  sleep(1000);
+  launch();
+  sleep(5000);
+  clearFirstRun();
+  if (!findIn(nodes(dump()), "Home"))
+    fail("the app did not come back after the phone's text size was made bigger");
+  else {
+    log("ok", "the app reopened at the largest text size");
+    shot("big-home");
+    auditDown("big text · home");
+    /* Getting back. The first run of this pass opened two screens and then
+       reported the last three tiles and the More tab "not on screen": it had
+       never left the second screen, because one BACK is not always enough and
+       everything after it was looking for the home screen from inside a form.
+       So: press back until the tab bar is there, then tap Home. */
+    const toHome = () => {
+      for (let i = 0; i < 6; i++) {
+        const n = nodes(dump());
+        const home = findIn(n, "Home"), more = findIn(n, "More");
+        if (home && more) { tap(home); return true; }
+        back();
+      }
+      return false;
+    };
+    for (const label of BIG_TILES) {
+      if (!toHome()) { fail(`big text: could not get back to the home screen before "${label}"`); break; }
+      /* The home screen is half as long again at this text size. */
+      const n = seek(label, { swipes: 14 });
+      if (!n) { fail(`big text: "${label}" is not on the home screen`); continue; }
+      tap(n);
+      shot("big-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+      auditDown("big text · " + label);
+      const c = crashes();
+      if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
+      back();
+    }
+    toHome();
+    const moreBig = findIn(nodes(dump()), "More");
+    if (!moreBig) fail("big text: the More tab is not on screen");
+    else {
+      tap(moreBig);
+      for (const label of BIG_ROWS) {
+        /* Back to the menu the same way: press back until the tab bar is there,
+           then tap More. */
+        for (let i = 0; i < 6 && !findIn(nodes(dump()), "Resources"); i++) {
+          const n = nodes(dump()), more = findIn(n, "More");
+          if (more && findIn(n, "Home")) { tap(more); break; }
+          back();
+        }
+        const n = seek(label, { swipes: 14 });
+        if (!n) { fail(`big text: menu row "${label}" is missing`); continue; }
+        tap(n);
+        shot("big-menu-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
+        auditDown("big text · " + label);
+        const c = crashes();
+        if (c.length) { fail(`big text: "${label}" crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
+        back();
+      }
+    }
+  }
+} catch (e) {
+  fail("the big-text pass stopped early: " + (e && e.message ? e.message : String(e)));
+} finally {
+  /* Left at 1.5 the next thing to use this emulator would be measuring a phone
+     nobody configured. */
+  try { adb(["shell", "settings", "put", "system", "font_scale", "1.0"]); } catch {}
 }
 
 /* ---------- verdict ------------------------------------------------------- */
@@ -560,6 +755,20 @@ if (late.length) fail("crashes in the log at the end:\n    " + late.slice(0, 8).
 
 try { fs.writeFileSync(path.join(OUT, "last-screen.xml"), dump()); } catch {}
 say(`\n${shots} screenshots in ${OUT}`);
+/* Damage found while walking the screens. Reported as failures, because every
+   one of these was found by a person holding a phone and should have been
+   found here — so it has to be decided BEFORE the exit below, not after it.
+   Each line is annotated as well as printed: the run log is served from a host
+   this environment cannot reach, so a finding that exists only in the log is a
+   finding nobody reads. */
+if (damage.length) {
+  const seen = new Set();
+  const uniq = damage.filter(d => !seen.has(d) && seen.add(d));
+  say(`\n${uniq.length} layout problem(s):`);
+  uniq.slice(0, 40).forEach((d, i) => { say("  · " + d); if (i < 12) annotate(d); });
+  fail(`${uniq.length} screen(s) draw text that is cut off, or offer no way back`);
+} else say("\nno clipped text and no screen without a way back");
+
 if (failures.length) {
   say(`\n${failures.length} problem(s):`);
   failures.forEach(f => say("  · " + f));

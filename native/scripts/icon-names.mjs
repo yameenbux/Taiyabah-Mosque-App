@@ -74,7 +74,19 @@ for (const file of files) {
     babelrc: false, configFile: false, sourceType: "module",
   });
   babel.traverse(ast, {
-    StringLiteral(p) { strings.add(p.node.value); },
+    StringLiteral(p) {
+      /* A ROLE IS NOT AN ICON. "checkbox", "radio", "link", "search" and
+         "image" are all Ionicons glyph names as well as accessibility roles,
+         so the moment a control said accessibilityRole="checkbox" this asked
+         for a glyph nothing draws — and the subset check then failed for a
+         picture the app has never shown. Excluded only where it is that
+         attribute's own value; the same word written anywhere else still
+         counts, because being over-inclusive everywhere else is the whole
+         point of this file. */
+      const up = p.parent;
+      if (up && up.type === "JSXAttribute" && up.name && up.name.name === "accessibilityRole") return;
+      strings.add(p.node.value);
+    },
     TemplateElement(p) { const v = p.node.value.cooked; if (v) strings.add(v); },
   });
 }

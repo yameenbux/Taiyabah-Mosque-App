@@ -5,7 +5,7 @@
  * the next jamāʿah" and should never be more than one tap away.
  */
 import React, { useMemo, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { LinearGradient } from "expo-linear-gradient";
@@ -122,22 +122,27 @@ export default function PrayerTimes({ navigation }) {
       {/* .chip — 12.5px semibold on a white pill inside a hairline, muted;
           chosen, it fills BRAND-700 with cream. These were gold outlines on
           plum, which is a different control in a different place. */}
-      <View style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 7,
-                     paddingHorizontal: 16, paddingTop: 10 }}>
+      {/* .chips SCROLLS SIDEWAYS — overflow-x:auto on the website, with every
+          .chip flex:0 0 auto. Drawn as a plain row, the third chip ("Full
+          month") was simply off the right of a 320px screen at the largest
+          text size: not clipped, unreachable. */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ flexDirection: rtl ? "row-reverse" : "row", gap: 7,
+                                 paddingHorizontal: 16, paddingTop: 10 }}>
         {[{ k: "today", lab: t("app.today", "Today"), on: offset === 0, go: () => setOffset(0) },
           { k: "fri", lab: t("app.next_jumu_ah", "Next Jumuʿah"), on: offset === jumuah,
             go: () => setOffset(jumuah), off: !dayFor(jumuahDate) },
           { k: "month", lab: t("app.full_month", "Full month"),
             go: () => navigation.navigate("Timetable") }].map(c => (
           <Press key={c.k} disabled={c.off} onPress={() => { tap(); c.go(); }}
-            style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: R.pill, borderWidth: 1,
+            style={{ flexShrink: 0, paddingHorizontal: 13, paddingVertical: 8, borderRadius: R.pill, borderWidth: 1,
                      borderColor: c.on ? C.pick : C.line,
                      backgroundColor: c.on ? C.pick : C.card,
                      opacity: c.off ? 0.35 : 1 }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
                            color: c.on ? C.cream : C.muted }}>{c.lab}</Text>
           </Press>))}
-      </View>
+      </ScrollView>
 
       <View style={{ paddingHorizontal: 16 }}>
         {!day ? (
@@ -207,7 +212,7 @@ export default function PrayerTimes({ navigation }) {
                         {(isNow || isNext) && (
                           /* .pill.now is a GOLD fill with near-black text;
                              .pill.next is #EFE6EC with brand-600. */
-                          <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
+                          <Text style={{ flexShrink: 0, fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
                                          textTransform: "uppercase", overflow: "hidden",
                                          color: isNow ? "#3A2C07" : C.brand600,
                                          backgroundColor: isNow ? C.gold : C.tintPlumPill,

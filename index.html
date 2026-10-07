@@ -422,10 +422,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .sheet .scrim{position:absolute;inset:0;background:rgba(32,12,25,.55);backdrop-filter:blur(2px)}
   .sheet .panel{position:absolute;left:0;right:0;bottom:0;top:0;max-width:520px;margin-inline:auto;
     background:var(--paper);display:flex;flex-direction:column}
-  .sh-top{display:flex;align-items:center;gap:10px;
+  /* WRAPS, because on the month sheet it cannot always fit. That header carries
+     two 38px steppers, the month and a Done pill, and at the largest text size
+     on a 320px phone the Done ran 9px off the right edge — the one button that
+     closes the sheet, half off the glass. Wrapping costs nothing at any size
+     that fits: the row only breaks when its own min-content will not. */
+  .sh-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     padding:calc(14px + env(safe-area-inset-top,0)) 14px 14px;flex:0 0 auto;
     background:linear-gradient(180deg,var(--brand-900),var(--brand-800));color:#F3EFE3}
-  .sh-top h3{font-family:"Fraunces",serif;font-size:calc(15.5px * var(--ts));font-weight:600;flex:1;text-align:center}
+  .sh-top h3{font-family:"Fraunces",serif;font-size:calc(15.5px * var(--ts));font-weight:600;flex:1;
+    min-width:0;text-align:center}
   .sh-nav{width:38px;height:38px;flex:0 0 auto;border-radius:11px;cursor:pointer;font:inherit;font-size:calc(20px * var(--ts));
     border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#F3EFE3}
   /* Returns to the sheet this one was opened from. It only exists when there
@@ -9232,6 +9238,7 @@ const reach = (() => {
     document.documentElement.dataset.offline = (state === "unreachable") ? "1" : "";
     const bar = document.getElementById("offline-bar");
     if (bar) bar.hidden = (state !== "unreachable");
+    if (state === "unreachable") startProbing(); else stopProbing();
   }
   function note(ok){
     if (ok) { failures = 0; set("reachable"); return; }
@@ -9250,7 +9257,35 @@ const reach = (() => {
                                   e => { note(false); throw e; });
   };
 
+  /* ASK AGAIN WHILE THE ANSWER IS NO.
+     The native app wore a stuck bar on a real phone for exactly the reason
+     this would: the only thing that could clear it was a request that happened
+     to succeed, and a screen whose request already failed does not repeat it.
+     The online event covers losing the network and getting it back; it does
+     NOT cover a captive portal being signed into, or the masjid's own server
+     coming back, and neither fires anything. So poll, gently — 5s then 10, 20,
+     40, to a minute — and stop the moment anything answers. */
+  let timer = null, wait = 0;
+  function stopProbing(){ if (timer) { clearTimeout(timer); timer = null; } wait = 0; }
+  function startProbing(){
+    if (timer) return;
+    wait = wait ? Math.min(wait * 2, 60000) : 5000;
+    timer = setTimeout(() => {
+      timer = null;
+      /* HEAD the REST root: any status at all proves the round trip, and this
+         goes through the same wrapper so it reports like everything else. */
+      fetch(`${SUPA.url}/rest/v1/`, { method: "HEAD", cache: "no-store" })
+        .catch(() => {})
+        .finally(() => { if (state === "unreachable") startProbing(); });
+    }, wait);
+  }
+
   addEventListener("offline", () => { failures = PATIENCE; set("unreachable"); });
+  /* Coming back to the tab is worth a fresh ask, at once rather than waiting
+     out the backoff. */
+  addEventListener("visibilitychange", () => {
+    if (!document.hidden && state === "unreachable") { stopProbing(); startProbing(); }
+  });
   /* Back on a network is not the same as the masjid answering, so this only
      clears the bar and waits to be told otherwise by the next request. */
   addEventListener("online", () => { failures = 0; set("unknown"); });

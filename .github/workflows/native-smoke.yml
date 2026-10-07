@@ -28,7 +28,10 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The walk now audits every screen below the fold and then opens the ten
+    # wordiest ones again at the largest text size a phone can ask for, which is
+    # minutes more emulator than the hour this used to need.
+    timeout-minutes: 80
     # The sideload variant, as the APK build uses — see native/app.config.js.
     # Nothing here should ever be able to produce the real package id.
     env:

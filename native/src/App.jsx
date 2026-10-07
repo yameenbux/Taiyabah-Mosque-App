@@ -4,7 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Platform, View } from "react-native";
+import { Platform, View, Text, AppState } from "react-native";
+import { wokeUp } from "./reach";
 import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -71,6 +72,15 @@ const icon = name => ({ color, focused }) =>
 
 function Tabs() {
   const { t, fs, rtl } = useApp();
+  /* Past this size the longest English label, "Prayer Times", no longer fits
+     one line of a quarter of a 360px screen. Measured, not guessed: 85px of
+     words in 80px of tab at fs(10.5) = 16. */
+  const wraps = fs(rtl ? 12.5 : 10.5) >= (rtl ? 15 : 14);
+  const label = text => ({ color }) => (
+    <Text numberOfLines={2}
+          style={{ fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
+                   lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
+                   includeFontPadding: false, textAlign: "center", color }}>{text}</Text>);
   return (
     <Tab.Navigator
       screenLayout={({ children, route }) => (
@@ -93,16 +103,26 @@ function Tabs() {
                        width: "100%", maxWidth: COLUMN, alignSelf: "center",
                        /* Urdu and Arabic glyphs hang well below the baseline; at
                           the Latin height their descenders are sliced off. */
-                       height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14)) },
-        tabBarLabelStyle: { fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
-                            lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
-                            includeFontPadding: false },
+                       height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14))
+                               /* and room for the second line, once the text is
+                                  big enough that a two-word label needs one. */
+                               + (wraps ? fs(rtl ? 22 : 14) : 0) },
+        /* The label is drawn here rather than left to React Navigation, which
+           puts it on ONE line with no ellipsis: at the largest text size
+           "Prayer Times" needed 85px and had 80, so the words were sliced down
+           the middle. The website's .tab span is a plain span in a flex column
+           with no nowrap — it wraps to "Prayer" over "Times", and .tabbar has
+           no fixed height, so the bar grows under it. This does both. */
         sceneContainerStyle: { backgroundColor: C.paper },
       }}>
-      <Tab.Screen name="HomeTab"    component={Home}        options={{ title: t("nav.home", "Home"), tabBarIcon: icon("home") }} />
-      <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer Times"), tabBarIcon: icon("time") }} />
-      <Tab.Screen name="NoticesTab" component={Notices}     options={{ title: t("nav.notices", "Notices"), tabBarIcon: icon("document-text") }} />
-      <Tab.Screen name="MoreTab"    component={More}        options={{ title: t("nav.more", "More"), tabBarIcon: icon("ellipsis-horizontal") }} />
+      <Tab.Screen name="HomeTab"    component={Home}        options={{ title: t("nav.home", "Home"),
+                                                                         tabBarLabel: label(t("nav.home", "Home")), tabBarIcon: icon("home") }} />
+      <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer Times"),
+                                                                         tabBarLabel: label(t("nav.prayer_times", "Prayer Times")), tabBarIcon: icon("time") }} />
+      <Tab.Screen name="NoticesTab" component={Notices}     options={{ title: t("nav.notices", "Notices"),
+                                                                         tabBarLabel: label(t("nav.notices", "Notices")), tabBarIcon: icon("document-text") }} />
+      <Tab.Screen name="MoreTab"    component={More}        options={{ title: t("nav.more", "More"),
+                                                                         tabBarLabel: label(t("nav.more", "More")), tabBarIcon: icon("ellipsis-horizontal") }} />
     </Tab.Navigator>
   );
 }
@@ -244,6 +264,14 @@ export default function App() {
        Neither blocks a frame: the bundled file is in memory from the start,
        so the app always has times to draw while this happens. */
     restoreTimetable().finally(() => { syncTimetable(); });
+
+    /* Coming back to the app is the moment worth asking again whether the
+       masjid is reachable. A phone that has been in a pocket has usually been
+       somewhere with signal since, and the offline bar should be gone before
+       anybody reads it. reach.js only acts on this while the answer is still
+       no, so on a working connection it costs nothing. */
+    const sub = AppState.addEventListener("change", s => { if (s === "active") wokeUp(); });
+    return () => { try { sub.remove(); } catch {} };
   }, []);
 
   /* Shown only while the settings store answers, which has its own ceiling in

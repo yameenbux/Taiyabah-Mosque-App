@@ -114,7 +114,17 @@ export default function Collect({ navigation }) {
         students_total: students.total || null,
         students_boarding: students.boarding || null,
       });
-      setState({ done: r });
+      /* rpc() answers {ok, data} or {ok:false, message} — NOT the function's
+         row. Stored whole, `done` was truthy even when Postgres had refused
+         the request, so a rejected application drew "Your request has been
+         sent" and the reference under it was never there to print. The other
+         three forms all read r.ok; this one did not. */
+      if (!r.ok) {
+        setState({ error: r.message || t("collect.couldnt_send",
+          "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.") });
+        return;
+      }
+      setState({ done: r.data });
     } catch (e) {
       setState({ error: e.message || t("collect.couldnt_send", "That didn't send. Please try again, or ring Rafik Patel on 07951 795 465.") });
     }
@@ -123,13 +133,15 @@ export default function Collect({ navigation }) {
   if (state.done)
     return (
       <Screen>
+        {/* reference IS A PROP. Handed to Sent as a child it was dropped on the
+            floor — Sent takes title, body, reference and extra and renders no
+            children — so a charity that applied was told "Keep your reference"
+            with no reference under it, and the office had nothing to look the
+            request up by. The other three forms pass the prop. */}
         <Sent title={t("collect.request_sent", "Your request has been sent")}
               body={t("collect.the_office_will_ring_the_trustee",
-                "The office rings the trustee to confirm before anything is agreed. Keep your reference.")}>
-          {!!state.done?.reference && (
-            <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.brand600, textAlign: "center" }}>
-              {state.done.reference}</Text>)}
-        </Sent>
+                "The office rings the trustee to confirm before anything is agreed. Keep your reference.")}
+              reference={state.done?.reference} />
       </Screen>
     );
 

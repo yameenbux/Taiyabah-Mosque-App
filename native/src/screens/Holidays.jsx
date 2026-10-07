@@ -138,7 +138,7 @@ function ListRow({ name, sub, when, len, past, est, first }) {
             /* Gold, as .hp-est is on the website. In grey it reads as a
                disabled label rather than "this date is an estimate", which is
                the one thing it is there to say. */
-            <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), color: C.goldInk, borderWidth: 1,
+            <Text style={{ flexShrink: 0, fontFamily: F.sans, fontSize: fs(9.5), color: C.goldInk, borderWidth: 1,
                            borderColor: "rgba(198,162,76,.45)", backgroundColor: "rgba(198,162,76,.12)",
                            borderRadius: R.pill, paddingHorizontal: 5,
                            paddingVertical: 1, overflow: "hidden" }}>{t("hol.est", "est.")}</Text>)}

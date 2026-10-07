@@ -129,7 +129,7 @@ export default function Qibla({ navigation }) {
        before there was anything to calibrate. */
     <Screen pad={false} bg={C.paper}>
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
-        <TopBar navigation={navigation} />
+        <TopBar back navigation={navigation} />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16, paddingTop: 6 }}>
         <Heading tag={from.mine ? t("qibla.your_location", "Your location")
