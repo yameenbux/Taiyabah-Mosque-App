@@ -88,9 +88,15 @@ export async function daysPublished(year, { url, key }, fetchImpl = fetch) {
     headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({ p_year: year }),
   });
-  if (!res.ok) throw new Error(`prayer_year(${year}) answered ${res.status}`);
-  const rows = await res.json();
-  if (!Array.isArray(rows)) throw new Error(`prayer_year(${year}) did not return a list`);
+  const body = await res.text();
+  /* PostgREST says WHY in the body — an ambiguous overload is PGRST203, a
+     function anon may not execute is 42501 — and a watchdog whose own failure
+     is unreadable is half a watchdog. */
+  if (!res.ok) throw new Error(`prayer_year(${year}) answered ${res.status}: ${body.slice(0, 300)}`);
+  let rows;
+  try { rows = JSON.parse(body); }
+  catch { throw new Error(`prayer_year(${year}) returned something that is not JSON: ${body.slice(0, 200)}`); }
+  if (!Array.isArray(rows)) throw new Error(`prayer_year(${year}) did not return a list but ${typeof rows}: ${body.slice(0, 200)}`);
   return rows.length;
 }
 
@@ -99,12 +105,19 @@ if (import.meta.filename === process.argv[1]) {
   const today = new Date();
   const years = [today.getFullYear(), today.getFullYear() + 1];
   const counts = {};
+  const ci = !!process.env.GITHUB_ACTIONS;
   for (const y of years) {
     try { counts[y] = await daysPublished(y, cfg); }
-    catch (e) { counts[y] = null; console.log(`  (asking about ${y} failed: ${e.message})`); }
+    catch (e) {
+      counts[y] = null;
+      /* On the annotation channel as well as stdout: this runner's logs are
+         served from storage a sandbox cannot reach, so a reason printed only
+         to stdout is a reason nobody reads. */
+      console.log(`  asking about ${y} failed — ${e.message}`);
+      if (ci) console.log(`::error::asking about ${y} failed — ${e.message}`);
+    }
   }
   const { exit, lines } = verdict({ today, counts });
-  const ci = !!process.env.GITHUB_ACTIONS;
   for (const l of lines) {
     console.log(`${l.level === "error" ? "✗" : "✓"} ${l.text}`);
     if (ci) console.log(`::${l.level}::${l.text}`);
