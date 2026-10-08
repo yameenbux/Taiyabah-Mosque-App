@@ -3,7 +3,7 @@
     "name": "Taiyabah Masjid",
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -75,8 +75,8 @@
         {
           "android": {
             "kotlinVersion": "1.9.25",
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36
           }
         }
       ],
@@ -106,7 +106,8 @@
             "./assets/notification-icon.png"
           ]
         }
-      ]
+      ],
+      "./plugins/with-api-36"
     ],
     "experiments": {
       "typedRoutes": false

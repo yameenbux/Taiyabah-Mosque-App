@@ -159,7 +159,14 @@ for (const f of srcFiles) {
   }
 }
 Object.assign(en, own);
-fs.writeFileSync(path.join(OUT, "TODO-translate.json"), JSON.stringify(own, null, 1));
+
+/* A key is only waiting for a translator if it is actually missing one. Twelve
+ * of this app's own strings have since been given Urdu, Gujarati and Arabic in
+ * app-extra.json; without this filter they would still be listed as untranslated
+ * and a reviewer handed the file would waste their time on words already done. */
+const todo = Object.fromEntries(
+  Object.entries(own).filter(([k]) => !Object.keys(packs).every(code => packs[code][k])));
+fs.writeFileSync(path.join(OUT, "TODO-translate.json"), JSON.stringify(todo, null, 1));
 
 fs.writeFileSync(path.join(OUT, "en.json"), JSON.stringify(en, null, 1));
 for (const [code, p] of Object.entries(packs))
@@ -172,5 +179,5 @@ for (const [code, n] of Object.entries(kept)) {
   console.log(`${code}  ${String(n).padStart(5)} strings  ${String(Math.round(100 * covered / enKeys)).padStart(3)}% of the English keys`);
 }
 console.log(`\n${rows} rows read from lang/src — wrote src/i18n/{en,ur,gu,ar}.json`);
-console.log(`${Object.keys(own).length} strings are this app's own and have no translation yet —`);
+console.log(`${Object.keys(todo).length} strings are this app's own and have no translation yet —`);
 console.log(`they are listed in src/i18n/TODO-translate.json, and show in English meanwhile.`);
