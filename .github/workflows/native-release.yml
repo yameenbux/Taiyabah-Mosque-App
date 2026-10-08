@@ -256,11 +256,13 @@ jobs:
           perms=$(grep -oE 'android.permission.[A-Z_]+' "$merged" | sort -u)
           echo "$perms"
           echo "::notice::permissions in the bundle: $(echo $perms | tr '\n' ' ')"
-          # Each of these makes Play ask for a declaration, a policy review, or
-          # both. None of them belongs in this app.
-          for bad in ACTIVITY_RECOGNITION CAMERA RECORD_AUDIO READ_CONTACTS \
-                     READ_SMS RECEIVE_SMS QUERY_ALL_PACKAGES REQUEST_INSTALL_PACKAGES \
-                     ACCESS_BACKGROUND_LOCATION MANAGE_EXTERNAL_STORAGE; do
+          # Each of these either makes Play ask for a declaration, or is a
+          # permission a masjid app has no business holding. None of them is in
+          # app.json; every one would have arrived from a library's manifest.
+          for bad in ACTIVITY_RECOGNITION SYSTEM_ALERT_WINDOW CAMERA RECORD_AUDIO \
+                     READ_CONTACTS READ_SMS RECEIVE_SMS QUERY_ALL_PACKAGES \
+                     REQUEST_INSTALL_PACKAGES ACCESS_BACKGROUND_LOCATION \
+                     MANAGE_EXTERNAL_STORAGE; do
             if echo "$perms" | grep -q "android.permission.$bad$"; then
               echo "::error::the bundle asks for $bad, which this app has no use for."
               echo "::error::A library's manifest contributed it. Remove it with"

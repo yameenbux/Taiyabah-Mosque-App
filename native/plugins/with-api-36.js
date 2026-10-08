@@ -43,36 +43,45 @@ function withBackUnchanged(config) {
   });
 }
 
-/* NO STEP COUNTING, SO NO PHYSICAL ACTIVITY PERMISSION.
+/* PERMISSIONS A LIBRARY ASKED FOR AND THIS APP DOES NOT WANT.
  *
- * expo-sensors is in this app for one thing: the magnetometer behind the qibla
- * compass. Its library manifest declares ACTIVITY_RECOGNITION for a pedometer
- * this app does not have, and the merge puts that permission into the bundle —
- * where Play sees it, stops the upload, and asks which health features the app
- * provides. The answer is none, and Google's own text says the fix is to take
- * the permission out rather than declare features that do not exist.
+ * ACTIVITY_RECOGNITION — expo-sensors declares it for a pedometer. The app uses
+ *   that library for one thing, the magnetometer behind the qibla compass.
+ *   Play refused the upload over it on 7 October and asked which health
+ *   features the app provides. It provides none.
  *
- * It also spares the congregation a "Taiyabah Masjid wants to track your
- * physical activity" prompt for something it never asks the phone for.
+ * SYSTEM_ALERT_WINDOW — "display over other apps", contributed by React
+ *   Native's own manifest so the red error overlay can be drawn during
+ *   development. A release build has no error overlay, nothing in this app
+ *   asks for the permission, and a masjid app that can draw over other apps is
+ *   a question nobody should have to answer.
  *
  * tools:node="remove" is the manifest merger's instruction to drop a node a
- * library contributed. Nothing in the app calls Pedometer, so nothing breaks. */
-function withoutStepCounting(config) {
+ * library contributed. Both are checked for in the release workflow, so a
+ * future library quietly adding one back fails the build rather than the
+ * upload. */
+const UNWANTED = [
+  "android.permission.ACTIVITY_RECOGNITION",
+  "android.permission.SYSTEM_ALERT_WINDOW",
+];
+
+function withoutUnwantedPermissions(config) {
   return withAndroidManifest(config, cfg => {
     const manifest = cfg.modResults.manifest;
     manifest.$["xmlns:tools"] = manifest.$["xmlns:tools"] || "http://schemas.android.com/tools";
-    const NAME = "android.permission.ACTIVITY_RECOGNITION";
     manifest["uses-permission"] = manifest["uses-permission"] || [];
-    const already = manifest["uses-permission"].find(p => p.$ && p.$["android:name"] === NAME);
-    if (already) already.$["tools:node"] = "remove";
-    else manifest["uses-permission"].push({ $: { "android:name": NAME, "tools:node": "remove" } });
+    for (const name of UNWANTED) {
+      const already = manifest["uses-permission"].find(p => p.$ && p.$["android:name"] === name);
+      if (already) already.$["tools:node"] = "remove";
+      else manifest["uses-permission"].push({ $: { "android:name": name, "tools:node": "remove" } });
+    }
     return cfg;
   });
 }
 
 module.exports = function withApi36(config) {
   config = withBackUnchanged(config);
-  config = withoutStepCounting(config);
+  config = withoutUnwantedPermissions(config);
   return withGradleProperties(config, cfg => {
     const key = "android.suppressUnsupportedCompileSdk";
     cfg.modResults = cfg.modResults.filter(

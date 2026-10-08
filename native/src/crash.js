@@ -12,10 +12,16 @@
  * for a congregation that did not ask for one — is a bigger decision than
  * this problem warrants. report_app_crash() takes nothing that identifies
  * anybody, and the table's CHECK constraints keep it that way.
+ *
+ * WHAT IS LEFT IN THIS FILE is only what React Native knows and Node cannot:
+ * the platform, the model, the OS version and the app's own version. Every
+ * decision — the trimming, the payload, the one-report-per-fault rule — is in
+ * crash-report.js, where a test can reach it.
  */
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 import { rpc } from "./supabase";
+import { crashPayload, firstTime, shortMessage } from "./crash-report";
 
 /* Platform.constants rather than expo-device: React Native already knows the
  * model and the OS version, and this is not worth a native module that would
@@ -26,34 +32,20 @@ const OS_VERSION = Platform.OS === "ios"
   : `Android ${C.Release || Platform.Version || ""}`.trim();
 const MODEL = Platform.OS === "ios" ? (C.interfaceIdiom || null) : (C.Model || null);
 
-/* One report per fault per run. A component that throws on every render would
- * otherwise post on every retry, and the useful fact — that it happened — is
- * already in the first one. The server counts repeats across installs. */
-const reported = new Set();
-
-const short = e =>
-  !e ? "" : String(e.message || e).replace(/\s+/g, " ").trim().slice(0, 500);
-
 export async function reportCrash(error, { screen } = {}) {
   try {
-    const message = short(error);
+    const message = shortMessage(error);
     if (!message) return;
-    const key = message + "|" + (screen || "");
-    if (reported.has(key)) return;
-    reported.add(key);
+    if (!firstTime(message, screen)) return;
 
-    await rpc("report_app_crash", {
-      message,
-      stack: String(error?.stack || "").slice(0, 8000) || null,
-      app_version: Constants.expoConfig?.version || "unknown",
-      build: String(Constants.expoConfig?.android?.versionCode || "") || null,
-      platform: Platform.OS === "ios" ? "ios" : "android",
-      os_version: OS_VERSION || null,
-      /* The model, not a device id: "Pixel 7" is what makes a crash
-         reproducible, and nothing here is unique to one phone. */
+    await rpc("report_app_crash", crashPayload(error, {
+      screen,
+      version: Constants.expoConfig?.version,
+      build: Constants.expoConfig?.android?.versionCode,
+      platform: Platform.OS,
+      osVersion: OS_VERSION,
       device: MODEL,
-      screen: screen || null,
-    });
+    }));
   } catch {
     /* A crash report must never be a second thing for a crashing app to
        handle. If this cannot be sent, it cannot be sent. */

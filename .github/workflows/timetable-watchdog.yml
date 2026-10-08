@@ -1,0 +1,47 @@
+name: Next year's timetable
+
+# Only 2026 has ever been published. On 1 January 2027, with nothing newer in
+# the database, every phone falls back to the timetable bundled into the app and
+# shows 2026's times as though they were 2027's. There is no error and no blank
+# screen — a congregation that trusts these times would be praying to last
+# year's clock, and nobody would be told.
+#
+# So this asks, every Monday, through the same publishable key and the same
+# prayer_year() function the app itself uses. Until November a missing next year
+# is only a note. From 1 November it fails the job, which turns the Actions tab
+# red and sends the repository owner an email — once a week, until it is done.
+#
+# Two things to know about it:
+#   - A scheduled workflow only runs from the DEFAULT BRANCH. This file does
+#     nothing until it is on main.
+#   - GitHub switches scheduled workflows off after 60 days with no activity in
+#     the repository, and emails before it does. If that mail arrives, press
+#     "Enable workflow" on this one.
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"     # Mondays, 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    name: Is next year published?
+    defaults:
+      run:
+        working-directory: native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The rules are unit-tested because this repository's sandbox cannot
+      # reach Supabase, so a watchdog that had stopped barking would otherwise
+      # look exactly like a watchdog with nothing to bark at.
+      - name: The rules still say what we think they say
+        run: node --test scripts/test/next-year.test.mjs
+
+      - name: Ask the database
+        run: node scripts/next-year-published.mjs
