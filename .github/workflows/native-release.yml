@@ -93,6 +93,16 @@ jobs:
         working-directory: native
         run: npm ci
 
+      # Version code 7 shipped to Play with a publishable key the project
+      # answers 401 to, so the installed app authenticated to nothing and said
+      # nothing about it — every server-backed screen degraded quietly, exactly
+      # as it would for somebody with no signal. Nothing in this workflow would
+      # have caught it. Now the first thing it does is refuse to build a bundle
+      # whose key does not match the website's.
+      - name: The app's key must be the website's key
+        working-directory: native
+        run: node scripts/check-keys.mjs
+
       # The same four checks the APK build runs. A release is the last moment
       # anybody would want to discover a screen does not parse.
       - name: Check every screen parses

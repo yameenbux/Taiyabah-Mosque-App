@@ -21,7 +21,15 @@ const URL = "https://phenbhmobxwyvdeshvqw.supabase.co";
  * there is nowhere to forget it. The web app keeps the same value in
  * SUPA.masjid and the Worker in its publish_notice payload. */
 export const MASJID = "taiyabah";
-const ANON = "sb_publishable_mOPuQKVP8WCTGGJdQK1yJw_e0MSu3_W";
+/* MUST be the same key index.html uses, and scripts/check-keys.mjs fails the
+ * build if it is not. It was not, from the day the native app was wired up
+ * until 8 October 2026: this file had a key the project answers 401 "Invalid
+ * API key" to, so the app authenticated to nothing. Published prayer times fell
+ * back to the bundled file, notices stayed empty, every form submission failed
+ * and no crash was ever reported — all of it silently, because each of those
+ * paths is written to degrade rather than shout. A wrong key here looks exactly
+ * like a congregation with no internet. */
+const ANON = "sb_publishable_mOPuQKVP8WCTlBF2Qa1DVw_r_Tra5OO";
 
 const HEAD = { apikey: ANON, Authorization: `Bearer ${ANON}`, "Content-Type": "application/json" };
 
