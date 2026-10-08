@@ -163,6 +163,29 @@ reading this file:
   has run out — because a trustee opens `admin.html` and nobody opens a
   Cloudflare log
 
+A fourth now asks on its own, because all three of those still need somebody to
+go and look. **`.github/workflows/timetable-watchdog.yml` runs every Monday**
+and asks the database the same question the app asks, through the same
+publishable key and the same `prayer_year()` function. Until November a missing
+next year is a note; **from 1 November it fails the job**, which turns the
+Actions tab red and emails the repository owner, weekly, until it is done. It
+also checks the year that is *running* — a part-published or duplicated year is
+an error on any date — and fails loudly when it cannot reach the database at
+all, because a check that had silently stopped working would look exactly like
+a clean bill of health.
+
+Its rules are unit-tested (`native/scripts/test/next-year.test.mjs`) rather than
+only exercised live, because this repository's sandbox has no route to Supabase,
+so the deciding half had to be verifiable without the network. That design paid
+for itself immediately: the watchdog's first real run failed with "could not ask
+the database", which is how the publishable key bug below was found.
+
+> [!NOTE]
+> A scheduled workflow only runs from the **default branch**, and GitHub
+> switches scheduled workflows off after 60 days with no activity in the
+> repository (it emails first). If that mail arrives, press **Enable workflow**
+> on this one.
+
 ### Annual refresh
 
 The year is an argument now, so nothing in the pipeline is edited:
@@ -623,6 +646,14 @@ node scripts/check-i18n.mjs       # translation coverage
 Both are plain Node with no dependencies, and both run in CI anyway. Running
 them first saves a red build.
 
+**The native app has its own gate**, because the things that can be wrong in it
+are different ones: `npm run check` in `native/` is 14 checks and `npm test` is
+114 unit tests, and the release workflow adds four more that only matter when a
+bundle is being cut — a smoke run on that exact commit, the publishable key
+matching the website's, the permission list read back out of the merged
+manifest, and the signing certificate read back out of the finished `.aab`. See
+[`native/README.md`](native/README.md).
+
 > [!NOTE]
 > **`scripts/check-back-button.mjs` is deliberately not in CI.** It drives a real
 > browser through eleven scenarios and asserts only on what is visible from
@@ -798,13 +829,23 @@ PUPPETEER_EXECUTABLE_PATH=/path/to/chrome node scripts/build-diagrams.mjs
 ## Where things stand
 
 **Live:** the web app at [taiyabahapp.ysbdesigns.uk](https://taiyabahapp.ysbdesigns.uk),
-installable on any phone, and the **Android app on Google Play** as a Trusted Web
-Activity — `com.taiyabahmasjid.app`, verified against both signing certificates
-so it opens with no browser bar.
+installable on any phone, and the **Android app on Google Play** —
+`com.taiyabahmasjid.app`, version 2.0.1, version code 8.
+
+That Play app is now the **native React Native build in `native/`**, not the
+Trusted Web Activity it started as; the TWA ended at version code 1. See
+[`native/README.md`](native/README.md). The web app remains live, maintained,
+and the source of every word the native app says — `npm run content` in
+`native/` lifts the copy straight out of `index.html`, so the committee changes
+wording in one place.
 
 Still outstanding, roughly in the order it matters:
 
-- **The 2027 timetable.** The one dated item here. See *The prayer timetable*.
+- **The 2027 timetable.** The one dated item here, and the only one with a
+  deadline nobody can move: on 1 January 2027 the dataset runs out. Confirmed by
+  query on 8 October 2026 — `prayer_years` holds **2026 only**, 365 days,
+  published 15 September. A watchdog now nags weekly and fails from 1 November.
+  See *The prayer timetable*.
 - **Account ownership** — OneSignal, Cloudflare, Stripe, Supabase and GitHub are
   under a personal account rather than the charity's. This is the most important
   item on this list.
@@ -845,6 +886,26 @@ Still outstanding, roughly in the order it matters:
 
 ### Done since the first release
 
+- **The native app replaced the Trusted Web Activity on Play** — version 2.0.1,
+  version code 8. See [`native/README.md`](native/README.md)
+- **The app had been talking to nothing.** `native/src/supabase.js` shipped a
+  publishable key the project answers 401 `Invalid API key` to, from the commit
+  that first wired the native app up until 8 October 2026. The website and the
+  portal always had the right one. So the installed app never authenticated to
+  the database — and nothing said so, because every server-backed path degrades
+  quietly: prayer times fell back to the bundled timetable (correct for 2026,
+  which is exactly why nobody saw it), notices came back empty, form
+  submissions failed, and no crash was ever reported. `app_crashes` sitting
+  empty had been read as "no crashes"; it meant "no connection".
+  `native/scripts/check-keys.mjs` now refuses a key that does not match the
+  website's, and runs first in both `npm run check` and the release workflow
+- **Two permissions the app never used**, stripped at the manifest merge:
+  `ACTIVITY_RECOGNITION`, which triggered Play's Health declaration, and
+  `SYSTEM_ALERT_WINDOW` — "draw over other apps" — from a development overlay.
+  The release workflow reads the permission list back out of the *merged*
+  manifest and fails if either returns
+- **A watchdog for next year's timetable**, which found the key bug before it
+  ever got to do the job it was written for. See *The prayer timetable*
 - **The nikāḥ date request form**, which could not be submitted at all: the
   mailto link in the closed panel and the email box in the form both carried
   `id="nk-email"`, `getElementById` returned the anchor, and `nkValidate()`
