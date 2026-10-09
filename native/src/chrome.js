@@ -44,3 +44,39 @@ export function tabBar({ rtl = false, line, wraps = false, inset = 0 }) {
   const content = barContent({ rtl, line, wraps });
   return { content, height: content + safe, paddingBottom: safe };
 }
+/**
+ * The label metrics the bar is built from.
+ *
+ * Here rather than in the navigator because the bar is not the only thing that
+ * depends on its height: the offline notice floats above it. Two files doing
+ * the same sum from memory is how the notice ends up behind the bar the next
+ * time either number moves.
+ */
+export const LABEL = {
+  size:   (rtl) => (rtl ? 12.5 : 10.5), /* the label's own font size      */
+  line:   (rtl) => (rtl ? 22 : 14),     /* its line height                */
+  wrapAt: (rtl) => (rtl ? 15 : 14),     /* where "Prayer Times" wraps     */
+};
+
+/** The bar as the app actually renders it, from the script and the text size. */
+export function tabBarFor({ rtl = false, fs, inset = 0 }) {
+  const scale = typeof fs === "function" ? fs : (n) => n;
+  return tabBar({ rtl, inset,
+                  line: scale(LABEL.line(rtl)),
+                  wraps: scale(LABEL.size(rtl)) >= LABEL.wrapAt(rtl) });
+}
+
+/** A few points of air between the bar and anything floating over it. */
+export const GAP = 12;
+
+/**
+ * How far up from the bottom of the window a floating notice has to sit.
+ *
+ * The tab bar takes layout space, but the offline notice is positioned against
+ * the window, so it has to clear the bar's WHOLE height — content and the
+ * system inset both. This was a constant 86 and went behind the bar the moment
+ * the inset was added back.
+ */
+export function aboveTabBar(o) {
+  return tabBarFor(o).height + GAP;
+}

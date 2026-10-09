@@ -7,6 +7,7 @@
 
 /* num() and hm12() are the web app's own formatters; the native equivalents
  * are passed in beside the translator. */
+const MARK_MAWLID = false;
 const suhoorNote = c => c.suhoor
   ? " " + T("reminder.suhoor_ends","Suhūr ends {time}.").replace("{time}", PRETTY((c.suhoor)))
   : "";

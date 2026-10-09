@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
 import { COLUMN } from "./layout";
+import { tabBarFor, LABEL } from "./chrome";
 import { AppProvider, useApp } from "./store";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
@@ -84,12 +85,14 @@ function Tabs() {
   /* Past this size the longest English label, "Prayer Times", no longer fits
      one line of a quarter of a 360px screen. Measured, not guessed: 85px of
      words in 80px of tab at fs(10.5) = 16. */
-  const wraps = fs(rtl ? 12.5 : 10.5) >= (rtl ? 15 : 14);
-  const bar = tabBar({ rtl, line: fs(rtl ? 22 : 14), wraps, inset: insets.bottom });
+  const bar = tabBarFor({ rtl, fs, inset: insets.bottom });
   const label = text => ({ color }) => (
     <Text numberOfLines={2}
-          style={{ fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
-                   lineHeight: fs(rtl ? 22 : 14), marginBottom: rtl ? 10 : 7,
+          /* LABEL, not these numbers again: the bar's height is worked out
+             from them, so a size changed here and not there is a clipped
+             word or a gap. */
+          style={{ fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(LABEL.size(rtl)),
+                   lineHeight: fs(LABEL.line(rtl)), marginBottom: rtl ? 10 : 7,
                    includeFontPadding: false, textAlign: "center", color }}>{text}</Text>);
   return (
     <Tab.Navigator

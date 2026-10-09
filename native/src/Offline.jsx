@@ -22,25 +22,32 @@
  * It sits above the tab bar rather than at the top, because every screen in
  * this app opens on a dark hero and a red bar across one is a fault, not a
  * notice. It never takes a touch.
+ *
+ * HOW FAR ABOVE IS NOT A CONSTANT. It used to be: 86 points, cleared the
+ * tallest script, done. But the tab bar also has to clear Android's navigation
+ * bar, and on a three-button phone that is 48 more points — so the constant
+ * put this notice behind the thing it sits on. It asks src/chrome.js for the
+ * same height the navigator uses, rather than keeping its own copy of the sum.
  */
 import React from "react";
 import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F, R } from "./theme";
+import { aboveTabBar } from "./chrome";
 import { COLUMN } from "./layout";
 import { useApp } from "./store";
 import { useOffline } from "./reach";
 
 export default function Offline() {
-  const { t, fs } = useApp();
+  const { t, fs, rtl } = useApp();
+  const insets = useSafeAreaInsets();
   if (!useOffline()) return null;
 
   return (
     <View pointerEvents="none"
-      /* The tab bar is 64-74 tall depending on the script; this clears the
-         tallest of them without measuring, because a few points of gap is
-         cheaper than a layout subscription that runs on every render. */
-      style={{ position: "absolute", left: 0, right: 0, bottom: 86, alignItems: "center",
+      style={{ position: "absolute", left: 0, right: 0, alignItems: "center",
+               bottom: aboveTabBar({ rtl, fs, inset: insets.bottom }),
                paddingHorizontal: 16 }}>
       <View style={{ width: "100%", maxWidth: COLUMN - 32, flexDirection: "row", alignItems: "center",
                      gap: 9, backgroundColor: C.tintRose, borderWidth: 1, borderColor: C.tintRoseLine,
