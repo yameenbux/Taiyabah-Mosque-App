@@ -13,7 +13,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, FlatList, Pressable, TextInput, useWindowDimensions, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { clampScale, clampOffset, doubleTap as dtap, pagerEnabled, MIN } from "../zoom";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { surah } from "../data/quran-index";
@@ -204,6 +207,88 @@ export function Surah({ route, navigation }) {
 
 /* ---------- the muṣḥaf -------------------------------------------------- */
 
+/* ---------- one page, which you can get closer to ------------------------
+ *
+ * The 13-line muṣḥaf is small print photographed small, and a committee member
+ * reading it on an Android phone could not make it any bigger: the page was a
+ * plain image fitted to the glass with no zoom at all. React Native's own
+ * ScrollView zoom is iOS-only, so on the phones most of this community uses it
+ * would have done nothing — hence gestures rather than a scroll view.
+ *
+ * Three gestures, which is what people already try: pinch, drag once you are
+ * in, and double tap. Double tap matters most — it is the one gesture somebody
+ * who has never pinched a screen will still find, and it is the way back out.
+ *
+ * The sums are in src/zoom.js and tested in Node; everything here is wiring.
+ */
+function Page({ n, width, height, uri, dim, children, onZoom }) {
+  const scale = useSharedValue(1), start = useSharedValue(1);
+  const x = useSharedValue(0), y = useSharedValue(0);
+  const fromX = useSharedValue(0), fromY = useSharedValue(0);
+
+  /* The pager above has to be told, because a sideways drag at 2x means "look
+     across this page", not "turn it". */
+  const tell = s => onZoom(pagerEnabled(s));
+
+  const settle = () => {
+    "worklet";
+    if (scale.value <= MIN + 0.01) {
+      scale.value = withTiming(MIN); x.value = withTiming(0); y.value = withTiming(0);
+    } else {
+      x.value = clampOffset(x.value, width, scale.value);
+      y.value = clampOffset(y.value, height, scale.value);
+    }
+    runOnJS(tell)(scale.value);
+  };
+
+  const pinch = Gesture.Pinch()
+    .onStart(() => { "worklet"; start.value = scale.value; })
+    .onUpdate(e => { "worklet"; scale.value = clampScale(start.value * e.scale); })
+    .onEnd(() => { "worklet"; settle(); });
+
+  const pan = Gesture.Pan()
+    .averageTouches(true)
+    .onStart(() => { "worklet"; fromX.value = x.value; fromY.value = y.value; })
+    .onUpdate(e => {
+      "worklet";
+      if (scale.value <= MIN + 0.01) return;      /* fitted: the pager has it */
+      x.value = clampOffset(fromX.value + e.translationX, width, scale.value);
+      y.value = clampOffset(fromY.value + e.translationY, height, scale.value);
+    })
+    .onEnd(() => { "worklet"; settle(); });
+
+  const twice = Gesture.Tap().numberOfTaps(2).maxDuration(260)
+    .onEnd(e => {
+      "worklet";
+      const out = dtap({ scale: scale.value, x: e.x - width / 2, y: e.y - height / 2,
+                         ox: x.value, oy: y.value, width, height });
+      scale.value = withTiming(out.scale, { duration: 180 });
+      x.value = withTiming(out.x, { duration: 180 });
+      y.value = withTiming(out.y, { duration: 180 });
+      runOnJS(tell)(out.scale);
+    });
+
+  /* Pinch and pan together, so you can frame a line in one movement; the
+     double tap races them, because it must not be swallowed by the pan. */
+  const gesture = Gesture.Race(twice, Gesture.Simultaneous(pinch, pan));
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: x.value }, { translateY: y.value }, { scale: scale.value }],
+  }));
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <View style={{ width, height, justifyContent: "center", backgroundColor: dim }}>
+        {children}
+        <Animated.View style={[{ width, height }, style]}>
+          <Image {...uri} style={{ width, height }} contentFit="contain"
+                 cachePolicy="disk" transition={140} placeholder={null} />
+        </Animated.View>
+      </View>
+    </GestureDetector>
+  );
+}
+
 export function Mushaf({ route, navigation }) {
   const { t, fs, setLastRead, muMark, muFavs, toggleMushafMark, toggleMushafFav } = useApp();
   /* Not Dimensions.get(): that is measured once, and this screen is the one
@@ -215,6 +300,9 @@ export function Mushaf({ route, navigation }) {
   const [land, setLand] = useState(false);
   const [toast, setToast] = useState(null);
   const [failed, setFailed] = useState(() => new Set());
+  /* False while a page is zoomed in, so a sideways drag looks across the page
+     instead of turning it. Pages report this up as they are pinched. */
+  const [canPage, setCanPage] = useState(true);
   const list = useRef(null);
   const pages = useMemo(() => Array.from({ length: MUSHAF.pages }, (_, i) => i + 1), []);
 
@@ -290,6 +378,7 @@ export function Mushaf({ route, navigation }) {
         data={pages}
         horizontal
         pagingEnabled
+        scrollEnabled={canPage}
         /* Right to left, because that is the direction a muṣḥaf turns. */
         inverted
         initialScrollIndex={start - 1}
@@ -299,7 +388,10 @@ export function Mushaf({ route, navigation }) {
         onMomentumScrollEnd={e => setPage(Math.round(e.nativeEvent.contentOffset.x / width) + 1)}
         windowSize={3}
         renderItem={({ item: n }) => (
-          <View style={{ width, height, justifyContent: "center", backgroundColor: "#15060F" }}>
+          <Page n={n} width={width} height={height} dim="#15060F" onZoom={setCanPage}
+                uri={{ source: { uri: pageUrl(n) },
+                       onError: () => setFailed(f => new Set(f).add(n)),
+                       onLoad: () => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; }) }}>
             {/* 848 pages are streamed and then kept, so the first read of any
                 page needs signal. The website never had to say so — it cannot
                 be opened without a connection — and the app used to say it on
@@ -315,20 +407,7 @@ export function Mushaf({ route, navigation }) {
                      "This page has not been read before, so it needs a connection the first time. Once read, it stays on the phone.")}
                 </Text>
               </View>)}
-            <Image
-              onError={() => setFailed(f => new Set(f).add(n))}
-              onLoad={() => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; })}
-              source={{ uri: pageUrl(n) }}
-              /* Fitted to the whole window rather than to a fixed aspect, so the
-                 same page fills the screen upright and sideways. */
-              style={{ width, height }}
-              contentFit="contain"
-              /* Cached to disk on first read, so a page loads instantly the
-                 second time and works with no signal after that. */
-              cachePolicy="disk"
-              transition={140}
-              placeholder={null} />
-          </View>)} />
+          </Page>)} />
 
       {/* The way back to the bookmark, which is the whole point of having one.
           It stays out of the way while you are standing on it. */}

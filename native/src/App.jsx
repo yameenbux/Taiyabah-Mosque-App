@@ -8,6 +8,11 @@ import { Platform, View, Text, AppState } from "react-native";
 import { wokeUp } from "./reach";
 import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
+/* Required, and silently so. Gesture Handler's gestures are recognised by a
+   native view that has to be an ancestor of them; on Android, without this at
+   the root, a pinch or a double tap simply never fires and nothing in the logs
+   says why. The muṣḥaf's zoom is the first thing in the app to depend on it. */
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { C, F } from "./theme";
@@ -280,6 +285,7 @@ export default function App() {
   const veil = <View style={{ flex: 1, backgroundColor: C.brand900 }} />;
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaProvider>
       {/* the hero is dark, so the clock and battery must be light */}
       <StatusBar style="light" />
@@ -302,5 +308,6 @@ export default function App() {
       {/* Inside the provider, because it needs the saved preferences to know
           whether this phone has already been offered reminders. */}
     </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
