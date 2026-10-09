@@ -68,6 +68,33 @@ const SHEET = {
    * legend with no colours and three empty cards. It has a real screen now. */
 };
 
+/**
+ * Something dark for the clock to sit on.
+ *
+ * styles.xml asks for android:statusBarColor #3C0B2A — brand-900, the top of
+ * the hero's gradient — and until Android 15 it got it. An app targeting SDK
+ * 35 or above no longer does: the attribute is deprecated and ignored, the
+ * system bars are forced transparent, and the app is drawn underneath them.
+ *
+ * That is the same change that hid the tab bar's labels behind the navigation
+ * bar, at the other end of the screen. Here it shows up a scroll later: the
+ * hero slides away, cream paper arrives under the status bar, and the clock,
+ * battery and signal are still being drawn light — white on #F5F1E8.
+ *
+ * So the colour the theme asked for is put back as something Android 15 does
+ * honour. At rest it is invisible: every screen in this app opens on a
+ * gradient whose first stop is this exact colour. It reads C rather than the
+ * #3C0B2A in styles.xml, so unlike the theme it follows dark mode.
+ */
+function StatusBarBackdrop() {
+  const insets = useSafeAreaInsets();
+  if (!insets.top) return null;          /* nothing reserved, nothing to cover */
+  return (
+    <View pointerEvents="none"
+          style={{ position: "absolute", top: 0, left: 0, right: 0,
+                   height: insets.top, backgroundColor: C.brand900, zIndex: 1 }} />);
+}
+
 /* The tab bar is the one piece of chrome a person touches all day, so it is the
  * first thing that had to stop feeling like a web page. It is drawn by the
  * platform, keeps clear of the gesture area by itself with no env() guesswork,
@@ -297,6 +324,7 @@ export default function App() {
     <SafeAreaProvider>
       {/* the hero is dark, so the clock and battery must be light */}
       <StatusBar style="light" />
+      <StatusBarBackdrop />
       {/* The outer one, for a fault outside any screen — in the provider, the
           navigation container, the first-run card. Rarer, and the only thing
           it can offer is a retry, but a retry beats a white screen. */}
