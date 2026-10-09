@@ -3,7 +3,7 @@ import Offline from "./Offline";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Platform, View, Text, AppState } from "react-native";
 import { wokeUp } from "./reach";
 import * as Font from "expo-font";
@@ -77,10 +77,15 @@ const icon = name => ({ color, focused }) =>
 
 function Tabs() {
   const { t, fs, rtl } = useApp();
+  /* What the system has reserved at the bottom: a slim bar under gesture
+     navigation, roughly twice that under three buttons, the home indicator on
+     iOS, nothing on an old Android. The tab bar has to sit ON it, not under. */
+  const insets = useSafeAreaInsets();
   /* Past this size the longest English label, "Prayer Times", no longer fits
      one line of a quarter of a 360px screen. Measured, not guessed: 85px of
      words in 80px of tab at fs(10.5) = 16. */
   const wraps = fs(rtl ? 12.5 : 10.5) >= (rtl ? 15 : 14);
+  const bar = tabBar({ rtl, line: fs(rtl ? 22 : 14), wraps, inset: insets.bottom });
   const label = text => ({ color }) => (
     <Text numberOfLines={2}
           style={{ fontFamily: rtl ? F.arabic : F.sans, fontSize: fs(rtl ? 12.5 : 10.5),
@@ -104,14 +109,14 @@ function Tabs() {
            max-width:520px with margin-inline:auto, so on an iPad the tabs sit
            under the content they belong to instead of stretching the full
            width of the glass with four icons marooned in the middle. */
+        /* Height and padding both: height alone leaves the icons centred in a
+           taller bar, floating above the navigation instead of resting on it.
+           Urdu and Arabic glyphs hang well below the baseline, so they get a
+           taller bar; a wrapped two-word label gets a second line. The sums,
+           and the reason they are not inline any more, are in src/chrome.js. */
         tabBarStyle: { backgroundColor: C.card, borderTopColor: C.line, paddingTop: 6,
                        width: "100%", maxWidth: COLUMN, alignSelf: "center",
-                       /* Urdu and Arabic glyphs hang well below the baseline; at
-                          the Latin height their descenders are sliced off. */
-                       height: (rtl ? 74 : 64) + Math.max(0, fs(rtl ? 22 : 14) - (rtl ? 22 : 14))
-                               /* and room for the second line, once the text is
-                                  big enough that a two-word label needs one. */
-                               + (wraps ? fs(rtl ? 22 : 14) : 0) },
+                       height: bar.height, paddingBottom: bar.paddingBottom },
         /* The label is drawn here rather than left to React Navigation, which
            puts it on ONE line with no ellipsis: at the largest text size
            "Prayer Times" needed 85px and had 80, so the words were sliced down
