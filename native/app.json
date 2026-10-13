@@ -107,7 +107,8 @@
           ]
         }
       ],
-      "./plugins/with-api-36"
+      "./plugins/with-api-36",
+      "./plugins/with-fmt-consteval"
     ],
     "experiments": {
       "typedRoutes": false

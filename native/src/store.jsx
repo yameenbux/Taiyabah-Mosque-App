@@ -46,7 +46,9 @@ const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favou
                     * dialog can only be raised once — after that it is the
                     * settings app or nothing — so the offer is made once, on
                     * purpose, and never nags. */
-                   askedPush: false };
+                   askedPush: false,
+                   /* Written only by the store-screenshot harness; see App.jsx. */
+                   shotRoute: null };
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);

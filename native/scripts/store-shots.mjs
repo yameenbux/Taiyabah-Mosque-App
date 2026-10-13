@@ -87,12 +87,12 @@ const bundleId = sh("/usr/libexec/PlistBuddy",
  * why somebody downloads a masjid app at all; the rest follow in the order a
  * congregation would care about them. */
 const SHOTS = [
-  { name: "1-home",      url: "taiyabah://home",      why: "today's times and the next jamaat" },
-  { name: "2-timetable", url: "taiyabah://times",     why: "the full prayer timetable" },
-  { name: "3-mushaf",    url: "taiyabah://mushaf",    why: "the Qur'an" },
-  { name: "4-qibla",     url: "taiyabah://qibla",     why: "Qibla direction" },
-  { name: "5-zakat",     url: "taiyabah://zakat",     why: "zakat calculator" },
-  { name: "6-alerts",    url: "taiyabah://alerts",    why: "choosing which notifications to get" },
+  { name: "1-home",      route: null,        why: "today's times and the next jamaat" },
+  { name: "2-timetable", route: "Timetable", why: "the full prayer timetable" },
+  { name: "3-mushaf",    route: "Mushaf",    why: "the Qur'an" },
+  { name: "4-qibla",     route: "Qibla",     why: "Qibla direction" },
+  { name: "5-zakat",     route: "Zakat",     why: "zakat calculator" },
+  { name: "6-alerts",    route: "Alerts",    why: "choosing which notifications to get" },
 ];
 
 /* Apple's required sizes, asserted rather than hoped for. If a runner image
@@ -172,7 +172,29 @@ for (const want of DEVICES) {
       const file = path.join(outDir, `${shot.name}.png`);
       try {
         try { sh("xcrun", ["simctl", "terminate", dev.udid, bundleId]); } catch { /* not running */ }
-        sh("xcrun", ["simctl", "openurl", dev.udid, shot.url]);
+        /* LAUNCH, never openurl. `simctl openurl` does not open the app: iOS
+         * asks "Open in Taiyabah Masjid?" first, and on a simulator nobody is
+         * there to tap Open. Every screenshot taken that way was the
+         * springboard with a confirmation dialog over it — which is also why
+         * they were all byte-identical, and why the app never logged a
+         * [deeplink] line: it was never launched at all.
+         *
+         * `simctl launch` opens it with no prompt, which is what the build gate
+         * has always done. The route to show is handed over in the saved
+         * preferences instead, seeded below before launch. */
+        if (shot.route) {
+          try {
+            const data = sh("xcrun", ["simctl", "get_app_container", dev.udid, bundleId, "data"]).trim();
+            const store = path.join(data, "Documents", "RCTAsyncLocalStorage_V1");
+            fs.mkdirSync(store, { recursive: true });
+            fs.writeFileSync(path.join(store, "manifest.json"), JSON.stringify({
+              "taiyabah.prefs.v1": JSON.stringify({ askedPush: true, shotRoute: shot.route }),
+            }));
+          } catch (e) {
+            annotate("warning", `${want.label}/${shot.name}: could not seed the route (${e.message})`);
+          }
+        }
+        sh("xcrun", ["simctl", "launch", dev.udid, bundleId]);
         /* A cold start has to boot React Native, read the saved preferences and
          * let the splash time itself out before anything is worth
          * photographing. */
@@ -200,7 +222,7 @@ for (const want of DEVICES) {
          * listing, because it looks deliberate. */
         const hash = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
         if (seen.has(hash)) {
-          annotate("error", `${want.label}/${shot.name} is byte-identical to ${seen.get(hash)} — ${shot.url} did not navigate, so this is the wrong screen`);
+          annotate("error", `${want.label}/${shot.name} is byte-identical to ${seen.get(hash)} — the route ${shot.route} did not open, so this is the wrong screen`);
           failed++;
           continue;
         }

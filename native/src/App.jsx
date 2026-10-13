@@ -236,7 +236,24 @@ const linking = {
 };
 
 function Root() {
-  const { t, tx, fs, lang } = useApp();
+  const { t, tx, fs, lang, shotRoute } = useApp();
+
+  /* OPENING STRAIGHT ONTO A SCREEN, FOR THE STORE SCREENSHOTS ONLY.
+   *
+   * The listing needs a picture of the mushaf, the qibla and the zakat
+   * calculator, and a simulator cannot tap. Deep links looked like the answer
+   * and are not: `simctl openurl` does not open an app, it asks iOS to, and
+   * iOS puts up "Open in Taiyabah Masjid?" with nobody there to answer. Every
+   * screenshot taken that way was the springboard with a dialog over it.
+   *
+   * So the harness writes one key into the saved preferences before launching,
+   * and this reads it. Nothing in the app ever writes shotRoute, nothing offers
+   * it, and it defaults to absent — so for everyone who is not a screenshot
+   * script this is exactly the app it was before: it opens on Home. Tabs is
+   * kept underneath so back behaves normally in the photograph. */
+  const initialState = shotRoute
+    ? { index: 1, routes: [{ name: "Tabs" }, { name: shotRoute }] }
+    : undefined;
 
   /* EVERY PUSHED SCREEN WEARS THE WEBSITE'S SHEET HEADER.
    *
@@ -269,7 +286,7 @@ function Root() {
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
-    <NavigationContainer key={lang} linking={linking}>
+    <NavigationContainer key={lang} linking={linking} initialState={initialState}>
       {/* layout is the one place react-navigation lets a wrapper sit INSIDE
           each screen, which is what makes a fault recoverable: the header and
           the tab bar survive it, so "Try again" has something to go back to.
