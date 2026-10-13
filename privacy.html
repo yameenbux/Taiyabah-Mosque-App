@@ -84,7 +84,7 @@
     <div class="card">
       <p>Most of the app asks nothing of you. Prayer times, the Qur&rsquo;an, the du&rsquo;ā collections, the qibla compass, the zakat calculator and the mosque information all work without an account and without sending anything about you anywhere.</p>
       <p>Five things do involve your information: <strong>booking the hall</strong>, <strong>requesting a nikāḥ date</strong>, <strong>asking to hold a charity collection</strong>, <strong>sending a written question to the imams</strong>, and <strong>turning on notifications</strong>. Each is described below.</p>
-      <p>There is no advertising in the app, no analytics, and no tracking of any kind. We do not profile you, we do not sell anything about you, and nothing you do in the app is used to build a picture of you.</p>
+      <p>There is no advertising in the app and no tracking of any kind. We do not profile you, we do not sell anything about you, and nothing you do in the app is used to build a picture of you. Two small things are counted and worth naming: our notification provider records how often a notification is opened, so the masjid can tell whether a reminder reached anyone, and the app reports its own faults so they can be fixed. Neither is joined to your name.</p>
     </div>
   </section>
 
@@ -120,6 +120,10 @@
 
     <h3>Payments</h3>
     <p>Hall deposits, nikāḥ fees and donations are handled by <strong>Stripe</strong> on their own pages, which open outside the app. <strong>Your card details never pass through the app and we never see them.</strong> We receive confirmation that a payment was made and the reference it relates to. Stripe is the data controller for the payment itself, under their own privacy policy.</p>
+
+    <h3>When the app goes wrong</h3>
+    <p>If the app hits a fault, it sends a report so the fault can be found and fixed. The report holds the error message and its technical trace, which version and build of the app you have, whether it is an iPhone or an Android phone, the operating system version, the phone&rsquo;s model name &mdash; &ldquo;Pixel 7&rdquo;, the model, not your phone &mdash; and which screen you were on when it happened. <strong>There is no name, no account and no device identifier in it. Nothing in a crash report points back to you.</strong></p>
+    <p>A fault is reported once from a phone rather than every time it repeats, so an app that is crashing does not keep sending. Reports are stored in Supabase with everything else. Our lawful basis is <strong>legitimate interests</strong> &mdash; keeping an app the congregation opens five times a day in working order.</p>
   </section>
 
   <section>
@@ -140,7 +144,7 @@
     <h2>Who else is involved</h2>
     <p>We use a small number of suppliers to run the app. They act on our instructions and may not use your information for their own purposes.</p>
     <div class="kv">
-      <div><dt>Supabase</dt><dd>Stores hall bookings, nikāḥ requests, charity collection requests and the certificates uploaded with them, and written questions to the imams. Hosted in the EU.</dd></div>
+      <div><dt>Supabase</dt><dd>Stores hall bookings, nikāḥ requests, charity collection requests and the certificates uploaded with them, written questions to the imams, and the app&rsquo;s own crash reports. Hosted in the EU.</dd></div>
       <div><dt>OneSignal</dt><dd>Delivers notifications. Holds a device identifier and your notification preferences only.</dd></div>
       <div><dt>Stripe</dt><dd>Takes payments on its own pages. We never see card details.</dd></div>
       <div><dt>Cloudflare</dt><dd>Serves the app and runs the small service that saves your notification preferences.</dd></div>
@@ -159,6 +163,7 @@
       <div><dt>Notification preferences</dt><dd>Until you turn notifications off or uninstall the app.</dd></div>
       <div><dt>Charity collection requests</dt><dd>Deleted twelve months after the collection is completed, declined or withdrawn, together with the certificate uploaded with it. A job runs every night to do this.</dd></div>
       <div><dt>Questions to the imams</dt><dd>Deleted twelve months after the last thing happened on the question, together with the imam&rsquo;s answers. A job runs every night to do this. If you may want to look back at an answer after that, keep the email.</dd></div>
+      <div><dt>Crash reports</dt><dd>Kept while they are still useful for fixing the app. There is nothing in a crash report that identifies a person, so there is nothing in one to hand back or erase.</dd></div>
       <div><dt>Requests that go nowhere</dt><dd>An unpaid hall booking releases its hold after thirty minutes and is deleted.</dd></div>
     </div>
   </section>
