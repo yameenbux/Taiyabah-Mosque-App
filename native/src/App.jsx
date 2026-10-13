@@ -167,6 +167,43 @@ function Tabs() {
   );
 }
 
+/* DEEP LINKS. app.json already declares the `taiyabah` scheme, so the phone
+ * knows which app a taiyabah:// URL belongs to — but without this, every such
+ * link merely launches the app and lands on Home. This is what turns one into
+ * a screen.
+ *
+ * It was added so App Store screenshots can be taken without a human: the
+ * simulator has no way to tap, so `simctl openurl taiyabah://qibla` is the only
+ * way to photograph anything but the first screen. It is not only that, though
+ * — it is also what a notification needs to open the thing it is about, which
+ * is why it maps the screens people are sent to rather than only the ones that
+ * photograph well.
+ *
+ * Scoped to the custom scheme alone. No https prefix, so nothing this app does
+ * starts intercepting ordinary web links, and a URL that matches no route here
+ * is ignored rather than guessed at. */
+const linking = {
+  prefixes: ["taiyabah://"],
+  config: {
+    screens: {
+      Tabs: { screens: { HomeTab: "home", TimesTab: "times",
+                         NoticesTab: "notices", MoreTab: "more" } },
+      Qibla:     "qibla",
+      Quran:     "quran",
+      Mushaf:    "mushaf",
+      Timetable: "timetable",
+      Zakat:     "zakat",
+      Live:      "live",
+      Alerts:    "alerts",
+      Holidays:  "holidays",
+      HallHire:  "hall",
+      Marriage:  "marriage",
+      NewBuild:  "donate",
+      Portal:    "madrasah",
+    },
+  },
+};
+
 function Root() {
   const { t, tx, fs, lang } = useApp();
 
@@ -201,7 +238,7 @@ function Root() {
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
-    <NavigationContainer key={lang}>
+    <NavigationContainer key={lang} linking={linking}>
       {/* layout is the one place react-navigation lets a wrapper sit INSIDE
           each screen, which is what makes a fault recoverable: the header and
           the tab bar survive it, so "Try again" has something to go back to.

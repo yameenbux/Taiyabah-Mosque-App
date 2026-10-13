@@ -1,0 +1,97 @@
+# App Store screenshots, produced rather than taken by hand.
+#
+# App Store Connect will not accept a submission without them, and it is strict
+# about size: one 6.9" iPhone set (1320x2868) and — because app.json sets
+# supportsTablet — a 13" iPad set (2064x2752). A screenshot taken on a phone
+# somebody happens to own is usually the wrong size and gets refused at upload,
+# so these come off simulators of exactly the right devices.
+#
+# Manual only. This is not a gate and proves nothing about the app: the gate is
+# ios-build.yml, which runs on every push and checks the app opens at all. This
+# job exists to hand over a folder of images, and it should be run when the
+# listing needs them, not forty times a day.
+#
+# It shares no steps with the release workflow on purpose. This one builds for
+# the SIMULATOR, which needs no account, no certificate and no provisioning
+# profile — so it can be run freely by anybody, and a broken screenshot run can
+# never put a build in front of real people.
+name: iOS — App Store screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shots:
+    runs-on: macos-15
+    # Same budget as the build gate: a cold pod compile is most of it.
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      - name: Generate the iOS project
+        working-directory: native
+        run: npx expo prebuild --platform ios --no-install --clean
+
+      - name: Pods
+        working-directory: native/ios
+        run: pod install || pod install --repo-update
+
+      - name: Find the workspace and scheme
+        id: xc
+        working-directory: native/ios
+        run: |
+          set -euo pipefail
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME=$(basename "$(ls -d *.xcodeproj | head -1)" .xcodeproj)
+          echo "workspace=$WS"  >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+
+      # Release, not Debug — the same reason the build gate gives. A Debug
+      # build does not embed the JavaScript and shows the React Native error
+      # screen without a Metro server, which once produced five green runs and
+      # a set of screenshots that were 72% black with a red banner across them.
+      # That is precisely the failure this job must never ship to a listing.
+      - name: Build for the simulator
+        working-directory: native/ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace "${{ steps.xc.outputs.workspace }}" \
+            -scheme "${{ steps.xc.outputs.scheme }}" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Photograph the app at App Store sizes
+        working-directory: native
+        run: node scripts/store-shots.mjs
+
+      # Kept even when the run fails: a partial set is still worth having, and
+      # seeing which screen came out wrong is most of the diagnosis.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: app-store-screenshots
+          path: native/store-shots/**
+          if-no-files-found: error
+          retention-days: 30
