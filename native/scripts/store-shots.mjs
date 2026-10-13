@@ -166,7 +166,7 @@ for (const want of DEVICES) {
      * the same byte size, which is what a navigation that never happened looks
      * like, so this takes the shorter path and the fingerprints below prove
      * which screen each shot actually is. */
-    const seen = new Map();
+    const seen = new Map();  // hash -> { name, bytes }
 
     for (const shot of SHOTS) {
       const file = path.join(outDir, `${shot.name}.png`);
@@ -216,17 +216,29 @@ for (const want of DEVICES) {
           failed++;
           continue;
         }
-        /* The one way to catch a set where every shot is the same screen.
-         * A screenshot is lossless, so two identical screens hash identically
-         * — and a listing of six copies of the home screen is worse than no
-         * listing, because it looks deliberate. */
+        /* Catching a set where every shot is really the same screen.
+         *
+         * An exact hash is not enough, and a whole run was lost proving it: the
+         * home screen carries a live countdown ("in 1h 35m"), so consecutive
+         * captures of the SAME screen differ by a few bytes and every hash came
+         * out unique. Five listing images were produced showing the home screen
+         * under five different headlines, and the check called them all fine.
+         *
+         * Compressed size is the cheap discriminator. Two different screens
+         * differ by tens of kilobytes; the same screen with a ticking clock
+         * differs by a few hundred bytes. So a shot within a hair of one
+         * already taken is treated as the same screen, whatever its hash says.
+         * Not perfect — two genuinely similar screens could trip it — but it
+         * fails towards saying "look at this", which is the right direction. */
         const hash = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
-        if (seen.has(hash)) {
-          annotate("error", `${want.label}/${shot.name} is byte-identical to ${seen.get(hash)} — the route ${shot.route} did not open, so this is the wrong screen`);
+        const near = [...seen.entries()].find(([, v]) =>
+          Math.abs(v.bytes - bytes) / Math.max(v.bytes, bytes) < 0.004);
+        if (near) {
+          annotate("error", `${want.label}/${shot.name} is the same size as ${near[1].name} to within 0.4% (${bytes} vs ${near[1].bytes} bytes) — the route ${shot.route} almost certainly did not open, so this is the wrong screen`);
           failed++;
           continue;
         }
-        seen.set(hash, shot.name);
+        seen.set(hash, { name: shot.name, bytes });
 
         taken++;
         annotate("notice", `${want.label}/${shot.name}.png — ${shot.why} (${w}x${h}, ${Math.round(bytes / 1024)}KB, ${hash})`);

@@ -1,6 +1,6 @@
 import React from "react";
 import Offline from "./Offline";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
 import * as ExpoLinking from "expo-linking";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -251,9 +251,18 @@ function Root() {
    * it, and it defaults to absent — so for everyone who is not a screenshot
    * script this is exactly the app it was before: it opens on Home. Tabs is
    * kept underneath so back behaves normally in the photograph. */
-  const initialState = shotRoute
-    ? { index: 1, routes: [{ name: "Tabs" }, { name: shotRoute }] }
-    : undefined;
+  /* Navigated on ready rather than handed over as initialState. initialState is
+   * only consulted when linking does not supply a state, and this container has
+   * a linking config, so the two quietly contended and the app opened on Home —
+   * which produced a set of store screenshots that were all the home screen
+   * under five different headlines. Navigating once the navigator is ready has
+   * no such interaction to lose. */
+  const navRef = useNavigationContainerRef();
+  const onReady = React.useCallback(() => {
+    if (shotRoute) {
+      try { navRef.navigate(shotRoute); } catch { /* an unknown route must not crash the app */ }
+    }
+  }, [navRef, shotRoute]);
 
   /* EVERY PUSHED SCREEN WEARS THE WEBSITE'S SHEET HEADER.
    *
@@ -286,7 +295,7 @@ function Root() {
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
-    <NavigationContainer key={lang} linking={linking} initialState={initialState}>
+    <NavigationContainer key={lang} linking={linking} ref={navRef} onReady={onReady}>
       {/* layout is the one place react-navigation lets a wrapper sit INSIDE
           each screen, which is what makes a fault recoverable: the header and
           the tab bar survive it, so "Try again" has something to go back to.
