@@ -503,10 +503,13 @@ if (!available) fail("the app never said which fonts it had — expected a 'font
 else {
   say("\n" + available.replace(/^.*?fonts available:/, "fonts available:"));
   notice(available.replace(/^.*?fonts available:/, "fonts available:").slice(0, 400));
-  for (const want of ["ionicons", "HankenGrotesk", "Fraunces", "Amiri"])
+  for (const want of ["ionicons", "HankenGrotesk", "Fraunces", "Amiri", "NotoNaskhArabic"])
     if (!new RegExp(want, "i").test(available))
       fail(`the font "${want}" is not registered on the device` +
-           (want === "ionicons" ? " — so no icon in the app can draw" : ""));
+           (want === "ionicons" ? " — so no icon in the app can draw" : "") +
+           (want === "NotoNaskhArabic"
+             ? " — so the Qurʼanic marks draw as empty boxes, one verse in six"
+             : ""));
 }
 
 /* Unique colours in a slice of a screenshot. An icon that drew has strokes and

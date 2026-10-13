@@ -170,7 +170,7 @@ export default function Bukhari({ navigation }) {
               {t("bukhari.hadith_n", "Hadith {n}").replace("{n}", String(b.n))}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted }}>{b.name}</Text>
           </View>
-          <Text style={{ fontFamily: F.arabic, fontSize: fs(19), lineHeight: fs(41), color: C.ink,
+          <Text style={{ fontFamily: F.quranic, fontSize: fs(19), lineHeight: fs(41), color: C.ink,
                          textAlign: "right", writingDirection: "rtl", marginTop: 4 }}>
             {"…" + b.before}
             <Text style={{ color: C.brand600 }}>{b.hit}</Text>

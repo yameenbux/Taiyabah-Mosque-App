@@ -534,6 +534,10 @@ Anything committed here is reachable by URL.
 │   ├── *.woff2                   Google's own stylesheet with the URLs
 │   └── OFL.txt                   rewritten — same files, same unicode-range,
 │                                  so the same glyphs. OFL.txt is the licence.
+│                                 One file is not Google's: a 692-byte cut of
+│                                 Noto Naskh Arabic holding U+08E2 alone, the
+│                                 one Qurʼanic mark Google carves out of its
+│                                 own Arabic range. Declared in index.html.
 │
 ├── push/onesignal/              OneSignal's own service workers, kept on a
 │   └── …                         separate scope so they don't collide with
@@ -678,6 +682,15 @@ of copyright, taken from [Tanzil](https://tanzil.net) — `en.yusufali`, one aya
 per line, which is the file the JSON editions in circulation are made from.
 `scripts/fetch-quran.mjs` fetches both and refuses to write anything that does
 not match the canonical ayah counts.
+
+**It needs a font that can draw it.** The IndoPak edition uses Arabic
+Extended-A as well as the main Arabic block — the waqf signs, the sajda and
+rukūʿ marks, the sakta, U+08D4 to U+08E2 — and 1,031 of the 6,236 āyāt carry at
+least one. Amiri has a glyph for none of them. Scripture is therefore set in
+**Noto Naskh Arabic** on both sides: `.quranic` on the website, `F.quranic` in
+the app, with Amiri kept for short display Arabic. `native/scripts/check-arabic.mjs`
+fails the build if any Arabic character in the bundled data has no glyph in the
+font that draws it, or if a Qurʼanic mark turns up in a file Amiri draws.
 
 > [!WARNING]
 > **Take the translation from Tanzil, not from an API.** The English used to

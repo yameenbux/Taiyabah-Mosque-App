@@ -87,9 +87,12 @@ export function Note({ children, center }) {
                         textAlign: center ? "center" : rtl ? "right" : "left" }}>{children}</Rich>;
 }
 
+/* Quoted scripture — a hadith, an āyah — so it is set in the Qurʼanic face.
+   Short display Arabic goes through Hero or is written inline, and stays
+   Amiri, exactly as the website splits .quranic from .arabic. */
 export function Arabic({ children, size = 26, center = true }) {
   const { fs } = useApp();
-  return <Text style={{ fontFamily: F.arabic, fontSize: fs(size), lineHeight: fs(size * 1.75),
+  return <Text style={{ fontFamily: F.quranic, fontSize: fs(size), lineHeight: fs(size * 1.75),
                         color: C.ink, textAlign: center ? "center" : "right", writingDirection: "rtl" }}>{children}</Text>;
 }
 

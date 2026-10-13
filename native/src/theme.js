@@ -219,5 +219,20 @@ export const F = {
   sansSemi:    "HankenGroteskSemiBold",
   sansBold:    "HankenGroteskBold",
   display:     "Fraunces",          // the serif used for prayer names
-  arabic:      "Amiri",             // scripture is set in Amiri, never a fallback
+  /* Short Arabic — the salām on the home screen, a prayer name beside its
+     English, the Arabic tab labels. Amiri is the display face for it, here as
+     on the website, and never a fallback. */
+  arabic:      "Amiri",
+  /* The Qurʼan, and anything else quoted from the muṣḥaf.
+   *
+   * The IndoPak edition draws on Arabic Extended-A as well as the main Arabic
+   * block: the waqf signs, the sajda and rukūʿ marks, the sakta — U+08D4 to
+   * U+08E2, and 1,031 of the 6,236 āyāt carry at least one. Amiri has a glyph
+   * for none of them, so each one came out as an empty box in the middle of a
+   * verse, which reads as scripture being corrupted rather than as a font
+   * being short of a glyph. Noto Naskh Arabic covers all twelve.
+   *
+   * This is the website's own answer — its .quranic rule is Noto first, Amiri
+   * behind it — arriving in the app, which had neither. */
+  quranic:     "NotoNaskhArabic",
 };

@@ -103,9 +103,10 @@ const browser = await pw.chromium.launch({ executablePath: "/opt/pw-browsers/chr
  * were comparing Hanken Grotesk against whatever Chromium falls back to, so
  * any reading of weight or letterform taken off them was worthless.
  *
- * The same five files the APK carries are served here and declared under the
+ * The same files the APK carries are served here and declared under the
  * exact family names theme.js asks for. */
-const FONTS = ["HankenGrotesk", "HankenGroteskMedium", "HankenGroteskSemiBold", "HankenGroteskBold", "Fraunces", "Amiri"];
+const FONTS = ["HankenGrotesk", "HankenGroteskMedium", "HankenGroteskSemiBold", "HankenGroteskBold",
+               "Fraunces", "Amiri", "NotoNaskhArabic"];
 const FACES = FONTS.map(f =>
   `@font-face{font-family:"${f}";src:url("/__fonts/${f}.ttf") format("truetype");font-display:block}`
 ).join("\n");

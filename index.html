@@ -221,6 +221,17 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
   .arabic{font-family:"Amiri", serif}
   .quranic{font-family:"Noto Naskh Arabic","Amiri",serif}
+  /* ONE CHARACTER, served separately. Google's Arabic subset of Noto Naskh
+     carves a hole in its own range for U+08E2 — "U+0897-08E1, U+08E3-08FF" —
+     so the disputed end-of-ayah mark was the one Qurʼanic sign no web font
+     here could draw, and it was being deleted before display rather than
+     shown as a box. This is that single glyph, cut from the full Noto Naskh
+     Arabic with pyftsubset: 692 bytes, fetched only by a reader who opens a
+     page that actually contains the mark. Declared after fonts.css so it wins
+     for this codepoint, and nothing else. */
+  @font-face{font-family:"Noto Naskh Arabic";font-style:normal;font-weight:400;
+    font-display:swap;src:url(fonts/noto-naskh-arabic-quranic-400.woff2) format("woff2");
+    unicode-range:U+08E2}
   .tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 
   /* ---- brand bar ---- */
@@ -9167,20 +9178,19 @@ function loadOnce(src, flagName){
    keep a second escaper that could drift from the first. */
 
 /* Qur'anic recitation marks — the sajda, rukūʿ, waqf and sakta signs, and the
-   disputed end-of-āyah mark (U+08D4–U+08E2). They are annotations printed
-   above the line, not letters or vowels, and no font available to this app
-   carries them: on a phone they render as empty boxes in the middle of a
-   verse, which reads as corruption of scripture rather than as a missing
-   glyph. Hidden here rather than removed from the data, so bundling a Qur'anic
-   font later is one line to undo and nothing has been lost in the meantime. */
-/* U+08E2 ARABIC DISPUTED END OF AYAH is an editorial marker, not a recitation
-   sign, and Google Fonts deliberately excludes it from the Arabic subset of
-   both Amiri and Noto Naskh Arabic — it renders as a tofu box on every device.
-   Every other waqf mark in the IndoPak text (U+08D4-U+08E1: rukuʿ, qif, waqfa,
-   sakta, sajda …) IS covered by Noto Naskh Arabic, which is first in the
-   .quranic stack, so those are left exactly as the mushaf has them. */
-const UNRENDERABLE_MARKS = /\u08E2/g;
-const arabicForDisplay = t => String(t).replace(UNRENDERABLE_MARKS, "");
+   disputed end-of-āyah mark (U+08D4–U+08E2) — are annotations printed above
+   the line, not letters or vowels. They used to be deleted here before
+   display, because no font this page could reach drew them and a box in the
+   middle of a verse reads as corruption of scripture rather than as a missing
+   glyph. Nothing is deleted now. Noto Naskh Arabic covers U+08D4–U+08E1, and
+   U+08E2 — the one codepoint Google carves out of its own Arabic subset — is
+   served as a 692-byte face of its own, declared in the stylesheet above. The
+   muṣḥaf is shown as the muṣḥaf has it.
+
+   Kept as a function rather than unpicked from its nine call sites: this is
+   where a mark would be hidden again if one ever turned up that nothing can
+   draw, and the call sites are exactly the right ones. */
+const arabicForDisplay = t => String(t);
 
 /* ---------------- hall booking ----------------
    The same two endpoints the website uses, so the office works one queue:

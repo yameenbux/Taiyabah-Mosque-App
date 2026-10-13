@@ -68,6 +68,7 @@
             "./assets/fonts/HankenGroteskBold.ttf",
             "./assets/fonts/Fraunces.ttf",
             "./assets/fonts/Amiri.ttf",
+            "./assets/fonts/NotoNaskhArabic.ttf",
             "./assets/fonts/ionicons.ttf"
           ]
         }
