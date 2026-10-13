@@ -151,6 +151,22 @@ jobs:
           chmod 600 ~/private_keys/AuthKey_${KEY_ID}.p8
           echo "wrote ~/private_keys/AuthKey_${KEY_ID}.p8"
 
+      # TWO SIGNING SETTINGS, NOT ONE. expo prebuild writes
+      #
+      #     "CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+      #
+      # into the generated project, and an SDK-conditional build setting is
+      # NOT overridden by its plain counterpart. Passing CODE_SIGN_IDENTITY
+      # alone leaves the conditional one saying development, and Xcode stops
+      # with "automatically signed for development, but a conflicting code
+      # signing identity Apple Distribution has been manually specified."
+      # Both have to be set, and the bracketed one is the one that decides.
+      #
+      # Automatic signing without either is no good: it asks Apple for a
+      # DEVELOPMENT profile, those are built from registered devices, and a
+      # team that has never had a device gets "your team has no devices from
+      # which to generate a provisioning profile". An App Store distribution
+      # profile needs none.
       - name: Archive
         working-directory: native/ios
         env:
@@ -172,6 +188,7 @@ jobs:
             CODE_SIGN_STYLE=Automatic \
             DEVELOPMENT_TEAM="$TEAM" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
+            "CODE_SIGN_IDENTITY[sdk=iphoneos*]=Apple Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             | tee /tmp/archive.log | xcpretty || {
               echo "::error::archive failed"
