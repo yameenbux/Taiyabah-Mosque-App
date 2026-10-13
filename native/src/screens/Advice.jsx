@@ -47,6 +47,31 @@ export default function Advice({ navigation }) {
   const sheet = SHEETS.advice;
   const hero = sheet?.blocks.find(b => b.type === "hero");
 
+  /* THE WEBSITE'S CLOSED NOTICE IS NOT THE TRUTH; THE ADMIN CENTRE IS.
+   *
+   * The site's prose says "Written questions are not being taken just now" and
+   * the app lifts that panel out of it like any other block. Whether questions
+   * are actually being taken is a live switch — isOpen("request_imam_advice"),
+   * which the admin centre sets — and when it is on, the screen showed the
+   * panel saying questions were closed with the form to ask one directly
+   * underneath it. A screen that contradicts itself in two inches is worse
+   * than either half alone.
+   *
+   * So the notice is shown only when the switch agrees with it. The website
+   * carries the same sentence with no such switch behind it, and should be
+   * corrected separately — this fixes the app, not the prose.
+   *
+   * The footer comes out of the body too. It is the last block in the sheet,
+   * so with the form appended after the blocks the charity line landed in the
+   * middle of the screen, ending the page halfway down. It is rendered after
+   * the form instead, which is where the website puts it. */
+  const CLOSED_NOTICE = "advice.written_questions_are_not_being";
+  const all = sheet?.blocks || [];
+  const foot = all.filter(b => b.type === "foot");
+  const body = all.filter(b =>
+    b.type !== "hero" && b.type !== "foot" &&
+    !(open !== false && b.type === "callout" && b.h?.k === CLOSED_NOTICE));
+
   if (state.sent)
     return (
       <Screen>
@@ -60,7 +85,7 @@ export default function Advice({ navigation }) {
     <Screen pad={false}>
       {!!hero && <Hero lines={hero.lines} ring={sheet.ring} />}
       <View style={{ paddingHorizontal: 16 }}>
-        <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
+        <Blocks blocks={body} nav={navigation} />
 
         {/* WHEN WRITTEN QUESTIONS ARE CLOSED, THE WEBSITE'S OWN PROSE IS THE
             CLOSED STATE — "Written questions are not being taken just now",
@@ -107,9 +132,11 @@ export default function Advice({ navigation }) {
                     sending={state.sending} onPress={send} />
           </>
         )}
-        {/* The charity line is the last block of the advice sheet and is drawn
-            from it above, so adding it again here printed it twice. The same
-            defect the charity collections screen had. */}
+        {/* The charity line, held back from the body above so it lands under
+            the form rather than halfway down the screen. It is still the
+            sheet's own block, so it is printed once and says what the website
+            says. */}
+        <Blocks blocks={foot} nav={navigation} />
       </View>
     </Screen>
   );
