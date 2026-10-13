@@ -8,8 +8,8 @@ descriptions that promise features the build does not have.
 
 ## Promotional Text  (max 170 characters)
 
-Prayer times taken straight from the masjid's own timetable, with jamāʿah
-notifications, Qibla, the Qurʾān, live audio and a zakat calculator.
+Prayer times taken straight from the masjid's own timetable, with jamaat
+notifications, Qibla, the Qur'an, live audio and a zakat calculator.
 
 ---
 
@@ -19,16 +19,16 @@ The official app of Taiyabah Masjid, Bolton — built for the congregation, and
 for anyone who needs the masjid's times while they are out.
 
 PRAYER TIMES FROM THE MASJID ITSELF
-Beginning and jamāʿah times come straight from Taiyabah Masjid's own official
+Beginning and jamaat times come straight from Taiyabah Masjid's own official
 Salah timetable — the same one printed and put up each year. They are not
-calculated estimates, so the time on your phone is the time the jamāʿah
+calculated estimates, so the time on your phone is the time the jamaat
 actually stands. See today at a glance, or open the full timetable for any
 date in the year.
 
 NOTIFICATIONS YOU CHOOSE
-Be told when jamāʿah is about to begin, with time to get there. You can also
+Be told when jamaat is about to begin, with time to get there. You can also
 turn on:
-• Janāzah (funeral prayer) announcements
+• Janazah (funeral prayer) announcements
 • Timetable changes, Ramadan and Eid
 • Events, bayaans, classes and community gatherings
 Each is a separate switch, so you get only what you asked for.
@@ -36,8 +36,8 @@ Each is a separate switch, so you get only what you asked for.
 QIBLA
 Find the direction of prayer from wherever you are standing.
 
-THE HOLY QURʾĀN
-The complete muṣḥaf, laid out clearly, with pinch to zoom for closer reading.
+THE HOLY QUR'AN
+The complete mushaf, laid out clearly, with pinch to zoom for closer reading.
 
 LISTEN LIVE
 Hear the masjid live when you cannot be there in person.
@@ -53,7 +53,7 @@ class times, and the full year calendar of closures alongside the Islamic
 dates.
 
 SERVICES
-• Nikāḥ, in keeping with authentic Islamic tradition
+• Nikah, in keeping with authentic Islamic tradition
 • Funeral services, and support for families through every part of an Islamic
   funeral
 • Hall and room hire at the Taiyabah Centre
@@ -127,12 +127,27 @@ At least one iPhone 6.9" set is mandatory (1320 x 2868 or 1290 x 2796
 portrait). iPad screenshots are required only if the app is offered on iPad.
 
 Good candidates, in order:
-  1. Home — today's times and the next jamāʿah
+  1. Home — today's times and the next jamaat
   2. Full timetable
   3. Qibla
-  4. The Qurʾān, open on a page
+  4. The Qur'an, open on a page
   5. Zakat calculator
   6. Notification choices
 
 Do not show a loading state, an empty screen, or a time that has obviously
 passed. Status bar should look clean.
+
+---
+
+## A note on spelling
+
+App Store Connect rejects the transliteration marks this project uses
+elsewhere: the half rings in jama'ah and Qur'an (U+02BF and U+02BE) and every
+letter carrying a macron or a dot, such as a-macron and h-with-dot. The field
+turns red and says only "This field contains one or more invalid characters",
+naming none of them.
+
+So the listing uses plain spellings — jamaat, Qur'an, Nikah, Janazah, mushaf —
+which is how the congregation writes them anyway. Do not restore the diacritics
+here, however much better they look in the app itself. The em dash and the
+bullet are fine and are deliberately kept.
