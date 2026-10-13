@@ -56,7 +56,15 @@ export default function Notices() {
       keyExtractor={r => String(r.id)}
       ListHeaderComponent={Header}
       refreshControl={<RefreshControl refreshing={busy} onRefresh={load} tintColor={C.brand600} />}
-      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 28 }}
+      /* NO HORIZONTAL PADDING HERE. A contentContainerStyle applies to every
+         child of the list INCLUDING ListHeaderComponent, and this header holds
+         the plum app bar. Padding it inset the bar 16px on each side and let
+         the cream list background show down both edges — a white stripe beside
+         the bar on the one tab that is otherwise identical to the website's
+         page. The padding belongs on the things inside the list, and the
+         header already pads its own heading, which is why that heading was
+         sitting 32px in rather than 16. */
+      contentContainerStyle={{ paddingBottom: 28 }}
       ListEmptyComponent={
         /* .nt-empty is a CARD — 16px of radius on the card colour inside a
            hairline with the shared lift, 44/22 of padding, everything centred
@@ -65,6 +73,7 @@ export default function Notices() {
            bordered circle and a GOLD bell, so the one screen that is empty
            most of the time had nothing on it at all. */
         <View style={[{ alignItems: "center", gap: 12, paddingVertical: 44, paddingHorizontal: 22,
+                        marginHorizontal: 16,
                         borderRadius: 16, backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
                         marginTop: 14 }, SHADOW]}>
           <View style={{ width: 56, height: 56, borderRadius: 28, alignItems: "center",
@@ -94,7 +103,7 @@ export default function Notices() {
            that is the whole point of the notice below the fold.
            The date rides in .nt-when WITH the topic, not alone at the foot. */
         <View style={[{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line,
-                        marginTop: 12, overflow: "hidden" }, SHADOW]}>
+                        marginTop: 12, marginHorizontal: 16, overflow: "hidden" }, SHADOW]}>
           {!!item.image_url && (
             <Image source={{ uri: item.image_url }} resizeMode="contain"
                    style={{ width: "100%", aspectRatio: (item.image_w && item.image_h) ? item.image_w / item.image_h : 4 / 3,
