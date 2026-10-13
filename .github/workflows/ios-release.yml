@@ -203,7 +203,28 @@ jobs:
       # export step then resolves an *App Store* profile, which is implied by
       # `method: app-store-connect` rather than guessed at. Distribution
       # profiles do not enumerate devices, so no device has to be registered.
-      - name: Archive (unsigned)
+      # AD-HOC, not unsigned. The first version of this step passed
+      # CODE_SIGNING_ALLOWED=NO, which archived fine and shipped a build whose
+      # entitlements were only
+      #
+      #     application-identifier, beta-reports-active,
+      #     com.apple.developer.team-identifier, get-task-allow
+      #
+      # — the set Xcode synthesises when it re-signs a bundle carrying none of
+      # its own. aps-environment and both app groups were gone, so push
+      # notifications were dead in 2.0.2 build 1: no prayer time alerts, no
+      # jamaat alerts, and nothing on the phone to say why. Disabling code
+      # signing disables entitlement processing with it, so the archive never
+      # recorded them and export had nothing to carry forward.
+      #
+      # Ad-hoc signing ("-") still needs no certificate, no provisioning
+      # profile and no registered device, so it keeps everything the unsigned
+      # archive bought us — but Xcode does process CODE_SIGN_ENTITLEMENTS,
+      # which is the whole point. Export then re-signs for distribution over
+      # entitlements that are actually there. Manual style is deliberate: it
+      # is what lets an identity be named without the automatic-signing
+      # conflict that killed three earlier attempts.
+      - name: Archive (ad-hoc signed, so entitlements survive)
         working-directory: native/ios
         run: |
           set -o pipefail
@@ -213,12 +234,46 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Taiyabah.xcarchive" \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             | tee /tmp/archive.log | xcpretty || {
               echo "::error::archive failed"
               grep -E "error:|Provisioning|No profiles|doesn't match" /tmp/archive.log | head -20 \
                 | while IFS= read -r l; do echo "::error::${l}"; done
               exit 1; }
+
+      # Checked here rather than only on the finished IPA, because the two
+      # failures look identical at the end and have different owners: if the
+      # archive carries aps-environment and the IPA does not, the export lost
+      # it; if the archive does not carry it either, the App ID is missing the
+      # Push Notifications capability and no change to this workflow can fix
+      # that. Non-fatal — export's own errors are more precise than a guess
+      # made here, and this only has to narrow the search.
+      - name: What entitlements did the archive actually record?
+        run: |
+          set -uo pipefail
+          app=$(find "$RUNNER_TEMP/Taiyabah.xcarchive/Products/Applications" \
+                  -maxdepth 1 -name '*.app' | head -1 || true)
+          if [ -z "$app" ]; then
+            echo "::warning::no .app in the archive to inspect"
+            exit 0
+          fi
+          ent="$RUNNER_TEMP/archive-entitlements.plist"
+          codesign -d --entitlements :"$ent" "$app" 2>/dev/null \
+            || codesign -d --entitlements - --xml "$app" >"$ent" 2>/dev/null \
+            || true
+          keys=$(grep -oE '<key>[^<]+</key>' "$ent" 2>/dev/null | sed 's/<\/*key>//g' | paste -sd, - || true)
+          echo "::notice::archive entitlements: ${keys:-none readable}"
+          case "$keys" in
+            *aps-environment*) echo "::notice::archive carries aps-environment, so push is configured correctly at build time" ;;
+            *) echo "::warning::archive carries NO aps-environment — check that the App ID com.taiyabahmasjid.app has the Push Notifications capability enabled" ;;
+          esac
+          case "$keys" in
+            *application-groups*) ;;
+            *) echo "::warning::archive carries no app groups — the OneSignal extension cannot share data with the app without them" ;;
+          esac
 
       - name: Export the IPA
         working-directory: native/ios
