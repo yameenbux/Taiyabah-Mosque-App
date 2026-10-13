@@ -167,12 +167,39 @@ jobs:
       # team that has never had a device gets "your team has no devices from
       # which to generate a provisioning profile". An App Store distribution
       # profile needs none.
-      - name: Archive
+      # The archive is deliberately UNSIGNED, and the export step below is what
+      # signs it. This is not a shortcut — it is the only combination that can
+      # work here, established by three failed runs:
+      #
+      #   1. Automatic signing, no overrides (71c586f) asked Apple for an *iOS
+      #      App Development* profile and died on "Your team has no devices from
+      #      which to generate a provisioning profile". The team has no
+      #      registered devices and does not need any: we ship through
+      #      TestFlight, not to tethered hardware.
+      #   2. Adding CODE_SIGN_IDENTITY="Apple Distribution" (c9c03e7) failed the
+      #      other way — "automatically signed for development, but a
+      #      conflicting code signing identity Apple Distribution has been
+      #      manually specified". Any identity given on the command line counts
+      #      as *manual* and cannot coexist with CODE_SIGN_STYLE=Automatic.
+      #   3. Adding the SDK-conditional CODE_SIGN_IDENTITY[sdk=iphoneos*] too
+      #      (57f2180) failed identically, and showed why the override could
+      #      never have bitten: xcodebuild parsed the bracket as part of the
+      #      value and reported the identity as `iphoneos*]=Apple Distribution`.
+      #
+      # The root cause is in the project Expo generates: `expo prebuild` writes
+      #   "CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+      # into *both* configurations, so automatic signing goes looking for a
+      # development profile whatever the export method is. Installing an App
+      # Store profile does not help — that changes which profile exists, not
+      # which type Xcode asks for. And the pin cannot simply be edited out,
+      # because prebuild regenerates native/ios from scratch on every run.
+      #
+      # Archiving unsigned sidesteps profile resolution altogether, and the
+      # export step then resolves an *App Store* profile, which is implied by
+      # `method: app-store-connect` rather than guessed at. Distribution
+      # profiles do not enumerate devices, so no device has to be registered.
+      - name: Archive (unsigned)
         working-directory: native/ios
-        env:
-          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
-          TEAM: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -o pipefail
           xcodebuild archive \
@@ -181,15 +208,7 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Taiyabah.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
-            -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER" \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM="$TEAM" \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            "CODE_SIGN_IDENTITY[sdk=iphoneos*]=Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
+            CODE_SIGNING_ALLOWED=NO \
             | tee /tmp/archive.log | xcpretty || {
               echo "::error::archive failed"
               grep -E "error:|Provisioning|No profiles|doesn't match" /tmp/archive.log | head -20 \
@@ -213,6 +232,11 @@ jobs:
             <key>signingStyle</key><string>automatic</string>
           </dict></plist>
           PLIST
+          # This is now the step that does all the signing, so it is also the
+          # step whose failures have to be readable. Logs and artifacts cannot
+          # be fetched from this environment at all, so anything needed to
+          # diagnose a failure has to leave as a ::error:: annotation.
+          set -o pipefail
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Taiyabah.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
@@ -220,8 +244,85 @@ jobs:
             -allowProvisioningUpdates \
             -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
             -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER"
+            -authenticationKeyIssuerID "$ISSUER" \
+            2>&1 | tee /tmp/export.log || {
+              echo "::error::export failed"
+              grep -iE "error|No profiles|No signing certificate|doesn't match|not found|requires a|Provisioning" \
+                /tmp/export.log | head -20 \
+                | while IFS= read -r l; do echo "::error::${l}"; done
+              exit 1; }
           ls -lh "$RUNNER_TEMP/export"
+          # Which identities ended up in the keychain, and whether the export
+          # created one. An Apple Distribution certificate made on the fly is
+          # fine for getting a build out, but the team is limited to a small
+          # number of them and the private key dies with the runner, so each
+          # run that creates one burns a slot in the Developer portal. Recorded
+          # rather than inferred, so the cost is visible before it bites.
+          security find-identity -v -p codesigning 2>/dev/null \
+            | sed -n 's/.*"\(.*\)"/\1/p' | sort -u \
+            | while IFS= read -r id; do echo "::notice::signing identity present: ${id}"; done
+
+      # An unsigned .ipa is a structurally valid .ipa: it zips, it unzips, it
+      # carries the right bundle id, and App Store Connect rejects it only
+      # after the upload. Since the archive above is now deliberately unsigned,
+      # "did the export actually sign it" is the one thing that must not be
+      # taken on trust.
+      - name: Verify the IPA is distribution-signed
+        run: |
+          set -euo pipefail
+          IPA=$(ls "$RUNNER_TEMP/export"/*.ipa 2>/dev/null | head -1 || true)
+          if [ -z "$IPA" ]; then
+            echo "::error::no .ipa under $RUNNER_TEMP/export"
+            exit 1
+          fi
+          work=$(mktemp -d)
+          unzip -o -q "$IPA" -d "$work"
+          app=$(find "$work/Payload" -maxdepth 1 -name '*.app' | head -1)
+          # --deep because Apple's own validation is deep: without it only the
+          # outer bundle is checked, and the unsigned OneSignal notification
+          # service extension inside would sail through here and be rejected at
+          # upload instead.
+          if ! codesign --verify --deep --strict "$app" 2>/tmp/cs.log; then
+            echo "::error::IPA failed codesign verification"
+            head -10 /tmp/cs.log | while IFS= read -r l; do echo "::error::${l}"; done
+            exit 1
+          fi
+          # `|| true` because pipefail is on and a no-match grep would
+          # otherwise abort the step with no annotation at all — the empty
+          # value is handled by the case below, which is the message we want.
+          authority=$(codesign -dvvv "$app" 2>&1 | grep '^Authority=' | head -1 | cut -d= -f2- || true)
+          case "$authority" in
+            "Apple Distribution"*) ;;
+            *)
+              echo "::error::IPA signed by '${authority}', expected an Apple Distribution certificate — a development-signed build cannot be submitted"
+              exit 1
+              ;;
+          esac
+          if [ ! -f "$app/embedded.mobileprovision" ]; then
+            echo "::error::IPA has no embedded provisioning profile"
+            exit 1
+          fi
+          bid=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")
+          ver=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Info.plist")
+          bld=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist")
+          # aps-environment decides which APNs environment the build talks to.
+          # It comes from the provisioning profile, so an App Store profile
+          # should yield "production" — and if it says development instead,
+          # every push to this build would go to the sandbox and silently never
+          # arrive. Worth asserting here rather than discovering on a phone.
+          # Read, not assumed — but a failure to *read* it is reported rather
+          # than treated as a wrong value. codesign's entitlement output format
+          # has changed across releases, and blocking a correctly signed build
+          # over a parsing quirk would be the worse error of the two.
+          aps=$(codesign -d --entitlements - --xml "$app" 2>/dev/null \
+                | plutil -extract aps-environment raw - 2>/dev/null || true)
+          if [ -z "$aps" ]; then
+            echo "::warning::could not read aps-environment from the signed bundle; check a TestFlight install actually receives a push"
+          elif [ "$aps" != "production" ]; then
+            echo "::error::aps-environment is '${aps}', expected 'production' — pushes would go to the APNs sandbox and never arrive"
+            exit 1
+          fi
+          echo "::notice::IPA ${bid} ${ver} (${bld}), signed by ${authority}, aps-environment ${aps:-unreadable}."
 
       - name: Send it to TestFlight
         env:
