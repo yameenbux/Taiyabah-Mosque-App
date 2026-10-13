@@ -1,6 +1,6 @@
 import React from "react";
 import Offline from "./Offline";
-import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import * as ExpoLinking from "expo-linking";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -251,18 +251,25 @@ function Root() {
    * it, and it defaults to absent — so for everyone who is not a screenshot
    * script this is exactly the app it was before: it opens on Home. Tabs is
    * kept underneath so back behaves normally in the photograph. */
-  /* Navigated on ready rather than handed over as initialState. initialState is
-   * only consulted when linking does not supply a state, and this container has
-   * a linking config, so the two quietly contended and the app opened on Home —
-   * which produced a set of store screenshots that were all the home screen
-   * under five different headlines. Navigating once the navigator is ready has
-   * no such interaction to lose. */
-  const navRef = useNavigationContainerRef();
-  const onReady = React.useCallback(() => {
-    if (shotRoute) {
-      try { navRef.navigate(shotRoute); } catch { /* an unknown route must not crash the app */ }
-    }
-  }, [navRef, shotRoute]);
+  /* OPENING ON A GIVEN SCREEN, FOR THE STORE SCREENSHOTS ONLY.
+   *
+   * Two attempts failed before this one, both for the same underlying reason:
+   * the linking machinery owns the navigator's initial state. initialState is
+   * only consulted when linking supplies none, and navigating in onReady is
+   * undone when linking resolves its own state a moment later. Either way the
+   * app opened on Home, and a whole set of listing images came out as the home
+   * screen under five different headlines.
+   *
+   * So when a shot route is set, linking is switched off for that launch and
+   * initialState is left as the only thing deciding where the app opens.
+   * Nothing contends, and there is no timing to lose.
+   *
+   * For everyone who is not a screenshot harness, shotRoute is absent, linking
+   * is on exactly as before, and the app opens on Home. Tabs stays underneath
+   * so back behaves normally in the photograph. */
+  const shotState = shotRoute
+    ? { index: 1, routes: [{ name: "Tabs" }, { name: shotRoute }] }
+    : undefined;
 
   /* EVERY PUSHED SCREEN WEARS THE WEBSITE'S SHEET HEADER.
    *
@@ -295,7 +302,7 @@ function Root() {
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
      * rather than leaving yesterday's words in the headers. */
-    <NavigationContainer key={lang} linking={linking} ref={navRef} onReady={onReady}>
+    <NavigationContainer key={lang} linking={shotRoute ? undefined : linking} initialState={shotState}>
       {/* layout is the one place react-navigation lets a wrapper sit INSIDE
           each screen, which is what makes a fault recoverable: the header and
           the tab bar survive it, so "Try again" has something to go back to.
