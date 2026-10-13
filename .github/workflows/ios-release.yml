@@ -47,10 +47,40 @@ on:
 
 jobs:
   testflight:
-    runs-on: macos-15
+    # macOS 26, because Apple refuses any upload built with an older SDK. The
+    # macos-15 image ships Xcode 16 and the iOS 18.5 SDK, and App Store Connect
+    # answers a build made with it:
+    #   SDK version issue. This app was built with the iOS 18.5 SDK. All iOS
+    #   and iPadOS apps must be built with the iOS 26 SDK or later.
+    # That is what rejected 2.0.2 builds 1, 2 and 3 — the first two silently,
+    # because the upload step was not reading altool's exit status.
+    runs-on: macos-26
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      # Asserted here, in seconds, rather than discovered at the upload after a
+      # twenty-five minute archive. The runner image decides the SDK and can
+      # change under us, so the floor is checked rather than assumed, and the
+      # newest Xcode present is selected rather than trusting the image default.
+      - name: Xcode must be new enough for Apple's SDK floor
+        run: |
+          set -euo pipefail
+          newest="$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)"
+          if [ -z "$newest" ]; then
+            echo "::error::No Xcode found on this runner"
+            exit 1
+          fi
+          sudo xcode-select -s "$newest/Contents/Developer"
+          xcv="$(xcodebuild -version | head -1 | awk '{print $2}')"
+          sdk="$(xcodebuild -showsdks | awk '/-sdk iphoneos/{print $NF}' \
+                 | sed 's/iphoneos//' | sort -V | tail -1)"
+          echo "::notice::Xcode $xcv, iOS SDK ${sdk:-unknown}, at $newest"
+          major="${sdk%%.*}"
+          if [ -z "$sdk" ] || [ "${major:-0}" -lt 26 ]; then
+            echo "::error::iOS SDK ${sdk:-unknown} is below Apple's floor of 26. App Store Connect refuses uploads built with anything older, so this build would be rejected after the archive. Use a runner image with Xcode 26 or later."
+            exit 1
+          fi
 
       # The same gate the Play bundle has. A signed build that crashes on
       # launch is worse than no build: it costs a TestFlight round trip and
