@@ -92,9 +92,17 @@ try {
     const vs = Object.fromEntries((included || [])
       .filter(i => i.type === "preReleaseVersions")
       .map(i => [i.id, i.attributes.version]));
-    return (data || []).some(b =>
-      String(b.attributes.version) === String(WANT_BUILD) &&
-      (!WANT_VERSION || vs[b.relationships?.preReleaseVersion?.data?.id] === WANT_VERSION));
+    /* The BUILD NUMBER is the identity; the version string is not yet reliable.
+     * Apple creates the build record before attaching it to a preReleaseVersion,
+     * so for a few minutes a genuinely uploaded build reports its version as
+     * nothing at all. Demanding both rejected 2.0.2 (5) while it sat on App
+     * Store Connect, VALID and installable. So an unattached version matches,
+     * and only a version that is present AND different rules a build out. */
+    return (data || []).some(b => {
+      if (String(b.attributes.version) !== String(WANT_BUILD)) return false;
+      const v = vs[b.relationships?.preReleaseVersion?.data?.id];
+      return !WANT_VERSION || !v || v === WANT_VERSION;
+    });
   };
 
   let builds = await fetchBuilds();
@@ -151,7 +159,11 @@ try {
    * the build, read back from Apple. */
   if (WANT_BUILD) {
     if (!matches(builds.data, builds.included)) {
-      annotate("error", `App Store Connect is NOT holding ${WANT_VERSION} (${WANT_BUILD}) after ${WAIT_SECONDS}s. The upload did not arrive, whatever altool reported. Check the Apple ID inbox for an ITMS- message.`);
+      /* Carefully worded. "Not confirmed" and "did not arrive" are different
+       * claims, and the first version of this said the second — about a build
+       * that was sitting on App Store Connect, valid, the whole time. */
+      const held = (builds.data || []).map(b => b.attributes.version).join(", ") || "none";
+      annotate("error", `Could not confirm ${WANT_VERSION} (${WANT_BUILD}) on App Store Connect within ${WAIT_SECONDS}s. This does NOT by itself mean the upload failed — Apple can take longer than this to file a build. Builds currently held: ${held}. Re-run the "where are my builds" workflow before concluding anything; if it is still absent, check the Apple ID inbox for an ITMS- message.`);
       process.exit(1);
     }
     annotate("notice", `confirmed: Apple is holding ${WANT_VERSION} (${WANT_BUILD}).`);

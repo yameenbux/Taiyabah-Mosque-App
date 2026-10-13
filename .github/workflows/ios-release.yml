@@ -516,7 +516,10 @@ jobs:
           APPSTORE_API_KEY_P8: ${{ secrets.APPSTORE_API_KEY_P8 }}
           EXPECT_VERSION: ${{ inputs.versionName }}
           EXPECT_BUILD: ${{ inputs.buildNumber }}
-          WAIT_SECONDS: "300"
+          # Twelve minutes. Five was not enough: 2.0.2 build 5 uploaded fine
+          # and was filed by Apple after the window closed, so a good build was
+          # reported as a failure.
+          WAIT_SECONDS: "720"
         run: node native/scripts/asc-builds.mjs
 
       # The IPA is kept whatever happens, so a failed upload does not mean
