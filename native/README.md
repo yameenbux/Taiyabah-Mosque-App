@@ -249,6 +249,14 @@ codegen. It runs on React Native 0.76, and it wants the New Architecture **off**
 Pinned exactly, not with a caret — a caret is how a 0.76 project drifted onto a
 release built for 0.79.
 
+**And the version has to clear a Kotlin window.** The wrapper pins an exact
+native Android SDK, which has to compile at the `kotlinVersion` above. OneSignal
+built native SDK **5.7.1, 5.7.2 and 5.7.3 with Kotlin 2.2.0** and then went back
+to 1.9.25 at 5.7.7 — so `react-native-onesignal` **5.3.6** (which pins 5.7.3)
+will not compile here, while the newer **5.4.3** (which pins 5.7.7) does.
+Nothing in the version numbers says this. **5.3.1** pins 5.6.1, Kotlin 1.9.25,
+which is why it is the one pinned.
+
 `scripts/check-arch.mjs` enforces the pair and every workflow runs it after
 prebuild. Moving one without the other is the mistake it exists to catch;
 `scripts/test/arch.test.mjs` pins both ways it has already gone wrong.

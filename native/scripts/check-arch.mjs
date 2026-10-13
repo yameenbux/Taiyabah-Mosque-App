@@ -36,6 +36,35 @@ export function wants(version) {
   return { known: true, newArch: false, why: "5.3.x is a legacy bridge module and predates codegen" };
 }
 
+
+/**
+ * The second trap, found the hard way on 13 October.
+ *
+ * The wrapper pins an exact native Android SDK, and that SDK's Kotlin has to
+ * match the kotlinVersion in app.json's expo-build-properties (1.9.25). It did
+ * not for one narrow window: OneSignal built 5.7.1, 5.7.2 and 5.7.3 with
+ * Kotlin 2.2.0 and then went BACK to 1.9.25 at 5.7.7. So the newest 5.3.x
+ * (5.3.6 -> 5.7.3) fails to compile while the newer 5.4.3 (-> 5.7.7) is fine,
+ * which reads like nonsense until you look at the POMs:
+ *
+ *     e: notifications-5.7.3-api.jar ... metadata is 2.2.0, expected 1.9.0
+ *
+ * Recorded as a fact rather than inferred, because nothing in the version
+ * number says it.
+ */
+const KOTLIN_2_SDKS = new Set(["5.7.1", "5.7.2", "5.7.3"]);
+
+/** Pure: is the pinned native SDK compilable at this project's Kotlin? */
+export function nativeSdkOk(sdkVersion, kotlinVersion) {
+  const kotlinMajor = Number(String(kotlinVersion || "").split(".")[0]);
+  if (!KOTLIN_2_SDKS.has(String(sdkVersion))) return { ok: true };
+  if (kotlinMajor >= 2) return { ok: true };
+  return { ok: false, message:
+    `OneSignal's native SDK ${sdkVersion} is built with Kotlin 2.2 and this project ` +
+    `compiles with ${kotlinVersion}. Only 5.7.1-5.7.3 are affected; 5.7.7 and later ` +
+    `went back to 1.9.25. Choose a react-native-onesignal that pins outside that window.` };
+}
+
 /** Pure: the verdict, given the version and what prebuild actually wrote. */
 export function verdict(version, flagIsOn) {
   const want = wants(version);
@@ -58,6 +87,22 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     if (process.env.GITHUB_ACTIONS) console.log(`::error::no ${gradle} — did prebuild run?`);
     process.exit(1);
   }
+  /* The native SDK the installed wrapper pins, and the Kotlin we compile with. */
+  const gradlePath = path.join(root, "node_modules", "react-native-onesignal", "android", "build.gradle");
+  if (fs.existsSync(gradlePath)) {
+    const sdk = (fs.readFileSync(gradlePath, "utf8").match(/com\.onesignal:OneSignal:([0-9.]+)/) || [])[1];
+    const app = JSON.parse(fs.readFileSync(path.join(root, "app.json"), "utf8")).expo;
+    const props = (app.plugins || []).find(p => Array.isArray(p) && /build-properties/.test(p[0]));
+    const kotlin = props?.[1]?.android?.kotlinVersion;
+    const k = nativeSdkOk(sdk, kotlin);
+    console.log(`    native SDK ${sdk}, kotlinVersion ${kotlin}`);
+    if (!k.ok) {
+      console.error("FAIL  " + k.message);
+      if (process.env.GITHUB_ACTIONS) console.log(`::error::${k.message}`);
+      process.exit(1);
+    }
+  }
+
   const flagIsOn = /^newArchEnabled=true\s*$/m.test(text);
   const v = verdict(version, flagIsOn);
   console.log((v.ok ? "ok  " : "FAIL  ") + v.message);

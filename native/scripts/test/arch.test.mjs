@@ -9,7 +9,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { wants, verdict } from "../check-arch.mjs";
+import { wants, verdict, nativeSdkOk } from "../check-arch.mjs";
 
 test("5.4 and above needs the New Architecture", () => {
   for (const v of ["5.4.0", "5.4.3", "^5.4.3", "5.5.1", "5.4.7"])
@@ -45,4 +45,27 @@ test("a mismatch says which way to move, and that it is both or neither", () => 
 test("a version it cannot read fails rather than guessing", () => {
   for (const bad of ["", null, undefined, "latest", "6.0.0", "file:../x"])
     assert.equal(verdict(bad, true).ok, false, String(bad));
+});
+
+/* --- the Kotlin window ----------------------------------------------------
+ * Found by compiling: 5.3.6 pins native SDK 5.7.3, built with Kotlin 2.2,
+ * against this project's kotlinVersion 1.9.25. 5.4.3 pins 5.7.7, which went
+ * back to 1.9.25. Nothing in the version numbers says so. */
+
+test("the three SDKs OneSignal built with Kotlin 2.2 are rejected at 1.9", () => {
+  for (const sdk of ["5.7.1", "5.7.2", "5.7.3"])
+    assert.equal(nativeSdkOk(sdk, "1.9.25").ok, false, sdk);
+});
+
+test("the ones either side of that window are fine", () => {
+  for (const sdk of ["5.6.1", "5.6.2", "5.7.7", "5.9.3"])
+    assert.equal(nativeSdkOk(sdk, "1.9.25").ok, true, sdk);
+});
+
+test("and they would be fine if we ever compile with Kotlin 2", () => {
+  assert.equal(nativeSdkOk("5.7.3", "2.0.21").ok, true);
+});
+
+test("the message says which way out", () => {
+  assert.match(nativeSdkOk("5.7.3", "1.9.25").message, /5\.7\.7 and later/);
 });
