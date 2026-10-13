@@ -66,7 +66,24 @@ jobs:
       - name: Xcode must be new enough for Apple's SDK floor
         run: |
           set -euo pipefail
-          newest="$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)"
+          echo "Xcodes on this runner:"; ls -d /Applications/Xcode*.app 2>/dev/null || true
+          # The OLDEST Xcode that still satisfies Apple's floor, not the newest.
+          # Apple requires 26; the fmt that React Native 0.76 vendors fails to
+          # compile on Apple Clang 21, which arrived in Xcode 26.4. Anything
+          # from 26.0 to 26.3 is both acceptable to Apple and able to build
+          # this. The Podfile patch in plugins/with-fmt-consteval.js handles the
+          # newer compiler regardless, because depending on a runner image
+          # happening to carry an older Xcode is not a fix — but when there is a
+          # choice, the conservative compiler is the one to take.
+          pick=""
+          for x in $(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V); do
+            v="$(/usr/bin/defaults read "$x/Contents/Info" CFBundleShortVersionString 2>/dev/null || echo 0)"
+            case "${v%%.*}" in
+              ''|*[!0-9]*) continue ;;
+            esac
+            if [ "${v%%.*}" -ge 26 ]; then pick="$x"; break; fi
+          done
+          newest="${pick:-$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)}"
           if [ -z "$newest" ]; then
             echo "::error::No Xcode found on this runner"
             exit 1
