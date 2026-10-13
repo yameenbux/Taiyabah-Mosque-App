@@ -1,0 +1,69 @@
+# What EAS Build does NOT need to upload.
+#
+# The app lives in native/, but this repository also holds the website, the
+# Qur'an assets, the worker and the admin pages. EAS archives from the git root
+# — the build machine unpacks it and then looks for the app at native/ — so
+# without this it uploads all 800MB of it, compressed to 178MB, every single
+# build.
+#
+# When this file exists EAS uses it INSTEAD of .gitignore, so anything that must
+# not be uploaded has to be listed here even if .gitignore already covers it.
+# That is why node_modules and the generated native projects appear below.
+#
+# Everything is anchored with a leading slash on purpose, and the root files are
+# named rather than matched with a wildcard. An unanchored `assets/` would also
+# match native/assets/, which holds the app icon and the fonts, and a `*.png`
+# that behaved differently than expected would quietly drop the icon. Naming
+# them costs a few lines and removes the question. That is not a
+# hypothetical: an unanchored `package.json` in .gitignore hid
+# native/package.json from the archiver and failed a build in 37 seconds with
+# "package.json does not exist in /Users/expo/workingdir/build/native".
+
+# Dependencies and generated native projects — rebuilt on the build machine.
+node_modules/
+/native/ios/
+/native/android/
+/native/.expo/
+/native/dist/
+
+# Screenshot and comparison output from the local tooling.
+/native/ios-shots/
+/native/store-shots/
+/native/.darkshots/
+/native/.compare/
+
+# The website and its assets. None of it is compiled into the app.
+/quran/
+/data/
+/db/
+/lang/
+/fonts/
+/assets/
+/portal/
+/push/
+/worker/
+/store/
+/scripts/
+/docs/
+/.well-known/
+/Taiyabah-Mosque-App/
+/admin.html
+/delete-data.html
+/index.html
+/privacy.html
+/apple-touch-icon.png
+/icon-1024.png
+/icon-192.png
+/icon-512.png
+/logo.svg
+/manifest.webmanifest
+/sw.js
+/CNAME
+/.nojekyll
+/twa-manifest.json
+
+# Repository documentation.
+/README.md
+/ROADMAP.md
+/STATUS.md
+/LICENSE.md

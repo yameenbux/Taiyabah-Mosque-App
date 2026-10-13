@@ -1,7 +1,7 @@
 node_modules/
 /node_modules
-package-lock.json
-package.json
+/package-lock.json
+/package.json
 
 # MCP server config — written by `claude mcp add -s project` and by the
 # 21st.dev CLI, and can carry an API key in a plaintext header
