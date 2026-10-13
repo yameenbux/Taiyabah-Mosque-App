@@ -123,11 +123,18 @@ jobs:
           ./gradlew assembleRelease --no-daemon --stacktrace \
             -PreactNativeArchitectures=arm64-v8a,x86_64 2>&1 | tee /tmp/gradle.log
 
+      # "Compilation error. See log for more details" is not a diagnosis, and
+      # the log it points at cannot be fetched from outside the runner. Kotlin
+      # and Java write the line that matters as "e: file.kt:12:3 Unresolved
+      # reference", nowhere near "What went wrong", so both are collected.
       - name: What Gradle actually said
         if: failure()
         run: |
           grep -iE "what went wrong" -A6 /tmp/gradle.log | head -30 \
             | while IFS= read -r line; do echo "::error::${line}"; done || true
+          grep -E "^(e|w): |error:|Unresolved reference|Compilation error" /tmp/gradle.log \
+            | grep -v "^w: " | head -20 \
+            | while IFS= read -r line; do echo "::error::compile: ${line}"; done || true
 
       # The emulator needs hardware acceleration, and the runner's KVM device
       # is root-only until this rule opens it up.
