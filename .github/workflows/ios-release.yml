@@ -50,20 +50,41 @@ jobs:
       # The same gate the Play bundle has. A signed build that crashes on
       # launch is worse than no build: it costs a TestFlight round trip and
       # the testers' patience.
-      - name: Has this exact commit opened on a simulator?
+      # THE GATE GUARDS THE APP, NOT THE COMMIT ID.
+      #
+      # A straight head_sha match is too strict: editing this workflow, or a
+      # README, produces a commit the simulator job never runs on — its paths
+      # filter is native/** — so the gate would refuse a build whose app code
+      # has not changed by a byte. Fixing that by loosening it to "a recent
+      # run" is how a Debug build reaches TestFlight.
+      #
+      # So compare the native/ TREE instead. If some commit with a passing
+      # simulator run has the identical native/ tree, this app HAS been opened
+      # on a phone — the difference is elsewhere. Any change under native/
+      # gives a new tree hash and the gate bites again.
+      - name: Has this app opened on a simulator?
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -e
-          sha=${{ github.sha }}
-          n=$(gh api "repos/${{ github.repository }}/actions/workflows/ios-build.yml/runs?head_sha=$sha&status=success" \
-                --jq '.total_count')
-          echo "successful iOS simulator runs for $sha: $n"
-          if [ "${n:-0}" -lt 1 ]; then
-            echo "::error::No successful 'iOS app — does it build and open?' run for $sha."
-            echo "::error::Run it on this ref first. Signing proves nothing about whether the app opens."
+          R=${{ github.repository }}
+          tree_of() { gh api "repos/$R/git/trees/$1" --jq '.tree[] | select(.path=="native") | .sha'; }
+          want=$(tree_of ${{ github.sha }})
+          echo "native/ tree for this commit: $want"
+
+          ok=""
+          for sha in $(gh api "repos/$R/actions/workflows/ios-build.yml/runs?status=success&per_page=30" \
+                         --jq '.workflow_runs[].head_sha'); do
+            if [ "$(tree_of "$sha" 2>/dev/null)" = "$want" ]; then ok=$sha; break; fi
+          done
+
+          if [ -z "$ok" ]; then
+            echo "::error::No successful simulator run for an identical native/ tree."
+            echo "::error::Run 'iOS app — does it build and open?' on this ref first."
+            echo "::error::Signing proves a binary is authentic, not that it opens."
             exit 1
           fi
+          echo "::notice::native/ matches ${ok:0:7}, which opened on a phone and an iPad."
 
       - uses: actions/setup-node@v4
         with:
@@ -150,6 +171,8 @@ jobs:
             -authenticationKeyIssuerID "$ISSUER" \
             CODE_SIGN_STYLE=Automatic \
             DEVELOPMENT_TEAM="$TEAM" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             | tee /tmp/archive.log | xcpretty || {
               echo "::error::archive failed"
               grep -E "error:|Provisioning|No profiles|doesn't match" /tmp/archive.log | head -20 \
