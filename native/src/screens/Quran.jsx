@@ -46,6 +46,12 @@ const MODE = (() => {
 })();
 
 export default function Quran({ navigation }) {
+  /* Six across, however wide the column turns out to be. See the grid below. */
+  const JUZ_COLS = 6, JUZ_GAP = 7;
+  const [juzW, setJuzW] = useState(0);
+  const juzTile = juzW
+    ? Math.floor((juzW - JUZ_GAP * (JUZ_COLS - 1)) / JUZ_COLS)
+    : 46;
   const { t, tx, fs, lastRead } = useApp();
   const resume = lastRead && (lastRead.mode === "mushaf"
     ? { label: `${t("mushaf.page", "Page")} ${lastRead.page}`, go: () => navigation.navigate("Mushaf", { page: lastRead.page }) }
@@ -95,11 +101,23 @@ export default function Quran({ navigation }) {
         </View>
 
         <Heading tag={t("quran.in_the_mushaf", "in the muṣḥaf")}>{t("quran.by_juz", "By juzʼ")}</Heading>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 7 }}>
+        {/* THE GRID FILLS THE COLUMN, RATHER THAN A FIXED 46pt EACH.
+            At 46 wide with 7 between, six tiles came to 311pt in a 370pt
+            column and the remaining 59 sat empty on the right, so thirty
+            numbers that are each perfectly centred in their own tile read as a
+            block shoved to one side. The width is measured and divided
+            instead, which fills the row exactly, keeps the left edge in line
+            with the cards above, and holds at six across whatever the column
+            is — a phone, a larger phone, or the 520pt cap on a tablet, where a
+            fixed size would have fitted nine and left a last row of three
+            stranded. The 46 stays as the width to use before the first
+            measurement, so nothing jumps on the first frame. */}
+        <View onLayout={e => setJuzW(e.nativeEvent.layout.width)}
+              style={{ flexDirection: "row", flexWrap: "wrap", gap: JUZ_GAP }}>
           {Object.entries(MUSHAF.juzPage).map(([j, page]) => (
             <Press key={j} onPress={() => { tap(); navigation.navigate("Mushaf", { page }); }}
               hitSlop={{ top: 1, bottom: 1, left: 0, right: 0 }}
-              style={{ width: 46, height: 42, alignItems: "center", justifyContent: "center",
+              style={{ width: juzTile, height: 42, alignItems: "center", justifyContent: "center",
                        backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 12 }}>
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.brand600 }}>{j}</Text>
             </Press>))}
