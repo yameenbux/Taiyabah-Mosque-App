@@ -100,8 +100,13 @@ const SHOTS = [
  * way to produce a whole set App Store Connect will reject, and it would only
  * surface at upload. */
 const DEVICES = [
-  { label: "iphone-6.9", match: /^iPhone 16 Pro Max$/,   w: 1320, h: 2868 },
-  { label: "ipad-13",    match: /^iPad Pro 13-inch/,     w: 2064, h: 2752 },
+  /* iPhone 16 Pro, not Pro Max. App Store Connect's iPhone tab is now "iPhone
+   * with Dynamic Island (medium display)" and takes 1206x2622 or 1179x2556,
+   * scaling those down for smaller devices itself. The Pro Max's 1320x2868 is
+   * not on that list, so a set shot at 6.9" is refused on upload — which would
+   * only have been discovered while trying to submit. */
+  { label: "iphone", match: /^iPhone 16 Pro$/,       w: 1206, h: 2622 },
+  { label: "ipad-13",  match: /^iPad Pro 13-inch/,   w: 2064, h: 2752 },
 ];
 
 fs.rmSync(OUT, { recursive: true, force: true });
