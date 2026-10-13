@@ -19,18 +19,38 @@ import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs";
  * Abdullah Yusuf Ali (1934) is the default because it is out of copyright
  * and can be distributed in an app store without permission.
  *
- * Mufti Taqi Usmani (eng-muftitaqiusmani) is the translation most Indo-Pak
- * communities actually prefer, and switching to it is one line — but it is
- * in copyright, so get written permission from the publisher before doing
- * so. Pickthall (eng-mohammedmarmadu) is another public-domain option.
+ * Mufti Taqi Usmani is the translation most Indo-Pak communities actually
+ * prefer, and switching to it is one URL — but it is in copyright, so get
+ * written permission from the publisher before doing so. Pickthall
+ * (en.pickthall) is another public-domain option.
+ *
+ * IT COMES FROM TANZIL, NOT FROM AN API. It used to be read from the
+ * fawazahmed0 edition alongside the Arabic, and that edition is a punctuation-
+ * stripped derivative: every ayah had its closing mark shaved off, so no verse
+ * ended in a full stop, 1,112 verses carried an opening quotation mark with
+ * nothing to close it, and the twelve ayahs that open with the disjointed
+ * letters lost their first letter outright — "A. L. M." came out as "L. M".
+ * 6,215 of 6,236 verses were wrong. The words were right in all but those
+ * twelve; it was the punctuation that was missing, which is why it survived
+ * every count-based check this script already did.
+ *
+ * Tanzil's own file is the text those editions were made from, before the
+ * stripping. Its format is one ayah per line, `sura|aya|text`.
  */
-const TRANSLATION = "eng-abdullahyusufal";
 const TRANSLATION_LABEL = "Abdullah Yusuf Ali";
 
 const RAW = "https://raw.githubusercontent.com";
 const ARABIC_URL = `${RAW}/fawazahmed0/quran-api/1/editions/ara-quranindopak.json`;
-const TRANS_URL  = `${RAW}/fawazahmed0/quran-api/1/editions/${TRANSLATION}.json`;
 const META_URL   = `${RAW}/semarketir/quranjson/master/source/surah.json`;
+/* tanzil.net first, because it is the source. The second is a verbatim
+   snapshot of that same file (its own header still says so) and is there
+   because a build machine behind a proxy can usually reach GitHub and
+   usually cannot reach tanzil.net. Both are checked before anything is
+   written, so taking the mirror costs nothing but the first fetch. */
+const TRANS_URLS = [
+  "https://tanzil.net/trans/en.yusufali",
+  `${RAW}/Q-Translate/translations/master/en.yusufali.txt`,
+];
 
 /* Ayah counts per surah, Kufan/Hafs numbering. The check, not the data. */
 const CANON = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,
@@ -65,6 +85,35 @@ const get = async (url) => {
   return r.json();
 };
 
+/* `sura|aya|text` per line, hash-comments at the end, into the same shape the
+   JSON editions arrive in so one verifier covers both. */
+const parseTanzil = (body) => {
+  const rows = [];
+  for (const line of body.split("\n")) {
+    if (!line || line.startsWith("#")) continue;
+    const a = line.indexOf("|"), b = line.indexOf("|", a + 1);
+    if (a < 0 || b < 0) continue;
+    rows.push({ chapter: Number(line.slice(0, a)), verse: Number(line.slice(a + 1, b)),
+                text: line.slice(b + 1).trim() });
+  }
+  return rows;
+};
+
+const getTranslation = async () => {
+  const failures = [];
+  for (const url of TRANS_URLS) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const rows = parseTanzil(await r.text());
+      if (rows.length !== 6236) throw new Error(`${rows.length} lines, expected 6236`);
+      console.log(`  translation from ${url}`);
+      return rows;
+    } catch (e) { failures.push(`${url}: ${e.message}`); }
+  }
+  throw new Error(`no translation source answered\n  ${failures.join("\n  ")}`);
+};
+
 /* Group a flat list of {chapter, verse, text} into 114 arrays, and refuse
    anything that does not match the canonical counts exactly. */
 function groupAndVerify(rows, label) {
@@ -94,12 +143,25 @@ function groupAndVerify(rows, label) {
 }
 
 console.log("fetching…");
-const [arabicDoc, transDoc, meta] = await Promise.all([get(ARABIC_URL), get(TRANS_URL), get(META_URL)]);
+const [arabicDoc, transRows, meta] = await Promise.all([get(ARABIC_URL), getTranslation(), get(META_URL)]);
 
 const arabic = groupAndVerify(arabicDoc.quran, "arabic (IndoPak)");
-const trans  = groupAndVerify(transDoc.quran,  `translation (${TRANSLATION})`);
+const trans  = groupAndVerify(transRows, "translation (en.yusufali)");
 console.log(`  arabic      ${arabicDoc.quran.length} ayahs — verified`);
-console.log(`  translation ${transDoc.quran.length} ayahs — verified`);
+console.log(`  translation ${transRows.length} ayahs — verified`);
+
+/* THE CHECK THAT WAS MISSING. Counting ayahs cannot see a translation whose
+   sentences have all been filed off: 6,236 verses arrived, every one of them
+   non-empty, and every one of them ended mid-sentence. Yusuf Ali ends 99.6% of
+   his verses on a mark of punctuation. A source that does not is not his text,
+   whatever its ayah count says, and must not be written over the one we have. */
+const ENDS_WELL = /[.!?:;,)"'\u2019\u201d-]$/;
+const ended = transRows.filter(r => ENDS_WELL.test(r.text)).length;
+const pct = (100 * ended / transRows.length);
+console.log(`  translation ${pct.toFixed(1)}% of ayahs end on a mark of punctuation`);
+if (pct < 95) throw new Error(
+  `translation looks stripped of its punctuation: only ${pct.toFixed(1)}% of ayahs ` +
+  `end on one, where Yusuf Ali's text is 99.6% — nothing written`);
 
 if (meta.length !== 114) throw new Error(`metadata has ${meta.length} surahs, expected 114`);
 meta.forEach((m, i) => {

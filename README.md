@@ -666,9 +666,34 @@ manifest, and the signing certificate read back out of the finished `.aab`. See
 
 ## Third-party data
 
-Most of this repository is original work under one licence. Two things are not,
-and the distinction matters more than it looks — both app stores can ask to see
-the right to ship content, and "it was on GitHub" is not an answer.
+Most of this repository is original work under one licence. Three things are
+not, and the distinction matters more than it looks — both app stores can ask to
+see the right to ship content, and "it was on GitHub" is not an answer.
+
+**The Qurʼan.** The Arabic is the IndoPak (King Fahd Complex Nastaliq) text,
+converted to standard Unicode, from
+[quran-api](https://github.com/fawazahmed0/quran-api) (edition
+`ara-quranindopak`). The English is **Abdullah Yusuf Ali (1934)**, which is out
+of copyright, taken from [Tanzil](https://tanzil.net) — `en.yusufali`, one ayah
+per line, which is the file the JSON editions in circulation are made from.
+`scripts/fetch-quran.mjs` fetches both and refuses to write anything that does
+not match the canonical ayah counts.
+
+> [!WARNING]
+> **Take the translation from Tanzil, not from an API.** The English used to
+> come from the same JSON API as the Arabic, and that edition is a
+> punctuation-stripped derivative of the Tanzil file: every ayah had its closing
+> mark shaved off, so not one verse in 6,236 ended in a full stop, 1,112 carried
+> an opening quotation mark with nothing to close it, and the twelve ayahs that
+> open with the disjointed letters lost their first letter outright — Yusuf
+> Ali's "A. L. M." came out as "L. M". 6,215 of 6,236 verses were wrong.
+>
+> The words were right in all but those twelve. Only the punctuation was gone,
+> which is why it survived every count this script already did: 114 sūrahs,
+> 6,236 āyāt, nothing empty, numbering unbroken. A translation can be whole and
+> still not be the translation. The script now also measures how many āyāt end
+> on a mark of punctuation and refuses a source below 95% — Yusuf Ali's own text
+> is 99.7%, the stripped edition 12.5%.
 
 **Ṣaḥīḥ al-Bukhārī** is Arabic text and book structure from
 [hadith-api](https://github.com/fawazahmed0/hadith-api) (edition `ara-bukhari`),
