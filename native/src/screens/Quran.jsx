@@ -243,10 +243,18 @@ function Page({ n, width, height, uri, dim, children, onZoom }) {
   const scale = useSharedValue(1), start = useSharedValue(1);
   const x = useSharedValue(0), y = useSharedValue(0);
   const fromX = useSharedValue(0), fromY = useSharedValue(0);
+  /* Zoomed-in-ness in ordinary React state as well as in a shared value,
+     because it decides whether the drag gesture below is CONFIGURED at all,
+     and a gesture is configured on the JS side. */
+  const [zoomed, setZoomed] = useState(false);
 
   /* The pager above has to be told, because a sideways drag at 2x means "look
      across this page", not "turn it". */
-  const tell = s => onZoom(pagerEnabled(s));
+  const tell = s => {
+    const fitted = pagerEnabled(s);
+    onZoom(fitted);
+    setZoomed(!fitted);
+  };
 
   const settle = () => {
     "worklet";
@@ -264,7 +272,19 @@ function Page({ n, width, height, uri, dim, children, onZoom }) {
     .onUpdate(e => { "worklet"; scale.value = clampScale(start.value * e.scale); })
     .onEnd(() => { "worklet"; settle(); });
 
+  /* Only while zoomed in, which is what lets a fitted page be swiped at all.
+     A Pan that merely EXISTS takes the finger off the pager underneath it:
+     gesture-handler gives its own recogniser first refusal on the touch, so
+     the swipe went to a drag that had been told to do nothing, and the page
+     did not turn. Returning early inside onUpdate cannot help — by then the
+     touch has been claimed. Disabled, there is nothing to claim it, and the
+     list gets the swipe.
+
+     The cost is that you cannot slide the page around in the middle of a
+     pinch, only once that pinch has ended; which nobody notices, because a
+     pinch is two fingers converging and a drag is one finger travelling. */
   const pan = Gesture.Pan()
+    .enabled(zoomed)
     .averageTouches(true)
     .onStart(() => { "worklet"; fromX.value = x.value; fromY.value = y.value; })
     .onUpdate(e => {
@@ -310,7 +330,8 @@ function Page({ n, width, height, uri, dim, children, onZoom }) {
 export function Mushaf({ route, navigation }) {
   const { t, fs, setLastRead, muMark, muFavs, toggleMushafMark, toggleMushafFav } = useApp();
   /* Not Dimensions.get(): that is measured once, and this screen is the one
-   * place in the app that turns sideways on purpose. */
+   * place in the app that turns sideways on purpose. The window is only the
+   * STARTING guess, though — see `box` below. */
   const { width, height } = useWindowDimensions();
   const start = route.params?.page || 1;
   const [page, setPage] = useState(start);
@@ -321,6 +342,24 @@ export function Mushaf({ route, navigation }) {
   /* False while a page is zoomed in, so a sideways drag looks across the page
      instead of turning it. Pages report this up as they are pinched. */
   const [canPage, setCanPage] = useState(true);
+  /* How much glass this reader ACTUALLY has, and how much of it the page bar
+   * is standing on.
+   *
+   * Pages used to be built a whole window tall. They are not shown in a whole
+   * window: the muṣḥaf keeps its header, so the strip starts an inch down and
+   * runs off the bottom of the phone by exactly that much. A page centred in
+   * a box like that is centred somewhere you cannot see — which on a phone
+   * came out as a black band across the top and the last line of the page
+   * tucked under the bar.
+   *
+   * So the strip reports its own size, and the bar reports its own height, and
+   * a page is given what is left. Measured rather than worked out from the
+   * window, because the header is a different height on every phone and the
+   * answer is sitting right there in the layout. */
+  const [box, setBox] = useState({ w: width, h: height });
+  const [bar, setBar] = useState(0);
+  const pageW = box.w;
+  const pageH = Math.max(1, box.h - bar);
   const list = useRef(null);
   const pages = useMemo(() => Array.from({ length: MUSHAF.pages }, (_, i) => i + 1), []);
 
@@ -352,6 +391,11 @@ export function Mushaf({ route, navigation }) {
     list.current?.scrollToIndex({ index: i - 1, animated: false });
   };
 
+  const measure = e => {
+    const { width: w, height: h } = e.nativeEvent.layout;
+    setBox(b => (b.w === w && b.h === h ? b : { w, h }));
+  };
+
   /* Turning the phone changes how wide a page is, and the strip is laid out in
    * page-widths — so without this the reader would be left between two pages. */
   useEffect(() => {
@@ -359,7 +403,7 @@ export function Mushaf({ route, navigation }) {
       try { list.current?.scrollToIndex({ index: page - 1, animated: false }); } catch {}
     }, 60);
     return () => clearTimeout(id);
-  }, [width, height]);
+  }, [pageW, pageH]);
 
   /* The web app turns the page a quarter turn inside an upright window, because
    * a browser cannot unlock rotation. An app can, so this turns the screen
@@ -391,41 +435,43 @@ export function Mushaf({ route, navigation }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#15060F" }}>
-      <FlatList
-        ref={list}
-        data={pages}
-        horizontal
-        pagingEnabled
-        scrollEnabled={canPage}
-        /* Right to left, because that is the direction a muṣḥaf turns. */
-        inverted
-        initialScrollIndex={start - 1}
-        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
-        keyExtractor={n => String(n)}
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={e => setPage(Math.round(e.nativeEvent.contentOffset.x / width) + 1)}
-        windowSize={3}
-        renderItem={({ item: n }) => (
-          <Page n={n} width={width} height={height} dim="#15060F" onZoom={setCanPage}
-                uri={{ source: { uri: pageUrl(n) },
-                       onError: () => setFailed(f => new Set(f).add(n)),
-                       onLoad: () => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; }) }}>
-            {/* 848 pages are streamed and then kept, so the first read of any
-                page needs signal. The website never had to say so — it cannot
-                be opened without a connection — and the app used to say it on
-                the row outside, which the website does not. Said here instead,
-                where somebody with no signal is looking at the page that will
-                not come, rather than guessing the app is broken. */}
-            {failed.has(n) && (
-              <View style={{ position: "absolute", left: 24, right: 24, alignItems: "center", gap: 6 }}>
-                <Ionicons name="cloud-offline-outline" size={26} color="rgba(243,239,227,.5)" />
-                <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), textAlign: "center",
-                               color: "rgba(243,239,227,.66)" }}>
-                  {t("mushaf.needs_signal",
-                     "This page has not been read before, so it needs a connection the first time. Once read, it stays on the phone.")}
-                </Text>
-              </View>)}
-          </Page>)} />
+      <View style={{ flex: 1 }} onLayout={measure}>
+        <FlatList
+          ref={list}
+          data={pages}
+          horizontal
+          pagingEnabled
+          scrollEnabled={canPage}
+          /* Right to left, because that is the direction a muṣḥaf turns. */
+          inverted
+          initialScrollIndex={start - 1}
+          getItemLayout={(_, i) => ({ length: pageW, offset: pageW * i, index: i })}
+          keyExtractor={n => String(n)}
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={e => setPage(Math.round(e.nativeEvent.contentOffset.x / pageW) + 1)}
+          windowSize={3}
+          renderItem={({ item: n }) => (
+            <Page n={n} width={pageW} height={pageH} dim="#15060F" onZoom={setCanPage}
+                  uri={{ source: { uri: pageUrl(n) },
+                         onError: () => setFailed(f => new Set(f).add(n)),
+                         onLoad: () => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; }) }}>
+              {/* 848 pages are streamed and then kept, so the first read of any
+                  page needs signal. The website never had to say so — it cannot
+                  be opened without a connection — and the app used to say it on
+                  the row outside, which the website does not. Said here instead,
+                  where somebody with no signal is looking at the page that will
+                  not come, rather than guessing the app is broken. */}
+              {failed.has(n) && (
+                <View style={{ position: "absolute", left: 24, right: 24, alignItems: "center", gap: 6 }}>
+                  <Ionicons name="cloud-offline-outline" size={26} color="rgba(243,239,227,.5)" />
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), textAlign: "center",
+                                 color: "rgba(243,239,227,.66)" }}>
+                    {t("mushaf.needs_signal",
+                       "This page has not been read before, so it needs a connection the first time. Once read, it stays on the phone.")}
+                  </Text>
+                </View>)}
+            </Page>)} />
+      </View>
 
       {/* The way back to the bookmark, which is the whole point of having one.
           It stays out of the way while you are standing on it. */}
@@ -452,7 +498,11 @@ export function Mushaf({ route, navigation }) {
         </Press>)}
 
       {/* The page bar. Tapping the number opens a jump list of juzʼ and surah. */}
-      <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
+      <View onLayout={e => setBar(h => {
+                       const next = e.nativeEvent.layout.height;
+                       return h === next ? h : next;
+                     })}
+            style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
                      alignItems: "center", justifyContent: "center", gap: 10,
                      paddingVertical: 11, backgroundColor: "rgba(21,6,15,.9)" }}>
         <Press onPress={() => goto(page - 1)} style={{ padding: 8 }}
