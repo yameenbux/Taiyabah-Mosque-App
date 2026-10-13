@@ -425,20 +425,52 @@ jobs:
           esac
           echo "::notice::IPA ${bid} ${ver} (${bld}), signed by ${authority}, aps-environment ${aps:-unreadable}."
 
+      # `set -o pipefail` is the whole point of this line, and its absence is
+      # why 2.0.2 builds 1 and 2 were both announced as uploaded while App
+      # Store Connect held no builds at all. `altool | tee` reports TEE's exit
+      # status, which is always zero, so a failed upload never reached the ||
+      # branch and the success notice printed regardless. The step passed, the
+      # run went green, and nothing had been sent.
       - name: Send it to TestFlight
         env:
           KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
           ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
+          set -o pipefail
           IPA=$(ls "$RUNNER_TEMP/export"/*.ipa | head -1)
           echo "uploading $(basename "$IPA")"
+
+          # Validate first. It makes the same checks the upload does but
+          # reports them as a list rather than aborting on the first, so one
+          # run names everything wrong with the build instead of one thing at
+          # a time.
+          xcrun altool --validate-app -f "$IPA" -t ios \
+            --apiKey "$KEY_ID" --apiIssuer "$ISSUER" 2>&1 | tee /tmp/validate.log || {
+              echo "::error::validation failed — the build was not uploaded"
+              grep -iE "error|invalid|missing|not supported" /tmp/validate.log | head -15 \
+                | while IFS= read -r l; do echo "::error::${l}"; done
+              exit 1; }
+
           xcrun altool --upload-app -f "$IPA" -t ios \
             --apiKey "$KEY_ID" --apiIssuer "$ISSUER" 2>&1 | tee /tmp/upload.log || {
               echo "::error::upload failed"
-              grep -iE "error|already exists|invalid" /tmp/upload.log | head -10 \
+              grep -iE "error|already exists|invalid" /tmp/upload.log | head -15 \
                 | while IFS= read -r l; do echo "::error::${l}"; done
               exit 1; }
-          echo "::notice::Uploaded ${{ inputs.versionName }} build ${{ inputs.buildNumber }}. Apple takes a few minutes to process it before it appears in TestFlight."
+          echo "::notice::altool accepted ${{ inputs.versionName }} build ${{ inputs.buildNumber }}."
+
+      # Acceptance is not arrival. Ask Apple whether it is actually holding the
+      # build, because that is the only claim worth making — and the one that
+      # would have caught the two uploads that silently went nowhere.
+      - name: Confirm Apple is actually holding the build
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPSTORE_API_KEY_P8: ${{ secrets.APPSTORE_API_KEY_P8 }}
+          EXPECT_VERSION: ${{ inputs.versionName }}
+          EXPECT_BUILD: ${{ inputs.buildNumber }}
+          WAIT_SECONDS: "300"
+        run: node native/scripts/asc-builds.mjs
 
       # The IPA is kept whatever happens, so a failed upload does not mean
       # rebuilding to retry it.

@@ -25,6 +25,12 @@ const KEY_ID = process.env.APPSTORE_KEY_ID;
 const ISSUER = process.env.APPSTORE_ISSUER_ID;
 const P8_B64 = process.env.APPSTORE_API_KEY_P8;
 const BUNDLE = process.env.BUNDLE_ID || "com.taiyabahmasjid.app";
+/* Set by the release workflow to turn this from a report into an assertion:
+ * after an upload, the only answer worth accepting is that Apple is actually
+ * holding the build that was just sent. */
+const WANT_VERSION = process.env.EXPECT_VERSION || "";
+const WANT_BUILD = process.env.EXPECT_BUILD || "";
+const WAIT_SECONDS = Number(process.env.WAIT_SECONDS || 0);
 
 const annotate = (level, msg, max = 900) =>
   console.log(`::${level}::${String(msg).replace(/\r?\n/g, " ").slice(0, max)}`);
@@ -65,6 +71,8 @@ async function api(path) {
   return JSON.parse(body);
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 try {
   const apps = await api(`/v1/apps?filter[bundleId]=${encodeURIComponent(BUNDLE)}`);
   if (!apps.data?.length) {
@@ -74,13 +82,39 @@ try {
   const app = apps.data[0];
   annotate("notice", `app: ${app.attributes.name} (${BUNDLE}), Apple ID ${app.id}`);
 
-  const builds = await api(
+  const fetchBuilds = () => api(
     `/v1/builds?filter[app]=${app.id}&limit=20&sort=-uploadedDate`
     + `&include=preReleaseVersion`
     + `&fields[builds]=version,processingState,uploadedDate,expired,usesNonExemptEncryption`);
 
-  if (!builds.data?.length) {
-    annotate("error", "App Store Connect holds NO builds for this app at all. The uploads were accepted but nothing survived — check the Apple ID inbox for an ITMS- message, which names the reason.");
+  const matches = (data, included) => {
+    if (!WANT_BUILD) return false;
+    const vs = Object.fromEntries((included || [])
+      .filter(i => i.type === "preReleaseVersions")
+      .map(i => [i.id, i.attributes.version]));
+    return (data || []).some(b =>
+      String(b.attributes.version) === String(WANT_BUILD) &&
+      (!WANT_VERSION || vs[b.relationships?.preReleaseVersion?.data?.id] === WANT_VERSION));
+  };
+
+  let builds = await fetchBuilds();
+
+  /* A build does not appear the instant altool returns, so when the release
+   * workflow asks for a specific one it is given a few minutes before the
+   * absence is called a failure. Anything longer than this and the upload did
+   * not arrive, whatever altool said. */
+  if (WANT_BUILD && WAIT_SECONDS > 0 && !matches(builds.data, builds.included)) {
+    const deadline = Date.now() + WAIT_SECONDS * 1000;
+    while (Date.now() < deadline) {
+      await sleep(20000);
+      builds = await fetchBuilds();
+      if (matches(builds.data, builds.included)) break;
+      annotate("notice", `waiting for ${WANT_VERSION} (${WANT_BUILD}) to appear...`);
+    }
+  }
+
+  if (!builds.data?.length && !WAIT_SECONDS) {
+    annotate("error", "App Store Connect holds NO builds for this app at all. An upload that reported success but left nothing here did not actually arrive — check the Apple ID inbox for an ITMS- message.");
     process.exit(1);
   }
 
@@ -109,6 +143,19 @@ try {
         annotate("warning", `could not read beta detail for ${a.version}: ${e.message}`);
       }
     }
+  }
+
+  /* The assertion the release workflow needs. "altool exited zero" is not
+   * evidence an upload arrived — that is exactly how two builds were reported
+   * as uploaded while Apple held none — so the proof is that Apple is holding
+   * the build, read back from Apple. */
+  if (WANT_BUILD) {
+    if (!matches(builds.data, builds.included)) {
+      annotate("error", `App Store Connect is NOT holding ${WANT_VERSION} (${WANT_BUILD}) after ${WAIT_SECONDS}s. The upload did not arrive, whatever altool reported. Check the Apple ID inbox for an ITMS- message.`);
+      process.exit(1);
+    }
+    annotate("notice", `confirmed: Apple is holding ${WANT_VERSION} (${WANT_BUILD}).`);
+    process.exit(0);
   }
 
   if (!usable) {
