@@ -39,6 +39,7 @@
  * has to look at these before they go on the App Store.
  */
 import { execFileSync } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -152,17 +153,25 @@ for (const want of DEVICES) {
         "--dataNetwork", "wifi", "--wifiMode", "active", "--wifiBars", "3"]);
     } catch { /* cosmetic only; never worth failing a set over */ }
 
-    sh("xcrun", ["simctl", "launch", dev.udid, bundleId]);
-    /* The splash takes itself away on a timer and the first paint needs the
-     * saved preferences to come back, so the first shot waits longer than the
-     * rest. */
-    wait(12000);
+    /* Each screen is a COLD LAUNCH through its URL, not a URL fired at an
+     * already-running app. Both are supposed to work, but they travel
+     * different paths — a running app receives the URL as an event, while a
+     * launch delivers it as the initial URL — and the event path has more that
+     * can quietly swallow it. The first set came back with every screenshot
+     * the same byte size, which is what a navigation that never happened looks
+     * like, so this takes the shorter path and the fingerprints below prove
+     * which screen each shot actually is. */
+    const seen = new Map();
 
     for (const shot of SHOTS) {
       const file = path.join(outDir, `${shot.name}.png`);
       try {
+        try { sh("xcrun", ["simctl", "terminate", dev.udid, bundleId]); } catch { /* not running */ }
         sh("xcrun", ["simctl", "openurl", dev.udid, shot.url]);
-        wait(3500);
+        /* A cold start has to boot React Native, read the saved preferences and
+         * let the splash time itself out before anything is worth
+         * photographing. */
+        wait(11000);
         sh("xcrun", ["simctl", "io", dev.udid, "screenshot", file]);
 
         const { w, h } = pngSize(file);
@@ -180,8 +189,20 @@ for (const want of DEVICES) {
           failed++;
           continue;
         }
+        /* The one way to catch a set where every shot is the same screen.
+         * A screenshot is lossless, so two identical screens hash identically
+         * — and a listing of six copies of the home screen is worse than no
+         * listing, because it looks deliberate. */
+        const hash = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
+        if (seen.has(hash)) {
+          annotate("error", `${want.label}/${shot.name} is byte-identical to ${seen.get(hash)} — ${shot.url} did not navigate, so this is the wrong screen`);
+          failed++;
+          continue;
+        }
+        seen.set(hash, shot.name);
+
         taken++;
-        annotate("notice", `${want.label}/${shot.name}.png — ${shot.why} (${w}x${h}, ${Math.round(bytes / 1024)}KB)`);
+        annotate("notice", `${want.label}/${shot.name}.png — ${shot.why} (${w}x${h}, ${Math.round(bytes / 1024)}KB, ${hash})`);
       } catch (e) {
         annotate("error", `${want.label}/${shot.name} failed: ${e.message}`);
         failed++;

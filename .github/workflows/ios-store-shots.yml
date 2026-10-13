@@ -49,6 +49,20 @@ jobs:
         working-directory: native
         run: npx expo prebuild --platform ios --no-install --clean
 
+      # After prebuild, never before: prebuild --clean deletes ios/ and would
+      # throw away anything restored ahead of it. Keyed on the configuration as
+      # well as the lockfile, for the reason ios-build.yml sets out at length —
+      # a Debug Pods tree restored into a Release build links the wrong Hermes
+      # and segfaults inside the engine.
+      - name: Cache Pods
+        uses: actions/cache@v4
+        with:
+          path: |
+            native/ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-release-${{ hashFiles('native/package-lock.json') }}
+          restore-keys: pods-${{ runner.os }}-release-
+
       - name: Pods
         working-directory: native/ios
         run: pod install || pod install --repo-update
