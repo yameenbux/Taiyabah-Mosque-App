@@ -1,0 +1,37 @@
+# Where did the build go?
+#
+# altool reported 2.0.2 builds 1 and 2 as uploaded and TestFlight showed "No
+# Builds". Both can be true at once: an upload only has to be ACCEPTED, and
+# processing happens afterwards and can reject a build for reasons the upload
+# never looks at. Apple emails the account holder when it does, which is a poor
+# place for the answer to live when it is the build pipeline that needs it.
+#
+# So this asks App Store Connect directly. No Xcode, no macOS, no build — it
+# runs on Linux in seconds using the same three secrets the release workflow
+# already has, and can be re-run as often as it is useful while waiting for
+# processing to finish.
+name: iOS — where are my builds?
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  builds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ask App Store Connect
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPSTORE_API_KEY_P8: ${{ secrets.APPSTORE_API_KEY_P8 }}
+        run: node native/scripts/asc-builds.mjs
