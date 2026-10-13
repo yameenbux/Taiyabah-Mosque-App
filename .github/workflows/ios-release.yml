@@ -18,7 +18,12 @@
 #
 #   APPSTORE_ISSUER_ID    the Issuer ID, a UUID, from Users and Access -
 #                         Integrations - App Store Connect API
-#   APPSTORE_KEY_ID       the Key ID of that key, ten characters
+#   APPSTORE_KEY_ID       the Key ID of that key, ten characters. The key must
+#                         have ADMIN access: Apple refuses to sign for
+#                         distribution with its cloud-managed certificate for
+#                         anything less, including App Manager, and the export
+#                         fails with "Cloud signing permission error". A key's
+#                         role cannot be changed after it is created.
 #   APPSTORE_API_KEY_P8   the .p8 file, base64 encoded:
 #                            base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
 #   APPLE_TEAM_ID         the ten-character Team ID. Not secret, but it lives
@@ -250,6 +255,16 @@ jobs:
               grep -iE "error|No profiles|No signing certificate|doesn't match|not found|requires a|Provisioning" \
                 /tmp/export.log | head -20 \
                 | while IFS= read -r l; do echo "::error::${l}"; done
+              # "Cloud signing permission error" has exactly one cause and it is
+              # not in this repository, so say so rather than leaving the next
+              # run to rediscover it. Apple requires an App Store Connect API
+              # key with ADMIN access to sign for distribution with its
+              # cloud-managed certificate; App Manager and Developer keys are
+              # refused. A key's role is fixed when it is created, so the fix is
+              # a new Admin key, not an edit to the existing one.
+              if grep -q "Cloud signing permission error" /tmp/export.log; then
+                echo "::error::The App Store Connect API key does not have Admin access. Apple requires an Admin-level key to sign for distribution with the cloud-managed certificate — App Manager is not enough. Create a new Team Key with Access = Admin (Users and Access - Integrations - App Store Connect API), then update the APPSTORE_KEY_ID and APPSTORE_API_KEY_P8 secrets. APPSTORE_ISSUER_ID is per-team and does not change."
+              fi
               exit 1; }
           ls -lh "$RUNNER_TEMP/export"
           # Which identities ended up in the keychain, and whether the export
