@@ -100,12 +100,23 @@ jobs:
         working-directory: native
         run: node scripts/store-shots.mjs
 
+      # Always, because the capture step fails the run when a deep link does not
+      # navigate, and the screenshots it DID take are still the input to the
+      # listing images. A set missing one screen is worth composing; a run that
+      # threw them away because one URL misbehaved is not.
+      - name: Compose the listing images
+        if: always()
+        working-directory: native
+        run: node scripts/store-frames.mjs
+
       # Kept even when the run fails: a partial set is still worth having, and
       # seeing which screen came out wrong is most of the diagnosis.
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: app-store-screenshots
-          path: native/store-shots/**
+          path: |
+            native/store-shots/**
+            docs/store-assets/frames/**
           if-no-files-found: error
           retention-days: 30

@@ -213,6 +213,20 @@ for (const want of DEVICES) {
         failed++;
       }
     }
+    /* Whether the URL reached JavaScript at all. App.jsx logs a [deeplink]
+     * line from getInitialURL and from the url event, so their presence or
+     * absence separates "the link never arrived" from "it arrived and did not
+     * navigate" — two different bugs that look identical from a screenshot. */
+    try {
+      const log = sh("xcrun", ["simctl", "spawn", dev.udid, "log", "show",
+        "--last", "5m", "--style", "compact",
+        "--predicate", 'eventMessage CONTAINS "[deeplink]"']);
+      const lines = log.split("\n").filter(l => l.includes("[deeplink]")).slice(0, 8);
+      if (lines.length) for (const l of lines) annotate("notice", `${want.label} ${l.trim()}`, 300);
+      else annotate("warning", `${want.label}: no [deeplink] line in the app's log — the URL never reached JavaScript`);
+    } catch (e) {
+      annotate("warning", `${want.label}: could not read the simulator log (${e.message})`);
+    }
   } catch (e) {
     annotate("error", `${want.label}: ${e.message}`);
     failed++;

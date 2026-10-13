@@ -1,6 +1,7 @@
 import React from "react";
 import Offline from "./Offline";
 import { NavigationContainer } from "@react-navigation/native";
+import * as ExpoLinking from "expo-linking";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -184,6 +185,36 @@ function Tabs() {
  * is ignored rather than guessed at. */
 const linking = {
   prefixes: ["taiyabah://"],
+
+  /* Routed through expo-linking rather than left to React Navigation's default,
+   * which reads React Native's own Linking module. The generated AppDelegate
+   * forwards a URL like this:
+   *
+   *     return [super application:openURL:options:]
+   *         || [RCTLinkingManager application:openURL:options:];
+   *
+   * and `||` short-circuits. Any Expo or OneSignal subscriber inside `super`
+   * that claims the URL first means RCTLinkingManager is never called at all,
+   * so React Native's Linking never hears about it and the deep link is lost
+   * before any of this file runs. That is consistent with what was measured:
+   * the scheme is registered, simctl reported the open as successful, the
+   * config resolves `qibla` to Qibla, and the app still sat on Home.
+   *
+   * expo-linking listens inside the chain `super` walks, so it sees the URL
+   * whoever else handles it. */
+  async getInitialURL() {
+    const url = await ExpoLinking.getInitialURL();
+    if (url) console.log(`[deeplink] initial ${url}`);
+    return url ?? null;
+  },
+  subscribe(listener) {
+    const sub = ExpoLinking.addEventListener("url", ({ url }) => {
+      console.log(`[deeplink] event ${url}`);
+      listener(url);
+    });
+    return () => sub.remove();
+  },
+
   config: {
     screens: {
       Tabs: { screens: { HomeTab: "home", TimesTab: "times",

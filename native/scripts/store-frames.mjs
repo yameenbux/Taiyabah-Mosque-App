@@ -20,6 +20,11 @@
  * timetable, it really does work with no signal, the nisab really is computed
  * from both metals.
  *
+ * Each panel names the screenshot it frames, and they are deliberately not all
+ * the same one: a headline promising the mushaf over a picture of the home
+ * screen is a misrepresentation, which Apple cares about and which is in any
+ * case simply untrue.
+ *
  * SIZE. 1206x2622, which is what App Store Connect's "iPhone with Dynamic
  * Island (medium display)" tab accepts, and 2064x2752 for the 13" iPad tab.
  * Rendered by the Chromium already on the machine, at half size with a device
@@ -34,7 +39,27 @@ const native = path.resolve(here, "..");
 const repo = path.resolve(native, "..");
 const SHOTS = process.env.SHOTS_DIR || path.join(native, "store-shots");
 const OUT = process.env.FRAMES_DIR || path.join(repo, "docs", "store-assets", "frames");
-const CHROME = process.env.CHROME_BIN || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+/* Resolved rather than hardcoded: this runs both in a Linux container with
+ * Playwright's Chromium and on a macOS runner with Google Chrome, and a path
+ * that only exists in one of them fails in the other with ENOENT and nothing
+ * to say why. */
+const CHROME = (() => {
+  const candidates = [
+    process.env.CHROME_BIN,
+    "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+  ].filter(Boolean);
+  const found = candidates.find(c => fs.existsSync(c));
+  if (!found) {
+    console.log(`::error::no Chrome or Chromium found. Looked in: ${candidates.join(", ")}`);
+    process.exit(1);
+  }
+  return found;
+})();
 
 const C = {
   brand900: "#3C0B2A", brand800: "#4B1136", brand700: "#5E1844",
@@ -56,19 +81,19 @@ const PANELS = [
     lead: "Times from the masjid.",
     turn: "Not from an algorithm.",
     body: "The same timetable that is printed and put up on the wall each year — so the time on your phone is the time the jamaat actually stands." },
-  { shot: "1-home",
+  { shot: "6-alerts",
     lead: "Know before the adhan.",
     turn: "Not after it.",
     body: "A quiet reminder the number of minutes before jamaat that you choose. Janazah, Ramadan and Eid changes too, each its own switch." },
-  { shot: "1-home",
+  { shot: "3-mushaf",
     lead: "The whole mushaf.",
     turn: "In your pocket.",
     body: "All 114 surahs in the familiar 13-line layout, with the page you stopped at kept for next time." },
-  { shot: "1-home",
+  { shot: "2-timetable",
     lead: "Works in the prayer hall.",
     turn: "Signal or none.",
     body: "Prayer times, the Qur'an, the adhkar and the Qibla all keep working with no connection at all." },
-  { shot: "1-home",
+  { shot: "5-zakat",
     lead: "Zakat, worked out.",
     turn: "Not guessed at.",
     body: "The nisab in both gold and silver from today's prices, then cash, metals, stock and what you are owed." },
