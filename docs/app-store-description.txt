@@ -1,37 +1,54 @@
 The official app of Taiyabah Masjid, Bolton — built for the congregation, and for anyone who needs the masjid's times while they are out.
 
 PRAYER TIMES FROM THE MASJID ITSELF
-Beginning and jamaat times come straight from Taiyabah Masjid's own official Salah timetable — the same one printed and put up each year. They are not calculated estimates, so the time on your phone is the time the jamaat actually stands. See today at a glance, or open the full timetable for any date in the year.
+Beginning and jamaat times come straight from Taiyabah Masjid's own official Salah timetable — the same one printed and put up each year. They are not calculated estimates, so the time on your phone is the time the jamaat actually stands. See today at a glance, or open the full monthly timetable for any date in the year.
 
 NOTIFICATIONS YOU CHOOSE
-Be told when jamaat is about to begin, with time to get there. You can also turn on:
+A quiet reminder before each congregation, with the number of minutes' warning set by you, so you leave in time rather than arrive during it. You can also turn on:
 • Janazah (funeral prayer) announcements
 • Timetable changes, Ramadan and Eid
 • Events, bayaans, classes and community gatherings
-Each is a separate switch, so you get only what you asked for.
+• Surah al-Kahf on a Friday morning
+Each is a separate switch. You get what you asked for and nothing else, and you can change your mind at any time.
 
 QIBLA
-Find the direction of prayer from wherever you are standing.
+Find the direction of prayer from wherever you are standing. Your location is used on the phone itself to work out the direction, and is never stored or sent anywhere.
 
 THE HOLY QUR'AN
-The complete mushaf, laid out clearly, with pinch to zoom for closer reading.
+The complete mushaf in the familiar 13-line layout, with pinch to zoom for closer reading. Jump to any of the 114 surahs, mark the page you stopped at, and keep the ones you return to in a list of their own.
+
+HADITH
+Sahih al-Bukhari, arranged by book, to read a few at a time.
+
+DUAS AND DAILY ATHKAR
+The athkar for morning and evening, after every salah, and before sleep — alongside everyday duas and the 40 Rabbana of the Qur'an.
 
 LISTEN LIVE
-Hear the masjid live when you cannot be there in person.
+Hear the masjid live when you cannot be there in person, and watch recorded bayaans and talks.
 
 ZAKAT CALCULATOR
-A plain-English guide to who pays zakat and when; the nisab in both gold and silver, worked out from today's prices; and a step-by-step calculator covering cash, gold, silver, business stock and money owed to you.
+A plain-English guide to who pays zakat and when. The nisab in both gold and silver, worked out from today's prices, with a note on why the Hanafi school uses the silver one. Then a step-by-step calculator covering cash, gold, silver, business stock and money owed to you.
 
 MADRASAH
-The madrasah has taught the community's children since 1967. Admissions, fees, class times, and the full year calendar of closures alongside the Islamic dates.
+The madrasah has taught the community's children since 1967. Admissions, fees, class times, and what is asked of students and parents — with a holiday planner showing every day the madrasah is closed this year, set against the Islamic dates.
 
 SERVICES
 • Nikah, in keeping with authentic Islamic tradition
 • Funeral services, and support for families through every part of an Islamic funeral
-• Hall and room hire at the Taiyabah Centre
-• Donate securely to the masjid
+• Hall and room hire at the Taiyabah Centre, with halls and kitchens for community and family events
+• The imams' advice on questions families bring to the masjid
+• Charity collections
+• Donate securely — Sadaqah, Lillah, and the masjid's own appeals
 
-IN YOUR LANGUAGE
-English, Urdu, Arabic and Gujarati, with full right-to-left layout.
+NOTICES
+Announcements from the masjid, so a change to the timetable, or something happening this weekend, reaches you without a phone call.
 
-Taiyabah Masjid is run by Bolton Central Islamic Society.
+IT WORKS WHEN THE SIGNAL DOES NOT
+Prayer times, the Qur'an, the adhkar and the Qibla all keep working with no connection — which matters in a prayer hall, in a basement, and abroad.
+
+MADE TO BE READ BY EVERYONE
+• English, Urdu, Arabic and Gujarati, with full right-to-left layout
+• Text size you can set, so the times are legible without reaching for glasses
+• A light theme and a dark one, the dark easier on the eyes at Fajr and Isha
+
+Taiyabah Masjid is run by Bolton Central Islamic Society, registered charity 1041569.
