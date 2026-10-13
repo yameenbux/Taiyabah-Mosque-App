@@ -326,17 +326,48 @@ jobs:
           # every push to this build would go to the sandbox and silently never
           # arrive. Worth asserting here rather than discovering on a phone.
           # Read, not assumed — but a failure to *read* it is reported rather
-          # than treated as a wrong value. codesign's entitlement output format
-          # has changed across releases, and blocking a correctly signed build
-          # over a parsing quirk would be the worse error of the two.
-          aps=$(codesign -d --entitlements - --xml "$app" 2>/dev/null \
-                | plutil -extract aps-environment raw - 2>/dev/null || true)
-          if [ -z "$aps" ]; then
-            echo "::warning::could not read aps-environment from the signed bundle; check a TestFlight install actually receives a push"
-          elif [ "$aps" != "production" ]; then
-            echo "::error::aps-environment is '${aps}', expected 'production' — pushes would go to the APNs sandbox and never arrive"
-            exit 1
+          # than treated as a wrong value, because blocking a correctly signed
+          # build over a parsing quirk is the worse of the two errors. The first
+          # attempt at this piped codesign into `plutil -extract`, which failed
+          # for a reason worth recording: plutil writes "Could not extract
+          # value" to STDOUT, so the error text landed in the variable, the
+          # empty-check below never fired, and a good build was blocked by the
+          # very guard meant to prevent that. Entitlements are therefore dumped
+          # to a file first and read with two independent methods, so a format
+          # change costs a warning rather than a release.
+          ent="$RUNNER_TEMP/entitlements.plist"
+          codesign -d --entitlements :"$ent" "$app" 2>/dev/null \
+            || codesign -d --entitlements - --xml "$app" >"$ent" 2>/dev/null \
+            || true
+          aps=""
+          if [ -s "$ent" ]; then
+            # PlistBuddy handles both XML and binary plists; the grep is for the
+            # case where the dump carries a blob header PlistBuddy won't parse.
+            aps=$(/usr/libexec/PlistBuddy -c 'Print :aps-environment' "$ent" 2>/dev/null || true)
+            if [ -z "$aps" ]; then
+              aps=$(grep -A1 '<key>aps-environment</key>' "$ent" 2>/dev/null \
+                    | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | head -1 || true)
+            fi
           fi
+          case "$aps" in
+            production) ;;
+            "")
+              # Say what IS in there, so the next run diagnoses this instead of
+              # repeating it. These are capability names and the team id, not
+              # anything secret.
+              echo "::warning::could not read aps-environment from the signed bundle — confirm by hand that a TestFlight install receives a push"
+              if [ -s "$ent" ]; then
+                keys=$(grep -oE '<key>[^<]+</key>' "$ent" 2>/dev/null | sed 's/<\/*key>//g' | paste -sd, - || true)
+                echo "::warning::entitlement keys present: ${keys:-none parsed}"
+              else
+                echo "::warning::codesign produced no entitlements output at all"
+              fi
+              ;;
+            *)
+              echo "::error::aps-environment is '${aps}', expected 'production' — every push would go to the APNs sandbox and silently never arrive"
+              exit 1
+              ;;
+          esac
           echo "::notice::IPA ${bid} ${ver} (${bld}), signed by ${authority}, aps-environment ${aps:-unreadable}."
 
       - name: Send it to TestFlight
