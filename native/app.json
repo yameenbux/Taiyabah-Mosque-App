@@ -116,6 +116,11 @@
     "experiments": {
       "typedRoutes": false
     },
-    "owner": "ysbdesigns"
+    "owner": "ysbdesigns",
+    "extra": {
+      "eas": {
+        "projectId": "647995fe-86db-4b00-88d5-50a611b14a7b"
+      }
+    }
   }
 }
