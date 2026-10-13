@@ -97,15 +97,10 @@ jobs:
       # listener setup calls a property that is not there, and the app dies on
       # launch with "undefined is not a function" — a blank screen, no clue.
       # app.json asks for it; this proves prebuild actually wrote it.
-      - name: Check the New Architecture is really on
-        working-directory: native/android
+      - name: The OneSignal version and the architecture flag must agree
+        working-directory: native
         run: |
-          grep -n "newArchEnabled" gradle.properties || true
-          if ! grep -q "^newArchEnabled=true" gradle.properties; then
-            echo "::error::newArchEnabled is not true in android/gradle.properties."
-            echo "::error::OneSignal needs it; without it the app crashes on launch."
-            exit 1
-          fi
+          node scripts/check-arch.mjs android/gradle.properties
 
       - uses: actions/setup-java@v4
         with:

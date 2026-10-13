@@ -230,15 +230,30 @@ It runs first in `npm run check` and first in the release workflow.
 `app.json` is JSON and cannot hold a comment, so the two that would cost a day
 to re-derive are written down here.
 
-**`newArchEnabled: true`.** `react-native-onesignal` 5.4.3 declares its event
-listeners as codegen `EventEmitter` properties (`src/NativeOneSignal.ts`), and
-those properties only exist under React Native's New Architecture. Build
-without it and nothing complains: the module loads, its constructor calls
-`setupListeners`, and the first line reaches for a property that was never
-generated. The app dies on launch with `TypeError: undefined is not a
-function` and shows a blank screen — no stack anyone would connect to a
-notification library. Every workflow now checks `android/gradle.properties`
-after prebuild rather than trusting that the flag survived.
+**`newArchEnabled` is paired with the OneSignal version.** They are one
+setting wearing two hats, and each half has broken the app once.
+
+`react-native-onesignal` **5.4.x** declares its Android event listeners as
+codegen `EventEmitter` properties (`src/NativeOneSignal.ts`), which exist only
+under the New Architecture. Build without it and nothing complains: the module
+loads, its constructor calls `setupListeners`, and the first line reaches for a
+property that was never generated. Blank screen, `TypeError: undefined is not a
+function`, no stack anyone would connect to a notification library. But 5.4.x
+also registers its **iOS** module through `codegenConfig.ios.modulesProvider`, a
+field React Native added in **0.79** — and Expo SDK 52 ships 0.76. So on iOS the
+app dies with `Invariant Violation: 'OneSignal' could not be found`, and no flag
+fixes that. 5.4.x cannot run on iOS here at all.
+
+**5.3.x** is built for the legacy bridge: `NativeModules` on both platforms, no
+codegen. It runs on React Native 0.76, and it wants the New Architecture **off**.
+Pinned exactly, not with a caret — a caret is how a 0.76 project drifted onto a
+release built for 0.79.
+
+`scripts/check-arch.mjs` enforces the pair and every workflow runs it after
+prebuild. Moving one without the other is the mistake it exists to catch;
+`scripts/test/arch.test.mjs` pins both ways it has already gone wrong.
+
+The way out is Expo 53+ (React Native 0.79), which is the 2.2 milestone.
 
 **`targetSdkVersion: 36`**, under `expo-build-properties`. Play now requires
 API 36 of every update and SDK 52 defaults to 34, so without this the bundle is
