@@ -119,9 +119,9 @@ console.log(`app: ${app}\nbundle: ${bundleId}\n`);
  * API as plain text. So every verdict is repeated here in one line, and a
  * failure says WHY on the summary page rather than only in a log nobody can
  * open. Same reason scripts/next-year-published.mjs does it. */
-const annotate = (level, msg) => {
+const annotate = (level, msg, max = 900) => {
   if (!process.env.GITHUB_ACTIONS) return;
-  console.log(`::${level}::` + String(msg).replace(/\s*\n\s*/g, " — ").trim().slice(0, 900));
+  console.log(`::${level}::` + String(msg).replace(/\s*\n\s*/g, " — ").trim().slice(0, max));
 };
 
 const DEVICES = [
@@ -240,6 +240,18 @@ for (const want of DEVICES) {
             const keep = /com\.facebook\.react|Invariant|Exception|Error|fatal/i.test(l) ? 4000 : 200;
             console.error(`      ${l.slice(0, keep)}`);
           }
+          /* THE WHOLE POINT OF THIS CAPTURE. 4d73049 widened these lines so the
+             stack behind "'OneSignal' could not be found" would be visible, and
+             then the stack sat in a log that cannot be fetched from outside the
+             runner. The telling lines go to annotations at full width, because
+             which frame asks for the module is the open question. */
+          const telling = out.filter(l =>
+            /Invariant|Exception|fatal|could not be found|TurboModule|RCTFatal/i.test(l));
+          for (const l of telling.slice(0, 4))
+            annotate("error", `${want.label} log: ${l}`, 4000);
+          if (!telling.length && out.length)
+            annotate("error", `${want.label}: exited with nothing telling in the device log; ` +
+                              `last line: ${out[out.length - 1]}`);
         }
       } catch (e) { console.error(`    (device log unavailable: ${String(e.message).split("\n")[0]})`); }
       failures++;
@@ -257,6 +269,13 @@ for (const want of DEVICES) {
       if (recent.length) {
         console.error(`  FAIL  crash report(s): ${recent.join(", ")}`);
         annotate("error", `${want.label}: crash report(s) written on launch: ${recent.join(", ")}`);
+        try {
+          const first = JSON.parse(fs.readFileSync(path.join(crashDir, recent[0]), "utf8")
+            .split("\n").slice(1).join("\n"));
+          annotate("error", `${want.label} crash: ${first.exception?.type || "?"} ` +
+                            `${first.exception?.signal || ""} ${first.termination?.indicator || ""} ` +
+                            `${(first.asi ? JSON.stringify(first.asi) : "").slice(0, 2000)}`, 4000);
+        } catch { /* the plain-text report shape; report() already printed it */ }
         for (const f of recent.slice(0, 2)) report(path.join(crashDir, f));
         failures++;
       }
