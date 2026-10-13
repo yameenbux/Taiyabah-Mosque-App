@@ -1,0 +1,209 @@
+# The signed build that reaches TestFlight and, eventually, the App Store.
+#
+# WHY THIS IS SEPARATE FROM ios-build.yml. That one builds for the simulator,
+# which needs no signing, no account and no secrets — which is exactly why it
+# can run on every push. This one puts a build in front of real people, so it
+# runs only when somebody asks for it, and only from a commit the simulator
+# job has already opened. The iOS app shipped five green runs that were
+# photographs of a React Native error screen (6e61df6); the gate below is what
+# stops the signed path repeating it.
+#
+# SIGNING WITHOUT A MAC AND WITHOUT A .p12. xcodebuild is given an App Store
+# Connect API key and -allowProvisioningUpdates, so Xcode creates and fetches
+# the certificate and both provisioning profiles itself — the app's and the
+# notification service extension's. Nothing has to be exported from anybody's
+# Keychain, and the only secrets are the three that make up the API key.
+#
+# Three secrets, set in Settings - Secrets and variables - Actions:
+#
+#   APPSTORE_ISSUER_ID    the Issuer ID, a UUID, from Users and Access -
+#                         Integrations - App Store Connect API
+#   APPSTORE_KEY_ID       the Key ID of that key, ten characters
+#   APPSTORE_API_KEY_P8   the .p8 file, base64 encoded:
+#                            base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
+#   APPLE_TEAM_ID         the ten-character Team ID. Not secret, but it lives
+#                         here so all four Apple settings are in one place.
+#
+# Apple lets a .p8 be downloaded ONCE. Keep it somewhere safe as well as here.
+
+name: iOS app — sign and send to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Version people see, e.g. 2.0.2'
+        required: true
+        default: '2.0.2'
+      buildNumber:
+        description: 'Build number — HIGHER than the last TestFlight upload for this version'
+        required: true
+        default: '1'
+
+jobs:
+  testflight:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # The same gate the Play bundle has. A signed build that crashes on
+      # launch is worse than no build: it costs a TestFlight round trip and
+      # the testers' patience.
+      - name: Has this exact commit opened on a simulator?
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          sha=${{ github.sha }}
+          n=$(gh api "repos/${{ github.repository }}/actions/workflows/ios-build.yml/runs?head_sha=$sha&status=success" \
+                --jq '.total_count')
+          echo "successful iOS simulator runs for $sha: $n"
+          if [ "${n:-0}" -lt 1 ]; then
+            echo "::error::No successful 'iOS app — does it build and open?' run for $sha."
+            echo "::error::Run it on this ref first. Signing proves nothing about whether the app opens."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Install
+        working-directory: native
+        run: npm ci
+
+      - name: The OneSignal version and the architecture flag must agree
+        working-directory: native
+        run: node scripts/check-arch.mjs
+
+      - name: Set the version for this build
+        working-directory: native
+        env:
+          VNAME: ${{ inputs.versionName }}
+          VBUILD: ${{ inputs.buildNumber }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const c = JSON.parse(fs.readFileSync("app.json", "utf8"));
+            c.expo.version = process.env.VNAME;
+            /* iOS wants a string, and App Store Connect rejects a build
+               number it has already seen for this version. */
+            c.expo.ios = c.expo.ios || {};
+            c.expo.ios.buildNumber = String(process.env.VBUILD);
+            fs.writeFileSync("app.json", JSON.stringify(c, null, 2) + "\n");
+            console.log("version", c.expo.version, "build", c.expo.ios.buildNumber);
+          '
+
+      - name: Generate the iOS project
+        working-directory: native
+        run: npx expo prebuild --platform ios --no-install --clean
+
+      - name: Pods
+        working-directory: native/ios
+        run: pod install || pod install --repo-update
+
+      - name: Find the workspace and scheme
+        id: xc
+        working-directory: native/ios
+        run: |
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME=$(ls -d *.xcodeproj | head -1 | sed 's/\.xcodeproj$//')
+          echo "workspace=$WS"  >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          echo "Archiving scheme '$SCHEME' from '$WS'"
+
+      # altool and xcodebuild both look for the key in ~/private_keys.
+      - name: Put the API key where the tools look for it
+        env:
+          P8: ${{ secrets.APPSTORE_API_KEY_P8 }}
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+        run: |
+          if [ -z "$P8" ] || [ -z "$KEY_ID" ]; then
+            echo "::error::APPSTORE_API_KEY_P8 or APPSTORE_KEY_ID is not set. See the comment at the top of this file."
+            exit 1
+          fi
+          mkdir -p ~/private_keys
+          printf '%s' "$P8" | base64 --decode > ~/private_keys/AuthKey_${KEY_ID}.p8
+          chmod 600 ~/private_keys/AuthKey_${KEY_ID}.p8
+          echo "wrote ~/private_keys/AuthKey_${KEY_ID}.p8"
+
+      - name: Archive
+        working-directory: native/ios
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -workspace "${{ steps.xc.outputs.workspace }}" \
+            -scheme "${{ steps.xc.outputs.scheme }}" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Taiyabah.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER" \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM="$TEAM" \
+            | tee /tmp/archive.log | xcpretty || {
+              echo "::error::archive failed"
+              grep -E "error:|Provisioning|No profiles|doesn't match" /tmp/archive.log | head -20 \
+                | while IFS= read -r l; do echo "::error::${l}"; done
+              exit 1; }
+
+      - name: Export the IPA
+        working-directory: native/ios
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${TEAM}</string>
+            <key>uploadSymbols</key><true/>
+            <key>signingStyle</key><string>automatic</string>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Taiyabah.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER"
+          ls -lh "$RUNNER_TEMP/export"
+
+      - name: Send it to TestFlight
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          IPA=$(ls "$RUNNER_TEMP/export"/*.ipa | head -1)
+          echo "uploading $(basename "$IPA")"
+          xcrun altool --upload-app -f "$IPA" -t ios \
+            --apiKey "$KEY_ID" --apiIssuer "$ISSUER" 2>&1 | tee /tmp/upload.log || {
+              echo "::error::upload failed"
+              grep -iE "error|already exists|invalid" /tmp/upload.log | head -10 \
+                | while IFS= read -r l; do echo "::error::${l}"; done
+              exit 1; }
+          echo "::notice::Uploaded ${{ inputs.versionName }} build ${{ inputs.buildNumber }}. Apple takes a few minutes to process it before it appears in TestFlight."
+
+      # The IPA is kept whatever happens, so a failed upload does not mean
+      # rebuilding to retry it.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: taiyabah-ios-${{ inputs.versionName }}-build${{ inputs.buildNumber }}
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: warn
+          retention-days: 30

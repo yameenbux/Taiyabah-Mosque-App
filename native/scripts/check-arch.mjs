@@ -82,11 +82,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     .dependencies["react-native-onesignal"];
   const gradle = process.argv[2] || path.join(root, "android", "gradle.properties");
   const text = fs.existsSync(gradle) ? fs.readFileSync(gradle, "utf8") : "";
-  if (!text) {
-    console.error(`no ${gradle} — did prebuild run?`);
-    if (process.env.GITHUB_ACTIONS) console.log(`::error::no ${gradle} — did prebuild run?`);
-    process.exit(1);
-  }
+
+  /* An iOS-only prebuild writes no gradle.properties, and the pairing still
+     matters there — 5.4.x cannot run on this project's iOS at all. So fall
+     back to what app.json ASKS for. On Android the gradle file is the better
+     source, because it is what prebuild actually wrote. */
+  const asked = JSON.parse(fs.readFileSync(path.join(root, "app.json"), "utf8"))
+    .expo.newArchEnabled === true;
   /* The native SDK the installed wrapper pins, and the Kotlin we compile with. */
   const gradlePath = path.join(root, "node_modules", "react-native-onesignal", "android", "build.gradle");
   if (fs.existsSync(gradlePath)) {
@@ -103,7 +105,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   }
 
-  const flagIsOn = /^newArchEnabled=true\s*$/m.test(text);
+  const flagIsOn = text ? /^newArchEnabled=true\s*$/m.test(text) : asked;
+  console.log(`    ${text ? `${gradle} says` : "app.json asks for"} newArchEnabled=${flagIsOn}`);
   const v = verdict(version, flagIsOn);
   console.log((v.ok ? "ok  " : "FAIL  ") + v.message);
   if (!v.ok && process.env.GITHUB_ACTIONS) console.log(`::error::${v.message}`);
