@@ -13,6 +13,7 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { dayFor, nowLondon, londonInstant, NAMES, ORDER } from "./prayer";
+import { at, weekly, FRIDAY } from "./triggers";
 
 const DAYS_AHEAD = 7;
 
@@ -68,7 +69,10 @@ export async function arm(reminders, extras = {}) {
           body: `${pretty(at)} at Taiyabah Masjid`,
           sound: "default",
         },
-        trigger: Platform.OS === "android" ? { date: when, channelId: "prayer" } : { date: when },
+        /* src/triggers.js, and read its header before touching this: a
+           trigger object without a `type` is not rejected by
+           expo-notifications, it is delivered immediately. */
+        trigger: at(when, Platform.OS === "android" ? "prayer" : undefined),
       });
       armed++;
     }
@@ -84,14 +88,26 @@ export async function arm(reminders, extras = {}) {
         body: "It is Friday — a reminder to read it.",
         sound: "default",
       },
-      /* expo-notifications counts weekdays from Sunday, so Friday is 6. */
-      trigger: Platform.OS === "android"
-        ? { weekday: 6, hour: 7, minute: 30, repeats: true, channelId: "prayer" }
-        : { weekday: 6, hour: 7, minute: 30, repeats: true },
+      trigger: weekly({ weekday: FRIDAY, hour: 7, minute: 30,
+                        channelId: Platform.OS === "android" ? "prayer" : undefined }),
     });
     armed++;
   }
-  return armed;
+
+  /* Counted by asking the OS, not by counting what we sent it.
+   *
+   * The settings screen says "N reminders are scheduled on this phone", and
+   * until now N was our own tally of scheduleNotificationAsync calls, which is
+   * a promise rather than a reading. Every one of those calls had been
+   * delivering immediately and leaving nothing behind, so the screen was
+   * reporting thirty-six scheduled reminders against an empty queue. A number
+   * that cannot be wrong in that direction is worth the one extra call. */
+  try {
+    const held = await Notifications.getAllScheduledNotificationsAsync();
+    return held.length;
+  } catch {
+    return armed;
+  }
 }
 
 const pretty = hhmm => {

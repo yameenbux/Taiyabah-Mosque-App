@@ -20,7 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
-import { useApp } from "../store";
+import { useApp, EVERYTHING_ON } from "../store";
 import { Screen, TopBar, Heading, Card, Note, P, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
 import { arm, ask } from "../reminders";
@@ -78,6 +78,7 @@ export default function Alerts() {
   const [granted, setGranted] = useState(null);
   const [armed, setArmed] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [tagState, setTagState] = useState(null);
   const [diag, setDiag] = useState(false);
   const [pickMins, setPickMins] = useState(false);
   const nav = useNavigation();
@@ -107,15 +108,42 @@ export default function Alerts() {
     tap();
     const ok = await ask();
     setGranted(ok);
+    if (!ok) return;
+    /* Stored before anything is sent, so a phone that loses signal between the
+       two still has the choice when it comes back. The reminders themselves
+       are armed by the effect above, which this change to `alerts` wakes. */
+    setAlerts(EVERYTHING_ON);
+    setSaved(true);
+    await optIn();
+    setTagState(await syncTags({ ...alerts, ...EVERYTHING_ON }));
   };
 
-  const set = patch => { tap(); setAlerts(patch); setSaved(false); };
+  /* A switch is a decision, not a draft. It is written to the phone here and
+     sent to the masjid by the effect below — Save commits nothing that has not
+     already been committed, and is kept because the website has one and
+     because a tag write that failed needs a way to be tried again. */
+  const set = patch => { tap(); setAlerts(patch); };
 
   /* The three the masjid sends are tags on this device, and a tag written is
-   * the whole of what makes a phone reachable by a targeted send. Written when
-   * Save is pressed rather than on every flick of a switch, so a person
-   * changing their mind four times does not queue four writes. */
-  const [tagState, setTagState] = useState(null);
+   * the whole of what makes a phone reachable by a targeted send.
+   *
+   * These used to be written only when Save was pressed, so a switch moved and
+   * left alone did nothing at all — the one thing a switch must never do. They
+   * are written here instead, a second after the last change, which is the
+   * same thing the website does and for the same reason: somebody changing
+   * their mind four times queues one write, not four. syncTags skips a payload
+   * identical to the last one, so coming back to this screen sends nothing. */
+  useEffect(() => {
+    if (!granted) return undefined;
+    const id = setTimeout(async () => {
+      const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf;
+      if (wantsAny) await optIn(); else await optOut();
+      setTagState(await syncTags(alerts));
+      setSaved(true);
+    }, 900);
+    return () => clearTimeout(id);
+  }, [granted, alerts]);
+
   const saveAll = async () => {
     tap(); setSaved(true);
     await rearm({});

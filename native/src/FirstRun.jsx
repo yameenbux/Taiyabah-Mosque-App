@@ -18,14 +18,14 @@ import { View, Text, Modal } from "react-native";
 import * as Notifications from "expo-notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "./theme";
-import { useApp } from "./store";
+import { useApp, EVERYTHING_ON } from "./store";
 import { Press, tap } from "./ui";
 import { ORDER } from "./prayer";
 import { arm, ask } from "./reminders";
 import { askPush, syncTags, optIn } from "./push";
 
 export default function FirstRun() {
-  const { t, fs, alerts, askedPush, setAskedPush } = useApp();
+  const { t, fs, alerts, askedPush, setAskedPush, setAlerts } = useApp();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -50,15 +50,20 @@ export default function FirstRun() {
      * asking twice for the same permission is how an app looks broken. */
     const ok = (await askPush()) || (await ask());
     if (ok) {
+      /* Yes means yes to all of it. The same rule as the Notifications screen,
+       * from the same constant: agreeing to be told is the decision, and
+       * choosing what not to be told is theirs to make afterwards. */
+      const a = { ...alerts, ...EVERYTHING_ON };
+      setAlerts(EVERYTHING_ON);
       /* Armed immediately, so the first reminder is real rather than a promise
        * somebody has to go and switch on themselves. */
       const per = {};
-      if (alerts.jamaah) for (const k of ORDER) per[k] = alerts.mins;
-      try { await arm(per, { kahf: alerts.kahf }); } catch {}
+      for (const k of ORDER) per[k] = a.mins;
+      try { await arm(per, { kahf: a.kahf }); } catch {}
       /* And subscribed with the tags the masjid's segments are built on, so
        * this phone is reachable from the moment it says yes rather than only
        * after somebody finds the Notifications screen and presses Save. */
-      try { await optIn(); await syncTags(alerts); } catch {}
+      try { await optIn(); await syncTags(a); } catch {}
     }
     close();
   };

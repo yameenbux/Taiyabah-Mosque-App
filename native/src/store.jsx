@@ -35,6 +35,19 @@ const osFontScale = () => {
   return Number.isFinite(n) && n > 0 ? n : 1;
 };
 
+/* Saying yes to the notifications dialog turns all of these on.
+ *
+ * It used to turn on nothing: permission was granted and the switches were
+ * left exactly as they were, unwritten, behind a Save button nobody had
+ * pressed — so somebody who had just agreed to be notified was subscribed to
+ * nothing at all. Agreeing to be told is the decision. Choosing what not to be
+ * told is a second and smaller one, and it is theirs to make afterwards.
+ *
+ * `mins` is deliberately absent: it is a number, not a switch, and whatever it
+ * was set to is kept. */
+export const EVERYTHING_ON = { jamaah: true, janazah: true, announcements: true,
+                               events: true, kahf: true };
+
 const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favourites: [], lastRead: null,
                    muMark: 0, muFavs: [],
                    /* The website's own five switches and its ten-minute default,

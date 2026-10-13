@@ -103,6 +103,13 @@ async function waitForId(tries = 6) {
   return null;
 }
 
+/* What was last written, so writing it again can be skipped. The website has
+ * kept this since a device could be tagged more than once, and the app needs
+ * it more now that a switch writes through on its own instead of waiting for
+ * Save: opening the screen, leaving it and coming back would otherwise send
+ * the same six values to the Worker every time. */
+let lastSent = null;
+
 /* The six tags the website writes, spelled exactly as it spells them, so one
  * segment reaches both. Written through the Worker with the REST key, never
  * from here. */
@@ -116,6 +123,8 @@ export async function syncTags(alerts) {
     events:        alerts.events ? "1" : "0",
     kahf:          alerts.kahf ? "1" : "0",
   };
+  const key = JSON.stringify(tags);
+  if (key === lastSent) return "stored";
   const id = await waitForId();
   if (!id) return "OneSignal has not issued this device an id yet";
 
@@ -129,9 +138,10 @@ export async function syncTags(alerts) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `server returned ${res.status}`);
+      lastSent = key;
       return "stored";
     } catch (e) {
-      if (n === MAX) return "failed: " + String(e && e.message || e);
+      if (n === MAX) { lastSent = null; return "failed: " + String(e && e.message || e); }
       await new Promise(r => setTimeout(r, 2000 * n));
     }
   }
