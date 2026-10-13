@@ -6,6 +6,7 @@ import { C, F, R, SHADOW } from "../theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useApp } from "../store";
 import { TopBar, Heading } from "../ui";
+import { useTopBar } from "../barstyle";
 import { readList } from "../supabase";
 
 /* Notices come from `notices_live`, a function that exposes the notice text and
@@ -16,6 +17,7 @@ import { readList } from "../supabase";
  * It was a view until the app had to say which masjid it is for. A view takes
  * no argument; the function does, and returns the same rows newest first. */
 export default function Notices() {
+  const bar = useTopBar();
   const { t, fs, rtl } = useApp();
   const top = useSafeAreaInsets().top;
   const [rows, setRows] = useState(null);
@@ -36,7 +38,7 @@ export default function Notices() {
      list instead, so this was the only tab with no app bar above it. */
   const Header = (
     <>
-      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
@@ -52,6 +54,7 @@ export default function Notices() {
   return (
     <FlatList
       style={{ backgroundColor: C.paper }}
+      onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}
       data={rows || []}
       keyExtractor={r => String(r.id)}
       ListHeaderComponent={Header}

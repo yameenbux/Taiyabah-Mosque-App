@@ -9,6 +9,7 @@ import { View, Text, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTopBar } from "../barstyle";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, PageFoot, tap, TopBar } from "../ui";
 import { dayFor, pretty, nowLondon, londonInstant, NAMES, ORDER, nextJamaah } from "../prayer";
@@ -59,6 +60,7 @@ function nowAndNext(day, at, now) {
 }
 
 export default function PrayerTimes({ navigation }) {
+  const bar = useTopBar();
   const { t, fs, rtl } = useApp();
   const [offset, setOffset] = useState(0);         // days from today
   const jumuah = daysToJumuah();
@@ -79,14 +81,14 @@ export default function PrayerTimes({ navigation }) {
               : fullDow(t, when);
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* Prayer Times is one of the website's seven PAGES: the app bar above
           it, then the day stepper and the three chips ON THE PAPER, as plain
           white controls. The app put all of it inside a plum hero with its
           own title and the Hijri date, so the screen named itself twice and
           the stepper and chips were gold-on-plum — a different set of
           controls from the ones the website draws. */}
-      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar navigation={navigation} />
       </LinearGradient>
 

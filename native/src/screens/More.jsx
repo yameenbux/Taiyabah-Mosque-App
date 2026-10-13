@@ -26,6 +26,7 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, Press, open, tap } from "../ui";
+import { useTopBar } from "../barstyle";
 import DRAWER from "../data/drawer.json";
 
 /* Each drawer row's own drawing, lifted from the website by
@@ -88,13 +89,14 @@ const SOCIAL = [
 export default function More({ navigation }) {
   const { t, fs, rtl } = useApp();
   const top = useSafeAreaInsets().top;
+  const bar = useTopBar();
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* The drawer opens under the masjid's own wordmark on plum; so does this. */}
       {/* The website's drawer header is linear-gradient(brand-900, brand-800),
           straight down — not brand-900 to brand-700 across. */}
-      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingTop: top + 12, paddingBottom: 14, paddingHorizontal: 16,
                  alignItems: rtl ? "flex-end" : "flex-start" }}>
         <Image source={require("../../assets/logo.png")}

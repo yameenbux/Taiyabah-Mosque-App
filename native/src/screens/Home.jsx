@@ -9,6 +9,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTopBar } from "../barstyle";
 import Svg, { Path, Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
@@ -99,6 +100,7 @@ function TileIcon({ name }) {
 }
 
 export default function Home({ navigation }) {
+  const bar = useTopBar();
   const { t, fs, rtl } = useApp();
   const [now, setNow] = useState(nowLondon());
   const [rmIdx, setRmIdx] = useState(0);
@@ -148,7 +150,7 @@ export default function Home({ navigation }) {
   })();
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* ---- hero ------------------------------------------------------- */}
       {/* TWO gradients, as the website has them, not one spread over both.
           .topbar runs brand-900 to brand-800 over its own height; .hero then
@@ -157,7 +159,7 @@ export default function Home({ navigation }) {
           brand-900 where the site is already at brand-800 — measurably
           #400c2d against the website's #491034 — which also made the girih
           stand out, because it was being drawn on a darker ground. */}
-      <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ alignSelf: "stretch" }}>
         <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
       </LinearGradient>
