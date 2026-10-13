@@ -110,6 +110,20 @@ console.log(`app: ${app}\nbundle: ${bundleId}\n`);
 
 /* A phone and a tablet, because supportsTablet is true now and an iPad running
    a stretched phone layout is exactly the thing being checked for. */
+/* THE ONE CHANNEL THAT CAN BE READ FROM OUTSIDE THE RUNNER.
+ *
+ * Everything this script knows is printed — the ink counts, the palette, even
+ * an ASCII rendering of the screen — and none of it is reachable by a client
+ * that cannot follow GitHub's redirect to blob storage. Logs and artefacts
+ * both live there. Annotations do not: they come back from the check-runs
+ * API as plain text. So every verdict is repeated here in one line, and a
+ * failure says WHY on the summary page rather than only in a log nobody can
+ * open. Same reason scripts/next-year-published.mjs does it. */
+const annotate = (level, msg) => {
+  if (!process.env.GITHUB_ACTIONS) return;
+  console.log(`::${level}::` + String(msg).replace(/\s*\n\s*/g, " — ").trim().slice(0, 900));
+};
+
 const DEVICES = [
   { label: "iphone", match: /^iPhone 16 Pro$/ },
   { label: "ipad",   match: /^iPad Pro 13-inch/ },
@@ -125,6 +139,8 @@ for (const want of DEVICES) {
   if (!dev) {
     console.error(`FAIL  no simulator matching ${want.match} is available`);
     console.error("      available: " + [...new Set(all.map(d => d.name))].join(", "));
+    annotate("error", `${want.label}: no simulator matching ${want.match} on this runner. ` +
+                      `available: ${[...new Set(all.map(d => d.name))].join(", ")}`);
     failures++; continue;
   }
   console.log(`--- ${dev.name} ---`);
@@ -158,6 +174,9 @@ for (const want of DEVICES) {
     console.log(`  ink: ${whole} colours overall, ${strip} along the bottom ` +
                 `(${img.width}x${img.height})`);
     console.log(`  palette: ${palette(img).join("  ")}`);
+    annotate("notice", `${want.label}: ${whole} colours overall, ${strip} along the bottom, ` +
+                       `settled after ${waited}s, ${img.width}x${img.height}, ` +
+                       `palette ${palette(img).join(" ")}`);
 
     /* The artefact is uploaded, but the client that reads these logs cannot
        follow GitHub's redirect to blob storage, so the picture is printed as
@@ -177,15 +196,22 @@ for (const want of DEVICES) {
                     `screen. The usual cause is a build with no embedded JavaScript ` +
                     `(Debug rather than Release), which launches and survives and runs ` +
                     `none of this project's code.`);
+      annotate("error", `${want.label}: ${Math.round(top.share * 100)}% of the screen is ${top.hex} — ` +
+                        `the React Native error screen, usually a build with no embedded JavaScript`);
       failures++;
     } else if (whole < 100) {
       console.error(`  FAIL  the screen holds ${whole} colours — that is a blank or flat ` +
                     `rectangle, not the app`);
+      annotate("error", `${want.label}: only ${whole} colours on screen after ${waited}s — ` +
+                        `a blank or flat rectangle, not the app. palette: ${palette(img).join(" ")}`);
       failures++;
     } else if (strip < 10) {
       console.error(`  FAIL  the screen is busy in the middle and flat along the bottom ` +
                     `(${strip} colours) — that is the shape of a splash screen, not of a ` +
                     `laid-out one, so the app most likely never finished starting`);
+      annotate("error", `${want.label}: ${whole} colours overall but only ${strip} along the bottom ` +
+                        `after ${waited}s — the shape of a splash screen that never finished. ` +
+                        `palette: ${palette(img).join(" ")}`);
       failures++;
     }
 
@@ -194,6 +220,7 @@ for (const want of DEVICES) {
       .split("\n").some(l => l.includes(bundleId));
     if (!running) {
       console.error(`  FAIL  ${bundleId} is not running — it launched and exited`);
+      annotate("error", `${want.label}: ${bundleId} launched and exited`);
       /* A React Native fatal does not reach the crash report as anything but
          an abort; the message it printed on the way down is in the device log,
          and that message is usually the entire diagnosis. */
@@ -229,12 +256,14 @@ for (const want of DEVICES) {
         .filter(f => Date.now() - fs.statSync(path.join(crashDir, f)).mtimeMs < 180000);
       if (recent.length) {
         console.error(`  FAIL  crash report(s): ${recent.join(", ")}`);
+        annotate("error", `${want.label}: crash report(s) written on launch: ${recent.join(", ")}`);
         for (const f of recent.slice(0, 2)) report(path.join(crashDir, f));
         failures++;
       }
     }
   } catch (e) {
     console.error(`  FAIL  ${String(e.message).split("\n")[0]}`);
+    annotate("error", `${want.label}: ${String(e.message).split("\n")[0]}`);
     failures++;
   }
 }
