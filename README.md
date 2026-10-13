@@ -692,6 +692,18 @@ the app, with Amiri kept for short display Arabic. `native/scripts/check-arabic.
 fails the build if any Arabic character in the bundled data has no glyph in the
 font that draws it, or if a Qurʼanic mark turns up in a file Amiri draws.
 
+> [!NOTE]
+> **The app's four typefaces are renamed, and nothing else about them is
+> touched.** iOS registers a bundled font under the names inside the file and
+> React Native looks it up by family, so a font whose file is `X.ttf` but which
+> calls itself "X Y" is bundled, loaded, and never used — it draws in the
+> system font with no error. `native/scripts/name-fonts.py` rewrites each name
+> table so the font answers to its own file name, which is the name Android
+> resolves by anyway; `native/scripts/check-fonts.mjs` fails the build if one
+> ever drifts. Same glyphs, same outlines, same metrics. None of the four
+> families reserves a font name, so the OFL permits it — the web copies in
+> `fonts/` are untouched and still byte-for-byte Google's.
+
 > [!WARNING]
 > **Take the translation from Tanzil, not from an API.** The English used to
 > come from the same JSON API as the Arabic, and that edition is a
