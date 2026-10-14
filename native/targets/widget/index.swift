@@ -27,6 +27,111 @@ private enum Brand {
   static let cream     = Color(red: 0.953, green: 0.937, blue: 0.890)   // #F3EFE3
 }
 
+// MARK: - The furniture
+
+/* THE GROUND.
+ *
+ * Not a 135-degree band between two plums — that is the look of a gradient
+ * applied to a rectangle, and it is what every templated widget does. A light
+ * source at the top left, a vignette opposite it, and the flat brand plum
+ * underneath: the card reads as printed stock catching light rather than as a
+ * filled view. */
+private struct Ground: View {
+  var body: some View {
+    ZStack {
+      Brand.plum
+      RadialGradient(colors: [Color(red: 0.588, green: 0.176, blue: 0.431).opacity(0.55),
+                              Brand.plumLift.opacity(0.22), .clear],
+                     center: UnitPoint(x: 0.08, y: 0.0), startRadius: 0, endRadius: 210)
+      RadialGradient(colors: [Color(red: 0.07, green: 0.012, blue: 0.051).opacity(0.55), .clear],
+                     center: UnitPoint(x: 1.0, y: 1.0), startRadius: 0, endRadius: 190)
+    }
+  }
+}
+
+/* The sixteen-point girih star the app draws behind its own heroes, used here
+ * as a watermark that bleeds off a corner. Only an arc of it is ever on the
+ * card, which is what keeps it furniture rather than decoration — at four per
+ * cent it is texture you notice only once you look for it. */
+private struct Girih: Shape {
+  func path(in rect: CGRect) -> Path {
+    let pts: [(CGFloat, CGFloat)] = [
+      (50,2),(57.3,32.4),(83.9,16.1),(67.6,42.7),(98,50),(67.6,57.3),(83.9,83.9),(57.3,67.6),
+      (50,98),(42.7,67.6),(16.1,83.9),(32.4,57.3),(2,50),(32.4,42.7),(16.1,16.1),(42.7,32.4),
+    ]
+    var p = Path()
+    for (i, pt) in pts.enumerated() {
+      let x = rect.minX + pt.0 / 100 * rect.width
+      let y = rect.minY + pt.1 / 100 * rect.height
+      if i == 0 { p.move(to: CGPoint(x: x, y: y)) } else { p.addLine(to: CGPoint(x: x, y: y)) }
+    }
+    p.closeSubpath()
+    return p
+  }
+}
+
+/* A rule that is lit rather than drawn: a hard one-pixel line stops dead at
+ * each end, this one fades out. */
+private struct Rule: View {
+  var width: CGFloat? = nil
+  var body: some View {
+    LinearGradient(colors: [Brand.gold.opacity(0.55), Brand.gold.opacity(0.04)],
+                   startPoint: .leading, endPoint: .trailing)
+      .frame(width: width, height: 1)
+  }
+}
+
+private struct VRule: View {
+  var body: some View {
+    LinearGradient(stops: [.init(color: Brand.gold.opacity(0), location: 0),
+                           .init(color: Brand.gold.opacity(0.38), location: 0.22),
+                           .init(color: Brand.gold.opacity(0.38), location: 0.78),
+                           .init(color: Brand.gold.opacity(0), location: 1)],
+                   startPoint: .top, endPoint: .bottom)
+      .frame(width: 1)
+  }
+}
+
+/* The masjid's own mark. The full lockup — calligraphy over TAIYABAH over
+ * MASJID — is three elements tall and illegible below about ninety points, so
+ * what signs a widget is the calligraphy alone: مسجد طيبة, which is
+ * distinctive at any size and is the part people recognise. */
+private struct Mark: View {
+  var width: CGFloat
+  var body: some View {
+    Image("Wordmark")
+      .resizable()
+      .aspectRatio(contentMode: .fit)
+      .frame(width: width)
+      .opacity(0.62)
+  }
+}
+
+/* The countdown. NOT a capsule outline around two words — that is the first
+ * thing that makes a widget look like a component library. Tracked small caps
+ * in the accent say the same thing and get out of the way. */
+private struct Until: View {
+  let at: Date
+  var body: some View {
+    (Text("in ") + Text(at, style: .relative))
+      .font(.system(size: 9.5, weight: .bold))
+      .tracking(1.3)
+      .textCase(.uppercase)
+      .foregroundStyle(Brand.goldBright)
+      .lineLimit(1)
+  }
+}
+
+private struct Eyebrow: View {
+  var body: some View {
+    Text("NEXT JAMĀʿAH")
+      .font(.system(size: 9, weight: .bold))
+      .tracking(1.5)
+      .foregroundStyle(Brand.goldBright.opacity(0.75))
+      .lineLimit(1)
+  }
+}
+
 // MARK: - The timetable
 
 /// One day as the app stores it. Only the jamāʿah column is read here: a
@@ -240,11 +345,16 @@ struct NextJamaahView: View {
         }
       }
     case .accessoryRectangular:
-      VStack(alignment: .leading, spacing: 2) {
-        Text("NEXT JAMĀʿAH").font(.system(size: 10, weight: .semibold)).opacity(0.7)
+      /* Tinted white by iOS, so colour is not available here and only the
+         hierarchy carries it. */
+      VStack(alignment: .leading, spacing: 3) {
+        Text("NEXT JAMĀʿAH")
+          .font(.system(size: 9, weight: .bold)).tracking(1.2).opacity(0.62)
         if entry.known {
-          Text("\(entry.name)  \(timeText(entry.at))").font(.system(size: 15, weight: .bold))
-          Text(entry.at, style: .relative).font(.system(size: 11)).opacity(0.8)
+          Text("\(entry.name) \(timeText(entry.at))")
+            .font(.system(size: 16, weight: .bold)).tracking(-0.3)
+          (Text("in ") + Text(entry.at, style: .relative))
+            .font(.system(size: 10.5)).opacity(0.72)
         } else {
           Text("Timetable not published").font(.system(size: 13, weight: .semibold))
         }
@@ -256,141 +366,149 @@ struct NextJamaahView: View {
     }
   }
 
-  /* THE MEDIUM SIZE IS NOT THE SMALL ONE STRETCHED.
+  /* SMALL — a diagonal. The mark signs the top right, the type stacks up from
+     the bottom left, and the space between them is left alone. Everything
+     centred in a box is the default; a composition with a weighted corner is
+     a decision. */
+  private var home: some View {
+    ZStack {
+      Ground()
+      GeometryReader { g in
+        Girih()
+          .fill(Brand.gold)
+          .frame(width: g.size.height * 1.3, height: g.size.height * 1.3)
+          .rotationEffect(.degrees(14))
+          .opacity(0.038)
+          .offset(x: g.size.width - g.size.height * 0.74,
+                  y: g.size.height - g.size.height * 0.78)
+      }
+      VStack(alignment: .leading, spacing: 0) {
+        HStack(alignment: .top, spacing: 8) {
+          Eyebrow()
+          Spacer(minLength: 0)
+          Mark(width: 44)
+        }
+        Rule(width: 34).padding(.top, 7)
+        Spacer(minLength: 0)
+        if entry.known {
+          Text(entry.name)
+            .font(.system(size: 17, weight: .regular, design: .serif))
+            .foregroundStyle(Brand.cream)
+            .lineLimit(1).minimumScaleFactor(0.7)
+          Text(timeText(entry.at))
+            .font(.system(size: 34, weight: .bold))
+            .tracking(-1.2)
+            .monospacedDigit()
+            .foregroundStyle(.white)
+            .lineLimit(1).minimumScaleFactor(0.6)
+          Until(at: entry.at).padding(.top, 5)
+        } else {
+          Text("Timetable not\npublished yet")
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(Brand.cream)
+        }
+      }
+      .padding(EdgeInsets(top: 15, leading: 15, bottom: 14, trailing: 15))
+    }
+  }
+
+  /* MEDIUM IS NOT THE SMALL ONE STRETCHED.
    *
-   * It was: the same card, the same four lines, twice the width and nothing
-   * more in it. A medium widget costs somebody two small slots on their home
-   * screen and has to earn them.
+   * It was: the same four lines, twice the width, nothing more in it. A
+   * medium widget costs somebody two small slots and has to earn them. The
+   * left column answers "am I about to miss it" and the right answers "what
+   * else is on today" — the two reasons anybody opens a prayer app, without
+   * opening it. The rule between them carries the weight.
    *
-   * So the left half answers "am I about to miss it" and the right half
-   * answers "what else is on today" — the two questions a person actually
-   * opens a prayer app for, without opening it. The prayer that is next is
-   * the one picked out in gold; the ones already prayed are dimmed rather
-   * than removed, because a list that shrinks through the day loses its
-   * shape and people read these by position.
-   */
+   * The next prayer is MARKED, not shouted: a gold dot in the margin and the
+   * accent colour. Bolding a whole row unbalances the column. Prayers already
+   * prayed are dimmed rather than removed, because a list that shrinks
+   * through the day loses its shape and people read these by position. */
   private var medium: some View {
     ZStack {
-      LinearGradient(colors: [Brand.plumLift, Brand.plum],
-                     startPoint: .topLeading, endPoint: .bottomTrailing)
-      HStack(alignment: .top, spacing: 12) {
-        VStack(alignment: .leading, spacing: 3) {
-          Text("NEXT JAMĀʿAH")
-            .font(.system(size: 9.5, weight: .semibold))
-            .tracking(1.1)
-            .foregroundStyle(Brand.goldBright)
+      Ground()
+      GeometryReader { g in
+        Girih()
+          .fill(Brand.gold)
+          .frame(width: g.size.height * 1.35, height: g.size.height * 1.35)
+          .rotationEffect(.degrees(14))
+          .opacity(0.038)
+          .offset(x: -g.size.height * 0.52, y: g.size.height - g.size.height * 0.79)
+      }
+      HStack(alignment: .top, spacing: 15) {
+        VStack(alignment: .leading, spacing: 0) {
+          Eyebrow()
+          Rule(width: 34).padding(.top, 7)
+          Spacer(minLength: 0)
           if entry.known {
             Text(entry.name)
-              .font(.system(size: 18, weight: .semibold, design: .serif))
-              .minimumScaleFactor(0.7)
-              .lineLimit(1)
+              .font(.system(size: 16, weight: .regular, design: .serif))
               .foregroundStyle(Brand.cream)
+              .lineLimit(1).minimumScaleFactor(0.7)
             Text(timeText(entry.at))
-              .font(.system(size: 26, weight: .bold))
-              .minimumScaleFactor(0.6)
-              .lineLimit(1)
+              .font(.system(size: 31, weight: .bold))
+              .tracking(-1.2)
+              .monospacedDigit()
               .foregroundStyle(.white)
-            Text(entry.at, style: .relative)
-              .font(.system(size: 10.5, weight: .semibold))
-              .foregroundStyle(Brand.goldBright)
-              .padding(.horizontal, 7).padding(.vertical, 2.5)
-              .overlay(Capsule().stroke(Brand.gold.opacity(0.55), lineWidth: 1))
+              .lineLimit(1).minimumScaleFactor(0.6)
+            Until(at: entry.at).padding(.top, 5)
           } else {
             Text("Timetable not\npublished yet")
               .font(.system(size: 14, weight: .semibold))
               .foregroundStyle(Brand.cream)
           }
           Spacer(minLength: 0)
-          /* The hijri date lives down here, not beside the times. In the
-             column it was clipped — "4 Jumada al-Awwal 1448 AH" does not fit
-             in 142 points and shrinking it to fit made it unreadable. Down
-             here it has the width, and it fills the only dead space on the
-             card. */
-          if !entry.hijri.isEmpty {
-            Text(entry.hijri)
-              .font(.system(size: 9, weight: .semibold))
-              .lineLimit(1)
-              .minimumScaleFactor(0.75)
-              .foregroundStyle(Brand.gold.opacity(0.9))
-          }
-          Text("Taiyabah Masjid")
-            .font(.system(size: 8.5, weight: .medium))
-            .foregroundStyle(Brand.cream.opacity(0.55))
+          Mark(width: 62).padding(.leading, -2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
-        Rectangle()
-          .fill(Brand.gold.opacity(0.22))
-          .frame(width: 1)
+        VRule()
 
         VStack(alignment: .leading, spacing: 0) {
+          if !entry.hijri.isEmpty {
+            /* "AH" is dropped: everybody reading a hijri date on a masjid's
+               widget knows which calendar it is, and the column is 139 points
+               wide. */
+            Text(hijriShort(entry.hijri))
+              .font(.system(size: 8, weight: .bold))
+              .tracking(1.1)
+              .textCase(.uppercase)
+              .foregroundStyle(Brand.gold.opacity(0.8))
+              .lineLimit(1).minimumScaleFactor(0.75)
+            Rule().padding(.top, 6).padding(.bottom, 7)
+          }
           ForEach(entry.today, id: \.name) { slot in
             let isNext = entry.known && slot.at == entry.at
             let past = slot.at < entry.at
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
               Text(slot.name)
-                .font(.system(size: 11.5, weight: isNext ? .bold : .medium))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .font(.system(size: 11, weight: isNext ? .bold : .medium))
+                .lineLimit(1).minimumScaleFactor(0.75)
               Spacer(minLength: 4)
               Text(timeText(slot.at))
-                .font(.system(size: 11.5, weight: isNext ? .bold : .regular))
+                .font(.system(size: 11, weight: isNext ? .bold : .medium))
                 .monospacedDigit()
             }
             .foregroundStyle(isNext ? Brand.goldBright
-                                    : Brand.cream.opacity(past ? 0.42 : 0.82))
-            .padding(.vertical, 1.5)
+                                    : Brand.cream.opacity(past ? 0.34 : 0.88))
+            .padding(.vertical, 2.2)
+            .overlay(alignment: .leading) {
+              if isNext {
+                Circle().fill(Brand.goldBright).frame(width: 3, height: 3).offset(x: -9)
+              }
+            }
           }
           Spacer(minLength: 0)
         }
-        .frame(width: 142, alignment: .leading)
+        .frame(width: 139, alignment: .leading)
       }
-      .padding(13)
+      .padding(EdgeInsets(top: 15, leading: 16, bottom: 14, trailing: 16))
     }
   }
+}
 
-  /* The home-screen widget is the app's own hero, shrunk: the gold standfirst,
-     the prayer in the display face, the time large, and the countdown in the
-     gold pill underneath. */
-  private var home: some View {
-    ZStack(alignment: .topLeading) {
-      LinearGradient(colors: [Brand.plumLift, Brand.plum],
-                     startPoint: .topLeading, endPoint: .bottomTrailing)
-      VStack(alignment: .leading, spacing: 3) {
-        Text("NEXT JAMĀʿAH")
-          .font(.system(size: 10, weight: .semibold))
-          .tracking(1.1)
-          .foregroundStyle(Brand.goldBright)
-        if entry.known {
-          Text(entry.name)
-            .font(.system(size: 20, weight: .semibold, design: .serif))
-            .foregroundStyle(Brand.cream)
-          Text(timeText(entry.at))
-            .font(.system(size: 30, weight: .bold))
-            .minimumScaleFactor(0.6)
-            .lineLimit(1)
-            .foregroundStyle(.white)
-          Text(entry.at, style: .relative)
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(Brand.goldBright)
-            .padding(.horizontal, 8).padding(.vertical, 3)
-            .overlay(Capsule().stroke(Brand.gold.opacity(0.55), lineWidth: 1))
-        } else {
-          Text("Timetable not\npublished yet")
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(Brand.cream)
-          Text("Check at the masjid")
-            .font(.system(size: 11))
-            .foregroundStyle(Brand.goldBright)
-        }
-        Spacer(minLength: 0)
-        Text("Taiyabah Masjid")
-          .font(.system(size: 9, weight: .medium))
-          .foregroundStyle(Brand.cream.opacity(0.55))
-      }
-      .padding(14)
-    }
-  }
+private func hijriShort(_ s: String) -> String {
+  s.replacingOccurrences(of: " AH", with: "")
 }
 
 @main
