@@ -26,6 +26,8 @@ import path from "node:path";
 const NATIVE_ONLY = {
   "expo-notifications": new URL("./test/stubs/expo-notifications.mjs", import.meta.url).href,
   "react-native":       new URL("./test/stubs/react-native.mjs",       import.meta.url).href,
+  "@react-native-async-storage/async-storage":
+                        new URL("./test/stubs/async-storage.mjs",      import.meta.url).href,
 };
 
 export async function resolve(specifier, context, next) {

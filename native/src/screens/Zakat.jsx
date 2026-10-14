@@ -34,7 +34,7 @@ export default function Zakat() {
   const load = useCallback(async () => {
     setLive({ state: "loading" });
     const r = await fetchMetalPrices();
-    setLive(r ? { state: "ok", ...r } : { state: "failed" });
+    setLive(r.ok ? { state: "ok", ...r } : { state: "failed", reason: r.reason });
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -205,6 +205,21 @@ export default function Zakat() {
                                            : t("zakat.refresh", "Refresh")}</Text>
               </Press>)}
           </View>)}
+
+        {/* WHY it failed, when it failed, in the smallest type on the screen.
+          *
+          * "Couldn't fetch today's price" is true and useless: it cannot tell
+          * apart a provider refusing this app, a phone with no route to it,
+          * and a figure that arrived and was thrown out for being
+          * implausible. Those want three different fixes, and the only person
+          * who can see which one it is is the one holding the phone — this is
+          * the same bargain the Notifications screen already makes under
+          * "Having trouble?". Nobody has to read it, and it is not there when
+          * the price loads, which is almost always. */}
+        {live.state === "failed" && !!live.reason && (
+          <Text selectable style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted,
+                                    lineHeight: fs(16), marginTop: 6 }}>
+            {live.reason}</Text>)}
 
         {/* .zk-l is a flex ROW: the label on the left and "check price" on the
             right of the same line, plum and bold, with no icon. The app made
