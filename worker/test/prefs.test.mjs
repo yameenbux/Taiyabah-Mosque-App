@@ -128,8 +128,9 @@ test("the two handsets OneSignal actually holds encode to what it holds", () => 
 
 test("the filters are the size the live sends carried", () => {
   /* OneSignal recorded 47 filter entries on "Isha Jamāʿah in 15 min" and 143
-     on "Jamāʿah Time Now". Matching those here is what ties this file to the
-     code that actually ran, rather than to a plausible-looking copy of it. */
+     on the un-offset jamāʿah send, which is the same shape every category
+     send still uses. Matching those here is what ties this file to the code
+     that actually ran, rather than to a plausible-looking copy of it. */
   assert.equal(anyOfFilter(prefValues(TOPICS.jamaah.idx, 10)).length, 47);
   assert.equal(anyOfFilter(prefValues(TOPICS.jamaah.idx)).length, 143);
 });

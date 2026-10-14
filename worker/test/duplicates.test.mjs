@@ -32,12 +32,13 @@ test("a reminder the app arms itself is sent to browsers only", () => {
     assert.equal(p[k], false, `${k} must be excluded — the app arms this one itself`);
 });
 
-test("a reminder with no local counterpart still reaches everyone", () => {
-  const p = reminderPayload(APP, { title: "Jamāʿah Time Now", body: "…", tagMins: null });
+test("a send with no local counterpart reaches every platform", () => {
+  /* Janāzah, announcements and events are scheduled nowhere but here, so they
+     must never pick up a platform restriction. */
+  const p = reminderPayload(APP, { title: "Janāzah", body: "…", tagMins: null });
   for (const k of [...PLATFORMS, "isAnyWeb"])
     assert.equal(k in p, false,
-      `${k} is set, so this would reach only some platforms — nothing schedules ` +
-      "this one locally, so every subscriber needs the push");
+      `${k} is set, so this would reach only some platforms`);
 });
 
 test("restricting the platform does not stop honouring the switches", () => {
@@ -65,12 +66,21 @@ const calls = src.split("sendReminder(env, {").slice(1)
   .filter(chunk => /title:/.test(chunk));
 
 test("every scheduled send is accounted for", () => {
-  assert.equal(calls.length, 3,
+  assert.equal(calls.length, 2,
     "a scheduled send was added or removed — decide whether the app also arms " +
     "it locally, and set webOnly accordingly");
 });
 
-test("the two the app arms locally are web-only; the one it does not is not", () => {
+test("there is no second notification at the jamāʿah time", () => {
+  /* Two notifications per prayer is ten a day, which the committee said was
+     more than people want. The advance reminder is the useful one. If this
+     ever comes back it belongs on the phone, not in the cron. */
+  assert.doesNotMatch(src, /Jamāʿah Time Now/,
+    "the at-the-jamāʿah notification is back — it was removed deliberately");
+  assert.doesNotMatch(src, /mins:\s*"now"/, "an at-the-jamāʿah send has reappeared");
+});
+
+test("both scheduled reminders are web-only, because the app arms both", () => {
   const find = needle => {
     const hit = calls.filter(c => c.includes(needle));
     assert.equal(hit.length, 1, `expected exactly one send for ${needle}`);
@@ -82,9 +92,10 @@ test("the two the app arms locally are web-only; the one it does not is not", ()
     "every app user gets it twice");
   assert.match(find('"Sūrah al-Kahf"'), /webOnly:\s*true/,
     "the app arms Sūrah al-Kahf on Friday morning — without webOnly it arrives twice");
-  assert.doesNotMatch(find('"Jamāʿah Time Now"'), /webOnly/,
-    "nothing arms this one locally, so restricting it would leave app users " +
-    "with no alert at the jamāʿah itself");
+  for (const c of calls)
+    assert.match(c, /webOnly:\s*true/,
+      "every scheduled reminder is also armed on the phone, so every one of " +
+      "them must be web-only or app users hear the prayer announced twice");
 });
 
 test("Kahf is targeted by the Kahf switch, not by the jamāʿah one", () => {

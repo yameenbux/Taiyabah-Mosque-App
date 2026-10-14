@@ -297,9 +297,13 @@ function minusMinutes(hm, n) {
  * were Safari or Chrome and six were the app. So the push cannot simply be
  * switched off.
  *
- * `webOnly` therefore sends to browser subscriptions only, and is set on the
- * two reminders the app schedules for itself. "Jamāʿah Time Now" has no local
- * counterpart, so it is left reaching everyone.
+ * `webOnly` therefore sends to browser subscriptions only, and is set on both
+ * scheduled reminders, because the app arms both of them itself. Everybody
+ * still gets their 5/10/15-minute reminder — app users from their own phone,
+ * browser users from here — and nobody gets it twice.
+ *
+ * It is NOT set on janāzah, announcements or events: nothing schedules those
+ * locally and they must reach every subscriber.
  *
  * SEQUENCING, and it matters: an app older than the build that fixed arm()
  * has NO working local reminders. Deploying this before that build is live
@@ -586,17 +590,20 @@ async function runJamaahReminders(env) {
       results.push({ prayer: label, mins, ...r });
     }
 
-    // At the jamāʿah time itself. tagMins is null so this reaches everyone
-    // with jamāʿah reminders on, whatever advance warning they chose.
-    if (jamaat === hm) {
-      const key = `sent:${date}:${prayer}:now`;
-      const r = await sendReminder(env, {
-        key, tagMins: null,
-        title: "Jamāʿah Time Now",
-        body: `${label} jamāʿah is starting now at the masjid.`,
-      });
-      results.push({ prayer: label, mins: "now", ...r });
-    }
+    /* THERE IS NO SECOND NOTIFICATION AT THE JAMĀʿAH ITSELF.
+     *
+     * There used to be: "Jamāʿah Time Now", sent as the prayer began, on top
+     * of the advance reminder. The committee's view was that two notifications
+     * per prayer — ten a day — is more than people want from a masjid, and
+     * they are right. The advance reminder is the one that is useful, because
+     * it is the one you can still act on.
+     *
+     * Removed rather than made optional: a switch for it would be a sixth
+     * thing to explain on the Notifications screen in return for a
+     * notification nobody asked to keep. If it is ever wanted back it belongs
+     * to the phone, not here — a local reminder at the jamāʿah time arrives on
+     * time and with no signal, which this never reliably did.
+     */
   }
   if (results.length) console.log("reminder run", date, hm, JSON.stringify(results));
   return { date, hm, results };

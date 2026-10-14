@@ -1,13 +1,14 @@
 # Automated jamāʿah reminders
 
-Two automatic notifications per prayer, once per day each:
+**One** automatic notification per prayer:
 
-1. **Advance reminder** — "Zuhr Jamāʿah in 10 min", sent at each subscriber's
-   own chosen lead time (5/10/15 min — the setting in the app's Alerts tab).
-2. **At the jamāʿah time** — "Jamaat Time Now". This one has no offset, so it
-   reaches *everyone* with jamāʿah reminders switched on, whatever advance
-   warning they picked — that preference is about how much notice someone
-   wants, not whether they want to know it has started.
+- **Advance reminder** — "Zuhr Jamāʿah in 10 min", sent at each subscriber's
+  own chosen lead time (5/10/15 min — the setting in the app's Alerts tab).
+
+There used to be a second one, "Jamaat Time Now", sent as the prayer began.
+It was removed: the committee's view was that two notifications per prayer —
+ten a day — is more than people want from a masjid, and the advance reminder
+is the useful one because it is the one you can still act on.
 
 This runs entirely inside the existing Worker — no new service, no change to
 `admin.html`. It fires on a schedule rather than a click.
@@ -32,15 +33,18 @@ So the two reminders the app arms for itself are sent to **browsers only**
 |---|---|---|
 | Advance reminder ("in 10 min") | yes | browsers only |
 | Sūrah al-Kahf, Friday | yes (07:30 local) | browsers only |
-| "Jamāʿah Time Now" | **no** | everyone |
 | Janāzah, announcements, events | no | everyone |
+
+**Everybody still gets their 5/10/15-minute reminder.** App users get it from
+their own phone, browser users get it from here. Nobody gets it twice, and
+nobody goes without.
 
 The platform flag is an extra condition, never a replacement for the tag
 filter: a web subscriber who switched jamāʿah off is still not sent it.
 
 `test/duplicates.test.mjs` holds this table to the code, in both directions —
-adding a fourth scheduled send fails until somebody decides which column it
-belongs in.
+adding a third scheduled send fails until somebody decides which column it
+belongs in, and the at-the-jamāʿah notification cannot come back unnoticed.
 
 ### ⚠️ Deploy this AFTER the app build that fixed `arm()`
 
