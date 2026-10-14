@@ -179,6 +179,60 @@ async function validToken(token, secret) {
    several, so this slows abuse rather than guaranteeing a ceiling. The password
    plus an 8-hour session is the real control. */
 const hits = new Map();
+/* ---------------- gold and silver, for the zakat nisab ----------------
+
+   WHY THIS IS HERE AND NOT ONLY IN THE APP. The calculator asked each phone
+   to call three bullion APIs itself. When they all refuse — and a phone on
+   mobile data is refused far more often than a server is, by user-agent
+   filtering, by a captive portal, by an operator's DNS — the screen can only
+   say "couldn't fetch today's price, please enter it below", which is the
+   one thing that screen exists to save somebody doing.
+
+   Asking once from here fixes both halves of that. A Worker is not a browser
+   with an unusual user agent, so it is not filtered like one; and the answer
+   is kept, so a provider having a bad afternoon costs nobody their nisab —
+   this morning's price is still this morning's price.
+
+   The app keeps its own direct routes as a fallback, so this being down is
+   no worse than before it existed. */
+const TROY_OZ_G = 31.1034768;
+
+/* Wide enough for years of movement, narrow enough to catch a provider that
+   has changed its units or started answering with an error page that happens
+   to parse as a number. The app's own copy of these is in native/src/metals.js
+   and they are meant to agree. */
+const METAL_SANE = {
+  goldOz: [500, 20000], silverOz: [3, 500], fx: [0.4, 1.6],
+  goldG: [15, 700], silverG: [0.05, 20],
+};
+const METALS_KEY = "metals:last";
+const METALS_FRESH_MS = 15 * 60e3;      // serve the stored figure rather than refetch
+const METALS_MAX_AGE_MS = 7 * 864e5;    // older than this is not today's price
+
+const inMetalRange = (v, [lo, hi]) => Number.isFinite(v) && v >= lo && v <= hi;
+
+/* Pure: whatever the providers answered, in pounds per GRAM, or null if none
+   of it is believable. Separated from the fetching so it can be tested —
+   getting a unit wrong here would quietly put the nisab out by a factor of
+   thirty-one. */
+export function gramPrices({ gbp, goldOz, silverOz, rate }) {
+  if (gbp) {
+    const gold = Number(gbp.xauPrice) / TROY_OZ_G;
+    const silver = Number(gbp.xagPrice) / TROY_OZ_G;
+    if (inMetalRange(gold, METAL_SANE.goldG) && inMetalRange(silver, METAL_SANE.silverG))
+      return { gold, silver, source: "goldprice.org" };
+  }
+  if (inMetalRange(goldOz, METAL_SANE.goldOz) &&
+      inMetalRange(silverOz, METAL_SANE.silverOz) &&
+      inMetalRange(rate, METAL_SANE.fx)) {
+    const gold = (goldOz / TROY_OZ_G) * rate;
+    const silver = (silverOz / TROY_OZ_G) * rate;
+    if (inMetalRange(gold, METAL_SANE.goldG) && inMetalRange(silver, METAL_SANE.silverG))
+      return { gold, silver, source: "gold-api.com" };
+  }
+  return null;
+}
+
 function limit(key, max, windowMs) {
   const now = Date.now();
   const rec = hits.get(key) || { n: 0, reset: now + windowMs };
@@ -884,6 +938,65 @@ async function handle(request, env) {
        409s, the bug is in the client SDK call. If this ALSO 409s, the
        problem is on OneSignal's side for this app/subscription, not ours.
        GET /api/force-tag?id=<onesignal_id> */
+    /* GET /api/metals — today's gold and silver in pounds per gram.
+
+       Public and unauthenticated: it is a published commodity price, the app
+       needs it before anybody has signed in to anything, and the website's
+       calculator wants the same figure. */
+    if (url.pathname === "/api/metals" && request.method === "GET") {
+      if (!limit(`metals:${ip}`, 240, 60 * 60e3))
+        return json({ error: "Too many price checks from this network." }, 429, ch);
+
+      let cached = null;
+      try { cached = await env.SENT_KV.get(METALS_KEY, "json"); } catch { /* no cache, no matter */ }
+      const age = cached && cached.at ? Date.now() - cached.at : Infinity;
+      if (cached && age < METALS_FRESH_MS)
+        return json({ ...cached, stale: false, cached: true }, 200, ch);
+
+      /* An honest user agent rather than a borrowed one. If a provider will
+         not serve a masjid's app that says so, that is their answer and the
+         next source gets its turn. */
+      const head = {
+        "User-Agent": "TaiyabahMasjid/2.0 (+https://taiyabahapp.ysbdesigns.uk/)",
+        Accept: "application/json",
+      };
+      const get = async u => {
+        try {
+          const r = await fetch(u, { headers: head, cf: { cacheTtl: 300 } });
+          return r.ok ? await r.json() : null;
+        } catch { return null; }
+      };
+
+      const [gbp, xau, xag, fx] = await Promise.all([
+        get("https://data-asg.goldprice.org/dbXRates/GBP"),
+        get("https://api.gold-api.com/price/XAU"),
+        get("https://api.gold-api.com/price/XAG"),
+        get("https://api.frankfurter.app/latest?from=USD&to=GBP"),
+      ]);
+
+      const picked = gramPrices({
+        gbp: gbp && gbp.items && gbp.items[0],
+        goldOz: xau && Number(xau.price),
+        silverOz: xag && Number(xag.price),
+        rate: fx && fx.rates && Number(fx.rates.GBP),
+      });
+
+      if (picked) {
+        const rec = { ...picked, at: Date.now() };
+        /* Kept for a month, though anything over a week is refused below. The
+           extra three weeks are only so a long outage is visible as a stale
+           figure rather than as nothing at all. */
+        try { await env.SENT_KV.put(METALS_KEY, JSON.stringify(rec), { expirationTtl: 30 * 86400 }); } catch {}
+        return json({ ...rec, stale: false, cached: false }, 200, ch);
+      }
+
+      /* Yesterday's price is still a nisab. Nothing at all is not. */
+      if (cached && age < METALS_MAX_AGE_MS)
+        return json({ ...cached, stale: true, cached: true }, 200, ch);
+
+      return json({ error: "No price source answered." }, 503, ch);
+    }
+
     if (url.pathname === "/api/force-tag" && request.method === "GET") {
       const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
       if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);

@@ -9,10 +9,10 @@
  * telling you whether you are over the nisab — needed a trip to a bullion
  * site first.
  *
- * This is the website's own mechanism, source for source: the same three
- * routes in the same order, the same sanity ranges, the same cache of the
- * last good figures, and the same willingness to use yesterday's price rather
- * than nothing.
+ * This is the website's own mechanism, source for source: the same routes in
+ * the same order, the same sanity ranges, the same cache of the last good
+ * figures, and the same willingness to use yesterday's price rather than
+ * nothing — with the masjid's own server tried ahead of all of them.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -32,6 +32,15 @@ const MAX_DAYS   = 7;
  * at all — worth trying first, and worth having when the rate is what is
  * missing. */
 const GBP_URL = "https://data-asg.goldprice.org/dbXRates/GBP";
+
+/* The masjid's own Worker, which asks the providers on everyone's behalf and
+ * keeps the answer. Tried FIRST, because a phone is refused by a bullion API
+ * far more often than a server is — user-agent filtering, a captive portal, an
+ * operator's DNS — and when all three refused, the one screen whose job is to
+ * tell somebody whether they are over the nisab could only ask them to go and
+ * look the price up themselves. The direct routes below are kept, so the
+ * Worker being down is no worse than it was before the Worker existed. */
+const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
 
 const GOLD_SOURCES   = [{ url: "https://api.gold-api.com/price/XAU", pick: d => d?.price }];
 const SILVER_SOURCES = [{ url: "https://api.gold-api.com/price/XAG", pick: d => d?.price }];
@@ -83,7 +92,18 @@ async function lastGoodPrices() {
 /* Returns { gold, silver, at, stale } in pounds per GRAM, or null when every
  * route has failed and there is nothing remembered either. */
 export async function fetchMetalPrices() {
-  /* 1. both metals, already in pounds */
+  /* 1. the masjid's server, which has asked on our behalf and remembered */
+  try {
+    const d = await fetchJSON(`${SENDER}/api/metals`);
+    const gold = Number(d && d.gold), silver = Number(d && d.silver);
+    if (inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)) {
+      const at = new Date(Number(d.at) || Date.now());
+      write(LAST_PRICE, { gold, silver, at: at.getTime() });
+      return { gold, silver, at, stale: !!d.stale };
+    }
+  } catch { /* ask the providers directly instead */ }
+
+  /* 2. both metals, already in pounds */
   try {
     const d = await fetchJSON(GBP_URL);
     const it = d?.items?.[0];
@@ -97,7 +117,7 @@ export async function fetchMetalPrices() {
     }
   } catch { /* fall through to the dollar route */ }
 
-  /* 2. dollars an ounce, converted */
+  /* 3. dollars an ounce, converted */
   const [goldOz, silverOz, freshRate] = await Promise.all([
     firstSane(GOLD_SOURCES, SANE.goldOz),
     firstSane(SILVER_SOURCES, SANE.silverOz),
@@ -124,7 +144,7 @@ export async function fetchMetalPrices() {
     }
   }
 
-  /* 3. whatever was good last time */
+  /* 4. whatever was good last time */
   const last = await lastGoodPrices();
   return last ? { ...last, stale: true } : null;
 }
