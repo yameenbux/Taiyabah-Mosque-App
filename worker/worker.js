@@ -279,8 +279,62 @@ export default {
   async scheduled(_event, env, ctx) {
     ctx.waitUntil(runJamaahReminders(env));
     ctx.waitUntil(runKahfReminder(env));
+    ctx.waitUntil(runPrune(env));
   },
 };
+
+/* ================= the nightly tidy ================= */
+
+/* Crash reports are already well bounded in number — the same fault from a
+   hundred phones is one row, and a trigger caps new faults at forty an hour
+   per masjid — but nothing has ever bounded them in TIME. Every distinct
+   fault the app has had is kept for ever, including ones from versions nobody
+   runs and ones somebody marked fixed months ago. Slow and small rather than
+   dangerous, which is exactly the sort of thing noticed only when the
+   database is already full.
+
+   Done from here rather than with pg_cron so it is visible in code that gets
+   read and tested, and so it does not depend on an extension being enabled.
+   The rules themselves are in db/148_prune_app_crashes.sql. */
+const PRUNE_LOCAL_TIME = "03:10";
+
+/* Pure, so which minute owns the daily run can be checked without a database
+   and without waiting until ten past three. */
+export function shouldPrune(hm) { return hm === PRUNE_LOCAL_TIME; }
+
+async function runPrune(env) {
+  const { date, hm } = londonNow();
+  if (!shouldPrune(hm)) return { skipped: `not ${PRUNE_LOCAL_TIME}` };
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY)
+    return { skipped: "no Supabase service key" };
+
+  /* Once a day, not once a minute, and marked BEFORE the call: a prune that
+     fails is not worth retrying sixty times before four o'clock. */
+  const key = `prune:${date}`;
+  if (await env.SENT_KV.get(key)) return { skipped: true };
+  await env.SENT_KV.put(key, "1", { expirationTtl: DEDUP_TTL_SECONDS });
+
+  try {
+    const res = await fetch(`${supaBaseUrl(env)}/rest/v1/rpc/prune_app_crashes`, {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.log("crash prune failed", res.status, JSON.stringify(body));
+      return { ok: false, error: `prune ${res.status}` };
+    }
+    console.log("crash prune", date, JSON.stringify(body));
+    return { ok: true, ...body };
+  } catch (e) {
+    return { ok: false, error: String((e && e.message) || e) };
+  }
+}
 
 /* ================= scheduled jamāʿah reminders ================= */
 
