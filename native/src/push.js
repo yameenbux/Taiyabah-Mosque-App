@@ -109,12 +109,18 @@ async function waitForId(tries = 6) {
  * Save: opening the screen, leaving it and coming back would otherwise send
  * the same six values to the Worker every time. */
 let lastSent = null;
+/* What the Worker read back OUT of OneSignal for that payload, which is not
+ * the same thing as what we sent it. The settings screen shows this rather
+ * than the switches, because "the switch is off" and "the masjid knows the
+ * switch is off" are different claims and only the second one decides what
+ * arrives. */
+let lastPrefs = null;
 
 /* The six tags the website writes, spelled exactly as it spells them, so one
  * segment reaches both. Written through the Worker with the REST key, never
  * from here. */
 export async function syncTags(alerts) {
-  if (Platform.OS === "web") return "not on web";
+  if (Platform.OS === "web") return { ok: false, error: "not on web" };
   const tags = {
     jamaah:        alerts.jamaah ? "1" : "0",
     jamaah_mins:   String(alerts.mins),
@@ -124,9 +130,9 @@ export async function syncTags(alerts) {
     kahf:          alerts.kahf ? "1" : "0",
   };
   const key = JSON.stringify(tags);
-  if (key === lastSent) return "stored";
+  if (key === lastSent) return { ok: true, prefs: lastPrefs };
   const id = await waitForId();
-  if (!id) return "OneSignal has not issued this device an id yet";
+  if (!id) return { ok: false, error: "OneSignal has not issued this device an id yet" };
 
   const MAX = 5;
   for (let n = 1; n <= MAX; n++) {
@@ -139,13 +145,21 @@ export async function syncTags(alerts) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `server returned ${res.status}`);
       lastSent = key;
-      return "stored";
+      /* The Worker does not trust its own write either: it reads the tags back
+       * off OneSignal afterwards and returns what it found. That read-back is
+       * the only statement about this phone that comes from the machine which
+       * decides who a send reaches, so it is what gets shown. */
+      lastPrefs = data && data.tags && typeof data.tags === "object" ? data.tags : null;
+      return { ok: true, prefs: lastPrefs };
     } catch (e) {
-      if (n === MAX) { lastSent = null; return "failed: " + String(e && e.message || e); }
+      if (n === MAX) {
+        lastSent = null; lastPrefs = null;
+        return { ok: false, error: String(e && e.message || e) };
+      }
       await new Promise(r => setTimeout(r, 2000 * n));
     }
   }
-  return "failed";
+  return { ok: false, error: "failed" };
 }
 
 /* Who this phone is, to OneSignal.

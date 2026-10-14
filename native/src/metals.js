@@ -9,10 +9,10 @@
  * telling you whether you are over the nisab — needed a trip to a bullion
  * site first.
  *
- * This is the website's own mechanism, source for source: the same three
- * routes in the same order, the same sanity ranges, the same cache of the
- * last good figures, and the same willingness to use yesterday's price rather
- * than nothing.
+ * This is the website's own mechanism, source for source: the same routes in
+ * the same order, the same sanity ranges, the same cache of the last good
+ * figures, and the same willingness to use yesterday's price rather than
+ * nothing — with the masjid's own server tried ahead of all of them.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -33,6 +33,15 @@ const MAX_DAYS   = 7;
  * missing. */
 const GBP_URL = "https://data-asg.goldprice.org/dbXRates/GBP";
 
+/* The masjid's own Worker, which asks the providers on everyone's behalf and
+ * keeps the answer. Tried FIRST, because a phone is refused by a bullion API
+ * far more often than a server is — user-agent filtering, a captive portal, an
+ * operator's DNS — and when all three refused, the one screen whose job is to
+ * tell somebody whether they are over the nisab could only ask them to go and
+ * look the price up themselves. The direct routes below are kept, so the
+ * Worker being down is no worse than it was before the Worker existed. */
+const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
+
 const GOLD_SOURCES   = [{ url: "https://api.gold-api.com/price/XAU", pick: d => d?.price }];
 const SILVER_SOURCES = [{ url: "https://api.gold-api.com/price/XAG", pick: d => d?.price }];
 const FX_SOURCES = [
@@ -45,22 +54,42 @@ const FX_SOURCES = [
 
 const inRange = (v, [lo, hi]) => Number.isFinite(v) && v >= lo && v <= hi;
 
-async function fetchJSON(url, ms = 6000) {
+/* The browser sends an Accept header and these providers answer browsers all
+ * day — the masjid's own website fetches the same three and fills its
+ * calculator in. A bare request from a phone is the thing they have never
+ * seen, so it is worth not looking stranger than necessary. */
+const HEAD = { Accept: "application/json" };
+
+async function fetchJSON(url, ms = 8000) {
   const c = new AbortController();
   const timer = setTimeout(() => c.abort(), ms);
   try {
-    const r = await fetch(url, { signal: c.signal, cache: "no-store" });
+    const r = await fetch(url, { signal: c.signal, headers: HEAD });
     if (!r.ok) throw new Error("HTTP " + r.status);
     return await r.json();
   } finally { clearTimeout(timer); }
 }
 
-async function firstSane(sources, range) {
+/* Why each route failed, in the order they were tried.
+ *
+ * "Couldn't fetch today's price" is true and useless: it cannot tell apart a
+ * provider refusing this app, a phone with no route to it, and a figure that
+ * arrived and was rejected for being implausible. Those want three different
+ * fixes, and the only person who can see which one it is is holding the
+ * phone. So the reason is carried out of here and shown under the message. */
+const host = u => { try { return String(u).split("/")[2]; } catch { return String(u); } };
+const why = e => {
+  const m = String((e && e.message) || e);
+  return m === "Aborted" || /abort/i.test(m) ? "timed out" : m;
+};
+
+async function firstSane(sources, range, log) {
   for (const src of sources) {
     try {
       const v = Number(src.pick(await fetchJSON(src.url)));
       if (inRange(v, range)) return v;
-    } catch { /* next one */ }
+      log.push(`${host(src.url)}: ${Number.isFinite(v) ? `${v} is out of range` : "no figure in the reply"}`);
+    } catch (e) { log.push(`${host(src.url)}: ${why(e)}`); }
   }
   return null;
 }
@@ -83,7 +112,21 @@ async function lastGoodPrices() {
 /* Returns { gold, silver, at, stale } in pounds per GRAM, or null when every
  * route has failed and there is nothing remembered either. */
 export async function fetchMetalPrices() {
-  /* 1. both metals, already in pounds */
+  const tried = [];
+
+  /* 1. the masjid's server, which has asked on our behalf and remembered */
+  try {
+    const d = await fetchJSON(`${SENDER}/api/metals`);
+    const gold = Number(d && d.gold), silver = Number(d && d.silver);
+    if (inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)) {
+      const at = new Date(Number(d.at) || Date.now());
+      write(LAST_PRICE, { gold, silver, at: at.getTime() });
+      return { ok: true, gold, silver, at, stale: !!d.stale };
+    }
+    tried.push(`the masjid's server: ${(d && d.error) || "no figure in the reply"}`);
+  } catch (e) { tried.push(`the masjid's server: ${why(e)}`); }
+
+  /* 2. both metals, already in pounds */
   try {
     const d = await fetchJSON(GBP_URL);
     const it = d?.items?.[0];
@@ -92,16 +135,17 @@ export async function fetchMetalPrices() {
       if (inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)) {
         const at = new Date();
         write(LAST_PRICE, { gold, silver, at: at.getTime() });
-        return { gold, silver, at, stale: false };
+        return { ok: true, gold, silver, at, stale: false };
       }
-    }
-  } catch { /* fall through to the dollar route */ }
+      tried.push(`${host(GBP_URL)}: the figures are out of range`);
+    } else tried.push(`${host(GBP_URL)}: nothing in the reply`);
+  } catch (e) { tried.push(`${host(GBP_URL)}: ${why(e)}`); }
 
-  /* 2. dollars an ounce, converted */
+  /* 3. dollars an ounce, converted */
   const [goldOz, silverOz, freshRate] = await Promise.all([
-    firstSane(GOLD_SOURCES, SANE.goldOz),
-    firstSane(SILVER_SOURCES, SANE.silverOz),
-    firstSane(FX_SOURCES, SANE.fx),
+    firstSane(GOLD_SOURCES, SANE.goldOz, tried),
+    firstSane(SILVER_SOURCES, SANE.silverOz, tried),
+    firstSane(FX_SOURCES, SANE.fx, tried),
   ]);
   if (freshRate) write(LAST_FX, { rate: freshRate, at: Date.now() });
 
@@ -120,11 +164,12 @@ export async function fetchMetalPrices() {
     if (inRange(gold, SANE.goldG) && inRange(silver, SANE.silverG)) {
       const at = new Date();
       write(LAST_PRICE, { gold, silver, at: at.getTime() });
-      return { gold, silver, at, stale: false };
+      return { ok: true, gold, silver, at, stale: false };
     }
   }
 
-  /* 3. whatever was good last time */
+  /* 4. whatever was good last time */
   const last = await lastGoodPrices();
-  return last ? { ...last, stale: true } : null;
+  if (last) return { ok: true, ...last, stale: true };
+  return { ok: false, reason: tried.join(" · ") };
 }

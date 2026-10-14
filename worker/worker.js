@@ -121,6 +121,13 @@ const TOPICS = {
   kahf:          { idx: 4, label: "Sūrah al-Kahf" },
 };
 
+/* Named exports alongside the Worker's own default export, so test/prefs.test.mjs
+   can check THESE functions rather than a copy of them. A copy is what would
+   drift, and what decides who a notification reaches is not a thing to test by
+   resemblance. Cloudflare ignores named exports it was not asked for. */
+export { PREF_TAG, PREF_ORDER, PREF_MINUTES, LEGACY_FLAGS, TOPICS,
+         encodePrefs, decodePrefs, prefValues, anyOfFilter };
+
 /* ---------------- helpers ---------------- */
 const enc = new TextEncoder();
 const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf)))
@@ -172,6 +179,60 @@ async function validToken(token, secret) {
    several, so this slows abuse rather than guaranteeing a ceiling. The password
    plus an 8-hour session is the real control. */
 const hits = new Map();
+/* ---------------- gold and silver, for the zakat nisab ----------------
+
+   WHY THIS IS HERE AND NOT ONLY IN THE APP. The calculator asked each phone
+   to call three bullion APIs itself. When they all refuse — and a phone on
+   mobile data is refused far more often than a server is, by user-agent
+   filtering, by a captive portal, by an operator's DNS — the screen can only
+   say "couldn't fetch today's price, please enter it below", which is the
+   one thing that screen exists to save somebody doing.
+
+   Asking once from here fixes both halves of that. A Worker is not a browser
+   with an unusual user agent, so it is not filtered like one; and the answer
+   is kept, so a provider having a bad afternoon costs nobody their nisab —
+   this morning's price is still this morning's price.
+
+   The app keeps its own direct routes as a fallback, so this being down is
+   no worse than before it existed. */
+const TROY_OZ_G = 31.1034768;
+
+/* Wide enough for years of movement, narrow enough to catch a provider that
+   has changed its units or started answering with an error page that happens
+   to parse as a number. The app's own copy of these is in native/src/metals.js
+   and they are meant to agree. */
+const METAL_SANE = {
+  goldOz: [500, 20000], silverOz: [3, 500], fx: [0.4, 1.6],
+  goldG: [15, 700], silverG: [0.05, 20],
+};
+const METALS_KEY = "metals:last";
+const METALS_FRESH_MS = 15 * 60e3;      // serve the stored figure rather than refetch
+const METALS_MAX_AGE_MS = 7 * 864e5;    // older than this is not today's price
+
+const inMetalRange = (v, [lo, hi]) => Number.isFinite(v) && v >= lo && v <= hi;
+
+/* Pure: whatever the providers answered, in pounds per GRAM, or null if none
+   of it is believable. Separated from the fetching so it can be tested —
+   getting a unit wrong here would quietly put the nisab out by a factor of
+   thirty-one. */
+export function gramPrices({ gbp, goldOz, silverOz, rate }) {
+  if (gbp) {
+    const gold = Number(gbp.xauPrice) / TROY_OZ_G;
+    const silver = Number(gbp.xagPrice) / TROY_OZ_G;
+    if (inMetalRange(gold, METAL_SANE.goldG) && inMetalRange(silver, METAL_SANE.silverG))
+      return { gold, silver, source: "goldprice.org" };
+  }
+  if (inMetalRange(goldOz, METAL_SANE.goldOz) &&
+      inMetalRange(silverOz, METAL_SANE.silverOz) &&
+      inMetalRange(rate, METAL_SANE.fx)) {
+    const gold = (goldOz / TROY_OZ_G) * rate;
+    const silver = (silverOz / TROY_OZ_G) * rate;
+    if (inMetalRange(gold, METAL_SANE.goldG) && inMetalRange(silver, METAL_SANE.silverG))
+      return { gold, silver, source: "gold-api.com" };
+  }
+  return null;
+}
+
 function limit(key, max, windowMs) {
   const now = Date.now();
   const rec = hits.get(key) || { n: 0, reset: now + windowMs };
@@ -218,8 +279,62 @@ export default {
   async scheduled(_event, env, ctx) {
     ctx.waitUntil(runJamaahReminders(env));
     ctx.waitUntil(runKahfReminder(env));
+    ctx.waitUntil(runPrune(env));
   },
 };
+
+/* ================= the nightly tidy ================= */
+
+/* Crash reports are already well bounded in number — the same fault from a
+   hundred phones is one row, and a trigger caps new faults at forty an hour
+   per masjid — but nothing has ever bounded them in TIME. Every distinct
+   fault the app has had is kept for ever, including ones from versions nobody
+   runs and ones somebody marked fixed months ago. Slow and small rather than
+   dangerous, which is exactly the sort of thing noticed only when the
+   database is already full.
+
+   Done from here rather than with pg_cron so it is visible in code that gets
+   read and tested, and so it does not depend on an extension being enabled.
+   The rules themselves are in db/148_prune_app_crashes.sql. */
+const PRUNE_LOCAL_TIME = "03:10";
+
+/* Pure, so which minute owns the daily run can be checked without a database
+   and without waiting until ten past three. */
+export function shouldPrune(hm) { return hm === PRUNE_LOCAL_TIME; }
+
+async function runPrune(env) {
+  const { date, hm } = londonNow();
+  if (!shouldPrune(hm)) return { skipped: `not ${PRUNE_LOCAL_TIME}` };
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY)
+    return { skipped: "no Supabase service key" };
+
+  /* Once a day, not once a minute, and marked BEFORE the call: a prune that
+     fails is not worth retrying sixty times before four o'clock. */
+  const key = `prune:${date}`;
+  if (await env.SENT_KV.get(key)) return { skipped: true };
+  await env.SENT_KV.put(key, "1", { expirationTtl: DEDUP_TTL_SECONDS });
+
+  try {
+    const res = await fetch(`${supaBaseUrl(env)}/rest/v1/rpc/prune_app_crashes`, {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.log("crash prune failed", res.status, JSON.stringify(body));
+      return { ok: false, error: `prune ${res.status}` };
+    }
+    console.log("crash prune", date, JSON.stringify(body));
+    return { ok: true, ...body };
+  } catch (e) {
+    return { ok: false, error: String((e && e.message) || e) };
+  }
+}
 
 /* ================= scheduled jamāʿah reminders ================= */
 
@@ -274,7 +389,60 @@ function minusMinutes(hm, n) {
   return `${String(Math.floor(v / 60)).padStart(2, "0")}:${String(v % 60).padStart(2, "0")}`;
 }
 
-async function sendReminder(env, { key, idx = 0, tagMins, title, body }) {
+/* WHO A SCHEDULED REMINDER IS FOR — by platform as well as by tag.
+ *
+ * The app schedules its jamāʿah and Sūrah al-Kahf reminders on the phone
+ * itself. That is the whole reason they arrive with no signal, and it is what
+ * the app's own Notifications screen promises: "Jamāʿah and Sūrah al-Kahf
+ * reminders are set on this phone and arrive with no signal." So a push for
+ * the same prayer is not a reminder, it is a second copy of one the person
+ * already has — the same words twice, a minute apart.
+ *
+ * A browser subscriber cannot schedule anything locally. Nothing wakes a web
+ * page to say Asr is in ten minutes, which is the reason this scheduler was
+ * written at all. For them the push IS the reminder, and on 14 October 2026
+ * they were the majority: of fifteen devices on the jamāʿah reminder, nine
+ * were Safari or Chrome and six were the app. So the push cannot simply be
+ * switched off.
+ *
+ * `webOnly` therefore sends to browser subscriptions only, and is set on both
+ * scheduled reminders, because the app arms both of them itself. Everybody
+ * still gets their 5/10/15-minute reminder — app users from their own phone,
+ * browser users from here — and nobody gets it twice.
+ *
+ * It is NOT set on janāzah, announcements or events: nothing schedules those
+ * locally and they must reach every subscriber.
+ *
+ * SEQUENCING, and it matters: an app older than the build that fixed arm()
+ * has NO working local reminders. Deploying this before that build is live
+ * leaves those phones with neither copy. See REMINDERS.md.
+ */
+export function reminderPayload(appId, { title, body, idx = 0, tagMins, webOnly }) {
+  const payload = {
+    app_id: appId,
+    headings: { en: title },
+    contents: { en: body },
+    filters: anyOfFilter(prefValues(idx, tagMins == null ? null : tagMins)),
+    /* These are web-only today, so app_url is never used — it is set anyway,
+       so that the day somebody lifts the platform restriction this does not
+       quietly start sending app users to a web page again. */
+    web_url: `${SITE}/`,
+    app_url: APP_TIMES,
+  };
+  if (webOnly) {
+    /* Named one by one rather than trusting isAnyWeb alone to imply the rest.
+       A platform flag that quietly defaults to "true" is how this would turn
+       back into a duplicate without anybody touching it. */
+    payload.isAnyWeb  = true;
+    payload.isIos     = false;
+    payload.isAndroid = false;
+    payload.isHuawei  = false;
+    payload.isAdm     = false;
+  }
+  return payload;
+}
+
+async function sendReminder(env, { key, idx = 0, tagMins, title, body, webOnly }) {
   const already = await env.SENT_KV.get(key);
   if (already) return { skipped: true };
 
@@ -291,18 +459,11 @@ async function sendReminder(env, { key, idx = 0, tagMins, title, body }) {
   if (values.length > 120) {
     return { sent: false, error: `filter too large: ${values.length} values` };
   }
-  const filters = anyOfFilter(values);
 
   const res = await fetch("https://api.onesignal.com/notifications", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` },
-    body: JSON.stringify({
-      app_id: env.ONESIGNAL_APP_ID,
-      headings: { en: title },
-      contents: { en: body },
-      filters,
-      url: "https://taiyabahapp.ysbdesigns.uk/",
-    }),
+    body: JSON.stringify(reminderPayload(env.ONESIGNAL_APP_ID, { title, body, idx, tagMins, webOnly })),
   });
   const data = await res.json().catch(() => ({}));
 
@@ -372,6 +533,7 @@ async function runKahfReminder(env) {
     key: `kahf:${date}`,
     idx: KAHF_TOPIC_IDX,
     tagMins: null,                       // nothing to offset against
+    webOnly: true,                       // the app arms this one itself
     title: "Sūrah al-Kahf",
     body: "It is Jumuʿah. Whoever reads Sūrah al-Kahf today has a light between this Friday and the next.",
   });
@@ -380,12 +542,61 @@ async function runKahfReminder(env) {
 /* A data URL in, a public HTTPS URL out. Supabase Storage is addressed
    directly rather than through a client library, because a Worker should not
    carry one for three lines of REST. */
-async function uploadPoster(env, dataUrl) {
+/* Posters are served THROUGH this Worker, not straight off Supabase Storage.
+ *
+ * Supabase's free tier allows 5GB of egress a month. A poster is downloaded
+ * once by every phone that opens the notice, so at five thousand congregants
+ * a single 1MB poster is 5GB — the whole month, one announcement. The office
+ * cannot be expected to think about that before posting a janāzah notice.
+ *
+ * So the stored URL points here, and this fetches from Supabase with
+ * `cacheEverything`, which puts the image in Cloudflare's cache. Supabase then
+ * serves each poster a handful of times no matter how many people look at it,
+ * and Cloudflare — whose bandwidth is not metered — serves the rest. The
+ * response also carries an immutable year-long Cache-Control, so each phone
+ * fetches a given poster once ever.
+ *
+ * The name is generated here and never comes from a person, but it arrives
+ * back as a path segment, so it is checked rather than trusted: a bucket is
+ * not a thing to let a URL wander around in. */
+export function posterName(pathname) {
+  const name = pathname.slice("/api/poster/".length);
+  return /^[0-9]{10,16}-[0-9a-f]{8}\.(jpg|png|webp)$/.test(name) ? name : null;
+}
+
+const POSTER_CACHE_SECONDS = 30 * 86400;
+
+/* WHERE A NOTIFICATION TAKES YOU, which is not the same place on a phone as
+ * in a browser.
+ *
+ * Every send used to carry one `url`, the website's. On a browser that is
+ * right — the page IS the app. On a phone it is wrong twice over: it throws
+ * somebody out of the app they just installed and into a web page, and once
+ * the website is retired it opens a dead address. Every janāzah alert, every
+ * announcement.
+ *
+ * OneSignal takes the two separately. `web_url` goes to browser subscribers
+ * and `app_url` to the app, where it is a deep link the app already knows how
+ * to route — see the `linking` config in native/src/App.jsx, which exists for
+ * exactly this. The Notices tab lists newest first, so the notice that was
+ * just announced is the one at the top: opening that tab is opening the thing
+ * the notification is about. */
+const SITE = "https://taiyabahapp.ysbdesigns.uk";
+const APP_NOTICES = "taiyabah://notices";
+const APP_TIMES   = "taiyabah://times";
+
+async function uploadPoster(env, dataUrl, origin) {
   const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
   if (!m) return { error: "The poster must be a JPEG, PNG or WebP image." };
 
   const bytes = Uint8Array.from(atob(m[2]), c => c.charCodeAt(0));
-  if (bytes.length > 5 * 1024 * 1024) return { error: "The poster is over 5 MB. Please shrink it first." };
+  /* The office's own page shrinks a poster to about 1600px before it gets
+     here, which turns a 5MB photograph into a few hundred KB. This ceiling is
+     therefore not a normal limit somebody bumps into — it is the alarm for a
+     browser where that shrinking did not happen, and it is deliberately low
+     enough to go off rather than quietly fill the bucket. */
+  if (bytes.length > 2 * 1024 * 1024)
+    return { error: "The poster is over 2 MB after resizing, which should not happen. Try a smaller image." };
 
   const ext = m[1] === "image/png" ? "png" : m[1] === "image/webp" ? "webp" : "jpg";
   const name = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
@@ -402,7 +613,9 @@ async function uploadPoster(env, dataUrl) {
     body: bytes,
   });
   if (!res.ok) return { error: `Poster upload failed (${res.status})` };
-  return { url: `${base}/storage/v1/object/public/notices/${name}` };
+  /* Through this Worker, for the reason above. Taken from the request rather
+     than written down, so this keeps working if the Worker ever moves. */
+  return { url: `${origin}/api/poster/${name}` };
 }
 
 const supaBaseUrl = (env) =>
@@ -466,9 +679,8 @@ async function sendNotice(env, { topic, title, body, imageUrl, id }) {
     headings: { en: title },
     contents: { en: body },
     filters: anyOfFilter(prefValues(t.idx)),
-    url: id
-      ? `https://taiyabahapp.ysbdesigns.uk/#notice=${id}`
-      : "https://taiyabahapp.ysbdesigns.uk/#notices",
+    web_url: id ? `${SITE}/#notice=${id}` : `${SITE}/#notices`,
+    app_url: APP_NOTICES,
   };
   if (imageUrl) {
     payload.big_picture = imageUrl;                 // Android
@@ -533,23 +745,27 @@ async function runJamaahReminders(env) {
       const key = `sent:${date}:${prayer}:${mins}`;
       const r = await sendReminder(env, {
         key, tagMins: mins,
+        webOnly: true,                   // the app arms this one itself
         title: `${label} Jamāʿah in ${mins} min`,
         body: `${label} jamāʿah is at ${jamaat}.`,
       });
       results.push({ prayer: label, mins, ...r });
     }
 
-    // At the jamāʿah time itself. tagMins is null so this reaches everyone
-    // with jamāʿah reminders on, whatever advance warning they chose.
-    if (jamaat === hm) {
-      const key = `sent:${date}:${prayer}:now`;
-      const r = await sendReminder(env, {
-        key, tagMins: null,
-        title: "Jamāʿah Time Now",
-        body: `${label} jamāʿah is starting now at the masjid.`,
-      });
-      results.push({ prayer: label, mins: "now", ...r });
-    }
+    /* THERE IS NO SECOND NOTIFICATION AT THE JAMĀʿAH ITSELF.
+     *
+     * There used to be: "Jamāʿah Time Now", sent as the prayer began, on top
+     * of the advance reminder. The committee's view was that two notifications
+     * per prayer — ten a day — is more than people want from a masjid, and
+     * they are right. The advance reminder is the one that is useful, because
+     * it is the one you can still act on.
+     *
+     * Removed rather than made optional: a switch for it would be a sixth
+     * thing to explain on the Notifications screen in return for a
+     * notification nobody asked to keep. If it is ever wanted back it belongs
+     * to the phone, not here — a local reminder at the jamāʿah time arrives on
+     * time and with no signal, which this never reliably did.
+     */
   }
   if (results.length) console.log("reminder run", date, hm, JSON.stringify(results));
   return { date, hm, results };
@@ -625,7 +841,8 @@ async function handle(request, env) {
           headings: { en: title },
           contents: { en: message },
           filters: anyOfFilter(prefValues(t.idx)),
-          url: "https://taiyabahapp.ysbdesigns.uk/",
+          web_url: `${SITE}/#notices`,
+          app_url: APP_NOTICES,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -661,9 +878,21 @@ async function handle(request, env) {
          leave those devices untagged — indistinguishable from the fault this
          endpoint exists to fix. The per-device cap is what actually bounds
          abuse here; the address cap stays as a backstop, set high enough that
-         a room full of people never reaches it. */
+         a room full of people never reaches it.
+
+         SET FOR A CONGREGATION, NOT A ROOM. This was 600/hour, chosen for "a
+         room full of people". The masjid has thousands, and the hour after
+         the app is announced at Jumuʿah is the one hour when every phone in
+         the building writes its tags at once, over one public IP. At 600 the
+         six-hundred-and-first person is refused and left untagged — silently
+         unreachable by every announcement from then on, with a working app in
+         their hand. The failure would look exactly like the app not working
+         for "some people", on the single day it matters most.
+
+         A device that is abusing this is still stopped by the per-device cap
+         below, which is the one with teeth. */
       const ip = request.headers.get("CF-Connecting-IP") || "?";
-      if (!limit(`tags-ip:${ip}`, 600, 60 * 60e3))
+      if (!limit(`tags-ip:${ip}`, 20000, 60 * 60e3))
         return json({ error: "Too many attempts from this network. Try again shortly." }, 429, ch);
 
       let body = {};
@@ -763,7 +992,10 @@ async function handle(request, env) {
 
        POST /api/report { report, note } */
     if (url.pathname === "/api/report" && request.method === "POST") {
-      if (!limit(`report:${ip}`, 20, 60 * 60e3))
+      /* One address, many people. Twenty an hour is four congregants having a
+         bad morning, and a diagnostic report that is refused is the one piece
+         of evidence nobody can reconstruct later. */
+      if (!limit(`report:${ip}`, 400, 60 * 60e3))
         return json({ error: "Too many reports from this network just now." }, 429, ch);
 
       let body = {};
@@ -830,6 +1062,100 @@ async function handle(request, env) {
        409s, the bug is in the client SDK call. If this ALSO 409s, the
        problem is on OneSignal's side for this app/subscription, not ours.
        GET /api/force-tag?id=<onesignal_id> */
+    /* GET /api/poster/<name> — a notice poster, cached at the edge.
+
+       Public, because a poster is public the moment it is announced, and the
+       app has no credentials to present anyway. See uploadPoster for why this
+       is not served straight off Supabase Storage. */
+    if (url.pathname.startsWith("/api/poster/") && request.method === "GET") {
+      const name = posterName(url.pathname);
+      if (!name) return json({ error: "No such poster." }, 404, ch);
+      if (!env.SUPABASE_URL) return json({ error: "Storage is not configured." }, 501, ch);
+
+      const upstream = `${supaBaseUrl(env)}/storage/v1/object/public/notices/${name}`;
+      let res;
+      try {
+        res = await fetch(upstream, { cf: { cacheEverything: true, cacheTtl: POSTER_CACHE_SECONDS } });
+      } catch {
+        return json({ error: "The poster could not be fetched." }, 502, ch);
+      }
+      if (!res.ok) return json({ error: "No such poster." }, res.status === 404 ? 404 : 502, ch);
+
+      /* A poster never changes — the name carries a timestamp and a random
+         tail, and a new one gets a new name — so a phone that has fetched it
+         once never needs to again. */
+      const headers = new Headers({
+        "Content-Type": res.headers.get("Content-Type") || "image/jpeg",
+        "Cache-Control": `public, max-age=31536000, immutable`,
+        "Access-Control-Allow-Origin": "*",
+      });
+      const len = res.headers.get("Content-Length");
+      if (len) headers.set("Content-Length", len);
+      return new Response(res.body, { status: 200, headers });
+    }
+
+    /* GET /api/metals — today's gold and silver in pounds per gram.
+
+       Public and unauthenticated: it is a published commodity price, the app
+       needs it before anybody has signed in to anything, and the website's
+       calculator wants the same figure. */
+    if (url.pathname === "/api/metals" && request.method === "GET") {
+      /* Also a whole congregation behind one address — and this one answers
+         from a cache almost every time, so a high cap costs the providers
+         nothing. A published commodity price is not worth rationing. */
+      if (!limit(`metals:${ip}`, 20000, 60 * 60e3))
+        return json({ error: "Too many price checks from this network." }, 429, ch);
+
+      let cached = null;
+      try { cached = await env.SENT_KV.get(METALS_KEY, "json"); } catch { /* no cache, no matter */ }
+      const age = cached && cached.at ? Date.now() - cached.at : Infinity;
+      if (cached && age < METALS_FRESH_MS)
+        return json({ ...cached, stale: false, cached: true }, 200, ch);
+
+      /* An honest user agent rather than a borrowed one. If a provider will
+         not serve a masjid's app that says so, that is their answer and the
+         next source gets its turn. */
+      const head = {
+        "User-Agent": "TaiyabahMasjid/2.0 (+https://taiyabahapp.ysbdesigns.uk/)",
+        Accept: "application/json",
+      };
+      const get = async u => {
+        try {
+          const r = await fetch(u, { headers: head, cf: { cacheTtl: 300 } });
+          return r.ok ? await r.json() : null;
+        } catch { return null; }
+      };
+
+      const [gbp, xau, xag, fx] = await Promise.all([
+        get("https://data-asg.goldprice.org/dbXRates/GBP"),
+        get("https://api.gold-api.com/price/XAU"),
+        get("https://api.gold-api.com/price/XAG"),
+        get("https://api.frankfurter.app/latest?from=USD&to=GBP"),
+      ]);
+
+      const picked = gramPrices({
+        gbp: gbp && gbp.items && gbp.items[0],
+        goldOz: xau && Number(xau.price),
+        silverOz: xag && Number(xag.price),
+        rate: fx && fx.rates && Number(fx.rates.GBP),
+      });
+
+      if (picked) {
+        const rec = { ...picked, at: Date.now() };
+        /* Kept for a month, though anything over a week is refused below. The
+           extra three weeks are only so a long outage is visible as a stale
+           figure rather than as nothing at all. */
+        try { await env.SENT_KV.put(METALS_KEY, JSON.stringify(rec), { expirationTtl: 30 * 86400 }); } catch {}
+        return json({ ...rec, stale: false, cached: false }, 200, ch);
+      }
+
+      /* Yesterday's price is still a nisab. Nothing at all is not. */
+      if (cached && age < METALS_MAX_AGE_MS)
+        return json({ ...cached, stale: true, cached: true }, 200, ch);
+
+      return json({ error: "No price source answered." }, 503, ch);
+    }
+
     if (url.pathname === "/api/force-tag" && request.method === "GET") {
       const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
       if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
@@ -931,7 +1257,7 @@ async function handle(request, env) {
 
       let imageUrl = null, dims = {};
       if (typeof body.image === "string" && body.image.startsWith("data:")) {
-        const up = await uploadPoster(env, body.image);
+        const up = await uploadPoster(env, body.image, url.origin);
         if (up.error) return json({ error: up.error }, 400, ch);
         imageUrl = up.url;
         dims = { image_w: body.image_w || null, image_h: body.image_h || null };

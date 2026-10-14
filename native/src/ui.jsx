@@ -596,7 +596,7 @@ export function MenuRow({ label, sub, svg, icon, soon, onPress, href, ext, play 
             /* .dr-ext — a gold ↗ at 80%, which the website uses on every row
                that leaves the app, against .dr-ch's muted chevron for one
                that goes deeper. */
-            : ext ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.goldBright, opacity: 0.8 }}>↗</Text>
+            : ext ? <ExtArrow />
             : act ? <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} /> : null}
     </Press>
   );
@@ -899,6 +899,38 @@ export function Urgent({ lab, h, ps, nums }) {
   );
 }
 
+/* THE ARROW ON A ROW THAT LEAVES THE APP.
+ *
+ * The website writes this as the character &#8599; (↗) and lets the browser
+ * find a font that has it. The app cannot do that: not one of the eight fonts
+ * it bundles contains U+2197. It got away with it on iOS only because the
+ * text was silently being drawn in San Francisco — the fonts were never
+ * actually loading, which is the fault fixed by naming their internal tables
+ * after their files. The moment the real Hanken Grotesk started being used,
+ * iOS fell through to Apple Color Emoji and drew a blue rounded square
+ * instead. A colour emoji ignores the colour it is handed, so every arrow in
+ * the app stopped being gold on the same day and for the same reason.
+ *
+ * So it is an icon rather than a character, which cannot fall back to
+ * anything: arrow-forward turned forty-five degrees, already in the subset.
+ * Gold-bright at 80% is what .dr-ext is on the website — including inside the
+ * filled apply button, where this app had been drawing it white.
+ */
+export function ExtArrow({ size = 13, color = C.goldBright, opacity = 0.8, style }) {
+  const { fs, rtl } = useApp();
+  /* Mirrored for Arabic and Urdu: a row that leaves the app points away from
+     the text, and the text runs the other way. Both icons rotate the same
+     way — east turned 45° anticlockwise is north-east, west is north-west. */
+  return (
+    <Ionicons
+      name={rtl ? "arrow-back" : "arrow-forward"}
+      size={fs(size)}
+      color={color}
+      style={[{ opacity, transform: [{ rotate: "-45deg" }] }, style]}
+    />
+  );
+}
+
 export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
   const { fs, tx, rtl } = useApp();
   const tones = CALLOUT_TONES();
@@ -906,7 +938,7 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
   const align = rtl ? "right" : "left";
   const body = ps || [];
   /* .ad-apply — a FILLED brand-600 bar at 11px of radius, the label 13px bold
-     on the left and the ↗ hard right, 11/13 of padding. It was the shared
+     on the left and the gold ↗ hard right, 11/13 of padding. It was the shared
      gradient pill with everything centred, which on a dark panel read as a
      second paragraph rather than the thing to tap. */
   const button = !cta ? null : (
@@ -918,7 +950,7 @@ export function Callout({ lab, h, ps, cta, ctaAt, tone = "plum" }) {
                                  borderRadius: 11, backgroundColor: C.plumFill,
                                  opacity: pressed ? 0.88 : 1 })}>
       <Text style={{ fontFamily: F.sansBold, fontSize: fs(13), color: "#FFFFFF" }}>{tx(cta)}</Text>
-      <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "#FFFFFF" }}>↗</Text>
+      <ExtArrow />
     </Pressable>
   );
   /* The website puts it BETWEEN the paragraphs on admissions, so "The office

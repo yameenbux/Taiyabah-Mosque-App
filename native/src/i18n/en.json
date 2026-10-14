@@ -1184,6 +1184,7 @@
  "alerts.more_answers": "More answers in Help",
  "alerts.what_comes_from_where": "Jamāʿah and Sūrah al-Kahf reminders are set on this phone and arrive with no signal. Janāzah, announcements and events are sent by the masjid, so those need a connection.",
  "alerts.choices_not_stored": "Your choices for the masjid's announcements could not be saved just now. They are kept on this phone and will be sent again next time you press Save.",
+ "alerts.masjid_will_send": "The masjid has your choices and will send you:",
  "bukhari.nothing_matches": "Nothing matches that.",
  "bukhari.search_unavailable": "Search needs a connection the first time. Try again when you are online.",
  "bukhari.no_such_hadith": "There is no hadith with that number.",

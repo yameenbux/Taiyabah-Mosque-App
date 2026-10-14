@@ -60,16 +60,24 @@ export async function arm(reminders, extras = {}) {
     const day = dayFor(date);
     if (!day) continue;
     for (const [key, before] of wanted) {
-      const at = day.jamaat[key];
-      if (!at || !ORDER.includes(key)) continue;
-      const when = new Date(londonInstant(date, at).getTime() - Number(before) * 60000);
+      /* `jamaat` is the clock time as written in the timetable, "19:15".
+       * NOT named `at`: that is the trigger builder imported at the top of
+       * this file, and a local of the same name shadowed it for the whole of
+       * this block — so `at(when, …)` below called a STRING, threw
+       * "at is not a function" on the very first prayer, and left arm() to
+       * reject after it had already cancelled the queue. Every local reminder
+       * in the app was silently gone. scripts/test/arm.test.mjs now runs this
+       * loop for real so that cannot happen again. */
+      const time = day.jamaat[key];
+      if (!time || !ORDER.includes(key)) continue;
+      const when = new Date(londonInstant(date, time).getTime() - Number(before) * 60000);
       if (when <= realNow) continue;          // never schedule into the past
       await Notifications.scheduleNotificationAsync({
         content: {
           title: Number(before) === 0
             ? `${NAMES[key].en} jamāʿah`
             : `${NAMES[key].en} jamāʿah in ${before} min`,
-          body: `${pretty(at)} at Taiyabah Masjid`,
+          body: `${pretty(time)} at Taiyabah Masjid`,
           sound: "default",
         },
         /* src/triggers.js, and read its header before touching this: a
