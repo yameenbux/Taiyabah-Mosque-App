@@ -16,6 +16,10 @@
 
 import WidgetKit
 import SwiftUI
+/* DateFormatter and replacingOccurrences are Foundation. SwiftUI happens to
+   pull it in, but relying on a transitive import is how a build breaks on
+   somebody else's toolchain. */
+import Foundation
 
 // MARK: - The masjid's colours, which are the website's colours
 
@@ -240,10 +244,13 @@ private func daySlots(day: Date, record: Day) -> [Slot] {
   for p in PRAYERS {
     if p.key == "zuhr", let j = record.jummah, let first = j.first,
        let at = instant(day: day, hhmm: first) {
-      let two = (j.second?.isEmpty == false)
-      out.append(Slot(name: two ? "Jumuʿah" : "Jumuʿah", at: at))
-      if let second = j.second, !second.isEmpty,
-         let at2 = instant(day: day, hhmm: second) {
+      /* Numbered only when there are two. "Jumuʿah" and "2nd Jumuʿah" reads
+         as though the first one is the real one and the second an overflow;
+         "1st" and "2nd" says they are both sittings of the same prayer, which
+         is what they are. A lone sitting needs no number at all. */
+      let second = (j.second?.isEmpty == false) ? j.second : nil
+      out.append(Slot(name: second == nil ? "Jumuʿah" : "1st Jumuʿah", at: at))
+      if let second = second, let at2 = instant(day: day, hhmm: second) {
         out.append(Slot(name: "2nd Jumuʿah", at: at2))
       }
       continue
@@ -503,31 +510,48 @@ struct NextJamaahView: View {
             Rule().padding(.top, 6).padding(.bottom, 7)
           }
           ForEach(entry.today, id: \.name) { slot in
-            let isNext = entry.known && slot.at == entry.at
-            let past = slot.at < entry.at
-            HStack(spacing: 4) {
-              Text(slot.name)
-                .font(.system(size: 11, weight: isNext ? .bold : .medium))
-                .lineLimit(1).minimumScaleFactor(0.75)
-              Spacer(minLength: 4)
-              Text(timeText(slot.at))
-                .font(.system(size: 11, weight: isNext ? .bold : .medium))
-                .monospacedDigit()
-            }
-            .foregroundStyle(isNext ? Brand.goldBright
-                                    : Brand.cream.opacity(past ? 0.34 : 0.88))
-            .padding(.vertical, 2.2)
-            .overlay(alignment: .leading) {
-              if isNext {
-                Circle().fill(Brand.goldBright).frame(width: 3, height: 3).offset(x: -9)
-              }
-            }
+            DayRow(slot: slot,
+                   isNext: entry.known && slot.at == entry.at,
+                   past: slot.at < entry.at)
           }
           Spacer(minLength: 0)
         }
         .frame(width: 139, alignment: .leading)
       }
       .padding(EdgeInsets(top: 15, leading: 16, bottom: 14, trailing: 16))
+    }
+  }
+}
+
+/* One line of the day's list.
+ *
+ * Its own view rather than a `let` or two inside the ForEach closure: result
+ * builders only lifted their restrictions on local bindings in Swift 5.8, the
+ * target still declares SWIFT_VERSION 5.0, and a build failing on that would
+ * be a bad way to find out. It also reads better. */
+private struct DayRow: View {
+  let slot: Slot
+  let isNext: Bool
+  let past: Bool
+
+  var body: some View {
+    HStack(spacing: 4) {
+      Text(slot.name)
+        .font(.system(size: 11, weight: isNext ? .bold : .medium))
+        .lineLimit(1)
+        .minimumScaleFactor(0.75)
+      Spacer(minLength: 4)
+      Text(timeText(slot.at))
+        .font(.system(size: 11, weight: isNext ? .bold : .medium))
+        .monospacedDigit()
+    }
+    .foregroundStyle(isNext ? Brand.goldBright
+                            : Brand.cream.opacity(past ? 0.34 : 0.88))
+    .padding(.vertical, 2.2)
+    .overlay(alignment: .leading) {
+      if isNext {
+        Circle().fill(Brand.goldBright).frame(width: 3, height: 3).offset(x: -9)
+      }
     }
   }
 }
