@@ -272,9 +272,17 @@ for (const [device, rows] of Object.entries(byDevice))
       }
     }
 
-/* The frame composer needs the bar height and the colour to draw it in. */
-fs.writeFileSync(path.join(OUT, "status-bar.json"), JSON.stringify(
-  Object.fromEntries(report.map(r => [`${r.device}/${r.shot}`, { top: r.top, bar: r.bar }])), null, 1));
+/* The frame composer needs the bar height and the colour to draw it in.
+ *
+ * MERGED, NOT REPLACED. Written whole, a SHOT_ONLY run — which is the normal
+ * way to re-take one screen — threw away the entries for the other nine, and
+ * the composer then silently drew no status bar at all on any panel but the
+ * one just taken. A partial run must not delete what it did not look at. */
+const barFile = path.join(OUT, "status-bar.json");
+const before = fs.existsSync(barFile) ? JSON.parse(fs.readFileSync(barFile, "utf8")) : {};
+fs.writeFileSync(barFile, JSON.stringify(
+  { ...before, ...Object.fromEntries(report.map(r => [`${r.device}/${r.shot}`, { top: r.top, bar: r.bar }])) },
+  null, 1));
 
 const failed = report.filter(r => !r.reached);
 if (failed.length) {

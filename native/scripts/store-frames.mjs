@@ -70,6 +70,8 @@ const STAR = "50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,
             + "50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4";
 
 const fontFile = f => fs.readFileSync(path.join(native, "assets", "fonts", f)).toString("base64");
+/* The masjid's own wordmark, for the first panel. */
+const LOGO = fs.readFileSync(path.join(repo, "logo.svg")).toString("base64");
 const SANS = fontFile("HankenGroteskBold.ttf");
 const SANS_MED = fontFile("HankenGroteskMedium.ttf");
 
@@ -77,23 +79,23 @@ const SANS_MED = fontFile("HankenGroteskMedium.ttf");
  * defensible from the app itself, which is the only kind of marketing worth
  * writing for a masjid. `shot` names the screenshot that goes in the frame. */
 const PANELS = [
-  { shot: "1-home",
+  { shot: "1-home", art: "open", arc: "right",
     lead: "Times from the masjid.",
     turn: "Not from an algorithm.",
     body: "The same timetable that is printed and put up on the wall each year — so the time on your phone is the time the jamaat actually stands." },
-  { shot: "6-alerts",
+  { shot: "6-alerts", art: "plain", arc: "left",
     lead: "Know before the adhan.",
     turn: "Not after it.",
     body: "A quiet reminder the number of minutes before jamaat that you choose. Janazah, Ramadan and Eid changes too, each its own switch." },
-  { shot: "3-mushaf",
+  { shot: "3-mushaf", art: "plain", arc: "right",
     lead: "The whole mushaf.",
     turn: "In your pocket.",
     body: "All 114 surahs in the familiar 13-line layout, with the page you stopped at kept for next time." },
-  { shot: "2-timetable",
+  { shot: "2-timetable", art: "plain", arc: "left",
     lead: "Works in the prayer hall.",
     turn: "Signal or none.",
     body: "Prayer times, the Qur'an, the adhkar and the Qibla all keep working with no connection at all." },
-  { shot: "5-zakat",
+  { shot: "5-zakat", art: "plain", arc: "right",
     lead: "Zakat, worked out.",
     turn: "Not guessed at.",
     body: "The nisab in both gold and silver from today's prices, then cash, metals, stock and what you are owed." },
@@ -153,43 +155,106 @@ function statusBar(S, screenW, bar) {
     </div>`;
 }
 
-function panelHtml(w, h, p, shotB64, S, bar) {
-  const stars = FIELD.map(([x, y, s, o]) =>
-    `<svg class="g" viewBox="0 0 100 100" style="left:${x}%;top:${y}%;width:${s * S}px;height:${s * S}px;opacity:${o}">
-       <polygon fill="${C.gold}" points="${STAR}"/></svg>`).join("");
+function panelHtml(w, h, p, shotB64, S, bar, logoB64) {
+  /* ONE SYSTEM, FIVE PANELS. What makes a row of store images read as a set
+   * rather than five separate pictures is that the furniture never moves: the
+   * same plum field, the same gold arc sweeping out of the same corner, the
+   * same type at the same size in the same place, and the phone always running
+   * off the bottom edge at the same scale. Only the arc's side alternates, so
+   * the eye has something to travel along as it scrolls.
+   *
+   * THE PHONE IS CROPPED ON PURPOSE. A whole device floating in the middle of
+   * a panel with air underneath it is the tell of a screenshot that has been
+   * put in a frame. Every listing worth copying runs the device off the edge:
+   * it gives scale, it fills the panel, and it says the screen continues.
+   *
+   * The first panel carries the masjid's own mark and tilts the phone away,
+   * because the first image in the row is the one that has to say whose app
+   * this is before it says what it does. */
+  const PAD = 58 * S;
+  const arcLeft = p.arc === "left";
+
+  /* THE MOTIF. The app's own eight-point girih star, blown up far past the
+     panel and bled off a corner — drawn as an outline rather than a fill,
+     because a filled shape at this size is a stain and an outline is a motif.
+     It alternates sides down the row, which is what gives five panels of the
+     same furniture something to travel along.
+     
+     A fill at 7% was invisible; the first pass of this looked like flat plum
+     with words on it. Big, confident and still quiet is the thing to aim at. */
+  const arc = `
+    <svg viewBox="0 0 100 100" style="position:absolute;
+        ${arcLeft ? `left:${-300 * S}px` : `right:${-300 * S}px`};top:${150 * S}px;
+        width:${900 * S}px;height:${900 * S}px">
+      <polygon points="${STAR}" fill="none" stroke="${C.gold}" stroke-width="0.4" opacity=".30"/>
+      <polygon points="${STAR}" fill="${C.gold}" opacity=".05"/>
+    </svg>
+    <svg viewBox="0 0 100 100" style="position:absolute;
+        ${arcLeft ? `left:${-170 * S}px` : `right:${-170 * S}px`};top:${322 * S}px;
+        width:${560 * S}px;height:${560 * S}px">
+      <polygon points="${STAR}" fill="none" stroke="${C.goldBright}" stroke-width="0.5" opacity=".22"/>
+    </svg>`;
+
+  /* A warm lift behind the top of the device, so it sits in light rather than
+     on a flat field. */
+  const glow = `<div style="position:absolute;left:50%;top:${300 * S}px;width:${820 * S}px;
+      height:${820 * S}px;margin-left:${-410 * S}px;border-radius:50%;
+      background:radial-gradient(circle,rgba(198,162,76,.16) 0%,rgba(198,162,76,0) 62%)"></div>`;
+
+  const smallStars = [[10, 7, 120, .07], [92, 15, 92, .06], [6, 88, 110, .05], [88, 92, 86, .05]]
+    .map(([x, y, sz, o]) =>
+      `<svg viewBox="0 0 100 100" style="position:absolute;left:${x}%;top:${y}%;
+         width:${sz * S}px;height:${sz * S}px;opacity:${o};transform:translate(-50%,-50%)">
+         <polygon fill="${C.goldBright}" points="${STAR}"/></svg>`).join("");
+
+  const open = p.art === "open";
+
+  /* The wordmark, on the opener only. */
+  const mark = open
+    ? `<img src="data:image/svg+xml;base64,${logoB64}" style="width:${214 * S}px;display:block;
+         margin-bottom:${40 * S}px">`
+    : "";
+
+  /* Angled on the opener, square on the rest — one difference, not five. */
+  const tilt = open
+    ? `transform:perspective(${1700 * S}px) rotateY(-12deg) rotateX(4deg) rotate(-3deg);
+       transform-origin:50% 0`
+    : "";
+
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     @font-face{font-family:HK;src:url(data:font/ttf;base64,${SANS});font-weight:700}
     @font-face{font-family:HKm;src:url(data:font/ttf;base64,${SANS_MED})}
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{width:100%;height:100%;overflow:hidden;background:${C.brand900}}
-    .bg{position:fixed;inset:-2%;
-        background:linear-gradient(160deg,${C.brand700} 0%,${C.brand800} 42%,${C.brand900} 100%)}
-    .g{position:absolute;transform:translate(-50%,-50%)}
-    .wrap{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
-          padding:${68 * S}px ${54 * S}px 0}
+    .bg{position:fixed;inset:0;overflow:hidden;
+        background:linear-gradient(158deg,${C.brand700} 0%,${C.brand800} 38%,${C.brand900} 100%)}
+    .wrap{position:fixed;inset:0;padding:${64 * S}px ${PAD}px 0;overflow:hidden}
     .lead{font-family:HK,sans-serif;font-weight:700;color:${C.cream};
-          font-size:${38 * S}px;line-height:1.18;text-align:center;letter-spacing:${-0.5 * S}px}
+          font-size:${open ? 40 * S : 44 * S}px;line-height:1.12;letter-spacing:${-0.9 * S}px}
     .turn{font-family:HK,sans-serif;font-weight:700;color:${C.goldBright};
-          font-size:${38 * S}px;line-height:1.18;text-align:center;letter-spacing:${-0.5 * S}px}
-    .body{font-family:HKm,sans-serif;color:#D8C3D0;font-size:${17 * S}px;line-height:1.5;
-          text-align:center;margin-top:${16 * S}px;max-width:${500 * S}px}
+          font-size:${open ? 40 * S : 44 * S}px;line-height:1.12;letter-spacing:${-0.9 * S}px}
+    .body{font-family:HKm,sans-serif;color:rgba(243,239,227,.72);font-size:${17.5 * S}px;
+          line-height:1.5;margin-top:${15 * S}px;max-width:${430 * S}px}
     /* The device. A dark bezel with a bright inner hairline, which is what
        stops a flat rounded rectangle reading as a sticker. */
-    .phone{margin-top:${40 * S}px;width:${404 * S}px;border-radius:${56 * S}px;
-           padding:${11 * S}px;background:linear-gradient(170deg,#241018,#0B0409);
-           box-shadow:0 ${34 * S}px ${70 * S}px rgba(0,0,0,.5),
-                      inset 0 0 0 ${1.4 * S}px rgba(220,187,99,.30);
-           position:relative}
-    .screen{width:100%;display:block;border-radius:${46 * S}px;overflow:hidden;
-            background:#000}
+    .phone{position:absolute;left:50%;margin-left:${-237 * S}px;top:${open ? 452 * S : 344 * S}px;
+           width:${474 * S}px;border-radius:${64 * S}px;
+           padding:${12 * S}px;background:linear-gradient(170deg,#2A1320,#080308);
+           box-shadow:0 ${40 * S}px ${90 * S}px rgba(0,0,0,.55),
+                      inset 0 0 0 ${1.5 * S}px rgba(220,187,99,.34);${tilt}}
+    .screen{width:100%;display:flex;flex-direction:column;border-radius:${53 * S}px;
+            overflow:hidden;background:#000}
     .screen img{width:100%;display:block}
-  </style></head><body><div class="bg">${stars}</div>
+  </style></head><body>
+    <div class="bg">${glow}${arc}${smallStars}</div>
     <div class="wrap">
+      ${mark}
       <div class="lead">${p.lead}</div>
       <div class="turn">${p.turn}</div>
       <div class="body">${p.body}</div>
-      <div class="phone"><div class="screen">${statusBar(S, 404 * S, bar)}<img src="data:image/png;base64,${shotB64}"></div></div>
-    </div></body></html>`;
+    </div>
+    <div class="phone"><div class="screen">${statusBar(S, 450 * S, bar)}<img src="data:image/png;base64,${shotB64}"></div></div>
+  </body></html>`;
 }
 
 const DEVICES = [
@@ -207,6 +272,12 @@ const BARS = (() => {
 })();
 
 fs.mkdirSync(OUT, { recursive: true });
+/* Is this capture short of the frame — i.e. has it left room for a bar? */
+const shotShort = (file, d) => {
+  const b = fs.readFileSync(file);
+  return b.readUInt32BE(20) < d.h;
+};
+
 let made = 0;
 
 for (const d of DEVICES) {
@@ -229,6 +300,12 @@ for (const d of DEVICES) {
     /* The bar's height as a fraction of the shot's own width, so it lands at
        the same size whatever the device scale factor was. */
     const meta = BARS[`${d.dir}/${p.shot}`];
+    /* A shot that is short of the frame has had room left for a status bar,
+       and that bar has to be drawn — silently composing without one is how
+       four panels went out with the phone's screen starting at the bezel. */
+    if (!meta && shotShort(src, d))
+      throw new Error(`${d.dir}/${p.shot}: the shot is shorter than the frame but ` +
+                      `store-shots/status-bar.json has no entry for it — re-run store-web-shots.mjs`);
     const shotW = raw.readUInt32BE(16), shotH = raw.readUInt32BE(20);
     const bar = meta ? { top: meta.top, island: d.island,
                          h: (d.h - shotH) / shotW } : null;
@@ -237,7 +314,7 @@ for (const d of DEVICES) {
     const scale = 2;
     const page = path.join(outDir, `_${i + 1}.html`);
     const out = path.join(outDir, `${i + 1}-${p.lead.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}.png`);
-    fs.writeFileSync(page, panelHtml(d.w / scale, d.h / scale, p, b64, d.scale, bar));
+    fs.writeFileSync(page, panelHtml(d.w / scale, d.h / scale, p, b64, d.scale, bar, LOGO));
     execFileSync(CHROME, ["--headless", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
       `--force-device-scale-factor=${scale}`,
       `--window-size=${d.w / scale},${d.h / scale}`,
@@ -252,3 +329,32 @@ for (const d of DEVICES) {
   });
 }
 console.log(`::notice::${made} marketing screenshot(s) in ${OUT}`);
+
+/* A CONTACT SHEET, because the row is the thing being designed.
+ *
+ * Nobody meets these one at a time. They are scrolled through side by side on
+ * a store page, and whether they read as one set or five separate pictures is
+ * only visible when they are laid out the way the reader will meet them. Five
+ * panels that each look fine alone and nothing like each other together is the
+ * commonest way a listing looks homemade. */
+for (const d of DEVICES) {
+  const dir = path.join(OUT, d.label);
+  if (!fs.existsSync(dir)) continue;
+  const shots = fs.readdirSync(dir).filter(f => /^\d.*\.png$/.test(f)).sort();
+  if (!shots.length) continue;
+  const TH = 520, gap = 18;
+  const imgs = shots.map(f =>
+    `<img src="data:image/png;base64,${fs.readFileSync(path.join(dir, f)).toString("base64")}"
+       style="height:${TH}px;display:block;border-radius:6px">`).join("");
+  const sheetW = Math.round(shots.length * (TH * d.w / d.h) + (shots.length + 1) * gap);
+  const html = path.join(dir, "_sheet.html");
+  const out = path.join(OUT, `${d.label}-all.png`);
+  fs.writeFileSync(html, `<!doctype html><meta charset="utf-8">
+    <body style="margin:0;background:#17070F;display:flex;gap:${gap}px;padding:${gap}px;
+                 align-items:flex-start">${imgs}</body>`);
+  execFileSync(CHROME, ["--headless", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
+    "--force-device-scale-factor=2", `--window-size=${sheetW},${TH + gap * 2}`,
+    `--screenshot=${out}`, `file://${html}`], { stdio: ["ignore", "ignore", "pipe"] });
+  fs.rmSync(html);
+  console.log(`${path.basename(out)}  the five together — look at this one`);
+}
