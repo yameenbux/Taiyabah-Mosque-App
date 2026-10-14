@@ -337,13 +337,38 @@ struct NextJamaahView: View {
     case .accessoryInline:
       Text(entry.known ? "\(entry.name) \(timeText(entry.at))" : "No timetable")
     case .accessoryCircular:
-      VStack(spacing: 0) {
-        Text(entry.known ? entry.name.prefix(4).uppercased() : "—")
-          .font(.system(size: 11, weight: .semibold))
+      /* THE COUNTDOWN, NOT THE TIME.
+       *
+       * This family appears in exactly two places — the Lock Screen and
+       * StandBy — and both of them have a large clock immediately above it.
+       * A second clock time is therefore the one genuinely redundant thing
+       * this circle could show, and it was showing it. "5:00" also cannot
+       * say am or pm in 76 points, so Fajr at 7:00 and Isha at 7:00 read
+       * identically; switching it to 24-hour would fix the ambiguity while
+       * keeping the redundancy.
+       *
+       * What somebody actually wants off a glance at a circle this size is
+       * how long they have got. `.relative` is updated live by the system,
+       * so this needs no extra timeline entries, and minimumScaleFactor
+       * means a long gap ("11 hr") shrinks rather than clips.
+       *
+       * The full prayer name is kept rather than cut to four letters —
+       * "Jumu" was not worth the characters it saved. */
+      VStack(spacing: -1) {
+        Text(entry.known ? entry.name.uppercased() : "—")
+          .font(.system(size: 9.5, weight: .bold))
+          .tracking(0.4)
+          .opacity(0.75)
+          .lineLimit(1)
+          .minimumScaleFactor(0.55)
         if entry.known {
-          Text(entry.at, style: .time).font(.system(size: 13, weight: .bold))
+          Text(entry.at, style: .relative)
+            .font(.system(size: 13, weight: .bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
         }
       }
+      .padding(3)
     case .accessoryRectangular:
       /* Tinted white by iOS, so colour is not available here and only the
          hierarchy carries it. */

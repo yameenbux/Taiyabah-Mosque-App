@@ -192,8 +192,8 @@ const lockRect = c => `
 const lockCirc = c => `
 <div class="w lock" style="width:${SIZES.circ[0]}px;height:${SIZES.circ[1]}px;border-radius:50%;
      display:flex;flex-direction:column;align-items:center;justify-content:center">
-  <div style="font-size:10px;font-weight:700;letter-spacing:.6px;opacity:.72">${c.next.name.slice(0,4).toUpperCase()}</div>
-  <div style="font-size:15px;font-weight:700;letter-spacing:-.4px;margin-top:-1px">${pretty(c.next.at).replace(/(am|pm)/,"")}</div>
+  <div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;opacity:.75">${c.next.name.toUpperCase()}</div>
+  <div style="font-size:13px;font-weight:700;margin-top:-1px">38 min</div>
 </div>`;
 
 const lockInline = c => `
@@ -270,8 +270,8 @@ console.log(`\nwritten to ${out}`);
         </div>
         <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);
                     backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.6px;opacity:.75">ASR</div>
-          <div style="font-size:15px;font-weight:700;letter-spacing:-.4px;margin-top:-1px">5:00</div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;opacity:.75">ASR</div>
+          <div style="font-size:13px;font-weight:700;margin-top:-1px">38 min</div>
         </div>
       </div>
 
