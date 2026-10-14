@@ -51,7 +51,8 @@
       },
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "appleTeamId": "39N949HRK3"
     },
     "web": {
       "bundler": "metro",
@@ -111,7 +112,9 @@
         }
       ],
       "./plugins/with-api-36",
-      "./plugins/with-fmt-consteval"
+      "./plugins/with-fmt-consteval",
+      "@bacons/apple-targets",
+      "./plugins/with-xcode-object-version"
     ],
     "experiments": {
       "typedRoutes": false

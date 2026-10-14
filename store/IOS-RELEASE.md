@@ -179,10 +179,41 @@ list, because it requires `ios.appleTeamId`, and a Team ID is issued only with
 a Developer account. Adding it with a placeholder would break the build that
 currently passes, for no gain.
 
-There is a second, smaller obstacle behind that one: an Xcode 16
-`PBXFileSystemSynchronizedRootGroup` needs project `objectVersion` 70 or
-higher, and Expo SDK 52 generates 46. Worth knowing before the first attempt,
-so the error is recognised rather than debugged from scratch.
+The Team ID now exists — **39N949HRK3** — so that half is settled. The second
+obstacle is the one that still stops it, and it has now been TESTED rather
+than anticipated. On 14 October 2026, with the plugin added and the Team ID
+in place, `npx expo prebuild --platform ios` was run on both plugin versions:
+
+| | v4.0.7 | v5.0.0 |
+|---|---|---|
+| Clean prebuild | succeeds | succeeds |
+| `objectVersion` generated | **46** | **46** |
+| `PBXFileSystemSynchronizedRootGroup` emitted | yes, 3 | yes, 3 |
+| `ios/widget` created on disk | **no** | **no** |
+| Second, incremental prebuild | **crashes** | — |
+
+So the project it produces declares a widget target whose source folder does
+not exist, inside a project format too old for the group that references it.
+An Xcode 16 synchronized root group needs `objectVersion` 70 or higher; Expo
+SDK 52's template generates 46. The incremental crash is
+`TypeError: Cannot read properties of undefined (reading 'removeFromProject')`
+in `@bacons/apple-targets/build/with-xcode-changes.js` — EAS always prebuilds
+clean so that one would not bite in CI, but it makes local iteration painful.
+
+Upgrading the plugin does not help: v5.0.0 behaves identically, which is what
+the earlier note said and is now confirmed on real output rather than assumed.
+
+**So the widget does not ship on SDK 52.** Turning the switch on produces a
+build that fails in Xcode rather than a widget. The likely route is an Expo
+SDK upgrade, whose newer prebuild template should generate a project format
+that supports the synchronized group — that is the expectation, NOT a tested
+fact, and it wants checking on a branch of its own before it is relied on.
+Ejecting to a hand-maintained `ios/` directory is the other route and costs
+Continuous Native Generation permanently.
+
+Either way it is a release of its own, not a thing to attach to a launch
+build. The Swift, the design and the assets are all written and reviewed, so
+when the toolchain allows it this is config and a build, not work.
 
 **Push notifications on iOS.** The app already carries OneSignal and the
 entitlement. What is missing is an **APNs authentication key** (a `.p8` from
