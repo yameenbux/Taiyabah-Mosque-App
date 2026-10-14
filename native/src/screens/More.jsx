@@ -25,7 +25,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
-import { Screen, Press, open, tap } from "../ui";
+import { Screen, Press, open, tap, ExtArrow } from "../ui";
 import { useTopBar } from "../barstyle";
 import DRAWER from "../data/drawer.json";
 
@@ -183,7 +183,7 @@ function Row({ row, first, nav }) {
               {t("marriage.coming_soon", "Coming soon")}</Text>
           </View>
         : row.external
-          ? <Text style={{ fontFamily: F.sans, fontSize: fs(15), color: C.gold }}>↗</Text>
+          ? <ExtArrow size={15} color={C.gold} opacity={1} />
           : <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} />}
     </Press>
   );
