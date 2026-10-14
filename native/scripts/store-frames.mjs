@@ -87,10 +87,10 @@ const PANELS = [
     lead: "Know before the adhan.",
     turn: "Not after it.",
     body: "A quiet reminder the number of minutes before jamaat that you choose. Janazah, Ramadan and Eid changes too, each its own switch." },
-  { shot: "3-mushaf", art: "plain", arc: "right",
-    lead: "The whole mushaf.",
-    turn: "In your pocket.",
-    body: "All 114 surahs in the familiar 13-line layout, with the page you stopped at kept for next time." },
+  { shot: "7-qibla", art: "plain", arc: "right",
+    lead: "Which way to face.",
+    turn: "Down to the degree.",
+    body: "118\u00B0 from true north and 5,042 km to Makkah, worked out from the masjid\u2019s own position \u2014 with your phone\u2019s compass to turn by." },
   { shot: "2-timetable", art: "plain", arc: "left",
     lead: "Works in the prayer hall.",
     turn: "Signal or none.",
@@ -215,11 +215,12 @@ function panelHtml(w, h, p, shotB64, S, bar, logoB64) {
          margin-bottom:${40 * S}px">`
     : "";
 
-  /* Angled on the opener, square on the rest — one difference, not five. */
-  const tilt = open
-    ? `transform:perspective(${1700 * S}px) rotateY(-12deg) rotateX(4deg) rotate(-3deg);
-       transform-origin:50% 0`
-    : "";
+  /* SQUARE ON EVERY PANEL. The opener was tilted in perspective, which is a
+   * thing both reference listings do and which did not survive being looked
+   * at here: beside four square devices the tilt read as a mistake rather
+   * than a flourish. One difference between the opener and the rest — the
+   * wordmark — is enough, and it is the right one. */
+  const tilt = "";
 
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     @font-face{font-family:HK;src:url(data:font/ttf;base64,${SANS});font-weight:700}

@@ -110,6 +110,15 @@ const SHOTS = [
   /* Past the explainer to the nisab, which is the part the headline is about. */
   { name: "5-zakat",     steps: [["menu", /^Zakat calculator$/], ["scroll", 760]] },
   { name: "6-alerts",    steps: [["menu", /^Notifications$/]] },
+  /* Candidates. Not every one of these ends up in a frame — PANELS in
+     store-frames.mjs picks five — but they are cheap to take and the point of
+     having them is to choose by looking rather than by imagining. */
+  { name: "7-qibla",     steps: [["tile", /^Qibla$/]] },
+  { name: "8-athkar",    steps: [["tile", /^Daily Adhk/], ["row", /^Morning & Evening$/]] },
+  { name: "9-donate",    steps: [["tile", /^Donate$/]] },
+  { name: "10-bukhari",  steps: [["tile", /al-Bukh/]] },
+  { name: "11-surah",    path: "/quran", steps: [["row", /^English Translation$/],
+                                                 ["text", /^Ar-Rahman$|^Ar-Rahmaan$|^Al-Mulk$/]] },
 ];
 
 const DEVICES = [
@@ -230,6 +239,8 @@ for (const d of DEVICES) {
         continue;
       }
       if (where === "menu") { await tap(page, /^More$/); await page.waitForTimeout(900); }
+      /* "text" and "tile" and "row" all just tap a visible label; the names are
+         there so the table reads like the journey somebody actually makes. */
       if (!(await tap(page, what))) { reached = false; break; }
     }
     await page.waitForTimeout(1600);
