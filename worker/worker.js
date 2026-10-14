@@ -369,7 +369,11 @@ export function reminderPayload(appId, { title, body, idx = 0, tagMins, webOnly 
     headings: { en: title },
     contents: { en: body },
     filters: anyOfFilter(prefValues(idx, tagMins == null ? null : tagMins)),
-    url: "https://taiyabahapp.ysbdesigns.uk/",
+    /* These are web-only today, so app_url is never used — it is set anyway,
+       so that the day somebody lifts the platform restriction this does not
+       quietly start sending app users to a web page again. */
+    web_url: `${SITE}/`,
+    app_url: APP_TIMES,
   };
   if (webOnly) {
     /* Named one by one rather than trusting isAnyWeb alone to imply the rest.
@@ -508,6 +512,25 @@ export function posterName(pathname) {
 
 const POSTER_CACHE_SECONDS = 30 * 86400;
 
+/* WHERE A NOTIFICATION TAKES YOU, which is not the same place on a phone as
+ * in a browser.
+ *
+ * Every send used to carry one `url`, the website's. On a browser that is
+ * right — the page IS the app. On a phone it is wrong twice over: it throws
+ * somebody out of the app they just installed and into a web page, and once
+ * the website is retired it opens a dead address. Every janāzah alert, every
+ * announcement.
+ *
+ * OneSignal takes the two separately. `web_url` goes to browser subscribers
+ * and `app_url` to the app, where it is a deep link the app already knows how
+ * to route — see the `linking` config in native/src/App.jsx, which exists for
+ * exactly this. The Notices tab lists newest first, so the notice that was
+ * just announced is the one at the top: opening that tab is opening the thing
+ * the notification is about. */
+const SITE = "https://taiyabahapp.ysbdesigns.uk";
+const APP_NOTICES = "taiyabah://notices";
+const APP_TIMES   = "taiyabah://times";
+
 async function uploadPoster(env, dataUrl, origin) {
   const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
   if (!m) return { error: "The poster must be a JPEG, PNG or WebP image." };
@@ -602,9 +625,8 @@ async function sendNotice(env, { topic, title, body, imageUrl, id }) {
     headings: { en: title },
     contents: { en: body },
     filters: anyOfFilter(prefValues(t.idx)),
-    url: id
-      ? `https://taiyabahapp.ysbdesigns.uk/#notice=${id}`
-      : "https://taiyabahapp.ysbdesigns.uk/#notices",
+    web_url: id ? `${SITE}/#notice=${id}` : `${SITE}/#notices`,
+    app_url: APP_NOTICES,
   };
   if (imageUrl) {
     payload.big_picture = imageUrl;                 // Android
@@ -765,7 +787,8 @@ async function handle(request, env) {
           headings: { en: title },
           contents: { en: message },
           filters: anyOfFilter(prefValues(t.idx)),
-          url: "https://taiyabahapp.ysbdesigns.uk/",
+          web_url: `${SITE}/#notices`,
+          app_url: APP_NOTICES,
         }),
       });
       const data = await res.json().catch(() => ({}));

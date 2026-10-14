@@ -63,3 +63,32 @@ test("the WhatsApp tile carries an invite code, not just the host", () => {
   assert.match(wa[0], /chat\.whatsapp\.com\/[A-Za-z0-9]{10,}/);
   assert.ok(WEB.includes(wa[0]), "and it is the group the website invites people to");
 });
+
+/* ------------------------------------------------------------------
+ * The deep links the MASJID'S SERVER sends must be ones this app can route.
+ *
+ * The Worker sets app_url on every notification so that tapping one opens the
+ * app rather than a web page. That is two files in two directories agreeing
+ * with each other by nothing but habit: rename a route here, or change a
+ * constant there, and the notification still arrives, still looks right, and
+ * opens nothing at all. Nobody finds out until somebody taps a janāzah alert.
+ * ------------------------------------------------------------------ */
+test("every deep link the Worker sends resolves to a screen in this app", () => {
+  const worker = fs.readFileSync(
+    path.resolve(import.meta.dirname, "../../../worker/worker.js"), "utf8");
+
+  const sent = [...worker.matchAll(/const APP_[A-Z_]+\s*=\s*["'`](taiyabah:\/\/[^"'`]+)["'`]/g)]
+    .map(m => m[1]);
+  assert.ok(sent.length > 0, "the Worker sends no app deep links at all — see worker.js");
+
+  const app = fs.readFileSync(path.resolve(import.meta.dirname, "../../src/App.jsx"), "utf8");
+  const linking = app.slice(app.indexOf("const linking = {"));
+  const config = linking.slice(0, linking.indexOf("\n};"));
+
+  for (const link of sent) {
+    const route = link.replace("taiyabah://", "").split(/[/?#]/)[0];
+    assert.match(config, new RegExp(`["']${route}["']`),
+      `the Worker sends ${link}, and "${route}" is not in this app's linking ` +
+      "config — tapping that notification would open nothing");
+  }
+});
