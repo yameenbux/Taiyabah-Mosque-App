@@ -769,9 +769,21 @@ async function handle(request, env) {
          leave those devices untagged — indistinguishable from the fault this
          endpoint exists to fix. The per-device cap is what actually bounds
          abuse here; the address cap stays as a backstop, set high enough that
-         a room full of people never reaches it. */
+         a room full of people never reaches it.
+
+         SET FOR A CONGREGATION, NOT A ROOM. This was 600/hour, chosen for "a
+         room full of people". The masjid has thousands, and the hour after
+         the app is announced at Jumuʿah is the one hour when every phone in
+         the building writes its tags at once, over one public IP. At 600 the
+         six-hundred-and-first person is refused and left untagged — silently
+         unreachable by every announcement from then on, with a working app in
+         their hand. The failure would look exactly like the app not working
+         for "some people", on the single day it matters most.
+
+         A device that is abusing this is still stopped by the per-device cap
+         below, which is the one with teeth. */
       const ip = request.headers.get("CF-Connecting-IP") || "?";
-      if (!limit(`tags-ip:${ip}`, 600, 60 * 60e3))
+      if (!limit(`tags-ip:${ip}`, 20000, 60 * 60e3))
         return json({ error: "Too many attempts from this network. Try again shortly." }, 429, ch);
 
       let body = {};
@@ -871,7 +883,10 @@ async function handle(request, env) {
 
        POST /api/report { report, note } */
     if (url.pathname === "/api/report" && request.method === "POST") {
-      if (!limit(`report:${ip}`, 20, 60 * 60e3))
+      /* One address, many people. Twenty an hour is four congregants having a
+         bad morning, and a diagnostic report that is refused is the one piece
+         of evidence nobody can reconstruct later. */
+      if (!limit(`report:${ip}`, 400, 60 * 60e3))
         return json({ error: "Too many reports from this network just now." }, 429, ch);
 
       let body = {};
@@ -944,7 +959,10 @@ async function handle(request, env) {
        needs it before anybody has signed in to anything, and the website's
        calculator wants the same figure. */
     if (url.pathname === "/api/metals" && request.method === "GET") {
-      if (!limit(`metals:${ip}`, 240, 60 * 60e3))
+      /* Also a whole congregation behind one address — and this one answers
+         from a cache almost every time, so a high cap costs the providers
+         nothing. A published commodity price is not worth rationing. */
+      if (!limit(`metals:${ip}`, 20000, 60 * 60e3))
         return json({ error: "Too many price checks from this network." }, 429, ch);
 
       let cached = null;
