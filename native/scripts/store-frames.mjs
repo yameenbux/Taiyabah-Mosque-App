@@ -82,20 +82,24 @@ const PANELS = [
   { shot: "1-home", art: "open", arc: "right",
     lead: "Times from the masjid.",
     turn: "Not from an algorithm.",
-    body: "The same timetable that is printed and put up on the wall each year — so the time on your phone is the time the jamaat actually stands." },
+    body: "The same timetable that is printed and put up on the wall each year \u2014 so the time on your phone is the time the jamaat actually stands." },
   { shot: "6-alerts", art: "plain", arc: "left",
     lead: "Know before the adhan.",
     turn: "Not after it.",
     body: "A quiet reminder the number of minutes before jamaat that you choose. Janazah, Ramadan and Eid changes too, each its own switch." },
-  { shot: "7-qibla", art: "plain", arc: "right",
+  { shot: "11-surah", art: "plain", arc: "right",
+    lead: "The Qur\u2019an in English.",
+    turn: "Line beside line.",
+    body: "All 114 s\u016Brahs in Arabic with Abdullah Yusuf Ali beneath \u2014 and the familiar thirteen-line mu\u1E63\u1E25af alongside it." },
+  { shot: "7-qibla", art: "plain", arc: "left",
     lead: "Which way to face.",
     turn: "Down to the degree.",
     body: "118\u00B0 from true north and 5,042 km to Makkah, worked out from the masjid\u2019s own position \u2014 with your phone\u2019s compass to turn by." },
-  { shot: "2-timetable", art: "plain", arc: "left",
+  { shot: "2-timetable", art: "plain", arc: "right",
     lead: "Works in the prayer hall.",
     turn: "Signal or none.",
     body: "Prayer times, the Qur'an, the adhkar and the Qibla all keep working with no connection at all." },
-  { shot: "5-zakat", art: "plain", arc: "right",
+  { shot: "5-zakat", art: "plain", arc: "left",
     lead: "Zakat, worked out.",
     turn: "Not guessed at.",
     body: "The nisab in both gold and silver from today's prices, then cash, metals, stock and what you are owed." },
@@ -357,5 +361,5 @@ for (const d of DEVICES) {
     "--force-device-scale-factor=2", `--window-size=${sheetW},${TH + gap * 2}`,
     `--screenshot=${out}`, `file://${html}`], { stdio: ["ignore", "ignore", "pipe"] });
   fs.rmSync(html);
-  console.log(`${path.basename(out)}  the five together — look at this one`);
+  console.log(`${path.basename(out)}  all ${shots.length} together — look at this one`);
 }
