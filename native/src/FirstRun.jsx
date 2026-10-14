@@ -21,7 +21,7 @@ import { C, F, R } from "./theme";
 import { useApp, EVERYTHING_ON } from "./store";
 import { Press, tap } from "./ui";
 import { ORDER } from "./prayer";
-import { arm, ask } from "./reminders";
+import { arm, ask, plan } from "./reminders";
 import { askPush, syncTags, optIn } from "./push";
 
 export default function FirstRun() {
@@ -57,9 +57,8 @@ export default function FirstRun() {
       setAlerts(EVERYTHING_ON);
       /* Armed immediately, so the first reminder is real rather than a promise
        * somebody has to go and switch on themselves. */
-      const per = {};
-      for (const k of ORDER) per[k] = a.mins;
-      try { await arm(per, { kahf: a.kahf }); } catch {}
+      const { per, extras } = plan(a);
+      try { await arm(per, extras); } catch {}
       /* And subscribed with the tags the masjid's segments are built on, so
        * this phone is reachable from the moment it says yes rather than only
        * after somebody finds the Notifications screen and presses Save. */

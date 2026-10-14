@@ -14,6 +14,9 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { dayFor, nowLondon, londonInstant, NAMES, ORDER } from "./prayer";
 import { at, weekly, FRIDAY } from "./triggers";
+/* Re-exported so a caller needs one import, not two; it lives in its own file
+   because that one has no native imports and can therefore be tested. */
+export { plan } from "./plan";
 
 const DAYS_AHEAD = 7;
 

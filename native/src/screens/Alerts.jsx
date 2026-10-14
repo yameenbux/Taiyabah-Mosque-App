@@ -23,7 +23,7 @@ import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp, EVERYTHING_ON } from "../store";
 import { Screen, TopBar, Heading, Card, Note, P, Press, tap, open } from "../ui";
 import { ORDER } from "../prayer";
-import { arm, ask } from "../reminders";
+import { arm, ask, plan } from "../reminders";
 import { syncTags, optIn, optOut, whoAmI } from "../push";
 import { batteryHelp } from "../battery-help";
 
@@ -97,10 +97,8 @@ export default function Alerts() {
    * A reminder somebody believes in and never gets is worse than none. */
   const rearm = async next => {
     if (!granted) return;
-    const a = { ...alerts, ...next };
-    const per = {};
-    if (a.jamaah) for (const k of ORDER) per[k] = a.mins;
-    setArmed(await arm(per, { kahf: a.kahf }));
+    const { per, extras } = plan({ ...alerts, ...next });
+    setArmed(await arm(per, extras));
   };
   useEffect(() => { rearm({}); }, [granted, alerts]);
 

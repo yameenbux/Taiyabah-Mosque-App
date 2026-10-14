@@ -3,6 +3,7 @@ import Offline from "./Offline";
 import { NavigationContainer } from "@react-navigation/native";
 import * as ExpoLinking from "expo-linking";
 import { BarStyleProvider, useBarStyle } from "./barstyle";
+import KeepReminders from "./keep-reminders";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -417,6 +418,10 @@ export default function App() {
               would be explaining nothing about. */}
           <Offline />
           <FirstRun />
+          {/* Re-arms the rolling week on launch and on every return to the
+              app. Without it the reminders stop after seven days and nothing
+              says so — see the header of keep-reminders.jsx. */}
+          <KeepReminders />
         </AppProvider>
       </Boundary>
       {/* Last, so it sits over the app — and only over it. The app is mounted
