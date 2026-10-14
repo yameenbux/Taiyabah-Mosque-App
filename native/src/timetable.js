@@ -28,8 +28,26 @@ import { call } from "./supabase";
  * tests run the real code under plain Node. */
 const store = () => require("@react-native-async-storage/async-storage").default;
 
-const CACHE = "timetable.years";       // { [year]: { days, at } }
+const CACHE = "timetable.years";       // { [year]: { days, at, tried } }
 const MAX_AGE_DAYS = 400;              // a year is still a year; older is stale
+
+/* HOW OFTEN A PHONE IS ALLOWED TO ASK.
+ *
+ * syncTimetable() runs on every launch and fetchYear() used to go to the
+ * database every single time, cache or no cache. One year is 45KB, it asks
+ * for two, and a congregation of five thousand opening the app four times a
+ * day is around 27GB a month — against a free allowance of five. The app
+ * would have stopped being able to fetch anything within the first week of
+ * being announced, and the failure would arrive as prayer times quietly not
+ * updating.
+ *
+ * A published timetable does not change. It is re-checked weekly so that a
+ * correction by the committee still reaches people, which is three orders of
+ * magnitude less traffic than asking on every launch. A year that is not
+ * published yet answers empty — cheap, but not free — so that is asked for
+ * twice a day rather than every time the app opens. */
+const HOLD_DAYS = 7;                   // we already have it: re-check weekly
+const RETRY_HOURS = 12;                // not published yet: ask again later
 
 /* The day map everything reads, seeded from the file that ships with the app.
  * Downloaded years are merged in on top, so a year we have both ways takes the
@@ -125,17 +143,36 @@ export async function restoreTimetable() {
 /* Asks for one year and keeps it. An unpublished year comes back empty — the
  * committee uploading next year's figures does not put them in front of
  * anybody until they press publish — so an empty answer is left alone rather
- * than cached over something that works. */
-export async function fetchYear(year) {
+ * than cached over something that works.
+ *
+ * `force` is for the one caller that means it: somebody pulling to refresh,
+ * who is entitled to ignore every interval above. */
+export async function fetchYear(year, { force = false } = {}) {
+  const cache = await readCache();
+  const held = cache[year];
+  const have = !!(held && held.days && Object.keys(held.days).length);
+
+  if (!force) {
+    const since = Date.now() - Number((have ? held.at : held && held.tried) || 0);
+    if (have && since < HOLD_DAYS * 864e5) return false;
+    if (!have && held && since < RETRY_HOURS * 36e5) return false;
+  }
+
   try {
     const rows = await call("prayer_year", { p_year: year });
-    if (!Array.isArray(rows) || rows.length === 0) return false;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      /* Remember the ASK, not the answer. Without this an unpublished year is
+         requested on every launch for as long as it stays unpublished, which
+         for next year's timetable is most of the year. */
+      cache[year] = { ...(held || {}), tried: Date.now() };
+      await store().setItem(CACHE, JSON.stringify(cache)).catch(() => {});
+      return false;
+    }
 
     const days = fromRows(year, rows);
     if (!merge(days)) return false;
 
-    const cache = await readCache();
-    cache[year] = { days, at: Date.now() };
+    cache[year] = { days, at: Date.now(), tried: Date.now() };
     await store().setItem(CACHE, JSON.stringify(cache)).catch(() => {});
     announce();
     return true;
