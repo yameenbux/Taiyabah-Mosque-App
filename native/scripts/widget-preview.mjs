@@ -229,6 +229,79 @@ for (const [day, now, tag] of [[THURSDAY, AFTERNOON, "thu"], [FRIDAY, BEFORE_JUM
 await browser.close();
 console.log(`\nwritten to ${out}`);
 
+/* ---- the Lock Screen, which is where the design has to give things up ----
+ *
+ * iOS does not draw an accessory widget the way it is written. It takes the
+ * shapes and renders them in a vibrant white tint: the plum goes, the gold
+ * goes, the calligraphy would go. Only hierarchy and shape survive, which is
+ * why the three accessory families are typography and nothing else.
+ *
+ * Worth seeing in place rather than as three chips on a dark background,
+ * because the question on a Lock Screen is not "is it handsome" — it is
+ * "can you read it at arm's length over a photograph of somebody's
+ * children".
+ */
+{
+  const b3 = await chromium.launch();
+  const c = card(THURSDAY, AFTERNOON);
+  const W = 393, H = 852;                     // iPhone 15 points
+
+  const lockScene = (wall, label) => `
+  <div style="width:${W}px;height:${H}px;position:relative;overflow:hidden;font-family:'DejaVu Sans',sans-serif;color:#fff">
+    <div style="position:absolute;inset:0;background:${wall}"></div>
+
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:14px">
+      <div style="width:100%;display:flex;justify-content:space-between;padding:0 30px;font-size:13px;font-weight:600;opacity:.95">
+        <span>&nbsp;</span><span>▪▪▪ ᯤ ▮</span>
+      </div>
+
+      <div style="margin-top:46px;font-size:15px;font-weight:500;opacity:.92;letter-spacing:.2px">
+        ${c.next.name} ${pretty(c.next.at)} · in 38 min
+      </div>
+
+      <div style="margin-top:-4px;font-size:86px;font-weight:500;letter-spacing:-2px;line-height:1.05;
+                  text-shadow:0 2px 24px rgba(0,0,0,.35)">9:41</div>
+
+      <div style="margin-top:14px;display:flex;align-items:center;gap:12px">
+        <div style="width:158px;height:72px;display:flex;flex-direction:column;justify-content:center;gap:3px">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;opacity:.6;text-transform:uppercase">Next jamāʿah</div>
+          <div style="font-size:16px;font-weight:700;letter-spacing:-.3px">${c.next.name} ${pretty(c.next.at)}</div>
+          <div style="font-size:10.5px;opacity:.7">in 38 minutes</div>
+        </div>
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);
+                    backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.6px;opacity:.75">ASR</div>
+          <div style="font-size:15px;font-weight:700;letter-spacing:-.4px;margin-top:-1px">5:00</div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto;margin-bottom:34px;display:flex;gap:150px;opacity:.9">
+        <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.16);
+                    display:flex;align-items:center;justify-content:center;font-size:19px">⌁</div>
+        <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.16);
+                    display:flex;align-items:center;justify-content:center;font-size:17px">◉</div>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:9px;display:flex;justify-content:center">
+      <div style="width:138px;height:5px;border-radius:3px;background:rgba(255,255,255,.75)"></div>
+    </div>
+    <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:120px;height:32px;
+                border-radius:18px;background:#000"></div>
+    <div style="position:absolute;top:10px;left:10px;font-size:10px;font-weight:700;color:rgba(255,255,255,.5)">${label}</div>
+  </div>`;
+
+  const DARK  = "linear-gradient(170deg,#241a2e 0%,#3a2740 38%,#1a1420 100%)";
+  const LIGHT = "linear-gradient(165deg,#cfc3b4 0%,#9d8f88 45%,#6d6560 100%)";
+
+  const p = await b3.newPage({ viewport: { width: W*2 + 54, height: H + 36 }, deviceScaleFactor: 2 });
+  await p.setContent(page(`<div style="padding:18px;display:flex;gap:18px;background:#0b0b0d">
+     ${lockScene(DARK, "dark wallpaper")}${lockScene(LIGHT, "light wallpaper")}</div>`));
+  await p.screenshot({ path: path.join(out, "lock-screen.png") });
+  await p.close();
+  await b3.close();
+  console.log("  lock-screen.png  (in place, both wallpapers)");
+}
+
 /* ---- one sheet, so the sizes can be judged against each other ---- */
 {
   const browser2 = await chromium.launch();
