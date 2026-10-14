@@ -121,6 +121,13 @@ const TOPICS = {
   kahf:          { idx: 4, label: "Sūrah al-Kahf" },
 };
 
+/* Named exports alongside the Worker's own default export, so test/prefs.test.mjs
+   can check THESE functions rather than a copy of them. A copy is what would
+   drift, and what decides who a notification reaches is not a thing to test by
+   resemblance. Cloudflare ignores named exports it was not asked for. */
+export { PREF_TAG, PREF_ORDER, PREF_MINUTES, LEGACY_FLAGS, TOPICS,
+         encodePrefs, decodePrefs, prefValues, anyOfFilter };
+
 /* ---------------- helpers ---------------- */
 const enc = new TextEncoder();
 const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf)))
