@@ -114,6 +114,35 @@ export async function call(fn, args = {}) {
  * flag somebody edits by hand, so the app and the website cannot drift. An
  * empty payload is a safe question: the function validates before it touches
  * the table, so it raises "please choose a date" and writes nothing. */
+/* IS THE MASJID TAKING WRITTEN QUESTIONS FOR THE IMAMS?
+ *
+ * A yes-or-no of its own, asked the way the website asks it — POST
+ * advice_is_open with an empty body and read the boolean that comes back. It
+ * is false unless somebody active holds the imam role in the portal, because a
+ * form that takes a confidence nobody will read is worse than no form.
+ *
+ * NOT isOpen("request_imam_advice"), which is what this screen used to ask.
+ * That tests whether the submit function EXISTS, not whether an imam is on
+ * duty, so the app would draw the form and take the question however the
+ * portal was set — the exact drift between app and website that the Advice
+ * screen's header promises is impossible. One of the two was always going to
+ * be wrong, and it was this one.
+ *
+ * rpc() is not used because it wraps everything as { payload: { masjid, … } },
+ * and this function takes no arguments: a wrapped call is a different
+ * signature and PostgREST answers 404 to it.
+ *
+ * A failure to reach the server is SHUT, as on the website. Drawing the form
+ * and failing at the end, after somebody has written out something difficult,
+ * is much the worse of the two failures. */
+export async function adviceIsOpen() {
+  try {
+    const res = await go("rpc/advice_is_open", { method: "POST", body: "{}" });
+    if (!res.ok) return false;
+    return (await res.text()).trim() === "true";
+  } catch { return false; }
+}
+
 export async function isOpen(fn) {
   try {
     const r = await rpc(fn, {});

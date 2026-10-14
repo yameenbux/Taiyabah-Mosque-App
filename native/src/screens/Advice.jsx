@@ -9,7 +9,7 @@ import { View } from "react-native";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Note, Notice, Callout, RowGroup, NavRow, P } from "../ui";
 import { Field, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
-import { rpc, isOpen } from "../supabase";
+import { rpc, adviceIsOpen } from "../supabase";
 import { SHEETS, Blocks } from "../Blocks";
 
 export default function Advice({ navigation }) {
@@ -18,7 +18,7 @@ export default function Advice({ navigation }) {
   const [v, setV] = useState({ name: "", phone: "", email: "", subject: "", question: "" });
   const [state, setState] = useState({});
   const [touched, setTouched] = useState(false);
-  useEffect(() => { isOpen("request_imam_advice").then(setOpen); }, []);
+  useEffect(() => { adviceIsOpen().then(setOpen); }, []);
 
   const bad = {
     name: touched && !v.name.trim(), phone: touched && !isPhone(v.phone),
@@ -51,15 +51,15 @@ export default function Advice({ navigation }) {
    *
    * The site's prose says "Written questions are not being taken just now" and
    * the app lifts that panel out of it like any other block. Whether questions
-   * are actually being taken is a live switch — isOpen("request_imam_advice"),
-   * which the admin centre sets — and when it is on, the screen showed the
+   * are actually being taken is a live switch — advice_is_open(), which the
+   * admin centre sets — and when it is on, the screen showed the
    * panel saying questions were closed with the form to ask one directly
    * underneath it. A screen that contradicts itself in two inches is worse
    * than either half alone.
    *
-   * So the notice is shown only when the switch agrees with it. The website
-   * carries the same sentence with no such switch behind it, and should be
-   * corrected separately — this fixes the app, not the prose.
+   * So the notice is shown only when the switch agrees with it, and nothing
+   * at all is drawn until the switch has answered — the website keeps both
+   * halves hidden the same way, rather than showing one and swapping it.
    *
    * The footer comes out of the body too. It is the last block in the sheet,
    * so with the form appended after the blocks the charity line landed in the
@@ -93,8 +93,14 @@ export default function Advice({ navigation }) {
             all of that from the sheet and then added a second "Questions"
             heading, a second notice saying the same sentence, and a second
             copy of the same phone number, so the screen said it twice and
-            ended with the charity line in the middle. */}
-        {open === false ? null : (
+            ended with the charity line in the middle.
+
+            TRUE, not "not false". The switch is three-valued — null while the
+            answer is still coming — and a form drawn during that moment is a
+            form that may vanish under somebody's hands, or worse, take a
+            question the masjid is not reading. The website draws neither half
+            until it knows; so does this. */}
+        {open === true ? (
           <>
             <Heading>{t("advice.ask_a_question", "Ask a question")}</Heading>
             {/* Why the form asks for everything it asks for, and what will and
@@ -131,7 +137,7 @@ export default function Advice({ navigation }) {
             <Submit label={t("advice.send_this_to_the_imams", "Send this to the imams")}
                     sending={state.sending} onPress={send} />
           </>
-        )}
+        ) : null}
         {/* The charity line, held back from the body above so it lands under
             the form rather than halfway down the screen. It is still the
             sheet's own block, so it is printed once and says what the website
