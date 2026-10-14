@@ -12,6 +12,47 @@ Two automatic notifications per prayer, once per day each:
 This runs entirely inside the existing Worker — no new service, no change to
 `admin.html`. It fires on a schedule rather than a click.
 
+## Who each one goes to, and why it is not everybody
+
+The native app schedules its jamāʿah and Sūrah al-Kahf reminders **on the
+phone**. That is why they arrive with no signal, and it is what the app's
+Notifications screen promises. A push for the same prayer is therefore not a
+reminder — it is a second copy of one the person already has.
+
+A browser subscriber has no local reminders at all. Nothing wakes a web page
+to say Asr is in ten minutes, which is why this scheduler exists. On
+14 October 2026 they were also the majority: of the fifteen devices on the
+jamāʿah reminder, nine were Safari or Chrome and six were the app.
+
+So the two reminders the app arms for itself are sent to **browsers only**
+(`webOnly: true`, which sets `isAnyWeb` and clears `isIos`, `isAndroid`,
+`isHuawei`, `isAdm`):
+
+| Send | Armed on the phone? | Pushed to |
+|---|---|---|
+| Advance reminder ("in 10 min") | yes | browsers only |
+| Sūrah al-Kahf, Friday | yes (07:30 local) | browsers only |
+| "Jamāʿah Time Now" | **no** | everyone |
+| Janāzah, announcements, events | no | everyone |
+
+The platform flag is an extra condition, never a replacement for the tag
+filter: a web subscriber who switched jamāʿah off is still not sent it.
+
+`test/duplicates.test.mjs` holds this table to the code, in both directions —
+adding a fourth scheduled send fails until somebody decides which column it
+belongs in.
+
+### ⚠️ Deploy this AFTER the app build that fixed `arm()`
+
+An app older than that build has **no working local reminders at all**
+(`arm()` threw before scheduling anything). Deploying `webOnly` while those
+phones are still out there leaves them with neither copy: no push, because
+they are not browsers, and no local reminder, because their `arm()` is broken.
+
+Order: ship the app build first, then `npm run deploy` here. Reversing it is
+not dangerous — it is one prayer's reminder missed per phone until they
+update — but there is no reason to accept even that.
+
 ## How it works
 
 - A **Cron Trigger** fires the Worker every minute (Cloudflare's minimum

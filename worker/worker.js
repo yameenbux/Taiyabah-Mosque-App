@@ -281,7 +281,52 @@ function minusMinutes(hm, n) {
   return `${String(Math.floor(v / 60)).padStart(2, "0")}:${String(v % 60).padStart(2, "0")}`;
 }
 
-async function sendReminder(env, { key, idx = 0, tagMins, title, body }) {
+/* WHO A SCHEDULED REMINDER IS FOR — by platform as well as by tag.
+ *
+ * The app schedules its jamāʿah and Sūrah al-Kahf reminders on the phone
+ * itself. That is the whole reason they arrive with no signal, and it is what
+ * the app's own Notifications screen promises: "Jamāʿah and Sūrah al-Kahf
+ * reminders are set on this phone and arrive with no signal." So a push for
+ * the same prayer is not a reminder, it is a second copy of one the person
+ * already has — the same words twice, a minute apart.
+ *
+ * A browser subscriber cannot schedule anything locally. Nothing wakes a web
+ * page to say Asr is in ten minutes, which is the reason this scheduler was
+ * written at all. For them the push IS the reminder, and on 14 October 2026
+ * they were the majority: of fifteen devices on the jamāʿah reminder, nine
+ * were Safari or Chrome and six were the app. So the push cannot simply be
+ * switched off.
+ *
+ * `webOnly` therefore sends to browser subscriptions only, and is set on the
+ * two reminders the app schedules for itself. "Jamāʿah Time Now" has no local
+ * counterpart, so it is left reaching everyone.
+ *
+ * SEQUENCING, and it matters: an app older than the build that fixed arm()
+ * has NO working local reminders. Deploying this before that build is live
+ * leaves those phones with neither copy. See REMINDERS.md.
+ */
+export function reminderPayload(appId, { title, body, idx = 0, tagMins, webOnly }) {
+  const payload = {
+    app_id: appId,
+    headings: { en: title },
+    contents: { en: body },
+    filters: anyOfFilter(prefValues(idx, tagMins == null ? null : tagMins)),
+    url: "https://taiyabahapp.ysbdesigns.uk/",
+  };
+  if (webOnly) {
+    /* Named one by one rather than trusting isAnyWeb alone to imply the rest.
+       A platform flag that quietly defaults to "true" is how this would turn
+       back into a duplicate without anybody touching it. */
+    payload.isAnyWeb  = true;
+    payload.isIos     = false;
+    payload.isAndroid = false;
+    payload.isHuawei  = false;
+    payload.isAdm     = false;
+  }
+  return payload;
+}
+
+async function sendReminder(env, { key, idx = 0, tagMins, title, body, webOnly }) {
   const already = await env.SENT_KV.get(key);
   if (already) return { skipped: true };
 
@@ -298,18 +343,11 @@ async function sendReminder(env, { key, idx = 0, tagMins, title, body }) {
   if (values.length > 120) {
     return { sent: false, error: `filter too large: ${values.length} values` };
   }
-  const filters = anyOfFilter(values);
 
   const res = await fetch("https://api.onesignal.com/notifications", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` },
-    body: JSON.stringify({
-      app_id: env.ONESIGNAL_APP_ID,
-      headings: { en: title },
-      contents: { en: body },
-      filters,
-      url: "https://taiyabahapp.ysbdesigns.uk/",
-    }),
+    body: JSON.stringify(reminderPayload(env.ONESIGNAL_APP_ID, { title, body, idx, tagMins, webOnly })),
   });
   const data = await res.json().catch(() => ({}));
 
@@ -379,6 +417,7 @@ async function runKahfReminder(env) {
     key: `kahf:${date}`,
     idx: KAHF_TOPIC_IDX,
     tagMins: null,                       // nothing to offset against
+    webOnly: true,                       // the app arms this one itself
     title: "Sūrah al-Kahf",
     body: "It is Jumuʿah. Whoever reads Sūrah al-Kahf today has a light between this Friday and the next.",
   });
@@ -540,6 +579,7 @@ async function runJamaahReminders(env) {
       const key = `sent:${date}:${prayer}:${mins}`;
       const r = await sendReminder(env, {
         key, tagMins: mins,
+        webOnly: true,                   // the app arms this one itself
         title: `${label} Jamāʿah in ${mins} min`,
         body: `${label} jamāʿah is at ${jamaat}.`,
       });
