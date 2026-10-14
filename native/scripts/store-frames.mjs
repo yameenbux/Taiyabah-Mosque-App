@@ -102,7 +102,58 @@ const PANELS = [
 const FIELD = [[6, 10, 300, 0.03], [88, 18, 260, 0.028], [12, 72, 220, 0.022],
                [84, 80, 300, 0.025], [50, 95, 180, 0.015]];
 
-function panelHtml(w, h, p, shotB64, S) {
+/* THE STATUS BAR, DRAWN RATHER THAN CAPTURED.
+ *
+ * A simulator screenshot arrives with iOS's own bar already in it. A render of
+ * the web export does not — it has no operating system above it — so the
+ * screen would start at the device's top edge and read as a mockup rather than
+ * a phone. store-web-shots.mjs leaves exactly the right strip free and records
+ * the colour of the header underneath, and this fills it: the time at 9:41,
+ * which is the hour Apple's own marketing has used since 2007, the Dynamic
+ * Island, and the three indicators.
+ *
+ * Nothing here is a claim about the app. It is the frame around it. */
+function statusBar(S, screenW, bar) {
+  if (!bar || !bar.h) return "";
+  const H = screenW * bar.h;               /* as a share of the screen's width */
+  const ink = bar.ink || "#F3EFE3";
+  const pad = H * 0.42;
+  /* An iPad's bar is 24pt of 1376 — a twentieth of the phone's share of the
+     screen. Drawing a clock and three indicators into it produces specks, not
+     a status bar, so below this the strip is left as the plain top edge of the
+     glass, which is what it reads as anyway at that size. */
+  if (H < 26) return `<div style="height:${H}px;background:${bar.top};flex:0 0 auto"></div>`;
+  const island = bar.island
+    ? `<div style="width:${H * 1.95}px;height:${H * 0.62}px;border-radius:${H}px;background:#000"></div>`
+    : "";
+  /* Four ascending bars, an arc of wifi, a battery. Drawn with boxes and
+     borders rather than an icon font, because this is five shapes. */
+  const signal = [0.38, 0.56, 0.78, 1].map(f =>
+    `<i style="display:inline-block;width:${H * 0.075}px;height:${H * 0.3 * f}px;
+        background:${ink};border-radius:${H * 0.03}px;margin-left:${H * 0.045}px;
+        vertical-align:bottom"></i>`).join("");
+  const wifi = `<svg viewBox="0 0 24 18" style="width:${H * 0.36}px;height:${H * 0.27}px;
+      margin-left:${H * 0.22}px;vertical-align:bottom">
+      <path d="M12 16.2 8.6 12.5a5 5 0 0 1 6.8 0z" fill="${ink}"/>
+      <path d="M5.1 9.1a10 10 0 0 1 13.8 0" stroke="${ink}" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+      <path d="M1.9 5.6a15 15 0 0 1 20.2 0" stroke="${ink}" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+    </svg>`;
+  const battery = `<span style="display:inline-block;margin-left:${H * 0.22}px;vertical-align:bottom;
+      width:${H * 0.46}px;height:${H * 0.25}px;border:${H * 0.028}px solid ${ink};
+      border-radius:${H * 0.08}px;position:relative;opacity:.9">
+      <b style="position:absolute;inset:${H * 0.035}px;background:${ink};border-radius:${H * 0.04}px"></b>
+      <b style="position:absolute;left:100%;top:30%;height:40%;width:${H * 0.035}px;
+         background:${ink};border-radius:0 ${H}px ${H}px 0"></b></span>`;
+  return `<div style="height:${H}px;background:${bar.top};display:flex;align-items:center;
+      justify-content:space-between;padding:0 ${pad}px;flex:0 0 auto">
+      <span style="font-family:HK,sans-serif;font-weight:700;color:${ink};
+        font-size:${H * 0.33}px;letter-spacing:${H * 0.004}px;min-width:${H * 1.2}px">9:41</span>
+      ${island}
+      <span style="min-width:${H * 1.2}px;text-align:right">${signal}${wifi}${battery}</span>
+    </div>`;
+}
+
+function panelHtml(w, h, p, shotB64, S, bar) {
   const stars = FIELD.map(([x, y, s, o]) =>
     `<svg class="g" viewBox="0 0 100 100" style="left:${x}%;top:${y}%;width:${s * S}px;height:${s * S}px;opacity:${o}">
        <polygon fill="${C.gold}" points="${STAR}"/></svg>`).join("");
@@ -137,14 +188,23 @@ function panelHtml(w, h, p, shotB64, S) {
       <div class="lead">${p.lead}</div>
       <div class="turn">${p.turn}</div>
       <div class="body">${p.body}</div>
-      <div class="phone"><div class="screen"><img src="data:image/png;base64,${shotB64}"></div></div>
+      <div class="phone"><div class="screen">${statusBar(S, 404 * S, bar)}<img src="data:image/png;base64,${shotB64}"></div></div>
     </div></body></html>`;
 }
 
 const DEVICES = [
-  { label: "iphone", dir: "iphone", w: 1206, h: 2622, scale: 1.0 },
-  { label: "ipad",   dir: "ipad-13", w: 2064, h: 2752, scale: 1.55 },
+  { label: "iphone", dir: "iphone", w: 1206, h: 2622, scale: 1.0, island: true },
+  { label: "ipad",   dir: "ipad-13", w: 2064, h: 2752, scale: 1.55, island: false },
 ];
+
+/* Written by store-web-shots.mjs: how tall the strip it left free is, and what
+ * colour the header under it came out. Absent when the shots came from a
+ * simulator, which brings its own status bar — so no bar is drawn and the
+ * frames are composed exactly as they were before. */
+const BARS = (() => {
+  const f = path.join(SHOTS, "status-bar.json");
+  return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : {};
+})();
 
 fs.mkdirSync(OUT, { recursive: true });
 let made = 0;
@@ -164,11 +224,20 @@ for (const d of DEVICES) {
       console.log(`::warning::${src} missing — skipping panel ${i + 1}`);
       return;
     }
-    const b64 = fs.readFileSync(src).toString("base64");
+    const raw = fs.readFileSync(src);
+    const b64 = raw.toString("base64");
+    /* The bar's height as a fraction of the shot's own width, so it lands at
+       the same size whatever the device scale factor was. */
+    const meta = BARS[`${d.dir}/${p.shot}`];
+    const shotW = raw.readUInt32BE(16), shotH = raw.readUInt32BE(20);
+    const bar = meta ? { top: meta.top, island: d.island,
+                         h: (d.h - shotH) / shotW } : null;
+    if (meta && d.h - shotH <= 0)
+      throw new Error(`${src} is ${shotH} tall and the frame wants ${d.h} — no room for a status bar`);
     const scale = 2;
     const page = path.join(outDir, `_${i + 1}.html`);
     const out = path.join(outDir, `${i + 1}-${p.lead.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}.png`);
-    fs.writeFileSync(page, panelHtml(d.w / scale, d.h / scale, p, b64, d.scale));
+    fs.writeFileSync(page, panelHtml(d.w / scale, d.h / scale, p, b64, d.scale, bar));
     execFileSync(CHROME, ["--headless", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
       `--force-device-scale-factor=${scale}`,
       `--window-size=${d.w / scale},${d.h / scale}`,

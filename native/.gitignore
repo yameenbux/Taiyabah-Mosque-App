@@ -26,3 +26,8 @@ ios-shots/
 cmp*/
 final/
 ios-shots/
+
+# Raw captures for the App Store frames. The framed images in
+# docs/store-assets/frames are the deliverable; these are the input, and
+# store-web-shots.mjs regenerates them in a minute.
+store-shots/
