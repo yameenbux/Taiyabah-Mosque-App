@@ -646,32 +646,90 @@ $("diag-health").addEventListener("click", checkService);
 
 /* The poster travels as a data URL. It is read once here, kept in memory, and
    posted with the notice — no separate upload step for the office to get wrong,
-   and nothing left half-uploaded if they change their mind. */
+   and nothing left half-uploaded if they change their mind.
+
+   IT IS ALSO SHRUNK HERE, WHICH IS NOT A NICETY. A poster is downloaded once
+   by every phone that opens the notice. At five thousand congregants, a 1MB
+   photograph is 5GB of traffic for one announcement — a whole month's free
+   allowance. Straight off a phone camera a poster is 3-5MB, and nobody in the
+   office should have to think about any of that before posting a janāzah
+   notice. So it is resized to 1600px on its longest edge and re-encoded,
+   which takes a 4MB photograph to roughly 300KB with no visible difference on
+   a phone screen. The office is shown both numbers so it is not a secret. */
+const POSTER_MAX_EDGE = 1600;
+const POSTER_QUALITY  = 0.85;
+const POSTER_KEEP_AS_IS = 500 * 1024;   // already small: don't re-encode and lose a little
+
+function shrinkPoster(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("that file could not be read"));
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("that file is not an image this browser can open"));
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, POSTER_MAX_EDGE / Math.max(w, h));
+        /* Small and already in bounds: re-encoding would only lose quality. */
+        if(scale === 1 && file.size <= POSTER_KEEP_AS_IS){
+          resolve({ data: r.result, w, h, bytes: file.size }); return;
+        }
+        const cw = Math.max(1, Math.round(w * scale)), chh = Math.max(1, Math.round(h * scale));
+        try{
+          const c = document.createElement("canvas");
+          c.width = cw; c.height = chh;
+          c.getContext("2d").drawImage(img, 0, 0, cw, chh);
+          const data = c.toDataURL("image/jpeg", POSTER_QUALITY);
+          /* Rare, but real: a huge image can come back BIGGER as JPEG than a
+             well-compressed PNG original. Keep whichever is smaller. */
+          const bytes = Math.round(data.length * 3 / 4);
+          if(bytes >= file.size && scale === 1){
+            resolve({ data: r.result, w, h, bytes: file.size }); return;
+          }
+          resolve({ data, w: cw, h: chh, bytes });
+        }catch(err){
+          /* Canvas unavailable or refused. Send the original rather than
+             block the office — the Worker's own ceiling is the backstop. */
+          resolve({ data: r.result, w, h, bytes: file.size });
+        }
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
 let posterData = null, posterDims = {};
-$("poster").addEventListener("change", e => {
+$("poster").addEventListener("change", async e => {
   const f = e.target.files && e.target.files[0];
   posterData = null; posterDims = {};
   $("posterwrap").hidden = true; $("cropnote").hidden = true;
   if(!f){ $("c-poster").textContent = "No poster. The notice will be text only."; return; }
-  if(f.size > 5 * 1024 * 1024){
-    $("c-poster").textContent = `That file is ${(f.size/1048576).toFixed(1)} MB — the limit is 5 MB. Please shrink it.`;
+  /* Only to stop a browser running out of memory on a RAW file. Anything a
+     camera or a designer produces is far below this, and it is resized below
+     whatever it is. */
+  if(f.size > 25 * 1024 * 1024){
+    $("c-poster").textContent = `That file is ${(f.size/1048576).toFixed(1)} MB, which is too big to open here. Please export it smaller.`;
     e.target.value = ""; return;
   }
-  const r = new FileReader();
-  r.onload = () => {
-    posterData = r.result;
-    const img = new Image();
-    img.onload = () => {
-      posterDims = { w: img.naturalWidth, h: img.naturalHeight };
-      $("posterimg").src = posterData;
-      $("posterwrap").hidden = false;
-      $("cropnote").hidden = img.naturalHeight <= img.naturalWidth;   // only portrait crops badly
-      $("c-poster").textContent =
-        `${img.naturalWidth} × ${img.naturalHeight}, ${(f.size/1024).toFixed(0)} KB`;
-    };
-    img.src = posterData;
-  };
-  r.readAsDataURL(f);
+
+  $("c-poster").textContent = "Preparing the poster…";
+  let out;
+  try{ out = await shrinkPoster(f); }
+  catch(err){
+    $("c-poster").textContent = `Sorry — ${err.message}.`;
+    e.target.value = ""; return;
+  }
+
+  posterData = out.data;
+  posterDims = { w: out.w, h: out.h };
+  $("posterimg").src = posterData;
+  $("posterwrap").hidden = false;
+  $("cropnote").hidden = out.h <= out.w;              // only portrait crops badly
+  const kb = n => `${Math.round(n/1024)} KB`;
+  $("c-poster").textContent = out.bytes < f.size
+    ? `${out.w} × ${out.h}, ${kb(out.bytes)} (resized from ${kb(f.size)})`
+    : `${out.w} × ${out.h}, ${kb(out.bytes)}`;
 });
 $("posterx").addEventListener("click", () => {
   posterData = null; posterDims = {};

@@ -484,12 +484,42 @@ async function runKahfReminder(env) {
 /* A data URL in, a public HTTPS URL out. Supabase Storage is addressed
    directly rather than through a client library, because a Worker should not
    carry one for three lines of REST. */
-async function uploadPoster(env, dataUrl) {
+/* Posters are served THROUGH this Worker, not straight off Supabase Storage.
+ *
+ * Supabase's free tier allows 5GB of egress a month. A poster is downloaded
+ * once by every phone that opens the notice, so at five thousand congregants
+ * a single 1MB poster is 5GB — the whole month, one announcement. The office
+ * cannot be expected to think about that before posting a janāzah notice.
+ *
+ * So the stored URL points here, and this fetches from Supabase with
+ * `cacheEverything`, which puts the image in Cloudflare's cache. Supabase then
+ * serves each poster a handful of times no matter how many people look at it,
+ * and Cloudflare — whose bandwidth is not metered — serves the rest. The
+ * response also carries an immutable year-long Cache-Control, so each phone
+ * fetches a given poster once ever.
+ *
+ * The name is generated here and never comes from a person, but it arrives
+ * back as a path segment, so it is checked rather than trusted: a bucket is
+ * not a thing to let a URL wander around in. */
+export function posterName(pathname) {
+  const name = pathname.slice("/api/poster/".length);
+  return /^[0-9]{10,16}-[0-9a-f]{8}\.(jpg|png|webp)$/.test(name) ? name : null;
+}
+
+const POSTER_CACHE_SECONDS = 30 * 86400;
+
+async function uploadPoster(env, dataUrl, origin) {
   const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
   if (!m) return { error: "The poster must be a JPEG, PNG or WebP image." };
 
   const bytes = Uint8Array.from(atob(m[2]), c => c.charCodeAt(0));
-  if (bytes.length > 5 * 1024 * 1024) return { error: "The poster is over 5 MB. Please shrink it first." };
+  /* The office's own page shrinks a poster to about 1600px before it gets
+     here, which turns a 5MB photograph into a few hundred KB. This ceiling is
+     therefore not a normal limit somebody bumps into — it is the alarm for a
+     browser where that shrinking did not happen, and it is deliberately low
+     enough to go off rather than quietly fill the bucket. */
+  if (bytes.length > 2 * 1024 * 1024)
+    return { error: "The poster is over 2 MB after resizing, which should not happen. Try a smaller image." };
 
   const ext = m[1] === "image/png" ? "png" : m[1] === "image/webp" ? "webp" : "jpg";
   const name = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
@@ -506,7 +536,9 @@ async function uploadPoster(env, dataUrl) {
     body: bytes,
   });
   if (!res.ok) return { error: `Poster upload failed (${res.status})` };
-  return { url: `${base}/storage/v1/object/public/notices/${name}` };
+  /* Through this Worker, for the reason above. Taken from the request rather
+     than written down, so this keeps working if the Worker ever moves. */
+  return { url: `${origin}/api/poster/${name}` };
 }
 
 const supaBaseUrl = (env) =>
@@ -953,6 +985,38 @@ async function handle(request, env) {
        409s, the bug is in the client SDK call. If this ALSO 409s, the
        problem is on OneSignal's side for this app/subscription, not ours.
        GET /api/force-tag?id=<onesignal_id> */
+    /* GET /api/poster/<name> — a notice poster, cached at the edge.
+
+       Public, because a poster is public the moment it is announced, and the
+       app has no credentials to present anyway. See uploadPoster for why this
+       is not served straight off Supabase Storage. */
+    if (url.pathname.startsWith("/api/poster/") && request.method === "GET") {
+      const name = posterName(url.pathname);
+      if (!name) return json({ error: "No such poster." }, 404, ch);
+      if (!env.SUPABASE_URL) return json({ error: "Storage is not configured." }, 501, ch);
+
+      const upstream = `${supaBaseUrl(env)}/storage/v1/object/public/notices/${name}`;
+      let res;
+      try {
+        res = await fetch(upstream, { cf: { cacheEverything: true, cacheTtl: POSTER_CACHE_SECONDS } });
+      } catch {
+        return json({ error: "The poster could not be fetched." }, 502, ch);
+      }
+      if (!res.ok) return json({ error: "No such poster." }, res.status === 404 ? 404 : 502, ch);
+
+      /* A poster never changes — the name carries a timestamp and a random
+         tail, and a new one gets a new name — so a phone that has fetched it
+         once never needs to again. */
+      const headers = new Headers({
+        "Content-Type": res.headers.get("Content-Type") || "image/jpeg",
+        "Cache-Control": `public, max-age=31536000, immutable`,
+        "Access-Control-Allow-Origin": "*",
+      });
+      const len = res.headers.get("Content-Length");
+      if (len) headers.set("Content-Length", len);
+      return new Response(res.body, { status: 200, headers });
+    }
+
     /* GET /api/metals — today's gold and silver in pounds per gram.
 
        Public and unauthenticated: it is a published commodity price, the app
@@ -1116,7 +1180,7 @@ async function handle(request, env) {
 
       let imageUrl = null, dims = {};
       if (typeof body.image === "string" && body.image.startsWith("data:")) {
-        const up = await uploadPoster(env, body.image);
+        const up = await uploadPoster(env, body.image, url.origin);
         if (up.error) return json({ error: up.error }, 400, ch);
         imageUrl = up.url;
         dims = { image_w: body.image_w || null, image_h: body.image_h || null };
