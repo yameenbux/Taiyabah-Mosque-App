@@ -29,6 +29,18 @@ import { batteryHelp } from "../battery-help";
 
 const MINS = [5, 10, 15, 20, 30];
 
+/* The four categories the MASJID sends. Sūrah al-Kahf is deliberately not
+ * here: that one is scheduled on the phone, so the masjid's server has no
+ * part in whether it arrives and should not be claimed as something it will
+ * send. Every label reuses the switch's own wording above, so the line below
+ * and the switches can never say the same thing differently. */
+const SENT_BY_MASJID = [
+  { key: "jamaah",        id: "sheet.jama_ah_reminders", en: "Jamāʿah reminders" },
+  { key: "janazah",       id: "sheet.janazah",           en: "Janāzah" },
+  { key: "announcements", id: "sheet.announcements",     en: "Announcements" },
+  { key: "events",        id: "sheet.events_talks",      en: "Events & talks" },
+];
+
 function Row({ title, sub, badge, value, onChange, first }) {
   const { fs, rtl } = useApp();
   return (
@@ -368,9 +380,27 @@ export default function Alerts() {
 
         <Note>{t("alerts.what_comes_from_where",
           "Jamāʿah and Sūrah al-Kahf reminders are set on this phone and arrive with no signal. Janāzah, announcements and events are sent by the masjid, so those need a connection.")}</Note>
-        {!!tagState && tagState !== "stored" && (
+        {!!tagState && !tagState.ok && (
           <Note>{t("alerts.choices_not_stored",
             "Your choices for the masjid's announcements could not be saved just now. They are kept on this phone and will be sent again next time you press Save.")}</Note>)}
+
+        {/* THE ANSWER TO "did my choice actually take effect".
+          *
+          * Not read from the switches above — a switch says what somebody
+          * asked for, and that is not the same as what the masjid's server
+          * knows, which is the only thing that decides who a send reaches. A
+          * write that silently failed would leave the switch off and the
+          * notifications arriving, with nothing on the phone admitting it.
+          * So this is the Worker's own read-back, taken from OneSignal after
+          * the write, and it is the one claim on this screen that cannot be
+          * wrong in that direction. */}
+        {!!tagState?.ok && !!tagState.prefs && (() => {
+          const on = SENT_BY_MASJID.filter(c => tagState.prefs[c.key] === "1");
+          if (!on.length) return null;
+          return (
+            <Note>{`${t("alerts.masjid_will_send", "The masjid has your choices and will send you:")} ${
+              on.map(c => t(c.id, c.en)).join(" · ")}`}</Note>);
+        })()}
       </View>
     </Screen>
   );

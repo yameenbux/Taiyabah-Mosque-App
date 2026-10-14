@@ -1,8 +1,8 @@
-# Twelve strings needing a native speaker — app 2.0.1
+# Thirteen strings needing a native speaker — app 2.0.1
 
-These twelve are the only strings in the app whose Urdu, Gujarati and Arabic were
+These thirteen are the only strings in the app whose Urdu, Gujarati and Arabic were
 **drafted rather than taken from the website**. Everything else the app says was
-already translated for the web app and checked. Please read these twelve and
+already translated for the web app and checked. Please read these thirteen and
 correct anything that reads wrongly — the meaning matters more than the wording.
 
 They are held in `native/src/i18n/app-extra.json` as `"key": [Urdu, Gujarati, Arabic]`.
@@ -142,3 +142,17 @@ Change them there and run `npm run content`; do not edit `ur.json`, `gu.json` or
 | **Urdu** | ماہانہ ٹائم ٹیبل |
 | **Gujarati** | માસિક સમયપત્રક |
 | **Arabic** | الجدول الشهري |
+
+### alerts.masjid_will_send
+
+*Where it appears:* Notifications → under the card, followed by a list of the
+categories the masjid will send to this phone. It is read back from the
+masjid's own server rather than from the switches, so it is the line that
+tells somebody their choice actually took effect.
+
+| | |
+|---|---|
+| **English** | The masjid has your choices and will send you: |
+| **Urdu** | مسجد کے پاس آپ کی پسند محفوظ ہے۔ آپ کو یہ بھیجا جائے گا: |
+| **Gujarati** | મસ્જિદ પાસે તમારી પસંદગી સચવાયેલી છે. તમને આ મોકલવામાં આવશે: |
+| **Arabic** | المسجد لديه اختياراتك وسيُرسل إليك: |
