@@ -18,6 +18,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const root = path.resolve(import.meta.dirname, "..");
 const WIDGET = "targets/widget/activity.swift";
@@ -170,6 +171,98 @@ for (const [rel, src] of [[WIDGET, widget], [MODULE, mod], [INDEX, index]]) {
     const line = code.slice(0, m.index).split("\n").length;
     say(`${rel}:${line} builds a range starting at Date(). If the other end is ever in the past ` +
         `Swift traps, and this activity deliberately outlives its iqāmah — use the two stored instants instead`);
+  }
+}
+
+/* 8. Two Swift files in one target are one module. A file-private type in
+      one and an internal type of the SAME NAME in the other does not fail to
+      compile — Swift shadows, the narrower declaration wins inside its own
+      file, and the diagnostics you get later point anywhere but here.
+      index.swift and activity.swift both declared `Mark` and `Until`, with
+      different members, and nothing said a word. */
+{
+  const names = (src) => {
+    const out = new Map();
+    for (const m of stripped(src).matchAll(/^\s*(?:private |fileprivate |public |internal )?(?:struct|enum|class|actor|protocol|typealias)\s+(\w+)/gm))
+      out.set(m[1], (stripped(src).slice(0, m.index).split("\n").length));
+    return out;
+  };
+  const a = names(widget), b = names(index);
+  for (const [name, line] of a)
+    if (b.has(name))
+      say(`both ${WIDGET}:${line} and ${INDEX}:${b.get(name)} declare a type called ${name}. ` +
+          `They are one module, so one shadows the other instead of failing — rename one.`);
+}
+
+/* 9. A date rendered by SwiftUI's own styling follows the PHONE's 24-hour
+      setting and region, so the same jamāʿah reads "13:30" on the Lock Screen
+      and "1:30pm" on the screen behind it. The app formats times one way
+      everywhere; so must this. These are fixed instants, not counters, so
+      there is no cost to formatting them. */
+for (const [rel, src] of [[WIDGET, widget]]) {
+  for (const m of stripped(src).matchAll(/\bstyle:\s*\.(time|date)\b/g)) {
+    const line = stripped(src).slice(0, m.index).split("\n").length;
+    say(`${rel}:${line} renders a date with SwiftUI's own styling, which follows the phone's ` +
+        `24-hour setting — use pretty(), so it matches every other screen in the app`);
+  }
+}
+
+/* 10. ActivityKit arrived in iOS 16.1, and the APP target does not deploy
+       that high — Expo SDK 52 defaults to 15.1 and nothing here raises it. A
+       type conforming to ActivityAttributes therefore has to say when it
+       exists, or the app target does not compile at all. The widget
+       extension deploys to 17.0 and would never have noticed. */
+for (const [rel, src] of [[WIDGET, widget], [MODULE, mod]]) {
+  const code = stripped(src);
+  for (const m of code.matchAll(/(?:^|\n)([^\n]*)\n\s*(?:public |internal )?struct\s+(\w+)\s*:\s*ActivityAttributes/g)) {
+    if (!/@available\(\s*iOS\s*1[6-9]/.test(m[1]))
+      say(`${rel}: struct ${m[2]} conforms to ActivityAttributes with no @available line above it. ` +
+          `ActivityKit is iOS 16.1+ and the app target deploys lower, so this will not compile.`);
+  }
+}
+
+/* 11. The local module is a CocoaPod. A pod that declares a higher iOS
+       platform than the app makes `pod install` refuse the whole workspace —
+       not this pod, the whole thing. Everything needing a later iOS is
+       guarded in the Swift, so the podspec must match the app. */
+{
+  const podspec = read("modules/live-activity/ios/TaiyabahLiveActivity.podspec");
+  const want = parseFloat((podspec?.match(/:ios\s*=>\s*'([\d.]+)'/) || [])[1]);
+  const props = (appJson.expo?.plugins || []).find(
+    (p) => Array.isArray(p) && p[0] === "expo-build-properties");
+  /* Expo SDK 52's own default when nothing sets it. */
+  const app = parseFloat(props?.[1]?.ios?.deploymentTarget ?? "15.1");
+  if (!(want <= app))
+    say(`the podspec asks for iOS ${want} but the app deploys to ${app}, so pod install will refuse ` +
+        `the whole workspace. Lower the podspec and guard the newer APIs in Swift instead.`);
+}
+
+/* 12. Everything here has to actually BE in the repository. The native half
+       of this module lived under modules/live-activity/ios/, and .gitignore
+       carried a bare `ios/` — which git matches at any depth, not just the
+       prebuild output it was written for. So the JavaScript and the module
+       config were committed and the Swift and the podspec were not. Nothing
+       failed locally, because the files were on this disk; the build would
+       have gone looking for a module class that is not in the repository.
+
+       Checked against git rather than the filesystem for exactly that
+       reason: "it works here" is the failure mode. */
+{
+  const mustShip = [WIDGET, MODULE, INDEX, JS,
+                    "modules/live-activity/expo-module.config.json",
+                    "modules/live-activity/ios/TaiyabahLiveActivity.podspec"];
+  let tracked = null;
+  try {
+    tracked = new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "."],
+                                   { cwd: root, encoding: "utf8" }).split("\n").filter(Boolean));
+  } catch { /* not a git checkout: nothing to say */ }
+  if (tracked) {
+    for (const rel of mustShip) {
+      if (!fs.existsSync(path.join(root, rel))) { say(`${rel} does not exist`); continue; }
+      if (!tracked.has(rel))
+        say(`${rel} is on this disk but git will not ship it — it is covered by a .gitignore rule. ` +
+            `The build would be missing it.`);
+    }
   }
 }
 
