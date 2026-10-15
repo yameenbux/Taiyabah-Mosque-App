@@ -23,7 +23,9 @@ import Foundation
 
 // MARK: - The masjid's colours, which are the website's colours
 
-private enum Brand {
+/* Not private: activity.swift draws the Live Activity from the same palette,
+   and two copies of a brand's colours is how one of them goes stale. */
+enum Brand {
   static let plum      = Color(red: 0.235, green: 0.043, blue: 0.165)   // #3C0B2A
   static let plumLift  = Color(red: 0.369, green: 0.094, blue: 0.267)   // #5E1844
   static let gold      = Color(red: 0.776, green: 0.635, blue: 0.298)   // #C6A24C
@@ -560,7 +562,6 @@ private func hijriShort(_ s: String) -> String {
   s.replacingOccurrences(of: " AH", with: "")
 }
 
-@main
 struct NextJamaahWidget: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: "TaiyabahNextJamaah", provider: Provider()) { entry in

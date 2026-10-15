@@ -35,6 +35,7 @@
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+      "NSSupportsLiveActivities": true,
         "UIBackgroundModes": [
           "audio",
           "remote-notification"
