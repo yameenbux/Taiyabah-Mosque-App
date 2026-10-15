@@ -16,6 +16,12 @@
  *   ALLOWED_ORIGIN
  */
 
+/* Counting what the app is used for, without counting anybody. The rules and
+   the reasoning are in src/usage.js; the promise it keeps is the privacy
+   notice's "no tracking of any kind". */
+import { note, flush, due } from "./src/usage.js";
+
+
 const SESSION_HOURS = 8;
 
 /* Diagnostic reports congregants send in. Capped so one report cannot fill a
@@ -261,11 +267,19 @@ const json = (data, status, headers) =>
 
 /* ---------------- worker ---------------- */
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     // Always answer with CORS headers — a thrown error would otherwise return a
     // Cloudflare error page with none, which the browser reports only as an
     // opaque CORS failure and hides the real cause.
     const ch0 = cors(request.headers.get("Origin"), env.ALLOWED_ORIGIN);
+
+    /* Before anything else, and never in the way of anything. note() counts
+       only the handful of paths that are the congregation using the app, adds
+       nothing to the request, records no identifier, and swallows its own
+       errors — a number nobody reads in real time must never cost somebody
+       their page. */
+    try { note(env, ctx, request, supaRpc); } catch { /* never */ }
+
     try {
       return await handle(request, env);
     } catch (err) {
@@ -280,6 +294,11 @@ export default {
     ctx.waitUntil(runJamaahReminders(env));
     ctx.waitUntil(runKahfReminder(env));
     ctx.waitUntil(runPrune(env));
+    /* A quiet evening can leave a handful of counts held in an isolate that
+       never reaches the flush threshold. This only sees the tally if the cron
+       happens to run in the same isolate, which is why it is a tidy-up and
+       not the mechanism. */
+    if (due()) ctx.waitUntil(flush(env, supaRpc));
   },
 };
 
@@ -1042,6 +1061,27 @@ async function handle(request, env) {
     }
 
     /* Reports, newest first. Admin only — these carry device identifiers. */
+    /* What the app is used for. Read through the Worker rather than from the
+       browser because the office signs in HERE, with a session token, and not
+       with a Supabase account — admin.html has no JWT to call a database
+       function with. The service key is what reaches Supabase, and
+       usage_for_office() is granted to it and to nothing else.
+
+       These are the totals from db/149-153: a date, a feature, a platform and
+       a number. There is nothing in them about any individual, because there
+       is nothing about any individual anywhere in the table. */
+    if (url.pathname === "/api/usage" && request.method === "GET") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+      if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY)
+        return json({ error: "Usage is not configured: the Worker has no Supabase service key." }, 501, ch);
+
+      const days = Math.min(Math.max(parseInt(url.searchParams.get("days") || "30", 10) || 30, 1), 365);
+      const { data, error } = await supaRpc(env, "usage_for_office", { p_days: days });
+      if (error) return json({ error: `Could not read the usage totals: ${error}` }, 502, ch);
+      return json(data || { ok: true, totals: [], platforms: [], by_day: [] }, 200, ch);
+    }
+
     if (url.pathname === "/api/reports" && request.method === "GET") {
       const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
       if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);

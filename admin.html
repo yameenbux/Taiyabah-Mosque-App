@@ -307,6 +307,20 @@
 
     <p class="demo"><b>Live.</b> Messages go to everyone subscribed to the chosen category. Sending is handled by the masjid’s own service &mdash; the OneSignal key is never in this page.</p>
 
+    <div class="sec-h"><h2>What the app is used for</h2><span class="rule"></span></div>
+    <div class="card">
+      <p class="hint">Counts of requests the masjid's own server already receives &mdash; a page of the
+        mu&#7779;&#7717;af, a poster, a gold rate. <b>Nobody is counted.</b> There is no identifier of any
+        kind in these figures: not an address, not a device, not a session. A row is a date, a feature,
+        a platform and a number, and individual requests are never stored. This is what lets the app
+        keep saying there is no tracking of any kind.</p>
+      <p class="hint">Reading the Qur'&#257;n, the du'&#257; collections, the qibla and the zakat
+        calculator happens on the phone, so most of it is invisible here by design. What shows is what
+        had to come over the wire anyway.</p>
+      <button id="use-load">Load usage</button>
+      <div id="use-out"></div>
+    </div>
+
     <div class="sec-h"><h2>Reports from congregants</h2><span class="rule"></span></div>
     <div class="card">
       <p class="hint">Sent from the app's Having trouble screen. Each one carries what that
@@ -633,6 +647,54 @@ $("rep-load").addEventListener("click", async ()=>{
       /401|sign/i.test(e.message) ? "Session expired — sign in again." : "Couldn't load: " + e.message)}</p>`;
   }finally{
     btn.disabled = false; btn.textContent = "Load reports";
+  }
+});
+
+/* What the app is used for. The same shape as the reports loader above: ask
+   the Worker, which holds the only key that can read the totals. */
+$("use-load").addEventListener("click", async ()=>{
+  const btn = $("use-load"), out = $("use-out");
+  btn.disabled = true; btn.textContent = "Loading\u2026";
+  try{
+    const d = await apiGet("/api/usage?days=30");
+    const NAME = { mushaf:"Mu\u1e63\u1e25af pages", hadith:"\u1e24ad\u012bth", poster:"Notice posters",
+                   metals:"Gold &amp; silver rates", prefs:"Notification settings changed" };
+    const totals = d.totals || [], plats = d.platforms || [], byDay = d.by_day || [];
+    const sum = totals.reduce((a,t)=>a+Number(t.n||0), 0);
+    if (!sum){
+      out.innerHTML = `<p class="hint" style="margin-top:12px">Nothing counted yet. Figures start the
+        first time somebody opens the app after this goes live.</p>`;
+      return;
+    }
+    /* A bar each, widest first, so the answer to "does anybody use it" is the
+       first thing on the page rather than something to work out. */
+    const top = Number(totals[0].n) || 1;
+    const bars = totals.map(t => {
+      const n = Number(t.n) || 0;
+      return `<div style="margin:10px 0">
+        <div style="display:flex;justify-content:space-between;font-size:14px">
+          <span>${NAME[t.feature] || esc(t.feature)}</span>
+          <b>${n.toLocaleString()}</b>
+        </div>
+        <div style="height:8px;border-radius:4px;background:#00000014;margin-top:4px">
+          <div style="height:8px;border-radius:4px;width:${Math.max(2, Math.round(n/top*100))}%;
+                      background:linear-gradient(90deg,#C6A24C,#DCBB63)"></div>
+        </div>
+      </div>`;
+    }).join("");
+    const PLAT = { ios:"iOS", android:"Android", web:"Web", other:"Other" };
+    const split = plats.map(p => `${PLAT[p.platform] || esc(p.platform)} ${Number(p.n).toLocaleString()}`)
+                       .join(" &middot; ");
+    const days = byDay.length;
+    out.innerHTML = `
+      <p class="hint" style="margin-top:12px">Last ${d.days} days${days ? `, ${days} with any activity` : ""}.</p>
+      ${bars}
+      ${split ? `<p class="hint" style="margin-top:12px">By platform: ${split}</p>` : ""}`;
+  }catch(e){
+    out.innerHTML = `<p class="hint" style="margin-top:12px">${esc(
+      /401|sign/i.test(e.message) ? "Session expired \u2014 sign in again." : "Couldn't load: " + e.message)}</p>`;
+  }finally{
+    btn.disabled = false; btn.textContent = "Load usage";
   }
 });
 
