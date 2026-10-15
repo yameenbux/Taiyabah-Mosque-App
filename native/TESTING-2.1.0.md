@@ -156,12 +156,27 @@ not make without being able to test it.
 
 ## 4. Still outstanding
 
-**One line of SQL**, in the Supabase SQL editor. The tooling here holds `drop`
-statements for confirmation, so it could not be done from the session:
+**Nothing blocking.** There is a leftover `public.__probe_tmp()` in the
+database — a scrap from an earlier session that reads, in full:
+
+```sql
+CREATE FUNCTION public.__probe_tmp() RETURNS integer LANGUAGE sql AS $$select 1$$
+```
+
+It returns the number 1, it is not `SECURITY DEFINER`, and neither `anon` nor
+`authenticated` holds execute on it. Nothing can call it and nothing depends
+on it. It was listed here as a to-do, which was wrong — it is housekeeping,
+not a loose end. Drop it whenever you happen to be in
+[the SQL editor](https://supabase.com/dashboard/project/phenbhmobxwyvdeshvqw/sql/new),
+or leave it:
 
 ```sql
 drop function if exists public.__probe_tmp();
 ```
+
+(That project is listed as **Taiyabah Madrasah** in the dashboard, not
+"Masjid". It is the right one — it holds `app_crashes`, `publish_notice`, the
+imam advice functions and `app_usage`.)
 
 **Carried over from before**, still unconfirmed on a real phone:
 
