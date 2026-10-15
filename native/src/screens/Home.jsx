@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
-import { dayFor, nextJamaah, pretty, nowLondon, NAMES, ORDER } from "../prayer";
+import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
@@ -125,9 +125,9 @@ export default function Home({ navigation }) {
   const day = dayFor(now);
   const next = nextJamaah(now);
   const friday = now.getDay() === 5;
-  /* On Friday the midday jamāʿah is Jumuʿah, and saying "Zuhr" on the one day
-   * it is not Zuhr is the sort of thing a masjid gets told about. */
-  const friJum = next && next.key === "zuhr" && (next.tomorrow ? addDays(now, 1) : now).getDay() === 5;
+  /* The rule itself lives in prayer.js, because the Dynamic Island has to say
+     the same word as this screen does. */
+  const friJum = isJumuah(next, now);
 
   const { list: reminders } = currentReminders(now);
   const rm = reminders.length ? reminders[rmIdx % reminders.length] : null;

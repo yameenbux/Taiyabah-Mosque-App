@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as ExpoLinking from "expo-linking";
 import { BarStyleProvider, useBarStyle } from "./barstyle";
 import KeepReminders from "./keep-reminders";
+import KeepActivity from "./keep-activity";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -422,6 +423,7 @@ export default function App() {
               app. Without it the reminders stop after seven days and nothing
               says so — see the header of keep-reminders.jsx. */}
           <KeepReminders />
+          <KeepActivity />
         </AppProvider>
       </Boundary>
       {/* Last, so it sits over the app — and only over it. The app is mounted

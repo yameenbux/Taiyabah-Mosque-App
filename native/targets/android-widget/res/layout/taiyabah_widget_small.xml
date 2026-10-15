@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SMALL — the mark signs the top right, the type stacks from the bottom
+     left, and the space between them is left alone. Only views RemoteViews
+     can inflate: FrameLayout, LinearLayout, TextView, ImageView, Chronometer. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/taiyabah_widget_bg">
+
+  <ImageView
+      android:layout_width="190dp"
+      android:layout_height="190dp"
+      android:layout_gravity="bottom|end"
+      android:layout_marginEnd="-72dp"
+      android:layout_marginBottom="-68dp"
+      android:alpha="0.038"
+      android:scaleType="fitCenter"
+      android:src="@drawable/taiyabah_girih"
+      android:contentDescription="@null" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+      <TextView
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="NEXT JAMĀʿAH"
+          android:textColor="#BFDCBB63"
+          android:textSize="9sp"
+          android:textStyle="bold"
+          android:letterSpacing="0.16"
+          android:maxLines="1" />
+      <ImageView
+          android:layout_width="44dp"
+          android:layout_height="17dp"
+          android:alpha="0.62"
+          android:scaleType="fitEnd"
+          android:src="@drawable/taiyabah_wordmark"
+          android:contentDescription="@null" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="34dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/taiyabah_rule" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tw_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#F6F1E6"
+        android:textSize="15sp"
+        android:fontFamily="serif"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/tw_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFFFF"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:includeFontPadding="false" />
+
+    <Chronometer
+        android:id="@+id/tw_until"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="#DCBB63"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.14"
+        android:maxLines="1" />
+  </LinearLayout>
+</FrameLayout>

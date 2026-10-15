@@ -114,5 +114,18 @@ export function nextJamaah(now = nowLondon()) {
   };
 }
 
+/* On Friday the midday jamāʿah is Jumuʿah, and saying "Zuhr" on the one day
+ * it is not Zuhr is the sort of thing a masjid gets told about.
+ *
+ * The rule was written inline on the home screen. It is here because the
+ * Dynamic Island has to say the same word as the screen behind it, and two
+ * copies of a rule about Fridays is one that will be right on one of them. */
+export function isJumuah(next, now = nowLondon()) {
+  if (!next || next.key !== "zuhr") return false;
+  const day = new Date(now);
+  if (next.tomorrow) day.setDate(day.getDate() + 1);
+  return day.getDay() === 5;
+}
+
 /* The countdown lives in dates.js now: it is the one string on the home screen
  * that is built from a number, and it has to be sayable in four languages. */

@@ -35,6 +35,7 @@
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+      "NSSupportsLiveActivities": true,
         "UIBackgroundModes": [
           "audio",
           "remote-notification"
@@ -114,7 +115,8 @@
       "./plugins/with-api-36",
       "./plugins/with-fmt-consteval",
       "@bacons/apple-targets",
-      "./plugins/with-xcode-object-version"
+      "./plugins/with-xcode-object-version",
+      "./plugins/with-android-widget"
     ],
     "experiments": {
       "typedRoutes": false
