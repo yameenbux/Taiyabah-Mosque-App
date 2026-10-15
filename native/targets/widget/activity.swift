@@ -39,6 +39,16 @@ import SwiftUI
    unless they match character for character: edit one, run `npm run check`,
    and it will name the other. */
 /* ─── shared-with-app:begin ─────────────────────────────────────────────── */
+/* The annotation is not optional. ActivityAttributes arrived in iOS 16.1 and
+   the APP target deploys to 15.1 (Expo SDK 52's default — nothing in
+   app.json raises it), so without this the app target does not compile at
+   all: "'ActivityAttributes' is only available in iOS 16.1 or newer". The
+   widget extension deploys to 17.0 and would never have noticed.
+
+   16.2 rather than 16.1 because that is what Activity.request(content:) and
+   ActivityContent need, and there is no version in between worth supporting
+   separately. */
+@available(iOS 16.2, *)
 struct TaiyabahJamaahAttributes: ActivityAttributes {
   public struct ContentState: Codable, Hashable {
     /** "Fajr", "Jumuʿah", "2nd Jumuʿah" — what the congregation is called. */
@@ -55,11 +65,29 @@ struct TaiyabahJamaahAttributes: ActivityAttributes {
 }
 /* ─── shared-with-app:end ─────────────────────────────────────────────── */
 
+/* The app writes times one way everywhere — "1:30pm", London, no space — and
+   SwiftUI's own date styling does not: it follows the phone's 24-hour setting
+   and the device's region, so the same jamāʿah would read "13:30" on the Lock
+   Screen and "1:30pm" on the screen behind it. These are fixed instants
+   rather than counters, so formatting them here costs nothing and nothing has
+   to be pushed to keep them right. */
+private let jamaahTime: DateFormatter = {
+  let f = DateFormatter()
+  f.locale = Locale(identifier: "en_GB")
+  f.timeZone = TimeZone(identifier: "Europe/London") ?? .current
+  f.dateFormat = "h:mma"
+  f.amSymbol = "am"
+  f.pmSymbol = "pm"
+  return f
+}()
+
+private func pretty(_ date: Date) -> String { jamaahTime.string(from: date) }
+
 /* The eight-pointed khātim, which is the geometry the rest of the app's
    ornament is built from. The calligraphic lockup is three elements tall and
    illegible at the 18 points the compact island allows; a five-pointed star
    would read at that size but belongs to a different vocabulary entirely. */
-struct Khatim: Shape {
+private struct Khatim: Shape {
   func path(in rect: CGRect) -> Path {
     var p = Path()
     let c = CGPoint(x: rect.midX, y: rect.midY)
@@ -76,7 +104,7 @@ struct Khatim: Shape {
   }
 }
 
-struct Mark: View {
+private struct KhatimMark: View {
   var size: CGFloat
   var body: some View {
     Khatim()
@@ -88,7 +116,7 @@ struct Mark: View {
 
 /* The ring. ProgressView with a date range advances itself, so this is the
    countdown made visible without a single update being sent. */
-struct Ring: View {
+private struct Ring: View {
   var state: TaiyabahJamaahAttributes.ContentState
   var size: CGFloat
   var body: some View {
@@ -118,7 +146,7 @@ struct Ring: View {
    iOS once and redrawn by the system, with nothing pushed and nothing
    recomputed here. countsDown shows the time left to the upper bound, and
    once that has passed it simply reads zero. */
-struct Until: View {
+private struct Countdown: View {
   var state: TaiyabahJamaahAttributes.ContentState
   var body: some View {
     Text(timerInterval: state.adhan...state.iqamah, countsDown: true)
@@ -129,32 +157,39 @@ struct Until: View {
 /* What a locked phone shows, and what every iPhone without an island shows.
    The masjid's own ground rather than the island's black, because here it is
    a card and not a cutout. */
-struct JamaahLockView: View {
+private struct JamaahLockView: View {
   var attributes: TaiyabahJamaahAttributes
   var state: TaiyabahJamaahAttributes.ContentState
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      HStack(alignment: .center, spacing: 10) {
-        Mark(size: 17)
+      HStack(alignment: .center, spacing: 9) {
+        KhatimMark(size: 16)
         Text("NEXT JAMĀʿAH · \(attributes.masjid.uppercased())")
           .font(.system(size: 10, weight: .bold))
-          .kerning(1.3)
+          .kerning(1.2)
           .foregroundStyle(Brand.gold)
           .lineLimit(1)
+          .minimumScaleFactor(0.8)
         Spacer(minLength: 0)
       }
-      HStack(alignment: .firstTextBaseline, spacing: 9) {
-        Text(state.name)
-          .font(.custom("Georgia", size: 21))
-          .foregroundStyle(Brand.cream)
-          .lineLimit(1)
-        Until(state: state)
-          .font(.system(size: 26, weight: .bold))
-          .foregroundStyle(.white)
+
+      /* The iqāmah time is the hero, not the countdown: "1:30pm" is the thing
+         somebody repeats to themselves on the way out of the door. How long
+         is left is the ring's job, and the ticking number's, below. */
+      HStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .leading, spacing: 1) {
+          Text(state.name)
+            .font(.custom("Georgia", size: 20))
+            .foregroundStyle(Brand.cream)
+            .lineLimit(1)
+          Text(pretty(state.iqamah))
+            .font(.system(size: 30, weight: .bold))
+            .foregroundStyle(.white)
+        }
         Spacer(minLength: 0)
-        Ring(state: state, size: 40)
+        Ring(state: state, size: 42)
       }
-      .padding(.top, 9)
+      .padding(.top, 8)
 
       Rectangle()
         .fill(LinearGradient(colors: [Brand.gold.opacity(0.55), Brand.gold.opacity(0.04)],
@@ -162,14 +197,18 @@ struct JamaahLockView: View {
         .frame(height: 1)
         .padding(.vertical, 11)
 
-      HStack {
-        Text("Adhān \(state.adhan, style: .time)")
+      HStack(spacing: 6) {
+        Text("Adhān \(pretty(state.adhan))")
           .font(.system(size: 11))
-          .foregroundStyle(Brand.cream.opacity(0.62))
+          .foregroundStyle(Brand.cream.opacity(0.6))
         Spacer(minLength: 0)
-        Text("Jamāʿah \(state.iqamah, style: .time)")
+        Text("in")
           .font(.system(size: 11))
-          .foregroundStyle(Brand.cream.opacity(0.62))
+          .foregroundStyle(Brand.cream.opacity(0.6))
+        Countdown(state: state)
+          .font(.system(size: 11, weight: .semibold))
+          .foregroundStyle(Brand.goldBright)
+          .fixedSize()
       }
     }
     .padding(.horizontal, 16)
@@ -187,7 +226,7 @@ struct JamaahLiveActivity: Widget {
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
           HStack(spacing: 7) {
-            Mark(size: 18)
+            KhatimMark(size: 18)
             Text("NEXT JAMĀʿAH")
               .font(.system(size: 10, weight: .bold))
               .kerning(1.4)
@@ -197,7 +236,7 @@ struct JamaahLiveActivity: Widget {
         }
         DynamicIslandExpandedRegion(.trailing) {
           HStack(spacing: 8) {
-            Until(state: context.state)
+            Countdown(state: context.state)
               .font(.system(size: 15, weight: .bold))
               .foregroundStyle(.white)
               .multilineTextAlignment(.trailing)
@@ -211,12 +250,12 @@ struct JamaahLiveActivity: Widget {
                 .font(.custom("Georgia", size: 21))
                 .foregroundStyle(Brand.cream)
                 .lineLimit(1)
-              Text(context.state.iqamah, style: .time)
+              Text(pretty(context.state.iqamah))
                 .font(.system(size: 34, weight: .bold))
                 .foregroundStyle(.white)
               Spacer(minLength: 0)
             }
-            Text("Adhān \(context.state.adhan, style: .time)")
+            Text("Adhān \(pretty(context.state.adhan))")
               .font(.system(size: 11))
               .foregroundStyle(Brand.cream.opacity(0.55))
               .padding(.top, 5)
@@ -224,16 +263,16 @@ struct JamaahLiveActivity: Widget {
           .padding(.top, 2)
         }
       } compactLeading: {
-        Mark(size: 17)
+        KhatimMark(size: 17)
       } compactTrailing: {
-        Until(state: context.state)
+        Countdown(state: context.state)
           .font(.system(size: 14, weight: .semibold))
           .foregroundStyle(Brand.goldBright)
           .frame(maxWidth: 52)
       } minimal: {
         ZStack {
           Ring(state: context.state, size: 22)
-          Mark(size: 11)
+          KhatimMark(size: 11)
         }
       }
       .widgetURL(URL(string: "taiyabah://times"))
