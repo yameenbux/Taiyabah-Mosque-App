@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WIDE — the left column answers "am I about to miss it", the right answers
+     "what else is on today". The rule between them carries the weight.
+
+     The rows are written out six times rather than looped because RemoteViews
+     has no loop: a widget is a description sent to another process, not a
+     view hierarchy this app gets to build. Six is five prayers plus a second
+     Jumuʿah; the provider hides the ones a given day does not use. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/taiyabah_widget_bg">
+
+  <ImageView
+      android:layout_width="210dp"
+      android:layout_height="210dp"
+      android:layout_gravity="bottom|start"
+      android:layout_marginStart="-84dp"
+      android:layout_marginBottom="-90dp"
+      android:alpha="0.038"
+      android:scaleType="fitCenter"
+      android:src="@drawable/taiyabah_girih"
+      android:contentDescription="@null" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="horizontal"
+      android:baselineAligned="false"
+      android:paddingStart="14dp"
+      android:paddingEnd="14dp"
+      android:paddingTop="15dp"
+      android:paddingBottom="14dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="NEXT JAMĀʿAH"
+          android:textColor="#BFDCBB63"
+          android:textSize="9sp"
+          android:textStyle="bold"
+          android:letterSpacing="0.16"
+          android:maxLines="1" />
+      <View
+          android:layout_width="34dp"
+          android:layout_height="1dp"
+          android:layout_marginTop="7dp"
+          android:background="@drawable/taiyabah_rule" />
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:layout_weight="1" />
+      <TextView
+          android:id="@+id/tw_name"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textColor="#F6F1E6"
+          android:textSize="15sp"
+          android:fontFamily="serif"
+          android:maxLines="1"
+          android:ellipsize="end" />
+      <TextView
+          android:id="@+id/tw_time"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textColor="#FFFFFFFF"
+          android:textSize="26sp"
+          android:textStyle="bold"
+          android:maxLines="1"
+          android:includeFontPadding="false" />
+      <Chronometer
+          android:id="@+id/tw_until"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="5dp"
+          android:textColor="#DCBB63"
+          android:textSize="9sp"
+          android:textStyle="bold"
+          android:letterSpacing="0.14"
+          android:maxLines="1" />
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:layout_weight="1" />
+      <ImageView
+          android:layout_width="62dp"
+          android:layout_height="24dp"
+          android:alpha="0.62"
+          android:scaleType="fitStart"
+          android:src="@drawable/taiyabah_wordmark"
+          android:contentDescription="@null" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/taiyabah_vrule" />
+
+    <!-- A fixed width, so the rule between the columns sits in the same place
+         whatever the launcher gives the widget, and the left column takes the
+         slack. 116dp is what the longest hijri date and the widest row of
+         times measure, plus a little; it was 139dp, which fitted nothing
+         better and pushed the whole widget past four cells on a normal phone. -->
+    <LinearLayout
+        android:layout_width="116dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/tw_hijri"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textColor="#CCC6A24C"
+          android:textSize="8sp"
+          android:textStyle="bold"
+          android:textAllCaps="true"
+          android:letterSpacing="0.12"
+          android:maxLines="1"
+          android:ellipsize="end" />
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="6dp"
+          android:layout_marginBottom="7dp"
+          android:background="@drawable/taiyabah_rule" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r0_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r0_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r1_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r1_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r2_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r2_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r3_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r3_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r4_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r4_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:baselineAligned="true"
+          android:paddingTop="1dp"
+          android:paddingBottom="1dp">
+        <TextView
+            android:id="@+id/tw_r5_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tw_r5_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E0F6F1E6"
+            android:textSize="11sp"
+            android:maxLines="1" />
+      </LinearLayout>
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:layout_weight="1" />
+    </LinearLayout>
+  </LinearLayout>
+</FrameLayout>

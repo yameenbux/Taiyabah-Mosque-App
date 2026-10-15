@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Four cells by THREE. Two was wrong and the arithmetic says so: six rows
+     of times, a hijri line and a rule need about 120dp, and a two-cell-high
+     widget gives the content roughly 80. The last prayers of the day would
+     have been clipped off the bottom on a default placement — on Isha, which
+     is the one people check latest.
+
+     The resize floor is 155 by 120dp, which is what the narrow layout
+     measures — roughly two cells each way on a current phone. It was 110 by
+     110 because that is a round number, not because anything fitted in it.
+
+     updatePeriodMillis is zero on purpose: nothing here polls. The
+     Chronometer ticks itself and one alarm redraws at the next jamāʿah. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="300dp"
+    android:minHeight="160dp"
+    android:minResizeWidth="155dp"
+    android:minResizeHeight="120dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="3"
+    android:updatePeriodMillis="0"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:previewLayout="@layout/taiyabah_widget_wide"
+    android:initialLayout="@layout/taiyabah_widget_wide" />
