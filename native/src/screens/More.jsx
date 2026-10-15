@@ -18,14 +18,13 @@
  * swipe-back.
  */
 import React from "react";
-import { View, Text, Image } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text } from "react-native";
 import Svg, { Path, Circle, Rect, SvgXml } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
-import { Screen, Press, open, tap, ExtArrow } from "../ui";
+import { Screen, Press, TopBar, open, tap, ExtArrow } from "../ui";
 import { useTopBar } from "../barstyle";
 import DRAWER from "../data/drawer.json";
 
@@ -88,19 +87,22 @@ const SOCIAL = [
 
 export default function More({ navigation }) {
   const { t, fs, rtl } = useApp();
-  const top = useSafeAreaInsets().top;
   const bar = useTopBar();
 
   return (
     <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
-      {/* The drawer opens under the masjid's own wordmark on plum; so does this. */}
-      {/* The website's drawer header is linear-gradient(brand-900, brand-800),
-          straight down — not brand-900 to brand-700 across. */}
-      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-        style={{ paddingTop: top + 12, paddingBottom: 14, paddingHorizontal: 16,
-                 alignItems: rtl ? "flex-end" : "flex-start" }}>
-        <Image source={require("../../assets/logo.png")}
-               style={{ width: 74, height: 52, resizeMode: "contain" }} />
+      {/* THE SAME BAR AS EVERY OTHER PAGE. This drew the wordmark alone, on
+          the reasoning that the website's DRAWER opens under a bare wordmark
+          — but More is not the website's drawer. It is one of the seven
+          pages, and App.jsx says what a page wears in as many words: "the
+          logo, the society's name and the bell". Three of the four tabs had
+          it and this one did not, so the masthead changed when you moved
+          between them.
+
+          The gradient stays: TopBar draws no background of its own, and the
+          brand-900 → brand-800 straight down is the website's own. */}
+      <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+        <TopBar navigation={navigation} />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
 
