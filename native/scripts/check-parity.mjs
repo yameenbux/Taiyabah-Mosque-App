@@ -11,7 +11,8 @@
  *
  *   node scripts/check-parity.mjs
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("check-parity.mjs");
 import http from "node:http"; import fs from "node:fs"; import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");

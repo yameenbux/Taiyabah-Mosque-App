@@ -9,7 +9,8 @@
  *
  *   node scripts/build-logo.mjs
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("build-logo.mjs");
 import fs from "node:fs"; import path from "node:path";
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SRC = path.join(ROOT, "logo.svg");

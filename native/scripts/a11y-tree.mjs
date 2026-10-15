@@ -14,7 +14,8 @@
  *
  *   node scripts/a11y-tree.mjs <screen>
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("a11y-tree.mjs");
 const { chromium } = pw;
 import path from "node:path";
 import { createServer } from "node:http";

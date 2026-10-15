@@ -14,7 +14,8 @@
  *   node scripts/compare-all.mjs                  # Monday 5 Oct 2026, 2pm
  *   node scripts/compare-all.mjs 2026-10-09T17:30 # a Friday
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("compare-all.mjs");
 import http from "node:http"; import fs from "node:fs"; import path from "node:path";
 import { execFileSync } from "node:child_process";
 

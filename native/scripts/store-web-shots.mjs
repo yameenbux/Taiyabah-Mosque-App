@@ -34,7 +34,8 @@
  *   node scripts/store-web-shots.mjs            # both devices
  *   SHOT_ONLY=3-mushaf node scripts/store-web-shots.mjs
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("store-web-shots.mjs");
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";

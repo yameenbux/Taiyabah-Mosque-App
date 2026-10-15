@@ -12,7 +12,8 @@
  *
  *   node scripts/web-styles.mjs
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("web-styles.mjs");
 import http from "node:http"; import fs from "node:fs"; import path from "node:path";
 const ROOT="/home/user/Taiyabah-Mosque-App";
 const T={".js":"text/javascript",".html":"text/html",".ttf":"font/ttf",".png":"image/png",".json":"application/json",".svg":"image/svg+xml",".css":"text/css",".webp":"image/webp",".woff2":"font/woff2",".webmanifest":"application/manifest+json"};

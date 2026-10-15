@@ -18,7 +18,8 @@
  *
  *   node scripts/forms-submit.mjs
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { requirePlaywright } from "./lib/playwright.mjs";
+const pw = await requirePlaywright("forms-submit.mjs");
 import http from "node:http"; import fs from "node:fs"; import path from "node:path";
 
 const DIST = path.resolve(import.meta.dirname, "../dist");

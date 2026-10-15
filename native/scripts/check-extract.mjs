@@ -3,7 +3,14 @@
  * Walks the real DOM for text, walks the JSON for text, and reports whatever
  * the extractor dropped. An extractor you have not measured is a guess.
  */
-import pw from "/opt/node22/lib/node_modules/playwright/index.js";
+import { loadPlaywright } from "./lib/playwright.mjs";
+const pw = await loadPlaywright();
+/* Part of `npm run check`, so a machine without Playwright must not fail
+   the gate — it skips, loudly, and everything else still runs. */
+if (!pw) {
+  console.log("skipped the extractor check — Playwright is not installed here");
+  process.exit(0);
+}
 import fs from "node:fs"; import path from "node:path";
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const sheets = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../src/data/sheets.json"), "utf8"));
