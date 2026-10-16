@@ -30,7 +30,14 @@
  */
 module.exports = config => ({
   type: "widget",
-  name: "Next Jamaah",
+  /* NO SPACE IN THIS NAME. It becomes the Xcode target name verbatim, and
+     EAS looks the target up by the name with whitespace stripped — it asked
+     for 'NextJamaah', the project contained 'Next Jamaah', and the build died
+     at "Could not find target 'NextJamaah' in project.pbxproj", after prebuild
+     and pods had both passed. Nobody sees this string: the name in the widget
+     gallery is configurationDisplayName in index.swift. check-targets.mjs
+     fails on whitespace here so this cannot come back. */
+  name: "NextJamaah",
   icon: "../../assets/icon.png",
   /* The same group the app declares, so the widget can read what the app
      writes once that path is wired on a device. */

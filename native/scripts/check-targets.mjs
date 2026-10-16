@@ -48,6 +48,30 @@ if (plugged && !teamId) {
   process.exit(1);
 }
 
+/* The target name must survive EAS's lookup.
+ *
+ * @bacons/apple-targets uses `name` as the Xcode target name verbatim, spaces
+ * and all, but EAS assigns provisioning profiles by the name with whitespace
+ * stripped. "Next Jamaah" in the config became target 'Next Jamaah' in the
+ * project and a request for 'NextJamaah' from EAS, and the build failed with
+ * "Could not find target 'NextJamaah' in project.pbxproj" — after prebuild
+ * and pod install had both succeeded, so nothing earlier hinted at it. */
+const cfgPath = path.join(root, "targets/widget/expo-target.config.js");
+const cfgSrc = fs.readFileSync(cfgPath, "utf8");
+const named = cfgSrc.match(/\n\s*name:\s*"([^"]+)"/);
+if (!named) {
+  console.log("FAIL  targets/widget/expo-target.config.js declares no `name`");
+  process.exit(1);
+}
+if (/\s/.test(named[1])) {
+  console.log(`FAIL  the widget target is named "${named[1]}", which contains whitespace.`);
+  console.log("      @bacons/apple-targets makes that the Xcode target name verbatim, but EAS");
+  console.log(`      assigns the provisioning profile to "${named[1].replace(/\s+/g, "")}" and the build dies at`);
+  console.log("      \"Could not find target ... in project.pbxproj\" — after prebuild and pods pass.");
+  console.log("      Nobody sees this name; the gallery name is configurationDisplayName in index.swift.");
+  process.exit(1);
+}
+
 if (teamId && plugged) console.log(`widget and Watch target are ON (team ${teamId})`);
 else console.log("widget and Watch target are OFF — no Apple Team ID yet, which is expected; " +
                  "the code is in targets/widget and store/IOS-RELEASE.md says how to turn it on");
