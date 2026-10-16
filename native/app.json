@@ -10,7 +10,7 @@
     "backgroundColor": "#3C0B2A",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/adaptive-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#3C0B2A"
     },
@@ -18,7 +18,7 @@
       "package": "com.taiyabahmasjid.app",
       "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#3C0B2A"
       },
       "permissions": [
