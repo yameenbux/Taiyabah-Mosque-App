@@ -10,7 +10,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { activityPlan, samePlan, LEAD_MINUTES, GRACE_MINUTES } from "../../src/activity-plan.js";
+import { activityPlan, samePlan, nextAction, LEAD_MINUTES, GRACE_MINUTES } from "../../src/activity-plan.js";
 
 const MIN = 60000;
 const NOW = Date.parse("2026-10-16T12:00:00Z");
@@ -154,4 +154,61 @@ test("across a real year the island is offered once per jamāʿah, and briefly",
   assert.ok(share < 0.25,
     `the island could be on screen ${(share * 100).toFixed(0)}% of the day, which is too much of somebody's phone`);
   console.log(`      ${days} days, ${offered} windows, longest ${longest} min, at most ${(share * 100).toFixed(0)}% of a day`);
+});
+
+/* ---------------------------------------------------------------------------
+ * What the app does with the island, which is where the real bug was.
+ *
+ * The island sat at 0:00 on a real phone after the jamāʿah had been and
+ * stayed there. keep-activity.jsx returned without ending anything whenever
+ * there was no plan, on the assumption that iOS clears it. Nothing in
+ * ActivityKit does: staleDate marks content stale rather than removing it,
+ * and an ended activity leaves the Dynamic Island at once, so it cannot be
+ * ended in advance either. The end() call has to come from the app, and
+ * these are the four cases it has to come in.
+ * ------------------------------------------------------------------------ */
+
+test("no plan ends the island, whether or not this launch started it", () => {
+  const live = { key: "zuhr", iqamahMs: NOW + 10 * MIN };
+
+  assert.equal(nextAction(live, null), "end",
+    "the jamāʿah has been and the island is still up — it has to be ended");
+
+  /* The one the ref cannot help with: force quit during a window, reopen
+     afterwards. Nothing in this process ever started it, and something is
+     still on screen. end() is idempotent, so it is always safe to ask. */
+  assert.equal(nextAction(null, null), "end",
+    "a fresh launch must still clear an island left by a previous one");
+});
+
+test("an unchanged plan is left alone", () => {
+  const p = plan(30, -20);
+  assert.equal(nextAction(p, p), "none");
+  assert.equal(nextAction({ ...p }, { ...p }), "none",
+    "equality is by prayer and instant, not by object identity");
+});
+
+test("a different jamāʿah starts a new island", () => {
+  const zuhr = plan(30, -20);
+  const asr = activityPlan({ key: "asr", name: "Asr" },
+    { now: NOW, iqamahMs: NOW + 30 * MIN, adhanMs: NOW - 20 * MIN });
+  assert.equal(nextAction(zuhr, asr), "start");
+  assert.equal(nextAction(null, zuhr), "start", "nothing running yet");
+});
+
+test("the island is ended for every minute after the grace window", () => {
+  /* Walk from the jamāʿah out to two hours past it and assert that the rule
+     says "end" at every single minute once the window has closed — the whole
+     stretch the island was lingering through. */
+  const iqamahMs = NOW;
+  const adhanMs = NOW - LEAD_MINUTES * MIN;
+  let ended = 0;
+  for (let m = GRACE_MINUTES + 1; m <= 120; m++) {
+    const p = activityPlan(next, { now: NOW + m * MIN, iqamahMs, adhanMs });
+    assert.equal(p, null, `${m} min past the jamāʿah still plans an island`);
+    assert.equal(nextAction({ key: "zuhr", iqamahMs }, p), "end",
+      `${m} min past the jamāʿah does not end it`);
+    ended++;
+  }
+  console.log(`      ${ended} minutes past the jamāʿah, every one of them ends the island`);
 });
