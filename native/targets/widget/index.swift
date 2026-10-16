@@ -133,8 +133,11 @@ private struct Until: View {
      * computed here would be hours stale; both of these styles are redrawn
      * by the system instead. */
     (Text("in ") + Text(at, style: .timer))
-      .font(.system(size: 9.5, weight: .bold))
-      .tracking(1.1)
+      .font(.system(size: 11, weight: .bold))
+      /* Tracking is added in points and does NOT shrink with
+         minimumScaleFactor, so a heavily tracked line fights its own fallback.
+         Less of it here, now the string can be "in 10:30:14". */
+      .tracking(0.6)
       .textCase(.uppercase)
       .foregroundStyle(Brand.goldBright)
       .lineLimit(1)
@@ -150,8 +153,8 @@ private struct Eyebrow: View {
      * "NEX…". minimumScaleFactor makes the overflow shrink the type instead
      * of eating the words, and the tracking comes down so it rarely has to. */
     Text("NEXT JAMĀʿAH")
-      .font(.system(size: 9, weight: .bold))
-      .tracking(1.1)
+      .font(.system(size: 11, weight: .bold))
+      .tracking(1.2)
       .foregroundStyle(Brand.goldBright.opacity(0.75))
       .lineLimit(1)
       .minimumScaleFactor(0.7)
@@ -459,26 +462,36 @@ struct NextJamaahView: View {
           .offset(x: g.size.width - g.size.height * 0.74,
                   y: g.size.height - g.size.height * 0.78)
       }
+      /* THE EYEBROW GETS THE WHOLE LINE.
+       *
+       * It used to share the top row with the mark, and on a small widget
+       * that left it about half the width — "NEXT JAMĀʿAH" came out as
+       * "NEX…", then "NEXT JA…" once minimumScaleFactor was added, because
+       * the space was below even the floor that was willing to shrink to.
+       * No type size fixes that; the row does. The mark moves down beside
+       * the countdown, where the line is short and there is width going
+       * spare, and it gets bigger there than it ever was up top. */
       VStack(alignment: .leading, spacing: 0) {
-        HStack(alignment: .top, spacing: 8) {
-          Eyebrow()
-          Spacer(minLength: 0)
-          Mark(width: 34)
-        }
-        Rule(width: 34).padding(.top, 7)
+        Eyebrow()
+        Rule(width: 38).padding(.top, 7)
         Spacer(minLength: 0)
         if entry.known {
           Text(entry.name)
-            .font(.system(size: 17, weight: .regular, design: .serif))
+            .font(.system(size: 20, weight: .regular, design: .serif))
             .foregroundStyle(Brand.cream)
             .lineLimit(1).minimumScaleFactor(0.7)
           Text(timeText(entry.at))
-            .font(.system(size: 34, weight: .bold))
+            .font(.system(size: 38, weight: .bold))
             .tracking(-1.2)
             .monospacedDigit()
             .foregroundStyle(.white)
             .lineLimit(1).minimumScaleFactor(0.6)
-          Until(at: entry.at).padding(.top, 5)
+          HStack(alignment: .bottom, spacing: 8) {
+            Until(at: entry.at)
+            Spacer(minLength: 0)
+            Mark(width: 40)
+          }
+          .padding(.top, 6)
         } else {
           Text("Timetable not\npublished yet")
             .font(.system(size: 15, weight: .semibold))
@@ -518,11 +531,11 @@ struct NextJamaahView: View {
           Spacer(minLength: 0)
           if entry.known {
             Text(entry.name)
-              .font(.system(size: 16, weight: .regular, design: .serif))
+              .font(.system(size: 18, weight: .regular, design: .serif))
               .foregroundStyle(Brand.cream)
               .lineLimit(1).minimumScaleFactor(0.7)
             Text(timeText(entry.at))
-              .font(.system(size: 31, weight: .bold))
+              .font(.system(size: 34, weight: .bold))
               .tracking(-1.2)
               .monospacedDigit()
               .foregroundStyle(.white)
@@ -534,7 +547,7 @@ struct NextJamaahView: View {
               .foregroundStyle(Brand.cream)
           }
           Spacer(minLength: 0)
-          Mark(width: 62).padding(.leading, -2)
+          Mark(width: 68).padding(.leading, -2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -546,7 +559,7 @@ struct NextJamaahView: View {
                widget knows which calendar it is, and the column is 139 points
                wide. */
             Text(hijriShort(entry.hijri))
-              .font(.system(size: 8, weight: .bold))
+              .font(.system(size: 9, weight: .bold))
               .tracking(1.1)
               .textCase(.uppercase)
               .foregroundStyle(Brand.gold.opacity(0.8))
@@ -581,12 +594,12 @@ private struct DayRow: View {
   var body: some View {
     HStack(spacing: 4) {
       Text(slot.name)
-        .font(.system(size: 11, weight: isNext ? .bold : .medium))
+        .font(.system(size: 12, weight: isNext ? .bold : .medium))
         .lineLimit(1)
         .minimumScaleFactor(0.75)
       Spacer(minLength: 4)
       Text(timeText(slot.at))
-        .font(.system(size: 11, weight: isNext ? .bold : .medium))
+        .font(.system(size: 12, weight: isNext ? .bold : .medium))
         .monospacedDigit()
     }
     .foregroundStyle(isNext ? Brand.goldBright

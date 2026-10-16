@@ -3,39 +3,42 @@
  * The web app could only ask the browser for a compass heading, which on
  * Android means a permission prompt inside a permission prompt and on iOS means
  * nothing at all unless the page is served over HTTPS and the user taps first.
- * Here we read the magnetometer directly — this is the screen that most
- * obviously had to stop being a web page.
+ * WHY THE PLATFORM'S HEADING AND NOT THE MAGNETOMETER. This read the raw
+ * magnetometer and turned its x and y into a bearing itself, and that was
+ * wrong twice over.
+ *
+ * It was MIRRORED. With expo-sensors' device frame — x right, y to the top of
+ * the screen — a phone held flat facing bearing t sees the horizontal field at
+ * x = -H·sin(t), y = H·cos(t). The code computed (90 - atan2(y, x)), which
+ * returns t for north and south and 360 - t for everything else: 90° read as
+ * 270°, 45° as 315°. The dial and the arrow stayed consistent with each other,
+ * so it looked plausible — and sent somebody after a 118° Qibla round to 242°.
+ *
+ * And it had no tilt compensation, which matters more here than almost
+ * anywhere. At 53°N the field dips about 67° below horizontal, so most of what
+ * the magnetometer reads is vertical; tip the phone a few degrees off flat and
+ * the horizontal part it is deducing swings wildly.
+ *
+ * Location.watchHeadingAsync hands both problems to the sensor fusion that
+ * already exists on the device, and returns trueHeading — declination applied
+ * — which is what a Qibla bearing computed from true north has to be compared
+ * against.
  *
  * Cross-check: from the masjid this gives 118.3°, matching the published Qibla
- * direction for Bolton (118°).
+ * direction for Bolton (118°), London (118.9°) and Manchester (118.5°).
  */
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Animated, Easing, Pressable } from "react-native";
 import Svg, { Circle, Line, Path, G, Polygon, Rect, Defs, RadialGradient, Stop, Text as SvgText } from "react-native-svg";
-import { Magnetometer } from "expo-sensors";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
+import { MASJID, bearingTo, kmTo } from "../qibla";
 import { useApp } from "../store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, TopBar, Heading, Card, Note, tap } from "../ui";
 
-const KAABA  = { lat: 21.4224779, lon: 39.8251832 };
-const MASJID = { lat: 53.5869, lon: -2.4361 };
 const rad = d => (d * Math.PI) / 180;
-
-function bearingTo(lat, lon) {
-  const p1 = rad(lat), p2 = rad(KAABA.lat), dl = rad(KAABA.lon - lon);
-  const y = Math.sin(dl) * Math.cos(p2);
-  const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
-  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-}
-function kmTo(lat, lon) {
-  const R6 = 6371, p1 = rad(lat), p2 = rad(KAABA.lat);
-  const dp = rad(KAABA.lat - lat), dl = rad(KAABA.lon - lon);
-  const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
-  return 2 * R6 * Math.asin(Math.sqrt(a));
-}
 
 const DIAL = 268;
 
@@ -52,6 +55,7 @@ export default function Qibla({ navigation }) {
   const [live, setLive] = useState(false);
   const spin = useRef(new Animated.Value(0)).current;
   const last = useRef(0);
+  const window = useRef([]).current;
 
   const qibla = bearingTo(from.lat, from.lon);
   const km = kmTo(from.lat, from.lon);
@@ -61,23 +65,23 @@ export default function Qibla({ navigation }) {
    * broken rather than as precise. */
   useEffect(() => {
     if (!live) { setHeading(null); return; }
-    let sub;
-    Magnetometer.isAvailableAsync().then(ok => {
-      if (!ok) { setHeading(null); setLive(false); return; }
-      Magnetometer.setUpdateInterval(120);
-      const window = [];
-      sub = Magnetometer.addListener(({ x, y }) => {
-        let deg = Math.atan2(y, x) * 180 / Math.PI;
-        deg = (90 - deg + 360) % 360;
-        window.push(deg);
-        if (window.length > 6) window.shift();
-        /* A plain mean is wrong across the 359→0 seam; average the vectors. */
-        const sx = window.reduce((s, d) => s + Math.cos(rad(d)), 0);
-        const sy = window.reduce((s, d) => s + Math.sin(rad(d)), 0);
-        setHeading((Math.atan2(sy, sx) * 180 / Math.PI + 360) % 360);
-      });
-    }).catch(() => {});
-    return () => sub?.remove();
+    let sub, dead = false;
+    Location.watchHeadingAsync(({ trueHeading, magHeading }) => {
+      if (dead) return;
+      /* trueHeading is -1 when the platform cannot work out declination —
+         location off, or permission not granted. magHeading is always there,
+         and in Bolton the two differ by well under a degree. */
+      const deg = typeof trueHeading === "number" && trueHeading >= 0 ? trueHeading : magHeading;
+      if (typeof deg !== "number" || Number.isNaN(deg)) return;
+      window.push((deg + 360) % 360);
+      if (window.length > 5) window.shift();
+      /* A plain mean is wrong across the 359→0 seam; average the vectors. */
+      const sx = window.reduce((t, d) => t + Math.cos(rad(d)), 0);
+      const sy = window.reduce((t, d) => t + Math.sin(rad(d)), 0);
+      setHeading((Math.atan2(sy, sx) * 180 / Math.PI + 360) % 360);
+    }).then(h => { if (dead) h.remove(); else sub = h; })
+      .catch(() => { setHeading(null); setLive(false); });
+    return () => { dead = true; sub?.remove(); };
   }, [live]);
 
   /* Animate along the short way round, so turning past north does not send the

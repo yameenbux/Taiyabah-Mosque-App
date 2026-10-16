@@ -42,6 +42,9 @@ export default function Collect({ navigation }) {
   const sheet = SHEETS.collect;
   const hero = sheet?.blocks.find(b => b.type === "hero");
 
+  /* The key of the website's closed panel, so it can be told apart from the
+     rules above it. Same shape as Advice.jsx's CLOSED_NOTICE. */
+  const CLOSED_NOTICE = "collect.requests_by_phone_for_now";
   const [open_, setOpen] = useState(null);
   const [month, setMonth] = useState(null);
   const [date, setDate] = useState(null);
@@ -149,8 +152,32 @@ export default function Collect({ navigation }) {
     <Screen pad={false}>
       {!!hero && <Hero lines={hero.lines} />}
       <View style={{ paddingHorizontal: 16 }}>
+        {/* THE CLOSED PANEL IS A STATE, AND THE SWITCH DECIDES IT — NOT THE
+            SHEET.
+            
+            #cc-closed on the website — "Requests are taken by phone for now.
+            This form is not open yet." — is kept `hidden` there and revealed
+            only when request_charity_collection is shut. The extractor lifts
+            it out like any other block, which is deliberate: the sheet is
+            where the app gets the closed state's own words from, so the two
+            read identically.
+            
+            But it then has to be FILTERED when the form is open, and this
+            screen never filtered it. So the panel was drawn on every render,
+            and a live form that submits to the admin portal sat directly
+            beneath a banner saying it was not open yet.
+            
+            Advice.jsx already does exactly this, for exactly this panel's
+            twin, and the rule there is the rule here: open !== false rather
+            than open === true, because the switch is three-valued and null
+            means the answer has not come back. During that moment the notice
+            stays down — the same as the website, which keeps both halves
+            hidden until it knows. */}
         {/* The rules, in the masjid's own words. */}
-        <Blocks blocks={sheet?.blocks.filter(b => b.type !== "hero") || []} nav={navigation} />
+        <Blocks nav={navigation}
+                blocks={(sheet?.blocks || []).filter(b =>
+                  b.type !== "hero" &&
+                  !(open_ !== false && b.type === "callout" && b.h?.k === CLOSED_NOTICE))} />
 
         {/* WHEN THE FORM IS CLOSED, THE WEBSITE'S OWN PROSE IS THE CLOSED
             STATE — the plum "Requests are taken by phone for now" panel and
