@@ -290,6 +290,9 @@ private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah]
   let cal = londonCalendar()
   var day = cal.startOfDay(for: from)
   var guardDays = 0
+  /* The time of the jamāʿah appended just before this one, which is when the
+     next entry should replace it on screen. Carried across days. */
+  var previousAt: Date? = nil
   while out.count < limit && guardDays < 14 {
     if let record = table.days[isoKey(day)] {
       let slots = daySlots(day: day, record: record)
@@ -298,9 +301,26 @@ private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah]
         if slot.at <= from { continue }
         let key = PRAYERS.first { $0.name == slot.name }?.key ?? "zuhr"
         let begins = record.begins[key].flatMap { instant(day: day, hhmm: $0) }
-        out.append(Jamaah(date: out.isEmpty ? from : slot.at.addingTimeInterval(-1),
+        /* AN ENTRY TAKES OVER WHEN THE PRAYER BEFORE IT HAS BEEN, NOT A
+           SECOND BEFORE ITS OWN.
+           
+           This read `slot.at.addingTimeInterval(-1)`, which meant the entry
+           for Fajr did not become the visible one until one second before
+           Fajr — and so the entry for Isha stayed on screen from the evening
+           right through until morning, naming a jamāʿah that had already
+           been. Worse, `at` was then in the past, and Text(style: .timer)
+           counts UP from a past date: the widget sat there all night showing
+           Isha with a number climbing away from it.
+           
+           Handing each entry the PREVIOUS slot's time makes the widget turn
+           over at the jamāʿah, which is also exactly when nextJamaah() in
+           src/prayer.js turns over — the app and the widget now answer the
+           same question the same way, rather than differing by one prayer
+           for most of the night. */
+        out.append(Jamaah(date: out.isEmpty ? from : previousAt ?? from,
                           name: slot.name, at: slot.at, begins: begins, known: true,
                           hijri: hijri, today: slots))
+        previousAt = slot.at
       }
     }
     guard let next = cal.date(byAdding: .day, value: 1, to: day) else { break }
