@@ -32,7 +32,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.taiyabahmasjid.app",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
       "NSSupportsLiveActivities": true,

@@ -26,11 +26,30 @@ export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptic
 /* A link leaves the app. A tel: or mailto: hands off to the dialler or the mail
  * app; a web page opens in an in-app browser that keeps our chrome around it,
  * because being thrown out to Chrome is the exact seam we are here to remove. */
+/* PAYING LEAVES THE APP.
+ *
+ * Everything else opens in the in-app browser, which is Safari's engine in a
+ * sheet and is the nicer thing for reading a page. Collecting money is the
+ * exception: App Review's rule for charitable donations is that they are
+ * taken "via a website in Safari", and an app that appears to take payment
+ * inside itself is the kind of thing a first submission gets asked about.
+ * SFSafariViewController is arguably Safari, but arguably is not worth a
+ * rejection when the alternative costs one line.
+ *
+ * It is also the better thing for the person paying: in Safari proper they
+ * can see buy.stripe.com in the address bar, which is the whole reason to
+ * trust the page in front of them. */
+/* ANY Stripe host, not a list of them. The first version of this named
+   buy, donate and checkout, and missed book.stripe.com — the hall hire
+   deposit, which is just as much a payment. Every stripe.com link in
+   this app takes money; none of them is a page to read. */
+const PAYMENT = /^https:\/\/[a-z0-9-]+\.stripe\.com\//i;
+
 export async function open(href) {
   if (!href) return;
   tap();
   try {
-    if (/^(tel:|mailto:|sms:|geo:)/.test(href)) await Linking.openURL(href);
+    if (/^(tel:|mailto:|sms:|geo:)/.test(href) || PAYMENT.test(href)) await Linking.openURL(href);
     else await WebBrowser.openBrowserAsync(href, {
       toolbarColor: C.brand900, controlsColor: C.cream, enableBarCollapsing: true,
     });
