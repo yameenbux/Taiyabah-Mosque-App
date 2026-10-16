@@ -218,7 +218,11 @@ private struct JamaahLockView: View {
         Countdown(state: state)
           .font(.system(size: 12, weight: .bold))
           .foregroundStyle(Brand.goldBright)
-          .fixedSize()
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+          /* Right-aligned against the card edge, so losing a character at
+             ten minutes dragged the whole number sideways. Same fix. */
+          .frame(width: 54, alignment: .trailing)
       }
     }
     .padding(.horizontal, 16)
@@ -249,11 +253,33 @@ struct JamaahLiveActivity: Widget {
           }
         }
         DynamicIslandExpandedRegion(.trailing) {
-          HStack(spacing: 8) {
+          /* A FIXED WIDTH, AND THE REASON IS THE JUDDER.
+           *
+           * The countdown loses a character crossing ten minutes — "10:00"
+           * becomes "9:59" — and again at one minute. monospacedDigit keeps
+           * the glyphs equal but not the count, so the whole row re-laid
+           * itself out mid-tick and the island visibly jumped. Reserving the
+           * width of the longest form it can reach means the digits change
+           * underneath a layout that does not.
+           *
+           * And it is labelled. "8:14" alone, top right, in the position a
+           * clock lives, is read as a clock — which is exactly what it looked
+           * like at 19:51. One quiet word fixes that. */
+          HStack(spacing: 6) {
+            Spacer(minLength: 0)
+            Text("in")
+              .font(.system(size: 11, weight: .semibold))
+              .foregroundStyle(Brand.cream.opacity(0.7))
             Countdown(state: context.state)
               .font(.system(size: 15, weight: .bold))
               .foregroundStyle(.white)
-              .multilineTextAlignment(.trailing)
+              .lineLimit(1)
+              .minimumScaleFactor(0.7)
+              /* 64, not 52: the window is LEAD_MINUTES long and that is a
+                 whole hour, so the first tick of a Fajr activity reads
+                 "1:00:00" — seven characters — before dropping to "59:59"
+                 a second later. Sized for the longest it can ever be. */
+              .frame(width: 64, alignment: .trailing)
             Ring(state: context.state, size: 26)
           }
         }
@@ -271,11 +297,16 @@ struct JamaahLiveActivity: Widget {
               Spacer(minLength: 0)
             }
             Text("Adhān \(pretty(context.state.adhan))")
-              .font(.system(size: 11))
-              .foregroundStyle(Brand.cream.opacity(0.55))
+              .font(.system(size: 12))
+              .foregroundStyle(Brand.cream.opacity(0.8))
               .padding(.top, 5)
           }
+          /* The bottom region runs the full width of the island, under the
+             curved shoulders at each end, and nothing insets it — so the
+             first letter of "Adhān" and the "I" of "Isha" were being shaved
+             by the corner radius. */
           .padding(.top, 2)
+          .padding(.horizontal, 4)
         }
       } compactLeading: {
         KhatimMark(size: 17)
