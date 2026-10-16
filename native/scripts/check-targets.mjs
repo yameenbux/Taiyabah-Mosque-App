@@ -48,27 +48,46 @@ if (plugged && !teamId) {
   process.exit(1);
 }
 
-/* The target name must survive EAS's lookup.
+/* The target name must survive EAS's own sanitiser unchanged.
  *
- * @bacons/apple-targets uses `name` as the Xcode target name verbatim, spaces
- * and all, but EAS assigns provisioning profiles by the name with whitespace
- * stripped. "Next Jamaah" in the config became target 'Next Jamaah' in the
- * project and a request for 'NextJamaah' from EAS, and the build failed with
- * "Could not find target 'NextJamaah' in project.pbxproj" — after prebuild
- * and pod install had both succeeded, so nothing earlier hinted at it. */
+ * @bacons/apple-targets does two things with `name` from expo-target.config.js
+ * and they do not agree:
+ *
+ *   - it creates the Xcode target with the name VERBATIM, spaces and all;
+ *   - it injects {targetName: sanitizedName(name)} into
+ *     extra.eas.build.experimental.ios.appExtensions, which is where EAS reads
+ *     the extension list from for a managed project.
+ *
+ * EAS then assigns the provisioning profile with findNativeTargetByName, which
+ * compares the pbxproj name EXACTLY (@expo/config-plugins/build/ios/Target.js,
+ * findNativeTargetByName). So "Next Jamaah" became target 'Next Jamaah' in the
+ * project and a request for 'NextJamaah' from EAS, and the build died at
+ *   Could not find target 'NextJamaah' in project.pbxproj
+ * after expo doctor, prepare credentials, prebuild and pod install had all
+ * passed — a minute of build time and no hint of the cause anywhere earlier.
+ *
+ * The rule, therefore, is not "no spaces". It is that sanitising must change
+ * nothing, because whatever sanitising removes is exactly what makes the two
+ * names differ. This is sanitizedNameForProjects from
+ * @expo/config-plugins/build/ios/utils/Xcodeproj.js, copied rather than
+ * imported so that a hoist change cannot silently turn the check off. */
+const sanitize = n =>
+  n.replace(/[\W_]+/g, "").normalize("NFD").replace(/[̀-ͯ]/g, "");
+
 const cfgPath = path.join(root, "targets/widget/expo-target.config.js");
-const cfgSrc = fs.readFileSync(cfgPath, "utf8");
-const named = cfgSrc.match(/\n\s*name:\s*"([^"]+)"/);
+const named = fs.readFileSync(cfgPath, "utf8").match(/\n\s*name:\s*"([^"]+)"/);
 if (!named) {
   console.log("FAIL  targets/widget/expo-target.config.js declares no `name`");
   process.exit(1);
 }
-if (/\s/.test(named[1])) {
-  console.log(`FAIL  the widget target is named "${named[1]}", which contains whitespace.`);
-  console.log("      @bacons/apple-targets makes that the Xcode target name verbatim, but EAS");
-  console.log(`      assigns the provisioning profile to "${named[1].replace(/\s+/g, "")}" and the build dies at`);
-  console.log("      \"Could not find target ... in project.pbxproj\" — after prebuild and pods pass.");
-  console.log("      Nobody sees this name; the gallery name is configurationDisplayName in index.swift.");
+if (sanitize(named[1]) !== named[1]) {
+  console.log(`FAIL  the widget target is named "${named[1]}".`);
+  console.log(`      @bacons/apple-targets makes that the Xcode target name verbatim, but tells`);
+  console.log(`      EAS the extension is called "${sanitize(named[1])}", and EAS matches exactly.`);
+  console.log(`      The build fails at "Could not find target '${sanitize(named[1])}' in project.pbxproj",`);
+  console.log(`      after prebuild and pods have both passed.`);
+  console.log(`      Rename it to "${sanitize(named[1])}". Nobody sees this string — the name in the`);
+  console.log(`      widget gallery is configurationDisplayName in index.swift.`);
   process.exit(1);
 }
 

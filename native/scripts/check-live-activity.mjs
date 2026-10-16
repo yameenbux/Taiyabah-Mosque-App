@@ -266,6 +266,55 @@ for (const [rel, src] of [[WIDGET, widget], [MODULE, mod]]) {
   }
 }
 
+/* ---- 13. Nothing in the widget target may clip ----------------------------
+ *
+ * Every one of these shipped to a real phone in build 13 and was visible in
+ * a screenshot within a minute of installing it. None of them is catchable
+ * by a compiler, and none of them is visible on Linux, so they are asserted
+ * from the source instead.
+ *
+ *   a) `style: .relative` prints the TWO largest units — "12 min, 22 sec".
+ *      It truncated to "IN 12 min, 22…" in the small widget and would have
+ *      shrunk to about six points inside the circular complication. There is
+ *      no width at which it is the right choice here; .timer is one token.
+ *
+ *   b) `.lineLimit(1)` with no `.minimumScaleFactor` has nothing to do with
+ *      an overflow except spend it on an ellipsis. "NEXT JAMĀʿAH" became
+ *      "NEX…" that way, next to a mark that was taking a third of the width.
+ *
+ *   c) Ground() inside a content view. iOS 17 insets widget content from the
+ *      container, so a gradient drawn in the content stops short of the real
+ *      corners and reads as a second rounded panel inside the first. The
+ *      ground belongs to .containerBackground. */
+{
+  const swift = fs.readdirSync(path.join(root, "targets/widget"))
+    .filter(n => n.endsWith(".swift"));
+
+  for (const name of swift) {
+    const rel = `targets/widget/${name}`;
+    const lines = fs.readFileSync(path.join(root, rel), "utf8").split("\n");
+
+    lines.forEach((line, i) => {
+      const n = i + 1;
+      const code = line.split("//")[0];
+
+      if (/style:\s*\.relative/.test(code))
+        say(`${rel}:${n} uses style: .relative, which prints two units ` +
+            `("12 min, 22 sec") and will not fit. Use .timer.`);
+
+      if (/\.lineLimit\(1\)/.test(code) &&
+          !lines.slice(i, i + 3).join(" ").includes("minimumScaleFactor"))
+        say(`${rel}:${n} has .lineLimit(1) with no .minimumScaleFactor — ` +
+            `an overflow here truncates the words instead of shrinking the type.`);
+
+      if (/^\s{4,}Ground\(\)\s*$/.test(code) && !/containerBackground/.test(lines[i - 1] ?? ""))
+        say(`${rel}:${n} draws Ground() inside a content view. iOS insets ` +
+            `content from the container, so it renders as a panel within the ` +
+            `widget. It belongs in .containerBackground.`);
+    });
+  }
+}
+
 if (fail.length) {
   console.error(`\n${fail.length} problem(s) with the Live Activity:\n`);
   for (const m of fail) console.error("  " + m);

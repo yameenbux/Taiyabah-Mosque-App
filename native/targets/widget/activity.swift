@@ -182,14 +182,22 @@ private struct JamaahLockView: View {
             .font(.custom("Georgia", size: 20))
             .foregroundStyle(Brand.cream)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
           Text(pretty(state.iqamah))
             .font(.system(size: 30, weight: .bold))
             .foregroundStyle(.white)
         }
         Spacer(minLength: 0)
-        Ring(state: state, size: 42)
+        Ring(state: state, size: 46)
       }
       .padding(.top, 8)
+
+      /* iOS gives this card more height than the content asked for, and
+         without this the whole thing bunched against the top with an empty
+         third underneath. The spacer hands that height to the gap between
+         the hero and the footer, where it reads as spacing rather than as
+         something missing. */
+      Spacer(minLength: 0)
 
       Rectangle()
         .fill(LinearGradient(colors: [Brand.gold.opacity(0.55), Brand.gold.opacity(0.04)],
@@ -197,18 +205,24 @@ private struct JamaahLockView: View {
         .frame(height: 1)
         .padding(.vertical, 11)
 
+      /* 11pt at 60% opacity on plum is not a quiet footer, it is an absent
+         one — it did not survive the trip to a real Lock Screen at all. */
       HStack(spacing: 6) {
         Text("Adhān \(pretty(state.adhan))")
-          .font(.system(size: 11))
-          .foregroundStyle(Brand.cream.opacity(0.6))
+          .font(.system(size: 12))
+          .foregroundStyle(Brand.cream.opacity(0.82))
         Spacer(minLength: 0)
         Text("in")
-          .font(.system(size: 11))
-          .foregroundStyle(Brand.cream.opacity(0.6))
+          .font(.system(size: 12))
+          .foregroundStyle(Brand.cream.opacity(0.82))
         Countdown(state: state)
-          .font(.system(size: 11, weight: .semibold))
+          .font(.system(size: 12, weight: .bold))
           .foregroundStyle(Brand.goldBright)
-          .fixedSize()
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+          /* Right-aligned against the card edge, so losing a character at
+             ten minutes dragged the whole number sideways. Same fix. */
+          .frame(width: 54, alignment: .trailing)
       }
     }
     .padding(.horizontal, 16)
@@ -227,19 +241,45 @@ struct JamaahLiveActivity: Widget {
         DynamicIslandExpandedRegion(.leading) {
           HStack(spacing: 7) {
             KhatimMark(size: 18)
+            /* The expanded island's leading region is narrow and this is the
+               same twelve kerned letters that truncated to "NEX…" on the home
+               screen. It shrinks rather than clips here too. */
             Text("NEXT JAMĀʿAH")
               .font(.system(size: 10, weight: .bold))
-              .kerning(1.4)
+              .kerning(1.1)
               .foregroundStyle(Brand.gold)
               .lineLimit(1)
+              .minimumScaleFactor(0.7)
           }
         }
         DynamicIslandExpandedRegion(.trailing) {
-          HStack(spacing: 8) {
+          /* A FIXED WIDTH, AND THE REASON IS THE JUDDER.
+           *
+           * The countdown loses a character crossing ten minutes — "10:00"
+           * becomes "9:59" — and again at one minute. monospacedDigit keeps
+           * the glyphs equal but not the count, so the whole row re-laid
+           * itself out mid-tick and the island visibly jumped. Reserving the
+           * width of the longest form it can reach means the digits change
+           * underneath a layout that does not.
+           *
+           * And it is labelled. "8:14" alone, top right, in the position a
+           * clock lives, is read as a clock — which is exactly what it looked
+           * like at 19:51. One quiet word fixes that. */
+          HStack(spacing: 6) {
+            Spacer(minLength: 0)
+            Text("in")
+              .font(.system(size: 11, weight: .semibold))
+              .foregroundStyle(Brand.cream.opacity(0.7))
             Countdown(state: context.state)
               .font(.system(size: 15, weight: .bold))
               .foregroundStyle(.white)
-              .multilineTextAlignment(.trailing)
+              .lineLimit(1)
+              .minimumScaleFactor(0.7)
+              /* 64, not 52: the window is LEAD_MINUTES long and that is a
+                 whole hour, so the first tick of a Fajr activity reads
+                 "1:00:00" — seven characters — before dropping to "59:59"
+                 a second later. Sized for the longest it can ever be. */
+              .frame(width: 64, alignment: .trailing)
             Ring(state: context.state, size: 26)
           }
         }
@@ -250,25 +290,45 @@ struct JamaahLiveActivity: Widget {
                 .font(.custom("Georgia", size: 21))
                 .foregroundStyle(Brand.cream)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
               Text(pretty(context.state.iqamah))
                 .font(.system(size: 34, weight: .bold))
                 .foregroundStyle(.white)
               Spacer(minLength: 0)
             }
             Text("Adhān \(pretty(context.state.adhan))")
-              .font(.system(size: 11))
-              .foregroundStyle(Brand.cream.opacity(0.55))
+              .font(.system(size: 12))
+              .foregroundStyle(Brand.cream.opacity(0.8))
               .padding(.top, 5)
           }
+          /* The bottom region runs the full width of the island, under the
+             curved shoulders at each end, and nothing insets it — so the
+             first letter of "Adhān" and the "I" of "Isha" were being shaved
+             by the corner radius. */
           .padding(.top, 2)
+          .padding(.horizontal, 4)
         }
       } compactLeading: {
         KhatimMark(size: 17)
       } compactTrailing: {
-        Countdown(state: context.state)
+        /* THE IQĀMAH, NOT THE COUNTDOWN.
+         *
+         * The compact island has room for one short token and no room for a
+         * word to qualify it. A bare mm:ss there sits a few millimetres from
+         * the status bar clock in the same weight and the same size: at 19:47
+         * it read "12:23", which looks like a broken clock rather than twelve
+         * minutes. "8:00pm" cannot be misread — it carries its own meridiem,
+         * and it is the thing somebody acts on.
+         *
+         * The countdown is not lost: long-pressing gives the expanded view
+         * with the ticking number and the ring, and the Lock Screen card
+         * carries both. This is the glance. */
+        Text(pretty(context.state.iqamah))
           .font(.system(size: 14, weight: .semibold))
           .foregroundStyle(Brand.goldBright)
-          .frame(maxWidth: 52)
+          .lineLimit(1)
+          .minimumScaleFactor(0.8)
+          .frame(maxWidth: 62)
       } minimal: {
         ZStack {
           Ring(state: context.state, size: 22)
