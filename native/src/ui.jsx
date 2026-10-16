@@ -39,7 +39,11 @@ export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptic
  * It is also the better thing for the person paying: in Safari proper they
  * can see buy.stripe.com in the address bar, which is the whole reason to
  * trust the page in front of them. */
-const PAYMENT = /^https:\/\/(buy|donate|checkout)\.stripe\.com\//i;
+/* ANY Stripe host, not a list of them. The first version of this named
+   buy, donate and checkout, and missed book.stripe.com — the hall hire
+   deposit, which is just as much a payment. Every stripe.com link in
+   this app takes money; none of them is a page to read. */
+const PAYMENT = /^https:\/\/[a-z0-9-]+\.stripe\.com\//i;
 
 export async function open(href) {
   if (!href) return;
