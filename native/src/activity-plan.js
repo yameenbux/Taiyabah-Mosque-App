@@ -73,6 +73,35 @@ export function activityPlan(next, { now = Date.now(), iqamahMs, adhanMs } = {})
 }
 
 /**
+ * What to do with the island, given what is on screen and what should be.
+ *
+ * THE "end" CASE IS A BUG FIX AND IT IS THE WHOLE REASON THIS FUNCTION
+ * EXISTS. keep-activity.jsx used to return without ending anything when
+ * there was no plan, on the reasoning that iOS would have cleared it. iOS
+ * does not. Nothing in ActivityKit dismisses a Live Activity on a schedule:
+ * staleDate marks the content stale, it does not take it off the screen, and
+ * an activity that is ended is removed from the Dynamic Island immediately —
+ * so it cannot be ended in advance either, or there would be no island at
+ * all. The end() call has to come from the app.
+ *
+ * The result on a real phone was the island sitting at 0:00 after the
+ * jamāʿah had been and stayed there, because the only end() anywhere was the
+ * one inside start(), which does not run again until the NEXT window opens
+ * an hour before the next prayer.
+ *
+ * So: no plan means end, unconditionally, whether or not this launch is the
+ * one that started it. Unconditionally matters — the app may have been force
+ * quit and relaunched, in which case something is on screen that this
+ * process has never heard of. end() is idempotent and costs a loop over an
+ * empty list when there is nothing to end.
+ */
+export function nextAction(running, plan) {
+  if (!plan) return "end";
+  if (samePlan(running, plan)) return "none";
+  return "start";
+}
+
+/**
  * Whether a plan that is already running still describes the right prayer.
  * Starting a second activity for the same jamāʿah every time somebody opens
  * the app would stack them up; iOS would show the newest and keep the rest.

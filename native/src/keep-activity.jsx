@@ -30,7 +30,7 @@ import { useEffect, useRef } from "react";
 import { AppState, Platform } from "react-native";
 import { useApp } from "./store";
 import { nextJamaah, nowLondon, londonInstant, isJumuah, NAMES, dayFor } from "./prayer";
-import { activityPlan, samePlan } from "./activity-plan";
+import { activityPlan, nextAction } from "./activity-plan";
 import { start, end, isAvailable } from "../modules/live-activity";
 
 export default function KeepActivity() {
@@ -70,15 +70,18 @@ export default function KeepActivity() {
 
       const plan = activityPlan({ ...next, name }, { now: Date.now(), iqamahMs, adhanMs });
 
-      if (!plan) {
-        /* Outside the window. Whatever was showing has either been dismissed
-           by iOS already or belongs to a jamāʿah that has been. */
+      const action = nextAction(running.current, plan);
+
+      /* NOTHING ELSE WILL EVER TAKE IT OFF THE SCREEN.
+         iOS does not dismiss a Live Activity on a schedule — the island sat
+         at 0:00 after the jamāʿah because this branch used to return without
+         ending it, assuming iOS had. See nextAction in activity-plan.js. */
+      if (action === "end") {
         running.current = null;
+        try { await end(); } catch {}
         return;
       }
-      /* Already showing this one. Starting it again would replace a running
-         countdown with an identical one, which is work for nothing. */
-      if (samePlan(running.current, plan)) return;
+      if (action === "none") return;
 
       const ok = await start(plan);
       if (alive && ok) running.current = plan;
