@@ -119,22 +119,42 @@ private struct Mark: View {
 private struct Until: View {
   let at: Date
   var body: some View {
-    (Text("in ") + Text(at, style: .relative))
+    /* .timer, NOT .relative.
+     *
+     * SwiftUI's .relative style prints the two largest units — "12 min,
+     * 22 sec" — which is both longer than this line has room for and more
+     * precision than anybody wants off a glance. It truncated to
+     * "IN 12 min, 22…" on a real phone.
+     *
+     * .timer is the mm:ss form and always one short token. On its own that
+     * reads as a clock time, which is exactly the confusion to avoid next to
+     * a 24-hour status bar — so it is never shown here without the "in"
+     * carrying it. The timeline only refreshes once per prayer, so a string
+     * computed here would be hours stale; both of these styles are redrawn
+     * by the system instead. */
+    (Text("in ") + Text(at, style: .timer))
       .font(.system(size: 9.5, weight: .bold))
-      .tracking(1.3)
+      .tracking(1.1)
       .textCase(.uppercase)
       .foregroundStyle(Brand.goldBright)
       .lineLimit(1)
+      .minimumScaleFactor(0.75)
   }
 }
 
 private struct Eyebrow: View {
   var body: some View {
+    /* TRACKING COSTS WIDTH AND lineLimit(1) ALONE SPENDS IT ON AN ELLIPSIS.
+     * 1.5pt of tracking across twelve letters is 18pt — on a small widget,
+     * next to the mark, that was the difference between "NEXT JAMĀʿAH" and
+     * "NEX…". minimumScaleFactor makes the overflow shrink the type instead
+     * of eating the words, and the tracking comes down so it rarely has to. */
     Text("NEXT JAMĀʿAH")
       .font(.system(size: 9, weight: .bold))
-      .tracking(1.5)
+      .tracking(1.1)
       .foregroundStyle(Brand.goldBright.opacity(0.75))
       .lineLimit(1)
+      .minimumScaleFactor(0.7)
   }
 }
 
@@ -371,7 +391,10 @@ struct NextJamaahView: View {
           .lineLimit(1)
           .minimumScaleFactor(0.55)
         if entry.known {
-          Text(entry.at, style: .relative)
+          /* .timer, not .relative: "12 min, 22 sec" in a 76-point circle
+             shrinks to something nobody can read. mm:ss fits, and under the
+             prayer name it cannot be mistaken for a clock. */
+          Text(entry.at, style: .timer)
             .font(.system(size: 13, weight: .bold))
             .lineLimit(1)
             .minimumScaleFactor(0.5)
@@ -387,8 +410,9 @@ struct NextJamaahView: View {
         if entry.known {
           Text("\(entry.name) \(timeText(entry.at))")
             .font(.system(size: 16, weight: .bold)).tracking(-0.3)
-          (Text("in ") + Text(entry.at, style: .relative))
+          (Text("in ") + Text(entry.at, style: .timer))
             .font(.system(size: 10.5)).opacity(0.72)
+            .lineLimit(1).minimumScaleFactor(0.8)
         } else {
           Text("Timetable not published").font(.system(size: 13, weight: .semibold))
         }
@@ -406,7 +430,6 @@ struct NextJamaahView: View {
      a decision. */
   private var home: some View {
     ZStack {
-      Ground()
       GeometryReader { g in
         Girih()
           .fill(Brand.gold)
@@ -420,7 +443,7 @@ struct NextJamaahView: View {
         HStack(alignment: .top, spacing: 8) {
           Eyebrow()
           Spacer(minLength: 0)
-          Mark(width: 44)
+          Mark(width: 34)
         }
         Rule(width: 34).padding(.top, 7)
         Spacer(minLength: 0)
@@ -460,7 +483,6 @@ struct NextJamaahView: View {
    * through the day loses its shape and people read these by position. */
   private var medium: some View {
     ZStack {
-      Ground()
       GeometryReader { g in
         Girih()
           .fill(Brand.gold)
@@ -569,12 +591,26 @@ struct NextJamaahWidget: Widget {
          left. taiyabah://times is routed by the `linking` config in
          src/App.jsx, and native/scripts/test/links.test.mjs fails if that
          route stops existing. */
+      /* THE GROUND BELONGS TO THE CONTAINER, NOT THE CONTENT.
+       *
+       * iOS 17 insets a widget's content from its container by the system
+       * content margins. Ground() — plum plus two radial gradients — was
+       * being drawn inside that inset area while the container itself was
+       * filled with flat Brand.plum, so the gradient stopped short of the
+       * widget's edges and read as a second rounded panel sitting inside the
+       * first. A box inside a box, on the home screen, which is the single
+       * most obvious way for a widget to look unfinished.
+       *
+       * Behind the container it bleeds to the real corners and there is one
+       * surface again. Pre-17 has no container to fill, so it keeps a plain
+       * background and is equally not doubled. */
       if #available(iOS 17.0, *) {
         NextJamaahView(entry: entry)
-          .containerBackground(for: .widget) { Brand.plum }
+          .containerBackground(for: .widget) { Ground() }
           .widgetURL(URL(string: "taiyabah://times"))
       } else {
         NextJamaahView(entry: entry)
+          .background(Ground())
           .widgetURL(URL(string: "taiyabah://times"))
       }
     }
