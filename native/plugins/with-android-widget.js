@@ -58,6 +58,41 @@ const withFiles = config =>
       copyTree(path.join(from, "java"), path.join(main, "java"));
       copyTree(path.join(from, "res"), path.join(main, "res"));
 
+      /* THE R IMPORT HAS TO FOLLOW THE VARIANT, which is why it is rewritten
+       * here rather than written once in the source file.
+       *
+       * The provider lives in <pkg>.widget, so a bare R would resolve to
+       * com.taiyabahmasjid.app.widget.R, which nothing generates — hence the
+       * explicit import of the app's own R. But WHICH app: app.config.js moves
+       * the package to com.taiyabahmasjid.app.dev whenever TAIYABAH_VARIANT is
+       * set, so that test builds can sit beside the real app, and Gradle
+       * generates R under the namespace it is given. A file that names the
+       * release package compiles for Play and fails for every test build with
+       * "package R does not exist".
+       *
+       * That is not hypothetical. It is what happened: from the commit that
+       * added this widget on 15 October, every smoke run failed at
+       * compileReleaseJavaWithJavac, and because the Play workflow refuses to
+       * build without a green smoke run against the same commit, no Android
+       * build could be cut at all. The release build would have compiled
+       * perfectly — the one variant nobody could reach. */
+      const pkg = cfg.android && cfg.android.package;
+      if (!pkg) throw new Error("with-android-widget: the config has no android.package");
+      const provider = path.join(main, "java/com/taiyabahmasjid/app/widget/NextJamaahWidget.java");
+      if (!fs.existsSync(provider)) {
+        throw new Error(`with-android-widget: expected the provider at ${provider} — ` +
+                        "the widget source moved and this rewrite no longer finds it");
+      }
+      const R_IMPORT = /^import\s+[\w.]+\.R;[ \t]*$/m;
+      const java = fs.readFileSync(provider, "utf8");
+      if (!R_IMPORT.test(java)) {
+        throw new Error("with-android-widget: no `import <package>.R;` line in " +
+                        "NextJamaahWidget.java — it is what makes the resource " +
+                        "references resolve, and without it the build fails late");
+      }
+      fs.writeFileSync(provider, java.replace(R_IMPORT, `import ${pkg}.R;`));
+      console.log(`with-android-widget: R imported from ${pkg}`);
+
       /* The iOS widget's copy, verbatim. If these two ever diverge the two
          platforms disagree about when the jamāʿah is, which is the one thing
          a masjid's app may never do. */
