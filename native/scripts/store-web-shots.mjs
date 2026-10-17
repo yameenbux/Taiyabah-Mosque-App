@@ -108,14 +108,25 @@ const SHOTS = [
      is the one App.jsx publishes — Mushaf: "mushaf" — so this is the app
      routing itself, not the harness reaching inside it. */
   { name: "3-mushaf",    path: "/mushaf?page=3", steps: [] },
-  /* Past the explainer to the nisab, which is the part the headline is about. */
-  { name: "5-zakat",     steps: [["menu", /^Zakat calculator$/], ["scroll", 760]] },
+  /* Past the explainer to the niṣāb itself, which is the part the headline is
+     about. It used to stop 100px short, which left three lines of explanation
+     above the figures — and because text reflows at the wider 6.9" width, the
+     same offset landed mid-sentence there and the panel opened on a clipped
+     line. Landing on the two metal pills instead is both the better picture
+     and the one place the two widths agree. */
+  { name: "5-zakat",     steps: [["menu", /^Zakat calculator$/],
+                                 ["top", /^Silver\s*\u00B7\s*\d/, 84]] },
   { name: "6-alerts",    steps: [["menu", /^Notifications$/]] },
   /* Candidates. Not every one of these ends up in a frame — PANELS in
      store-frames.mjs picks five — but they are cheap to take and the point of
      having them is to choose by looking rather than by imagining. */
   { name: "7-qibla",     steps: [["tile", /^Qibla$/]] },
-  { name: "8-athkar",    steps: [["tile", /^Daily Adhk/], ["row", /^Morning & Evening$/]] },
+  /* Scrolled past the note about wording. It is the right thing for the
+     screen to say and the wrong thing for a marketing panel to open with: a
+     small grey caveat was the first line the eye met, above the adhkār the
+     headline is actually about. */
+  { name: "8-athkar",    steps: [["tile", /^Daily Adhk/], ["row", /^Morning & Evening$/],
+                                 ["scroll", 182]] },
   { name: "9-donate",    steps: [["tile", /^Donate$/]] },
   { name: "10-bukhari",  steps: [["tile", /al-Bukh/]] },
   { name: "11-surah",    path: "/quran", steps: [["row", /^English Translation$/],
@@ -128,6 +139,10 @@ const DEVICES = [
      two never fight over the same pixels and the sum is exactly the size App
      Store Connect asks for. 59pt on the phone, 24pt on the iPad. */
   { dir: "iphone",  w: 402,  h: 874 - 59,   dsf: 3, bar: 59 },  /* 1206 x 2445 (+177) */
+  /* THE 6.9" SET AS WELL, because which iPhone tab App Store Connect insists
+     on has moved more than once and a submission blocked at upload on a
+     Saturday costs a week. Same 59pt bar, a wider screen under it. */
+  { dir: "iphone-69", w: 440, h: 956 - 59, dsf: 3, bar: 59 },   /* 1320 x 2691 (+177) */
   { dir: "ipad-13", w: 1032, h: 1376 - 24, dsf: 2, bar: 24 },   /* 2064 x 2704 (+48)  */
 ];
 
@@ -226,7 +241,41 @@ for (const d of DEVICES) {
     }
 
     let reached = true;
-    for (const [where, what] of shot.steps) {
+    for (const [where, what, arg] of shot.steps) {
+      /* SCROLL UNTIL A NAMED THING IS AT THE TOP, rather than by a count of
+         pixels. A pixel offset only means the same thing at one width: the
+         6.9" screen is wider, the paragraphs above rewrap shorter, and the
+         same 860 that landed cleanly on the niṣāb pills at 402pt cut them in
+         half at 440pt. What does hold across both is the app's own header,
+         which is 68 CSS pixels on either device because it is specified in
+         points and not as a share of anything — so the target is "this
+         element, just under the header", and the scrolling is whatever it
+         takes to get there. */
+      if (where === "top") {
+        const el = page.getByText(what).first();
+        if (!(await el.waitFor({ timeout: 5000 }).then(() => true).catch(() => false))) {
+          reached = false; break;
+        }
+        await page.mouse.move(d.w / 2, d.h / 2);
+        const want = arg || 80;
+        let box = null;
+        for (let i = 0; i < 40; i++) {
+          box = await el.boundingBox();
+          if (!box) break;
+          const delta = Math.round(box.y - want);
+          if (Math.abs(delta) <= 3) break;
+          await page.mouse.wheel(0, delta);
+          await page.waitForTimeout(200);
+        }
+        await page.waitForTimeout(800);
+        box = await el.boundingBox();
+        /* Said out loud: a target that never arrived means the panel is being
+           photographed somewhere other than where it was aimed. */
+        if (!box || Math.abs(box.y - want) > 12)
+          throw new Error(`${shot.name} on ${d.dir}: wanted ${what} at y=${want}, ` +
+                          `it settled at ${box ? Math.round(box.y) : "nowhere"}`);
+        continue;
+      }
       if (where === "scroll") {
         await page.mouse.move(d.w / 2, d.h / 2);
         await page.mouse.wheel(0, what);

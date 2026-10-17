@@ -22,7 +22,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import zlib from "node:zlib";
+import { decode } from "./lib/png.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const expo = JSON.parse(fs.readFileSync(path.join(root, "app.json"), "utf8")).expo;
@@ -31,37 +31,7 @@ const say = m => fail.push(m);
 
 /** Decode a PNG far enough to find the artwork inside the flat background. */
 function measure(file) {
-  const d = fs.readFileSync(file);
-  let pos = 8, idat = [], w, h, ct;
-  while (pos < d.length) {
-    const len = d.readUInt32BE(pos), typ = d.toString("latin1", pos + 4, pos + 8);
-    if (typ === "IHDR") { w = d.readUInt32BE(pos + 8); h = d.readUInt32BE(pos + 12); ct = d[pos + 17]; }
-    else if (typ === "IDAT") idat.push(d.subarray(pos + 8, pos + 8 + len));
-    pos += 12 + len;
-  }
-  const ch = { 0: 1, 2: 3, 4: 2, 6: 4 }[ct];
-  const raw = zlib.inflateSync(Buffer.concat(idat));
-  const stride = w * ch, px = Buffer.alloc(stride * h);
-  let i = 0;
-  for (let y = 0; y < h; y++) {
-    const f = raw[i++];
-    for (let x = 0; x < stride; x++) {
-      const v = raw[i + x];
-      const a = x >= ch ? px[y * stride + x - ch] : 0;
-      const b = y ? px[(y - 1) * stride + x] : 0;
-      const c = x >= ch && y ? px[(y - 1) * stride + x - ch] : 0;
-      let out = v;
-      if (f === 1) out = v + a;
-      else if (f === 2) out = v + b;
-      else if (f === 3) out = v + ((a + b) >> 1);
-      else if (f === 4) {
-        const p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
-        out = v + (pa <= pb && pa <= pc ? a : pb <= pc ? b : c);
-      }
-      px[y * stride + x] = out & 255;
-    }
-    i += stride;
-  }
+  const { w, h, ch, stride, px, alpha } = decode(file);
   const bg = [px[0], px[1], px[2]];
   let minx = w, miny = h, maxx = -1, maxy = -1;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
@@ -71,7 +41,7 @@ function measure(file) {
       if (y < miny) miny = y; if (y > maxy) maxy = y;
     }
   }
-  return { w, h, alpha: ct === 4 || ct === 6,
+  return { w, h, alpha,
            aw: maxx - minx + 1, ah: maxy - miny + 1,
            offx: (minx + maxx) / 2 - w / 2, offy: (miny + maxy) / 2 - h / 2 };
 }
