@@ -338,6 +338,10 @@ function panelHtml(w, h, p, shotB64, S, bar, logoB64) {
  * commented out, and if tablet support comes back this is four lines. */
 const DEVICES = [
   { label: "iphone", dir: "iphone", w: 1206, h: 2622, scale: 1.0, island: true },
+  /* 6.9". `scale` is the only thing that changes: every measurement in a panel
+     is written as a multiple of it, so the larger canvas is the same design
+     drawn bigger rather than the same design with more room around it. */
+  { label: "iphone-6.9", dir: "iphone-69", w: 1320, h: 2868, scale: 1320 / 1206, island: true },
 ];
 
 /* Written by store-web-shots.mjs: how tall the strip it left free is, and what
