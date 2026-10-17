@@ -11,8 +11,16 @@
  *
  * So this reads the provider's own R references and checks each one against
  * the res tree it ships with, and it checks the import that makes R resolve at
- * all. That import is here for a reason: aapt generates R in the APPLICATION's
- * namespace, com.taiyabahmasjid.app, and the provider lives in a sub-package.
+ * all. That import is here for a reason: aapt generates R in the module's
+ * NAMESPACE, and the provider lives in a sub-package of it.
+ *
+ * The namespace is not a constant, which is the part that cost two days. It
+ * is whatever app.config.js resolved the package to, so a test build under
+ * TAIYABAH_VARIANT=dev generates com.taiyabahmasjid.app.dev.R and a file
+ * naming the release package fails with "package R does not exist". The
+ * source names the release package and with-android-widget.js rewrites the
+ * line to the real one as it copies the provider in, so what is asserted
+ * here is the line the rewrite aims at.
  * Without the import a bare R silently means com.taiyabahmasjid.app.widget.R,
  * which nothing generates, and every resource reference in the file fails. It
  * was written without it, and a compile check against a stub R placed in the
