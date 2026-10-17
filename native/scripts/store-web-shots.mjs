@@ -115,7 +115,12 @@ const SHOTS = [
      store-frames.mjs picks five — but they are cheap to take and the point of
      having them is to choose by looking rather than by imagining. */
   { name: "7-qibla",     steps: [["tile", /^Qibla$/]] },
-  { name: "8-athkar",    steps: [["tile", /^Daily Adhk/], ["row", /^Morning & Evening$/]] },
+  /* Scrolled past the note about wording. It is the right thing for the
+     screen to say and the wrong thing for a marketing panel to open with: a
+     small grey caveat was the first line the eye met, above the adhkār the
+     headline is actually about. */
+  { name: "8-athkar",    steps: [["tile", /^Daily Adhk/], ["row", /^Morning & Evening$/],
+                                 ["scroll", 182]] },
   { name: "9-donate",    steps: [["tile", /^Donate$/]] },
   { name: "10-bukhari",  steps: [["tile", /al-Bukh/]] },
   { name: "11-surah",    path: "/quran", steps: [["row", /^English Translation$/],
