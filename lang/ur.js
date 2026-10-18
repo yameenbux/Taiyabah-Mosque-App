@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "269dfe9fdc62",
+ "version": "b790c5dcf119",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -303,7 +303,6 @@ window.LANG_PACK = {
   "marriage.videos_bayaans": "ویڈیوز اور بیانات",
   "marriage.hajj_umrah": "حج / عمرہ",
   "marriage.coming_soon": "جلد آ رہا ہے",
-  "marriage.ramadan_2027": "رمضان 2027",
   "marriage.the_masjid": "مسجد",
   "marriage.our_services": "ہماری خدمات",
   "marriage.birth_marriage_death": "ولادت، نکاح اور وفات",
@@ -1817,7 +1816,6 @@ window.LANG_PACK = {
   "tiles.holy_quran": "قرآنِ کریم",
   "tiles.daily_adhkar": "روزانہ اذکار",
   "tiles.qibla": "قبلہ",
-  "tiles.ramadan": "رمضان",
   "tiles.madrasah": "مدرسہ",
   "tiles.nikah_services": "نکاح",
   "tiles.funeral_services": "جنازہ",
@@ -2086,6 +2084,12 @@ window.LANG_PACK = {
   "ramadan.allahumma_innaka_afuwwun_tuhibbul": "Allāhumma innaka ʿafuwwun tuḥibbul-ʿafwa faʿfu ʿannī",
   "ramadan.o_allah_you_are_most": "اے اللہ! تو بہت معاف کرنے والا ہے، اور معاف کرنا پسند کرتا ہے، پس مجھے معاف فرما۔",
   "ramadan.sunan_ibn_majah": "سنن ابن ماجہ",
-  "ramadan.dates_follow_the_masjid_s": "تاریخیں مسجد کے اپنے ٹائم ٹیبل اور چاند کی رویت کے مطابق ہوتی ہیں، اس لیے پہلی رات ایک دن آگے پیچھے ہو سکتی ہے۔"
+  "ramadan.dates_follow_the_masjid_s": "تاریخیں مسجد کے اپنے ٹائم ٹیبل اور چاند کی رویت کے مطابق ہوتی ہیں، اس لیے پہلی رات ایک دن آگے پیچھے ہو سکتی ہے۔",
+  "ramadan.ramadan_is_coming": "رمضان آ رہا ہے",
+  "ramadan.dates_to_be_confirmed": "تاریخوں کی تصدیق باقی ہے",
+  "ramadan.on_the_sighting_of_the": "چاند نظر آنے پر",
+  "ramadan.days": "دن",
+  "ramadan.hours": "گھنٹے",
+  "ramadan.minutes": "منٹ"
  }
 };

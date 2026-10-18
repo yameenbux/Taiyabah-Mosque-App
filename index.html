@@ -1022,6 +1022,52 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      is a div too. */
   .rm-src{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
   .rm-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
+
+  /* ---- Ramadan: the guard poster ----
+     The app's own Ramadan screen, line for line: native/src/screens/Ramadan.jsx.
+     It fills the sheet body instead of scrolling inside it, so the three
+     blocks sit at the top, the middle and the foot the way the design draws
+     them. The two stars are UNFILLED on purpose — .rm-hero's girih is a
+     filled watermark, which at this size is a stain across the middle of the
+     screen rather than something behind it.
+
+     Letter-spacing is in px, not em, because the native screen's is: there it
+     is a fixed number that does not grow with the text-size setting, and the
+     two have to stay the same shape at every size. */
+  .rmg{position:relative;overflow:hidden;min-height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    padding:54px 34px 40px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-700) 0%,var(--brand-800) 44%,var(--brand-900) 100%)}
+  .rmg-star{position:absolute;left:50%;top:50%;pointer-events:none}
+  .rmg-star-a{width:560px;height:560px;margin:-280px 0 0 -280px;color:var(--gold);opacity:.3}
+  .rmg-star-b{width:330px;height:330px;margin:-165px 0 0 -165px;color:var(--gold-bright);opacity:.22}
+  .rmg-top,.rmg-mid,.rmg-foot{position:relative;text-align:center}
+  .rmg-mid{width:100%}
+  .rmg-kicker{font-size:calc(10.5px * var(--ts));font-weight:700;color:var(--gold);
+    letter-spacing:3.4px;text-transform:uppercase}
+  .rmg-head{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(38px * var(--ts));
+    line-height:1.1;color:#F3EFE3;margin:14px 0 0}
+  .rmg-rule{display:block;width:46px;height:2px;background:var(--gold);opacity:.9;margin:20px auto 0}
+  .rmg-cells{display:flex;gap:9px}
+  .rmg-cell{flex:1;min-width:0;border:1px solid rgba(220,187,99,.34);border-radius:18px;
+    padding:15px 4px;background:rgba(243,239,227,.045)}
+  .rmg-n{font-family:"Fraunces",Georgia,serif;font-size:calc(36px * var(--ts));line-height:1.1;
+    color:#F3EFE3;font-variant-numeric:tabular-nums}
+  .rmg-l{font-size:calc(9px * var(--ts));font-weight:700;color:var(--gold);
+    letter-spacing:1.9px;text-transform:uppercase;margin-top:9px}
+  .rmg-phrase{font-family:"Fraunces",Georgia,serif;font-size:calc(34px * var(--ts));
+    line-height:1.18;color:#F3EFE3}
+  .rmg-when{font-size:calc(12.5px * var(--ts));font-weight:500;color:rgba(243,239,227,.6);margin-top:22px}
+  .rmg-logo{display:block;width:164px;height:116px;object-fit:contain;margin-inline:auto}
+  .rmg-soc{font-size:calc(8.5px * var(--ts));font-weight:600;color:rgba(243,239,227,.42);
+    letter-spacing:2.2px;text-transform:uppercase;margin-top:16px}
+  /* Nastaliq sits a long way outside the Latin em-box, and the display
+     setting these two carry is tight by design: at 1.1 the Urdu headline
+     lost the top of its second line and the “Dates to be confirmed” phrase
+     was clipped the same way. English keeps the tight setting; every other
+     script gets the room it needs. */
+  :root:not([lang="en"]) .rmg-head,
+  :root:not([lang="en"]) .rmg-phrase{line-height:1.6}
   .ia-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
   /* What the masjid can and cannot promise about a written question. Gold
      rather than the plum .ad-note, because .ad-note is the "this is shut"
@@ -4857,6 +4903,38 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="sh-close" id="rm-close" data-i18n="ramadan.done">Done</button>
       </div>
       <div class="sh-body">
+        <!-- THE GUARD. Everything below it is built and waiting; rmGuardState()
+             decides whether it is shown, and that rule is the website half of
+             native/src/ramadan.js. -->
+        <section class="rmg" id="rmg" hidden>
+        <svg class="rmg-star rmg-star-a" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="currentColor" stroke-width=".35"/></svg>
+        <svg class="rmg-star rmg-star-b" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="currentColor" stroke-width=".5"/></svg>
+
+          <div class="rmg-top">
+            <div class="rmg-kicker" data-i18n="ramadan.ramadan">Ramadan</div>
+            <h2 class="rmg-head" data-i18n="ramadan.ramadan_is_coming">Ramadan is coming</h2>
+            <span class="rmg-rule" aria-hidden="true"></span>
+          </div>
+
+          <div class="rmg-mid">
+            <div class="rmg-cells" id="rmg-cells" hidden>
+              <div class="rmg-cell"><div class="rmg-n" id="rmg-d">&mdash;</div><div class="rmg-l" data-i18n="ramadan.days">Days</div></div>
+              <div class="rmg-cell"><div class="rmg-n" id="rmg-h">&mdash;</div><div class="rmg-l" data-i18n="ramadan.hours">Hours</div></div>
+              <div class="rmg-cell"><div class="rmg-n" id="rmg-m">&mdash;</div><div class="rmg-l" data-i18n="ramadan.minutes">Minutes</div></div>
+            </div>
+            <!-- Written by hand rather than carried on a key, because which
+                 of the two it says depends on what the timetable holds. -->
+            <div class="rmg-phrase" id="rmg-phrase" hidden></div>
+            <div class="rmg-when" id="rmg-when"></div>
+          </div>
+
+          <div class="rmg-foot">
+            <img class="rmg-logo" src="logo.svg" alt="Taiyabah Masjid" width="164" height="116"
+                 data-i18n-attr="alt:a11y.taiyabah_masjid">
+            <div class="rmg-soc" data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</div>
+          </div>
+        </section>
+
 
         <section class="rm-hero">
           <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
@@ -6299,6 +6377,120 @@ function renderRamadan(){
   document.getElementById('ram-t').textContent=txt;
   document.getElementById('ram-n').textContent =
     t("ramadan.subject_to_moon_sighting","Subject to moon sighting") + (r.year?` · ${num(r.year)}`:"");
+}
+
+/* ---------------- Ramadan: the guard ----------------
+   The section below the poster is built — taraweeh, bayaan, i’tikaf, zakat
+   al-Fitr, the two du’as — and none of it has anything to say until the
+   committee has published the year Ramadan falls in and settled who is
+   leading. So the sheet opens onto a poster instead, and the poster is the
+   app’s own screen: src/screens/Ramadan.jsx.
+
+   THE RULE IS THE APP’S, not a second one written here. Ten days before the
+   first night, and one day past the last: native/src/ramadan.js, where it is
+   tested. Ten, because i’tikaf places have to be booked and the taraweeh
+   rota is settled about a month out — a booking screen that appears on the
+   first night gives nobody any warning. One day past the end, because Eid and
+   the fitrana deadline are on that screen and both matter on the morning
+   after the last night.
+
+   WHY THE ESTIMATE DOES NOT OPEN IT. ramadanStart() falls back to a
+   configured guess so the home strip can say "in about N days". A guess is
+   good enough for a sentence and wrong for a door: open the section a day
+   early and the schedules are live on the wrong night. Only a date the
+   committee has actually published — r.exact — opens anything, and until
+   there is one the poster says the dates are to be confirmed, which is what
+   the native screen says too.
+---------------------------------------------------- */
+const RAM_OPEN_BEFORE = 10;                  /* ramadan.js OPEN_DAYS_BEFORE */
+/* Ramadhan and Ramaḍān both turn up in real calendars, so all three spellings
+   are matched — the same regex as ramadan.js. */
+const RAM_MONTH = /^rama[dḍ]h?[aā]n$/i;
+
+function ramHijri(d){
+  const rec = DATA && DATA.days && DATA.days[ymd(d)];
+  const m = String((rec && rec.hijri) || "").match(/^(\d+)\s+(.+?)\s+(\d+)/);
+  return m ? { day:+m[1], month:m[2].trim(), year:+m[3] } : null;
+}
+
+/* Inside the month, or the morning after it. Yesterday counts as well as
+   today, which is what keeps the section open on Eid and also covers the
+   hours between midnight and Fajr — the night the masjid is still praying
+   belongs to the day before it. */
+function ramInMonth(){
+  const t0 = today0();
+  for(const d of [t0, new Date(t0.getTime() - 86400000)]){
+    const h = ramHijri(d);
+    if(h && RAM_MONTH.test(h.month)) return true;
+  }
+  return false;
+}
+
+/* The moment the first night begins: Maghrib on the EVE of 1 Ramadan, not
+   midnight. The first taraweeh is prayed the evening before the first fast,
+   so a countdown running to midnight would still be showing hours left while
+   the congregation was already standing in prayer. */
+function ramFirstNight(date){
+  const eve = new Date(date.getTime() - 86400000);
+  const rec = DATA && DATA.days && DATA.days[ymd(eve)];
+  const mg  = rec && rec.begins && rec.begins.maghrib;
+  if(!mg) return date;
+  const [hh,mm] = String(mg).split(":").map(Number);
+  if(!Number.isFinite(hh) || !Number.isFinite(mm)) return date;
+  eve.setHours(hh, mm, 0, 0);
+  return eve;
+}
+
+function ramGuardState(){
+  if(ramInMonth()) return { open:true };
+  const r = ramadanStart();
+  if(!r || !r.exact)
+    return { open:false, phrase:t("ramadan.dates_to_be_confirmed","Dates to be confirmed") };
+  if(Math.round((r.date - today0())/86400000) <= RAM_OPEN_BEFORE) return { open:true };
+  return { open:false, at:ramFirstNight(r.date) };
+}
+
+let RAM_TICK = null;
+function ramStopTick(){ if(RAM_TICK){ clearInterval(RAM_TICK); RAM_TICK = null; } }
+
+function ramCount(at){
+  const ms = Math.max(0, at - nowLondon());        /* never counts back up */
+  const two = n => String(n).padStart(2,"0");
+  document.getElementById('rmg-d').textContent = num(Math.floor(ms/86400000));
+  document.getElementById('rmg-h').textContent = num(two(Math.floor((ms%86400000)/3600000)));
+  document.getElementById('rmg-m').textContent = num(two(Math.floor((ms%3600000)/60000)));
+}
+
+function renderRamadanGuard(){
+  const g    = document.getElementById('rmg');
+  const hero = document.querySelector('#ramadan .rm-hero');
+  const body = document.querySelector('#ramadan .ab-wrap');
+  const s    = ramGuardState();
+
+  /* The content stays in the page rather than being built or torn down, so
+     the day the section opens there is nothing to go wrong. */
+  g.hidden = s.open;
+  hero.hidden = body.hidden = !s.open;
+  if(s.open){ ramStopTick(); return; }
+
+  const cells = document.getElementById('rmg-cells');
+  const phr   = document.getElementById('rmg-phrase');
+  ramStopTick();
+
+  if(s.phrase){
+    cells.hidden = true;
+    phr.hidden = false;
+    phr.textContent = s.phrase;
+  }else{
+    phr.hidden = true;
+    cells.hidden = false;
+    ramCount(s.at);
+    /* The minutes cell is the smallest thing on it, so a quarter-minute is
+       close enough — and the interval only runs while the sheet is open. */
+    RAM_TICK = setInterval(() => ramCount(s.at), 15000);
+  }
+  document.getElementById('rmg-when').textContent =
+    t("ramadan.on_the_sighting_of_the","On the sighting of the moon");
 }
 
 /* ---------------- reminders ----------------
@@ -7893,6 +8085,10 @@ function refreshRenderedText(){
        changes, not only when the screen opens — otherwise an Urdu reader is
        left with one line of English under the box they are typing in. */
     () => { if(open("advice")) iaTally(); },
+    /* Same reason: the guard's phrase and its moon-sighting line are written
+       by hand, so a language switch with the sheet open would otherwise leave
+       them in whatever language they were drawn in. */
+    () => { if(open("ramadan")) renderRamadanGuard(); },
   ];
   /* One screen failing to redraw must not stop the rest from being translated. */
   for(const job of jobs){ try{ job(); }catch(e){ console.warn("re-render after language change:", e); } }
@@ -10604,10 +10800,15 @@ function initAdvice(){
 }
 
 /* ---------------- ramadan ----------------
-   Prose and structure only — no form, no countdown, no booking widget. I'tikaf
-   booking and anything else with real logic is hand-written native; this
-   sheet only has to say the same thing the native screen says. */
+   Prose and structure only — no form, no booking widget. I'tikaf booking and
+   anything else with real logic is hand-written native; this sheet only has
+   to say the same thing the native screen says.
+
+   The one exception is the guard: until the section opens, the sheet shows
+   renderRamadanGuard()'s poster and the prose below it is hidden, because
+   that is what the native screen shows and the two have to match. */
 function openRamadan(){
+  renderRamadanGuard();
   document.getElementById('ramadan').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#ramadan .sh-body').scrollTop=0;
@@ -10615,6 +10816,7 @@ function openRamadan(){
 function closeRamadan(){
   document.getElementById('ramadan').dataset.open="0";
   document.body.style.overflow="";
+  ramStopTick();
 }
 function initRamadan(){
   document.getElementById('rm-close').addEventListener('click',closeRamadan);
