@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "add048a7a877",
+ "version": "28585dd24165",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -303,7 +303,6 @@ window.LANG_PACK = {
   "marriage.videos_bayaans": "વિડિયો અને બયાન",
   "marriage.hajj_umrah": "હજ / ઉમરહ",
   "marriage.coming_soon": "ટૂંક સમયમાં",
-  "marriage.ramadan_2027": "રમઝાન 2027",
   "marriage.the_masjid": "મસ્જિદ",
   "marriage.our_services": "અમારી સેવાઓ",
   "marriage.birth_marriage_death": "જન્મ, નિકાહ અને મૃત્યુ",
@@ -1817,7 +1816,6 @@ window.LANG_PACK = {
   "tiles.holy_quran": "પવિત્ર કુરઆન",
   "tiles.daily_adhkar": "દૈનિક અઝકાર",
   "tiles.qibla": "કિબ્લા",
-  "tiles.ramadan": "રમઝાન",
   "tiles.madrasah": "મદરેસા",
   "tiles.nikah_services": "નિકાહ સેવા",
   "tiles.funeral_services": "જનાઝા સેવા",
@@ -2086,6 +2084,12 @@ window.LANG_PACK = {
   "ramadan.allahumma_innaka_afuwwun_tuhibbul": "Allāhumma innaka ʿafuwwun tuḥibbul-ʿafwa faʿfu ʿannī",
   "ramadan.o_allah_you_are_most": "હે અલ્લાહ! તું ઘણો માફ કરનાર છે, અને માફ કરવાનું પસંદ કરે છે, તો મને માફ કર.",
   "ramadan.sunan_ibn_majah": "સુનન ઇબ્ન માજાહ",
-  "ramadan.dates_follow_the_masjid_s": "તારીખો મસ્જિદના પોતાના સમયપત્રક અને ચંદ્ર દર્શન પ્રમાણે હોય છે, તેથી પહેલી રાત એક દિવસ આગળ-પાછળ થઈ શકે છે."
+  "ramadan.dates_follow_the_masjid_s": "તારીખો મસ્જિદના પોતાના સમયપત્રક અને ચંદ્ર દર્શન પ્રમાણે હોય છે, તેથી પહેલી રાત એક દિવસ આગળ-પાછળ થઈ શકે છે.",
+  "ramadan.ramadan_is_coming": "રમઝાન આવી રહ્યો છે",
+  "ramadan.dates_to_be_confirmed": "તારીખોની પુષ્ટિ બાકી છે",
+  "ramadan.on_the_sighting_of_the": "ચાંદ દેખાય ત્યારે",
+  "ramadan.days": "દિવસ",
+  "ramadan.hours": "કલાક",
+  "ramadan.minutes": "મિનિટ"
  }
 };

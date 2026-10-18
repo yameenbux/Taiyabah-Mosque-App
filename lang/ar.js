@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "c8e57568f298",
+ "version": "445673acf066",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -303,7 +303,6 @@ window.LANG_PACK = {
   "marriage.videos_bayaans": "مقاطع الفيديو والبيانات",
   "marriage.hajj_umrah": "الحج / العمرة",
   "marriage.coming_soon": "قريباً",
-  "marriage.ramadan_2027": "رمضان 2027",
   "marriage.the_masjid": "المسجد",
   "marriage.our_services": "خدماتنا",
   "marriage.birth_marriage_death": "الولادة والزواج والوفاة",
@@ -1817,7 +1816,6 @@ window.LANG_PACK = {
   "tiles.holy_quran": "القرآن الكريم",
   "tiles.daily_adhkar": "الأذكار اليومية",
   "tiles.qibla": "القبلة",
-  "tiles.ramadan": "رَمَضَان",
   "tiles.madrasah": "المدرسة",
   "tiles.nikah_services": "خدمات النكاح",
   "tiles.funeral_services": "خدمات الجنازة",
@@ -2086,6 +2084,12 @@ window.LANG_PACK = {
   "ramadan.allahumma_innaka_afuwwun_tuhibbul": "Allāhumma innaka ʿafuwwun tuḥibbul-ʿafwa faʿfu ʿannī",
   "ramadan.o_allah_you_are_most": "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
   "ramadan.sunan_ibn_majah": "سنن ابن ماجه",
-  "ramadan.dates_follow_the_masjid_s": "تتبع التواريخ الجدول الزمني الخاص بالمسجد ورؤية الهلال، لذا قد تتغير الليلة الأولى بيوم واحد."
+  "ramadan.dates_follow_the_masjid_s": "تتبع التواريخ الجدول الزمني الخاص بالمسجد ورؤية الهلال، لذا قد تتغير الليلة الأولى بيوم واحد.",
+  "ramadan.ramadan_is_coming": "رمضان قادم",
+  "ramadan.dates_to_be_confirmed": "التواريخ قيد التأكيد",
+  "ramadan.on_the_sighting_of_the": "عند رؤية الهلال",
+  "ramadan.days": "أيام",
+  "ramadan.hours": "ساعات",
+  "ramadan.minutes": "دقائق"
  }
 };
