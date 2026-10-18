@@ -3827,6 +3827,17 @@
    },
    {
     "type": "heading",
+    "k": "sysprefs.appearance",
+    "t": "Appearance",
+    "tag": null
+   },
+   {
+    "type": "p",
+    "k": "sysprefs.choose_how_the_app_looks",
+    "t": "Choose how the app looks. Light is the usual setting; dark is easier on the eyes at night."
+   },
+   {
+    "type": "heading",
     "k": "sysprefs.text_size",
     "t": "Text size",
     "tag": null

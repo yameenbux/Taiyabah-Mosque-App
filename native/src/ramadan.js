@@ -193,3 +193,40 @@ export function ramadanAccess(now, days) {
   if (daysUntil <= OPEN_DAYS_BEFORE) return { open: true, state: null, early: true, daysUntil, iso };
   return { open: false, phase: daysUntil <= NEAR_DAYS ? "close" : "far", daysUntil, iso };
 }
+
+/**
+ * The moment the first night begins.
+ *
+ * Not midnight, and not Fajr: the first taraweeh is prayed on the EVENING
+ * BEFORE the first fast, so the month begins at Maghrib on the eve of
+ * 1 Ramadan. A countdown running to midnight would still be showing hours
+ * left while the congregation was already standing in prayer.
+ *
+ * Falls back to the start of the day itself when the eve is not in the
+ * timetable, which is what happens when 1 Ramadan is the first day of the
+ * published year.
+ */
+export function firstNightBegins(iso, days) {
+  const day = asDate(iso);
+  const eveIso = isoOf(new Date(day.getTime() - DAY));
+  const maghrib = days && days[eveIso] && days[eveIso].begins && days[eveIso].begins.maghrib;
+  if (!maghrib) return day;
+  const [h, mi] = String(maghrib).split(":").map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(mi)) return day;
+  const eve = asDate(eveIso);
+  eve.setHours(h, mi, 0, 0);
+  return eve;
+}
+
+/* Whole days, hours and minutes between now and then — floored, and never
+   negative, so a countdown that has run out reads as zero rather than
+   counting back up through a minus sign. */
+export function countdown(now, then) {
+  const ms = Math.max(0, then.getTime() - now.getTime());
+  return {
+    days: Math.floor(ms / DAY),
+    hours: Math.floor((ms % DAY) / 3600000),
+    minutes: Math.floor((ms % 3600000) / 60000),
+    done: ms === 0,
+  };
+}

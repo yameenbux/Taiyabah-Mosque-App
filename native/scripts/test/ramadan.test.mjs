@@ -242,3 +242,45 @@ test("once shut it counts to the NEXT Ramadan, not the one just gone", () => {
   assert.equal(a.iso, "2027-02-08");
   assert.equal(a.phase, "far");
 });
+
+/* ---- the countdown itself --------------------------------------------- */
+
+import { firstNightBegins, countdown } from "../../src/ramadan.js";
+
+test("the month begins at Maghrib on the eve, not at midnight", () => {
+  /* 1 Ramadan 1447 is 18 Feb 2026; the eve is the 17th, and the masjid's own
+     Maghrib for that day is what the countdown has to run to. */
+  const eve = DAYS["2026-02-17"];
+  assert.ok(eve, "the eve is in the timetable");
+  const [h, mi] = eve.begins.maghrib.split(":").map(Number);
+
+  const t = firstNightBegins(FIRST, DAYS);
+  assert.equal(t.getFullYear(), 2026);
+  assert.equal(t.getMonth(), 1);
+  assert.equal(t.getDate(), 17, "the eve, not the first of the month");
+  assert.equal(t.getHours(), h);
+  assert.equal(t.getMinutes(), mi);
+});
+
+test("with no eve in the timetable it falls back to the day itself", () => {
+  const days = fixture("2027-02-08", 29, 1448);   /* nothing before the 8th */
+  const t = firstNightBegins("2027-02-08", days);
+  assert.equal(t.getDate(), 8);
+  assert.equal(t.getHours(), 0);
+});
+
+test("the countdown floors, and stops at zero rather than going negative", () => {
+  const then = new Date(2027, 1, 7, 18, 0, 0);
+
+  const a = countdown(new Date(2027, 1, 4, 11, 30, 0), then);
+  assert.deepEqual([a.days, a.hours, a.minutes], [3, 6, 30]);
+  assert.equal(a.done, false);
+
+  const b = countdown(new Date(2027, 1, 7, 17, 59, 30), then);
+  assert.deepEqual([b.days, b.hours, b.minutes], [0, 0, 0]);
+  assert.equal(b.done, false, "thirty seconds left is not done");
+
+  const past = countdown(new Date(2027, 1, 9, 12, 0, 0), then);
+  assert.deepEqual([past.days, past.hours, past.minutes], [0, 0, 0]);
+  assert.equal(past.done, true);
+});
