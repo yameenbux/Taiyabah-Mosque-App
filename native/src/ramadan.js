@@ -144,6 +144,32 @@ export const OPEN_DAYS_BEFORE = 10;
 export const OPEN_DAYS_AFTER = 1;
 export const NEAR_DAYS = 30;
 
+/**
+ * THE ESTIMATE, AND WHAT IT IS ALLOWED TO DO.
+ *
+ * The bundled timetable covers one Gregorian year, so for most of that year
+ * the next Ramadan is simply not in it: today it ends at 22 Rajab 1448 and
+ * the first night of 1448 falls weeks past the last row. Refusing to count
+ * without a published date therefore does not mean "count later" — it means
+ * a countdown screen with nothing counting on it for the months in which a
+ * countdown is the whole point.
+ *
+ * So the estimate may COUNT and may not OPEN. A guess that is a day out puts
+ * i'tikaf booking and the taraweeh rota live on the wrong night, which is a
+ * real cost; a number with "subject to moon sighting" under it carries none,
+ * and is what the website's own home strip has always said. ramadanAccess
+ * therefore hands the estimate back as `iso` with `estimated: true`, and the
+ * early-open branch above it can only ever be reached from a date that came
+ * out of the committee's timetable.
+ *
+ * It corrects itself. The moment the published year is downloaded, the real
+ * first night is found and the estimate is never consulted again — so this
+ * date only has to be close, not right. It must stay in step with the
+ * website's RAM_FALLBACK; scripts/check-ramadan-estimate.mjs fails if it
+ * drifts.
+ */
+export const ESTIMATE = "2027-02-08";
+
 const DAY = 86400000;
 const asDate = iso => { const [Y, M, D] = iso.split("-").map(Number); return new Date(Y, M - 1, D); };
 const daysBetween = (a, b) => Math.round((asDate(b) - asDate(a)) / DAY);
@@ -187,7 +213,16 @@ export function ramadanAccess(now, days) {
   }
 
   const iso = nextFirstNight(now, days);
-  if (!iso) return { open: false, phase: "awaiting", daysUntil: null, iso: null };
+
+  /* No published first night. Count to the estimate instead — but never open
+     on it; see ESTIMATE above. Once even the estimate is behind us and still
+     nothing has been published, there is nothing honest left to show. */
+  if (!iso) {
+    const daysUntil = daysBetween(isoOf(now), ESTIMATE);
+    if (daysUntil < 0) return { open: false, phase: "awaiting", daysUntil: null, iso: null };
+    return { open: false, estimated: true, iso: ESTIMATE, daysUntil,
+             phase: daysUntil <= NEAR_DAYS ? "close" : "far" };
+  }
 
   const daysUntil = daysBetween(isoOf(now), iso);
   if (daysUntil <= OPEN_DAYS_BEFORE) return { open: true, state: null, early: true, daysUntil, iso };

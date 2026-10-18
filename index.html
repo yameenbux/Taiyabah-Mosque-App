@@ -6443,11 +6443,22 @@ function ramFirstNight(date){
 
 function ramGuardState(){
   if(ramInMonth()) return { open:true };
+
   const r = ramadanStart();
-  if(!r || !r.exact)
-    return { open:false, phrase:t("ramadan.dates_to_be_confirmed","Dates to be confirmed") };
-  if(Math.round((r.date - today0())/86400000) <= RAM_OPEN_BEFORE) return { open:true };
-  return { open:false, at:ramFirstNight(r.date) };
+  /* Not even an estimate left to count to — the configured one has passed and
+     no timetable has arrived with a real date. Say so rather than count to
+     nothing. */
+  if(!r) return { open:false, phrase:t("ramadan.dates_to_be_confirmed","Dates to be confirmed") };
+
+  /* THE ESTIMATE MAY COUNT. IT MAY NOT OPEN. Only r.exact — a first night the
+     committee has actually published in the timetable — unlocks the schedules
+     below, because a guess that is a day out puts i'tikaf booking and the
+     taraweeh rota live on the wrong night. The COUNT has no such cost: it is
+     a number with "subject to moon sighting" written under it, which is what
+     the home strip has always said, and the alternative is a countdown screen
+     with nothing counting on it for the months that matter most. */
+  if(r.exact && Math.round((r.date - today0())/86400000) <= RAM_OPEN_BEFORE) return { open:true };
+  return { open:false, at:ramFirstNight(r.date), estimated:!r.exact };
 }
 
 let RAM_TICK = null;
@@ -6489,8 +6500,11 @@ function renderRamadanGuard(){
        close enough — and the interval only runs while the sheet is open. */
     RAM_TICK = setInterval(() => ramCount(s.at), 15000);
   }
-  document.getElementById('rmg-when').textContent =
-    t("ramadan.on_the_sighting_of_the","On the sighting of the moon");
+  /* An estimated date says so in plainer words than a published one does.
+     Both are subject to the sighting; only one of them is the masjid's. */
+  document.getElementById('rmg-when').textContent = s.estimated
+    ? t("ramadan.subject_to_moon_sighting","Subject to moon sighting")
+    : t("ramadan.on_the_sighting_of_the","On the sighting of the moon");
 }
 
 /* ---------------- reminders ----------------
