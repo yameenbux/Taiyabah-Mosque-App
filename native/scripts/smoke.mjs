@@ -608,7 +608,7 @@ else {
   const menu = nodes(dump());
   shot("more");
   const GROUPS = ["Resources", "Madrasah", "The masjid", "Our services", "Settings"];
-  const ROWS = ["Full prayer timetable", "Videos & bayaans", "Hajj / Umrah", "Ramadan 2027",
+  const ROWS = ["Full prayer timetable", "Videos & bayaans", "Hajj / Umrah", "Ramadan",
                 "Zakat calculator", "Admissions & Fees", "Holiday Planner", "Madrasah Portal",
                 "About us", "Membership", "Find us", "Contact us", "Birth, Marriage & Death",
                 "Imams' Advice", "Education", "Tours & Visits", "Notifications",
@@ -626,7 +626,10 @@ else {
   toTop();
 
   /* The menu scrolls, so rows below the fold are found by scrolling to them. */
-  const SKIP = new Set(["Hajj / Umrah", "Ramadan 2027", "Tours & Visits",   // deliberately inert
+  /* Ramadan was in here while it was a dead "coming soon" row. It opens the
+   * countdown now, so it is followed like any other live row — which is the
+   * only thing that would catch that screen crashing on a phone. */
+  const SKIP = new Set(["Hajj / Umrah", "Tours & Visits",                   // deliberately inert
                         "Madrasah Portal", "Find us", "Privacy notice"]);   // leave the app
   for (const label of ROWS) {
     const n = seek(label);
