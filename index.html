@@ -1003,6 +1003,25 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .ia-call-k{font-size:calc(10.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .ia-call-v{font-size:calc(16px * var(--ts));font-weight:700;color:var(--ink)}
   .ia-note{font-size:calc(12px * var(--ts));color:var(--muted);line-height:1.6;margin:12px 6px 0}
+
+  /* ---- ramadan ---- */
+  .rm-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#F3EFE3;
+    background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .rm-hero .girih{position:absolute;right:-46px;top:-40px;width:190px;height:190px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .rm-ring{display:inline-flex;width:52px;height:52px;border-radius:50%;align-items:center;justify-content:center;
+    background:rgba(198,162,76,.16);border:1px solid rgba(198,162,76,.4);color:var(--gold-bright);margin-bottom:16px}
+  .rm-ring svg{width:26px;height:26px}
+  .rm-en{font-family:"Fraunces",Georgia,serif;font-size:calc(20px * var(--ts));font-weight:600;color:#F3EFE3}
+  .rm-card{padding:16px}
+  .rm-card p{font-size:calc(14px * var(--ts));line-height:1.65;color:var(--ink)}
+  .rm-card p+p{margin-top:11px}
+  /* The transliteration and source sit in their own divs, not <p>, so
+     .rm-card p's generic paragraph style can never outrank .du-tr's italic
+     or override this rule by specificity — the same reason the Arabic line
+     is a div too. */
+  .rm-src{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .rm-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
   .ia-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:18px 6px 28px}
   /* What the masjid can and cannot promise about a written question. Gold
      rather than the plum .ad-note, because .ad-note is the "this is shut"
@@ -2204,6 +2223,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="tile" data-tile="athkar"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12.00" cy="14.80" r="0.95"/><circle cx="15.34" cy="13.58" r="0.95"/><circle cx="17.12" cy="10.50" r="0.95"/><circle cx="16.50" cy="7.00" r="0.95"/><circle cx="13.78" cy="4.71" r="0.95"/><circle cx="10.22" cy="4.71" r="0.95"/><circle cx="7.50" cy="7.00" r="0.95"/><circle cx="6.88" cy="10.50" r="0.95"/><circle cx="8.66" cy="13.58" r="0.95"/><path d="M12 15.9v1.3"/><circle cx="12" cy="18.7" r="1.5"/></svg></span><span class="t-l" data-i18n="tiles.daily_adhkar">Daily Adhk&#257;r</span></button>
         <button class="tile" data-tile="bukhari"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z"/><path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22"/><path d="M8.5 8.5h6"/><path d="M8.5 12h6"/></svg></span><span class="t-l" data-i18n="tiles.hadith">Ṣaḥīḥ al-Bukhārī</span></button>
         <button class="tile" data-tile="qibla"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z"/></svg></span><span class="t-l" data-i18n="tiles.qibla">Qibla</span></button>
+        <button class="tile" data-tile="ramadan"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="t-l" data-i18n="tiles.ramadan">Ramadan</span></button>
         <button class="tile" data-tile="madrasah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="t-l" data-i18n="tiles.madrasah">Madrasah</span></button>
         <button class="tile" data-tile="nikah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="5.4"/><circle cx="15" cy="14" r="5.4"/></svg></span><span class="t-l" data-i18n="tiles.nikah_services">Nik&#257;&#7717; Services</span></button>
         <button class="tile" data-tile="funeral"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6"/><path d="M3.5 20.5h17"/><path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z"/></svg></span><span class="t-l" data-i18n="tiles.funeral_services">Funeral Services</span></button>
@@ -4824,6 +4844,90 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <div class="bk-done" id="ia-done" hidden></div>
 
           <p class="ia-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="ramadan" data-open="0" role="dialog" aria-modal="true" aria-label="Ramadan" data-i18n-attr="aria-label:a11y.ramadan">
+    <div class="scrim" id="rm-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="ramadan.ramadan">Ramadan</h3>
+        <button class="sh-close" id="rm-close" data-i18n="ramadan.done">Done</button>
+      </div>
+      <div class="sh-body">
+
+        <section class="rm-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <span class="rm-ring" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/>
+            </svg>
+          </span>
+          <div class="rm-en" data-i18n="ramadan.ramadan">Ramadan</div>
+        </section>
+
+        <div class="ab-wrap">
+          <div class="card rm-card">
+            <p data-i18n="ramadan.ramadan_is_the_month_the">Ramadan is the month the Qur&rsquo;an was sent down &mdash; a month of fasting
+               from first light until sunset, of standing in prayer at night, and of giving.</p>
+            <p data-i18n="ramadan.everything_the_masjid_is_running">Everything the masjid is running this month is here: who is leading
+               taraweeh, who is speaking, and how to book i&rsquo;tikaf.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.on_sighting_the_new_moon">On sighting the new moon</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <div class="rb-ar arabic">اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلاَمَةِ وَالإِسْلاَمِ رَبِّي وَرَبُّكَ اللَّهُ</div>
+            <div class="du-tr" data-i18n="ramadan.allahumma_ahlilhu_alayna_bil_yumni">Allāhumma ahlilhu ʿalaynā bil-yumni wal-īmāni was-salāmati wal-islām. Rabbī wa Rabbukallāh</div>
+            <p data-i18n="ramadan.o_allah_bring_it_over">O Allah, bring it over us with blessing and faith, with safety and with
+               Islam. My Lord and your Lord is Allah.</p>
+            <div class="rm-src" data-i18n="ramadan.jami_al_tirmidhi">Jāmiʿ al-Tirmidhī</div>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.taraweeh">Taraweeh</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <p data-i18n="ramadan.twenty_rak_ahs_each_night">Twenty rak&rsquo;ahs each night, led by five. Mufti Faiyaz, the Imam of the
+               masjid, leads the first four rak&rsquo;ahs, and four students of the masjid lead the rest.</p>
+            <p data-i18n="ramadan.the_four_students_are_confirmed">The four students are confirmed around a month before Ramadan begins. One
+               juz of the Qur&rsquo;an is read each night, so the whole Qur&rsquo;an is completed in taraweeh by the end of the month.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.bayaan">Bayaan</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <p data-i18n="ramadan.two_talks_a_day_one">Two talks a day, one after Asr and one after Isha.</p>
+            <p data-i18n="ramadan.changes_are_announced_in_the">Changes are announced in the app.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.i_tikaf">I&rsquo;tikaf</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <p data-i18n="ramadan.staying_in_the_masjid_for">Staying in the masjid for the last ten nights of Ramadan, brothers only.</p>
+            <p data-i18n="ramadan.places_are_limited_so_booking">Places are limited, so booking is asked for &mdash; book your place in the app.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.zakat_al_fitr">Zakat al-Fitr</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <p data-i18n="ramadan.due_per_person_in_the">Due per person in the household, before the Eid prayer.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.parking">Parking</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <p data-i18n="ramadan.the_masjid_car_park_is">The masjid car park is on Draycott Street. Please use it first.</p>
+            <p data-i18n="ramadan.when_it_is_full_park">When it is full, park with consideration for our neighbours and the wider
+               community &mdash; never across a driveway. The masjid sits on a main road, so take care pulling out, and keep hold of children.</p>
+          </div>
+
+          <div class="sec-h"><h2 data-i18n="ramadan.on_laylat_al_qadr">On Laylat al-Qadr</h2><span class="rule"></span></div>
+          <div class="card rm-card">
+            <div class="rb-ar arabic">اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي</div>
+            <div class="du-tr" data-i18n="ramadan.allahumma_innaka_afuwwun_tuhibbul">Allāhumma innaka ʿafuwwun tuḥibbul-ʿafwa faʿfu ʿannī</div>
+            <p data-i18n="ramadan.o_allah_you_are_most">O Allah, You are most forgiving, and You love to forgive, so forgive me.</p>
+            <div class="rm-src" data-i18n="ramadan.sunan_ibn_majah">Sunan Ibn Mājah</div>
+          </div>
+
+          <p class="rm-foot" data-i18n="ramadan.dates_follow_the_masjid_s">Dates follow the masjid&rsquo;s own timetable and the sighting of the moon,
+            so the first night can move by a day.</p>
+          <p class="rm-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
     </div>
@@ -10499,6 +10603,27 @@ function initAdvice(){
   document.getElementById("ia-form").addEventListener("submit", iaSubmit);
 }
 
+/* ---------------- ramadan ----------------
+   Prose and structure only — no form, no countdown, no booking widget. I'tikaf
+   booking and anything else with real logic is hand-written native; this
+   sheet only has to say the same thing the native screen says. */
+function openRamadan(){
+  document.getElementById('ramadan').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#ramadan .sh-body').scrollTop=0;
+}
+function closeRamadan(){
+  document.getElementById('ramadan').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initRamadan(){
+  document.getElementById('rm-close').addEventListener('click',closeRamadan);
+  document.getElementById('rm-scrim').addEventListener('click',closeRamadan);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('ramadan').dataset.open==="1") closeRamadan();
+  });
+}
+
 /* ---------------- writing to the imams (db/132) ----------------
 
    IA.open IS THREE-VALUED. null means "not asked yet", so the answer is asked
@@ -10791,6 +10916,7 @@ const TILE_ACTIONS = {
   athkar:   () => openAthkar(),
   bukhari:  () => openBukhari(),
   qibla:    () => { switchTab("qibla"); drawTicks(); },
+  ramadan:  () => openRamadan(),
   madrasah: () => openMadrasah(),
   nikah:    () => openMarriage(),
   funeral:  () => openFuneral(),
@@ -13356,6 +13482,7 @@ function boot(){
   initRabbanas();
   initLanguage();
   initAdvice();
+  initRamadan();
   initLive();
   initVids();
   initZakat();
