@@ -2223,7 +2223,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="tile" data-tile="athkar"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12.00" cy="14.80" r="0.95"/><circle cx="15.34" cy="13.58" r="0.95"/><circle cx="17.12" cy="10.50" r="0.95"/><circle cx="16.50" cy="7.00" r="0.95"/><circle cx="13.78" cy="4.71" r="0.95"/><circle cx="10.22" cy="4.71" r="0.95"/><circle cx="7.50" cy="7.00" r="0.95"/><circle cx="6.88" cy="10.50" r="0.95"/><circle cx="8.66" cy="13.58" r="0.95"/><path d="M12 15.9v1.3"/><circle cx="12" cy="18.7" r="1.5"/></svg></span><span class="t-l" data-i18n="tiles.daily_adhkar">Daily Adhk&#257;r</span></button>
         <button class="tile" data-tile="bukhari"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z"/><path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22"/><path d="M8.5 8.5h6"/><path d="M8.5 12h6"/></svg></span><span class="t-l" data-i18n="tiles.hadith">Ṣaḥīḥ al-Bukhārī</span></button>
         <button class="tile" data-tile="qibla"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z"/></svg></span><span class="t-l" data-i18n="tiles.qibla">Qibla</span></button>
-        <button class="tile" data-tile="ramadan"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="t-l" data-i18n="tiles.ramadan">Ramadan</span></button>
+        
         <button class="tile" data-tile="madrasah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="t-l" data-i18n="tiles.madrasah">Madrasah</span></button>
         <button class="tile" data-tile="nikah"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="5.4"/><circle cx="15" cy="14" r="5.4"/></svg></span><span class="t-l" data-i18n="tiles.nikah_services">Nik&#257;&#7717; Services</span></button>
         <button class="tile" data-tile="funeral"><span class="t-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6"/><path d="M3.5 20.5h17"/><path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z"/></svg></span><span class="t-l" data-i18n="tiles.funeral_services">Funeral Services</span></button>
@@ -5402,8 +5402,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="dr-row soon" disabled aria-disabled="true">
           <span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.ramadan_2027">Ramadan 2027</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+        <button class="dr-row" data-act="ramadan">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="dr-t" data-i18n="ramadan.ramadan">Ramadan</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="zakat">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8 7.5h8"/><circle cx="8.4" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="8.4" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r=".9" fill="currentColor" stroke="none"/></svg></span><span class="dr-t" data-i18n="menu.zakat">Zakat calculator</span><span class="dr-ch">&rsaquo;</span>
@@ -10916,7 +10916,6 @@ const TILE_ACTIONS = {
   athkar:   () => openAthkar(),
   bukhari:  () => openBukhari(),
   qibla:    () => { switchTab("qibla"); drawTicks(); },
-  ramadan:  () => openRamadan(),
   madrasah: () => openMadrasah(),
   nikah:    () => openMarriage(),
   funeral:  () => openFuneral(),
@@ -12816,6 +12815,7 @@ function initDrawer(){
       if(act==="education"){ setTimeout(openEducation,120); }
       if(act==="membership"){ setTimeout(openMembership,120); }
       if(act==="collect"){ setTimeout(openCollect,120); }
+      if(act==="ramadan"){ setTimeout(openRamadan,120); }
     });
   });
   // any external link closes the drawer behind it

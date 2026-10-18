@@ -45,7 +45,7 @@ const GROUPS = [
     { to: "Timetable", icon: "calendar-outline",   k: "menu.timetable",        t: "Full prayer timetable" },
     { to: "Videos",    icon: "play-circle-outline", k: "marriage.videos_bayaans", t: "Videos & bayaans" },
     { soon: true,      icon: "airplane-outline",    k: "marriage.hajj_umrah",  t: "Hajj / Umrah" },
-    { soon: true,      icon: "moon-outline",        k: "marriage.ramadan_2027", t: "Ramadan 2027" },
+    { to: "Ramadan",   icon: "moon-outline",        k: "ramadan.ramadan", t: "Ramadan" },
     { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
   ]},
   { k: "marriage.madrasah", t: "Madrasah", rows: [
