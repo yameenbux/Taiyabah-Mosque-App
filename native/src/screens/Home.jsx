@@ -49,7 +49,6 @@ const TILES = [
   { to: "Athkar",   k: "tiles.daily_adhkar",       t: "Daily Adhkār",         icon: "beads" },
   { to: "Bukhari",  k: "tiles.hadith",             t: "Ṣaḥīḥ al-Bukhārī",     icon: "book" },
   { to: "Qibla",    k: "tiles.qibla",              t: "Qibla",                icon: "compass" },
-  { to: "Ramadan",  k: "tiles.ramadan",            t: "Ramadan",              icon: "crescent" },
   { to: "Madrasah", k: "tiles.madrasah",           t: "Madrasah",             icon: "cap" },
   { to: "Marriage", k: "tiles.nikah_services",     t: "Nikāḥ Services",       icon: "rings" },
   { to: "Funeral",  k: "tiles.funeral_services",   t: "Funeral Services",     icon: "grave" },
@@ -78,16 +77,6 @@ const GLYPH = () => ({
   book:    <><Path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" /><Path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22" /><Path d="M8.5 8.5h6" /><Path d="M8.5 12h6" /></>,
   compass: <><Circle cx="12" cy="12" r="8.5" /><Path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z" /></>,
   cap:     <><Path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z" /><Path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7" /></>,
-  /* The website's own crescent, path for path — not the nearest moon in an
-     icon font, which is the rule every other glyph here follows.
-
-     NOT CALLED "moon". These keys are also the TILES `icon:` values, and
-     icon-names.mjs harvests every `icon:` string that Ionicons recognises
-     so the font subset can be cut to fit. "moon" is an Ionicons name, so
-     calling it that silently demanded a glyph into the shipped font that
-     nothing ever draws from it — and failed check-icons until it was
-     there. A name Ionicons does not know keeps the subset honest. */
-  crescent: <Path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" />,
   rings:   <><Circle cx="9" cy="14" r="5.4" /><Circle cx="15" cy="14" r="5.4" /></>,
   grave:   <><Path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6" /><Path d="M3.5 20.5h17" /><Path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z" /></>,
   hall:    <><Path d="M4 21V9l8-5 8 5v12" /><Path d="M4 21h16" /><Path d="M10 21v-6h4v6" /></>,
