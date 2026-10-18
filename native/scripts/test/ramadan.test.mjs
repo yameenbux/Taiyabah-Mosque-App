@@ -180,17 +180,55 @@ test("a day the timetable does not carry is left alone rather than guessed", () 
 
 /* ---- when the section opens ------------------------------------------- */
 
-import { ramadanAccess, nextFirstNight, OPEN_DAYS_BEFORE, NEAR_DAYS } from "../../src/ramadan.js";
+import { ramadanAccess, nextFirstNight, ESTIMATE,
+         OPEN_DAYS_BEFORE, NEAR_DAYS } from "../../src/ramadan.js";
 
-test("with no Ramadan published there is nothing to count to", () => {
+test("with no Ramadan published it counts to the estimate instead", () => {
   /* The state the app is really in today: its calendar stops in Rajab 1448
-     and Ramadan 1448 falls in a year the committee has not published. */
+     and Ramadan 1448 falls in a year the committee has not published. The
+     screen's whole job is to count, so it counts — to ESTIMATE, flagged. */
   const now = at("2026-10-18", 12, 0);
-  assert.equal(nextFirstNight(now, DAYS), null);
+  assert.equal(nextFirstNight(now, DAYS), null, "nothing published to find");
   const a = ramadanAccess(now, DAYS);
+  assert.equal(a.open, false);
+  assert.equal(a.estimated, true);
+  assert.equal(a.iso, ESTIMATE);
+  assert.ok(a.daysUntil > 0, "there is a real number to put on the screen");
+});
+
+test("THE ESTIMATE MAY COUNT AND MAY NEVER OPEN", () => {
+  /* The property the whole arrangement rests on. A guessed date that is a day
+     out would put i'tikaf booking and the taraweeh rota live on the wrong
+     night, so no distance from the estimate — not ten days, not one, not the
+     morning of — is allowed to unlock the section. Only a date out of the
+     committee's own timetable can do that. */
+  const [Y, M, D] = ESTIMATE.split("-").map(Number);
+  for (const back of [40, 30, OPEN_DAYS_BEFORE + 1, OPEN_DAYS_BEFORE, 3, 1, 0]) {
+    const a = ramadanAccess(new Date(Y, M - 1, D - back, 12, 0), DAYS);
+    assert.equal(a.open, false, `${back} days before the estimate must stay shut`);
+    assert.equal(a.estimated, true);
+  }
+});
+
+test("a date the committee published always beats the estimate", () => {
+  /* Published 20 January, a fortnight before the estimate. The screen counts
+     to theirs, drops the flag, and the ten-day door works again. */
+  const days = { ...DAYS, ...fixture("2027-01-20", 30, 1448) };
+  const a = ramadanAccess(at("2026-12-01", 12, 0), days);
+  assert.equal(a.iso, "2027-01-20");
+  assert.ok(!a.estimated, "a real date is not flagged as a guess");
+  assert.equal(ramadanAccess(at("2027-01-10", 12, 0), days).open, true, "ten days out it opens");
+});
+
+test("once the estimate is behind us too, there is nothing honest left", () => {
+  /* The estimate passed and still no timetable arrived. Counting to a date in
+     the past would run backwards or sit at zero, so the screen says so. */
+  const [Y, M, D] = ESTIMATE.split("-").map(Number);
+  const a = ramadanAccess(new Date(Y, M - 1, D + 1, 12, 0), DAYS);
   assert.equal(a.open, false);
   assert.equal(a.phase, "awaiting");
   assert.equal(a.daysUntil, null);
+  assert.equal(a.iso, null);
 });
 
 test("far out it counts, and says so, without opening", () => {

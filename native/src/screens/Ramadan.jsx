@@ -74,6 +74,8 @@ export default function Ramadan() {
                when: t("ramadan.first_taraweeh_after_isha", "First taraweeh after Isha") };
     }
 
+    /* Nothing left to count to: the published year has not arrived and even
+       the estimate is behind us. Only then does the screen go wordy. */
     if (access.phase === "awaiting") {
       return { kind: "words",
                phrase: t("ramadan.dates_to_be_confirmed", "Dates to be confirmed"),
@@ -88,7 +90,11 @@ export default function Ramadan() {
         { n: pad2(left.hours), label: t("ramadan.hours", "Hours") },
         { n: pad2(left.minutes), label: t("ramadan.minutes", "Minutes") },
       ],
-      when: t("ramadan.on_the_sighting_of_the", "On the sighting of the moon"),
+      /* An estimated date says so in plainer words than a published one does.
+         Both are subject to the sighting; only one of them is the masjid's. */
+      when: access.estimated
+        ? t("ramadan.subject_to_moon_sighting", "Subject to moon sighting")
+        : t("ramadan.on_the_sighting_of_the", "On the sighting of the moon"),
     };
   }, [now, t]);
 
