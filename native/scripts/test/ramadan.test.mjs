@@ -177,3 +177,68 @@ test("a day the timetable does not carry is left alone rather than guessed", () 
   assert.equal(ramadanState(at("2099-03-01", 12, 0), DAYS), null);
   assert.equal(activeDate(at("2099-03-01", 2, 0), DAYS), "2099-03-01");
 });
+
+/* ---- when the section opens ------------------------------------------- */
+
+import { ramadanAccess, nextFirstNight, OPEN_DAYS_BEFORE, NEAR_DAYS } from "../../src/ramadan.js";
+
+test("with no Ramadan published there is nothing to count to", () => {
+  /* The state the app is really in today: its calendar stops in Rajab 1448
+     and Ramadan 1448 falls in a year the committee has not published. */
+  const now = at("2026-10-18", 12, 0);
+  assert.equal(nextFirstNight(now, DAYS), null);
+  const a = ramadanAccess(now, DAYS);
+  assert.equal(a.open, false);
+  assert.equal(a.phase, "awaiting");
+  assert.equal(a.daysUntil, null);
+});
+
+test("far out it counts, and says so, without opening", () => {
+  const a = ramadanAccess(at("2025-11-01", 12, 0), { ...DAYS, ...fixture("2026-02-18", 30, 1447) });
+  assert.equal(a.open, false);
+  assert.equal(a.phase, "far");
+  assert.ok(a.daysUntil > NEAR_DAYS);
+});
+
+test("inside thirty days the guard changes its tune but still guards", () => {
+  const days = fixture("2027-02-08", 29, 1448);
+  const a = ramadanAccess(at("2027-01-20", 12, 0), days);
+  assert.equal(a.open, false);
+  assert.equal(a.phase, "close");
+  assert.equal(a.daysUntil, 19);
+});
+
+test("it opens ten days early, so i'tikaf can be booked before anybody fasts", () => {
+  const days = fixture("2027-02-08", 29, 1448);
+  const shut = ramadanAccess(at("2027-01-28", 12, 0), days);   /* 11 days out */
+  const open = ramadanAccess(at("2027-01-29", 12, 0), days);   /* 10 days out */
+  assert.equal(shut.open, false, "eleven days out is still the poster");
+  assert.equal(open.open, true, "ten days out the section opens");
+  assert.equal(open.early, true);
+  assert.equal(open.daysUntil, OPEN_DAYS_BEFORE);
+  assert.equal(open.state, null, "open early, but no night is being prayed yet");
+});
+
+test("during the month it is open and carries the night", () => {
+  const a = ramadanAccess(at("2026-03-13", 12, 0), DAYS);
+  assert.equal(a.open, true);
+  assert.equal(a.state.night, 24);
+});
+
+test("it stays open the day after the last night, for Eid and fitrana", () => {
+  const eid = ramadanAccess(at("2026-03-20", 12, 0), DAYS);   /* 1 Shawwal */
+  assert.equal(eid.open, true);
+  assert.equal(eid.trailing, true);
+  assert.equal(eid.state.night, 30);
+
+  const after = ramadanAccess(at("2026-03-21", 12, 0), DAYS);
+  assert.equal(after.open, false, "two days past the end it is shut again");
+});
+
+test("once shut it counts to the NEXT Ramadan, not the one just gone", () => {
+  const days = { ...fixture("2026-02-18", 30, 1447), ...fixture("2027-02-08", 29, 1448) };
+  const a = ramadanAccess(at("2026-06-01", 12, 0), days);
+  assert.equal(a.open, false);
+  assert.equal(a.iso, "2027-02-08");
+  assert.equal(a.phase, "far");
+});

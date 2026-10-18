@@ -118,3 +118,78 @@ export function ramadanState(now, days) {
     ahead: Array.from({ length: total - night }, (_, i) => entry(night + 1 + i)),
   };
 }
+
+/* ---- when the section opens, and when it closes again ------------------ */
+
+/**
+ * WHY IT OPENS BEFORE THE MONTH DOES.
+ *
+ * The obvious rule — open on the first night — is wrong, and for one reason:
+ * i'tikaf. Places are limited and have to be booked, and a booking screen
+ * that appears on the first night gives the committee no lead time and gives
+ * the congregation no warning. The taraweeh leaders are settled about a month
+ * beforehand, so by then there is a real schedule to read as well.
+ *
+ * Ten days is the window. It is long enough for i'tikaf to be booked and the
+ * rota to be read before anybody is fasting, and short enough that the
+ * countdown — which by then has been running for months — still gets to do
+ * its job. Below thirty days the poster changes its own tune without opening
+ * anything.
+ *
+ * IT STAYS OPEN ONE DAY PAST THE END, because Eid al-Fitr and the fitrana
+ * deadline are on that screen and both matter on the morning after the last
+ * night. Then it closes and the poster comes back, counting to next year.
+ */
+export const OPEN_DAYS_BEFORE = 10;
+export const OPEN_DAYS_AFTER = 1;
+export const NEAR_DAYS = 30;
+
+const DAY = 86400000;
+const asDate = iso => { const [Y, M, D] = iso.split("-").map(Number); return new Date(Y, M - 1, D); };
+const daysBetween = (a, b) => Math.round((asDate(b) - asDate(a)) / DAY);
+
+/* The first night of the next Ramadan the timetable carries, on or after the
+   given day — or null, which is the state the app is in until the committee
+   publishes the year Ramadan falls in. */
+export function nextFirstNight(now, days) {
+  const today = isoOf(now);
+  let best = null;
+  for (const iso of Object.keys(days || {})) {
+    if (iso < today) continue;
+    const h = hijriOf(days[iso]);
+    if (!h || h.day !== 1 || !isRamadanMonth(h.month)) continue;
+    if (!best || iso < best) best = iso;
+  }
+  return best;
+}
+
+/**
+ * Whether the Ramadan section is open, and what the guard should say when it
+ * is not.
+ *
+ *   { open: true,  state }                 inside the month (or its edges)
+ *   { open: false, phase, daysUntil, iso } outside it
+ *
+ * `phase` is one of "awaiting" (no date published yet), "close" (within
+ * thirty days) or "far". The design carries a fourth, "tonight", for the
+ * moment the moon is sighted; nothing here produces it, because by then the
+ * section has been open for ten days.
+ */
+export function ramadanAccess(now, days) {
+  const state = ramadanState(now, days);
+  if (state) return { open: true, state };
+
+  /* Just past the end: Eid and the fitrana deadline are still wanted. */
+  for (let back = 1; back <= OPEN_DAYS_AFTER; back++) {
+    const then = new Date(now.getTime() - back * DAY);
+    const was = ramadanState(then, days);
+    if (was && was.night === was.total) return { open: true, state: was, trailing: true };
+  }
+
+  const iso = nextFirstNight(now, days);
+  if (!iso) return { open: false, phase: "awaiting", daysUntil: null, iso: null };
+
+  const daysUntil = daysBetween(isoOf(now), iso);
+  if (daysUntil <= OPEN_DAYS_BEFORE) return { open: true, state: null, early: true, daysUntil, iso };
+  return { open: false, phase: daysUntil <= NEAR_DAYS ? "close" : "far", daysUntil, iso };
+}

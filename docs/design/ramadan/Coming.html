@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ramadan is coming</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body { margin: 0; }
+</style>
+</helmet>
+
+<!-- ONE SCREEN, THREE THINGS, AND AIR BETWEEN THEM.
+     A poster rather than a page: the words, the count, the mark. Everything
+     that was explaining itself has gone, so the plum and the gold do the
+     talking and nothing competes with the number. -->
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #3C0B2A; font-family: 'Hanken Grotesk', sans-serif">
+
+  <!-- the field: plum, lit from above so the mark at the foot sits in shadow -->
+  <div style="position: absolute; inset: 0; background: radial-gradient(120% 70% at 50% 12%, #6A1C4E 0%, #4B1136 42%, #35091F 78%, #2A0618 100%)"></div>
+
+  <!-- the girih, enormous and barely there, centred on the count -->
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 50%; top: 404px; width: 560px; height: 560px; margin-left: -280px; margin-top: -280px; opacity: .17">
+    <polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="#C6A24C" stroke-width="0.35"/>
+  </svg>
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 50%; top: 404px; width: 330px; height: 330px; margin-left: -165px; margin-top: -165px; opacity: .13">
+    <polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="#DCBB63" stroke-width="0.5"/>
+  </svg>
+
+  <!-- four specks of gold, the way the app scatters them elsewhere -->
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 13%; top: 17%; width: 54px; height: 54px; opacity: .1; transform: translate(-50%,-50%)"><polygon fill="#DCBB63" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 88%; top: 24%; width: 34px; height: 34px; opacity: .09; transform: translate(-50%,-50%)"><polygon fill="#DCBB63" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 9%; top: 72%; width: 40px; height: 40px; opacity: .08; transform: translate(-50%,-50%)"><polygon fill="#DCBB63" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+  <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: 91%; top: 65%; width: 26px; height: 26px; opacity: .08; transform: translate(-50%,-50%)"><polygon fill="#DCBB63" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+
+  <!-- the three things, spaced down the screen -->
+  <div style="position: absolute; inset: 0; padding: 86px 34px 46px; display: flex; flex-direction: column; align-items: center; text-align: center">
+
+    <!-- 1. the words -->
+    <div style="flex: 0 0 auto">
+      <div style="font-size: 10.5px; font-weight: 700; color: #C6A24C; letter-spacing: 3.4px; text-transform: uppercase">{{kicker}}</div>
+      <h1 style="margin: 15px 0 0; font-family: Fraunces, serif; font-size: 43px; font-weight: 600; line-height: 1.08; letter-spacing: -.8px; color: #F3EFE3">Ramadan<br>is coming</h1>
+      <div style="width: 46px; height: 2px; background: #C6A24C; margin: 20px auto 0; opacity: .9"></div>
+    </div>
+
+    <!-- 2. the count, holding the middle -->
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%">
+
+      <sc-if value="{{counting}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 9px; width: 100%">
+          <sc-for list="{{cells}}" as="c" hint-placeholder-count="3">
+            <div style="flex: 1 1 0; min-width: 0; border: 1px solid rgba(220,187,99,.34); border-radius: 18px; padding: 15px 4px 13px; background: rgba(243,239,227,.045)">
+              <div style="font-family: Fraunces, serif; font-size: 40px; font-weight: 600; color: #F3EFE3; line-height: 1; letter-spacing: -1.4px">{{c.n}}</div>
+              <div style="font-size: 9px; font-weight: 700; color: #C6A24C; letter-spacing: 1.9px; text-transform: uppercase; margin-top: 9px">{{c.label}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{wording}}" hint-placeholder-val="{{false}}">
+        <div style="font-family: Fraunces, serif; font-size: 40px; font-weight: 600; color: #F3EFE3; line-height: 1.15; letter-spacing: -.8px">{{phrase}}</div>
+      </sc-if>
+
+      <div style="margin-top: 22px; font-size: 12.5px; font-weight: 500; color: rgba(243,239,227,.6); letter-spacing: .2px">{{when}}</div>
+    </div>
+
+    <!-- 3. the mark -->
+    <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center">
+      <img src="../../../logo.svg" alt="Taiyabah Masjid" style="width: 164px; display: block; opacity: .97">
+      <div style="margin-top: 16px; font-size: 8.5px; font-weight: 600; color: rgba(243,239,227,.42); letter-spacing: 2.2px; text-transform: uppercase">Bolton Central Islamic Society</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["awaiting","far","close","tonight"],"default":"far","section":"State"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const phase = this.props.phase ?? 'far';
+
+    /* FOUR STATES, ALL OF THEM A POSTER.
+       "awaiting" is the one this ships in: the app's calendar stops at
+       22 Rajab 1448, so until the committee publishes 2027 there is no date
+       to count to. It says so in two words rather than showing a zero. */
+    const S = {
+      awaiting: {
+        kicker: 'Ramadan 1448',
+        counting: false,
+        phrase: 'Early February',
+        when: 'Confirmed on the sighting of the moon'
+      },
+      far: {
+        kicker: 'Ramadan 1448',
+        counting: true,
+        cells: [{ n: '113', label: 'Days' }, { n: '06', label: 'Hours' }, { n: '42', label: 'Minutes' }],
+        when: 'Sun 7 February, on the sighting of the moon'
+      },
+      close: {
+        kicker: 'Ramadan 1448',
+        counting: true,
+        cells: [{ n: '06', label: 'Days' }, { n: '14', label: 'Hours' }, { n: '09', label: 'Minutes' }],
+        when: 'Sun 7 February, on the sighting of the moon'
+      },
+      tonight: {
+        kicker: 'The moon has been sighted',
+        counting: false,
+        phrase: 'It begins tonight',
+        when: 'First taraweeh after Isha'
+      }
+    }[phase];
+
+    return {
+      kicker: S.kicker,
+      counting: S.counting,
+      wording: !S.counting,
+      phrase: S.phrase ?? '',
+      when: S.when,
+      cells: S.cells ?? []
+    };
+  }
+}
+</script>
+</body>
+</html>

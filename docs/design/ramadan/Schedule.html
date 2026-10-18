@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Taraweeh &amp; speakers</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body { margin: 0; }
+a { color: #7A5D14; }
+a:hover { color: #5E1844; }
+</style>
+</helmet>
+
+<div style="width: 390px; height: 1520px; box-sizing: border-box; background: #F5F1E8; font-family: 'Hanken Grotesk', sans-serif; color: #261B22; overflow: hidden; display: flex; flex-direction: column">
+
+  <div style="background: #3C0B2A; padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex: 0 0 auto">
+    <a href="Main.dc.html" aria-label="Back" style="width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(220,187,99,.38); display: flex; align-items: center; justify-content: center; text-decoration: none; flex: 0 0 auto">
+      <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1 1.5 7.5l6 6.5" stroke="#F3EFE3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div style="flex-grow: 1; min-width: 0">
+      <div style="font-size: 15px; font-weight: 600; color: #F3EFE3">Taraweeh &amp; bayaan</div>
+      <div style="font-size: 10.5px; font-weight: 500; color: #C6A24C; letter-spacing: 1.1px; text-transform: uppercase; margin-top: 1px">Ramadan 1448</div>
+    </div>
+  </div>
+
+  <div style="padding: 16px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 0">
+
+    <!-- WHO LEADS. Five people, four rak'ahs each, the same every night. -->
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px">
+        <h2 style="margin: 0; font-family: Fraunces, serif; font-size: 18px; font-weight: 600; color: #261B22">Who leads</h2>
+        <span style="font-size: 11px; font-weight: 600; color: #7C6E77; letter-spacing: .8px; text-transform: uppercase">20 rak&lsquo;ahs</span>
+      </div>
+
+      <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; overflow: hidden">
+        <div style="padding: 11px 16px 10px; background: #F0E9ED; display: flex; align-items: center; gap: 12px">
+          <span style="width: 54px; flex: 0 0 auto; font-size: 9.5px; font-weight: 700; color: #5E1844; letter-spacing: 1px; text-transform: uppercase">Rak&lsquo;ahs</span>
+          <span style="flex-grow: 1; font-size: 9.5px; font-weight: 700; color: #5E1844; letter-spacing: 1px; text-transform: uppercase">Led by</span>
+        </div>
+
+        <div style="height: 1px; background: #E4DECF"></div>
+        <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+          <span style="width: 54px; flex: 0 0 auto; font-family: Fraunces, serif; font-size: 16px; font-weight: 600; color: #261B22">1&ndash;4</span>
+          <div style="flex-grow: 1; min-width: 0">
+            <div style="font-size: 14px; font-weight: 600; color: #261B22">Mufti Faiyaz</div>
+            <div style="font-size: 11.5px; color: #7C6E77; margin-top: 2px">Imam of the masjid</div>
+          </div>
+        </div>
+
+        <sc-for list="{{leaders}}" as="l" hint-placeholder-count="4">
+          <div style="height: 1px; background: #E4DECF"></div>
+          <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+            <span style="width: 54px; flex: 0 0 auto; font-family: Fraunces, serif; font-size: 16px; font-weight: 600; color: #261B22">{{l.rakahs}}</span>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 14px; font-weight: 600; color: #261B22">{{l.who}}</div>
+              <div style="font-size: 11.5px; color: #7C6E77; margin-top: 2px">{{l.role}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <p style="margin: 9px 2px 0; font-size: 11.5px; line-height: 1.55; color: #7C6E77">The four students are confirmed about a month before Ramadan, and this list updates in the app when they are.</p>
+    </div>
+
+    <!-- THE NIGHTLY JUZ, with a way straight into it -->
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px">
+        <h2 style="margin: 0; font-family: Fraunces, serif; font-size: 18px; font-weight: 600; color: #261B22">Night by night</h2>
+        <span style="font-size: 11px; font-weight: 600; color: #7C6E77; letter-spacing: .8px; text-transform: uppercase">One juz</span>
+      </div>
+
+      <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; overflow: hidden">
+        <!-- the nights already kept, folded into one row -->
+        <a href="#past" style="display: flex; align-items: center; gap: 11px; padding: 12px 14px; text-decoration: none; background: #F5F1E8">
+          <span style="width: 40px; flex: 0 0 auto; text-align: center; font-family: Fraunces, serif; font-size: 15px; font-weight: 600; color: #7C6E77">1&ndash;6</span>
+          <div style="flex-grow: 1; min-width: 0">
+            <div style="font-size: 13px; font-weight: 600; color: #7C6E77">6 nights behind you</div>
+            <div style="font-size: 11.5px; color: #7C6E77; margin-top: 2px">Juz 1 to 6 &middot; tap to look back</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex: 0 0 auto"><path d="M6 8l4 4 4-4" stroke="#7C6E77" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div style="height: 1px; background: #E4DECF"></div>
+        <div style="background: #F0E9ED; padding: 11px 14px; display: flex; align-items: center; gap: 11px">
+          <div style="width: 40px; flex: 0 0 auto; text-align: center">
+            <div style="font-family: Fraunces, serif; font-size: 18px; font-weight: 600; color: #5E1844; line-height: 1">7</div>
+            <div style="font-size: 9px; font-weight: 600; color: #7C6E77; letter-spacing: .5px; text-transform: uppercase; margin-top: 1px">Tue 24</div>
+          </div>
+          <div style="flex-grow: 1; min-width: 0">
+            <div style="font-size: 13.5px; font-weight: 600; color: #261B22">Juz 7</div>
+            <div style="font-size: 11.5px; color: #7C6E77; margin-top: 2px">Pages 169&ndash;196</div>
+          </div>
+          <a href="#mushaf" style="flex: 0 0 auto; font-size: 11.5px; font-weight: 600; color: #F3EFE3; background: #5E1844; border-radius: 999px; padding: 7px 13px; text-decoration: none">Read</a>
+        </div>
+
+        <sc-for list="{{nights}}" as="n" hint-placeholder-count="5">
+          <div style="height: 1px; background: #E4DECF"></div>
+          <div style="padding: 11px 14px; display: flex; align-items: center; gap: 11px">
+            <div style="width: 40px; flex: 0 0 auto; text-align: center">
+              <div style="font-family: Fraunces, serif; font-size: 17px; font-weight: 600; color: #261B22; line-height: 1">{{n.night}}</div>
+              <div style="font-size: 9px; font-weight: 600; color: #7C6E77; letter-spacing: .5px; text-transform: uppercase; margin-top: 1px">{{n.date}}</div>
+            </div>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 13.5px; font-weight: 600; color: #261B22">{{n.juz}}</div>
+              <div style="font-size: 11.5px; color: #7C6E77; margin-top: 2px">{{n.pages}}</div>
+            </div>
+            <a href="#mushaf" style="flex: 0 0 auto; font-size: 11.5px; font-weight: 600; color: #7A5D14; border: 1px solid #E4DECF; border-radius: 999px; padding: 6px 12px; text-decoration: none">Read</a>
+          </div>
+        </sc-for>
+
+        <div style="height: 1px; background: #E4DECF"></div>
+        <a href="#all" style="display: block; padding: 12px 14px; text-align: center; font-size: 12.5px; font-weight: 600; color: #7A5D14; text-decoration: none">All 30 nights &rsaquo;</a>
+      </div>
+    </div>
+
+    <!-- BAYAAN. Two a day: after Asr and after Isha. -->
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px">
+        <h2 style="margin: 0; font-family: Fraunces, serif; font-size: 18px; font-weight: 600; color: #261B22">Bayaan</h2>
+        <span style="font-size: 11px; font-weight: 600; color: #7C6E77; letter-spacing: .8px; text-transform: uppercase">Twice daily</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="3">
+          <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; overflow: hidden">
+            <div style="padding: 10px 15px; display: flex; align-items: baseline; gap: 8px; background: #FBF6E7">
+              <span style="font-family: Fraunces, serif; font-size: 15px; font-weight: 600; color: #261B22">{{d.date}}</span>
+              <span style="font-size: 11px; font-weight: 600; color: #7A5C13">{{d.hijri}}</span>
+            </div>
+            <div style="height: 1px; background: #E4DECF"></div>
+            <div style="padding: 11px 15px; display: flex; gap: 11px; align-items: flex-start">
+              <span style="width: 58px; flex: 0 0 auto; font-size: 9.5px; font-weight: 700; color: #7A5D14; letter-spacing: .8px; text-transform: uppercase; padding-top: 2px">After Asr</span>
+              <div style="flex-grow: 1; min-width: 0">
+                <div style="font-size: 13.5px; font-weight: 600; color: #261B22">{{d.asrWho}}</div>
+                <div style="font-size: 11.5px; line-height: 1.45; color: #7C6E77; margin-top: 2px">{{d.asrTopic}}</div>
+              </div>
+            </div>
+            <div style="height: 1px; background: #E4DECF"></div>
+            <div style="padding: 11px 15px; display: flex; gap: 11px; align-items: flex-start">
+              <span style="width: 58px; flex: 0 0 auto; font-size: 9.5px; font-weight: 700; color: #7A5D14; letter-spacing: .8px; text-transform: uppercase; padding-top: 2px">After Isha</span>
+              <div style="flex-grow: 1; min-width: 0">
+                <div style="font-size: 13.5px; font-weight: 600; color: #261B22">{{d.ishaWho}}</div>
+                <div style="font-size: 11.5px; line-height: 1.45; color: #7C6E77; margin-top: 2px">{{d.ishaTopic}}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <p style="margin: 10px 2px 0; font-size: 11.5px; line-height: 1.55; color: #7C6E77">Changes are announced in the app. Turn on <strong style="font-weight: 600; color: #261B22">Announcements</strong> to be told.</p>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1520}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      leaders: [
+        { rakahs: '5–8',   who: '[Student name]', role: 'Student of the masjid' },
+        { rakahs: '9–12',  who: '[Student name]', role: 'Student of the masjid' },
+        { rakahs: '13–16', who: '[Student name]', role: 'Student of the masjid' },
+        { rakahs: '17–20', who: '[Student name]', role: 'Student of the masjid' }
+      ],
+      nights: [
+        { night: '8',  date: 'Wed 25', juz: 'Juz 8',  pages: 'Pages 197–224' },
+        { night: '9',  date: 'Thu 26', juz: 'Juz 9',  pages: 'Pages 225–252' },
+        { night: '10', date: 'Fri 27', juz: 'Juz 10', pages: 'Pages 253–280' },
+        { night: '11', date: 'Sat 28', juz: 'Juz 11', pages: 'Pages 281–308' },
+        { night: '12', date: 'Sun 01', juz: 'Juz 12', pages: 'Pages 309–336' }
+      ],
+      days: [
+        { date: 'Tue 24 Feb', hijri: '7 Ramadan',  asrWho: '[Speaker name]', asrTopic: '[Subject of the talk]', ishaWho: '[Speaker name]', ishaTopic: '[Subject of the talk]' },
+        { date: 'Wed 25 Feb', hijri: '8 Ramadan',  asrWho: '[Speaker name]', asrTopic: '[Subject of the talk]', ishaWho: '[Speaker name]', ishaTopic: '[Subject of the talk]' },
+        { date: 'Thu 26 Feb', hijri: '9 Ramadan',  asrWho: '[Speaker name]', asrTopic: '[Subject of the talk]', ishaWho: '[Speaker name]', ishaTopic: '[Subject of the talk]' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

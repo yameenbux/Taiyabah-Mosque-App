@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ramadan — on open</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body { margin: 0; }
+a { color: #7A5D14; }
+a:hover { color: #5E1844; }
+</style>
+</helmet>
+
+<div style="width: 390px; height: 1760px; box-sizing: border-box; background: #F5F1E8; font-family: 'Hanken Grotesk', sans-serif; color: #261B22; overflow: hidden; display: flex; flex-direction: column">
+
+  <!-- app header, as every other screen draws it -->
+  <div style="background: #3C0B2A; padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex: 0 0 auto">
+    <a href="More.dc.html" aria-label="Back" style="width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(220,187,99,.38); display: flex; align-items: center; justify-content: center; text-decoration: none; flex: 0 0 auto">
+      <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1 1.5 7.5l6 6.5" stroke="#F3EFE3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div style="flex-grow: 1; min-width: 0">
+      <div style="font-size: 15px; font-weight: 600; color: #F3EFE3; letter-spacing: .1px">Ramadan</div>
+      <div style="font-size: 10.5px; font-weight: 500; color: #C6A24C; letter-spacing: 1.1px; text-transform: uppercase; margin-top: 1px">1448 AH</div>
+    </div>
+    <button type="button" aria-label="Notifications" style="width: 34px; height: 34px; border-radius: 999px; border: 1px solid rgba(220,187,99,.38); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: 0 0 auto">
+      <svg width="15" height="17" viewBox="0 0 16 18" fill="none" aria-hidden="true"><path d="M8 1.6a4.6 4.6 0 0 0-4.6 4.6c0 4-1.6 5.3-1.6 5.3h12.4s-1.6-1.3-1.6-5.3A4.6 4.6 0 0 0 8 1.6ZM9.6 14.4a1.9 1.9 0 0 1-3.2 0" stroke="#DCBB63" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- the hero: the two times the whole month turns on -->
+  <div style="position: relative; background: linear-gradient(168deg, #5E1844 0%, #4B1136 44%, #3C0B2A 100%); padding: 22px 18px 24px; overflow: hidden; flex: 0 0 auto">
+    <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; right: -62px; top: -34px; width: 208px; height: 208px; opacity: .3">
+      <polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="#C6A24C" stroke-width="0.5"/>
+    </svg>
+    <svg viewBox="0 0 100 100" aria-hidden="true" style="position: absolute; left: -46px; bottom: -58px; width: 150px; height: 150px; opacity: .16">
+      <polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="#DCBB63"/>
+    </svg>
+
+    <div style="position: relative; display: flex; align-items: baseline; gap: 8px">
+      <span style="font-family: Fraunces, serif; font-size: 25px; font-weight: 600; color: #F3EFE3; line-height: 1">Day 7</span>
+      <span style="font-size: 12.5px; font-weight: 500; color: rgba(243,239,227,.72)">Tue 24 Feb &middot; 7 Ramadan</span>
+    </div>
+
+    <div style="position: relative; display: flex; gap: 10px; margin-top: 18px">
+      <div style="flex: 1 1 0; min-width: 0; background: rgba(243,239,227,.07); border: 1px solid rgba(220,187,99,.26); border-radius: 16px; padding: 12px 13px 13px">
+        <div style="font-size: 9.5px; font-weight: 600; color: #DCBB63; letter-spacing: 1.2px; text-transform: uppercase">Sehri ends</div>
+        <div style="font-family: Fraunces, serif; font-size: 29px; font-weight: 600; color: #F3EFE3; line-height: 1.08; margin-top: 5px">5:25<span style="font-size: 15px; font-weight: 400"> am</span></div>
+        <div style="font-size: 10.5px; color: rgba(243,239,227,.6); margin-top: 3px">Fajr begins</div>
+      </div>
+      <div style="flex: 1 1 0; min-width: 0; background: rgba(220,187,99,.14); border: 1px solid rgba(220,187,99,.5); border-radius: 16px; padding: 12px 13px 13px">
+        <div style="font-size: 9.5px; font-weight: 600; color: #DCBB63; letter-spacing: 1.2px; text-transform: uppercase">Iftar</div>
+        <div style="font-family: Fraunces, serif; font-size: 29px; font-weight: 600; color: #F3EFE3; line-height: 1.08; margin-top: 5px">5:43<span style="font-size: 15px; font-weight: 400"> pm</span></div>
+        <div style="font-size: 10.5px; color: rgba(243,239,227,.6); margin-top: 3px">Maghrib</div>
+      </div>
+    </div>
+
+    <div style="position: relative; margin-top: 14px; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,.22); border-radius: 999px; padding: 8px 14px">
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: #DCBB63; flex: 0 0 auto"></span>
+      <span style="font-size: 13px; font-weight: 500; color: #F3EFE3">Iftar in <strong style="font-weight: 700">3 hr 12 min</strong></span>
+    </div>
+  </div>
+
+  <!-- the body -->
+  <div style="padding: 16px; display: flex; flex-direction: column; gap: 13px; flex-grow: 1; min-height: 0">
+
+    <!-- intro + the du'a said when the month is sighted -->
+    <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; padding: 16px 16px 15px">
+      <p style="margin: 0; font-size: 14.5px; line-height: 1.62; color: #261B22">Ramadan is the month the Qur&rsquo;an was sent down &mdash; a month of fasting from first light until sunset, of standing in prayer at night, and of giving.</p>
+      <p style="margin: 9px 0 0; font-size: 14.5px; line-height: 1.62; color: #261B22">Everything the masjid is running this month is on this page: who is leading taraweeh, who is speaking, and how to book i&rsquo;tikaf.</p>
+
+      <div style="margin-top: 15px; background: #FBF6E7; border-radius: 14px; padding: 14px 15px 13px">
+        <div style="font-size: 9.5px; font-weight: 700; color: #7A5C13; letter-spacing: 1.3px; text-transform: uppercase">On sighting the new moon</div>
+        <p dir="rtl" lang="ar" style="margin: 10px 0 0; font-family: Amiri, serif; font-size: 20px; line-height: 1.95; color: #261B22; text-align: right">اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلاَمَةِ وَالإِسْلاَمِ رَبِّي وَرَبُّكَ اللَّهُ</p>
+        <p style="margin: 9px 0 0; font-size: 12px; font-style: italic; line-height: 1.55; color: #7C6E77">All&amacr;humma ahlilhu &lsquo;alayn&amacr; bil-yumni wal-&imacr;m&amacr;ni was-sal&amacr;mati wal-isl&amacr;m. Rabb&imacr; wa Rabbukall&amacr;h</p>
+        <p style="margin: 7px 0 0; font-size: 13px; line-height: 1.55; color: #261B22">O Allah, bring it over us with blessing and faith, with safety and with Islam. My Lord and your Lord is Allah.</p>
+        <div style="margin-top: 9px; font-size: 11px; font-weight: 500; color: #7A5C13">J&amacr;mi&lsquo; al-Tirmidh&imacr;</div>
+      </div>
+    </div>
+
+    <!-- tonight -->
+    <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; overflow: hidden">
+      <div style="padding: 14px 16px 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px">
+        <span style="font-family: Fraunces, serif; font-size: 17px; font-weight: 600; color: #261B22">Tonight</span>
+        <span style="font-size: 11px; font-weight: 600; color: #7A5D14; letter-spacing: .9px; text-transform: uppercase">Juz 7</span>
+      </div>
+      <div style="height: 1px; background: #E4DECF"></div>
+      <div style="padding: 13px 16px; display: flex; align-items: center; gap: 12px">
+        <div style="flex-grow: 1; min-width: 0">
+          <div style="font-size: 14px; font-weight: 600; color: #261B22">Isha jam&amacr;&lsquo;ah</div>
+          <div style="font-size: 12px; color: #7C6E77; margin-top: 2px">Taraweeh follows immediately</div>
+        </div>
+        <span style="font-family: Fraunces, serif; font-size: 19px; font-weight: 600; color: #261B22; flex: 0 0 auto">7:45 pm</span>
+      </div>
+      <div style="height: 1px; background: #E4DECF"></div>
+
+      <!-- tonight's juz, and how far through the Qur'an the masjid has read -->
+      <div style="padding: 13px 16px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="flex-grow: 1; min-width: 0">
+            <div style="font-size: 14px; font-weight: 600; color: #261B22">Tonight&rsquo;s juz</div>
+            <div style="font-size: 12px; color: #7C6E77; margin-top: 2px">Juz 7 &middot; pages 169&ndash;196</div>
+          </div>
+          <a href="#mushaf" style="font-size: 12.5px; font-weight: 600; color: #7A5D14; text-decoration: none; flex: 0 0 auto; border: 1px solid #E4DECF; border-radius: 999px; padding: 7px 13px">Read it</a>
+        </div>
+        <div style="margin-top: 12px; height: 7px; border-radius: 999px; background: #E4DECF; overflow: hidden">
+          <div style="width: 23.3%; height: 7px; border-radius: 999px; background: linear-gradient(90deg, #5E1844, #772157)"></div>
+        </div>
+        <div style="margin-top: 6px; display: flex; justify-content: space-between; gap: 8px">
+          <span style="font-size: 11px; font-weight: 600; color: #7C6E77">Juz 7 of 30</span>
+          <span style="font-size: 11px; color: #7C6E77">23 nights to go</span>
+        </div>
+      </div>
+      <div style="height: 1px; background: #E4DECF"></div>
+
+      <div style="padding: 13px 16px; display: flex; align-items: center; gap: 12px">
+        <div style="flex-grow: 1; min-width: 0">
+          <div style="font-size: 14px; font-weight: 600; color: #261B22">Leading</div>
+          <div style="font-size: 12px; color: #7C6E77; margin-top: 2px">Mufti Faiyaz and four students</div>
+        </div>
+        <a href="Schedule.dc.html" style="font-size: 12.5px; font-weight: 600; color: #7A5D14; text-decoration: none; flex: 0 0 auto">Who leads &rsaquo;</a>
+      </div>
+      <div style="height: 1px; background: #E4DECF"></div>
+
+      <!-- the stream, for anyone who cannot get to the masjid -->
+      <div style="padding: 13px 16px; display: flex; align-items: center; gap: 12px; background: #F0E9ED">
+        <span style="width: 8px; height: 8px; border-radius: 999px; background: #3FBE73; flex: 0 0 auto"></span>
+        <div style="flex-grow: 1; min-width: 0">
+          <div style="font-size: 14px; font-weight: 600; color: #261B22">Taraweeh is on air</div>
+          <div style="font-size: 12px; color: #7C6E77; margin-top: 2px">Listen from home</div>
+        </div>
+        <a href="#live" style="font-size: 12.5px; font-weight: 600; color: #F3EFE3; background: #5E1844; border-radius: 999px; padding: 8px 15px; text-decoration: none; flex: 0 0 auto">Listen</a>
+      </div>
+    </div>
+
+    <!-- the reminder opt-in: the one screen in the app people will say yes on -->
+    <div style="background: #F0E9ED; border-radius: 18px; padding: 15px 16px; display: flex; align-items: center; gap: 13px">
+      <div style="flex-grow: 1; min-width: 0">
+        <div style="font-size: 14px; font-weight: 600; color: #261B22">Sehri &amp; iftar reminders</div>
+        <div style="font-size: 12px; line-height: 1.5; color: #7C6E77; margin-top: 3px">A nudge 20 minutes before sehri ends, and one at iftar.</div>
+      </div>
+      <button type="button" role="switch" aria-checked="true" aria-label="Sehri and iftar reminders" style="width: 46px; height: 27px; border-radius: 999px; border: none; background: #5E1844; position: relative; cursor: pointer; flex: 0 0 auto; padding: 0">
+        <span style="position: absolute; top: 3px; left: 22px; width: 21px; height: 21px; border-radius: 999px; background: #FCFAF3"></span>
+      </button>
+    </div>
+
+    <!-- one narration a day: a reason to open the app on a day with no other reason -->
+    <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; padding: 15px 16px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px">
+        <span style="font-size: 9.5px; font-weight: 700; color: #7A5D14; letter-spacing: 1.3px; text-transform: uppercase">Today&rsquo;s hadith</span>
+        <span style="font-size: 11px; font-weight: 500; color: #7C6E77">Day 7 of 30</span>
+      </div>
+      <p style="margin: 11px 0 0; font-family: Fraunces, serif; font-size: 16px; line-height: 1.62; color: #261B22">[The narration for this day, chosen by the masjid before Ramadan begins.]</p>
+      <div style="margin-top: 11px; display: flex; align-items: center; gap: 10px">
+        <span style="font-size: 11.5px; font-weight: 500; color: #7C6E77; flex-grow: 1">&#7778;a&#7717;&imacr;&#7717; al-Bukh&amacr;r&imacr; &middot; [Book] [No.]</span>
+        <a href="#hadith" style="font-size: 12px; font-weight: 600; color: #7A5D14; text-decoration: none; flex: 0 0 auto">Read it &rsaquo;</a>
+      </div>
+    </div>
+
+    <!-- three things people reach for -->
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px">
+      <a href="Schedule.dc.html" style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 16px; padding: 13px 10px 12px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="15" height="14" rx="2.5" stroke="#5E1844" stroke-width="1.5"/><path d="M2.5 7.5h15M6.5 2v3M13.5 2v3" stroke="#5E1844" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span style="font-size: 11.5px; font-weight: 600; color: #261B22; line-height: 1.3">Timetable</span>
+      </a>
+      <button type="button" style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 16px; padding: 13px 10px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 7px; font-family: inherit">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5v10M10 2.5 6.5 6M10 2.5 13.5 6M3.5 11.5v4a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4" stroke="#5E1844" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size: 11.5px; font-weight: 600; color: #261B22; line-height: 1.3">Share</span>
+      </button>
+      <a href="LastTen.dc.html" style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 16px; padding: 13px 10px 12px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.6 12.3 7.3l5.2.76-3.75 3.66.89 5.18L10 14.46l-4.64 2.44.89-5.18L2.5 8.06l5.2-.76L10 2.6Z" stroke="#5E1844" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span style="font-size: 11.5px; font-weight: 600; color: #261B22; line-height: 1.3">Zakat</span>
+      </a>
+    </div>
+
+    <!-- coming to the masjid -->
+    <div style="background: #FCFAF3; border: 1px solid #E4DECF; border-radius: 18px; padding: 15px 16px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex: 0 0 auto"><path d="M10 17.5s6-4.6 6-9a6 6 0 1 0-12 0c0 4.4 6 9 6 9Z" stroke="#5E1844" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="8.4" r="2.1" stroke="#5E1844" stroke-width="1.5"/></svg>
+        <h2 style="margin: 0; font-family: Fraunces, serif; font-size: 16.5px; font-weight: 600; color: #261B22">Parking</h2>
+      </div>
+      <p style="margin: 10px 0 0; font-size: 13.5px; line-height: 1.6; color: #261B22">The masjid car park is on <strong style="font-weight: 600">Draycott Street</strong>. Please use it first.</p>
+      <p style="margin: 8px 0 0; font-size: 13.5px; line-height: 1.6; color: #7C6E77">When it is full, park with consideration for our neighbours and the wider community &mdash; never across a driveway. The masjid sits on a main road, so take care pulling out, and keep hold of children.</p>
+      <a href="#directions" style="display: block; text-align: center; text-decoration: none; border: 1px solid #E4DECF; color: #7A5D14; font-size: 13.5px; font-weight: 600; border-radius: 999px; padding: 11px 16px; margin-top: 13px">Directions</a>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
