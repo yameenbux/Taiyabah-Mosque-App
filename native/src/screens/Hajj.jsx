@@ -25,12 +25,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
-import { Screen } from "../ui";
-import { Press } from "../ui";
+import { Screen, Press } from "../ui";
+import { hajjAccess } from "../hajj";
+import { HAJJ_CONTENT } from "../hajj-data";
 
 /* One tile. `on` is the plum one; everything inside it has to be told its
    colour, because cream on plum is not what the paper tiles inherit. */
-function Tile({ on, top, title, detail, fs, rtl }) {
+function Tile({ on, top, title, detail, fs, rtl, onPress }) {
   const body = (
     <>
       <View>{top}</View>
@@ -50,16 +51,17 @@ function Tile({ on, top, title, detail, fs, rtl }) {
   const shape = { flex: 1, minHeight: 150, borderRadius: R.tile,
                   paddingHorizontal: 14, paddingTop: 15, paddingBottom: 16,
                   justifyContent: "space-between" };
-  if (on)
-    return (
-      <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }}
-                      style={shape}>{body}</LinearGradient>
-    );
-  return (
-    <View style={[shape, { backgroundColor: C.card, borderWidth: 1, borderColor: C.line }]}>
-      {body}
-    </View>
-  );
+  const inner = on
+    ? <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }}
+                      style={[shape, onPress && { flex: undefined, minHeight: 150 }]}>{body}</LinearGradient>
+    : <View style={[shape, { backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
+                    onPress && { flex: undefined }]}>{body}</View>;
+  /* While the section is held these four are a picture of what is coming, so
+     they are not controls and a screen reader should not offer them as any.
+     Once it opens, the same four tiles are the way in. */
+  if (!onPress) return inner;
+  return <Press onPress={onPress} dim={false} accessibilityRole="button"
+                accessibilityLabel={title} style={{ flex: 1 }}>{inner}</Press>;
 }
 
 /* A row at the foot. Not the drawer's Row: that one carries a coming-soon tag
@@ -84,20 +86,30 @@ export default function Hajj({ navigation }) {
   const { t, fs, rtl } = useApp();
   const row = { flexDirection: "row", gap: 12 };
 
+  /* THE GATE. Held until the masjid says otherwise, and shut anyway while the
+     ʿulamā's three sections are empty — so a release cannot put a blank
+     rulings screen in front of somebody about to fly. hajj.js has the rule
+     and check-hajj.mjs asserts it. The two states are the SAME four tiles:
+     a picture of what is coming, or the way in. */
+  const open = hajjAccess(HAJJ_CONTENT).open;
+  const go = section => () => navigation.navigate("HajjList", { section });
+
   return (
     <Screen top={18}>
-      <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", borderWidth: 1,
-                     borderColor: "rgba(198,162,76,.45)", borderRadius: R.pill,
-                     paddingHorizontal: 8, paddingVertical: 3 }}>
-        <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
-                       textTransform: "uppercase", color: C.gold }}>
-          {t("marriage.coming_soon", "Coming soon")}
-        </Text>
-      </View>
+      {!open && (
+        <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", borderWidth: 1,
+                       borderColor: "rgba(198,162,76,.45)", borderRadius: R.pill,
+                       paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
+                         textTransform: "uppercase", color: C.gold }}>
+            {t("marriage.coming_soon", "Coming soon")}
+          </Text>
+        </View>)}
 
       <Text style={{ fontFamily: F.display, fontSize: fs(27), lineHeight: fs(33), color: C.ink,
-                     marginTop: 13, textAlign: rtl ? "right" : "left" }}>
-        {t("hajj.what_you_will_carry", "What you will carry with you")}
+                     marginTop: open ? 0 : 13, textAlign: rtl ? "right" : "left" }}>
+        {open ? t("hajj.what_you_carry", "What you carry with you")
+              : t("hajj.what_you_will_carry", "What you will carry with you")}
       </Text>
       <Text style={{ fontFamily: F.sans, fontSize: fs(14.5), lineHeight: fs(23), color: C.muted,
                      marginTop: 10, textAlign: rtl ? "right" : "left" }}>
@@ -105,7 +117,7 @@ export default function Hajj({ navigation }) {
       </Text>
 
       <View style={[row, { marginTop: 18 }]}>
-        <Tile fs={fs} rtl={rtl}
+        <Tile fs={fs} rtl={rtl} onPress={open ? go("duas") : undefined}
               top={<Text style={{ fontFamily: F.arabic, fontSize: fs(20), lineHeight: fs(32),
                                   color: C.brand600, textAlign: "right" }}>
                      لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ
@@ -113,7 +125,7 @@ export default function Hajj({ navigation }) {
               title={t("hajj.the_duas", "The duʿās")}
               detail={t("hajj.duas_detail", "Iḥrām, talbiyah, ṭawāf, saʿī, with the transliteration")} />
 
-        <Tile on fs={fs} rtl={rtl}
+        <Tile on fs={fs} rtl={rtl} onPress={open ? () => navigation.navigate("HajjCounter") : undefined}
               top={<View style={{ flexDirection: "row", alignItems: "baseline", gap: 5 }}>
                      <Text style={{ fontFamily: F.display, fontSize: fs(38), color: C.cream }}>4</Text>
                      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13),
@@ -126,7 +138,7 @@ export default function Hajj({ navigation }) {
       </View>
 
       <View style={[row, { marginTop: 12 }]}>
-        <Tile fs={fs} rtl={rtl}
+        <Tile fs={fs} rtl={rtl} onPress={open ? go("steps") : undefined}
               top={<View>
                      {[1, 2, 3].map(n => (
                        <View key={n} style={{ flexDirection: "row", alignItems: "center", gap: 7,
@@ -144,7 +156,7 @@ export default function Hajj({ navigation }) {
               title={t("hajj.the_steps", "The steps")}
               detail={t("hajj.steps_detail", "How each rite is performed, in order, one step at a time")} />
 
-        <Tile fs={fs} rtl={rtl}
+        <Tile fs={fs} rtl={rtl} onPress={open ? go("rulings") : undefined}
               /* Allowed is the ordinary state and takes the ordinary ink; dam
                  is the exception and is the only one that takes a colour. A
                  green/red pair would have leaned on hue alone. */
@@ -165,20 +177,24 @@ export default function Hajj({ navigation }) {
 
       <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5), color: C.muted,
                      textAlign: "center", marginTop: 16 }}>
-        {t("hajj.checked_by_ulama",
-           "Every ruling will be checked and approved by the ʿulamā at the masjid before it appears here.")}
+        {open
+          ? t("hajj.approved_by_ulama", "Every ruling here was checked and approved by the ʿulamā at the masjid.")
+          : t("hajj.checked_by_ulama",
+              "Every ruling will be checked and approved by the ʿulamā at the masjid before it appears here.")}
       </Text>
 
+      {/* Held: the two things that already exist and already work offline,
+          which is the whole reason they are what is offered meanwhile. Open:
+          the section carries its own, so only the office stays. */}
       <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.7,
                      textTransform: "uppercase", color: C.goldInk, marginTop: 22,
                      textAlign: rtl ? "right" : "left" }}>
-        {t("hajj.until_then", "Until then")}
+        {open ? t("hajj.a_question", "A question") : t("hajj.until_then", "Until then")}
       </Text>
-      {/* Both of these already exist and already work offline, which is the
-          whole reason they are what is offered while the section is locked. */}
-      <Go fs={fs} rtl={rtl} icon="book-outline"
-          label={t("hajj.the_dua_book", "The duʿā book")}
-          onPress={() => navigation.navigate("Duas")} />
+      {!open && (
+        <Go fs={fs} rtl={rtl} icon="book-outline"
+            label={t("hajj.the_dua_book", "The duʿā book")}
+            onPress={() => navigation.navigate("Duas")} />)}
       <Go fs={fs} rtl={rtl} icon="call-outline"
           label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
           onPress={() => navigation.navigate("Contact")} />
