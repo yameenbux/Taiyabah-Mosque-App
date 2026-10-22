@@ -283,7 +283,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
       poster:  t({ title:"Talk", body:"Thursday.", imageUrl:"https://example.org/p.jpg" }),
       href:    h("a b&c"),
       max:     window.WA_MAX,
-      atRest:  { wa:tall("wa"), img:tall("wa-img"), long:tall("wa-long") },
+      atRest:  { wa:tall("wa"), img:tall("wa-img"), long:tall("wa-long"), hint:tall("wa-hint") },
       nameless: [...document.querySelectorAll("button")]
         .filter(e=>e.offsetParent!==null && !e.innerText.trim()
                    && !e.getAttribute("aria-label") && !e.getAttribute("title"))
@@ -301,6 +301,36 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
     fire("msg","After Maghrib jamāʿah. All welcome.");
     const b = document.getElementById("wa");
     return { height:b.getBoundingClientRect().height, label:b.innerText.trim() };
+  });
+
+  /* The poster riding along WITH the words, which is the point of one button
+     rather than two. A real PNG goes through the real file input, so the
+     resize and the data: URL are the page's own. navigator.share is stubbed
+     because headless Chromium refuses files — what is under test is this
+     page's logic, not what WhatsApp does with it, which no check here can
+     reach and only a phone can answer. */
+  const PNG = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAJklEQVR42u3OMQEAAAgDoC251a3g" +
+    "LwSgmVunAgQIECBAgAABAgS8dQF+AAHqrS3eAAAAAElFTkSuQmCC", "base64");
+  await p.setInputFiles("#poster", { name:"poster.png", mimeType:"image/png", buffer:PNG });
+  await p.waitForTimeout(600);
+  const waBoth = await p.evaluate(async () => {
+    window.__shared = null;
+    navigator.canShare = () => true;
+    navigator.share   = d => { window.__shared = d; return Promise.resolve(); };
+    const t = document.getElementById("title");
+    t.value += "!"; t.dispatchEvent(new Event("input",{bubbles:true}));  // force a re-offer
+    await new Promise(r => setTimeout(r, 500));
+    const g = id => { const e = document.getElementById(id);
+      return { shown: !e.hidden, label: (e.innerText || e.textContent || "").trim() }; };
+    const before = { main:g("wa"), alt:g("wa-img"), hint:g("wa-hint") };
+    document.getElementById("wa").click();
+    await new Promise(r => setTimeout(r, 200));
+    const sh = window.__shared;
+    return { ...before,
+      files: sh && sh.files ? sh.files.length : 0,
+      type:  sh && sh.files && sh.files[0] ? sh.files[0].type : "",
+      text:  sh && typeof sh.text === "string" ? sh.text : null };
   });
 
   if(wa.missing){ bad("admin","waText/waHref are not on the page"); }
@@ -332,6 +362,19 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
       : bad("whatsapp","nothing offered for a written message — "
                      + `height ${waWritten.height}, label ${JSON.stringify(waWritten.label)}. `
                      + "The button is then undiscoverable without pushing to everyone.");
+    /* One hand-off carrying both, not two. */
+    waBoth.files === 1 && /^image\//.test(waBoth.type) && waBoth.text && /Bayaan/.test(waBoth.text)
+      ? ok("whatsapp","the poster and the words go in ONE share, as a file plus a caption")
+      : bad("whatsapp","the share did not carry both — "
+                     + `${waBoth.files} file(s) of type ${JSON.stringify(waBoth.type)}, `
+                     + `text ${JSON.stringify(waBoth.text && waBoth.text.slice(0,40))}`);
+    /^share poster and message$/i.test(waBoth.main.label)
+      ? ok("whatsapp","with a poster attached the button says it carries both")
+      : bad("whatsapp",`the main button says ${JSON.stringify(waBoth.main.label)} with a poster attached`);
+    waBoth.alt.shown && /words only/i.test(waBoth.alt.label) && waBoth.hint.shown
+      ? ok("whatsapp","a words-only fallback and the paste hint sit underneath")
+      : bad("whatsapp","no words-only fallback offered — "
+                     + `alt ${JSON.stringify(waBoth.alt)}, hint shown ${waBoth.hint.shown}`);
     wa.nameless.length
       ? bad("a11y",`admin has ${wa.nameless.length} visible button(s) with no name: ${wa.nameless.join(", ")}`)
       : ok("a11y","every visible button on admin has a name");
