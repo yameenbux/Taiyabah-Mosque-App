@@ -431,7 +431,7 @@ function renderTemplates(){
   [...document.querySelectorAll(".tpl")].forEach(b=>{
     b.addEventListener("click",()=>{
       const x=list[+b.dataset.i];
-      titleEl.value=x.title; msgEl.value=x.msg; update();
+      titleEl.value=x.title; msgEl.value=x.msg; waPinned=false; update();
       msgEl.focus();
     });
   });
@@ -467,6 +467,7 @@ function update(){
   cm.classList.toggle("over", false);
   $("send").disabled = !(t && m);
   updateGuard();
+  waLive();
 }
 
 function clock(){
@@ -561,24 +562,37 @@ const WA_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.
    On a desktop the second button simply never appears — canShare says no,
    and an absent button is better than one that fails.
 ------------------------------------------------------------------------- */
+let waFileFor = { src:"\u0000none", file:null };
 async function waPosterFile(src){
   if(!src) return null;
+  /* waLive() runs on every keystroke, and this is the expensive part. The
+     poster changes far less often than the words do, so remember the last
+     one — failures included, or a broken src is re-fetched on every letter. */
+  if(waFileFor.src === src) return waFileFor.file;
+  const keep = f => { waFileFor = { src, file:f }; return f; };
   try{
     /* Works for both the data: URL held right after a send and the Worker's
        own poster URL, which answers with Access-Control-Allow-Origin: *. */
     const blob = await (await fetch(src)).blob();
-    if(!/^image\//.test(blob.type)) return null;
+    if(!/^image\//.test(blob.type)) return keep(null);
     const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
-    return new File([blob], `taiyabah-notice.${ext}`, { type: blob.type });
-  }catch{ return null; }
+    return keep(new File([blob], `taiyabah-notice.${ext}`, { type: blob.type }));
+  }catch{ return keep(null); }
 }
 const waCanShareFile = file =>
   !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
 
-/* Offer the just-sent notice to WhatsApp. */
+/* Offer a notice to WhatsApp — the one being written, or the one just sent. */
+let waShown = null;
 async function waOffer(item){
   const btn = $("wa"), note = $("wa-long");
   const text = waText(item);
+  /* Called on every keystroke now, so do nothing when nothing has changed.
+     Without this the button's innerHTML is rebuilt per letter, which throws
+     away "Opened in WhatsApp" and restarts the poster share. */
+  const key = text + "\u0000" + (item.posterData || item.imageUrl || "");
+  if(waShown === key && !btn.hidden) return;
+  waShown = key;
   const long = waTooLong(text);
   btn.hidden = false; btn.disabled = long; btn.dataset.done = "";
   btn.innerHTML = WA_ICON + "<span>Share to WhatsApp</span>";
@@ -610,7 +624,30 @@ async function waOffer(item){
     /* AbortError is the sender changing their mind, which is not a fault. */
     .catch(e => { if(e && e.name !== "AbortError") toast("Couldn't share the poster: " + e.message); });
 }
-function waHide(){ $("wa").hidden = true; $("wa-img").hidden = true; $("wa-long").hidden = true; }
+function waHide(){ waShown = null;
+  $("wa").hidden = true; $("wa-img").hidden = true; $("wa-long").hidden = true; }
+
+/* ---------- live while writing, pinned once sent ----------
+   The offer used to appear only after a send, which made it undiscoverable:
+   the one way to find out the button existed was to push a real notification
+   to the whole congregation, and the one way to test it was to do that again.
+
+   So it is live. As soon as there is a title and a message the button is
+   there, carrying exactly what is in the fields — which also means WhatsApp
+   can be used on its own, for something that does not warrant waking every
+   phone in the jamāʿah.
+
+   After a send it PINS: the fields are cleared a line later, and the offer
+   has to survive that holding the words that actually went out. Typing the
+   next message releases it. */
+let waPinned = false;
+function waLive(){
+  if(waPinned) return;
+  const title = titleEl.value.trim(), body = msgEl.value.trim();
+  if(!(title && body)) return waHide();
+  const inp = topicInput();
+  waOffer({ title, body, posterData: posterData || undefined, topic: inp && inp.value });
+}
 
 /* ---------- sending ----------
    All sends go through the masjid's sender service, which holds the OneSignal
@@ -944,12 +981,14 @@ $("poster").addEventListener("change", async e => {
   $("c-poster").textContent = out.bytes < f.size
     ? `${out.w} × ${out.h}, ${kb(out.bytes)} (resized from ${kb(f.size)})`
     : `${out.w} × ${out.h}, ${kb(out.bytes)}`;
+  waLive();
 });
 $("posterx").addEventListener("click", () => {
   posterData = null; posterDims = {};
   $("poster").value = "";
   $("posterwrap").hidden = true; $("cropnote").hidden = true;
   $("c-poster").textContent = "No poster. The notice will be text only.";
+  waLive();
 });
 
 $("send").addEventListener("click", async ()=>{
@@ -997,6 +1036,7 @@ $("send").addEventListener("click", async ()=>{
        round trip; image_url is the fallback and the only one a history row
        has. waOffer is async and deliberately not awaited — the text button
        appears at once and the poster button follows when its file is ready. */
+    waPinned = true;
     waOffer({ title, body:msg, posterData:posterData || undefined,
               imageUrl:(res.notice && res.notice.image_url) || undefined,
               topic:inp.value });
@@ -1022,14 +1062,12 @@ document.querySelectorAll('input[name="topic"]').forEach(r=>{
     renderTemplates(); update();
   });
 });
-titleEl.addEventListener("input",update);
-msgEl.addEventListener("input",update);
-/* A new message is being written, so the offer to share the LAST one goes.
-   Hooked to typing rather than to update(), because update() is also called
-   programmatically straight after a send — and that call would otherwise
-   hide the button in the same breath that offered it. */
-titleEl.addEventListener("input",waHide);
-msgEl.addEventListener("input",waHide);
+/* One handler, and the order inside it matters: typing means a new message,
+   so the pin from the last send has to be released BEFORE update() asks for
+   the live offer — otherwise the button lags a keystroke behind the words. */
+const waCompose = () => { waPinned = false; update(); };
+titleEl.addEventListener("input",waCompose);
+msgEl.addEventListener("input",waCompose);
 
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 if(token()) showApp(); else showGate("");

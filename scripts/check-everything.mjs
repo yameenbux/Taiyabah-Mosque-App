@@ -290,6 +290,19 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
         .map(e=>e.id || e.className || "?"),
     };
   });
+  /* Written, not sent. The offer is live from the fields now — it used to
+     appear only after a real push, which meant the only way to find the
+     button was to message the whole congregation, and the only way to test
+     it was to do that twice. */
+  const waWritten = await p.evaluate(()=>{
+    const fire = (id,v) => { const e=document.getElementById(id);
+      e.value=v; e.dispatchEvent(new Event("input",{bubbles:true})); };
+    fire("title","Bayaan this Thursday");
+    fire("msg","After Maghrib jamāʿah. All welcome.");
+    const b = document.getElementById("wa");
+    return { height:b.getBoundingClientRect().height, label:b.innerText.trim() };
+  });
+
   if(wa.missing){ bad("admin","waText/waHref are not on the page"); }
   else {
     wa.plain === "*Eid salāh*\n\n7.30am in the main hall.\n\n— Taiyabah Masjid"
@@ -311,9 +324,14 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
     /* THE REGRESSION. Zero height, signed in, before any send. */
     const r = wa.atRest;
     Object.values(r).every(h=>h===0)
-      ? ok("whatsapp","the share buttons take up no room until a send succeeds")
-      : bad("whatsapp",`share buttons are visible before any send — heights ${JSON.stringify(r)}. `
+      ? ok("whatsapp","the share buttons take up no room while the form is empty")
+      : bad("whatsapp",`share buttons are visible with an empty form — heights ${JSON.stringify(r)}. `
                      + `A class that sets display beats [hidden]; they render as empty boxes.`);
+    waWritten.height > 0 && /whatsapp/i.test(waWritten.label)
+      ? ok("whatsapp","the offer appears as soon as a message is written, with no send")
+      : bad("whatsapp","nothing offered for a written message — "
+                     + `height ${waWritten.height}, label ${JSON.stringify(waWritten.label)}. `
+                     + "The button is then undiscoverable without pushing to everyone.");
     wa.nameless.length
       ? bad("a11y",`admin has ${wa.nameless.length} visible button(s) with no name: ${wa.nameless.join(", ")}`)
       : ok("a11y","every visible button on admin has a name");
