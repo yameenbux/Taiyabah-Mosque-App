@@ -149,7 +149,6 @@
   .wa[data-done="1"]{color:var(--muted);background:var(--paper)}
   .wa[data-done="1"] svg{fill:var(--muted)}
   .wa-long{font-size:11.5px;color:var(--ink-danger,#8E2F3A);text-align:center;margin-top:7px;line-height:1.5}
-  .wa-hint{font-size:11.5px;color:var(--muted);text-align:center;margin-top:7px;line-height:1.5}
   /* The same thing, small, on a row of the history — for "nobody posted it"
      and "post it again". */
   .h-wa{flex:none;align-self:center;cursor:pointer;background:none;border:1px solid var(--line);
@@ -336,9 +335,7 @@
     <button class="send" id="send">Send notification</button>
     <p class="sendnote" id="sendnote">Goes to every device with this category switched on.</p>
     <button class="wa" id="wa" hidden></button>
-    <button class="wa" id="wa-img" hidden></button>
     <p class="wa-long" id="wa-long" hidden></p>
-    <p class="wa-hint" id="wa-hint" hidden></p>
 
     <div class="sec-h"><h2>Recently sent</h2><span class="rule"></span></div>
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
@@ -586,80 +583,73 @@ const waCanShareFile = file =>
 
 /* Offer a notice to WhatsApp — the one being written, or the one just sent.
 
-   ONE SHARE WHEN THERE IS A POSTER. navigator.share carries the file and the
-   caption in the same hand-off, which is what the sender actually wants: the
-   poster arrives as a picture with the words under it, not as two messages.
+   ONE BUTTON. It says the same thing whatever it is carrying, because the
+   sender does not need to know which of two mechanisms is underneath: words
+   alone go by wa.me, and a poster turns the same press into a single
+   navigator.share carrying the file and the caption together, so the notice
+   arrives as one message with the words under the picture rather than two.
 
-   What WhatsApp then does with the caption is undocumented, and has been
-   reported failing in BOTH directions — an MDN compatibility issue has iOS
+   What WhatsApp then does with that caption is undocumented, and has been
+   reported failing in both directions — an MDN compatibility issue has iOS
    Safari showing the text and dropping the image, other reports have the
    image arriving with the words gone. canShare() cannot be asked, because it
    returns true for data it will silently drop.
 
-   So the words are put on the clipboard in the same breath. If the caption
-   box comes up empty it is one paste, not a retype — and the sender can see
-   it is empty, because WhatsApp shows the compose screen before anything is
-   sent. Nothing can go out silently wordless, which was the failure that
-   mattered for a janāzah.
+   It cannot fail silently: WhatsApp shows the compose screen before anything
+   is sent, so an empty caption is in front of the sender. The words are put
+   on the clipboard in the same breath, which makes that a paste rather than
+   a retype — a backstop that costs nothing on screen, so it is not explained
+   there.
 
    The clipboard write is deliberately NOT awaited. An await before
    navigator.share spends the user gesture, and iOS answers that with
    NotAllowedError — the same trap the File is built early to avoid.
-
-   "Send the words only" stays underneath as the path that cannot fail.
 ------------------------------------------------------------------------- */
 let waShown = null;
 async function waOffer(item){
-  const btn = $("wa"), alt = $("wa-img"), note = $("wa-long"), hint = $("wa-hint");
+  const btn = $("wa"), note = $("wa-long");
   const text = waText(item);
   /* Called on every keystroke now, so do nothing when nothing has changed.
      Without this the button's innerHTML is rebuilt per letter, which throws
-     away "Opened in WhatsApp" and restarts the poster share. */
+     away "Opened in WhatsApp" and restarts the share. */
   const key = text + "\u0000" + (item.posterData || item.imageUrl || "");
   if(waShown === key && !btn.hidden) return;
   waShown = key;
-  const long = waTooLong(text);
 
   /* "Opened", never "Sent". Once WhatsApp has focus this page cannot know
      whether the send was pressed, and a false record in front of the
      committee is worse than no record. */
-  const opened = el => { el.dataset.done = "1";
-    el.innerHTML = WA_ICON + "<span>Opened in WhatsApp</span>"; };
-  const wordsOnly = el => () => { window.open(waHref(text), "_blank", "noopener"); opened(el); };
+  const opened = () => { btn.dataset.done = "1";
+    btn.innerHTML = WA_ICON + "<span>Opened in WhatsApp</span>"; };
 
-  btn.hidden = false; btn.disabled = long; btn.dataset.done = "";
-  btn.innerHTML = WA_ICON + "<span>Share to WhatsApp</span>";
-  btn.onclick = wordsOnly(btn);
+  /* Words alone. wa.me carries them in a URL, which is what the limit is. */
+  const long = waTooLong(text);
+  btn.hidden = false; btn.dataset.done = ""; btn.disabled = long;
+  btn.innerHTML = WA_ICON + "<span>Share on WhatsApp</span>";
+  btn.onclick = () => { window.open(waHref(text), "_blank", "noopener"); opened(); };
   note.hidden = !long;
   if(long) note.textContent =
     `Too long for WhatsApp — ${text.length.toLocaleString()} characters, limit ${WA_MAX.toLocaleString()}. ` +
     `Shorten the message and it can go to the community as well.`;
-  alt.hidden = true; hint.hidden = true;
 
   /* The File is built HERE rather than in the click handler: iOS refuses a
      share whose user gesture has expired across an await. */
   const file = await waPosterFile(item.posterData || item.imageUrl);
-  if(long || !waCanShareFile(file)) return;
+  if(!waCanShareFile(file)) return;
 
-  btn.dataset.done = "";
-  btn.innerHTML = WA_ICON + "<span>Share poster and message</span>";
+  /* Same button, both halves. The caption now rides in the share itself
+     rather than in a URL, so the wa.me length limit stops applying. */
+  btn.disabled = false; note.hidden = true;
   btn.onclick = () => {
     try{ navigator.clipboard && navigator.clipboard.writeText(text).catch(()=>{}); }catch{}
     navigator.share({ files: [file], text })
-      .then(() => opened(btn))
+      .then(opened)
       /* AbortError is the sender changing their mind, which is not a fault. */
       .catch(e => { if(e && e.name !== "AbortError") toast("Couldn't share: " + e.message); });
   };
-
-  alt.hidden = false; alt.disabled = false; alt.dataset.done = "";
-  alt.innerHTML = WA_ICON + "<span>Send the words only</span>";
-  alt.onclick = wordsOnly(alt);
-  hint.hidden = false;
-  hint.textContent = "The words are copied as you share, so if WhatsApp opens the "
-                   + "poster with an empty caption, long-press the box and paste.";
 }
 function waHide(){ waShown = null;
-  for(const id of ["wa","wa-img","wa-long","wa-hint"]) $(id).hidden = true; }
+  $("wa").hidden = true; $("wa-long").hidden = true; }
 
 /* ---------- live while writing, pinned once sent ----------
    The offer used to appear only after a send, which made it undiscoverable:

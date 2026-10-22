@@ -283,7 +283,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
       poster:  t({ title:"Talk", body:"Thursday.", imageUrl:"https://example.org/p.jpg" }),
       href:    h("a b&c"),
       max:     window.WA_MAX,
-      atRest:  { wa:tall("wa"), img:tall("wa-img"), long:tall("wa-long"), hint:tall("wa-hint") },
+      atRest:  { wa:tall("wa"), long:tall("wa-long") },
       nameless: [...document.querySelectorAll("button")]
         .filter(e=>e.offsetParent!==null && !e.innerText.trim()
                    && !e.getAttribute("aria-label") && !e.getAttribute("title"))
@@ -323,7 +323,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
     await new Promise(r => setTimeout(r, 500));
     const g = id => { const e = document.getElementById(id);
       return { shown: !e.hidden, label: (e.innerText || e.textContent || "").trim() }; };
-    const before = { main:g("wa"), alt:g("wa-img"), hint:g("wa-hint") };
+    const before = { main:g("wa"), buttons:document.querySelectorAll("button.wa:not([hidden])").length };
     document.getElementById("wa").click();
     await new Promise(r => setTimeout(r, 200));
     const sh = window.__shared;
@@ -357,7 +357,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
       ? ok("whatsapp","the share buttons take up no room while the form is empty")
       : bad("whatsapp",`share buttons are visible with an empty form — heights ${JSON.stringify(r)}. `
                      + `A class that sets display beats [hidden]; they render as empty boxes.`);
-    waWritten.height > 0 && /whatsapp/i.test(waWritten.label)
+    waWritten.height > 0 && /^share on whatsapp$/i.test(waWritten.label)
       ? ok("whatsapp","the offer appears as soon as a message is written, with no send")
       : bad("whatsapp","nothing offered for a written message — "
                      + `height ${waWritten.height}, label ${JSON.stringify(waWritten.label)}. `
@@ -368,13 +368,11 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
       : bad("whatsapp","the share did not carry both — "
                      + `${waBoth.files} file(s) of type ${JSON.stringify(waBoth.type)}, `
                      + `text ${JSON.stringify(waBoth.text && waBoth.text.slice(0,40))}`);
-    /^share poster and message$/i.test(waBoth.main.label)
-      ? ok("whatsapp","with a poster attached the button says it carries both")
-      : bad("whatsapp",`the main button says ${JSON.stringify(waBoth.main.label)} with a poster attached`);
-    waBoth.alt.shown && /words only/i.test(waBoth.alt.label) && waBoth.hint.shown
-      ? ok("whatsapp","a words-only fallback and the paste hint sit underneath")
-      : bad("whatsapp","no words-only fallback offered — "
-                     + `alt ${JSON.stringify(waBoth.alt)}, hint shown ${waBoth.hint.shown}`);
+    /* One button, saying one thing, whichever mechanism is underneath. */
+    waBoth.buttons === 1 && /^share on whatsapp$/i.test(waBoth.main.label)
+      ? ok("whatsapp","one button, reading the same with a poster attached as without")
+      : bad("whatsapp",`${waBoth.buttons} share button(s) with a poster attached, `
+                     + `the first reading ${JSON.stringify(waBoth.main.label)} — should be exactly one, "Share on WhatsApp"`);
     wa.nameless.length
       ? bad("a11y",`admin has ${wa.nameless.length} visible button(s) with no name: ${wa.nameless.join(", ")}`)
       : ok("a11y","every visible button on admin has a name");
