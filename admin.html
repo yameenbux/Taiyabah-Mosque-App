@@ -124,6 +124,32 @@
   .send:disabled{opacity:.45;cursor:default}
   .sendnote{font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.5}
 
+  /* SHARE TO WHATSAPP. The house palette, not WhatsApp green: a green slab in
+     a plum-and-gold page reads as somebody else's advert. The mark alone says
+     where it goes, and it is the only green thing here.
+
+     Secondary to .send on purpose. Sending the push is the act; this is the
+     second copy, for the half of the congregation who are in the community
+     chat and not in the app. */
+  .wa{width:100%;margin-top:10px;cursor:pointer;font:inherit;font-weight:700;font-size:14.5px;
+    color:var(--brand-900);background:var(--card);border:1px solid var(--line);
+    padding:13px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:10px}
+  .wa:hover:not(:disabled){background:#fff;border-color:var(--gold)}
+  .wa:disabled{opacity:.5;cursor:default}
+  .wa svg{width:19px;height:19px;flex:none;fill:#25D366}
+  /* Opened, NOT sent — this page cannot know whether they pressed send once
+     WhatsApp had focus, and must not claim it did. */
+  .wa[data-done="1"]{color:var(--muted);background:var(--paper)}
+  .wa[data-done="1"] svg{fill:var(--muted)}
+  .wa-long{font-size:11.5px;color:var(--ink-danger,#8E2F3A);text-align:center;margin-top:7px;line-height:1.5}
+  /* The same thing, small, on a row of the history — for "nobody posted it"
+     and "post it again". */
+  .h-wa{flex:none;align-self:center;cursor:pointer;background:none;border:1px solid var(--line);
+    border-radius:9px;padding:7px;display:grid;place-items:center}
+  .h-wa:hover:not(:disabled){border-color:var(--gold);background:var(--paper)}
+  .h-wa svg{width:16px;height:16px;fill:#25D366}
+  .h-wa:disabled{opacity:.35;cursor:default}
+
   .gate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:22px;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
   .gate[hidden]{display:none}
@@ -301,6 +327,9 @@
     <div class="guard" id="guard">—</div>
     <button class="send" id="send">Send notification</button>
     <p class="sendnote" id="sendnote">Goes to every device with this category switched on.</p>
+    <button class="wa" id="wa" hidden></button>
+    <button class="wa" id="wa-img" hidden></button>
+    <p class="wa-long" id="wa-long" hidden></p>
 
     <div class="sec-h"><h2>Recently sent</h2><span class="rule"></span></div>
     <div class="card hist" id="hist"><div class="empty">Nothing sent yet. Messages you send will be listed here.</div></div>
@@ -448,7 +477,7 @@ function renderHistory(){
   const items=store.get("sent",[]);
   const h=$("hist");
   if(!items.length){ h.innerHTML='<div class="empty">Nothing sent yet. Messages you send will be listed here.</div>'; return; }
-  h.innerHTML=items.slice(0,8).map(x=>`
+  h.innerHTML=items.slice(0,8).map((x,i)=>`
     <div class="h">
       <span class="dot ${x.urgent?'urgent':''}"></span>
       <div class="ht">
@@ -456,9 +485,125 @@ function renderHistory(){
         <div class="h2">${esc(x.msg)}</div>
         <div class="h3">${esc(x.topic)} · ${new Date(x.at).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
       </div>
+      <button class="h-wa" data-i="${i}" title="Share this to WhatsApp"
+              aria-label="Share &quot;${esc(x.title)}&quot; to WhatsApp">${WA_ICON}</button>
     </div>`).join("");
+  /* Delegated, because the rows are rebuilt on every send. */
+  h.querySelectorAll(".h-wa").forEach(b => b.addEventListener("click", () => {
+    const x = store.get("sent",[])[+b.dataset.i];
+    if(!x) return;
+    const text = waText({ title:x.title, body:x.msg, imageUrl:x.img, topic:x.topicKey });
+    if(waTooLong(text)){ toast(`Too long for WhatsApp (${text.length} of ${WA_MAX} characters).`); return; }
+    window.open(waHref(text), "_blank", "noopener");
+  }));
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ---------- the second copy, for WhatsApp ----------
+   HALF THE CONGREGATION IS NOT IN THE APP, and the older half is the half
+   that most needs to hear about a janāzah. The masjid already has a WhatsApp
+   community; this does not replace it, it feeds it.
+
+   WHY A BUTTON AND NOT AN API. Meta's Groups API caps a group at eight
+   people and can only manage groups it created itself, so the masjid's own
+   community of hundreds is unreachable by any supported route. The services
+   that CAN post to it drive a logged-in session against WhatsApp's terms,
+   and the penalty is the number being banned — which would lose the masjid
+   the community chat altogether. A button that opens WhatsApp with the words
+   already in it costs nothing, risks nothing, and keeps a person in the loop,
+   which for a death announcement is right rather than a compromise.
+
+   The point of assembling the text here rather than retyping it is that the
+   push and the WhatsApp message then cannot disagree.
+------------------------------------------------------------------------- */
+const WA_MAX = 1500;   /* characters of text, not of URL — see waTooLong */
+
+/* Pure, and on `window` so check-everything.mjs can assert the exact string.
+   WhatsApp renders *asterisks* as bold. The poster URL goes last of the
+   content but before the signature: WhatsApp previews the FIRST link it
+   finds, and the poster is the thing worth previewing. */
+function waText({ title, body, imageUrl, topic, signature = true }){
+  const parts = [];
+  if(topic === "janazah") parts.push("*Janāzah*", "");
+  parts.push(`*${String(title).trim()}*`, "", String(body).trim());
+  if(imageUrl) parts.push("", imageUrl);
+  if(signature) parts.push("", "— Taiyabah Masjid");
+  return parts.join("\n");
+}
+/* No phone number: wa.me then opens WhatsApp's own chat picker, which is what
+   lets the sender choose the community. */
+function waHref(text){ return "https://wa.me/?text=" + encodeURIComponent(text); }
+const waTooLong = text => text.length > WA_MAX;
+window.waText = waText; window.waHref = waHref; window.WA_MAX = WA_MAX;
+
+const WA_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.27-.2-.57-.35M12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.4Z"/></svg>`;
+
+/* ---------- the poster, as a real attachment ----------
+   TWO BUTTONS, TWO ACTS, on purpose.
+
+   wa.me can only ever prefill text, so the poster currently travels as a URL
+   that WhatsApp unfurls into a preview. navigator.share CAN attach the file
+   itself — but sharing text AND a file together is unreliable: on iOS an
+   image shared with `files` has been reported arriving as text, and Safari
+   sometimes puts the `text` field on the clipboard instead of passing it on.
+
+   The failure that must not happen is a janāzah poster arriving with the
+   words silently gone. So the words go first, by the path that always works,
+   and the picture goes second, deliberately. Neither can lose the other.
+
+   On a desktop the second button simply never appears — canShare says no,
+   and an absent button is better than one that fails.
+------------------------------------------------------------------------- */
+async function waPosterFile(src){
+  if(!src) return null;
+  try{
+    /* Works for both the data: URL held right after a send and the Worker's
+       own poster URL, which answers with Access-Control-Allow-Origin: *. */
+    const blob = await (await fetch(src)).blob();
+    if(!/^image\//.test(blob.type)) return null;
+    const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+    return new File([blob], `taiyabah-notice.${ext}`, { type: blob.type });
+  }catch{ return null; }
+}
+const waCanShareFile = file =>
+  !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
+
+/* Offer the just-sent notice to WhatsApp. */
+async function waOffer(item){
+  const btn = $("wa"), note = $("wa-long");
+  const text = waText(item);
+  const long = waTooLong(text);
+  btn.hidden = false; btn.disabled = long; btn.dataset.done = "";
+  btn.innerHTML = WA_ICON + "<span>Share to WhatsApp</span>";
+  note.hidden = !long;
+  if(long) note.textContent =
+    `Too long for WhatsApp — ${text.length.toLocaleString()} characters, limit ${WA_MAX.toLocaleString()}. ` +
+    `Shorten the message and it can go to the community as well.`;
+  btn.onclick = () => {
+    window.open(waHref(text), "_blank", "noopener");
+    /* "Opened", never "Sent". Once WhatsApp has focus this page cannot know
+       whether the send was pressed, and a false record in front of the
+       committee is worse than no record. */
+    btn.dataset.done = "1";
+    btn.innerHTML = WA_ICON + "<span>Opened in WhatsApp</span>";
+  };
+
+  /* The poster, second and separate. The File is built HERE rather than in
+     the click handler: iOS refuses a share whose user gesture has expired
+     across an await, and NotAllowedError is what that looks like. */
+  const pb = $("wa-img");
+  pb.hidden = true;
+  const file = await waPosterFile(item.posterData || item.imageUrl);
+  if(!waCanShareFile(file)) return;
+  pb.hidden = false; pb.dataset.done = "";
+  pb.innerHTML = WA_ICON + "<span>Share the poster</span>";
+  pb.onclick = () => navigator.share({ files: [file] })
+    .then(() => { pb.dataset.done = "1";
+                  pb.innerHTML = WA_ICON + "<span>Poster shared</span>"; })
+    /* AbortError is the sender changing their mind, which is not a fault. */
+    .catch(e => { if(e && e.name !== "AbortError") toast("Couldn't share the poster: " + e.message); });
+}
+function waHide(){ $("wa").hidden = true; $("wa-img").hidden = true; $("wa-long").hidden = true; }
 
 /* ---------- sending ----------
    All sends go through the masjid's sender service, which holds the OneSignal
@@ -829,10 +974,25 @@ $("send").addEventListener("click", async ()=>{
       toast(`Sent${rec}`);
     }
     const items=store.get("sent",[]);
-    items.unshift({title,msg,topic:inp.dataset.label,urgent:inp.dataset.urgent==="1",
+    /* `img` and `topicKey` are kept so the WhatsApp text can be rebuilt from a
+       history row weeks later — the poster is the thing WhatsApp previews, and
+       the topic is what puts the Janāzah heading on it. */
+    items.unshift({title,msg,topic:inp.dataset.label,topicKey:inp.value,
+                   urgent:inp.dataset.urgent==="1",
+                   img:(res.notice && res.notice.image_url) || undefined,
                    at:Date.now(),id:r.id,recipients:r.recipients});
     store.set("sent",items.slice(0,20));
     renderHistory();
+    /* Offered AFTER the push, with the words that were actually sent, so the
+       two copies cannot disagree. The fields are cleared below, which is why
+       this reads them first. */
+    /* posterData is the copy already in this page, so the poster needs no
+       round trip; image_url is the fallback and the only one a history row
+       has. waOffer is async and deliberately not awaited — the text button
+       appears at once and the poster button follows when its file is ready. */
+    waOffer({ title, body:msg, posterData:posterData || undefined,
+              imageUrl:(res.notice && res.notice.image_url) || undefined,
+              topic:inp.value });
     titleEl.value=""; msgEl.value=""; update();
   }catch(e){
     if(/sign|401/i.test(e.message)){ setToken(""); showGate("Your session expired — please sign in again."); }
@@ -857,6 +1017,12 @@ document.querySelectorAll('input[name="topic"]').forEach(r=>{
 });
 titleEl.addEventListener("input",update);
 msgEl.addEventListener("input",update);
+/* A new message is being written, so the offer to share the LAST one goes.
+   Hooked to typing rather than to update(), because update() is also called
+   programmatically straight after a send — and that call would otherwise
+   hide the button in the same breath that offered it. */
+titleEl.addEventListener("input",waHide);
+msgEl.addEventListener("input",waHide);
 
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 if(token()) showApp(); else showGate("");
