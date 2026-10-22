@@ -40,6 +40,8 @@ import More from "./screens/More";
 import Qibla from "./screens/Qibla";
 import Ramadan from "./screens/Ramadan";
 import Hajj from "./screens/Hajj";
+import HajjCounter from "./screens/HajjCounter";
+import HajjList from "./screens/HajjList";
 import Live from "./screens/Live";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
@@ -200,6 +202,8 @@ const linking = {
       Qibla:     "qibla",
       Ramadan:   "ramadan",
       Hajj:      "hajj",
+      HajjCounter: "hajj/counter",
+      HajjList:  "hajj/:section",
       Quran:     "quran",
       Mushaf:    "mushaf",
       Timetable: "timetable",
@@ -326,6 +330,14 @@ function Root() {
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Ramadan"   component={Ramadan}   options={{ ...bare, title: t("ramadan.ramadan", "Ramadan") }} />
         <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...pushed, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
+        <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...pushed, title: t("hajj.the_counters", "The counters") }} />
+        {/* One screen for three sections, so the title comes from the param
+            rather than from three near-identical route registrations. */}
+        <Stack.Screen name="HajjList"  component={HajjList}
+          options={({ route }) => ({ ...pushed, title:
+            route?.params?.section === "steps"   ? t("hajj.the_steps", "The steps")
+          : route?.params?.section === "rulings" ? t("hajj.the_rulings", "The rulings")
+          :                                       t("hajj.the_duas", "The duʿās") })} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
         {/* The donate page: one of the website's seven, so it wears the app
             bar rather than a sheet header. */}

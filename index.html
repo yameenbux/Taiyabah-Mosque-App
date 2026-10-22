@@ -1072,9 +1072,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     line-height:1.22;color:var(--ink);margin:13px 0 0}
   .hj-lede{font-size:calc(14.5px * var(--ts));line-height:1.6;color:var(--muted);margin:10px 0 0}
   .hj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+  /* A <button> even while held, and disabled: a disabled control is not in
+     the tab order and is not announced as pressable, so it reads as the
+     picture of a thing that is coming. Once the gate opens the same element
+     is the way in. */
   .hj-tile{border:1px solid var(--line);border-radius:16px;padding:15px 14px 16px;
     min-height:150px;display:flex;flex-direction:column;justify-content:space-between;
-    background:var(--card)}
+    background:var(--card);font:inherit;color:inherit;text-align:inherit;width:100%}
+  .hj-tile:not(:disabled){cursor:pointer}
+  .hj-tile:not(:disabled):active{transform:translateY(1px)}
   /* The counters are the one thing here a person can picture, so that tile is
      the plum one and shows a count rather than describing one. */
   .hj-tile.on{background:linear-gradient(170deg,var(--brand-700),var(--brand-900));border-color:transparent}
@@ -1107,10 +1113,58 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      a green/red pair would have leaned on hue alone, and both greens I tried
      failed contrast on their own tint in one mode or the other. */
   .hj-chip.yes{border:1px solid var(--line);background:var(--tint-green);color:var(--ink)}
+  .hj-chip.avoid{border:1px solid var(--tint-gold-line);background:var(--tint-gold);color:var(--ink)}
   .hj-chip.dam{border:1px solid var(--tint-rose-line);background:var(--tint-rose);color:var(--ink-rose)}
   .hj-by{font-size:calc(12px * var(--ts));line-height:1.55;color:var(--muted);text-align:center;margin:16px 0 0}
   .hj-sub{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:1.7px;
     text-transform:uppercase;color:var(--gold-ink);margin:22px 0 2px}
+
+  /* ---- the counters ----
+     The whole card counts, not a button inside it: a person is walking in a
+     crowd, in iḥrām, not looking down, and anything that needs aim is wrong. */
+  .hc-modes{display:flex;gap:7px}
+  .hc-mode{flex:1;padding:10px 4px;border:0;border-radius:999px;cursor:pointer;
+    font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.9px;
+    text-transform:uppercase;background:var(--tint-plum);color:var(--brand-600)}
+  .hc-mode[aria-pressed="true"]{background:var(--pick);color:var(--pick-ink)}
+  .hc-tap{width:100%;margin-top:16px;border:1px solid var(--line);border-radius:18px;
+    background:var(--card);padding:34px 20px;display:flex;flex-direction:column;
+    align-items:center;cursor:pointer;font:inherit;color:inherit}
+  .hc-tap:disabled{cursor:default}
+  .hc-dial{position:relative;width:132px;height:132px;display:grid;place-items:center}
+  .hc-dial svg{position:absolute;inset:0;transform:rotate(-90deg)}
+  .hc-n{font-family:"Fraunces",Georgia,serif;font-size:calc(54px * var(--ts));line-height:1;
+    color:var(--ink)}
+  .hc-tap.done .hc-n{color:var(--on-air)}
+  .hc-lab{font-size:calc(13.5px * var(--ts));font-weight:500;color:var(--muted);
+    margin-top:14px;text-align:center}
+  .hc-pips{display:flex;gap:7px;margin-top:16px}
+  .hc-pip{width:8px;height:8px;border-radius:999px;background:var(--line)}
+  .hc-pip.on{background:var(--brand-600)}
+  .hc-acts{display:flex;gap:10px;margin-top:12px}
+  .hc-act{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:13px 4px;border:1px solid var(--line);border-radius:13px;background:var(--card);
+    cursor:pointer;font:inherit;font-size:calc(13.5px * var(--ts));font-weight:600;color:var(--ink)}
+  .hc-act:disabled{opacity:.45;cursor:default}
+  .hc-act svg{width:16px;height:16px}
+  .hc-note{font-size:calc(12px * var(--ts));line-height:1.55;color:var(--muted);
+    text-align:center;margin:18px 0 0}
+  .hl-card{border:1px solid var(--line);border-radius:18px;background:var(--card);
+    padding:17px;margin-top:12px}
+  .hl-card:first-of-type{margin-top:0}
+  .hl-ar{font-family:"Amiri",Georgia,serif;font-size:calc(22px * var(--ts));line-height:1.9;
+    color:var(--ink);text-align:right;direction:rtl}
+  .hl-tr{font-size:calc(13px * var(--ts));font-weight:500;line-height:1.6;
+    color:var(--brand-600);margin-top:8px}
+  .hl-q{font-size:calc(15px * var(--ts));font-weight:600;line-height:1.45;color:var(--ink);margin-top:10px}
+  .hl-a{font-size:calc(14px * var(--ts));line-height:1.6;color:var(--muted);margin-top:6px}
+  .hl-when{font-size:calc(12.5px * var(--ts));font-weight:500;line-height:1.5;
+    color:var(--gold-ink);margin-top:9px}
+  .hl-src{font-size:calc(11.5px * var(--ts));line-height:1.45;color:var(--muted);margin-top:9px}
+  .hl-none{text-align:center;padding:28px 10px}
+  .hl-none h2{font-family:"Fraunces",Georgia,serif;font-size:calc(22px * var(--ts));
+    line-height:1.3;color:var(--ink);margin:0}
+  .hl-none p{font-size:calc(13.5px * var(--ts));line-height:1.6;color:var(--muted);margin:10px 0 0}
   /* Nastaliq sits a long way outside the Latin em-box, and the display
      setting these two carry is tight by design: at 1.1 the Urdu headline
      lost the top of its second line and the “Dates to be confirmed” phrase
@@ -5079,28 +5133,34 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="sh-close" id="hj-close" data-i18n="ramadan.done">Done</button>
       </div>
       <div class="sh-body">
-        <span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
-        <h2 class="hj-head" data-i18n="hajj.what_you_will_carry">What you will carry with you</h2>
+       <div class="ab-wrap">
+        <span class="soon-tag" id="hj-soon" data-i18n="marriage.coming_soon">Coming soon</span>
+        <!-- Two headlines, two by-lines, two sub-headings, one of each
+             hidden. Setting textContent instead would be overwritten the
+             next time the language changes, because data-i18n is what
+             owns these strings. -->
+        <h2 class="hj-head" id="hj-head-held" data-i18n="hajj.what_you_will_carry">What you will carry with you</h2>
+        <h2 class="hj-head" id="hj-head-open" data-i18n="hajj.what_you_carry" hidden>What you carry with you</h2>
         <p class="hj-lede" data-i18n="hajj.four_things_offline">Four things, on your phone, working without signal in the &#7716;aram.</p>
 
         <div class="hj-grid">
-          <div class="hj-tile">
+          <button type="button" class="hj-tile" id="hj-t-duas" disabled>
             <div class="hj-ar" lang="ar">&#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614; &#1575;&#1604;&#1604;&#1617;&#1614;&#1607;&#1615;&#1605;&#1617;&#1614; &#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614;</div>
             <div>
               <div class="hj-t" data-i18n="hajj.the_duas">The du&#703;&#257;s</div>
               <div class="hj-d" data-i18n="hajj.duas_detail">I&#7717;r&#257;m, talbiyah, &#7789;aw&#257;f, sa&#703;&#299;, with the transliteration</div>
             </div>
-          </div>
+          </button>
 
-          <div class="hj-tile on">
+          <button type="button" class="hj-tile on" id="hj-t-count" disabled>
             <div class="hj-count"><b data-i18n-latin>4</b><span data-i18n="hajj.of_seven">of 7</span></div>
             <div>
               <div class="hj-t" data-i18n="hajj.the_counters">The counters</div>
               <div class="hj-d" data-i18n="hajj.counters_detail">&#7788;aw&#257;f and sa&#703;&#299; without losing count, and a tasb&#299;&#7717;</div>
             </div>
-          </div>
+          </button>
 
-          <div class="hj-tile">
+          <button type="button" class="hj-tile" id="hj-t-steps" disabled>
             <div>
               <div class="hj-step now"><i>1</i><em></em></div>
               <div class="hj-step" style="margin-top:5px"><i>2</i><em></em></div>
@@ -5110,9 +5170,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <div class="hj-t" data-i18n="hajj.the_steps">The steps</div>
               <div class="hj-d" data-i18n="hajj.steps_detail">How each rite is performed, in order, one step at a time</div>
             </div>
-          </div>
+          </button>
 
-          <div class="hj-tile">
+          <button type="button" class="hj-tile" id="hj-t-rulings" disabled>
             <div class="hj-chips">
               <span class="hj-chip yes" data-i18n="hajj.allowed">Allowed</span>
               <span class="hj-chip dam" data-i18n="hajj.dam_due">Dam due</span>
@@ -5121,19 +5181,79 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <div class="hj-t" data-i18n="hajj.the_rulings">The rulings</div>
               <div class="hj-d" data-i18n="hajj.rulings_detail">In i&#7717;r&#257;m, shortening sal&#257;h, and when a dam is owed</div>
             </div>
-          </div>
+          </button>
         </div>
 
-        <p class="hj-by" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
+        <p class="hj-by" id="hj-by-held" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
+        <p class="hj-by" id="hj-by-open" data-i18n="hajj.approved_by_ulama" hidden>Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
 
-        <div class="hj-sub" data-i18n="hajj.until_then">Until then</div>
+        <div class="hj-sub" id="hj-sub-held" data-i18n="hajj.until_then">Until then</div>
+        <div class="hj-sub" id="hj-sub-open" data-i18n="hajj.a_question" hidden>A question</div>
         <button class="dr-row" id="hj-duas">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M8 7.5h7M8 11.5h7"/></svg></span><span class="dr-t" data-i18n="hajj.the_dua_book">The du&#703;&#257; book</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" id="hj-contact">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.3 17.3 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.8 5.5a1.8 1.8 0 0 1 1.8-2h2.6a1.8 1.8 0 0 1 1.8 1.6c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14 14 0 0 0 5.3 5.3l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6a1.8 1.8 0 0 1 1.6 1.9Z"/></svg></span><span class="dr-t" data-i18n="hajj.ask_the_ulama">Ask the &#703;ulam&#257;</span><span class="dr-ch">&rsaquo;</span>
         </button>
+       </div>
       </div>
+    </div>
+  </div>
+
+  <!-- The counters. Built and reachable only once the gate opens; see
+       HAJJ_RELEASED. The whole card is the target on purpose. -->
+  <div class="sheet" id="hajjcount" data-open="0" role="dialog" aria-modal="true" aria-label="The counters" data-i18n-attr="aria-label:hajj.the_counters">
+    <div class="scrim" id="hc-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="hajj.the_counters">The counters</h3>
+        <button class="sh-close" id="hc-close" data-i18n="ramadan.done">Done</button>
+      </div>
+      <div class="sh-body">
+       <div class="ab-wrap">
+        <div class="hc-modes" role="group" aria-label="Which counter" data-i18n-attr="aria-label:hajj.which_counter">
+          <button type="button" class="hc-mode" data-m="tawaf"  aria-pressed="true"  data-i18n="hajj.mode_tawaf">&#7788;aw&#257;f</button>
+          <button type="button" class="hc-mode" data-m="sai"    aria-pressed="false" data-i18n="hajj.mode_sai">Sa&#703;&#299;</button>
+          <button type="button" class="hc-mode" data-m="tasbih" aria-pressed="false" data-i18n="hajj.mode_tasbih">Tasb&#299;&#7717;</button>
+        </div>
+        <button type="button" class="hc-tap" id="hc-tap" aria-label="Count one more" data-i18n-attr="aria-label:hajj.count_one_more">
+          <span class="hc-dial">
+            <svg viewBox="0 0 132 132" aria-hidden="true">
+              <circle cx="66" cy="66" r="62.5" fill="none" stroke="var(--line)" stroke-width="7"></circle>
+              <circle id="hc-ring" cx="66" cy="66" r="62.5" fill="none" stroke="var(--brand-600)" stroke-width="7" stroke-linecap="round"></circle>
+            </svg>
+            <span class="hc-n" id="hc-n" data-i18n-latin>0</span>
+          </span>
+          <span class="hc-lab" id="hc-lab"></span>
+          <span class="hc-pips" id="hc-pips"></span>
+        </button>
+        <div class="hc-acts">
+          <button type="button" class="hc-act" id="hc-undo" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+            <span data-i18n="hajj.undo_one">Undo one</span>
+          </button>
+          <button type="button" class="hc-act" id="hc-reset" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink-rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v5h5"/></svg>
+            <span data-i18n="hajj.start_again_short">Start again</span>
+          </button>
+        </div>
+        <p class="hc-note" data-i18n="hajj.counter_is_not_a_ruling">This counts, and nothing more. It cannot tell you whether a circuit was valid, and the count is kept on this phone only.</p>
+       </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The du&#703;&#257;s, the steps and the rulings. One sheet, three sections:
+       they differ in what each entry carries, not in how a person moves
+       through them. Everything in them comes from HAJJ_CONTENT. -->
+  <div class="sheet" id="hajjlist" data-open="0" role="dialog" aria-modal="true" aria-label="Hajj and Umrah" data-i18n-attr="aria-label:a11y.hajj_umrah">
+    <div class="scrim" id="hl-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" id="hl-title"></h3>
+        <button class="sh-close" id="hl-close" data-i18n="ramadan.done">Done</button>
+      </div>
+      <div class="sh-body ab-wrap" id="hl-body"></div>
     </div>
   </div>
 
@@ -10958,10 +11078,168 @@ function closeRamadan(){
   document.body.style.overflow="";
   ramStopTick();
 }
-/* Hajj & Umrah. data-open is all the Back button needs: the MutationObserver
-   in initBackButton arms the history sentinel off that attribute, so this
-   sheet closes on Back without knowing anything about it. */
+/* ---------------- Hajj & Umrah ----------------
+
+   THE GATE, and it is the same rule as native/src/hajj.js. The section is
+   built and held: until the masjid says otherwise the public sees the locked
+   screen, exactly as Ramadan was held behind its guard.
+
+   THE FLAG IS NOT THE WHOLE GATE. Dam, the restrictions of iḥrām, qaṣr and
+   the order of the rites are rulings the ʿulamā at the masjid supply, and
+   nothing here writes them. So the gate also refuses to open onto content
+   that has not arrived — flipping HAJJ_RELEASED on its own is not enough,
+   and a release cannot expose an empty rulings screen. check-hajj.mjs
+   asserts that this constant and the app's RELEASED agree, because a website
+   that releases while the app holds is the same bug in a different hat.
+
+   The counters are exempt, deliberately: they carry no words but their own
+   numbers, so they are finished either way. */
+const HAJJ_RELEASED = false;
+
+/* Filled from what the ʿulamā write. Empty is the honest state, and it is
+   what keeps the gate shut. The shapes are documented in
+   native/src/hajj-data.js, which this mirrors. */
+const HAJJ_CONTENT = { duas: [], steps: [], rulings: [] };
+
+const HAJJ_SECTIONS = ["duas", "steps", "rulings"];
+function hajjMissing(c){
+  return HAJJ_SECTIONS.filter(k => !Array.isArray((c||{})[k]) || !(c||{})[k].length);
+}
+function hajjAccess(content, released){
+  if(!(released === undefined ? HAJJ_RELEASED : released)) return { open:false, reason:"held" };
+  const missing = hajjMissing(content);
+  if(missing.length) return { open:false, reason:"incomplete", missing };
+  return { open:true };
+}
+
+/* ---- the counters ----
+   Seven and seven, and a tasbīḥ that does not stop. The arithmetic is the
+   app's hajj.js, line for line, because a counter that disagrees between a
+   phone and a browser is worse than one that is simply wrong. */
+const HC = { tawaf:{total:7,marks:[]}, sai:{total:7,marks:[]}, tasbih:{total:0,marks:[33,66,99]} };
+const hcTick     = (m,n) => { const c=HC[m]; if(!c) return n; const x=n+1; return c.total && x>c.total ? c.total : x; };
+const hcUntick   = (m,n) => n>0 ? n-1 : 0;
+const hcComplete = (m,n) => { const c=HC[m]; return !!(c && c.total && n>=c.total); };
+/* Saʿī is walked between two hills, so lap 1 leaves Ṣafā and lap 2 Marwa —
+   which means the seventh ENDS at Marwa, and somebody who has lost that
+   cannot recover it by counting. 0 = Ṣafā, 1 = Marwa, null = no next lap. */
+const hcFrom     = n => n >= HC.sai.total ? null : (n % 2 === 0 ? 0 : 1);
+function hcProgress(m,n){
+  const c=HC[m]; if(!c) return 0;
+  if(c.total) return Math.min(n/c.total,1);
+  const mark=c.marks[c.marks.length-1]||100; return (n%mark)/mark;
+}
+
+const HC_KEY = "taiyabah.hajj.counts";
+let hcMode = "tawaf";
+let hcN = { tawaf:0, sai:0, tasbih:0 };
+/* Written on EVERY press, not on a timer and not on close: a phone that dies
+   at the fourth circuit comes back at the fourth circuit, which is the whole
+   reason a counter beats a hand. */
+function hcSave(){ try{ localStorage.setItem(HC_KEY, JSON.stringify(hcN)); }catch{} }
+function hcLoad(){ try{ const r=localStorage.getItem(HC_KEY); if(r) hcN={...hcN,...JSON.parse(r)}; }catch{} }
+
+function hcRender(){
+  const n = hcN[hcMode], c = HC[hcMode], done = hcComplete(hcMode,n);
+  const tap = document.getElementById("hc-tap");
+  document.getElementById("hc-n").textContent = num(n);
+  tap.classList.toggle("done", done);
+  tap.disabled = done;
+  const ring = document.getElementById("hc-ring"), C = 2*Math.PI*62.5;
+  ring.setAttribute("stroke-dasharray", `${C} ${C}`);
+  ring.setAttribute("stroke-dashoffset", String(C*(1-hcProgress(hcMode,n))));
+  ring.setAttribute("stroke", done ? "var(--on-air)" : "var(--brand-600)");
+  const from = hcFrom(n);
+  document.getElementById("hc-lab").textContent =
+      hcMode==="sai" && from!==null
+        ? (from===0 ? t("hajj.next_from_safa","Next lap leaves from \u1E62af\u0101")
+                    : t("hajj.next_from_marwa","Next lap leaves from Marwa"))
+    : done ? t("hajj.all_seven_complete","All seven complete")
+    : c.total ? t("hajj.of_total","of {n}").replace("{n}", num(c.total))
+    : t("hajj.keep_going","Keep going");
+  document.getElementById("hc-pips").innerHTML = c.total
+    ? Array.from({length:c.total},(_,i)=>`<span class="hc-pip${i<n?" on":""}"></span>`).join("")
+    : "";
+  document.getElementById("hc-undo").disabled = n===0;
+  document.getElementById("hc-reset").disabled = n===0;
+  [...document.querySelectorAll(".hc-mode")].forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.m===hcMode)));
+}
+function hcBuzz(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch{} }
+
+function openHajjCount(){
+  hcLoad(); hcRender();
+  document.getElementById("hajjcount").dataset.open="1";
+  document.body.style.overflow="hidden";
+}
+function closeHajjCount(){ document.getElementById("hajjcount").dataset.open="0"; document.body.style.overflow=""; }
+
+/* ---- the three lists ---- */
+const HL_TITLE = { duas:["hajj.the_duas","The du\u02BF\u0101s"],
+                   steps:["hajj.the_steps","The steps"],
+                   rulings:["hajj.the_rulings","The rulings"] };
+/* Three verdicts, and only "dam" takes a colour, so the two are not told
+   apart by hue alone. The same rule the tiles follow. */
+const HL_VERDICT = {
+  allowed: () => [t("hajj.allowed","Allowed"), "yes"],
+  avoid:   () => [t("hajj.avoid","Avoid"), "avoid"],
+  dam:     () => [t("hajj.dam_due","Dam due"), "dam"],
+};
+
+function openHajjList(section){
+  const items = HAJJ_CONTENT[section] || [];
+  const [tk,td] = HL_TITLE[section] || HL_TITLE.duas;
+  document.getElementById("hl-title").textContent = t(tk,td);
+  document.getElementById("hl-body").innerHTML = items.length
+    ? items.map(x => {
+        const v = HL_VERDICT[x.verdict] ? HL_VERDICT[x.verdict]() : null;
+        const src = [x.by, x.source].filter(Boolean).join(" \u00B7 ");
+        return `<div class="hl-card">`
+          + (x.ar ? `<div class="hl-ar" lang="ar">${esc(x.ar)}</div>` : "")
+          + (x.tr ? `<div class="hl-tr">${esc(x.tr)}</div>` : "")
+          + (v ? `<span class="hj-chip ${v[1]}">${esc(v[0])}</span>` : "")
+          + ((x.title||x.q) ? `<div class="hl-q">${x.n?esc(num(x.n))+". ":""}${esc(x.title||x.q)}</div>` : "")
+          + ((x.en||x.body||x.a) ? `<div class="hl-a">${esc(x.en||x.body||x.a)}</div>` : "")
+          + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
+          + (src ? `<div class="hl-src">${esc(src)}</div>` : "")
+          + `</div>`;
+      }).join("")
+    /* Not what the public sees — the gate is shut while a list is empty.
+       This is what a developer sees with it forced open, and it names the
+       file that is waiting rather than looking broken. */
+    : `<div class="hl-none"><h2 data-i18n="hajj.nothing_here_yet">${esc(t("hajj.nothing_here_yet","Nothing here yet"))}</h2>`
+      + `<p>${esc(t("hajj.awaiting_ulama","This section is waiting on the \u02BFulam\u0101 at the masjid. Until it arrives, the section stays shut."))}</p></div>`;
+  document.getElementById("hajjlist").dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.getElementById("hl-body").scrollTop=0;
+}
+function closeHajjList(){ document.getElementById("hajjlist").dataset.open="0"; document.body.style.overflow=""; }
+
+/* Held or open, it is the SAME four tiles: a picture of what is coming, or
+   the way in. A disabled control is not in the tab order and is not announced
+   as pressable, which is what makes the held state honest. */
+function renderHajj(){
+  const open = hajjAccess(HAJJ_CONTENT).open;
+  document.getElementById("hj-soon").hidden = open;
+  for(const base of ["hj-head","hj-by","hj-sub"]){
+    document.getElementById(base + "-held").hidden = open;
+    document.getElementById(base + "-open").hidden = !open;
+  }
+  /* The duʿā book row is what is offered INSTEAD of the section; once the
+     section carries its own, only the office stays. */
+  document.getElementById("hj-duas").hidden = open;
+  for(const [id,go] of [["hj-t-duas",()=>openHajjList("duas")],
+                        ["hj-t-count",openHajjCount],
+                        ["hj-t-steps",()=>openHajjList("steps")],
+                        ["hj-t-rulings",()=>openHajjList("rulings")]]){
+    const b = document.getElementById(id);
+    b.disabled = !open;
+    b.onclick = open ? () => { closeHajj(); setTimeout(go,120); } : null;
+  }
+}
+
 function openHajj(){
+  renderHajj();
   document.getElementById('hajj').dataset.open="1";
   document.body.style.overflow="hidden";
   document.querySelector('#hajj .sh-body').scrollTop=0;
@@ -10979,6 +11257,39 @@ function initHajj(){
   document.getElementById('hj-contact').addEventListener('click',()=>{ closeHajj(); setTimeout(openContact,120); });
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('hajj').dataset.open==="1") closeHajj();
+  });
+
+  /* The counters. Every press writes, so a phone that dies mid-ṭawāf comes
+     back where it was. */
+  document.getElementById('hc-close').addEventListener('click',closeHajjCount);
+  document.getElementById('hc-scrim').addEventListener('click',closeHajjCount);
+  [...document.querySelectorAll('.hc-mode')].forEach(b =>
+    b.addEventListener('click',()=>{ hcMode=b.dataset.m; hcRender(); }));
+  document.getElementById('hc-tap').addEventListener('click',()=>{
+    if(hcComplete(hcMode,hcN[hcMode])) return;
+    hcN[hcMode]=hcTick(hcMode,hcN[hcMode]); hcSave(); hcRender();
+    hcBuzz(hcComplete(hcMode,hcN[hcMode]) ? [18,60,18] : 14);
+  });
+  document.getElementById('hc-undo').addEventListener('click',()=>{
+    const next=hcUntick(hcMode,hcN[hcMode]);
+    if(next===hcN[hcMode]) return;
+    hcN[hcMode]=next; hcSave(); hcRender(); hcBuzz(8);
+  });
+  /* Asks first, always: a reset cannot be undone and what it destroys cannot
+     be reconstructed from anywhere. */
+  document.getElementById('hc-reset').addEventListener('click',()=>{
+    if(!hcN[hcMode]) return;
+    if(!confirm(t("hajj.start_again_q","Start again?") + "\n\n"
+              + t("hajj.reset_warning","The count goes back to zero. There is no way to get it back."))) return;
+    hcN[hcMode]=0; hcSave(); hcRender();
+  });
+
+  document.getElementById('hl-close').addEventListener('click',closeHajjList);
+  document.getElementById('hl-scrim').addEventListener('click',closeHajjList);
+  document.addEventListener('keydown',e=>{
+    if(e.key!=="Escape") return;
+    if(document.getElementById('hajjcount').dataset.open==="1") closeHajjCount();
+    if(document.getElementById('hajjlist').dataset.open==="1") closeHajjList();
   });
 }
 
