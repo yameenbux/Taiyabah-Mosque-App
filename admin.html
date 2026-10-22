@@ -34,6 +34,13 @@
     font-family:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  /* The hidden attribute, made to actually hide.
+     A class that sets display beats the browser's own [hidden]{display:none},
+     because a class is more specific than a built-in rule — so .wa{display:flex}
+     on a <button hidden> rendered the button anyway, as an empty box. That is
+     what #tt-warn[hidden] below was patching, one element at a time. Do it once,
+     for every element on the page that is hidden and later shown. */
+  [hidden]{display:none !important}
   body{background:var(--paper);color:var(--ink);max-width:560px;margin-inline:auto;
     min-height:100dvh;padding-bottom:44px;-webkit-font-smoothing:antialiased}
   .display{font-family:"Fraunces",Georgia,serif}
