@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "28585dd24165",
+ "version": "58ddaa148729",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -480,6 +480,7 @@ window.LANG_PACK = {
   "a11y.search_the_arabic_text": "અરબી લખાણમાં શોધો",
   "a11y.hadith_number": "હદીસ નંબર",
   "a11y.madrasah_curriculum": "મદ્રેસાનો અભ્યાસક્રમ",
+  "a11y.hajj_umrah": "હજ અને ઉમરાહ",
   "a11y.ramadan": "રમઝાન",
   "ramadan.begins_today": "રમઝાન આજે શરૂ થાય છે",
   "ramadan.begins_tomorrow": "રમઝાન આવતીકાલે શરૂ થાય છે",
@@ -2090,6 +2091,23 @@ window.LANG_PACK = {
   "ramadan.on_the_sighting_of_the": "ચાંદ દેખાય ત્યારે",
   "ramadan.days": "દિવસ",
   "ramadan.hours": "કલાક",
-  "ramadan.minutes": "મિનિટ"
+  "ramadan.minutes": "મિનિટ",
+  "hajj.what_you_will_carry": "તમે તમારી સાથે શું લઈ જશો",
+  "hajj.four_things_offline": "ચાર વસ્તુઓ, તમારા ફોનમાં, હરમમાં સિગ્નલ વગર પણ ચાલે છે.",
+  "hajj.the_duas": "દુઆઓ",
+  "hajj.duas_detail": "ઇહરામ, તલબિયહ, તવાફ, સઈ, ઉચ્ચાર સાથે",
+  "hajj.of_seven": "માંથી 7",
+  "hajj.the_counters": "ગણતરી",
+  "hajj.counters_detail": "તવાફ અને સઈ, ગણતરી ભૂલ્યા વગર, અને એક તસ્બીહ",
+  "hajj.the_steps": "રીત",
+  "hajj.steps_detail": "દરેક વિધિ કેવી રીતે કરવી, ક્રમમાં, એક એક પગલું",
+  "hajj.allowed": "જાયઝ",
+  "hajj.dam_due": "દમ વાજિબ",
+  "hajj.the_rulings": "મસાઇલ",
+  "hajj.rulings_detail": "ઇહરામમાં, નમાઝની કસર, અને દમ ક્યારે વાજિબ થાય",
+  "hajj.checked_by_ulama": "દરેક મસઅલો અહીં આવતા પહેલાં મસ્જિદના ઉલમા દ્વારા તપાસીને મંજૂર કરવામાં આવશે.",
+  "hajj.until_then": "ત્યાં સુધી",
+  "hajj.the_dua_book": "દુઆની ચોપડી",
+  "hajj.ask_the_ulama": "ઉલમાને પૂછો"
  }
 };

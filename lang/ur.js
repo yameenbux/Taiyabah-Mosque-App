@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "b790c5dcf119",
+ "version": "ebbdd725a07e",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -480,6 +480,7 @@ window.LANG_PACK = {
   "a11y.search_the_arabic_text": "عربی متن میں تلاش کریں",
   "a11y.hadith_number": "حدیث نمبر",
   "a11y.madrasah_curriculum": "مدرسے کا نصاب",
+  "a11y.hajj_umrah": "حج اور عمرہ",
   "a11y.ramadan": "رمضان",
   "ramadan.begins_today": "رمضان آج شروع ہو رہا ہے",
   "ramadan.begins_tomorrow": "رمضان کل شروع ہو رہا ہے",
@@ -2090,6 +2091,23 @@ window.LANG_PACK = {
   "ramadan.on_the_sighting_of_the": "چاند نظر آنے پر",
   "ramadan.days": "دن",
   "ramadan.hours": "گھنٹے",
-  "ramadan.minutes": "منٹ"
+  "ramadan.minutes": "منٹ",
+  "hajj.what_you_will_carry": "آپ اپنے ساتھ کیا لے جائیں گے",
+  "hajj.four_things_offline": "چار چیزیں، آپ کے فون میں، حرم میں سگنل کے بغیر بھی کام کرتی ہیں۔",
+  "hajj.the_duas": "دعائیں",
+  "hajj.duas_detail": "احرام، تلبیہ، طواف، سعی، تلفظ کے ساتھ",
+  "hajj.of_seven": "میں سے 7",
+  "hajj.the_counters": "شمار",
+  "hajj.counters_detail": "طواف اور سعی، شمار بھولے بغیر، اور ایک تسبیح",
+  "hajj.the_steps": "طریقہ",
+  "hajj.steps_detail": "ہر عمل کیسے ادا کیا جائے، ترتیب سے، ایک ایک قدم",
+  "hajj.allowed": "جائز",
+  "hajj.dam_due": "دم واجب",
+  "hajj.the_rulings": "مسائل",
+  "hajj.rulings_detail": "احرام میں، نماز کی قصر، اور دم کب واجب ہوتا ہے",
+  "hajj.checked_by_ulama": "ہر مسئلہ یہاں آنے سے پہلے مسجد کے علماء سے جانچ اور منظوری کے بعد ہی شامل کیا جائے گا۔",
+  "hajj.until_then": "اس وقت تک",
+  "hajj.the_dua_book": "دعاؤں کی کتاب",
+  "hajj.ask_the_ulama": "علماء سے پوچھیں"
  }
 };

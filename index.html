@@ -1061,6 +1061,56 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .rmg-logo{display:block;width:164px;height:116px;object-fit:contain;margin-inline:auto}
   .rmg-soc{font-size:calc(8.5px * var(--ts));font-weight:600;color:rgba(243,239,227,.42);
     letter-spacing:2.2px;text-transform:uppercase;margin-top:16px}
+
+  /* ---- Hajj & Umrah, while it is still locked ----
+     Not the Ramadan guard's plum poster. That screen is a countdown to a
+     month the whole masjid keeps together; this one is for the handful of
+     people who are going, and its job is to say what they will be given and
+     what they can use TODAY. So it is an ordinary paper sheet, and the four
+     tiles carry the weight. */
+  .hj-head{font-family:"Fraunces",Georgia,serif;font-size:calc(27px * var(--ts));
+    line-height:1.22;color:var(--ink);margin:13px 0 0}
+  .hj-lede{font-size:calc(14.5px * var(--ts));line-height:1.6;color:var(--muted);margin:10px 0 0}
+  .hj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+  .hj-tile{border:1px solid var(--line);border-radius:16px;padding:15px 14px 16px;
+    min-height:150px;display:flex;flex-direction:column;justify-content:space-between;
+    background:var(--card)}
+  /* The counters are the one thing here a person can picture, so that tile is
+     the plum one and shows a count rather than describing one. */
+  .hj-tile.on{background:linear-gradient(170deg,var(--brand-700),var(--brand-900));border-color:transparent}
+  .hj-t{font-size:calc(14.5px * var(--ts));font-weight:600;color:var(--ink)}
+  .hj-d{font-size:calc(12px * var(--ts));line-height:1.5;color:var(--muted);margin-top:3px}
+  /* Cream on plum is a literal here, as it is in every .rmg- rule: there is
+     no --cream token on this page, and var(--cream) silently resolves to
+     nothing, which inherits --ink and paints dark text on a dark tile. */
+  .hj-tile.on .hj-t{color:#F3EFE3}
+  .hj-tile.on .hj-d{color:rgba(243,239,227,.62)}
+  .hj-ar{font-family:"Amiri",Georgia,serif;font-size:calc(20px * var(--ts));line-height:1.6;
+    color:var(--brand-600);text-align:right;direction:rtl}
+  .hj-count{display:flex;align-items:baseline;gap:5px}
+  .hj-count b{font-family:"Fraunces",Georgia,serif;font-weight:400;
+    font-size:calc(38px * var(--ts));line-height:1;color:#F3EFE3}
+  .hj-count span{font-size:calc(13px * var(--ts));font-weight:600;color:rgba(243,239,227,.55)}
+  .hj-step{display:flex;align-items:center;gap:7px}
+  .hj-step i{width:17px;height:17px;flex:none;border-radius:999px;display:grid;place-items:center;
+    font-style:normal;font-size:calc(9px * var(--ts));font-weight:700;
+    background:rgba(119,33,87,.16);color:var(--brand-600)}
+  .hj-step.now i{background:var(--brand-600);color:#F3EFE3}
+  /* --line, not a literal: this tile is paper in light and card in dark, and
+     a fixed #EEE9DC bar is a pale scar across the dark one. */
+  .hj-step em{height:3px;flex:1 1 auto;border-radius:2px;background:var(--line)}
+  .hj-chips{display:flex;gap:6px;flex-wrap:wrap}
+  .hj-chip{border-radius:7px;padding:3px 7px;font-size:calc(9.5px * var(--ts));font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase}
+  /* Allowed is the ordinary state and reads in the ordinary ink; dam is the
+     exception and is the only one that takes a colour. Telling them apart by
+     a green/red pair would have leaned on hue alone, and both greens I tried
+     failed contrast on their own tint in one mode or the other. */
+  .hj-chip.yes{border:1px solid var(--line);background:var(--tint-green);color:var(--ink)}
+  .hj-chip.dam{border:1px solid var(--tint-rose-line);background:var(--tint-rose);color:var(--ink-rose)}
+  .hj-by{font-size:calc(12px * var(--ts));line-height:1.55;color:var(--muted);text-align:center;margin:16px 0 0}
+  .hj-sub{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:1.7px;
+    text-transform:uppercase;color:var(--gold-ink);margin:22px 0 2px}
   /* Nastaliq sits a long way outside the Latin em-box, and the display
      setting these two carry is tight by design: at 1.1 the Urdu headline
      lost the top of its second line and the “Dates to be confirmed” phrase
@@ -5011,6 +5061,82 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     </div>
   </div>
 
+  <!-- HAJJ & UMRAH, LOCKED.
+       The row that opens this used to be dead: .dr-row.soon with disabled on
+       it, on both platforms. A person going for Hajj tapped it and nothing
+       happened, which is the worst of the three answers available (nothing,
+       a promise, or the truth).
+
+       It makes NO promise it cannot keep. Nothing here reaches the masjid and
+       nobody is signed up for anything, so the screen never says it will be
+       in touch. It says what is coming, and then sends them to the two things
+       that are already built and already work with no signal. -->
+  <div class="sheet" id="hajj" data-open="0" role="dialog" aria-modal="true" aria-label="Hajj and Umrah" data-i18n-attr="aria-label:a11y.hajj_umrah">
+    <div class="scrim" id="hj-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="marriage.hajj_umrah">Hajj / Umrah</h3>
+        <button class="sh-close" id="hj-close" data-i18n="ramadan.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+        <h2 class="hj-head" data-i18n="hajj.what_you_will_carry">What you will carry with you</h2>
+        <p class="hj-lede" data-i18n="hajj.four_things_offline">Four things, on your phone, working without signal in the &#7716;aram.</p>
+
+        <div class="hj-grid">
+          <div class="hj-tile">
+            <div class="hj-ar" lang="ar">&#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614; &#1575;&#1604;&#1604;&#1617;&#1614;&#1607;&#1615;&#1605;&#1617;&#1614; &#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614;</div>
+            <div>
+              <div class="hj-t" data-i18n="hajj.the_duas">The du&#703;&#257;s</div>
+              <div class="hj-d" data-i18n="hajj.duas_detail">I&#7717;r&#257;m, talbiyah, &#7789;aw&#257;f, sa&#703;&#299;, with the transliteration</div>
+            </div>
+          </div>
+
+          <div class="hj-tile on">
+            <div class="hj-count"><b data-i18n-latin>4</b><span data-i18n="hajj.of_seven">of 7</span></div>
+            <div>
+              <div class="hj-t" data-i18n="hajj.the_counters">The counters</div>
+              <div class="hj-d" data-i18n="hajj.counters_detail">&#7788;aw&#257;f and sa&#703;&#299; without losing count, and a tasb&#299;&#7717;</div>
+            </div>
+          </div>
+
+          <div class="hj-tile">
+            <div>
+              <div class="hj-step now"><i>1</i><em></em></div>
+              <div class="hj-step" style="margin-top:5px"><i>2</i><em></em></div>
+              <div class="hj-step" style="margin-top:5px"><i>3</i><em></em></div>
+            </div>
+            <div>
+              <div class="hj-t" data-i18n="hajj.the_steps">The steps</div>
+              <div class="hj-d" data-i18n="hajj.steps_detail">How each rite is performed, in order, one step at a time</div>
+            </div>
+          </div>
+
+          <div class="hj-tile">
+            <div class="hj-chips">
+              <span class="hj-chip yes" data-i18n="hajj.allowed">Allowed</span>
+              <span class="hj-chip dam" data-i18n="hajj.dam_due">Dam due</span>
+            </div>
+            <div>
+              <div class="hj-t" data-i18n="hajj.the_rulings">The rulings</div>
+              <div class="hj-d" data-i18n="hajj.rulings_detail">In i&#7717;r&#257;m, shortening sal&#257;h, and when a dam is owed</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="hj-by" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
+
+        <div class="hj-sub" data-i18n="hajj.until_then">Until then</div>
+        <button class="dr-row" id="hj-duas">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M8 7.5h7M8 11.5h7"/></svg></span><span class="dr-t" data-i18n="hajj.the_dua_book">The du&#703;&#257; book</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+        <button class="dr-row" id="hj-contact">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.3 17.3 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.8 5.5a1.8 1.8 0 0 1 1.8-2h2.6a1.8 1.8 0 0 1 1.8 1.6c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14 14 0 0 0 5.3 5.3l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6a1.8 1.8 0 0 1 1.6 1.9Z"/></svg></span><span class="dr-t" data-i18n="hajj.ask_the_ulama">Ask the &#703;ulam&#257;</span><span class="dr-ch">&rsaquo;</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet" id="birth" data-open="0" role="dialog" aria-modal="true" aria-label="Birth" data-i18n-attr="aria-label:a11y.birth">
     <div class="scrim" id="bt-scrim"></div>
     <div class="panel">
@@ -5477,8 +5603,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="dr-row" data-act="vids">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M10 9.3v5.4l4.5-2.7L10 9.3Z"/></svg></span><span class="dr-t" data-i18n="marriage.videos_bayaans">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
         </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+        <button class="dr-row" data-act="hajj">
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="11" rx="1.5"/><path d="M4 19.5h16"/><path d="M6.5 8h11"/></svg></span><span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
         <button class="dr-row" data-act="ramadan">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="dr-t" data-i18n="ramadan.ramadan">Ramadan</span><span class="dr-ch">&rsaquo;</span>
@@ -10832,6 +10958,30 @@ function closeRamadan(){
   document.body.style.overflow="";
   ramStopTick();
 }
+/* Hajj & Umrah. data-open is all the Back button needs: the MutationObserver
+   in initBackButton arms the history sentinel off that attribute, so this
+   sheet closes on Back without knowing anything about it. */
+function openHajj(){
+  document.getElementById('hajj').dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.querySelector('#hajj .sh-body').scrollTop=0;
+}
+function closeHajj(){
+  document.getElementById('hajj').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initHajj(){
+  document.getElementById('hj-close').addEventListener('click',closeHajj);
+  document.getElementById('hj-scrim').addEventListener('click',closeHajj);
+  /* Both of these already exist and already work offline, which is the whole
+     reason they are what is offered while the section is locked. */
+  document.getElementById('hj-duas').addEventListener('click',()=>{ closeHajj(); setTimeout(openDuas,120); });
+  document.getElementById('hj-contact').addEventListener('click',()=>{ closeHajj(); setTimeout(openContact,120); });
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('hajj').dataset.open==="1") closeHajj();
+  });
+}
+
 function initRamadan(){
   document.getElementById('rm-close').addEventListener('click',closeRamadan);
   document.getElementById('rm-scrim').addEventListener('click',closeRamadan);
@@ -13032,6 +13182,7 @@ function initDrawer(){
       if(act==="membership"){ setTimeout(openMembership,120); }
       if(act==="collect"){ setTimeout(openCollect,120); }
       if(act==="ramadan"){ setTimeout(openRamadan,120); }
+      if(act==="hajj"){ setTimeout(openHajj,120); }
     });
   });
   // any external link closes the drawer behind it
@@ -13699,6 +13850,7 @@ function boot(){
   initLanguage();
   initAdvice();
   initRamadan();
+  initHajj();
   initLive();
   initVids();
   initZakat();

@@ -68,6 +68,7 @@ export const LIGHT = {
   tintRose:     "#FBF0EB",
   tintRoseLine: "#EBCDBF",
   tintRoseInk:  "#7C3A20",
+  tintGreen:    "#F1F7F3",   // --tint-green: the website has it, this never did
   tintGold:     "#FBF6E7",
   tintGoldInk:  "#7A5C13",
 };
@@ -117,6 +118,7 @@ export const DARK = {
   tintRose:     "#431812",
   tintRoseLine: "#5E2419",
   tintRoseInk:  "#F0937A",   // the warning's own words, lifted to read
+  tintGreen:    "#12301F",
   tintGold:     "#352609",
   tintGoldInk:  "#E6C87A",
 };
