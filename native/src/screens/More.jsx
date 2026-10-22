@@ -44,7 +44,11 @@ const GROUPS = [
   { k: "menu.resources", t: "Resources", rows: [
     { to: "Timetable", icon: "calendar-outline",   k: "menu.timetable",        t: "Full prayer timetable" },
     { to: "Videos",    icon: "play-circle-outline", k: "marriage.videos_bayaans", t: "Videos & bayaans" },
-    { soon: true,      icon: "airplane-outline",    k: "marriage.hajj_umrah",  t: "Hajj / Umrah" },
+    /* `soon` is the gold tag, `to` is where it goes. The two are separate
+       now: this row still says Coming soon, and it opens a screen that
+       says what is coming. Tours & Visits below has no `to` and stays the
+       dead row it was. */
+    { soon: true, to: "Hajj", icon: "airplane-outline", k: "marriage.hajj_umrah", t: "Hajj / Umrah" },
     { to: "Ramadan",   icon: "moon-outline",        k: "ramadan.ramadan", t: "Ramadan" },
     { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
   ]},
@@ -145,7 +149,10 @@ export default function More({ navigation }) {
 
 function Row({ row, first, nav }) {
   const { t, fs, rtl } = useApp();
-  const act = row.soon ? null : row.to ? () => nav.navigate(row.to) : () => open(row.href);
+  /* Tappability follows the DESTINATION, not the tag. A row with nowhere
+     to go is the dead one; a row that is merely unfinished can still have
+     a screen that says so. */
+  const act = row.to ? () => nav.navigate(row.to) : row.href ? () => open(row.href) : null;
   return (
     <Press onPress={act} disabled={!act} dim={false}
       /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13.
@@ -159,7 +166,7 @@ function Row({ row, first, nav }) {
           starts where the others' icons do. And .dr-ico is a 29px #F0E9ED
           square at 9px of radius with a 16px glyph, not a bare 19px mark on
           the card. */}
-      {!row.soon && (
+      {!!act && (
         <View style={{ width: 29, height: 29, borderRadius: 9, alignItems: "center",
                        justifyContent: "center", backgroundColor: C.tintPlum }}>
           {DRAWER.rows[row.k]
@@ -167,7 +174,7 @@ function Row({ row, first, nav }) {
             : <Ionicons name={row.icon} size={16} color={C.brand600} />}
         </View>)}
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: row.soon ? C.muted : C.ink,
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: act ? C.ink : C.muted,
                        textAlign: rtl ? "right" : "left" }}>{t(row.k, row.t)}</Text>
         {!!row.note && (
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(17.5), color: C.muted,

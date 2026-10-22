@@ -39,6 +39,7 @@ import Notices from "./screens/Notices";
 import More from "./screens/More";
 import Qibla from "./screens/Qibla";
 import Ramadan from "./screens/Ramadan";
+import Hajj from "./screens/Hajj";
 import Live from "./screens/Live";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
@@ -198,6 +199,7 @@ const linking = {
                          NoticesTab: "notices", MoreTab: "more" } },
       Qibla:     "qibla",
       Ramadan:   "ramadan",
+      Hajj:      "hajj",
       Quran:     "quran",
       Mushaf:    "mushaf",
       Timetable: "timetable",
@@ -323,6 +325,7 @@ function Root() {
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Ramadan"   component={Ramadan}   options={{ ...bare, title: t("ramadan.ramadan", "Ramadan") }} />
+        <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...pushed, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
         {/* The donate page: one of the website's seven, so it wears the app
             bar rather than a sheet header. */}
