@@ -249,6 +249,75 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
     leaked: /service_role|sb_secret/.test(document.documentElement.innerHTML)}));
   g.gated  ? ok("admin","is behind a sign-in gate") : bad("admin","NOT gated");
   g.leaked ? bad("admin","a secret key appears in the page") : ok("admin","no secret key in the page");
+
+  /* ---- the WhatsApp hand-off ----
+   *
+   * Two separate things, and it was the second that shipped broken.
+   *
+   * First, the message: waText and waHref are pure, so they can simply be
+   * called. A missing asterisk or a dropped line break is a message that goes
+   * out to the whole community looking wrong.
+   *
+   * Second — and this is the one — the buttons that carry it have to be
+   * INVISIBLE until a send has succeeded. They were not. `.wa{display:flex}`
+   * is a class, so it outranks the browser's own [hidden]{display:none}, and a
+   * <button class="wa" hidden> with nothing in it yet rendered as an empty
+   * rounded box. Two of them, under the send button, on a signed-in phone.
+   *
+   * It survived every check because the only way this page was ever driven was
+   * by calling waOffer(), which fills the buttons and un-hides them. Nobody
+   * looked at the page sitting still. So look at it sitting still.
+   *
+   * #wrap is removed by hand because everything here lives behind the
+   * sign-in gate, and the question is what the stylesheet does with the
+   * hidden attribute — not whether the gate holds, which is checked above. */
+  const wa = await p.evaluate(()=>{
+    const t = window.waText, h = window.waHref;
+    if(typeof t!=="function" || typeof h!=="function") return { missing:true };
+    document.getElementById("wrap").removeAttribute("hidden");
+    const tall = id => { const e=document.getElementById(id);
+                         return e ? e.getBoundingClientRect().height : -1; };
+    return {
+      plain:   t({ title:"Eid salāh", body:"7.30am in the main hall." }),
+      janazah: t({ title:"Marhum Ismail", body:"Burial at 2pm.", topic:"janazah" }),
+      poster:  t({ title:"Talk", body:"Thursday.", imageUrl:"https://example.org/p.jpg" }),
+      href:    h("a b&c"),
+      max:     window.WA_MAX,
+      atRest:  { wa:tall("wa"), img:tall("wa-img"), long:tall("wa-long") },
+      nameless: [...document.querySelectorAll("button")]
+        .filter(e=>e.offsetParent!==null && !e.innerText.trim()
+                   && !e.getAttribute("aria-label") && !e.getAttribute("title"))
+        .map(e=>e.id || e.className || "?"),
+    };
+  });
+  if(wa.missing){ bad("admin","waText/waHref are not on the page"); }
+  else {
+    wa.plain === "*Eid salāh*\n\n7.30am in the main hall.\n\n— Taiyabah Masjid"
+      ? ok("whatsapp","the message is the title in bold, the body, then the masjid")
+      : bad("whatsapp","message text is wrong: "+JSON.stringify(wa.plain));
+    /^\*Janāzah\*\n\n/.test(wa.janazah)
+      ? ok("whatsapp","a janāzah is labelled as one on the first line")
+      : bad("whatsapp","janāzah is not labelled: "+JSON.stringify(wa.janazah));
+    wa.poster.includes("\nhttps://example.org/p.jpg\n")
+      ? ok("whatsapp","the poster link is carried in the text as well")
+      : bad("whatsapp","poster link missing from the text");
+    wa.href === "https://wa.me/?text=a%20b%26c"
+      ? ok("whatsapp","the text is url-encoded, so & and spaces survive")
+      : bad("whatsapp","wa.me link is wrong: "+wa.href);
+    typeof wa.max === "number" && wa.max > 0
+      ? ok("whatsapp",`a length limit is set (${wa.max})`)
+      : bad("whatsapp","no WA_MAX length limit");
+
+    /* THE REGRESSION. Zero height, signed in, before any send. */
+    const r = wa.atRest;
+    Object.values(r).every(h=>h===0)
+      ? ok("whatsapp","the share buttons take up no room until a send succeeds")
+      : bad("whatsapp",`share buttons are visible before any send — heights ${JSON.stringify(r)}. `
+                     + `A class that sets display beats [hidden]; they render as empty boxes.`);
+    wa.nameless.length
+      ? bad("a11y",`admin has ${wa.nameless.length} visible button(s) with no name: ${wa.nameless.join(", ")}`)
+      : ok("a11y","every visible button on admin has a name");
+  }
   await p.close();
 }
 
