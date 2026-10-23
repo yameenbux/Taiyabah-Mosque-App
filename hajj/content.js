@@ -55,6 +55,7 @@ window.HAJJ = {
             { id: "p-ihram", pack: true, t: "Two iḥrām sheets, and a spare set",
               d: "One set gets wet, sandy or stained within a day or two. A spare is the difference between washing in a hotel sink at midnight and not." },
             { id: "p-belt", pack: true, t: "An iḥrām belt with pockets",
+              art: { id: "ihramBelt", cap: "A cotton belt with zipped pockets, worn over the izār." },
               d: "It holds the sheets and keeps your phone, money and room key on you. Pockets matter: there are none in an iḥrām." },
             { id: "p-pins", pack: true, t: "Safety pins and clips",
               d: "Whether they may be used on an iḥrām is a question for the ʿulamā, not for a packing list. Take them either way; they are useful for everything else." },
@@ -284,17 +285,36 @@ window.HAJJ = {
              first-time pilgrim cannot picture from words. The note at the
              head of native/src/hajj-art.jsx says where the picture came from
              and why nothing in this section carries a verdict. */
-          art: { id: "worn", cap: "The izār at the waist and the ridāʾ over the shoulder." },
+          /* Marks are placed in fractions of the picture, so they hold at
+             every width. The labels are what the picture SHOWS — none of
+             them is a ruling, and check-hajj.mjs enforces that. */
+          art: {
+            id: "worn",
+            cap: "The izār at the waist and the ridāʾ over the shoulder.",
+            marks: [
+              { n: 1, x: 0.560, y: 0.048, t: "The head is uncovered — nothing rests on it." },
+              { n: 2, x: 0.655, y: 0.200, t: "The ridāʾ, over one shoulder and across the chest, leaving the other shoulder bare." },
+              { n: 3, x: 0.500, y: 0.420, t: "The izār, wrapped at the waist and held without a belt or a pin." },
+              { n: 4, x: 0.455, y: 0.952, t: "The hem falls above the ankle, and the feet are bare." },
+            ],
+          },
           items: [
             { id: "i-m-dress", by: null, verdict: "allowed", t: "Two unstitched sheets",
               d: "DRAFT FOR REVIEW. An izār around the lower body and a ridāʾ over the upper, both unstitched and ordinarily white. Nothing sewn to the shape of the body is worn." },
             { id: "i-m-head", by: null, verdict: "avoid", t: "The head stays uncovered",
               d: "DRAFT FOR REVIEW. A man in iḥrām does not cover his head. Shade from an umbrella or a roof is a different matter from a cap or a cloth resting on the head; the ʿulamā should set out exactly where the line sits." },
             { id: "i-m-feet", by: null, verdict: "avoid", t: "Footwear that leaves the instep bare",
-              /* Where the instep is, which is anatomy. The sandal is drawn
-                 plainly: which ones pass is the ʿulamā's to say, not a
-                 drawing's. */
-              art: { id: "instep", cap: "The marked part of the foot is the instep." },
+              /* Two photographs of the same foot at the same angle, so the
+                 only difference between them is the thing the entry asks a
+                 pilgrim to look at. Captioned by what each one physically
+                 does, NOT by which one passes — that is the ʿulamā's to say
+                 and the entry above carries it. */
+              art: [
+                { id: "instepBare",
+                  cap: "A toe post leaves the instep — the raised middle bone — uncovered." },
+                { id: "instepCovered",
+                  cap: "A broad strap covers the instep completely." },
+              ],
               d: "DRAFT FOR REVIEW. In the Ḥanafī school the raised middle bone of the foot is not covered. The ʿulamā should say plainly which sandals pass, because this is the single thing pilgrims from this community ask about most and get wrong in the shop." },
           ],
         },

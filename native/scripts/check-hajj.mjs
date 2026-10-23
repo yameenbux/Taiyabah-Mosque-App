@@ -116,11 +116,17 @@ if (webFlag !== undefined)
  * exactly the kind of thing that gets noticed on one platform and not the
  * other. So every id the content names must be carried by both, and must
  * come with a caption — an unlabelled diagram of a foot explains nothing. */
+/* `art` is one picture or a list of them, so both shapes are flattened here
+   before anything is asserted. An earlier version read the list itself as a
+   picture and reported an id of "undefined". */
 const arts = [];
+const collect = (where, art) => {
+  for (const a of (Array.isArray(art) ? art : [art])) if (a) arts.push([where, a]);
+};
 for (const b of branches)
   for (const sec of (b.sections || [])) {
-    if (sec.art) arts.push([`${b.id}/${sec.id}`, sec.art]);
-    for (const it of (sec.items || [])) if (it.art) arts.push([`${b.id}/${it.id}`, it.art]);
+    if (sec.art) collect(`${b.id}/${sec.id}`, sec.art);
+    for (const it of (sec.items || [])) if (it.art) collect(`${b.id}/${it.id}`, it.art);
   }
 const nativeArt = fs.readFileSync(path.join(here, "src/hajj-art.jsx"), "utf8");
 const nativeIds = [...nativeArt.matchAll(/^\s{2}(\w+):\s*\{\s*el:/gm)].map(m => m[1]);
@@ -149,13 +155,29 @@ ok(files.length > 0, "no picture files found on either platform — the scan did
 for (const [which, f] of files)
   ok(fs.existsSync(f), `the ${which} points at ${path.relative(path.join(here, ".."), f)}, which is not in the repository`);
 
-/* The drawings must stay descriptive. Nothing in this section may assert a
-   ruling the ʿulamā have not given, and a caption is the easiest place for
-   one to creep in. */
+/* The pictures must stay descriptive. Nothing in this section may assert a
+   ruling the ʿulamā have not given, and a caption or a mark's label is the
+   easiest place for one to creep in — especially on a PAIR of pictures,
+   where "allowed" and "not allowed" would be the obvious thing to write. */
+const RULING = /\b(must|must not|may not|haram|ḥarām|forbidden|not allowed|permissible|impermissible|is required|invalid|valid)\b/i;
+for (const [where, art] of arts) {
+  const lines = [["caption", art.cap],
+                 ...(Array.isArray(art.marks) ? art.marks : []).map(m => [`mark ${m.n}`, m.t])];
+  for (const [what, line] of lines)
+    ok(!RULING.test(line || ""),
+       `${where}'s ${what} reads like a ruling: "${line}". ` +
+       `A picture describes; the entry's own words do the fiqh.`);
+}
+
+/* A mark that is off the picture points at nothing, and one with no label is
+   a dot the reader cannot resolve. */
 for (const [where, art] of arts)
-  ok(!/\b(must|must not|may not|haram|ḥarām|forbidden|not allowed|is required)\b/i.test(art.cap),
-     `${where}'s caption reads like a ruling: "${art.cap}". ` +
-     `A drawing describes; the entry's own words do the fiqh.`);
+  for (const m of (Array.isArray(art.marks) ? art.marks : [])) {
+    ok(Number.isFinite(m.x) && m.x > 0 && m.x < 1 && Number.isFinite(m.y) && m.y > 0 && m.y < 1,
+       `${where} mark ${m.n} sits at (${m.x}, ${m.y}), which is not on the picture`);
+    ok(typeof m.t === "string" && m.t.trim().length > 0,
+       `${where} mark ${m.n} has no label`);
+  }
 
 /* ---- the counters ------------------------------------------------------ */
 is(tick("tawaf", 6), 7, "the seventh circuit counts");
