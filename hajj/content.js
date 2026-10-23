@@ -522,6 +522,36 @@ window.HAJJ = {
               d: "DRAFT FOR REVIEW. Men either shave the head or trim it, and the trim has to take at least an inch off the whole head rather than a tidy-up at the sides. Shaving carries the greater reward. Women take a little over an inch from the end of the plait. With that the ʿUmrah is finished and everything iḥrām had closed off is open again." },
           ],
         },
+        /* COLLECTED, NOT SCATTERED, AND PLACED SECOND ON PURPOSE. Each
+           difference below is also stated in the step it belongs to, because
+           somebody reading the rite in order should not have to come here for
+           it. But the reverse was not true: a woman had to read five entries
+           written from a man\u2019s default and assemble her own rite out of the
+           clauses at the end of them. This section is that assembly, done once.
+
+           It sits directly under the five steps rather than after saʿī, which
+           is where it was first written. Thirteen entries of ṭawāf and saʿī
+           detail stood between a woman and the one section addressed to her,
+           and the whole point of the rewrite was to stop her scrolling past
+           men\u2019s defaults to reach it. Do not tidy it back down the list. */
+        {
+          id: "rites-women",
+          title: "For women, through the rites",
+          items: [
+            { id: "w-ihram", by: null, t: "Entering iḥrām",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. No special garment — ordinary clothing that covers as it normally would, and the face left uncovered by anything resting on it. Ghusl or wuḍūʾ, the two rakʿahs, the intention and the talbiyah, the same as anyone, with the talbiyah said quietly. The iḥrām branch has the detail, including ḥayḍ and nifās, which is worth reading before booking rather than before flying." },
+            { id: "w-tawaf", by: null, t: "During ṭawāf",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Idṭibāʿ and ramal are both men\u2019s Sunnahs and neither applies: no shoulder is bared and the first three rounds are walked at the same pace as the other four. Everything else is the same rite — the start and end in line with the Black Stone, the Ḥaṭīm gone round, the Kaʿbah kept on the left. Istilām from where you are standing rather than pressing into the crowd is the ordinary way it is done." },
+            { id: "w-sai", by: null, t: "During saʿī",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The stretch between the two sets of green lights is where men quicken to a jog. Women walk it at their own pace, the same as the rest of the mas\u2018ā. Seven laps ending at Marwa, and the standing duʿā at both ends, are unchanged." },
+            { id: "w-halq", by: null, t: "Taqṣīr at the end",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The head is not shaved. A little over an inch is taken from the end of the plait, and with that iḥrām ends and its restrictions lift." },
+          ],
+        },
         /* ṬAWĀF AND SAʿĪ GET THEIR OWN SECTIONS because the five steps above
            are the shape of the rite and these are the twenty things that go
            wrong inside two of them. Folded into r-u-2 they were a paragraph
@@ -575,30 +605,6 @@ window.HAJJ = {
             { id: "s-dua", by: null, t: "Standing at each end",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
               d: "DRAFT FOR REVIEW. Facing the Kaʿbah, hands raised to the shoulders as in duʿā, takbīr and tahlīl three times, durūd, then ask. The same at both ends, every lap. This is the part of saʿī most people cut short, and it is the part the walking is for." },
-          ],
-        },
-        /* COLLECTED, NOT SCATTERED. Each difference below is also stated in
-           the step it belongs to, because somebody reading the rite in order
-           should not have to come here for it. But the reverse was not true:
-           a woman had to read five entries written from a man\u2019s default and
-           assemble her own rite out of the clauses at the end of them. This
-           section is that assembly, done once. */
-        {
-          id: "rites-women",
-          title: "For women, through the rites",
-          items: [
-            { id: "w-ihram", by: null, t: "Entering iḥrām",
-              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
-              d: "DRAFT FOR REVIEW. No special garment — ordinary clothing that covers as it normally would, and the face left uncovered by anything resting on it. Ghusl or wuḍūʾ, the two rakʿahs, the intention and the talbiyah, the same as anyone, with the talbiyah said quietly. The iḥrām branch has the detail, including ḥayḍ and nifās, which is worth reading before booking rather than before flying." },
-            { id: "w-tawaf", by: null, t: "During ṭawāf",
-              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
-              d: "DRAFT FOR REVIEW. Idṭibāʿ and ramal are both men\u2019s Sunnahs and neither applies: no shoulder is bared and the first three rounds are walked at the same pace as the other four. Everything else is the same rite — the start and end in line with the Black Stone, the Ḥaṭīm gone round, the Kaʿbah kept on the left. Istilām from where you are standing rather than pressing into the crowd is the ordinary way it is done." },
-            { id: "w-sai", by: null, t: "During saʿī",
-              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
-              d: "DRAFT FOR REVIEW. The stretch between the two sets of green lights is where men quicken to a jog. Women walk it at their own pace, the same as the rest of the mas\u2018ā. Seven laps ending at Marwa, and the standing duʿā at both ends, are unchanged." },
-            { id: "w-halq", by: null, t: "Taqṣīr at the end",
-              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
-              d: "DRAFT FOR REVIEW. The head is not shaved. A little over an inch is taken from the end of the plait, and with that iḥrām ends and its restrictions lift." },
           ],
         },
         {
