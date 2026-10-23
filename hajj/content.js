@@ -398,7 +398,20 @@ window.HAJJ = {
             { id: "r-u-1", by: null, n: 1, t: "Iḥrām and the intention",
               d: "DRAFT FOR REVIEW. Where it is entered, what is said, and what the mīqāt means for somebody flying from Manchester." },
             { id: "r-u-2", by: null, n: 2, t: "Ṭawāf, seven circuits",
-              d: "DRAFT FOR REVIEW. Where it starts and ends, which shoulder is bared and when, and what is said. The counter in this section keeps the number; this entry is what the counter cannot tell anybody." },
+              d: "DRAFT FOR REVIEW. Where it starts and ends, which shoulder is bared and when, and what is said. The counter in this section keeps the number; this entry is what the counter cannot tell anybody.",
+              /* The plan names the four things a first-timer cannot find by
+                 looking, and nothing else: the entry's own words, once they
+                 carry a scholar's name, say what is done at each of them. */
+              art: {
+                id: "mataf",
+                cap: "The maṭāf from above. The arrows follow the way the circuit is walked.",
+                marks: [
+                  { n: 1, x: 0.647, y: 0.652, t: "Al-Ḥajar al-Aswad, set in this corner." },
+                  { n: 2, x: 0.707, y: 0.538, t: "The door, on the wall between that corner and the ʿIrāqī corner." },
+                  { n: 3, x: 0.500, y: 0.266, t: "The Ḥaṭīm, the low semicircular wall, and the ground it encloses." },
+                  { n: 4, x: 0.818, y: 0.492, t: "Maqām Ibrāhīm." },
+                ],
+              } },
             { id: "r-u-3", by: null, n: 3, t: "Two rakʿahs after ṭawāf",
               d: "DRAFT FOR REVIEW." },
             { id: "r-u-4", by: null, n: 4, t: "Saʿī, seven laps",

@@ -51,6 +51,7 @@ import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
 import { HajjScreen, Panel } from "../hajj-ui";
 import { COUNTER_MODES, COUNTERS, tick, untick, isComplete, saiFrom, progress } from "../hajj";
+import { MaTafPlan } from "../hajj-art";
 
 /* Its own key rather than a field on prefs: this is written on every press,
    and prefs writes the whole settings blob each time. */
@@ -86,7 +87,7 @@ function Undo({ color }) {
  * none yet". The tasbīḥ has no total, so it keeps the continuous arc and
  * comes round on its own mark.
  */
-function Ring({ size, total, n, fraction }) {
+function Ring({ size, total, n, fraction, mode }) {
   const r = (size - STROKE) / 2;
   const c = 2 * Math.PI * r;
   const mid = size / 2;
@@ -112,6 +113,14 @@ function Ring({ size, total, n, fraction }) {
   const GAP = 7;                       // degrees of plum between two circuits
   const step = 360 / total;
   const arc = c * ((step - GAP) / 360);
+  /* ṬAWĀF FILLS ANTICLOCKWISE, because that is the direction it is walked.
+     The dial used to fill the other way, which put the one picture on the
+     screen — a plan of the Kaʿbah with the stone marked — next to a motion
+     going the opposite way round it. Saʿī is a there-and-back between Ṣafā
+     and Marwa with no direction to contradict, so it follows ṭawāf rather
+     than disagreeing with it on the same dial. */
+  const anti = mode !== "tasbih";
+  const at = i => anti ? -90 - (i + 1) * step + GAP / 2 : -90 + i * step + GAP / 2;
   return (
     <Svg width={size} height={size} style={{ position: "absolute" }}>
       {gold}
@@ -120,9 +129,35 @@ function Ring({ size, total, n, fraction }) {
         <Circle key={i} cx={mid} cy={mid} r={r} fill="none"
                 stroke={i < n ? "url(#hjDial)" : HJ.panelLine} strokeWidth={STROKE}
                 strokeDasharray={`${arc} ${c - arc}`} strokeLinecap="round"
-                rotation={-90 + i * step + GAP / 2} origin={`${mid}, ${mid}`} />
+                rotation={at(i)} origin={`${mid}, ${mid}`} />
       ))}
     </Svg>
+  );
+}
+
+/* The Kaʿbah at the centre of the ṭawāf dial.
+ *
+ * ONLY FOR ṬAWĀF. Saʿī is between Ṣafā and Marwa and the tasbīḥ is neither,
+ * so putting the Kaʿbah under those counts would say something false. They
+ * keep the numeral in the middle.
+ *
+ * IT IS THE SAME DRAWING THE RITES BRANCH USES, from hajj-art.jsx, so the
+ * plan a pilgrim studies before they go is the one under their thumb while
+ * they walk. Here it is drawn without the maṭāf ring and its arrows: the
+ * dial's own seven segments are the circuit, and a second ring inside them
+ * would be a diagram of the thing the dial already is.
+ *
+ * IT IS NOT LABELLED, and that is deliberate. Naming the corners and saying
+ * where the salām is given is teaching rites, and the counter is the one
+ * branch that opens WITHOUT the ʿulamā precisely because it asserts nothing.
+ * The numbered version belongs in the rites branch, behind the same gate as
+ * every other ruling. Here it orients, and nothing more.
+ */
+function Kaabah({ size }) {
+  return (
+    <View style={{ position: "absolute", width: size * 0.52, height: size * 0.52 }}>
+      <MaTafPlan full={false} />
+    </View>
   );
 }
 
@@ -203,6 +238,11 @@ export default function HajjCounter() {
 
   /* Under the numeral: what the next press means, which for saʿī is which
      hill it leaves from and for the rest is how far there is to go. */
+  /* The Kaʿbah belongs to ṭawāf alone: saʿī is between Ṣafā and Marwa and the
+     tasbīḥ is neither, so showing it under those counts would say something
+     that is not true. */
+  const kaabah = mode === "tawaf";
+
   const from = saiFrom(n);
   const under = mode === "sai" && from !== null
     ? (from === 0 ? t("hajj.next_from_safa", "Next lap leaves from Ṣafā")
@@ -252,13 +292,26 @@ export default function HajjCounter() {
                style={{ width: dial, height: dial, borderRadius: dial / 2, borderWidth: 0,
                         backgroundColor: "transparent", padding: 0,
                         alignItems: "center", justifyContent: "center" }}>
-          <Ring size={dial} total={total} n={n} fraction={progress(mode, n)} />
-          <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.38)),
-                         lineHeight: fs(Math.round(dial * 0.42)), color: HJ.ink }}>{n}</Text>
-          <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 2.2,
-                         textTransform: "uppercase", color: HJ.gold, marginTop: 6,
-                         textAlign: "center", paddingHorizontal: 24 }}>{under}</Text>
+          <Ring size={dial} total={total} n={n} fraction={progress(mode, n)} mode={mode} />
+          {kaabah ? <Kaabah size={dial} /> : (
+            <>
+              <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.38)),
+                             lineHeight: fs(Math.round(dial * 0.42)), color: HJ.ink }}>{n}</Text>
+              <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 2.2,
+                             textTransform: "uppercase", color: HJ.gold, marginTop: 6,
+                             textAlign: "center", paddingHorizontal: 24 }}>{under}</Text>
+            </>)}
         </Panel>
+        {/* With the Kaʿbah in the middle the count moves out from under it,
+            where it has room to stay large enough to read at arm's length. */}
+        {kaabah && (
+          <View style={{ alignItems: "center", marginTop: 14 }}>
+            <Text style={{ fontFamily: F.display, fontSize: fs(46), lineHeight: fs(50),
+                           color: HJ.ink }}>{n}</Text>
+            <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 2.2,
+                           textTransform: "uppercase", color: HJ.gold, marginTop: 5,
+                           textAlign: "center" }}>{under}</Text>
+          </View>)}
       </View>
 
       {/* "Tap the dial" is gone. The dial is a 276pt circle with a numeral in

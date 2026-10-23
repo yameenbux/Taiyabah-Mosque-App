@@ -1210,9 +1210,22 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hc-tap{width:clamp(196px,76vw,276px);aspect-ratio:1;border:0;background:none;padding:0;
     border-radius:50%;position:relative;display:grid;place-items:center;align-content:center}
   .hc-tap:not(:disabled):active{background:var(--hj-panel-hi)}
-  .hc-tap svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  /* THE DIRECT CHILD ONLY. This rotates the dial so its first segment starts
+     at twelve o'clock, and as a descendant rule it also caught the Kaʿbah plan
+     nested inside the same button and stood it on its side — Ḥaṭīm to the west
+     of a drawing whose whole job is to say which corner is which. */
+  .hc-tap > svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
   .hc-n{font-family:"Fraunces",Georgia,serif;font-size:clamp(74px,28vw,106px);line-height:1;
     color:var(--hj-ink);position:relative}
+  /* Line work on the section's own ground, so it needs no mask and no edge
+     of its own. Half the dial: the ring is the circuit, this is the target. */
+  .hc-kaaba{position:absolute;width:52%;aspect-ratio:1}
+  .hc-kaaba svg{width:100%;height:100%;display:block}
+  .hc-under{text-align:center;margin-top:14px}
+  .hc-n2{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(46px * var(--ts));
+    line-height:1;color:var(--hj-ink)}
+  .hc-lab2{display:block;font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:2.2px;
+    text-transform:uppercase;color:var(--hj-gold);margin-top:5px}
   .hc-lab{font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:2.2px;
     text-transform:uppercase;color:var(--hj-gold);margin-top:6px;text-align:center;
     padding:0 24px;position:relative}
@@ -1239,6 +1252,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hj-shotwrap.next{margin-top:20px}
   .hj-shot{position:relative}
   .hj-shot img{width:100%;height:auto;display:block;border-radius:18px}
+  .hj-shot svg{width:100%;height:auto;display:block}
   /* Gold on a dark ring, so a mark survives both the cream cloth and the plum
      ground — there is nowhere on these pictures it can be dropped and vanish. */
   .hj-mark{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;
@@ -5394,9 +5408,19 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <circle id="hc-track" cx="138" cy="138" r="130" fill="none" stroke="var(--hj-panel-line)" stroke-width="12" hidden></circle>
               <circle id="hc-ring" cx="138" cy="138" r="130" fill="none" stroke="url(#hc-gold)" stroke-width="12" stroke-linecap="round" hidden></circle>
             </svg>
+            <!-- The Kaʿbah plan, shown for ṭawāf only: saʿī is between Ṣafā
+                 and Marwa and the tasbīḥ is neither, so it would say something
+                 untrue under those counts. -->
+            <div class="hc-kaaba" id="hc-kaaba" hidden></div>
             <span class="hc-n" id="hc-n" data-i18n-latin>0</span>
             <span class="hc-lab" id="hc-lab"></span>
           </button>
+          <!-- With the plan in the middle the count moves out from under it,
+               where it keeps the size it needs to be read at arm's length. -->
+          <div class="hc-under" id="hc-under" hidden>
+            <span class="hc-n2" id="hc-n2" data-i18n-latin>0</span>
+            <span class="hc-lab2" id="hc-lab2"></span>
+          </div>
         </div>
         <div class="hc-acts">
           <button type="button" class="hj-panel hc-act" id="hc-undo" disabled>
@@ -11368,13 +11392,22 @@ function hcRender(){
      reads as disabled, where seven empty segments say "seven of these, none
      yet". The tasbīḥ has no total and keeps the continuous arc. */
   const C = 2*Math.PI*130;
+  const k = document.getElementById("hc-kaaba");
+  if(!k.firstChild) k.innerHTML = hjMaTaf(false);
   const seg = document.getElementById("hc-seg");
   const track = document.getElementById("hc-track"), ring = document.getElementById("hc-ring");
   if(c.total){
     const GAP = 7, step = 360/c.total, arc = C*((step-GAP)/360);
+    /* ṬAWĀF FILLS ANTICLOCKWISE, because that is the direction it is walked.
+       It used to fill the other way, which put the one picture on the screen
+       — a plan of the Kaʿbah with the stone marked — next to a motion going
+       the opposite way round it. Saʿī is a there-and-back between Ṣafā and
+       Marwa with no direction to contradict, so it follows ṭawāf rather than
+       disagreeing with it on the same dial. */
+    const at = i => hcMode==="tasbih" ? i*step+GAP/2 : -(i+1)*step+GAP/2;
     seg.innerHTML = Array.from({length:c.total},(_,i)=>
       `<circle cx="138" cy="138" r="130" fill="none" stroke-width="12" stroke-linecap="round"`
-      + ` stroke-dasharray="${arc} ${C-arc}" transform="rotate(${i*step+GAP/2} 138 138)"`
+      + ` stroke-dasharray="${arc} ${C-arc}" transform="rotate(${at(i)} 138 138)"`
       + ` stroke="${i<n?"url(#hc-gold)":"var(--hj-panel-line)"}"></circle>`).join("");
     track.hidden = true; ring.hidden = true;
   } else {
@@ -11384,6 +11417,7 @@ function hcRender(){
     ring.setAttribute("stroke-dashoffset", String(C*(1-hcProgress(hcMode,n))));
   }
   const from = hcFrom(n);
+  document.getElementById("hc-lab2").textContent =
   document.getElementById("hc-lab").textContent =
       hcMode==="sai" && from!==null
         ? (from===0 ? t("hajj.next_from_safa","Next lap leaves from Ṣafā")
@@ -11391,6 +11425,13 @@ function hcRender(){
     : done ? t("hajj.all_seven_complete","All seven complete")
     : c.total ? t("hajj.of_total","of {n}").replace("{n}", num(c.total))
     : t("hajj.keep_going","Keep going");
+  /* ṭawāf alone circles the Kaʿbah, so it alone gets the plan. */
+  const kaabah = hcMode === "tawaf";
+  document.getElementById("hc-kaaba").hidden = !kaabah;
+  document.getElementById("hc-n").hidden = kaabah;
+  document.getElementById("hc-lab").hidden = kaabah;
+  document.getElementById("hc-under").hidden = !kaabah;
+  document.getElementById("hc-n2").textContent = num(n);
   document.getElementById("hc-undo").disabled = n===0;
   document.getElementById("hc-reset").disabled = n===0;
   [...document.querySelectorAll(".hc-mode")].forEach(b =>
@@ -11442,11 +11483,49 @@ function closeHajjCount(){
    it is the same path data as native/src/hajj-art.jsx and the two are meant
    to be diffable by eye. check-hajj.mjs asserts both sides carry every id the
    content names, so a typo fails the build instead of leaving a gap. */
+/* THE MAṬĀF, drawn rather than photographed — the same shapes, the same
+   numbers, as MaTafPlan in native/src/hajj-art.jsx, and meant to stay
+   diffable against it by eye. Why it is vector and why the Ḥaṭīm is drawn
+   standing clear of the corners is written up over there; the short of it is
+   that two generated bitmaps of this came to 275KB and 639KB, and that an arc
+   welded to a wide rectangle reads as a padlock.
+
+   `full` is the plan: the maṭāf, its arrows and the Maqām. The dial takes
+   the other one — the building, the Ḥaṭīm and the stone, centred and cropped
+   in. Its own seven segments are already the circuit, and a landmark that is
+   not the corner you are looking for is one more thing to read at 90px. */
+function hjMaTaf(full){
+  const G = "var(--hj-gold)";
+  const arrow = d => `<path d="M-7 -80 L2 -84.6 L2 -75.4 Z" fill="${G}" opacity=".9"`
+    + ` transform="translate(100 100) rotate(${d})"></path>`;
+  /* The dial crops in to the building. The full box is framed for the maṭāf
+     ring, and reusing it there would leave a cube the size of a thumbnail in
+     the middle of a 276px dial. */
+  return `<svg viewBox="${full ? "8 8 184 184" : "56 54 88 88"}" role="presentation" focusable="false">`
+    + (full
+       ? `<circle cx="100" cy="100" r="80" fill="none" stroke="rgba(220,187,99,.07)" stroke-width="22"></circle>`
+         + `<circle cx="100" cy="100" r="80" fill="none" stroke="rgba(220,187,99,.45)" stroke-width="1.2"`
+         + ` stroke-dasharray="3 6" stroke-linecap="round"></circle>`
+         + [0,90,180,270].map(arrow).join("")
+       : "")
+    + `<path d="M127 128 L${full ? "157 157" : "148 149"}" stroke="${G}" stroke-width="1.2" stroke-dasharray="2.5 4" opacity=".75"></path>`
+    + `<path d="M84 73 A16 16 0 0 1 116 73 L116 77 L84 77 Z" fill="rgba(220,187,99,.13)"></path>`
+    + `<path d="M84 73 a16 16 0 0 1 32 0" fill="none" stroke="${G}" stroke-width="1.6" stroke-linecap="round"></path>`
+    + `<rect x="73" y="76" width="54" height="52" fill="#190511" stroke="${G}" stroke-width="2.6"></rect>`
+    + `<path d="M73 90 H127" stroke="${G}" stroke-width="2.4" opacity=".45"></path>`
+    + `<path d="M127 101 L127 114" stroke="${G}" stroke-width="4.6" stroke-linecap="round"></path>`
+    + (full ? `<rect x="152" y="92" width="13" height="13" fill="none" stroke="${G}" stroke-width="1.8"></rect>` : "")
+    + [[73,76],[127,76],[73,128],[127,128]].map(([x,y]) =>
+        `<circle cx="${x}" cy="${y}" r="2.4" fill="${G}" opacity=".55"></circle>`).join("")
+    + `<circle cx="127" cy="128" r="7" fill="${G}"></circle>`
+    + `</svg>`;
+}
 const HJ_ART = {
   worn:          '<img src="hajj/ihram.jpg" alt="" width="688" height="1008">',
   instepBare:    '<img src="hajj/instep-bare.jpg" alt="" width="1024" height="688">',
   instepCovered: '<img src="hajj/instep-covered.jpg" alt="" width="1024" height="688">',
   ihramBelt:     '<img src="hajj/ihram-belt.jpg" alt="" width="1024" height="688">',
+  mataf:         hjMaTaf(true),
 };
 /* One picture: the image, any numbered marks over it, the key under it, then
    the caption. Marks are placed in fractions of the picture rather than in
