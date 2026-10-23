@@ -17,15 +17,20 @@
  * frosted panels, the masjid's mark at the foot. hajj-ui.jsx holds that and
  * index.html#hajj is the same screen on the website.
  */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjRow, HajjChevron }
   from "../hajj-ui";
 import { hajjAccess, visibleItems } from "../hajj";
-import { BRANCHES } from "../hajj-data";
+import { BRANCHES, byStage } from "../hajj-data";
+
+/* The packing list's own key, read here so the branch row can say how far
+   through the case somebody is rather than how many lines the branch has. */
+const PACKED = "taiyabah.hajj.packed";
 
 /* One of the four panels on the held screen. `lit` is the gold one — the
    counters, because they are the one thing on this screen that already
@@ -64,7 +69,36 @@ export default function Hajj({ navigation }) {
   const { t, fs, rtl } = useApp();
   const row = { flexDirection: "row", gap: 12 };
   const access = hajjAccess(BRANCHES);
-  const glyph = id => <Ionicons name={BRANCH_ICON[id] || "ellipse-outline"} size={19} color={HJ.gold} />;
+  const glyph = (id, lit) =>
+    <Ionicons name={BRANCH_ICON[id] || "ellipse-outline"} size={19}
+              color={lit ? HJ.gold : HJ.inkSoft} />;
+
+  const [packed, setPacked] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    AsyncStorage.getItem(PACKED)
+      .then(raw => { if (alive && raw) setPacked(JSON.parse(raw) || {}); })
+      .catch(() => {});     // no progress to show is not an error
+    return () => { alive = false; };
+  }, []);
+
+  /* WHAT A ROW SAYS UNDER ITS TITLE. "35 entries" was a developer's idea of
+     a subtitle — nobody opening this wants to know how many lines a branch
+     has. Reusing the screen's own lead instead was worse: four-line rows made
+     the list TALLER than the counts it replaced. A row subtitle and a screen
+     lead are different jobs, so every branch carries its own `sub`, one short
+     line, and a branch with nothing to add says nothing. The packing list is
+     the exception worth making: it knows how far through the case you are. */
+  const detailFor = b => {
+    if (b.id === "pack" && packed) {
+      const all = visibleItems(b).filter(i => i.pack);
+      if (all.length)
+        return t("hajj.packed_count", "{a} of {b} packed")
+          .replace("{a}", String(all.filter(i => packed[i.id]).length))
+          .replace("{b}", String(all.length));
+    }
+    return b.sub || "";
+  };
 
   if (access.open)
     return (
@@ -77,35 +111,41 @@ export default function Hajj({ navigation }) {
              "Everything the masjid has ready for the journey, working without signal in the Ḥaram.")}
         </HajjLead>
 
-        <View style={{ marginTop: 6 }}>
-          {access.branches.map(b => (
-            <HajjRow key={b.id} icon={glyph(b.id)} label={b.title}
-                     tone={b.kind === "tool" ? "gold" : "plain"}
-                     /* A branch only partly approved says so by its count
-                        rather than by looking whole. */
-                     detail={b.kind === "tool" ? b.lead
-                           : t("hajj.n_entries", "{n} entries")
-                               .replace("{n}", String(visibleItems(b).length))}
-                     onPress={() => navigation.navigate(
-                       b.route || "HajjBranch", b.route ? undefined : { branch: b.id })} />
-          ))}
-        </View>
-
-        {/* The approval line is shown only when a ruling is actually showing;
-            with every fiqh branch shut it would boast about content nobody
-            can see. */}
-        {access.branches.some(b => b.kind === "fiqh") && (
-          <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
-                         color: HJ.inkFaint, marginTop: 18, textAlign: "center" }}>
-            {t("hajj.approved_by_ulama",
-               "Every ruling here was checked and approved by the ʿulamā at the masjid.")}
-          </Text>)}
+        {/* GROUPED BY THE JOURNEY, which the branches were already ordered by
+            and which the screen used to throw away: eight rows at one weight
+            is a menu. A branch no stage names falls to the end under no
+            heading rather than disappearing. */}
+        {byStage(access.branches).map((g, gi) => (
+          <View key={g.id} style={{ marginTop: gi === 0 ? 20 : 26 }}>
+            {!!g.title && <HajjKicker style={{ marginBottom: 2 }}>{g.title}</HajjKicker>}
+            {g.branches.map(b => {
+              const lit = b.kind === "tool";
+              return (
+                <HajjRow key={b.id} icon={glyph(b.id, lit)} label={b.title}
+                         tone={lit ? "gold" : "plain"} detail={detailFor(b)}
+                         onPress={() => navigation.navigate(
+                           b.route || "HajjBranch", b.route ? undefined : { branch: b.id })} />
+              );
+            })}
+          </View>
+        ))}
 
         <HajjKicker style={{ marginTop: 26 }}>{t("hajj.a_question", "A question")}</HajjKicker>
-        <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.gold} />}
+        <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.inkSoft} />}
                  label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
                  trail={<HajjChevron />}
                  onPress={() => navigation.navigate("Contact")} />
+
+        {/* Provenance, so it sits with the mark at the foot rather than as a
+            banner between the title and the content. Shown only when a ruling
+            is actually showing: with every fiqh branch shut it would boast
+            about content nobody can see. */}
+        {access.branches.some(b => b.kind === "fiqh") && (
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
+                         color: HJ.inkFaint, marginTop: 30, textAlign: "center" }}>
+            {t("hajj.approved_by_ulama",
+               "Every ruling here was checked and approved by the ʿulamā at the masjid.")}
+          </Text>)}
       </HajjScreen>
     );
 
@@ -188,11 +228,11 @@ export default function Hajj({ navigation }) {
       {/* The two things that already exist and already work offline, which is
           the whole reason they are what is offered meanwhile. */}
       <HajjKicker style={{ marginTop: 26 }}>{t("hajj.until_then", "Until then")}</HajjKicker>
-      <HajjRow icon={<Ionicons name="book-outline" size={19} color={HJ.gold} />}
+      <HajjRow icon={<Ionicons name="book-outline" size={19} color={HJ.inkSoft} />}
                label={t("hajj.the_dua_book", "The duʿā book")}
                trail={<HajjChevron />}
                onPress={() => navigation.navigate("Duas")} />
-      <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.gold} />}
+      <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.inkSoft} />}
                label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
                trail={<HajjChevron />}
                onPress={() => navigation.navigate("Contact")} />

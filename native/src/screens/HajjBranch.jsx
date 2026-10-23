@@ -27,6 +27,7 @@ import * as Haptics from "expo-haptics";
 import Svg, { Path } from "react-native-svg";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
+import { Press } from "../ui";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip } from "../hajj-ui";
 import HajjArt from "../hajj-art";
 import { visibleSections } from "../hajj";
@@ -36,9 +37,13 @@ const KEY = "taiyabah.hajj.packed";
 
 /* Three verdicts, and only "dam" takes a colour — the same rule the panels on
    the section front follow, so the two cannot drift apart. */
+/* ONLY DAM TAKES A COLOUR. That was the rule from the start and "avoid" had
+   drifted to gold, which put three gold things on a screen meant to have at
+   most one and made the warn tone stop meaning "this costs you something".
+   Allowed and avoid are the ordinary states and read in the ordinary ink. */
 const VERDICT = {
   allowed: { k: "hajj.allowed", en: "Allowed", tone: "plain" },
-  avoid:   { k: "hajj.avoid",   en: "Avoid",   tone: "gold"  },
+  avoid:   { k: "hajj.avoid",   en: "Avoid",   tone: "plain" },
   dam:     { k: "hajj.dam_due", en: "Dam due", tone: "warn"  },
 };
 
@@ -160,15 +165,18 @@ export default function HajjBranch({ route }) {
                 {!!item.tr && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), lineHeight: fs(21),
                                  color: HJ.gold, marginTop: 6, textAlign: align }}>{item.tr}</Text>)}
-                {!!v && (
-                  <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginBottom: 9 }}>
-                    <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
-                  </View>)}
+                {/* The chip used to sit ABOVE the title, so "ALLOWED" was the
+                    first word read on the card and the least informative one
+                    there. It belongs with the thing it qualifies. */}
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21.5),
                                color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
                                textDecorationLine: on ? "line-through" : "none" }}>
                   {item.n ? `${item.n}. ` : ""}{item.t}
                 </Text>
+                {!!v && (
+                  <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginTop: 8 }}>
+                    <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
+                  </View>)}
                 {!!item.d && (
                   <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
                                  color: HJ.inkSoft, marginTop: 5, textAlign: align }}>{item.d}</Text>)}
@@ -190,15 +198,22 @@ export default function HajjBranch({ route }) {
             if (!item.pack)
               return <Panel key={item.id} tone={tone} style={gap}>{body}</Panel>;
 
+            /* A PACKING LIST IS A LIST. Thirty-five full cards was a wall
+               three screens tall; a row with a hairline above it is half the
+               height and twice as quick to run an eye down. Cards are still
+               right for a ruling, which carries a chip, a source and a
+               paragraph — this carries a line and a tick. */
             return (
-              <Panel key={item.id} tone={tone} onPress={toggle(item.id)}
+              <Press key={item.id} onPress={toggle(item.id)} dim={false}
                      accessibilityRole="checkbox" accessibilityState={{ checked: on }}
                      accessibilityLabel={item.t}
-                     style={[gap, { flexDirection: rtl ? "row-reverse" : "row", gap: 12,
-                                    alignItems: "flex-start" }]}>
+                     style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 13,
+                              alignItems: "flex-start", paddingVertical: 13,
+                              paddingHorizontal: 2,
+                              borderTopWidth: ii === 0 ? 0 : 1, borderTopColor: HJ.panelLine }}>
                 <View style={{ paddingTop: 1 }}><Tick on={on} /></View>
                 <View style={{ flex: 1 }}>{body}</View>
-              </Panel>
+              </Press>
             );
           })}
         </View>

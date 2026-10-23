@@ -76,32 +76,59 @@ function Undo({ color }) {
   );
 }
 
-/* The dial. The arc is the glance: a thumb's width of gold per circuit, so
-   four of seven is legible without reading the numeral at all. */
-function Ring({ size, fraction }) {
+/* The dial.
+ *
+ * SEVEN SEGMENTS, NOT ONE ARC. A continuous arc tells you roughly how far
+ * round you are; a pilgrim wants to know WHICH CIRCUIT, which is a counting
+ * question, and seven separate marks answer it without reading the numeral.
+ * It also fixes the empty state: one arc at zero is a flat grey ring that
+ * reads as disabled, where seven empty segments plainly say "seven of these,
+ * none yet". The tasbīḥ has no total, so it keeps the continuous arc and
+ * comes round on its own mark.
+ */
+function Ring({ size, total, n, fraction }) {
   const r = (size - STROKE) / 2;
   const c = 2 * Math.PI * r;
+  const mid = size / 2;
+  const gold = (
+    <Defs>
+      <LinearGradient id="hjDial" x1="0" y1="0" x2="1" y2="1">
+        <Stop offset="0" stopColor="#DCBB63" />
+        <Stop offset="1" stopColor="#C6A24C" />
+      </LinearGradient>
+    </Defs>
+  );
+  if (!total)
+    return (
+      <Svg width={size} height={size} style={{ position: "absolute" }}>
+        {gold}
+        <Circle cx={mid} cy={mid} r={r} fill={HJ.panel} stroke={HJ.panelLine} strokeWidth={1} />
+        <Circle cx={mid} cy={mid} r={r} fill="none" stroke={HJ.panelLine} strokeWidth={STROKE} />
+        <Circle cx={mid} cy={mid} r={r} fill="none" stroke="url(#hjDial)" strokeWidth={STROKE}
+                strokeDasharray={`${c} ${c}`} strokeDashoffset={c * (1 - fraction)}
+                strokeLinecap="round" rotation="-90" origin={`${mid}, ${mid}`} />
+      </Svg>
+    );
+  const GAP = 7;                       // degrees of plum between two circuits
+  const step = 360 / total;
+  const arc = c * ((step - GAP) / 360);
   return (
     <Svg width={size} height={size} style={{ position: "absolute" }}>
-      <Defs>
-        <LinearGradient id="hjDial" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#DCBB63" />
-          <Stop offset="1" stopColor="#C6A24C" />
-        </LinearGradient>
-      </Defs>
-      {/* the glass of the dial, then the unfilled track, then the arc */}
-      <Circle cx={size / 2} cy={size / 2} r={r} fill={HJ.panel} stroke={HJ.panelLine} strokeWidth={1} />
-      <Circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={HJ.panelLine} strokeWidth={STROKE} />
-      <Circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="url(#hjDial)" strokeWidth={STROKE}
-              strokeDasharray={`${c} ${c}`} strokeDashoffset={c * (1 - fraction)}
-              strokeLinecap="round" rotation="-90" origin={`${size / 2}, ${size / 2}`} />
+      {gold}
+      <Circle cx={mid} cy={mid} r={r} fill={HJ.panel} stroke={HJ.panelLine} strokeWidth={1} />
+      {Array.from({ length: total }, (_, i) => (
+        <Circle key={i} cx={mid} cy={mid} r={r} fill="none"
+                stroke={i < n ? "url(#hjDial)" : HJ.panelLine} strokeWidth={STROKE}
+                strokeDasharray={`${arc} ${c - arc}`} strokeLinecap="round"
+                rotation={-90 + i * step + GAP / 2} origin={`${mid}, ${mid}`} />
+      ))}
     </Svg>
   );
 }
 
 export default function HajjCounter() {
   const { t, fs, rtl } = useApp();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   /* As wide as the glass allows and no wider: 268 on a 390pt phone, smaller
      on an SE, and capped so it does not become a dinner plate on a tablet. */
   const dial = Math.max(196, Math.min(276, width - 84));
@@ -191,6 +218,13 @@ export default function HajjCounter() {
   return (
     /* The lamp sits where the dial sits, not at the top of the screen. */
     <HajjScreen top={16} foot={false} lamp="38%">
+     {/* The dial used to sit in the top third with a third of the glass empty
+         under it. space-between over the height the sheet actually has puts
+         the modes at the top, the dial in the middle and the actions where a
+         thumb already is. minHeight rather than flex:1 because this is inside
+         a ScrollView: at the largest text size it has to be free to grow and
+         scroll instead of squashing. */}
+     <View style={{ minHeight: height - 164, justifyContent: "space-between" }}>
       {/* Which counter. Three, so they fit a row without becoming a menu. */}
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 7 }}>
         {COUNTER_MODES.map(m => {
@@ -218,7 +252,7 @@ export default function HajjCounter() {
                style={{ width: dial, height: dial, borderRadius: dial / 2, borderWidth: 0,
                         backgroundColor: "transparent", padding: 0,
                         alignItems: "center", justifyContent: "center" }}>
-          <Ring size={dial} fraction={progress(mode, n)} />
+          <Ring size={dial} total={total} n={n} fraction={progress(mode, n)} />
           <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.38)),
                          lineHeight: fs(Math.round(dial * 0.42)), color: HJ.ink }}>{n}</Text>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 2.2,
@@ -227,11 +261,11 @@ export default function HajjCounter() {
         </Panel>
       </View>
 
-      <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20), color: HJ.inkSoft,
-                     marginTop: 28, textAlign: "center", paddingHorizontal: 30 }}>
-        {t("hajj.tap_the_dial", "Tap the dial. The count is kept even if the phone dies.")}
-      </Text>
-
+      {/* "Tap the dial" is gone. The dial is a 276pt circle with a numeral in
+          it; nobody needed telling, and it was one of two grey paragraphs
+          stacked under the only thing on the screen that matters. The note
+          below is the one that earns its place: it is the promise the screen
+          is making. */}
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 10, marginTop: 22 }}>
         <Panel onPress={back} disabled={n === 0}
                style={[foot, { backgroundColor: HJ.panel, borderColor: HJ.panelLine }]}>
@@ -255,6 +289,7 @@ export default function HajjCounter() {
         {t("hajj.counter_is_not_a_ruling",
            "This counts, and nothing more. It cannot tell you whether a circuit was valid, and the count is kept on this phone only.")}
       </Text>
+     </View>
     </HajjScreen>
   );
 }

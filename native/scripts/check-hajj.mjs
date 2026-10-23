@@ -110,6 +110,50 @@ if (webFlag !== undefined)
      `the app says RELEASED=${RELEASED} and the website says ${webFlag}. ` +
      `One platform would show the section while the other hides it.`);
 
+/* ---- the journey stages ------------------------------------------------
+ * The section front groups the branches into three stages. The failure that
+ * matters is a branch quietly disappearing from the front because a stage
+ * list and the content drifted apart — so every id a stage names must exist,
+ * no id may be named twice, and nothing may be lost. A branch no stage names
+ * is NOT a failure: it falls through to the end under no heading, which is
+ * the safe direction for this to break in. */
+const stages = Array.isArray(data.stages) ? data.stages : [];
+ok(stages.length > 0, "hajj.json has no stages — the section front has nothing to group by");
+/* The counters are a tool, not a text, so they are declared by the app's own
+   data layer rather than by the content file. ORDER there is the app's list
+   of every branch it expects, which is exactly the right thing to check a
+   stage's names against. */
+const nativeData = fs.readFileSync(path.join(here, "src/hajj-data.js"), "utf8");
+const ordered = [...(nativeData.match(/const ORDER = \[([^\]]*)\]/) || ["", ""])[1]
+                  .matchAll(/"(\w+)"/g)].map(m => m[1]);
+ok(ordered.length > 0, "hajj-data.js has no ORDER — the branch list did not parse");
+const known = new Set([...branches.map(b => b.id), ...ordered]);
+const named = [];
+for (const st of stages) {
+  ok(typeof st.title === "string" && st.title.trim().length > 0, `stage ${st.id} has no title`);
+  for (const id of (st.branches || [])) {
+    ok(known.has(id), `stage "${st.title}" names the branch "${id}", which does not exist`);
+    ok(!named.includes(id), `the branch "${id}" is named by more than one stage`);
+    named.push(id);
+  }
+}
+for (const b of branches)
+  ok(named.includes(b.id),
+     `the branch "${b.id}" is in no stage, so it would fall to the end of the ` +
+     `section front under no heading. Add it to a stage in hajj/content.js.`);
+/* The website must GROUP by them too. Asserting the titles appear literally
+   in index.html would be testing the wrong thing — the website reads them
+   from the same content file at runtime, which is the point. What can drift
+   is the machinery, so that is what is checked: if the grouping is removed
+   from one platform the two sections stop matching. */
+for (const [need, why] of [
+  ["data.stages", "does not read the stages out of the content file"],
+  ["function hajjByStage", "has no function to group the branches by stage"],
+  ["hajjByStage(access.branches)", "builds its branch list without grouping it"],
+]) ok(web.includes(need),
+      `index.html ${why} — the website and the app have drifted apart. ` +
+      `(looked for "${need}")`);
+
 /* ---- the drawings exist on both platforms ------------------------------
  * A mistyped art id is silent: the renderer draws nothing and the screen
  * just looks a little empty, which nobody would report as a bug. It is also

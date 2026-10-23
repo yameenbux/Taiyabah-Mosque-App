@@ -1157,18 +1157,25 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     text-align:center;margin:18px 0 0}
   .hj-sub{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:2.6px;
     text-transform:uppercase;color:var(--hj-gold);margin:26px 0 0}
+  #hj-branches .hj-sub:first-child{margin-top:20px}
 
   /* A row that goes somewhere: a branch on the front, a link at the foot.
      Its own class rather than .dr-row, which half the site's sheets share and
      which is paper everywhere else. */
   .hj-row{display:flex;align-items:center;gap:14px;padding:15px 16px;margin-top:11px}
-  .hj-ico{flex:0 0 auto;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
-    background:var(--hj-gold-fill);color:var(--hj-gold)}
+  /* Only the lit row gets a gold tile behind its glyph; the rest carry the
+     glyph on its own, and the chevron goes with them. */
+  .hj-ico{flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;color:var(--hj-ink-soft)}
+  .hj-ico.gold{border-radius:12px;background:var(--hj-gold-fill);color:var(--hj-gold)}
   .hj-ico svg{width:19px;height:19px}
   .hj-rt{flex:1;min-width:0;font-size:calc(15.5px * var(--ts));font-weight:600;color:var(--hj-ink)}
-  .hj-rd{display:block;font-size:calc(12.5px * var(--ts));font-weight:400;line-height:1.45;
+  /* Two lines, hard. A row subtitle that wraps to four turns the list back
+     into the wall this grouping exists to undo, and a longer translation
+     must not be able to do that. */
+  .hj-rd{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    font-size:calc(12.5px * var(--ts));font-weight:400;line-height:1.45;
     color:var(--hj-ink-faint);margin-top:2px}
-  .hj-ch{flex:0 0 auto;color:var(--hj-gold);font-size:calc(20px * var(--ts));line-height:1}
+  .hj-ch{flex:0 0 auto;color:var(--hj-ink-faint);font-size:calc(20px * var(--ts));line-height:1}
 
   /* The mark at the foot, where design C had a star behind the words. Small
      and centred: it signs the screen rather than decorating it, and it is the
@@ -1192,7 +1199,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     text-transform:uppercase;color:var(--hj-ink-faint)}
   .hc-mode[aria-pressed="true"]{border-color:var(--hj-gold-line);background:var(--hj-gold-panel);
     color:var(--hj-gold)}
-  .hc-wrap{display:grid;place-items:center;margin-top:34px}
+  /* The dial used to sit in the top third with a third of the glass empty
+     under it. space-between over the height the sheet actually has puts the
+     modes at the top, the dial in the middle and the actions where a thumb
+     already is. */
+  #hajjcount .ab-wrap{min-height:100%;display:flex;flex-direction:column;justify-content:space-between}
+  .hc-wrap{display:grid;place-items:center;margin:28px 0}
   /* clamp, so the dial is as wide as the glass allows on a phone and does not
      become a dinner plate on a desktop window. */
   .hc-tap{width:clamp(196px,76vw,276px);aspect-ratio:1;border:0;background:none;padding:0;
@@ -1204,9 +1216,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hc-lab{font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:2.2px;
     text-transform:uppercase;color:var(--hj-gold);margin-top:6px;text-align:center;
     padding:0 24px;position:relative}
-  .hc-hint{font-size:calc(13px * var(--ts));line-height:1.55;color:var(--hj-ink-soft);
-    text-align:center;margin:28px 30px 0}
-  .hc-acts{display:flex;gap:10px;margin-top:22px}
+  .hc-acts{display:flex;gap:10px;margin-top:0}
   .hc-act{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
     padding:14px 4px;border-radius:14px;font-size:calc(13.5px * var(--ts));font-weight:600;
     color:var(--hj-ink)}
@@ -1259,6 +1269,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     color:var(--hj-gold);margin-top:6px}
   .hl-q{font-size:calc(14.5px * var(--ts));font-weight:600;line-height:1.48;
     color:var(--hj-ink);margin-top:9px}
+  .hl-q:first-child{margin-top:0}
+  .hl-q + .hj-chip{margin-top:8px}
   .hl-a{font-size:calc(13px * var(--ts));line-height:1.6;color:var(--hj-ink-soft);margin-top:5px}
   .hl-when{font-size:calc(12.5px * var(--ts));font-weight:500;line-height:1.5;
     color:var(--hj-gold);margin-top:8px}
@@ -1278,7 +1290,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hl-count span{flex:1;font-size:calc(12.5px * var(--ts));font-weight:600;letter-spacing:.6px;
     color:var(--hj-ink-soft)}
   /* The whole card ticks. A thumb at eleven at night should not have to aim. */
-  .hl-tick{display:flex;gap:12px;align-items:flex-start}
+  .hl-tick{display:flex;gap:13px;align-items:flex-start}
+  .hl-row{width:100%;text-align:inherit;font:inherit;color:inherit;background:none;border:0;
+    border-top:1px solid var(--hj-panel-line);padding:13px 2px;cursor:pointer}
+  .hl-row:first-of-type{border-top:0}
+  .hl-row:active{background:var(--hj-panel)}
   .hl-box{flex:0 0 auto;width:25px;height:25px;border-radius:8px;margin-top:1px;
     display:grid;place-items:center;border:1.5px solid var(--hj-panel-line);background:transparent}
   .hl-box svg{width:14px;height:14px;opacity:0}
@@ -5313,7 +5329,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         </div>
 
         <p class="hj-by" id="hj-by-held" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
-        <p class="hj-by" id="hj-by-open" data-i18n="hajj.approved_by_ulama" hidden>Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
 
         <!-- Drawn once the section opens; the four tiles above give way
              to the branches that are actually ready. -->
@@ -5327,6 +5342,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="hj-panel hj-row" id="hj-contact">
           <span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.3 17.3 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.8 5.5a1.8 1.8 0 0 1 1.8-2h2.6a1.8 1.8 0 0 1 1.8 1.6c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14 14 0 0 0 5.3 5.3l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6a1.8 1.8 0 0 1 1.6 1.9Z"/></svg></span><span class="hj-rt" data-i18n="hajj.ask_the_ulama">Ask the &#703;ulam&#257;</span><span class="hj-ch" aria-hidden="true">&rsaquo;</span>
         </button>
+        <!-- Provenance, so it sits with the mark at the foot rather than as a
+             banner between the title and the content. -->
+        <p class="hj-by" id="hj-by-open" data-i18n="hajj.approved_by_ulama" hidden>Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
         <!-- The mark at the foot, the same two lines the Ramadan guard ends
              on and the same two the app draws. -->
         <div class="hj-foot">
@@ -5369,14 +5387,17 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                 </linearGradient>
               </defs>
               <circle cx="138" cy="138" r="130" fill="var(--hj-panel)" stroke="var(--hj-panel-line)" stroke-width="1"></circle>
-              <circle cx="138" cy="138" r="130" fill="none" stroke="var(--hj-panel-line)" stroke-width="12"></circle>
-              <circle id="hc-ring" cx="138" cy="138" r="130" fill="none" stroke="url(#hc-gold)" stroke-width="12" stroke-linecap="round"></circle>
+              <!-- Seven segments for ṭawāf and saʿī, written by hcRender; the
+                   continuous track and arc below are for the tasbīḥ, which
+                   has no total. -->
+              <g id="hc-seg"></g>
+              <circle id="hc-track" cx="138" cy="138" r="130" fill="none" stroke="var(--hj-panel-line)" stroke-width="12" hidden></circle>
+              <circle id="hc-ring" cx="138" cy="138" r="130" fill="none" stroke="url(#hc-gold)" stroke-width="12" stroke-linecap="round" hidden></circle>
             </svg>
             <span class="hc-n" id="hc-n" data-i18n-latin>0</span>
             <span class="hc-lab" id="hc-lab"></span>
           </button>
         </div>
-        <p class="hc-hint" data-i18n="hajj.tap_the_dial">Tap the dial. The count is kept even if the phone dies.</p>
         <div class="hc-acts">
           <button type="button" class="hj-panel hc-act" id="hc-undo" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
@@ -11256,12 +11277,28 @@ const HAJJ_RELEASED = false;
 /* The counters have no text to import: they are a tool, they are finished,
    and `kind:"tool"` is what exempts them from the content rule. */
 const HAJJ_COUNTERS_BRANCH = { id:"counters", kind:"tool", sheet:"counters",
-  title:"The counters", lead:"Ṭawāf and saʿī without losing count, and a tasbīḥ.", sections:[] };
+  title:"The counters", sub:"Ṭawāf and saʿī without losing count",
+  lead:"Ṭawāf and saʿī without losing count, and a tasbīḥ.", sections:[] };
 const HAJJ_ORDER = ["pack","heat","papers","ihram","rites","duas","counters","home"];
 
 /* Filled by hajj/content.js, which the app imports through the same file. */
 let HAJJ_BRANCHES = [HAJJ_COUNTERS_BRANCH];
+/* The three stages of the journey, from the same content file as the
+   branches. A branch no stage names still appears, at the end, under no
+   heading: adding content must never be able to make a branch vanish. */
+let HAJJ_STAGES = [];
+function hajjByStage(open){
+  const left = new Set(open.map(b => b.id));
+  const groups = HAJJ_STAGES.map(st => ({
+    id: st.id, title: st.title,
+    branches: (st.branches || []).map(id => { left.delete(id); return open.find(b => b.id === id); })
+                                 .filter(Boolean),
+  })).filter(g => g.branches.length);
+  const rest = open.filter(b => left.has(b.id));
+  return rest.length ? [...groups, { id:"rest", title:"", branches:rest }] : groups;
+}
 function hajjAdopt(data){
+  HAJJ_STAGES = (data && Array.isArray(data.stages)) ? data.stages : [];
   const got = (data && Array.isArray(data.branches)) ? data.branches : [];
   HAJJ_BRANCHES = [...got, HAJJ_COUNTERS_BRANCH].sort((x,y)=>{
     const i=HAJJ_ORDER.indexOf(x.id), j=HAJJ_ORDER.indexOf(y.id);
@@ -11324,11 +11361,28 @@ function hcRender(){
   const tap = document.getElementById("hc-tap");
   document.getElementById("hc-n").textContent = num(n);
   tap.disabled = done;
-  /* The arc stays gold at every count. It used to turn green at seven, which
-     is a second colour doing the job the full circle already does. */
-  const ring = document.getElementById("hc-ring"), C = 2*Math.PI*130;
-  ring.setAttribute("stroke-dasharray", `${C} ${C}`);
-  ring.setAttribute("stroke-dashoffset", String(C*(1-hcProgress(hcMode,n))));
+  /* SEVEN SEGMENTS, NOT ONE ARC. A continuous arc says roughly how far round
+     you are; a pilgrim wants to know WHICH CIRCUIT, which is a counting
+     question that seven separate marks answer without reading the numeral.
+     It also fixes the empty state: one arc at zero is a flat grey ring that
+     reads as disabled, where seven empty segments say "seven of these, none
+     yet". The tasbīḥ has no total and keeps the continuous arc. */
+  const C = 2*Math.PI*130;
+  const seg = document.getElementById("hc-seg");
+  const track = document.getElementById("hc-track"), ring = document.getElementById("hc-ring");
+  if(c.total){
+    const GAP = 7, step = 360/c.total, arc = C*((step-GAP)/360);
+    seg.innerHTML = Array.from({length:c.total},(_,i)=>
+      `<circle cx="138" cy="138" r="130" fill="none" stroke-width="12" stroke-linecap="round"`
+      + ` stroke-dasharray="${arc} ${C-arc}" transform="rotate(${i*step+GAP/2} 138 138)"`
+      + ` stroke="${i<n?"url(#hc-gold)":"var(--hj-panel-line)"}"></circle>`).join("");
+    track.hidden = true; ring.hidden = true;
+  } else {
+    seg.innerHTML = "";
+    track.hidden = false; ring.hidden = false;
+    ring.setAttribute("stroke-dasharray", `${C} ${C}`);
+    ring.setAttribute("stroke-dashoffset", String(C*(1-hcProgress(hcMode,n))));
+  }
   const from = hcFrom(n);
   document.getElementById("hc-lab").textContent =
       hcMode==="sai" && from!==null
@@ -11417,9 +11471,12 @@ function hjArtHtml(art, inner){
   return `<div class="hj-photo${inner ? " inner" : ""}">${body}</div>`;
 }
 
+/* ONLY DAM TAKES A COLOUR. That was the rule from the start and "avoid" had
+   drifted to gold, which put three gold things on a screen meant to have at
+   most one. Allowed and avoid are the ordinary states, in the ordinary ink. */
 const HJ_VERDICT = {
   allowed: () => [t("hajj.allowed","Allowed"), ""],
-  avoid:   () => [t("hajj.avoid","Avoid"), "avoid"],
+  avoid:   () => [t("hajj.avoid","Avoid"), ""],
   dam:     () => [t("hajj.dam_due","Dam due"), "dam"],
 };
 
@@ -11430,8 +11487,10 @@ function hjItemHtml(x){
   const inner =
       (x.ar ? `<div class="hl-ar" lang="ar">${esc(x.ar)}</div>` : "")
     + (x.tr ? `<div class="hl-tr">${esc(x.tr)}</div>` : "")
-    + (v ? `<span class="hj-chip${v[1]?" "+v[1]:""}">${esc(v[0])}</span>` : "")
     + `<div class="hl-q${on?" done":""}">${x.n?esc(num(x.n))+". ":""}${esc(x.t||"")}</div>`
+    /* The chip used to sit ABOVE the title, so "ALLOWED" was the first word
+       read and the least informative one on the card. */
+    + (v ? `<span class="hj-chip${v[1]?" "+v[1]:""}">${esc(v[0])}</span>` : "")
     + (x.d ? `<div class="hl-a">${esc(x.d)}</div>` : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)
@@ -11440,7 +11499,11 @@ function hjItemHtml(x){
      costs money looks different from across the room. */
   const tone = v && v[1] === "dam" ? " warn" : "";
   if(!x.pack) return `<div class="hj-panel${tone} hl-card">${inner}</div>`;
-  return `<button type="button" class="hj-panel${tone} hl-card hl-tick" data-pack="${esc(x.id)}"`
+  /* A PACKING LIST IS A LIST. Thirty-five full cards was a wall three screens
+     tall; a row with a hairline above it is half the height and twice as
+     quick to run an eye down. Cards are still right for a ruling, which
+     carries a chip, a source and a paragraph. */
+  return `<button type="button" class="hl-row hl-tick" data-pack="${esc(x.id)}"`
        + ` role="checkbox" aria-checked="${on}"><span class="hl-box${on?" on":""}" aria-hidden="true">`
        + `<svg viewBox="0 0 24 24" fill="none" stroke="#3C0B2A" stroke-width="3.2"`
        + ` stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`
@@ -11514,18 +11577,36 @@ function renderHajj(){
   const list = document.getElementById("hj-branches");
   list.hidden = !open;
   if(!open){ list.innerHTML = ""; return; }
-  list.innerHTML = access.branches.map(b => {
-    const detail = b.kind === "tool" ? (b.lead || "")
-      : t("hajj.n_entries","{n} entries").replace("{n}", num(hajjVisibleItems(b).length));
+  /* WHAT A ROW SAYS UNDER ITS TITLE. "35 entries" is a developer's idea of a
+     subtitle: nobody opening this wants to know how many lines a branch has.
+     The packing list knows how far through the case you are and says that;
+     everything else says what it is for, in its own words. */
+  const detailFor = b => {
+    if(b.id === "pack"){
+      const all = hajjVisibleItems(b).filter(x => x.pack);
+      if(all.length) return t("hajj.packed_count","{a} of {b} packed")
+        .replace("{a}", num(all.filter(x => hjPacked[x.id]).length))
+        .replace("{b}", num(all.length));
+    }
+    return b.sub || "";
+  };
+  const rowHtml = b => {
     /* The counters are the one branch that is a tool rather than a text, and
-       they get the lit panel — one per screen, or it stops meaning anything. */
+       they get the lit panel — one per screen, or it stops meaning anything.
+       Only that row gets a gold tile behind its glyph: eight of them drew a
+       bright stripe down the left edge louder than any of the titles. */
     const tone = b.kind === "tool" ? " gold" : "";
     return `<button type="button" class="hj-panel${tone} hj-row" data-branch="${esc(b.id)}" data-sheet="${esc(b.sheet||"")}">`
-      + `<span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"`
+      + `<span class="hj-ico${tone}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"`
       + ` stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${HJ_ICON[b.id]||""}</svg></span>`
-      + `<span class="hj-rt">${esc(b.title)}<span class="hj-rd">${esc(detail)}</span></span>`
+      + `<span class="hj-rt">${esc(b.title)}<span class="hj-rd">${esc(detailFor(b))}</span></span>`
       + `<span class="hj-ch" aria-hidden="true">&rsaquo;</span></button>`;
-  }).join("");
+  };
+  /* GROUPED BY THE JOURNEY, which the branches were already ordered by and
+     which the screen used to throw away: eight rows at one weight is a menu. */
+  list.innerHTML = hajjByStage(access.branches).map(g =>
+    (g.title ? `<div class="hj-sub">${esc(g.title)}</div>` : "")
+    + g.branches.map(rowHtml).join("")).join("");
   [...list.querySelectorAll("[data-branch]")].forEach(btn =>
     btn.addEventListener("click", () => {
       const id = btn.dataset.branch;

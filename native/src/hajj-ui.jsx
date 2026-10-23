@@ -172,22 +172,33 @@ export function HajjChip({ children, tone = "plain", style }) {
   );
 }
 
-/** A row that goes somewhere: a branch on the front, a link at the foot. */
+/** A row that goes somewhere: a branch on the front, a link at the foot.
+ *
+ *  ONLY THE GOLD ROW GETS A GOLD TILE. Eight rows each with a gold square
+ *  behind the icon drew a bright vertical stripe down the left edge that was
+ *  louder than any of the titles, and gold stopped meaning "this one is
+ *  different" because everything was. The plain rows carry the glyph on its
+ *  own now, and the chevron goes with them. */
 export function HajjRow({ icon, label, detail, trail, tone, onPress }) {
   const { fs, rtl } = useApp();
+  const lit = tone === "gold";
   return (
     <Panel tone={tone} onPress={onPress} accessibilityLabel={label}
            style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                    gap: 14, paddingVertical: 15, marginTop: 11 }}>
-      <View style={{ width: 38, height: 38, borderRadius: 12, alignItems: "center",
-                     justifyContent: "center", backgroundColor: HJ.goldFill }}>
+                    gap: lit ? 14 : 12, paddingVertical: 15, marginTop: 11 }}>
+      <View style={[{ width: 38, height: 38, alignItems: "center", justifyContent: "center" },
+                    lit && { borderRadius: 12, backgroundColor: HJ.goldFill }]}>
         {icon}
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15.5), color: HJ.ink,
                        textAlign: rtl ? "right" : "left" }}>{label}</Text>
         {!!detail && (
-          <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(18.5),
+          /* Two lines, hard. A row subtitle that wraps to four turns the list
+             back into the wall this grouping exists to undo, and a longer
+             translation must not be able to do that. */
+          <Text numberOfLines={2}
+                style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(18.5),
                          color: HJ.inkFaint, marginTop: 2,
                          textAlign: rtl ? "right" : "left" }}>{detail}</Text>)}
       </View>
@@ -200,7 +211,7 @@ export function HajjRow({ icon, label, detail, trail, tone, onPress }) {
 /* The chevron, drawn rather than taken from Ionicons so that it is the same
    stroke weight as the rest of the section's line work and the same mark the
    website draws. The subset font's chevron is heavier and sits differently. */
-export function HajjChevron({ color = HJ.gold, size = 18, back }) {
+export function HajjChevron({ color = HJ.inkFaint, size = 18, back }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
          strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">

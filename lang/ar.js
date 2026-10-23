@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "531185e32b02",
+ "version": "5fab0fc8a5a3",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -2093,7 +2093,6 @@ window.LANG_PACK = {
   "ramadan.hours": "ساعات",
   "ramadan.minutes": "دقائق",
   "hajj.packed_count": "{a} مِنْ {b} جَاهِز",
-  "hajj.n_entries": "{n} مُدْخَلَات",
   "hajj.what_is_ready": "كُلُّ مَا أَعَدَّهُ الْمَسْجِدُ لِلرِّحْلَة، يَعْمَلُ بِلَا إِنْتَرْنِت فِي الْحَرَم.",
   "hajj.what_you_carry": "مَا تَحْمِلُهُ مَعَكَ",
   "hajj.approved_by_ulama": "كُلُّ حُكْمٍ هُنَا رَاجَعَهُ وَاعْتَمَدَهُ عُلَمَاءُ الْمَسْجِد.",
@@ -2132,7 +2131,6 @@ window.LANG_PACK = {
   "hajj.checked_by_ulama": "كُلُّ حُكْمٍ سَيُرَاجَعُ وَيُعْتَمَدُ مِنْ عُلَمَاءِ الْمَسْجِدِ قَبْلَ ظُهُورِهِ هُنَا.",
   "hajj.until_then": "حَتَّى ذَلِكَ الْحِين",
   "hajj.the_dua_book": "كِتَابُ الْأَدْعِيَة",
-  "hajj.ask_the_ulama": "اِسْأَلِ الْعُلَمَاء",
-  "hajj.tap_the_dial": "اِنْقُرْ عَلَى الْقُرْص. يُحْفَظُ الْعَدُّ حَتَّى إِنْ تَوَقَّفَ الْهَاتِف."
+  "hajj.ask_the_ulama": "اِسْأَلِ الْعُلَمَاء"
  }
 };

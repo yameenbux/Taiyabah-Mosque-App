@@ -36,6 +36,20 @@
    so where it matters.
 */
 window.HAJJ = {
+  /* THE ORDER OF THE JOURNEY, SURFACED. The branches were already in this
+     order — what to take, surviving the heat, what to check before booking,
+     then iḥrām and the rites, then the counters you carry, then home — but
+     the section front listed all eight at the same weight, which is a menu
+     rather than a companion. Naming the three stages costs nothing and
+     halves the work of finding the right one.
+
+     A branch not named here still appears, at the end, under no heading:
+     adding content must never make a branch vanish. */
+  stages: [
+    { id: "before", title: "Before you go",       branches: ["pack", "heat", "papers"] },
+    { id: "there",  title: "While you are there", branches: ["ihram", "rites", "duas", "counters"] },
+    { id: "after",  title: "Afterwards",          branches: ["home"] },
+  ],
   branches: [
 
     /* ---------------------------------------------------------------- *
@@ -46,6 +60,7 @@ window.HAJJ = {
       id: "pack",
       kind: "practical",
       title: "What to pack",
+      sub: "Tick it off as it goes in the case",
       lead: "Tick it off as it goes in the case. It saves itself, so you can come back to it.",
       sections: [
         {
@@ -171,6 +186,7 @@ window.HAJJ = {
       id: "heat",
       kind: "practical",
       title: "Heat, water and crowds",
+      sub: "Staying upright in the heat and the crowd",
       lead: "Most of what goes wrong on Hajj is heat, dehydration or a crowd, and all three are survivable if you know what you are looking at.",
       sections: [
         {
@@ -239,6 +255,7 @@ window.HAJJ = {
       id: "papers",
       kind: "practical",
       title: "Before you book",
+      sub: "What to check before you pay",
       lead: "Entry rules, visas and vaccination requirements change from season to season. What follows is what to go and check, not what the answer is.",
       sections: [
         {
@@ -276,6 +293,7 @@ window.HAJJ = {
       id: "ihram",
       kind: "fiqh",
       title: "Iḥrām",
+      sub: "What may be worn, and what is owed",
       lead: "What may be worn, what may not be done, and what is owed if something is broken.",
       sections: [
         {
@@ -370,6 +388,7 @@ window.HAJJ = {
       id: "rites",
       kind: "fiqh",
       title: "The rites, in order",
+      sub: "What is done, when, and in what order",
       lead: "What is done, when, and in what order.",
       sections: [
         {
@@ -412,6 +431,7 @@ window.HAJJ = {
       id: "duas",
       kind: "fiqh",
       title: "The duʿās",
+      sub: "What is said, and where",
       lead: "What is said, where, with the pronunciation to read from.",
       sections: [
         {
@@ -438,6 +458,7 @@ window.HAJJ = {
       id: "home",
       kind: "practical",
       title: "Coming home",
+      sub: "Your health, and the first days back",
       sections: [
         {
           id: "home-health",

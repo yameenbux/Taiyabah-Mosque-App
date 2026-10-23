@@ -21,6 +21,7 @@ export const COUNTERS_BRANCH = {
   kind: "tool",
   route: "HajjCounter",
   title: "The counters",
+  sub: "Ṭawāf and saʿī without losing count",
   lead: "Ṭawāf and saʿī without losing count, and a tasbīḥ.",
   sections: [],
 };
@@ -31,6 +32,23 @@ export const COUNTERS_BRANCH = {
 const ORDER = ["pack", "heat", "papers", "ihram", "rites", "duas", "counters", "home"];
 
 const imported = Array.isArray(CONTENT && CONTENT.branches) ? CONTENT.branches : [];
+
+/* The three stages of the journey, from the same content file. A branch no
+   stage names still appears, at the end, under no heading — adding content
+   must never be able to make a branch vanish. */
+export const STAGES = Array.isArray(CONTENT && CONTENT.stages) ? CONTENT.stages : [];
+
+/** The open branches grouped by stage, with anything unnamed last. */
+export function byStage(open) {
+  const left = new Set(open.map(b => b.id));
+  const groups = STAGES.map(st => ({
+    id: st.id, title: st.title,
+    branches: st.branches.map(id => { left.delete(id); return open.find(b => b.id === id); })
+                         .filter(Boolean),
+  })).filter(g => g.branches.length);
+  const rest = open.filter(b => left.has(b.id));
+  return rest.length ? [...groups, { id: "rest", title: "", branches: rest }] : groups;
+}
 
 export const BRANCHES = [...imported, COUNTERS_BRANCH]
   .sort((a, b) => {
