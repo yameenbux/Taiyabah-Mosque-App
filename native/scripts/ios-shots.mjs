@@ -108,8 +108,16 @@ const plist = path.join(APP, "Info.plist");
 const bundleId = sh("/usr/libexec/PlistBuddy", ["-c", "Print :CFBundleIdentifier", plist]).trim();
 console.log(`app: ${app}\nbundle: ${bundleId}\n`);
 
-/* A phone and a tablet, because supportsTablet is true now and an iPad running
-   a stretched phone layout is exactly the thing being checked for. */
+/* A phone and a tablet, because an iPad running a stretched phone layout is
+   exactly the thing being checked for.
+
+   This comment used to say "because supportsTablet is true now". It was not.
+   app.json carried supportsTablet:false from the first commit that set it, so
+   every run installed an iPhone-only build on an iPad, got a phone-sized
+   window letterboxed in black, and reported it below as the React Native
+   error screen — the one reading the black could not distinguish. The device
+   family is now asserted as a number in check-ios-config.mjs, which is where
+   that question can actually be answered. */
 /* THE ONE CHANNEL THAT CAN BE READ FROM OUTSIDE THE RUNNER.
  *
  * Everything this script knows is printed — the ink counts, the palette, even
@@ -191,13 +199,36 @@ for (const want of DEVICES) {
     const top = dominant(img);
     const nearBlack = top.r < 16 && top.g < 16 && top.b < 16;
     if (nearBlack && top.share > 0.4) {
-      console.error(`  FAIL  ${Math.round(top.share * 100)}% of the screen is ${top.hex} — ` +
-                    `this app has no black screen, so that is the React Native error ` +
-                    `screen. The usual cause is a build with no embedded JavaScript ` +
-                    `(Debug rather than Release), which launches and survives and runs ` +
-                    `none of this project's code.`);
-      annotate("error", `${want.label}: ${Math.round(top.share * 100)}% of the screen is ${top.hex} — ` +
-                        `the React Native error screen, usually a build with no embedded JavaScript`);
+      /* TWO FAULTS LOOK IDENTICAL HERE, and naming only one of them cost six
+         weeks. A letterbox — an iPhone-only build in a phone-sized window on
+         a tablet — is black around a perfectly good app, and on an iPad Pro
+         13" it is 77% of the glass. The error screen is black across all of
+         it. The share is the tell: a letterbox leaves the app's own colours
+         in the middle, so the count of DISTINCT colours stays high, while the
+         error screen has almost none. Both are reported, so whoever reads the
+         annotation is not handed one guess as a conclusion. */
+      const pct = Math.round(top.share * 100);
+      /* MEASURED, NOT GUESSED, like the thresholds above it. The letterboxed
+         iPad reported: #000000 76.5%, #f5f1e8 9.7%, #2a0a1e 1.4%, #772157
+         1.1% — the app's paper and its plum, still on the glass, in a smaller
+         window. 2620 distinct colours against the working iPhone's 2956. The
+         React Native error screen has neither brand colour and tens of
+         colours, not thousands. So: is the app painting anything at all? */
+      const pal = palette(img, 8);
+      const brand = pal.some(e => /^#(f5f1e8|772157|3c0b2a|4b1136)\b/.test(e));
+      const letterbox = brand && whole > 500;
+      const likely = letterbox
+        ? `${whole} distinct colours are still on screen, so the app IS drawing — this is a ` +
+          `LETTERBOX, not a crash: an iPhone-only build (UIDeviceFamily [1]) in a phone-sized ` +
+          `window on a tablet. Set ios.supportsTablet to true in app.json.`
+        : `only ${whole} distinct colours, so nothing of this app is drawing — that is the ` +
+          `React Native error screen, usually a build with no embedded JavaScript (Debug ` +
+          `rather than Release), which launches and survives and runs none of this code.`;
+      console.error(`  FAIL  ${pct}% of the screen is ${top.hex}. This app has no black screen — ` +
+                    `the lightest theme is cream and the darkest card is #24091A. ${likely}`);
+      annotate("error", `${want.label}: ${pct}% of the screen is ${top.hex}, ${whole} colours — ` +
+                        (letterbox ? "letterboxed iPhone-only build, set supportsTablet"
+                                   : "the React Native error screen, likely no embedded JavaScript"));
       failures++;
     } else if (whole < 100) {
       console.error(`  FAIL  the screen holds ${whole} colours — that is a blank or flat ` +

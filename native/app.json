@@ -32,8 +32,14 @@
     },
     "ios": {
       "bundleIdentifier": "com.taiyabahmasjid.app",
-      "supportsTablet": false,
+      "supportsTablet": true,
       "infoPlist": {
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
         "ITSAppUsesNonExemptEncryption": false,
       "NSSupportsLiveActivities": true,
         "UIBackgroundModes": [

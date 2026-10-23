@@ -137,6 +137,33 @@ if (ip.json) {
   }
 }
 
+/* ---- iPhone AND iPad, which is a number rather than a photograph ----
+ *
+ * supportsTablet:false writes UIDeviceFamily [1], and an iPhone-only app on an
+ * iPad does not fail. It runs — correctly, in a phone-sized window, with black
+ * around it. On an iPad Pro 13" that is 390x844 of app inside 1024x1366 of
+ * glass: 23% content, 77% black.
+ *
+ * Which is exactly the figure ios-shots.mjs reported, while reading it as "the
+ * React Native error screen, usually a build with no embedded JavaScript". Both
+ * really do look like a wall of black in a screenshot, and the wrong one was
+ * believed for weeks because the right one is invisible from a photograph.
+ *
+ * So the device family is asserted here, where it is a list of integers and
+ * cannot be mistaken for anything, and the screenshot check is left to catch
+ * the failure it can actually see. */
+if (ip.json) {
+  const fam = Array.isArray(ip.json.UIDeviceFamily) ? ip.json.UIDeviceFamily.map(Number) : null;
+  if (!fam) problems.push("the built app declares no UIDeviceFamily at all");
+  else if (fam.includes(2)) console.log(`  ok      UIDeviceFamily ${JSON.stringify(fam)} — iPhone and iPad`);
+  else problems.push(
+    `UIDeviceFamily is ${JSON.stringify(fam)}, so this is an iPhone-only build. It will not fail ` +
+    `on an iPad — it will run letterboxed in a phone-sized window, which photographs as a wall ` +
+    `of black. Set ios.supportsTablet to true in app.json.`);
+} else {
+  console.log("  note    UIDeviceFamily not checked — plutil was unavailable to parse the plist");
+}
+
 /* ---- entitlements, from the generated project ---- */
 const want = declared.entitlements || {};
 if (Object.keys(want).length) {

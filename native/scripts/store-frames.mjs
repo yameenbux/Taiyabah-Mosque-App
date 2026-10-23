@@ -330,18 +330,25 @@ function panelHtml(w, h, p, shotB64, S, bar, logoB64) {
   </body></html>`;
 }
 
-/* ONE SET, BECAUSE THE APP IS IPHONE ONLY.
+/* THREE SETS, BECAUSE THE APP IS NO LONGER IPHONE ONLY.
  *
- * app.json sets supportsTablet to false, so App Store Connect never shows the
- * 13" iPad tab and a set rendered for it is six files nobody can upload. The
- * iPad entry stayed here long after that changed; it is gone rather than
- * commented out, and if tablet support comes back this is four lines. */
+ * This said "one set, because the app is iPhone only", and promised that if
+ * tablet support came back the iPad entry was four lines. app.json now sets
+ * supportsTablet to true, so App Store Connect shows the 13" iPad tab — and
+ * that tab is not optional: a listing that declares iPad support and offers
+ * no iPad screenshots cannot be submitted. Here are the four lines.
+ *
+ * No `island`: an iPad has no Dynamic Island, and statusBar() already leaves
+ * the strip as the plain top edge of the glass below 26px, which is what an
+ * iPad's 24-of-1376 bar comes out as anyway. */
 const DEVICES = [
   { label: "iphone", dir: "iphone", w: 1206, h: 2622, scale: 1.0, island: true },
   /* 6.9". `scale` is the only thing that changes: every measurement in a panel
      is written as a multiple of it, so the larger canvas is the same design
      drawn bigger rather than the same design with more room around it. */
   { label: "iphone-6.9", dir: "iphone-69", w: 1320, h: 2868, scale: 1320 / 1206, island: true },
+  /* 13" iPad, the size the tab accepts — see the note at the top of this file. */
+  { label: "ipad-13", dir: "ipad-13", w: 2064, h: 2752, scale: 2064 / 1206, island: false },
 ];
 
 /* Written by store-web-shots.mjs: how tall the strip it left free is, and what
