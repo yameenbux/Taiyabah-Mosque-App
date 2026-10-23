@@ -4,20 +4,31 @@
  *
  * WHAT THIS IS FOR. The section is built and held. Until the masjid says
  * otherwise the public sees one locked screen, exactly as Ramadan was held
- * behind its guard, and this file is what decides which of the two a person
- * gets. It is the Hajj half of what ramadan.js does for Ramadan.
+ * behind its guard, and this file decides which of the two a person gets.
  *
- * THE FLAG IS NOT THE WHOLE GATE, and that is the point of the file. Dam,
- * iḥrām restrictions, qaṣr and the order of the rites are Ḥanafī rulings that
- * the ʿulamā at the masjid supply; nothing here writes them. So the gate
- * refuses to open onto content that has not arrived: flipping RELEASED on its
- * own is not enough, and a release cannot expose an empty rulings screen by
- * being merged on a Friday afternoon. Both halves have to be true.
+ * THE GATE HAS THREE LOCKS, not one, and they answer different fears.
  *
- * THE COUNTERS ARE EXEMPT from that rule, deliberately. They carry no words
- * of anyone's but their own numbers, so they are finished whether the rulings
- * have arrived or not — and they are the part of the section a person has
- * open in their hand during the ṭawāf itself.
+ *   1. RELEASED. The masjid's own switch. Nothing opens while it is false,
+ *      however complete the content is.
+ *
+ *   2. The branch. Each branch opens on its own, so the packing list and the
+ *      heat guidance can be in somebody's hands months before the rulings are
+ *      written. A branch with nothing in it is not offered at all rather than
+ *      offered and empty.
+ *
+ *   3. `by`, and this is the one that matters. A fiqh entry counts towards
+ *      opening its branch ONLY if it carries an approver's name. The drafts
+ *      in hajj/content.js exist to save the ʿulamā a blank page; they are a
+ *      starting document to be corrected, not an answer. Until a scholar puts
+ *      their name on an entry it is invisible to every reader and cannot open
+ *      anything — whoever merges it, and whoever flips the switch.
+ *
+ * So a draft cannot ship by being forgotten, which is the only way a draft
+ * ever ships. check-hajj.mjs asserts all three.
+ *
+ * THE COUNTERS ARE EXEMPT. They carry no words but their own numbers, so they
+ * are finished whether the rulings have arrived or not — and they are the
+ * part of the section a person has open in their hand during the ṭawāf.
  *
  * NOTHING IS IMPORTED ON PURPOSE, for the reason ramadan.js and qibla.js are
  * written the same way: it takes its inputs as arguments, so the tests run
@@ -29,38 +40,64 @@
  *  THE GATE
  * ------------------------------------------------------------------ */
 
-/* The masjid's own switch. Held until they say otherwise; see check-hajj.mjs,
-   which makes sure the website and the app never disagree about it. */
+/* The masjid's own switch. Held until they say otherwise; check-hajj.mjs
+   makes sure the website and the app never disagree about it. */
 export const RELEASED = false;
 
-/* The three that need the ʿulamā. `counters` is not among them. */
-export const CONTENT_SECTIONS = ["duas", "steps", "rulings"];
+/* A fiqh entry is only real when somebody is willing to be named for it. An
+   empty string, a whitespace string and a missing field all mean the same
+   thing: nobody has approved this yet. */
+export function approved(item) {
+  return !!(item && typeof item.by === "string" && item.by.trim().length > 0);
+}
 
-/* A section counts as supplied when it has at least one entry. An empty array
-   is the honest state while it is being written, and it is what keeps the
-   gate shut. */
-export function missingContent(content) {
-  const c = content || {};
-  return CONTENT_SECTIONS.filter(k => !Array.isArray(c[k]) || c[k].length === 0);
+/** Every item of a branch that a reader may actually see. */
+export function visibleItems(branch) {
+  if (!branch || !Array.isArray(branch.sections)) return [];
+  const all = branch.sections.flatMap(s => (Array.isArray(s.items) ? s.items : []));
+  /* Practical branches are travel and safety guidance written in the repo and
+     need no scholar. Fiqh branches show only what has been approved. */
+  return branch.kind === "fiqh" ? all.filter(approved) : all;
+}
+
+/** The branch's sections, with unapproved entries and emptied sections gone. */
+export function visibleSections(branch) {
+  if (!branch || !Array.isArray(branch.sections)) return [];
+  const keep = branch.kind === "fiqh" ? approved : () => true;
+  return branch.sections
+    .map(s => ({ ...s, items: (Array.isArray(s.items) ? s.items : []).filter(keep) }))
+    .filter(s => s.items.length > 0);
+}
+
+/** A tool is always ready. Anything else needs something to show. */
+export function branchOpen(branch) {
+  if (!branch) return false;
+  if (branch.kind === "tool") return true;
+  return visibleItems(branch).length > 0;
+}
+
+export function openBranches(branches) {
+  return (Array.isArray(branches) ? branches : []).filter(branchOpen);
 }
 
 /**
  * Which screen a person gets.
  *
- *   { open: false, reason: "held" }        the masjid has not released it
- *   { open: false, reason: "incomplete", missing: [...] }
- *                                          released, but the ʿulamā's words
- *                                          for those sections are not in yet
- *   { open: true }                         the section proper
+ *   { open: false, reason: "held" }                  not released
+ *   { open: false, reason: "incomplete", missing }   released, nothing ready
+ *   { open: true, branches: [...] }                  the section proper
  *
  * `released` is an argument rather than a read of the constant so the tests
  * can drive both sides of the switch without editing the file under test.
  */
-export function hajjAccess(content, released = RELEASED) {
+export function hajjAccess(branches, released = RELEASED) {
   if (!released) return { open: false, reason: "held" };
-  const missing = missingContent(content);
-  if (missing.length) return { open: false, reason: "incomplete", missing };
-  return { open: true };
+  const open = openBranches(branches);
+  if (!open.length) {
+    const missing = (Array.isArray(branches) ? branches : []).map(b => b && b.id).filter(Boolean);
+    return { open: false, reason: "incomplete", missing };
+  }
+  return { open: true, branches: open };
 }
 
 /* ------------------------------------------------------------------ *

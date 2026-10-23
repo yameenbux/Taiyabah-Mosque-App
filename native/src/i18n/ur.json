@@ -2059,6 +2059,8 @@
  "ramadan.days": "دن",
  "ramadan.hours": "گھنٹے",
  "ramadan.minutes": "منٹ",
+ "hajj.packed_count": "{b} میں سے {a} رکھ لیے",
+ "hajj.n_entries": "{n} اندراجات",
  "hajj.what_you_carry": "آپ اپنے ساتھ کیا لے جاتے ہیں",
  "hajj.approved_by_ulama": "یہاں کا ہر مسئلہ مسجد کے علماء نے جانچ کر منظور کیا ہے۔",
  "hajj.a_question": "ایک سوال",

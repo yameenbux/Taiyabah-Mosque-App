@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "1e5b2adcf10e",
+ "version": "d9bcc819c004",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -2092,6 +2092,9 @@ window.LANG_PACK = {
   "ramadan.days": "أيام",
   "ramadan.hours": "ساعات",
   "ramadan.minutes": "دقائق",
+  "hajj.packed_count": "{a} مِنْ {b} جَاهِز",
+  "hajj.n_entries": "{n} مُدْخَلَات",
+  "hajj.what_is_ready": "كُلُّ مَا أَعَدَّهُ الْمَسْجِدُ لِلرِّحْلَة، يَعْمَلُ بِلَا إِنْتَرْنِت فِي الْحَرَم.",
   "hajj.what_you_carry": "مَا تَحْمِلُهُ مَعَكَ",
   "hajj.approved_by_ulama": "كُلُّ حُكْمٍ هُنَا رَاجَعَهُ وَاعْتَمَدَهُ عُلَمَاءُ الْمَسْجِد.",
   "hajj.a_question": "سُؤَال",

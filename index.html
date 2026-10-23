@@ -1161,6 +1161,29 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hl-when{font-size:calc(12.5px * var(--ts));font-weight:500;line-height:1.5;
     color:var(--gold-ink);margin-top:9px}
   .hl-src{font-size:calc(11.5px * var(--ts));line-height:1.45;color:var(--muted);margin-top:9px}
+  .hl-sec{margin-top:26px}
+  .hl-sec:first-of-type{margin-top:20px}
+  .hl-sec h2{font-family:"Fraunces",Georgia,serif;font-size:calc(19px * var(--ts));
+    line-height:1.3;color:var(--ink);margin:0}
+  .hl-seclead{font-size:calc(13px * var(--ts));line-height:1.58;color:var(--muted);margin:6px 0 0}
+  /* A count, not a progress bar: it is a case being packed, not a task being
+     completed, and a bar implies a deadline nobody set. */
+  .hl-count{font-size:calc(12.5px * var(--ts));font-weight:600;letter-spacing:.6px;
+    color:var(--gold-ink);margin:12px 0 0}
+  /* The whole card ticks. A thumb at eleven at night should not have to aim. */
+  .hl-tick{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:inherit;
+    font:inherit;color:inherit;cursor:pointer}
+  .hl-tick:active{transform:translateY(1px)}
+  .hl-box{flex:0 0 auto;width:24px;height:24px;border-radius:7px;margin-top:1px;
+    display:grid;place-items:center;border:1.5px solid var(--line);background:transparent}
+  .hl-box svg{width:14px;height:14px;opacity:0}
+  .hl-box.on{border-color:transparent;background:var(--brand-600)}
+  .hl-box.on svg{opacity:1}
+  .hl-tick .hl-body{flex:1 1 auto;min-width:0}
+  .hl-q.done{color:var(--muted);text-decoration:line-through}
+  /* The second line of a branch row, under its title. */
+  .dr-d{display:block;font-size:calc(12px * var(--ts));font-weight:400;line-height:1.45;
+    color:var(--muted);margin-top:2px}
   .hl-none{text-align:center;padding:28px 10px}
   .hl-none h2{font-family:"Fraunces",Georgia,serif;font-size:calc(22px * var(--ts));
     line-height:1.3;color:var(--ink);margin:0}
@@ -5141,9 +5164,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
              owns these strings. -->
         <h2 class="hj-head" id="hj-head-held" data-i18n="hajj.what_you_will_carry">What you will carry with you</h2>
         <h2 class="hj-head" id="hj-head-open" data-i18n="hajj.what_you_carry" hidden>What you carry with you</h2>
-        <p class="hj-lede" data-i18n="hajj.four_things_offline">Four things, on your phone, working without signal in the &#7716;aram.</p>
+        <p class="hj-lede" id="hj-lede-held" data-i18n="hajj.four_things_offline">Four things, on your phone, working without signal in the &#7716;aram.</p>
+        <p class="hj-lede" id="hj-lede-open" data-i18n="hajj.what_is_ready" hidden>Everything the masjid has ready for the journey, working without signal in the &#7716;aram.</p>
 
-        <div class="hj-grid">
+        <div class="hj-grid" id="hj-grid">
           <button type="button" class="hj-tile" id="hj-t-duas" disabled>
             <div class="hj-ar" lang="ar">&#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614; &#1575;&#1604;&#1604;&#1617;&#1614;&#1607;&#1615;&#1605;&#1617;&#1614; &#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614;</div>
             <div>
@@ -5186,6 +5210,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
         <p class="hj-by" id="hj-by-held" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
         <p class="hj-by" id="hj-by-open" data-i18n="hajj.approved_by_ulama" hidden>Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
+
+        <!-- Drawn once the section opens; the four tiles above give way
+             to the branches that are actually ready. -->
+        <div id="hj-branches" hidden></div>
 
         <div class="hj-sub" id="hj-sub-held" data-i18n="hajj.until_then">Until then</div>
         <div class="hj-sub" id="hj-sub-open" data-i18n="hajj.a_question" hidden>A question</div>
@@ -5246,14 +5274,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   <!-- The du&#703;&#257;s, the steps and the rulings. One sheet, three sections:
        they differ in what each entry carries, not in how a person moves
        through them. Everything in them comes from HAJJ_CONTENT. -->
-  <div class="sheet" id="hajjlist" data-open="0" role="dialog" aria-modal="true" aria-label="Hajj and Umrah" data-i18n-attr="aria-label:a11y.hajj_umrah">
-    <div class="scrim" id="hl-scrim"></div>
+  <div class="sheet" id="hajjbranch" data-open="0" role="dialog" aria-modal="true" aria-label="Hajj and Umrah" data-i18n-attr="aria-label:a11y.hajj_umrah">
+    <div class="scrim" id="hb-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left" id="hl-title"></h3>
-        <button class="sh-close" id="hl-close" data-i18n="ramadan.done">Done</button>
+        <h3 style="text-align:left" id="hb-title"></h3>
+        <button class="sh-close" id="hb-close" data-i18n="ramadan.done">Done</button>
       </div>
-      <div class="sh-body ab-wrap" id="hl-body"></div>
+      <div class="sh-body ab-wrap" id="hb-body"></div>
     </div>
   </div>
 
@@ -11080,37 +11108,62 @@ function closeRamadan(){
 }
 /* ---------------- Hajj & Umrah ----------------
 
-   THE GATE, and it is the same rule as native/src/hajj.js. The section is
-   built and held: until the masjid says otherwise the public sees the locked
-   screen, exactly as Ramadan was held behind its guard.
+   THE GATE, and it is hajj.js on the other platform, rule for rule.
 
-   THE FLAG IS NOT THE WHOLE GATE. Dam, the restrictions of iḥrām, qaṣr and
-   the order of the rites are rulings the ʿulamā at the masjid supply, and
-   nothing here writes them. So the gate also refuses to open onto content
-   that has not arrived — flipping HAJJ_RELEASED on its own is not enough,
-   and a release cannot expose an empty rulings screen. check-hajj.mjs
-   asserts that this constant and the app's RELEASED agree, because a website
-   that releases while the app holds is the same bug in a different hat.
+   The section is built and held. Until the masjid says otherwise the public
+   sees one locked screen, exactly as Ramadan was held behind its guard.
 
-   The counters are exempt, deliberately: they carry no words but their own
-   numbers, so they are finished either way. */
+   THREE LOCKS, not one, and they answer different fears.
+
+     1. HAJJ_RELEASED — the masjid's own switch. Nothing opens while it is
+        false, however complete the content is.
+     2. The branch — each opens on its own, so the packing list and the heat
+        guidance can be in somebody's hands months before the rulings are
+        written. A branch with nothing in it is not offered at all.
+     3. `by` — and this is the one that matters. A fiqh entry counts towards
+        opening its branch ONLY if it carries an approver's name. The drafts
+        in hajj/content.js exist to save the ʿulamā a blank page; until a
+        scholar puts their name on one it is invisible to every reader and
+        cannot open anything, whoever flips the switch.
+
+   check-hajj.mjs asserts all three, and asserts this constant and the app's
+   RELEASED never disagree — a website that releases while the app holds is
+   the same bug in a different hat. */
 const HAJJ_RELEASED = false;
 
-/* Filled from what the ʿulamā write. Empty is the honest state, and it is
-   what keeps the gate shut. The shapes are documented in
-   native/src/hajj-data.js, which this mirrors. */
-const HAJJ_CONTENT = { duas: [], steps: [], rulings: [] };
+/* The counters have no text to import: they are a tool, they are finished,
+   and `kind:"tool"` is what exempts them from the content rule. */
+const HAJJ_COUNTERS_BRANCH = { id:"counters", kind:"tool", sheet:"counters",
+  title:"The counters", lead:"Ṭawāf and saʿī without losing count, and a tasbīḥ.", sections:[] };
+const HAJJ_ORDER = ["pack","heat","papers","ihram","rites","duas","counters","home"];
 
-const HAJJ_SECTIONS = ["duas", "steps", "rulings"];
-function hajjMissing(c){
-  return HAJJ_SECTIONS.filter(k => !Array.isArray((c||{})[k]) || !(c||{})[k].length);
+/* Filled by hajj/content.js, which the app imports through the same file. */
+let HAJJ_BRANCHES = [HAJJ_COUNTERS_BRANCH];
+function hajjAdopt(data){
+  const got = (data && Array.isArray(data.branches)) ? data.branches : [];
+  HAJJ_BRANCHES = [...got, HAJJ_COUNTERS_BRANCH].sort((x,y)=>{
+    const i=HAJJ_ORDER.indexOf(x.id), j=HAJJ_ORDER.indexOf(y.id);
+    return (i<0?HAJJ_ORDER.length:i) - (j<0?HAJJ_ORDER.length:j);
+  });
 }
-function hajjAccess(content, released){
+
+const hajjApproved = it => !!(it && typeof it.by === "string" && it.by.trim().length);
+function hajjVisibleSections(br){
+  if(!br || !Array.isArray(br.sections)) return [];
+  const keep = br.kind === "fiqh" ? hajjApproved : () => true;
+  return br.sections.map(sec => ({ ...sec, items:(sec.items||[]).filter(keep) }))
+                    .filter(sec => sec.items.length);
+}
+const hajjVisibleItems = br => hajjVisibleSections(br).flatMap(sec => sec.items);
+const hajjBranchOpen  = br => !!br && (br.kind === "tool" || hajjVisibleItems(br).length > 0);
+const hajjOpenBranches = bs => (Array.isArray(bs)?bs:[]).filter(hajjBranchOpen);
+function hajjAccess(branches, released){
   if(!(released === undefined ? HAJJ_RELEASED : released)) return { open:false, reason:"held" };
-  const missing = hajjMissing(content);
-  if(missing.length) return { open:false, reason:"incomplete", missing };
-  return { open:true };
+  const open = hajjOpenBranches(branches);
+  if(!open.length) return { open:false, reason:"incomplete" };
+  return { open:true, branches:open };
 }
+const hajjBranchById = id => HAJJ_BRANCHES.find(b => b.id === id) || null;
 
 /* ---- the counters ----
    Seven and seven, and a tasbīḥ that does not stop. The arithmetic is the
@@ -11131,13 +11184,18 @@ function hcProgress(m,n){
 }
 
 const HC_KEY = "taiyabah.hajj.counts";
+const HP_KEY = "taiyabah.hajj.packed";
 let hcMode = "tawaf";
 let hcN = { tawaf:0, sai:0, tasbih:0 };
+let hjPacked = {};
 /* Written on EVERY press, not on a timer and not on close: a phone that dies
    at the fourth circuit comes back at the fourth circuit, which is the whole
-   reason a counter beats a hand. */
+   reason a counter beats a hand. The packing list is the same — somebody
+   packs a case over a week, in four sittings, at eleven at night. */
 function hcSave(){ try{ localStorage.setItem(HC_KEY, JSON.stringify(hcN)); }catch{} }
 function hcLoad(){ try{ const r=localStorage.getItem(HC_KEY); if(r) hcN={...hcN,...JSON.parse(r)}; }catch{} }
+function hjPackSave(){ try{ localStorage.setItem(HP_KEY, JSON.stringify(hjPacked)); }catch{} }
+function hjPackLoad(){ try{ const r=localStorage.getItem(HP_KEY); if(r) hjPacked=JSON.parse(r)||{}; }catch{} }
 
 function hcRender(){
   const n = hcN[hcMode], c = HC[hcMode], done = hcComplete(hcMode,n);
@@ -11152,7 +11210,7 @@ function hcRender(){
   const from = hcFrom(n);
   document.getElementById("hc-lab").textContent =
       hcMode==="sai" && from!==null
-        ? (from===0 ? t("hajj.next_from_safa","Next lap leaves from \u1E62af\u0101")
+        ? (from===0 ? t("hajj.next_from_safa","Next lap leaves from Ṣafā")
                     : t("hajj.next_from_marwa","Next lap leaves from Marwa"))
     : done ? t("hajj.all_seven_complete","All seven complete")
     : c.total ? t("hajj.of_total","of {n}").replace("{n}", num(c.total))
@@ -11174,71 +11232,125 @@ function openHajjCount(){
 }
 function closeHajjCount(){ document.getElementById("hajjcount").dataset.open="0"; document.body.style.overflow=""; }
 
-/* ---- the three lists ---- */
-const HL_TITLE = { duas:["hajj.the_duas","The du\u02BF\u0101s"],
-                   steps:["hajj.the_steps","The steps"],
-                   rulings:["hajj.the_rulings","The rulings"] };
-/* Three verdicts, and only "dam" takes a colour, so the two are not told
-   apart by hue alone. The same rule the tiles follow. */
-const HL_VERDICT = {
+/* ---- one branch ----
+   Seven branches differ in what an entry carries, not in how a person moves
+   through them, so there is one renderer. It draws hajjVisibleSections(),
+   never the raw branch, which is what stops an unapproved draft appearing
+   here even if somebody opens the sheet directly. */
+const HJ_VERDICT = {
   allowed: () => [t("hajj.allowed","Allowed"), "yes"],
   avoid:   () => [t("hajj.avoid","Avoid"), "avoid"],
   dam:     () => [t("hajj.dam_due","Dam due"), "dam"],
 };
 
-function openHajjList(section){
-  const items = HAJJ_CONTENT[section] || [];
-  const [tk,td] = HL_TITLE[section] || HL_TITLE.duas;
-  document.getElementById("hl-title").textContent = t(tk,td);
-  document.getElementById("hl-body").innerHTML = items.length
-    ? items.map(x => {
-        const v = HL_VERDICT[x.verdict] ? HL_VERDICT[x.verdict]() : null;
-        const src = [x.by, x.source].filter(Boolean).join(" \u00B7 ");
-        return `<div class="hl-card">`
-          + (x.ar ? `<div class="hl-ar" lang="ar">${esc(x.ar)}</div>` : "")
-          + (x.tr ? `<div class="hl-tr">${esc(x.tr)}</div>` : "")
-          + (v ? `<span class="hj-chip ${v[1]}">${esc(v[0])}</span>` : "")
-          + ((x.title||x.q) ? `<div class="hl-q">${x.n?esc(num(x.n))+". ":""}${esc(x.title||x.q)}</div>` : "")
-          + ((x.en||x.body||x.a) ? `<div class="hl-a">${esc(x.en||x.body||x.a)}</div>` : "")
-          + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
-          + (src ? `<div class="hl-src">${esc(src)}</div>` : "")
-          + `</div>`;
-      }).join("")
-    /* Not what the public sees — the gate is shut while a list is empty.
-       This is what a developer sees with it forced open, and it names the
-       file that is waiting rather than looking broken. */
-    : `<div class="hl-none"><h2 data-i18n="hajj.nothing_here_yet">${esc(t("hajj.nothing_here_yet","Nothing here yet"))}</h2>`
-      + `<p>${esc(t("hajj.awaiting_ulama","This section is waiting on the \u02BFulam\u0101 at the masjid. Until it arrives, the section stays shut."))}</p></div>`;
-  document.getElementById("hajjlist").dataset.open="1";
-  document.body.style.overflow="hidden";
-  document.getElementById("hl-body").scrollTop=0;
+function hjItemHtml(x){
+  const v = HJ_VERDICT[x.verdict] ? HJ_VERDICT[x.verdict]() : null;
+  const src = [x.by, x.source].filter(Boolean).join(" · ");
+  const on = !!hjPacked[x.id];
+  const inner =
+      (x.ar ? `<div class="hl-ar" lang="ar">${esc(x.ar)}</div>` : "")
+    + (x.tr ? `<div class="hl-tr">${esc(x.tr)}</div>` : "")
+    + (v ? `<span class="hj-chip ${v[1]}">${esc(v[0])}</span>` : "")
+    + `<div class="hl-q${on?" done":""}">${x.n?esc(num(x.n))+". ":""}${esc(x.t||"")}</div>`
+    + (x.d ? `<div class="hl-a">${esc(x.d)}</div>` : "")
+    + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
+    + (src ? `<div class="hl-src">${esc(src)}</div>` : "");
+  if(!x.pack) return `<div class="hl-card">${inner}</div>`;
+  return `<button type="button" class="hl-card hl-tick" data-pack="${esc(x.id)}"`
+       + ` role="checkbox" aria-checked="${on}"><span class="hl-box${on?" on":""}" aria-hidden="true">`
+       + `<svg viewBox="0 0 24 24" fill="none" stroke="#F3EFE3" stroke-width="3"`
+       + ` stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`
+       + `<span class="hl-body">${inner}</span></button>`;
 }
-function closeHajjList(){ document.getElementById("hajjlist").dataset.open="0"; document.body.style.overflow=""; }
 
-/* Held or open, it is the SAME four tiles: a picture of what is coming, or
-   the way in. A disabled control is not in the tab order and is not announced
-   as pressable, which is what makes the held state honest. */
+function openHajjBranch(id){
+  const br = hajjBranchById(id);
+  const secs = br ? hajjVisibleSections(br) : [];
+  document.getElementById("hb-title").textContent = br ? br.title : "";
+  const items = secs.flatMap(sec => sec.items);
+  const total = items.filter(x => x.pack).length;
+  const done  = items.filter(x => x.pack && hjPacked[x.id]).length;
+  document.getElementById("hb-body").innerHTML = secs.length
+    ? (br.lead ? `<p class="hj-lede">${esc(br.lead)}</p>` : "")
+      /* A count, not a progress bar: it is a case being packed, not a task
+         being completed, and a bar implies a deadline nobody set. */
+      + (total ? `<p class="hl-count">${esc(t("hajj.packed_count","{a} of {b} packed")
+            .replace("{a}", num(done)).replace("{b}", num(total)))}</p>` : "")
+      + secs.map(sec =>
+          `<div class="hl-sec"><h2>${esc(sec.title)}</h2>`
+          + (sec.lead ? `<p class="hl-seclead">${esc(sec.lead)}</p>` : "")
+          + sec.items.map(hjItemHtml).join("") + `</div>`).join("")
+    /* Not what the public sees — the gate keeps an empty branch out of the
+       list entirely. This is what a developer sees opening it directly. */
+    : `<div class="hl-none"><h2>${esc(t("hajj.nothing_here_yet","Nothing here yet"))}</h2>`
+      + `<p>${esc(t("hajj.awaiting_ulama","This section is waiting on the ʿulamā at the masjid. Until it arrives, the section stays shut."))}</p></div>`;
+  document.getElementById("hajjbranch").dataset.open="1";
+  document.body.style.overflow="hidden";
+  document.getElementById("hb-body").scrollTop=0;
+}
+function closeHajjBranch(){ document.getElementById("hajjbranch").dataset.open="0"; document.body.style.overflow=""; }
+
+/* Held or open, it is the same sheet: a picture of what is coming, or the way
+   in. A disabled control is not in the tab order and is not announced as
+   pressable, which is what makes the held state honest. */
+const HJ_ICON = {
+  pack:'<path d="M9 4.5h6v3H9z"/><rect x="3.5" y="7.5" width="17" height="13" rx="2"/><path d="M9 13l1.8 1.8L15 10.8"/>',
+  heat:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>',
+  papers:'<path d="M14 2H6.5A1.5 1.5 0 0 0 5 3.5v17A1.5 1.5 0 0 0 6.5 22h11a1.5 1.5 0 0 0 1.5-1.5V7Z"/><path d="M14 2v5h5"/><path d="M8.5 12h7M8.5 16h7"/>',
+  ihram:'<path d="M12 2.5 4.5 5.5v6c0 4.6 3.1 8.8 7.5 10 4.4-1.2 7.5-5.4 7.5-10v-6Z"/><path d="M9 12l2 2 4-4"/>',
+  rites:'<circle cx="13" cy="4" r="1.6"/><path d="M11 21l1.5-6-2.5-2 1-5 3 2 2.5 1"/><path d="M8 21l2-4"/>',
+  duas:'<path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M8 7.5h7M8 11.5h7"/>',
+  counters:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',
+  home:'<path d="M3 14.5l18-6.5-3.5 9-4-2.5-3 3.5-1-4Z"/><path d="M4 20h16"/>',
+};
 function renderHajj(){
-  const open = hajjAccess(HAJJ_CONTENT).open;
+  const access = hajjAccess(HAJJ_BRANCHES);
+  const open = access.open;
   document.getElementById("hj-soon").hidden = open;
-  for(const base of ["hj-head","hj-by","hj-sub"]){
-    document.getElementById(base + "-held").hidden = open;
-    document.getElementById(base + "-open").hidden = !open;
+  for(const base of ["hj-head","hj-lede","hj-sub"]){
+    document.getElementById(base+"-held").hidden = open;
+    document.getElementById(base+"-open").hidden = !open;
   }
+  /* The by-line claims every ruling here was approved. That is only true
+     when a ruling is actually showing: with every fiqh branch still shut it
+     would be a boast about content nobody can see. */
+  const anyFiqh = (access.branches||[]).some(b => b.kind === "fiqh");
+  document.getElementById("hj-by-held").hidden = open;
+  document.getElementById("hj-by-open").hidden = !(open && anyFiqh);
+  document.getElementById("hj-grid").hidden = open;
   /* The duʿā book row is what is offered INSTEAD of the section; once the
      section carries its own, only the office stays. */
   document.getElementById("hj-duas").hidden = open;
-  for(const [id,go] of [["hj-t-duas",()=>openHajjList("duas")],
-                        ["hj-t-count",openHajjCount],
-                        ["hj-t-steps",()=>openHajjList("steps")],
-                        ["hj-t-rulings",()=>openHajjList("rulings")]]){
-    const b = document.getElementById(id);
-    b.disabled = !open;
-    b.onclick = open ? () => { closeHajj(); setTimeout(go,120); } : null;
-  }
+
+  const list = document.getElementById("hj-branches");
+  list.hidden = !open;
+  if(!open){ list.innerHTML = ""; return; }
+  list.innerHTML = access.branches.map(b => {
+    const detail = b.kind === "tool" ? (b.lead || "")
+      : t("hajj.n_entries","{n} entries").replace("{n}", num(hajjVisibleItems(b).length));
+    return `<button type="button" class="dr-row" data-branch="${esc(b.id)}" data-sheet="${esc(b.sheet||"")}">`
+      + `<span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"`
+      + ` stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${HJ_ICON[b.id]||""}</svg></span>`
+      + `<span class="dr-t">${esc(b.title)}<span class="dr-d">${esc(detail)}</span></span>`
+      + `<span class="dr-ch">&rsaquo;</span></button>`;
+  }).join("");
+  [...list.querySelectorAll("[data-branch]")].forEach(btn =>
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.branch;
+      closeHajj();
+      setTimeout(() => btn.dataset.sheet === "counters" ? openHajjCount() : openHajjBranch(id), 120);
+    }));
 }
 
-function openHajj(){
+/* Hajj & Umrah. data-open is all the Back button needs: the MutationObserver
+   in initBackButton arms the history sentinel off that attribute, so these
+   sheets close on Back without knowing anything about it. */
+async function openHajj(){
+  hjPackLoad();
+  /* 20KB of guidance, fetched the first time somebody opens the section
+     rather than carried by every visitor who never will. */
+  await loadOnce('hajj/content.js', 'HAJJ_LOADED');
+  hajjAdopt(window.HAJJ);
   renderHajj();
   document.getElementById('hajj').dataset.open="1";
   document.body.style.overflow="hidden";
@@ -11255,9 +11367,6 @@ function initHajj(){
      reason they are what is offered while the section is locked. */
   document.getElementById('hj-duas').addEventListener('click',()=>{ closeHajj(); setTimeout(openDuas,120); });
   document.getElementById('hj-contact').addEventListener('click',()=>{ closeHajj(); setTimeout(openContact,120); });
-  document.addEventListener('keydown',e=>{
-    if(e.key==="Escape" && document.getElementById('hajj').dataset.open==="1") closeHajj();
-  });
 
   /* The counters. Every press writes, so a phone that dies mid-ṭawāf comes
      back where it was. */
@@ -11284,12 +11393,33 @@ function initHajj(){
     hcN[hcMode]=0; hcSave(); hcRender();
   });
 
-  document.getElementById('hl-close').addEventListener('click',closeHajjList);
-  document.getElementById('hl-scrim').addEventListener('click',closeHajjList);
+  document.getElementById('hb-close').addEventListener('click',closeHajjBranch);
+  document.getElementById('hb-scrim').addEventListener('click',closeHajjBranch);
+  /* Delegated: the rows are rebuilt every time a branch is opened. */
+  document.getElementById('hb-body').addEventListener('click', e => {
+    const btn = e.target.closest('[data-pack]');
+    if(!btn) return;
+    const id = btn.dataset.pack;
+    hjPacked[id] ? delete hjPacked[id] : hjPacked[id] = true;
+    hjPackSave();
+    const on = !!hjPacked[id];
+    btn.setAttribute('aria-checked', String(on));
+    btn.querySelector('.hl-box').classList.toggle('on', on);
+    btn.querySelector('.hl-q').classList.toggle('done', on);
+    const cnt = document.querySelector('#hb-body .hl-count');
+    if(cnt){
+      const all = [...document.querySelectorAll('#hb-body [data-pack]')];
+      cnt.textContent = t("hajj.packed_count","{a} of {b} packed")
+        .replace("{a}", num(all.filter(b => hjPacked[b.dataset.pack]).length))
+        .replace("{b}", num(all.length));
+    }
+  });
+
   document.addEventListener('keydown',e=>{
     if(e.key!=="Escape") return;
+    if(document.getElementById('hajj').dataset.open==="1") closeHajj();
     if(document.getElementById('hajjcount').dataset.open==="1") closeHajjCount();
-    if(document.getElementById('hajjlist').dataset.open==="1") closeHajjList();
+    if(document.getElementById('hajjbranch').dataset.open==="1") closeHajjBranch();
   });
 }
 

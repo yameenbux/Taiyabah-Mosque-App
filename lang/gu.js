@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "ca3b5383d698",
+ "version": "b9e8df8ba15c",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -2092,6 +2092,9 @@ window.LANG_PACK = {
   "ramadan.days": "દિવસ",
   "ramadan.hours": "કલાક",
   "ramadan.minutes": "મિનિટ",
+  "hajj.packed_count": "{b} માંથી {a} મૂકી દીધા",
+  "hajj.n_entries": "{n} નોંધો",
+  "hajj.what_is_ready": "મુસાફરી માટે મસ્જિદ પાસે જે તૈયાર છે, હરમમાં સિગ્નલ વગર પણ ચાલે છે.",
   "hajj.what_you_carry": "તમે તમારી સાથે શું લઈ જાઓ છો",
   "hajj.approved_by_ulama": "અહીંનો દરેક મસઅલો મસ્જિદના ઉલમાએ તપાસીને મંજૂર કર્યો છે.",
   "hajj.a_question": "એક સવાલ",

@@ -2059,6 +2059,8 @@
  "ramadan.days": "أيام",
  "ramadan.hours": "ساعات",
  "ramadan.minutes": "دقائق",
+ "hajj.packed_count": "{a} مِنْ {b} جَاهِز",
+ "hajj.n_entries": "{n} مُدْخَلَات",
  "hajj.what_you_carry": "مَا تَحْمِلُهُ مَعَكَ",
  "hajj.approved_by_ulama": "كُلُّ حُكْمٍ هُنَا رَاجَعَهُ وَاعْتَمَدَهُ عُلَمَاءُ الْمَسْجِد.",
  "hajj.a_question": "سُؤَال",

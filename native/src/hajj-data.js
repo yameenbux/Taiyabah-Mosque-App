@@ -1,72 +1,43 @@
 /**
- * Hajj & Umrah — the content the ʿulamā supply.
+ * Hajj & Umrah — the branches, as the app sees them.
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
- * THIS FILE IS DELIBERATELY EMPTY, and the gate in hajj.js reads it to find
- * that out. Dam, the restrictions of iḥrām, qaṣr and jamʿ while travelling,
- * and the order of each rite are Ḥanafī rulings with real consequences if
- * they are wrong: a wrong answer about dam costs somebody money or a
- * defective Hajj. They are the masjid's ʿulamā to write and nobody else's,
- * and until they are written these three lists stay empty and the section
- * stays shut. That is not a placeholder waiting to be forgotten — it is the
- * mechanism, and check-hajj.mjs asserts it.
+ * THE CONTENT IS NOT WRITTEN HERE. It is authored once in hajj/content.js at
+ * the repository root, which the website loads directly and which
+ * scripts/import-content.mjs turns into src/data/hajj.json for the app — the
+ * same door duas.js and athkar.js come through. Writing it twice would
+ * guarantee the two drift, and the thing they would drift on is a ruling.
  *
- * WHAT IS NOT WAITING ON ANYONE: the counters. They carry no words but their
- * own numbers, so they are finished, and hajj.js exempts them from the gate's
- * content rule for that reason.
- *
- * HOW TO FILL IT. Each list takes the shapes below. Every entry carries a
- * `source` because a ruling with no attribution is worth less than no ruling
- * at all in front of a congregation, and `by` because the person who approved
- * it should be nameable. Add entries; change nothing else. When all three
- * lists have something in them AND the masjid says the word, flip RELEASED in
- * src/hajj.js and HAJJ_RELEASED in index.html together.
+ * This file adds the one branch that has no content to import: the counters.
+ * They are a tool rather than a text, they are finished, and hajj.js lets a
+ * tool open whether or not the ʿulamā have supplied anything.
  */
+import CONTENT from "./data/hajj.json";
 
-/* A duʿā.
- *
- *   { id:     "talbiyah",
- *     ar:     "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ",   // exactly as the muṣḥaf or the hadith has it
- *     tr:     "Labbayk Allahumma labbayk",     // for the reader who cannot read Arabic
- *     en:     "Here I am, O Allah, here I am",
- *     when:   "From the moment of iḥrām until the first stoning",
- *     source: "Bukhārī 1549",
- *     by:     "Mufti ..." }
- *
- * The app already verifies its other duʿās against their sources
- * (scripts/verify-hadith-duas.mjs, verify-quran-duas.mjs). Anything added
- * here should go through the same door rather than round it.
- */
-export const DUAS = [];
+/* A branch with nothing to read, because what it holds is a thing you press.
+   `kind: "tool"` is what exempts it from the content rule in hajj.js. */
+export const COUNTERS_BRANCH = {
+  id: "counters",
+  kind: "tool",
+  route: "HajjCounter",
+  title: "The counters",
+  lead: "Ṭawāf and saʿī without losing count, and a tasbīḥ.",
+  sections: [],
+};
 
-/* One step of one rite, in the order it is performed.
- *
- *   { id:   "tawaf-3",
- *     rite: "tawaf",            // tawaf | sai | ihram | arafah | stoning | ...
- *     n:    3,                  // its place in that rite
- *     title:"Walking the circuit",
- *     body: "...",
- *     by:   "Mufti ..." }
- *
- * The counters already know a ṭawāf is seven and that saʿī alternates between
- * the hills; this is the part a counter cannot tell anybody.
- */
-export const STEPS = [];
+/* The order they are offered in is the order of the journey: what to take,
+   how to survive the heat, what to check before booking, then iḥrām and the
+   rites, then the counters you carry, then coming home. */
+const ORDER = ["pack", "heat", "papers", "ihram", "rites", "duas", "counters", "home"];
 
-/* A ruling, in the form people actually ask it.
- *
- *   { id:      "perfume-in-ihram",
- *     q:       "I put on scented soap after iḥrām. Is a dam due?",
- *     a:       "...",
- *     verdict: "dam",           // allowed | avoid | dam
- *     source:  "...",
- *     by:      "Mufti ..." }
- *
- * `verdict` is what colours the chip on the screen. Three values only, and
- * "dam" is the only one that takes a colour, so the two are not told apart by
- * hue alone.
- */
-export const RULINGS = [];
+const imported = Array.isArray(CONTENT && CONTENT.branches) ? CONTENT.branches : [];
 
-/* What hajjAccess() reads. The keys are the ones CONTENT_SECTIONS names. */
-export const HAJJ_CONTENT = { duas: DUAS, steps: STEPS, rulings: RULINGS };
+export const BRANCHES = [...imported, COUNTERS_BRANCH]
+  .sort((a, b) => {
+    const i = ORDER.indexOf(a.id), j = ORDER.indexOf(b.id);
+    /* Anything the content file adds later and this list has not been told
+       about goes to the end rather than silently to the front. */
+    return (i < 0 ? ORDER.length : i) - (j < 0 ? ORDER.length : j);
+  });
+
+export const branchById = id => BRANCHES.find(b => b.id === id) || null;

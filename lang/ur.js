@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "51fcb3bbf405",
+ "version": "96d68f1edfc6",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -2092,6 +2092,9 @@ window.LANG_PACK = {
   "ramadan.days": "دن",
   "ramadan.hours": "گھنٹے",
   "ramadan.minutes": "منٹ",
+  "hajj.packed_count": "{b} میں سے {a} رکھ لیے",
+  "hajj.n_entries": "{n} اندراجات",
+  "hajj.what_is_ready": "سفر کے لیے مسجد کے پاس جو کچھ تیار ہے، حرم میں سگنل کے بغیر بھی کام کرتا ہے۔",
   "hajj.what_you_carry": "آپ اپنے ساتھ کیا لے جاتے ہیں",
   "hajj.approved_by_ulama": "یہاں کا ہر مسئلہ مسجد کے علماء نے جانچ کر منظور کیا ہے۔",
   "hajj.a_question": "ایک سوال",
