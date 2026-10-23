@@ -26,9 +26,15 @@
  * from under and the glow never crosses the digits. The mark at the foot is
  * off here — the dial is the whole composition and a logo under it crowds.
  *
- * THE SCREEN WILL STILL SLEEP. expo-keep-awake is not a dependency of this
- * app and adding one is not this screen's call to make, so a phone left alone
- * mid-ṭawāf dims as usual. Worth fixing, and noted rather than hidden.
+ * THE SCREEN STAYS AWAKE, but only while this screen is the one in front.
+ * Seven circuits is twenty minutes of walking and the phone is in a hand, not
+ * being tapped — it would dim and lock halfway round, which is the moment a
+ * counter is least useful. The lock is tied to FOCUS rather than to mounting:
+ * react-navigation keeps a pushed screen mounted underneath whatever is on
+ * top of it, so a plain useKeepAwake() here would hold the display on while
+ * somebody sat reading a duʿā two screens away, and keep holding it until
+ * they walked all the way back. Tag and untag on focus, and the only time the
+ * screen is held is the only time it is being looked at.
  *
  * The arithmetic is all in hajj.js so that it can be tested under plain Node:
  * seven circuits and no eighth, and which hill the next saʿī lap leaves from.
@@ -37,6 +43,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { View, Text, Alert, useWindowDimensions } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import { useIsFocused } from "@react-navigation/native";
 import Svg, { Circle, Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { F, R, HJ } from "../theme";
@@ -47,6 +55,9 @@ import { COUNTER_MODES, COUNTERS, tick, untick, isComplete, saiFrom, progress } 
 /* Its own key rather than a field on prefs: this is written on every press,
    and prefs writes the whole settings blob each time. */
 const KEY = "taiyabah.hajj.counts";
+/* Tagged, so releasing ours cannot release a hold some other screen is
+   keeping for its own reasons. */
+const AWAKE = "taiyabah.hajj.counter";
 const EMPTY = { tawaf: 0, sai: 0, tasbih: 0 };
 
 const STROKE = 12;
@@ -95,6 +106,7 @@ export default function HajjCounter() {
      on an SE, and capped so it does not become a dinner plate on a tablet. */
   const dial = Math.max(196, Math.min(276, width - 84));
 
+  const focused = useIsFocused();
   const [mode, setMode] = useState("tawaf");
   const [counts, setCounts] = useState(EMPTY);
   const [ready, setReady] = useState(false);
@@ -114,6 +126,15 @@ export default function HajjCounter() {
       .catch(() => { if (alive) setReady(true); });
     return () => { alive = false; };
   }, []);
+
+  /* Every call is guarded: keeping a screen awake is a nicety, and a phone
+     that refuses the request — a policy-managed device, a browser without the
+     Wake Lock API behind expo-keep-awake's web shim — must still count. */
+  useEffect(() => {
+    if (!focused) return undefined;
+    activateKeepAwakeAsync(AWAKE).catch(() => {});
+    return () => { try { deactivateKeepAwake(AWAKE)?.catch?.(() => {}); } catch {} };
+  }, [focused]);
 
   const write = useCallback(next => {
     latest.current = next;

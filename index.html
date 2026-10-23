@@ -11344,12 +11344,40 @@ function hcRender(){
 }
 function hcBuzz(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch{} }
 
+/* Keep the screen awake while the counter is open — seven circuits is twenty
+   minutes of walking with the phone in a hand and not being tapped, and it
+   would lock halfway round.
+
+   The browser drops a wake lock whenever the tab is hidden and does NOT give
+   it back on return, so re-requesting on visibilitychange is the whole
+   difference between this working and working once. Every call is guarded:
+   Safari below 16.4 and any browser over plain http has no wakeLock at all,
+   and the counter has to keep counting regardless. */
+let hcWake = null;
+async function hcWakeOn(){
+  try{
+    if(!("wakeLock" in navigator) || hcWake) return;
+    hcWake = await navigator.wakeLock.request("screen");
+    hcWake.addEventListener("release", () => { hcWake = null; });
+  }catch{ hcWake = null; }
+}
+function hcWakeOff(){ try{ hcWake && hcWake.release(); }catch{} hcWake = null; }
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState !== "visible") return;
+  if(document.getElementById("hajjcount")?.dataset.open === "1") hcWakeOn();
+});
+
 function openHajjCount(){
   hcLoad(); hcRender();
   document.getElementById("hajjcount").dataset.open="1";
   document.body.style.overflow="hidden";
+  hcWakeOn();
 }
-function closeHajjCount(){ document.getElementById("hajjcount").dataset.open="0"; document.body.style.overflow=""; }
+function closeHajjCount(){
+  document.getElementById("hajjcount").dataset.open="0";
+  document.body.style.overflow="";
+  hcWakeOff();
+}
 
 /* ---- one branch ----
    Seven branches differ in what an entry carries, not in how a person moves
