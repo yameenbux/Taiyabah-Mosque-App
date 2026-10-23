@@ -127,12 +127,25 @@ const nativeData = fs.readFileSync(path.join(here, "src/hajj-data.js"), "utf8");
 const ordered = [...(nativeData.match(/const ORDER = \[([^\]]*)\]/) || ["", ""])[1]
                   .matchAll(/"(\w+)"/g)].map(m => m[1]);
 ok(ordered.length > 0, "hajj-data.js has no ORDER — the branch list did not parse");
-const known = new Set([...branches.map(b => b.id), ...ordered]);
+/* ONLY THE COUNTERS MAY LIVE IN CODE ALONE. This used to take the union of
+   the content file's branches and ORDER, which let a stage name anything
+   either side knew about — and so a branch deleted from hajj/content.js by a
+   bad edit still passed, because ORDER remembered it. The suite does not fail
+   when content disappears, it just gets smaller, which is the quietest way a
+   section can lose a whole branch. Everything a stage names must now be in
+   the content file, with one listed exception. */
+const CODE_ONLY = new Set(["counters"]);
+const fromContent = new Set(branches.map(b => b.id));
+for (const id of ordered)
+  ok(fromContent.has(id) || CODE_ONLY.has(id),
+     `hajj-data.js lists the branch "${id}" but hajj/content.js no longer has it — ` +
+     `either it was deleted by accident or ORDER needs updating`);
 const named = [];
 for (const st of stages) {
   ok(typeof st.title === "string" && st.title.trim().length > 0, `stage ${st.id} has no title`);
   for (const id of (st.branches || [])) {
-    ok(known.has(id), `stage "${st.title}" names the branch "${id}", which does not exist`);
+    ok(fromContent.has(id) || CODE_ONLY.has(id),
+       `stage "${st.title}" names the branch "${id}", which is not in hajj/content.js`);
     ok(!named.includes(id), `the branch "${id}" is named by more than one stage`);
     named.push(id);
   }

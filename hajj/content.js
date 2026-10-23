@@ -28,6 +28,21 @@
    So: correct the text, then add `by: "Mufti ..."` and a `source`. The entry
    appears when, and only when, somebody is willing to be named for it.
 
+   WHERE THE ʿUMRAH DRAFTS CAME FROM. Iḥrām, the rites and the duʿās were
+   drafted from "How to Perform Umrah" by Shaykh Muhammad Saleem Dhorat,
+   Islāmic Daʿwah Academy, Leicester — a Ḥanafī guide written for exactly
+   this congregation. It is a copyrighted publication: the masjid is getting
+   the Academy's permission in writing, and nothing here reaches a reader
+   before that is in hand. The wording below is ours and the transliteration
+   is this app's; the Academy is named in each entry's `source`.
+
+   PERMISSION AND APPROVAL ARE NOT THE SAME THING, and neither stands in for
+   the other. Permission to draw on the book is the Academy's to give. `by` is
+   a scholar's name against OUR sentences, which nobody at the Academy has
+   read. So `by` is still null below, even where the material is theirs — the
+   gate does not open because a source is good, only because somebody has
+   checked these words and will be named for them.
+
    ON THE PRACTICAL BRANCHES. Nothing here states a Saudi entry requirement,
    a visa rule or a vaccination rule as current fact, because those change
    between seasons and being confidently wrong about one is worse than saying
@@ -318,10 +333,13 @@ window.HAJJ = {
           },
           items: [
             { id: "i-m-dress", by: null, verdict: "allowed", t: "Two unstitched sheets",
-              d: "DRAFT FOR REVIEW. An izār around the lower body and a ridāʾ over the upper, both unstitched and ordinarily white. Nothing sewn to the shape of the body is worn." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. An izār around the lower body and a ridāʾ over the upper, both unstitched and ordinarily white. Nothing sewn to the shape of the body is worn. Iḥrām in this sense is for men: a woman enters iḥrām without any special garment." },
             { id: "i-m-head", by: null, verdict: "avoid", t: "The head stays uncovered",
-              d: "DRAFT FOR REVIEW. A man in iḥrām does not cover his head. Shade from an umbrella or a roof is a different matter from a cap or a cloth resting on the head; the ʿulamā should set out exactly where the line sits." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A man in iḥrām covers neither his head nor his face. The line is contact, not shade: an umbrella, a parasol, the roof of a car or a bus is fine so long as it does not rest on the head, while a cap, a towel or a fold of the ridāʾ laid over it is not." },
             { id: "i-m-feet", by: null, verdict: "avoid", t: "Footwear that leaves the instep bare",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
               /* Two photographs of the same foot at the same angle, so the
                  only difference between them is the thing the entry asks a
                  pilgrim to look at. Captioned by what each one physically
@@ -333,7 +351,7 @@ window.HAJJ = {
                 { id: "instepCovered",
                   cap: "A broad strap covers the instep completely." },
               ],
-              d: "DRAFT FOR REVIEW. In the Ḥanafī school the raised middle bone of the foot is not covered. The ʿulamā should say plainly which sandals pass, because this is the single thing pilgrims from this community ask about most and get wrong in the shop." },
+              d: "DRAFT FOR REVIEW. For men, footwear that covers the raised middle bone on top of the foot is not worn. That one bone is the whole test, and it is why a toe-post sandal passes where a broad-strapped one does not. The ʿulamā should say plainly which sandals pass, because this is the single thing pilgrims from this community ask about most and get wrong in the shop." },
           ],
         },
         {
@@ -341,9 +359,11 @@ window.HAJJ = {
           title: "For women",
           items: [
             { id: "i-w-dress", by: null, verdict: "allowed", t: "Ordinary modest clothing",
-              d: "DRAFT FOR REVIEW. There is no special garment. Stitched clothing is worn as usual, covering as it normally would, and the colour is not fixed." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. There is no special garment. Stitched clothing is worn as usual, covering as it normally would, and the colour is not fixed. The talbiyah is said quietly rather than aloud." },
             { id: "i-w-face", by: null, verdict: "avoid", t: "The face is not covered by cloth resting on it",
-              d: "DRAFT FOR REVIEW. The usual arrangement is a covering held away from the face. The ʿulamā should describe what is actually done in practice, not only the principle." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A woman in iḥrām does not cover her face in the way a niqāb rests on it. Where men are present it is covered by a screen held clear of the face — the usual arrangement is a cap or a stiffened band that carries the cloth forward so nothing touches. The ʿulamā should describe what is actually done, not only the principle, because this is bought before flying." },
             { id: "i-w-hands", by: null, verdict: "allowed", t: "Hands and feet",
               d: "DRAFT FOR REVIEW. Needs the ʿulamā's wording on gloves and socks." },
           ],
@@ -353,17 +373,47 @@ window.HAJJ = {
           title: "What is not done in iḥrām",
           items: [
             { id: "i-scent", by: null, verdict: "dam", t: "Perfume and scented things",
-              d: "DRAFT FOR REVIEW. Including scented soap, shampoo, deodorant and some toothpaste, which is why the packing list sends people to buy unscented before flying. The ʿulamā should set out what is owed for a small amount against a lot, because that distinction is the one people need." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Scent, perfume, perfumed oil, anything with a fragrance — on the body, on the clothes, or in what you eat and drink. Including scented soap, shampoo, deodorant and some toothpaste, which is why the packing list sends people to buy unscented before flying. The ʿulamā should set out what is owed for a small amount against a lot, because that distinction is the one people need." },
             { id: "i-hair", by: null, verdict: "dam", t: "Cutting hair or nails",
-              d: "DRAFT FOR REVIEW. Needs the ʿulamā on quantity, and on hair that falls out without being cut." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Shaving or clipping hair from anywhere on the body, and cutting the nails. Hair that comes away by itself while you are washing, with no intention of removing it, is not the same thing. The ʿulamā are needed on quantity — how much hair, how many nails — because that is where what is owed is decided." },
             { id: "i-marry", by: null, verdict: "avoid", t: "Contracting a marriage",
               d: "DRAFT FOR REVIEW." },
             { id: "i-intimacy", by: null, verdict: "dam", t: "Intimacy",
               d: "DRAFT FOR REVIEW. The consequences here are graver than a dam and differ by stage. This entry must not go live until the ʿulamā have written it in full." },
             { id: "i-hunt", by: null, verdict: "dam", t: "Hunting",
-              d: "DRAFT FOR REVIEW." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Hunting a wild animal, and also helping or pointing one out to somebody else who is. It reaches further down than people expect — killing a louse falls under it. Vermin that attack you are a separate question and the ʿulamā should take it." },
             { id: "i-argue", by: null, verdict: "avoid", t: "Quarrelling and foul speech",
-              d: "DRAFT FOR REVIEW. Not a matter of dam, but of what the Qurʾān asks of a pilgrim, and worth saying in a crowd of two million in the heat." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Obscenity, transgression and argument, and harming another Muslim with a word as much as with an elbow. Not a matter of dam, but of what the Qurʾān asks of a pilgrim, and worth saying in a crowd of two million in the heat." },
+          ],
+        },
+        /* WHAT IS FINE. The section above is a list of ways to get it wrong,
+           and a first-time pilgrim reading only that arrives in Makkah
+           frightened of their own glasses. Nearly every question the office
+           gets asked before a group flies is answered here rather than
+           there. */
+        {
+          id: "ihram-ok",
+          title: "What is fine in iḥrām",
+          items: [
+            { id: "o-shade", by: null, verdict: "allowed", t: "Shade, as long as it does not touch you",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. An umbrella, a parasol, the roof of a car or a coach, the shade of a wall. None of it is covering the head in the sense iḥrām means, because none of it rests on the head. In the heat this matters more than it sounds: see the heat branch." },
+            { id: "o-wear", by: null, verdict: "allowed", t: "A ring, glasses, a watch, a money belt",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A ring, spectacles, a hearing aid, a wristwatch, and a belt or pouch that keeps your money and documents on you. The belt being fine is the reason one is on the packing list — stitching is not the test here, the garment is." },
+            { id: "o-wash", by: null, verdict: "allowed", t: "Washing, and changing the sheets",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. You may wash your body and hair, and change the sheets or wash them. Soap is the part that needs the ʿulamā to be exact — scented soap is already out under perfume, and there is more to say about plain soap than one line here can carry. The packing list sends people to buy unscented before flying for this reason." },
+            { id: "o-cover", by: null, verdict: "allowed", t: "A blanket over you at night",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A blanket, a quilt or a sleeping bag over the body, feet included. The head and face are what stay clear, not the rest of you, and a cold night in Minā is not a reason to lie uncovered." },
+            { id: "o-small", by: null, verdict: "allowed", t: "A miswāk, and carrying something",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A miswāk for the teeth. Carrying something on your head is not covering it. Hair that comes away by itself while you wash, with no intention of removing it, is not cutting it." },
           ],
         },
         {
@@ -396,9 +446,10 @@ window.HAJJ = {
           title: "ʿUmrah",
           items: [
             { id: "r-u-1", by: null, n: 1, t: "Iḥrām and the intention",
-              d: "DRAFT FOR REVIEW. Where it is entered, what is said, and what the mīqāt means for somebody flying from Manchester." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. At the mīqāt or before it: ghusl if you can manage it, wuḍūʾ if you cannot, then the two sheets. Men may put ʿiṭr on now and not after. Pray two rakʿahs nafl with the head covered, then sit bareheaded, make the intention for ʿUmrah, and say the talbiyah three times — men aloud, women quietly. Iḥrām begins with the intention and the talbiyah, not with the cloth: the restrictions start from that moment. Flying from Manchester this is a decision made on the plane, because Jeddah is already past the boundary. Somebody already in Makkah goes out to Masjid Tanʿīm to enter iḥrām." },
             { id: "r-u-2", by: null, n: 2, t: "Ṭawāf, seven circuits",
-              d: "DRAFT FOR REVIEW. Where it starts and ends, which shoulder is bared and when, and what is said. The counter in this section keeps the number; this entry is what the counter cannot tell anybody.",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
               /* The plan names the four things a first-timer cannot find by
                  looking, and nothing else: the entry's own words, once they
                  carry a scholar's name, say what is done at each of them. */
@@ -411,13 +462,72 @@ window.HAJJ = {
                   { n: 3, x: 0.500, y: 0.266, t: "The Ḥaṭīm, the low semicircular wall, and the ground it encloses." },
                   { n: 4, x: 0.818, y: 0.492, t: "Maqām Ibrāhīm." },
                 ],
-              } },
+              },
+              d: "DRAFT FOR REVIEW. Before you reach the corner, stop the talbiyah, men make idṭibāʿ, and the intention is made — it has to be made before you get there. Stand level with the Black Stone, turn to face the Kaʿbah and do istilām. Then move off to your right, keep the Kaʿbah on your left, and go round it anticlockwise. Istilām again at the end of each round, seven rounds in all. The section below has the details; the one that catches people is that what must be right is where a round starts and where it ends." },
             { id: "r-u-3", by: null, n: 3, t: "Two rakʿahs after ṭawāf",
-              d: "DRAFT FOR REVIEW." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Two rakʿahs at Maqām Ibrāhīm, wājib, with Sūrat al-Kāfirūn and then al-Ikhlāṣ, and duʿā after. If there is no room at the Maqām — and most of the time there is not — anywhere in the Masjid will do, and trying to force a space there is the wrong trade. Then Zamzam, facing the Kaʿbah, as much as you can take. Then the Multazam, between the Black Stone and the door, where you put your chest and arms against the wall and ask. Either order for those two. Then back to the stone for one more istilām before saʿī, which is mustaḥabb rather than required." },
             { id: "r-u-4", by: null, n: 4, t: "Saʿī, seven laps",
-              d: "DRAFT FOR REVIEW. From Ṣafā to Marwa and back, and why the seventh ends where it does." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Out to Ṣafā, climbing until the Kaʿbah comes into view between the pillars, and make the intention there. Facing it, hands raised to the shoulders, takbīr and tahlīl three times, durūd, and then duʿā for as long as you can — this is one of the places where duʿā is answered and most people leave it too quickly. Walk to Marwa at your normal pace; between the green lights men quicken to a jog and women do not. Ṣafā to Marwa is one lap, not a return trip, so seven laps end at Marwa. Two rakʿahs afterwards are mustaḥabb." },
             { id: "r-u-5", by: null, n: 5, t: "Ḥalq or taqṣīr",
-              d: "DRAFT FOR REVIEW. What is done for men and for women, and the point at which iḥrām ends." },
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Men either shave the head or trim it, and the trim has to take at least an inch off the whole head rather than a tidy-up at the sides. Shaving carries the greater reward. Women take a little over an inch from the end of the plait. With that the ʿUmrah is finished and everything iḥrām had closed off is open again." },
+          ],
+        },
+        /* ṬAWĀF AND SAʿĪ GET THEIR OWN SECTIONS because the five steps above
+           are the shape of the rite and these are the twenty things that go
+           wrong inside two of them. Folded into r-u-2 they were a paragraph
+           nobody would read standing in the maṭāf at two in the morning. */
+        {
+          id: "rites-tawaf",
+          title: "Ṭawāf, point by point",
+          items: [
+            { id: "t-find", by: null, t: "Finding the corner",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A green light on the arched wall faces the corner the Black Stone sits in, and that corner is the one facing the single minaret — the other three face two each. The strip of dark marble that used to mark the line across the floor is gone, so you judge it by eye. Nobody can be exact about it and you are not required to be." },
+            { id: "t-start", by: null, t: "Where a round begins and ends",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. This is the part that actually has to be right. A round that starts after you have already passed the stone is short, and a seventh that ends before you reach it is short. If you are unsure on the last one, keep walking until you are sure rather than stopping early." },
+            { id: "t-istilam", by: null, t: "Istilām",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Raise the hands to the ears with the palms towards the stone, say bismillāh and the takbīr, place both palms on it and kiss it without force. If you cannot reach it, touch it with a hand, or raise the hands towards it and kiss them. Done at the end of every round." },
+            { id: "t-crowd", by: null, verdict: "avoid", t: "The stone is not worth hurting somebody for",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Kissing the Black Stone is Sunnah. Not harming a Muslim is farḍ. A Sunnah is not carried out by breaking a farḍ, and pushing through a crowd to reach the stone trades the greater thing for the lesser one. When it is packed, raise your hands from where you are, say bismillāh Allāhu akbar, and keep moving with the flow." },
+            { id: "t-hateem", by: null, t: "The Ḥaṭīm is part of the Kaʿbah",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The low semicircular wall on the far side encloses ground that belongs to the Kaʿbah, so the circuit passes outside it. Cutting between the wall and the building shortens the round. The plan on the ṭawāf step shows which wall it stands on." },
+            { id: "t-left", by: null, t: "The Kaʿbah stays on your left",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. All the way round. Not your back to it, not your chest, not your right shoulder — which is the usual way it happens, when somebody turns to look at it or to take a photograph and keeps walking." },
+            { id: "t-ramal", by: null, t: "Ramal and idṭibāʿ, for men",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Ramal is a brisk, short-stepped walk with the chest out and the shoulders moving, in the first three rounds only. Idṭibāʿ is the ridāʾ taken under the right arm and thrown over the left shoulder, leaving the right shoulder bare; it is for ṭawāf and nothing else, so it comes off once the seventh round is done — not worn to saʿī and not worn to ṣalāh." },
+            { id: "t-yamani", by: null, t: "The Yamānī corner",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The corner you pass just before the Black Stone. Touch it with both hands or the right hand if you can reach it; it is not kissed and the hands are not raised towards it the way they are at the stone." },
+            { id: "t-say", by: null, t: "What to say during ṭawāf",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. There is no set duʿā for the rounds, and the printed booklets that give one for each circuit are a convenience rather than a requirement. Ask for what you actually need, in whatever language it comes in. Between the Yamānī corner and the Black Stone the Sunnah is Rabbanā ātinā, which is in the duʿās branch. Keep your voice down — the person beside you is also asking." },
+          ],
+        },
+        {
+          id: "rites-sai",
+          title: "Saʿī, point by point",
+          items: [
+            { id: "s-count", by: null, t: "Seven laps, not seven returns",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Ṣafā to Marwa is one. Marwa to Ṣafā is two. Counted that way the seventh finishes at Marwa, and anyone who ends back at Ṣafā has walked fourteen. The counter in this section counts it the right way round and tells you which end the next lap leaves from." },
+            { id: "s-green", by: null, t: "Between the green lights",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Men quicken to a jog between the two sets of green lights and walk normally either side of them. Women walk at their own pace the whole way, including between the lights." },
+            { id: "s-marwa", by: null, t: "You cannot see the Kaʿbah from Marwa",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. At Ṣafā you climb until it comes into view between the pillars. At Marwa it is not visible at all now, so you climb and face its direction. People stand looking for it and hold up the people behind them." },
+            { id: "s-dua", by: null, t: "Standing at each end",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Facing the Kaʿbah, hands raised to the shoulders as in duʿā, takbīr and tahlīl three times, durūd, then ask. The same at both ends, every lap. This is the part of saʿī most people cut short, and it is the part the walking is for." },
           ],
         },
         {
@@ -451,19 +561,64 @@ window.HAJJ = {
           id: "duas-core",
           title: "Through the journey",
           items: [
+            { id: "d-niyyah", by: null, t: "The intention for ʿUmrah",
+              ar: "اللَّهُمَّ إِنِّي أُرِيدُ الْعُمْرَةَ فَيَسِّرْهَا لِي وَتَقَبَّلْهَا مِنِّي",
+              tr: "Allāhumma innī urīdul-ʿumrata fa-yassirhā lī wa taqabbalhā minnī",
+              when: "Bareheaded, after the two rakʿahs at the mīqāt",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cO Allah, I intend to perform ʿUmrah. Make it easy for me and accept it from me.\u201d Said sitting, after the two rakʿahs and with the head uncovered. The talbiyah follows it, and the two together are what begin iḥrām." },
             { id: "d-talbiyah", by: null, t: "The talbiyah",
-              ar: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ",
-              tr: "Labbayk Allāhumma labbayk",
-              when: "From entering iḥrām",
-              d: "DRAFT FOR REVIEW. The opening words only. The full wording, when it is begun and when it stops, and the Arabic verified against the masjid's own source, are the ʿulamā's to confirm — the app verifies its other duʿās against their sources and this should go the same way." },
-            { id: "d-tawaf", by: null, t: "Between the two corners", d: "DRAFT FOR REVIEW." },
-            { id: "d-safa", by: null, t: "At Ṣafā and Marwa", d: "DRAFT FOR REVIEW." },
-            { id: "d-arafah", by: null, t: "On the day of ʿArafah", d: "DRAFT FOR REVIEW." },
+              ar: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ",
+              tr: "Labbayk Allāhumma labbayk, labbayka lā sharīka laka labbayk, innal-ḥamda wan-niʿmata laka wal-mulk, lā sharīka lak",
+              when: "Three times at the mīqāt, then as often as you can until Makkah",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cHere I am at Your service, O Allah, here I am. Here I am, You have no partner, here I am. Truly all praise and favour are Yours, and the dominion. You have no partner.\u201d Three times when iḥrām is entered, men aloud and women quietly, then kept up on the road and stopped before you reach the Black Stone to begin ṭawāf. The ʿulamā should confirm the wording against the masjid\u2019s own source the way the app\u2019s other duʿās are verified." },
+            { id: "d-masjid", by: null, t: "Entering the Masjid",
+              ar: "بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+              tr: "Bismillāhi waṣ-ṣalātu was-salāmu ʿalā rasūlillāh. Allāhummaftaḥ lī abwāba raḥmatik",
+              when: "Right foot first, going in",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cIn the name of Allah, and peace and blessings be upon the Messenger of Allah. O Allah, open for me the doors of Your mercy.\u201d" },
+            { id: "d-kaaba", by: null, t: "The first time you see the Kaʿbah",
+              ar: "اللَّهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللَّهُ",
+              tr: "Allāhu akbar, lā ilāha illallāh",
+              when: "Three times, standing, facing it",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cAllah is the greatest. There is no god but Allah.\u201d Three times, then durūd, then ask — standing where you are and facing it. People walk straight past this moment towards the crowd. It is one of the places duʿā is answered, and it comes once." },
+            { id: "d-istilam", by: null, t: "At the Black Stone",
+              ar: "بِسْمِ اللَّهِ، اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ",
+              tr: "Bismillāhi, Allāhu akbar wa lillāhil-ḥamd",
+              when: "At the start of ṭawāf and the end of every round",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cIn the name of Allah, Allah is the greatest, and all praise is for Allah.\u201d Hands raised towards the stone. In a crowd this is said from where you are standing, without pushing in." },
+            { id: "d-tawaf", by: null, t: "Between the two corners",
+              /* The muṣḥaf\u2019s own text, lifted from quran/rabbanas.js rather
+                 than typed again here: one verse in two different Arabic
+                 orthographies inside one app is the kind of thing a ḥāfiẓ
+                 notices immediately. */
+              ar: "رَبَّنَآ اٰتِنَا فِى الدُّنْيَا حَسَنَةً وَّفِى الْاٰخِرَةِ حَسَنَةً وَّقِنَا عَذَابَ النَّارِ",
+              tr: "Rabbanā ātinā fid-dunyā ḥasanatan wa fil-ākhirati ḥasanatan wa qinā ʿadhāban-nār",
+              when: "Between the Yamānī corner and the Black Stone, every round",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cOur Lord, give us good in this world and good in the hereafter, and save us from the punishment of the Fire.\u201d Al-Baqarah 201. The one stretch of ṭawāf with a Sunnah wording attached to it; the rest of the circuit has none." },
+            { id: "d-safa", by: null, t: "At Ṣafā and Marwa",
+              ar: "اللَّهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللَّهُ",
+              tr: "Allāhu akbar, lā ilāha illallāh",
+              when: "Three times at each end, every lap",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Facing the Kaʿbah with the hands raised to the shoulders, three times, then durūd, then duʿā \u2014 at both ends and on every lap, not only the first." },
+            { id: "d-sai", by: null, t: "Walking between them",
+              ar: "رَبِّ اغْفِرْ وَارْحَمْ أَنْتَ الْأَعَزُّ الْأَكْرَمُ",
+              tr: "Rabbighfir warḥam anta al-aʿazzul-akram",
+              when: "On the way, between Ṣafā and Marwa",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. \u201cMy Lord, forgive and have mercy. You are the Mightiest, the Most Generous.\u201d Nothing is fixed for the walking itself, so ask for what you need; this is the Sunnah wording to come back to between times." },
+            { id: "d-arafah", by: null, t: "On the day of ʿArafah",
+              d: "DRAFT FOR REVIEW. Still blank. The ʿUmrah source this branch was drafted from does not cover the days of Hajj, so this one waits for the ʿulamā with nothing in front of it." },
           ],
         },
       ],
     },
-
     /* ---------------------------------------------------------------- *
      *  7. COMING HOME
      * ---------------------------------------------------------------- */
