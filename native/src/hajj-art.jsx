@@ -76,10 +76,15 @@ function Instep() {
       <Path {...GOLD} d="M100 0 Q101 32 98 56" />
       <Path {...GOLD} d="M98 56 Q118 68 146 78 Q180 90 208 98" />
       <Path {...GOLD} d="M208 98 Q222 103 219 111 Q215 117 202 116 L68 112" />
-      <Path {...GOLD} d="M44 120 L226 120 Q238 120 238 127 Q238 134 226 134 L44 134 Q34 134 34 127 Q34 120 44 120Z" />
-      <Path {...GOLD} strokeOpacity={0.8} d="M178 120 Q190 108 206 102" />
-      <Path {...GOLD} strokeOpacity={0.8} d="M56 120 Q48 104 57 91" />
-      <Path {...GOLD} strokeWidth={4.5} strokeOpacity={0.95} d="M112 64 Q133 73 158 82" />
+      {/* A thick sole with a lifted toe, and a toe-post strap drawn as a band
+          running from the side of the sole up to just behind the toes. It is
+          the shape in the reference, and it is the shape that matters here:
+          the strap sits FORWARD of the instep, so nothing crosses it. */}
+      <Path {...GOLD} d="M48 118 L212 118 Q230 118 234 126 Q236 133 228 137 L48 137 Q34 137 34 128 Q34 118 48 118Z" />
+      <Path {...GOLD} d="M170 117 L196 100" />
+      <Path {...GOLD} d="M180 118 L204 103" />
+      <Path {...GOLD} d="M196 100 Q201 100 204 103" />
+      <Path {...GOLD} strokeWidth={4.5} strokeOpacity={0.95} d="M110 63 Q132 72 158 82" />
     </Svg>
   );
 }
