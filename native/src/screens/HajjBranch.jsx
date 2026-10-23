@@ -28,6 +28,7 @@ import Svg, { Path } from "react-native-svg";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip } from "../hajj-ui";
+import HajjArt from "../hajj-art";
 import { visibleSections } from "../hajj";
 import { branchById } from "../hajj-data";
 
@@ -139,6 +140,12 @@ export default function HajjBranch({ route }) {
           {!!s.lead && (
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
                            color: HJ.inkFaint, marginTop: 7, textAlign: align }}>{s.lead}</Text>)}
+          {/* A drawing belonging to the whole section sits above its items,
+              where it can be looked at once and then read past. */}
+          {!!s.art && (
+            <Panel style={{ marginTop: 13, paddingVertical: 18 }}>
+              <HajjArt art={s.art} />
+            </Panel>)}
 
           {s.items.map((item, ii) => {
             const v = VERDICT[item.verdict];
@@ -170,6 +177,7 @@ export default function HajjBranch({ route }) {
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
                                  color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}
+                {!!item.art && <HajjArt art={item.art} style={{ marginTop: 14 }} />}
                 {!!src && (
                   <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(17),
                                  color: HJ.inkFaint, marginTop: 9, textAlign: align }}>{src}</Text>)}

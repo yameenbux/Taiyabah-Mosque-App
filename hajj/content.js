@@ -280,12 +280,20 @@ window.HAJJ = {
         {
           id: "ihram-men",
           title: "For men",
+          /* A drawing of the CLOTH, not of a man wearing it. See the note at
+             the head of native/src/hajj-art.jsx for why, and for why nothing
+             drawn in this section carries a verdict. */
+          art: { id: "cloth", cap: "The izār and the ridāʾ, before they are worn." },
           items: [
             { id: "i-m-dress", by: null, verdict: "allowed", t: "Two unstitched sheets",
               d: "DRAFT FOR REVIEW. An izār around the lower body and a ridāʾ over the upper, both unstitched and ordinarily white. Nothing sewn to the shape of the body is worn." },
             { id: "i-m-head", by: null, verdict: "avoid", t: "The head stays uncovered",
               d: "DRAFT FOR REVIEW. A man in iḥrām does not cover his head. Shade from an umbrella or a roof is a different matter from a cap or a cloth resting on the head; the ʿulamā should set out exactly where the line sits." },
             { id: "i-m-feet", by: null, verdict: "avoid", t: "Footwear that leaves the instep bare",
+              /* Where the instep is, which is anatomy. The sandal is drawn
+                 plainly: which ones pass is the ʿulamā's to say, not a
+                 drawing's. */
+              art: { id: "instep", cap: "The marked part of the foot is the instep." },
               d: "DRAFT FOR REVIEW. In the Ḥanafī school the raised middle bone of the foot is not covered. The ʿulamā should say plainly which sandals pass, because this is the single thing pilgrims from this community ask about most and get wrong in the shop." },
           ],
         },

@@ -110,6 +110,42 @@ if (webFlag !== undefined)
      `the app says RELEASED=${RELEASED} and the website says ${webFlag}. ` +
      `One platform would show the section while the other hides it.`);
 
+/* ---- the drawings exist on both platforms ------------------------------
+ * A mistyped art id is silent: the renderer draws nothing and the screen
+ * just looks a little empty, which nobody would report as a bug. It is also
+ * exactly the kind of thing that gets noticed on one platform and not the
+ * other. So every id the content names must be carried by both, and must
+ * come with a caption — an unlabelled diagram of a foot explains nothing. */
+const arts = [];
+for (const b of branches)
+  for (const sec of (b.sections || [])) {
+    if (sec.art) arts.push([`${b.id}/${sec.id}`, sec.art]);
+    for (const it of (sec.items || [])) if (it.art) arts.push([`${b.id}/${it.id}`, it.art]);
+  }
+const nativeArt = fs.readFileSync(path.join(here, "src/hajj-art.jsx"), "utf8");
+const nativeIds = [...nativeArt.matchAll(/^\s{2}(\w+):\s*\{\s*el:/gm)].map(m => m[1]);
+const webIds = [...(web.match(/const HJ_ART = \{[\s\S]*?\n\};/) || [""])[0]
+                 .matchAll(/^\s{2}(\w+):\s/gm)].map(m => m[1]);
+ok(nativeIds.length > 0, "hajj-art.jsx declares no drawings — the ART map did not parse");
+ok(webIds.length > 0, "index.html declares no drawings — HJ_ART did not parse");
+for (const [where, art] of arts) {
+  ok(nativeIds.includes(art.id),
+     `${where} asks for the "${art.id}" drawing, which the app does not have ` +
+     `(it has: ${nativeIds.join(", ")})`);
+  ok(webIds.includes(art.id),
+     `${where} asks for the "${art.id}" drawing, which the website does not have ` +
+     `(it has: ${webIds.join(", ")})`);
+  ok(typeof art.cap === "string" && art.cap.trim().length > 0,
+     `${where} has a drawing with no caption`);
+}
+/* The drawings must stay descriptive. Nothing in this section may assert a
+   ruling the ʿulamā have not given, and a caption is the easiest place for
+   one to creep in. */
+for (const [where, art] of arts)
+  ok(!/\b(must|must not|may not|haram|ḥarām|forbidden|not allowed|is required)\b/i.test(art.cap),
+     `${where}'s caption reads like a ruling: "${art.cap}". ` +
+     `A drawing describes; the entry's own words do the fiqh.`);
+
 /* ---- the counters ------------------------------------------------------ */
 is(tick("tawaf", 6), 7, "the seventh circuit counts");
 is(tick("tawaf", 7), 7, "THERE IS NO EIGHTH CIRCUIT");

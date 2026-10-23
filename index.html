@@ -1218,6 +1218,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hc-note{font-size:calc(12px * var(--ts));line-height:1.55;color:var(--hj-ink-faint);
     text-align:center;margin:22px 0 0}
 
+  /* The drawings. native/src/hajj-art.jsx is the same set of paths and the
+     note at its head says why none of them contains a person and why none of
+     them carries a verdict. */
+  .hj-art{margin-top:13px;padding:18px 16px}
+  .hj-art svg{width:100%;height:auto;display:block}
+  .hj-artcap{font-size:calc(11.5px * var(--ts));line-height:1.5;color:var(--hj-ink-faint);
+    text-align:center;margin:11px 0 0}
+  .hl-card .hj-artcap{margin-top:11px}
+
   /* ---- one branch ---- */
   /* NOT :first-of-type. It matches the first div AND the first button, so a
      section mixing a tickable item with a plain one lost a gap in the middle
@@ -11328,6 +11337,47 @@ function closeHajjCount(){ document.getElementById("hajjcount").dataset.open="0"
    through them, so there is one renderer. It draws hajjVisibleSections(),
    never the raw branch, which is what stops an unapproved draft appearing
    here even if somebody opens the sheet directly. */
+/* id -> the drawing. Kept as markup rather than built node by node because
+   it is the same path data as native/src/hajj-art.jsx and the two are meant
+   to be diffable by eye. check-hajj.mjs asserts both sides carry every id the
+   content names, so a typo fails the build instead of leaving a gap. */
+const HJ_ART = {
+  cloth: '<svg viewBox="0 0 300 214" fill="none" stroke="var(--hj-gold)" stroke-width="1.6"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<g fill="var(--hj-gold)" fill-opacity=".06" stroke="none">'
+    + '<path d="M22 28 Q74 20 126 26 Q137 110 131 190 Q102 176 72 190 Q45 202 19 190 Q14 108 22 28Z"/>'
+    + '<path d="M174 28 Q224 20 276 26 Q285 100 279 168 Q252 156 227 168 Q202 180 178 168 Q170 98 174 28Z"/></g>'
+    + '<path d="M22 28 Q74 20 126 26"/><path d="M22 28 Q14 108 19 190"/>'
+    + '<path d="M126 26 Q137 110 131 190"/><path d="M19 190 Q45 202 72 190 Q102 176 131 190"/>'
+    + '<path d="M48 25 Q38 110 43 196" stroke-opacity=".42"/>'
+    + '<path d="M74 22 Q72 108 72 190" stroke-opacity=".25"/>'
+    + '<path d="M100 24 Q108 110 103 182" stroke-opacity=".42"/>'
+    + '<path d="M174 28 Q224 20 276 26"/><path d="M174 28 Q170 98 178 168"/>'
+    + '<path d="M276 26 Q285 100 279 168"/><path d="M178 168 Q202 180 227 168 Q252 156 279 168"/>'
+    + '<path d="M198 25 Q190 98 195 174" stroke-opacity=".42"/>'
+    + '<path d="M226 22 Q224 96 225 170" stroke-opacity=".25"/>'
+    + '<path d="M254 24 Q261 98 256 162" stroke-opacity=".42"/></svg>',
+  instep: '<svg viewBox="26 -2 222 144" fill="none" stroke="var(--hj-gold)" stroke-width="1.6"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<path d="M64 0 Q59 34 57 60 Q49 80 51 96 Q53 110 68 112"/>'
+    + '<path d="M100 0 Q101 32 98 56"/>'
+    + '<path d="M98 56 Q118 68 146 78 Q180 90 208 98"/>'
+    + '<path d="M208 98 Q222 103 219 111 Q215 117 202 116 L68 112"/>'
+    + '<path d="M44 120 L226 120 Q238 120 238 127 Q238 134 226 134 L44 134 Q34 134 34 127 Q34 120 44 120Z"/>'
+    + '<path d="M178 120 Q190 108 206 102" stroke-opacity=".8"/>'
+    + '<path d="M56 120 Q48 104 57 91" stroke-opacity=".8"/>'
+    + '<path d="M112 64 Q133 73 158 82" stroke-width="4.5" stroke-opacity=".95"/></svg>',
+};
+/* `inner` wraps it in a panel of its own; an item draws it bare, inside the
+   card it belongs to. */
+function hjArtHtml(art, inner){
+  if(!art || !HJ_ART[art.id]) return "";
+  const body = HJ_ART[art.id]
+    + (art.cap ? `<p class="hj-artcap">${esc(art.cap)}</p>` : "");
+  return inner ? `<div style="margin-top:14px">${body}</div>`
+               : `<div class="hj-panel hj-art">${body}</div>`;
+}
+
 const HJ_VERDICT = {
   allowed: () => [t("hajj.allowed","Allowed"), ""],
   avoid:   () => [t("hajj.avoid","Avoid"), "avoid"],
@@ -11345,6 +11395,7 @@ function hjItemHtml(x){
     + `<div class="hl-q${on?" done":""}">${x.n?esc(num(x.n))+". ":""}${esc(x.t||"")}</div>`
     + (x.d ? `<div class="hl-a">${esc(x.d)}</div>` : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
+    + hjArtHtml(x.art, true)
     + (src ? `<div class="hl-src">${esc(src)}</div>` : "");
   /* A dam entry wears the warn panel, so the one thing on the screen that
      costs money looks different from across the room. */
@@ -11374,6 +11425,7 @@ function openHajjBranch(id){
       + secs.map(sec =>
           `<div class="hl-sec"><h2>${esc(sec.title)}</h2>`
           + (sec.lead ? `<p class="hl-seclead">${esc(sec.lead)}</p>` : "")
+          + hjArtHtml(sec.art)
           + sec.items.map(hjItemHtml).join("") + `</div>`).join("")
       + `<div class="hj-foot"><img src="logo.svg" alt="${esc(t("a11y.taiyabah_masjid","Taiyabah Masjid"))}"`
       + ` width="118" height="84"><div class="hj-soc">`
