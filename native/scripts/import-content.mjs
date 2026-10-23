@@ -12,19 +12,23 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import vm from "node:vm";
+import { basename } from "node:path";
 
-const SRC = "../quran";
+/* Each entry names its own path now: the shared content is no longer all
+   under quran/, and filing Hajj guidance there to save one line would mislead
+   whoever reads this next. */
 const OUT = "src/data";
 mkdirSync(OUT, { recursive: true });
 
 const files = [
-  ["athkar.js",   "ATHKAR",   "athkar.json"],
-  ["duas.js",     "DUAS",     "duas.json"],
-  ["rabbanas.js", "RABBANAS", "rabbanas.json"],
+  ["../quran/athkar.js",   "ATHKAR",   "athkar.json"],
+  ["../quran/duas.js",     "DUAS",     "duas.json"],
+  ["../quran/rabbanas.js", "RABBANAS", "rabbanas.json"],
+  ["../hajj/content.js",   "HAJJ",     "hajj.json"],
 ];
 
 for (const [file, global_, out] of files) {
-  const code = readFileSync(`${SRC}/${file}`, "utf8");
+  const code = readFileSync(file, "utf8");
   const sandbox = { window: {} };
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox, { filename: file });
@@ -32,6 +36,7 @@ for (const [file, global_, out] of files) {
   if (!data) { console.error(`  FAIL ${file}: window.${global_} was not set`); process.exit(1); }
   writeFileSync(`${OUT}/${out}`, JSON.stringify(data));
   const size = (readFileSync(`${OUT}/${out}`).length / 1024).toFixed(0);
-  const count = data.sections?.length ?? data.categories?.length ?? (Array.isArray(data) ? data.length : Object.keys(data).length);
-  console.log(`  ok   ${file.padEnd(13)} -> ${out.padEnd(14)} ${size}KB, ${count} groups`);
+  const count = data.branches?.length ?? data.sections?.length ?? data.categories?.length
+             ?? (Array.isArray(data) ? data.length : Object.keys(data).length);
+  console.log(`  ok   ${basename(file).padEnd(13)} -> ${out.padEnd(14)} ${size}KB, ${count} groups`);
 }

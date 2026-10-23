@@ -19,7 +19,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { C, F } from "./theme";
+import { C, F, HJ } from "./theme";
 import { COLUMN } from "./layout";
 import { tabBarFor, LABEL } from "./chrome";
 import { AppProvider, useApp } from "./store";
@@ -40,8 +40,9 @@ import More from "./screens/More";
 import Qibla from "./screens/Qibla";
 import Ramadan from "./screens/Ramadan";
 import Hajj from "./screens/Hajj";
+import { branchById } from "./hajj-data";
 import HajjCounter from "./screens/HajjCounter";
-import HajjList from "./screens/HajjList";
+import HajjBranch from "./screens/HajjBranch";
 import Live from "./screens/Live";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
@@ -203,7 +204,7 @@ const linking = {
       Ramadan:   "ramadan",
       Hajj:      "hajj",
       HajjCounter: "hajj/counter",
-      HajjList:  "hajj/:section",
+      HajjBranch: "hajj/:branch",
       Quran:     "quran",
       Mushaf:    "mushaf",
       Timetable: "timetable",
@@ -287,6 +288,12 @@ function Root() {
    * society's name and the bell — not a sheet header. They draw their own. */
   const page = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
   const pushed = sheet, bare = sheet;
+  /* Hajj & Umrah is the one dark place in the app, and it is dark whatever
+     the phone's theme says — so its screens must not be handed the paper
+     background underneath. Without this the push animation slides a cream
+     card in and the section paints over it a frame later, which reads as a
+     flash every single time the section is opened. */
+  const hajj = { ...sheet, contentStyle: { backgroundColor: HJ.ground } };
 
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
@@ -329,15 +336,14 @@ function Root() {
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Ramadan"   component={Ramadan}   options={{ ...bare, title: t("ramadan.ramadan", "Ramadan") }} />
-        <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...pushed, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
-        <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...pushed, title: t("hajj.the_counters", "The counters") }} />
-        {/* One screen for three sections, so the title comes from the param
-            rather than from three near-identical route registrations. */}
-        <Stack.Screen name="HajjList"  component={HajjList}
-          options={({ route }) => ({ ...pushed, title:
-            route?.params?.section === "steps"   ? t("hajj.the_steps", "The steps")
-          : route?.params?.section === "rulings" ? t("hajj.the_rulings", "The rulings")
-          :                                       t("hajj.the_duas", "The duʿās") })} />
+        <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...hajj, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
+        <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...hajj, title: t("hajj.the_counters", "The counters") }} />
+        {/* One screen for every branch, so the title comes from the data
+            rather than from eight near-identical route registrations. */}
+        <Stack.Screen name="HajjBranch" component={HajjBranch}
+          options={({ route }) => ({ ...hajj,
+            title: (branchById(route?.params?.branch) || {}).title
+                || t("marriage.hajj_umrah", "Hajj / Umrah") })} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />
         {/* The donate page: one of the website's seven, so it wears the app
             bar rather than a sheet header. */}
