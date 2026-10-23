@@ -287,6 +287,13 @@ window.HAJJ = {
               d: "Some medicines sold freely here are controlled there. Check the official guidance, carry them in the original packaging, and take your prescription." },
             { id: "d-insure", t: "Insurance that actually covers pilgrimage",
               d: "Read the exclusions. Several ordinary travel policies will not cover Hajj or ʿUmrah, and medical care abroad is not free." },
+            /* PRACTICAL, NOT FIQH — which is why it sits in this branch and
+               carries no approver. It states no ruling: it says when to ask,
+               and the ruling itself is in the iḥrām branch behind the gate.
+               A woman finding this out after the flights are paid for is the
+               failure this entry exists to prevent. */
+            { id: "d-dates", t: "Women: check the dates before you pay",
+              d: "Ṭawāf is done inside the Masjid, and ḥayḍ or nifās stops a woman entering it — so a fixed set of dates can leave an ʿUmrah unfinishable through nobody\u2019s fault. Work out where your dates are likely to fall before the booking is confirmed, and put the question to the ʿulamā at that point rather than on the plane. The iḥrām branch has what they say about it." },
           ],
         },
         {
@@ -360,12 +367,24 @@ window.HAJJ = {
           items: [
             { id: "i-w-dress", by: null, verdict: "allowed", t: "Ordinary modest clothing",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
-              d: "DRAFT FOR REVIEW. There is no special garment. Stitched clothing is worn as usual, covering as it normally would, and the colour is not fixed. The talbiyah is said quietly rather than aloud." },
+              d: "DRAFT FOR REVIEW. There is no special garment. Stitched clothing is worn as usual, covering as it normally would, and the colour is not fixed. Iḥrām as a garment is a men\u2019s matter; a woman enters iḥrām in what she would ordinarily wear." },
             { id: "i-w-face", by: null, verdict: "avoid", t: "The face is not covered by cloth resting on it",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
               d: "DRAFT FOR REVIEW. A woman in iḥrām does not cover her face in the way a niqāb rests on it. Where men are present it is covered by a screen held clear of the face — the usual arrangement is a cap or a stiffened band that carries the cloth forward so nothing touches. The ʿulamā should describe what is actually done, not only the principle, because this is bought before flying." },
             { id: "i-w-hands", by: null, verdict: "allowed", t: "Hands and feet",
-              d: "DRAFT FOR REVIEW. Needs the ʿulamā's wording on gloves and socks." },
+              d: "DRAFT FOR REVIEW. Still open. The restriction on a woman in iḥrām is the face, and the hands and feet are not treated the same way — but whether gloves and socks may be worn, and whether that changes during ṭawāf, is the ʿulamā\u2019s to state. The guide this branch was drafted from does not address it." },
+            { id: "i-w-talbiyah", by: null, verdict: "allowed", t: "The talbiyah, said quietly",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. A woman says it at a volume she can hear herself, where a man raises his voice. It is said just as often, and iḥrām is not complete without it: the intention and the talbiyah together are what begin it, the same for both." },
+            /* ḤAYḌ AND NIFĀS. The whole section had nothing on this, which is a
+               serious omission rather than a tidy one: ṭawāf is farḍ and it is
+               inside the Masjid, so this is the one thing that can stop an
+               ʿUmrah being completed on the dates somebody has already paid
+               for. It belongs in front of a woman BEFORE she books, not after
+               she lands, which is why the papers branch points here too. */
+            { id: "i-w-hayd", by: null, t: "Ḥayḍ and nifās",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Iḥrām itself is entered as usual — the ghusl, the intention and the talbiyah are not prevented. What is prevented is entering the Masjid, and ṭawāf is inside the Masjid and is farḍ, so the ʿUmrah cannot be completed until it has passed. That makes this a question to put to the ʿulamā before the flights are booked rather than after: what to do when the return date is fixed, what the position is on delaying a period, and what is owed if the group has to leave first. None of that is answered here. This entry exists so the question gets asked early enough to matter." },
           ],
         },
         {
@@ -528,6 +547,30 @@ window.HAJJ = {
             { id: "s-dua", by: null, t: "Standing at each end",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
               d: "DRAFT FOR REVIEW. Facing the Kaʿbah, hands raised to the shoulders as in duʿā, takbīr and tahlīl three times, durūd, then ask. The same at both ends, every lap. This is the part of saʿī most people cut short, and it is the part the walking is for." },
+          ],
+        },
+        /* COLLECTED, NOT SCATTERED. Each difference below is also stated in
+           the step it belongs to, because somebody reading the rite in order
+           should not have to come here for it. But the reverse was not true:
+           a woman had to read five entries written from a man\u2019s default and
+           assemble her own rite out of the clauses at the end of them. This
+           section is that assembly, done once. */
+        {
+          id: "rites-women",
+          title: "For women, through the rites",
+          items: [
+            { id: "w-ihram", by: null, t: "Entering iḥrām",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. No special garment — ordinary clothing that covers as it normally would, and the face left uncovered by anything resting on it. Ghusl or wuḍūʾ, the two rakʿahs, the intention and the talbiyah, the same as anyone, with the talbiyah said quietly. The iḥrām branch has the detail, including ḥayḍ and nifās, which is worth reading before booking rather than before flying." },
+            { id: "w-tawaf", by: null, t: "During ṭawāf",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. Idṭibāʿ and ramal are both men\u2019s Sunnahs and neither applies: no shoulder is bared and the first three rounds are walked at the same pace as the other four. Everything else is the same rite — the start and end in line with the Black Stone, the Ḥaṭīm gone round, the Kaʿbah kept on the left. Istilām from where you are standing rather than pressing into the crowd is the ordinary way it is done." },
+            { id: "w-sai", by: null, t: "During saʿī",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The stretch between the two sets of green lights is where men quicken to a jog. Women walk it at their own pace, the same as the rest of the mas\u2018ā. Seven laps ending at Marwa, and the standing duʿā at both ends, are unchanged." },
+            { id: "w-halq", by: null, t: "Taqṣīr at the end",
+              source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              d: "DRAFT FOR REVIEW. The head is not shaved. A little over an inch is taken from the end of the plait, and with that iḥrām ends and its restrictions lift." },
           ],
         },
         {
