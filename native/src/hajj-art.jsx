@@ -31,9 +31,22 @@
  * picture added here gets the same treatment before it ships. No check can
  * catch a face, so this is on whoever adds the picture.
  *
- * The women's section gets no picture at all, deliberately. There is no
- * special garment, so a picture of one would contradict the entry it sat
- * under.
+ * THE WOMEN'S PICTURE SHOWS NO FACE BY FRAMING, not by blurring. The man's
+ * is blurred because he is photographed from the front; hers is taken from
+ * behind at three-quarters, so there is no face in the frame to remove. That
+ * is the better answer where the composition allows it — a blur is a repair,
+ * and a repair can be undone by whoever next re-exports the asset.
+ *
+ * It carries no special garment, because there is none: what it shows is
+ * ordinary clothing, loose and full length, with the head covered. The marks
+ * name what is in the picture and the entry beside it carries the ruling.
+ *
+ * There is no second picture of the face screen. Three drafts of a side-view
+ * diagram were drawn and all three read as an object rather than a head and
+ * a cloth — and a head drawn in profile with a nose and a chin on it is a
+ * face, however few lines it takes, so the honest versions were the ones
+ * that would not have been allowed anyway. The i-w-face entry describes the
+ * arrangement in words instead.
  *
  * index.html's HJ_ART is the same set, and check-hajj.mjs asserts that every
  * id the content names exists on both platforms and that every file it points
@@ -130,6 +143,8 @@ const ART = {
   ihramBelt:     { el: <Image source={require("../assets/ihram-belt.jpg")} style={fill} />,
                    aspect: 1024 / 688 },
   mataf:         { el: <MaTafPlan />, aspect: 1, drawn: true },
+  womenWorn:     { el: <Image source={require("../assets/ihram-women.jpg")} style={fill} />,
+                   aspect: 688 / 1024 },
 };
 
 /* A numbered dot, on the picture and again beside its line in the key. Gold

@@ -364,6 +364,21 @@ window.HAJJ = {
         {
           id: "ihram-women",
           title: "For women",
+          /* Photographed from behind so there is no face in the frame to
+             remove — see the note at the head of native/src/hajj-art.jsx.
+             The marks name what the picture shows and nothing else; the
+             entries beside it carry the fiqh, and check-hajj.mjs rejects a
+             label here that reads like a ruling. */
+          art: {
+            id: "womenWorn",
+            cap: "Loose, full length, with the head covered. Nothing in this picture is a special garment.",
+            marks: [
+              { n: 1, x: 0.500, y: 0.140, t: "The head and the hair are covered." },
+              { n: 2, x: 0.625, y: 0.530, t: "The sleeve reaches the wrist." },
+              { n: 3, x: 0.395, y: 0.660, t: "The garment hangs straight, without following the shape of the body." },
+              { n: 4, x: 0.470, y: 0.900, t: "The hem reaches the floor." },
+            ],
+          },
           items: [
             { id: "i-w-dress", by: null, verdict: "allowed", t: "Ordinary modest clothing",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
