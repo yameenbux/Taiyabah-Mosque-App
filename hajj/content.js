@@ -385,6 +385,19 @@ window.HAJJ = {
               d: "DRAFT FOR REVIEW. There is no special garment. Stitched clothing is worn as usual, covering as it normally would, and the colour is not fixed. Iḥrām as a garment is a men\u2019s matter; a woman enters iḥrām in what she would ordinarily wear." },
             { id: "i-w-face", by: null, verdict: "avoid", t: "The face is not covered by cloth resting on it",
               source: "Islāmic Daʿwah Academy, How to Perform Umrah",
+              /* The item itself, on a plain block — see the note at the head
+                 of native/src/hajj-art.jsx for why it is not shown worn. The
+                 marks name what is in the frame; the entry carries the fiqh. */
+              art: {
+                id: "faceScreen",
+                cap: "The item on a plain display block. The brim carries the veil forward, so the cloth hangs away from whatever is beneath it.",
+                marks: [
+                  { n: 1, x: 0.330, y: 0.140, t: "The cap, wrapped over the crown." },
+                  { n: 2, x: 0.540, y: 0.200, t: "A stiffened brim reaches forward from the front edge." },
+                  { n: 3, x: 0.620, y: 0.520, t: "The veil hangs from the outer rim of that brim." },
+                  { n: 4, x: 0.490, y: 0.650, t: "It falls with a gap, touching nothing beneath it." },
+                ],
+              },
               d: "DRAFT FOR REVIEW. A woman in iḥrām does not cover her face in the way a niqāb rests on it. Where men are present it is covered by a screen held clear of the face — the usual arrangement is a cap or a stiffened band that carries the cloth forward so nothing touches. The ʿulamā should describe what is actually done, not only the principle, because this is bought before flying." },
             { id: "i-w-hands", by: null, verdict: "allowed", t: "Hands and feet",
               d: "DRAFT FOR REVIEW. Still open. The restriction on a woman in iḥrām is the face, and the hands and feet are not treated the same way — but whether gloves and socks may be worn, and whether that changes during ṭawāf, is the ʿulamā\u2019s to state. The guide this branch was drafted from does not address it." },

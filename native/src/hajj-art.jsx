@@ -41,12 +41,18 @@
  * ordinary clothing, loose and full length, with the head covered. The marks
  * name what is in the picture and the entry beside it carries the ruling.
  *
- * There is no second picture of the face screen. Three drafts of a side-view
- * diagram were drawn and all three read as an object rather than a head and
- * a cloth — and a head drawn in profile with a nose and a chin on it is a
- * face, however few lines it takes, so the honest versions were the ones
- * that would not have been allowed anyway. The i-w-face entry describes the
- * arrangement in words instead.
+ * THE FACE SCREEN IS PHOTOGRAPHED AS AN OBJECT, on a plain wooden block.
+ * It is the thing pilgrims from this community buy wrong, so it earns a
+ * picture, but every way of showing it worn runs into the same wall: a head
+ * form has a nose and a chin on it, and that is a face however little else
+ * is there. Three side-view diagrams were drawn before this and all three
+ * read as a lamp rather than as a head and a cloth; the drafts that would
+ * have read properly are exactly the ones the masjid's rule forbids.
+ *
+ * A featureless cylinder solves it. The veil needs something to hang CLEAR
+ * of or the gap — the entire point of the item — cannot be seen, which is
+ * why the version photographed with no block at all was rejected: it read
+ * as a hat floating in the dark.
  *
  * index.html's HJ_ART is the same set, and check-hajj.mjs asserts that every
  * id the content names exists on both platforms and that every file it points
@@ -145,6 +151,8 @@ const ART = {
   mataf:         { el: <MaTafPlan />, aspect: 1, drawn: true },
   womenWorn:     { el: <Image source={require("../assets/ihram-women.jpg")} style={fill} />,
                    aspect: 688 / 1024 },
+  faceScreen:    { el: <Image source={require("../assets/face-screen.jpg")} style={fill} />,
+                   aspect: 1024 / 688 },
 };
 
 /* A numbered dot, on the picture and again beside its line in the key. Gold
