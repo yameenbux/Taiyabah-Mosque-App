@@ -280,10 +280,11 @@ window.HAJJ = {
         {
           id: "ihram-men",
           title: "For men",
-          /* A drawing of the CLOTH, not of a man wearing it. See the note at
-             the head of native/src/hajj-art.jsx for why, and for why nothing
-             drawn in this section carries a verdict. */
-          art: { id: "cloth", cap: "The izār and the ridāʾ, before they are worn." },
+          /* How the two cloths are actually worn, which is the thing a
+             first-time pilgrim cannot picture from words. The note at the
+             head of native/src/hajj-art.jsx says where the picture came from
+             and why nothing in this section carries a verdict. */
+          art: { id: "worn", cap: "The izār at the waist and the ridāʾ over the shoulder." },
           items: [
             { id: "i-m-dress", by: null, verdict: "allowed", t: "Two unstitched sheets",
               d: "DRAFT FOR REVIEW. An izār around the lower body and a ridāʾ over the upper, both unstitched and ordinarily white. Nothing sewn to the shape of the body is worn." },

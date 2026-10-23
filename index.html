@@ -1222,6 +1222,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      note at its head says why none of them contains a person and why none of
      them carries a verdict. */
   .hj-art{margin-top:13px;padding:18px 16px}
+  /* A photograph already carries the section's own plum ground, so a frosted
+     card around it would draw a second edge inside the first. */
+  .hj-photo{margin-top:13px}
+  .hj-photo img{width:100%;height:auto;display:block;border-radius:18px}
   .hj-art svg{width:100%;height:auto;display:block}
   .hj-artcap{font-size:calc(11.5px * var(--ts));line-height:1.5;color:var(--hj-ink-faint);
     text-align:center;margin:11px 0 0}
@@ -11342,21 +11346,7 @@ function closeHajjCount(){ document.getElementById("hajjcount").dataset.open="0"
    to be diffable by eye. check-hajj.mjs asserts both sides carry every id the
    content names, so a typo fails the build instead of leaving a gap. */
 const HJ_ART = {
-  cloth: '<svg viewBox="0 0 300 214" fill="none" stroke="var(--hj-gold)" stroke-width="1.6"'
-    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    + '<g fill="var(--hj-gold)" fill-opacity=".06" stroke="none">'
-    + '<path d="M22 28 Q74 20 126 26 Q137 110 131 190 Q102 176 72 190 Q45 202 19 190 Q14 108 22 28Z"/>'
-    + '<path d="M174 28 Q224 20 276 26 Q285 100 279 168 Q252 156 227 168 Q202 180 178 168 Q170 98 174 28Z"/></g>'
-    + '<path d="M22 28 Q74 20 126 26"/><path d="M22 28 Q14 108 19 190"/>'
-    + '<path d="M126 26 Q137 110 131 190"/><path d="M19 190 Q45 202 72 190 Q102 176 131 190"/>'
-    + '<path d="M48 25 Q38 110 43 196" stroke-opacity=".42"/>'
-    + '<path d="M74 22 Q72 108 72 190" stroke-opacity=".25"/>'
-    + '<path d="M100 24 Q108 110 103 182" stroke-opacity=".42"/>'
-    + '<path d="M174 28 Q224 20 276 26"/><path d="M174 28 Q170 98 178 168"/>'
-    + '<path d="M276 26 Q285 100 279 168"/><path d="M178 168 Q202 180 227 168 Q252 156 279 168"/>'
-    + '<path d="M198 25 Q190 98 195 174" stroke-opacity=".42"/>'
-    + '<path d="M226 22 Q224 96 225 170" stroke-opacity=".25"/>'
-    + '<path d="M254 24 Q261 98 256 162" stroke-opacity=".42"/></svg>',
+  worn: '<img src="hajj/ihram.jpg" alt="" width="688" height="1008">',
   instep: '<svg viewBox="26 -2 222 144" fill="none" stroke="var(--hj-gold)" stroke-width="1.6"'
     + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
     + '<path d="M64 0 Q59 34 57 60 Q49 80 51 96 Q53 110 68 112"/>'
@@ -11368,13 +11358,15 @@ const HJ_ART = {
     + '<path d="M196 100 Q201 100 204 103"/>'
     + '<path d="M110 63 Q132 72 158 82" stroke-width="4.5" stroke-opacity=".95"/></svg>',
 };
-/* `inner` wraps it in a panel of its own; an item draws it bare, inside the
-   card it belongs to. */
+/* A drawing gets a panel of its own; a photograph gets none, and an item
+   draws either one bare inside the card it belongs to. */
 function hjArtHtml(art, inner){
   if(!art || !HJ_ART[art.id]) return "";
+  const photo = HJ_ART[art.id].startsWith("<img");
   const body = HJ_ART[art.id]
     + (art.cap ? `<p class="hj-artcap">${esc(art.cap)}</p>` : "");
-  return inner ? `<div style="margin-top:14px">${body}</div>`
+  if(inner) return `<div style="margin-top:14px">${body}</div>`;
+  return photo ? `<div class="hj-photo">${body}</div>`
                : `<div class="hj-panel hj-art">${body}</div>`;
 }
 

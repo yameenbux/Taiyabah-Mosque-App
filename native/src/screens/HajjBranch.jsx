@@ -141,11 +141,9 @@ export default function HajjBranch({ route }) {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
                            color: HJ.inkFaint, marginTop: 7, textAlign: align }}>{s.lead}</Text>)}
           {/* A drawing belonging to the whole section sits above its items,
-              where it can be looked at once and then read past. */}
-          {!!s.art && (
-            <Panel style={{ marginTop: 13, paddingVertical: 18 }}>
-              <HajjArt art={s.art} />
-            </Panel>)}
+              where it can be looked at once and then read past. HajjArt wears
+              its own frame — a panel for a drawing, none for a photograph. */}
+          {!!s.art && <HajjArt art={s.art} style={{ marginTop: 13 }} />}
 
           {s.items.map((item, ii) => {
             const v = VERDICT[item.verdict];

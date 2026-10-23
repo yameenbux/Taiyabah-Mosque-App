@@ -124,8 +124,8 @@ for (const b of branches)
   }
 const nativeArt = fs.readFileSync(path.join(here, "src/hajj-art.jsx"), "utf8");
 const nativeIds = [...nativeArt.matchAll(/^\s{2}(\w+):\s*\{\s*el:/gm)].map(m => m[1]);
-const webIds = [...(web.match(/const HJ_ART = \{[\s\S]*?\n\};/) || [""])[0]
-                 .matchAll(/^\s{2}(\w+):\s/gm)].map(m => m[1]);
+const webArt = (web.match(/const HJ_ART = \{[\s\S]*?\n\};/) || [""])[0];
+const webIds = [...webArt.matchAll(/^\s{2}(\w+):\s/gm)].map(m => m[1]);
 ok(nativeIds.length > 0, "hajj-art.jsx declares no drawings — the ART map did not parse");
 ok(webIds.length > 0, "index.html declares no drawings — HJ_ART did not parse");
 for (const [where, art] of arts) {
@@ -138,6 +138,17 @@ for (const [where, art] of arts) {
   ok(typeof art.cap === "string" && art.cap.trim().length > 0,
      `${where} has a drawing with no caption`);
 }
+/* A picture that points at a file nobody shipped is silent on the website —
+ * a broken image icon in a card — and a red build on the app. Both halves
+ * carry their own copy, so both are checked. */
+const files = [
+  ...[...nativeArt.matchAll(/require\("\.\.\/([^"]+)"\)/g)].map(m => ["app", path.join(here, m[1])]),
+  ...[...webArt.matchAll(/<img src="([^"]+)"/g)].map(m => ["website", path.join(here, "..", m[1])]),
+];
+ok(files.length > 0, "no picture files found on either platform — the scan did not parse");
+for (const [which, f] of files)
+  ok(fs.existsSync(f), `the ${which} points at ${path.relative(path.join(here, ".."), f)}, which is not in the repository`);
+
 /* The drawings must stay descriptive. Nothing in this section may assert a
    ruling the ʿulamā have not given, and a caption is the easiest place for
    one to creep in. */

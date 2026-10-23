@@ -1,67 +1,46 @@
-/* The drawings in the Hajj section.
+/* The drawings and pictures in the Hajj section.
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
- * WHY THERE IS NO PERSON IN ANY OF THEM. This is the masjid's own app, for a
- * community that would not thank us for a drawn human figure and certainly
- * not a face. So the iḥrām drawing is of the CLOTH, not of a man wearing it —
- * which is also the better illustration, because the question "what is
- * iḥrām?" is answered by the cloth. The first three attempts drew a figure
- * with the body left out and every one of them read as a dress.
+ * WHERE THE IḤRĀM PICTURE CAME FROM. The first version of this file drew the
+ * two cloths hanging, and no person at all — on the reasoning that a masjid's
+ * own app should not carry a drawn human figure. The masjid asked for the
+ * garment shown WORN, with references, because a first-time pilgrim cannot
+ * picture the arrangement from words. That is their call to make and this is
+ * it: a generated illustration, nobody real, commissioned to the section's
+ * own palette so it sits on the plum ground without a frame.
+ *
+ * Four hand-drawn attempts at a figure came before it and all four read as a
+ * man in a robe. The fault was technique, not patience: a drawing where the
+ * skin and the cloth are the same gold line cannot say which is which. Worth
+ * knowing before anyone tries to "simplify" this back to an SVG.
  *
  * WHY NOTHING HERE CARRIES A VERDICT. Every ruling in this section is an
- * unapproved draft until a scholar's name is on it, and a drawing that puts a
+ * unapproved draft until a scholar's name is on it, and a picture that puts a
  * tick on one sandal and a cross on another is a ruling — one nobody at the
  * masjid has made. So these are DESCRIPTIVE only: the instep drawing shows
- * where the instep IS, which is anatomy, and the sandal under it is drawn
- * plainly with no judgement attached. The entry's own words do the fiqh, and
- * they can be rewritten without the drawing becoming wrong.
+ * where the instep IS, which is anatomy, and the sandal under it is drawn in
+ * the shape the masjid supplied with no judgement attached. The entry's own
+ * words do the fiqh, and they can be rewritten without the picture becoming
+ * wrong. check-hajj.mjs rejects a caption that reads like a ruling.
  *
- * The women's section gets no drawing at all, deliberately. There is no
- * special garment, so a drawing of one would contradict the entry it sat
+ * The women's section gets no picture at all, deliberately. There is no
+ * special garment, so a picture of one would contradict the entry it sat
  * under.
  *
- * index.html's HJ_ART is the same set of paths. check-hajj.mjs asserts that
- * every art id the content names exists on both platforms, so a typo is a
- * failed build rather than a blank space on a phone.
+ * index.html's HJ_ART is the same set. check-hajj.mjs asserts that every id
+ * the content names exists on both platforms and that every picture file it
+ * points at is really there, so a typo is a failed build rather than a blank
+ * space on a phone.
  */
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import Svg, { Path, G } from "react-native-svg";
-import { F, HJ } from "./theme";
+import { F, R, HJ } from "./theme";
 import { useApp } from "./store";
+import { Panel } from "./hajj-ui";
 
 const GOLD = { stroke: HJ.gold, strokeWidth: 1.6, strokeLinecap: "round",
                strokeLinejoin: "round", fill: "none" };
-
-/* The izār and the ridāʾ, hanging. Two lengths of cloth and nothing else:
-   the fold lines and the uneven hem are what stop them reading as two
-   rectangles. */
-function Cloth() {
-  return (
-    <Svg width="100%" height="100%" viewBox="0 0 300 214">
-      {/* a breath of gold inside the outline, so they have weight — at 6% it
-          is not a fill you notice, only one you miss when it is gone */}
-      <G fill={HJ.gold} fillOpacity={0.06} stroke="none">
-        <Path d="M22 28 Q74 20 126 26 Q137 110 131 190 Q102 176 72 190 Q45 202 19 190 Q14 108 22 28Z" />
-        <Path d="M174 28 Q224 20 276 26 Q285 100 279 168 Q252 156 227 168 Q202 180 178 168 Q170 98 174 28Z" />
-      </G>
-      <Path {...GOLD} d="M22 28 Q74 20 126 26" />
-      <Path {...GOLD} d="M22 28 Q14 108 19 190" />
-      <Path {...GOLD} d="M126 26 Q137 110 131 190" />
-      <Path {...GOLD} d="M19 190 Q45 202 72 190 Q102 176 131 190" />
-      <Path {...GOLD} strokeOpacity={0.42} d="M48 25 Q38 110 43 196" />
-      <Path {...GOLD} strokeOpacity={0.25} d="M74 22 Q72 108 72 190" />
-      <Path {...GOLD} strokeOpacity={0.42} d="M100 24 Q108 110 103 182" />
-      <Path {...GOLD} d="M174 28 Q224 20 276 26" />
-      <Path {...GOLD} d="M174 28 Q170 98 178 168" />
-      <Path {...GOLD} d="M276 26 Q285 100 279 168" />
-      <Path {...GOLD} d="M178 168 Q202 180 227 168 Q252 156 279 168" />
-      <Path {...GOLD} strokeOpacity={0.42} d="M198 25 Q190 98 195 174" />
-      <Path {...GOLD} strokeOpacity={0.25} d="M226 22 Q224 96 225 170" />
-      <Path {...GOLD} strokeOpacity={0.42} d="M254 24 Q261 98 256 162" />
-    </Svg>
-  );
-}
 
 /* A foot in profile on a plain sandal. The thickened segment of the foot's
    own top line is the instep — drawn ON the foot rather than as a floating
@@ -93,11 +72,18 @@ function Instep() {
    the component: a component pulled out of a map and rendered as <Drawing/>
    is invisible to check-refs.mjs, which reads the source statically and
    cannot follow a variable — it reported this file as a screen that would
-   crash. Both drawings are pure and take no props, so there is nothing to
+   crash. The drawings are pure and take no props, so there is nothing to
    build per render anyway. The aspect lives here because React Native needs
-   the box before it can lay an SVG out. */
+   the box before it can lay an SVG or an image out.
+
+   `photo` marks the ones that are a picture rather than a drawing: they wear
+   no panel, because the illustration already carries the section's own plum
+   ground and a frosted card around it would draw a second edge inside the
+   first. */
 const ART = {
-  cloth:  { el: <Cloth />,  aspect: 300 / 214 },
+  worn:   { el: <Image source={require("../assets/ihram.jpg")}
+                       style={{ width: "100%", height: "100%", resizeMode: "cover" }} />,
+            aspect: 688 / 1008, photo: true },
   instep: { el: <Instep />, aspect: 222 / 144 },
 };
 
@@ -107,21 +93,22 @@ export default function HajjArt({ art, style }) {
   const { fs } = useApp();
   const entry = art && ART[art.id];
   if (!entry) return null;
-  return (
-    <View style={style}>
-      {/* The drawing is decoration beside words that already say it, so a
-          screen reader is given the caption and not the paths. */}
-      <View style={{ width: "100%", aspectRatio: entry.aspect }} accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants">
-        {entry.el}
-      </View>
-      {!!art.cap && (
-        <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(17),
-                       color: HJ.inkFaint, textAlign: "center", marginTop: 11 }}>
-          {art.cap}
-        </Text>)}
+  /* The drawing is decoration beside words that already say it, so a screen
+     reader is given the caption and not the paths. */
+  const box = (
+    <View style={{ width: "100%", aspectRatio: entry.aspect,
+                   borderRadius: entry.photo ? R.card : 0, overflow: "hidden" }}
+          accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      {entry.el}
     </View>
   );
+  const cap = !!art.cap && (
+    <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(17),
+                   color: HJ.inkFaint, textAlign: "center", marginTop: 11 }}>
+      {art.cap}
+    </Text>);
+  if (entry.photo) return <View style={style}>{box}{cap}</View>;
+  return <Panel style={[{ paddingVertical: 18 }, style]}>{box}{cap}</Panel>;
 }
 
 export const ART_IDS = Object.keys(ART);
