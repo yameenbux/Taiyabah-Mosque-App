@@ -31,9 +31,28 @@
  * picture added here gets the same treatment before it ships. No check can
  * catch a face, so this is on whoever adds the picture.
  *
- * The women's section gets no picture at all, deliberately. There is no
- * special garment, so a picture of one would contradict the entry it sat
- * under.
+ * THE WOMEN'S PICTURE SHOWS NO FACE BY FRAMING, not by blurring. The man's
+ * is blurred because he is photographed from the front; hers is taken from
+ * behind at three-quarters, so there is no face in the frame to remove. That
+ * is the better answer where the composition allows it — a blur is a repair,
+ * and a repair can be undone by whoever next re-exports the asset.
+ *
+ * It carries no special garment, because there is none: what it shows is
+ * ordinary clothing, loose and full length, with the head covered. The marks
+ * name what is in the picture and the entry beside it carries the ruling.
+ *
+ * THE FACE SCREEN IS PHOTOGRAPHED AS AN OBJECT, on a plain wooden block.
+ * It is the thing pilgrims from this community buy wrong, so it earns a
+ * picture, but every way of showing it worn runs into the same wall: a head
+ * form has a nose and a chin on it, and that is a face however little else
+ * is there. Three side-view diagrams were drawn before this and all three
+ * read as a lamp rather than as a head and a cloth; the drafts that would
+ * have read properly are exactly the ones the masjid's rule forbids.
+ *
+ * A featureless cylinder solves it. The veil needs something to hang CLEAR
+ * of or the gap — the entire point of the item — cannot be seen, which is
+ * why the version photographed with no block at all was rejected: it read
+ * as a hat floating in the dark.
  *
  * index.html's HJ_ART is the same set, and check-hajj.mjs asserts that every
  * id the content names exists on both platforms and that every file it points
@@ -130,6 +149,10 @@ const ART = {
   ihramBelt:     { el: <Image source={require("../assets/ihram-belt.jpg")} style={fill} />,
                    aspect: 1024 / 688 },
   mataf:         { el: <MaTafPlan />, aspect: 1, drawn: true },
+  womenWorn:     { el: <Image source={require("../assets/ihram-women.jpg")} style={fill} />,
+                   aspect: 688 / 1024 },
+  faceScreen:    { el: <Image source={require("../assets/face-screen.jpg")} style={fill} />,
+                   aspect: 1024 / 688 },
 };
 
 /* A numbered dot, on the picture and again beside its line in the key. Gold
