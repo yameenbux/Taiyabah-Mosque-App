@@ -41,10 +41,79 @@
  */
 import React from "react";
 import { View, Text, Image } from "react-native";
+import Svg, { Circle, Path, Rect, G } from "react-native-svg";
 import { F, R, HJ } from "./theme";
 import { useApp } from "./store";
 
 const fill = { width: "100%", height: "100%", resizeMode: "cover" };
+
+/* THE MAṬĀF, drawn rather than photographed.
+ *
+ * It is a plan of six shapes, so it is vector: a few hundred bytes that stay
+ * sharp at any size and recolour with the palette, where the generated
+ * bitmaps of the same thing came to 275KB and 639KB and still had to be
+ * keyed off their background.
+ *
+ * THE GEOGRAPHY IS THE POINT AND IT HAD BETTER BE RIGHT. Going anticlockwise
+ * from al-Ḥajar al-Aswad the corners are Aswad (bottom right here), ʿIrāqī
+ * (top right), Shāmī (top left), Yamānī (bottom left). The door is on the
+ * Aswad–ʿIrāqī wall with the Multazam between the stone and it. The Ḥaṭīm is
+ * on the ʿIrāqī–Shāmī wall — ADJACENT to the door wall, sharing the ʿIrāqī
+ * corner, not opposite it, which is what an earlier draft of this drawing had
+ * and what the masjid sent it back for.
+ *
+ * Two drawing decisions that are not taste. The box is near square because
+ * the Kaʿbah is, and a wide box under an arc stops reading as a plan and
+ * starts reading as a handbag. The Ḥaṭīm stands clear of both corners with
+ * its enclosure tinted, because the gaps at its ends are real and because an
+ * arc welded to the rectangle reads as a padlock — four drafts did.
+ *
+ * IT CARRIES NO WORDS. The numbers over it come from the entry's `marks` and
+ * the key under it from their labels, so it translates, it cannot clip, and
+ * the drawing itself asserts nothing.
+ *
+ * `full` is the plan: the maṭāf, its arrows and the Maqām. The dial takes the
+ * other one — the building, the Ḥaṭīm and the stone, centred and cropped in.
+ * Its own seven segments are already the circuit, and a landmark that is not
+ * the corner you are looking for is one more thing to read at 90pt. */
+const GOLD = HJ.gold, DIMLINE = "rgba(220,187,99,.45)";
+
+function Arrow({ deg, r }) {   /* tangential, anticlockwise */
+  return <Path d={`M-7 ${-r} L2 ${-r - 4.6} L2 ${-r + 4.6} Z`} fill={GOLD} opacity={0.9}
+               transform={`translate(100 100) rotate(${deg})`} />;
+}
+
+export function MaTafPlan({ full = true }) {
+  const r = 80;
+  /* The dial crops in to the building. The full box is framed for the maṭāf
+     ring, and reusing it there would leave a cube the size of a thumbnail in
+     the middle of a 276pt dial. */
+  return (
+    <Svg viewBox={full ? "8 8 184 184" : "56 54 88 88"} width="100%" height="100%">
+      {full && (
+        <G>
+          {/* the maṭāf — the floor walked on, not a line drawn round it */}
+          <Circle cx="100" cy="100" r={r} fill="none" stroke="rgba(220,187,99,.07)" strokeWidth={22} />
+          <Circle cx="100" cy="100" r={r} fill="none" stroke={DIMLINE} strokeWidth={1.2}
+                  strokeDasharray={[3, 6]} strokeLinecap="round" />
+          {[0, 90, 180, 270].map(d => <Arrow key={d} deg={d} r={r} />)}
+        </G>)}
+      {/* the line every circuit starts and ends on, out through the stone */}
+      <Path d={`M127 128 L${full ? "157 157" : "148 149"}`} stroke={GOLD} strokeWidth={1.2}
+            strokeDasharray={[2.5, 4]} opacity={0.75} />
+      <Path d="M84 73 A16 16 0 0 1 116 73 L116 77 L84 77 Z" fill="rgba(220,187,99,.13)" />
+      <Path d="M84 73 a16 16 0 0 1 32 0" fill="none" stroke={GOLD}
+            strokeWidth={1.6} strokeLinecap="round" />
+      <Rect x="73" y="76" width="54" height="52" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
+      <Path d="M73 90 H127" stroke={GOLD} strokeWidth={2.4} opacity={0.45} />
+      <Path d="M127 101 L127 114" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
+      {full && <Rect x="152" y="92" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
+      {[[73, 76], [127, 76], [73, 128], [127, 128]].map(([x, y]) =>
+        <Circle key={`${x}-${y}`} cx={x} cy={y} r={2.4} fill={GOLD} opacity={0.55} />)}
+      <Circle cx="127" cy="128" r={7} fill={GOLD} />
+    </Svg>
+  );
+}
 
 /* id -> the element and the shape of its box. The ELEMENT rather than the
    component: a component pulled out of a map and rendered as <Drawing/> is
@@ -60,6 +129,7 @@ const ART = {
                    aspect: 1024 / 688 },
   ihramBelt:     { el: <Image source={require("../assets/ihram-belt.jpg")} style={fill} />,
                    aspect: 1024 / 688 },
+  mataf:         { el: <MaTafPlan />, aspect: 1, drawn: true },
 };
 
 /* A numbered dot, on the picture and again beside its line in the key. Gold

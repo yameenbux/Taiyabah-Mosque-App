@@ -43,6 +43,7 @@ const ALLOWED = {
   "#7A2A18": "the funeral panel, solid dark red by design in both themes",
   "#5A1D10": "the same panel's lower stop",
   "#0C3B2A": "the Kaʿbah tile on the compass dial — a drawn object",
+  "#190511": "the Kaʿbah's own fill in the maṭāf plan — a drawn object, never text",
   "#4B3542": "the volume slider's unfilled track, which sits on the dark hero",
   "#3F7D58": "the free/open marker — a border, a dot and a key swatch, never text",
   "#C25B5B": "the 'Closed' key swatch, a square of colour beside its label",

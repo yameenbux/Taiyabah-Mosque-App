@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "cf5c0a31e2c2",
+ "version": "4f13f2731468",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -2093,7 +2093,6 @@ window.LANG_PACK = {
   "ramadan.hours": "કલાક",
   "ramadan.minutes": "મિનિટ",
   "hajj.packed_count": "{b} માંથી {a} મૂકી દીધા",
-  "hajj.n_entries": "{n} નોંધો",
   "hajj.what_is_ready": "મુસાફરી માટે મસ્જિદ પાસે જે તૈયાર છે, હરમમાં સિગ્નલ વગર પણ ચાલે છે.",
   "hajj.what_you_carry": "તમે તમારી સાથે શું લઈ જાઓ છો",
   "hajj.approved_by_ulama": "અહીંનો દરેક મસઅલો મસ્જિદના ઉલમાએ તપાસીને મંજૂર કર્યો છે.",
@@ -2132,7 +2131,6 @@ window.LANG_PACK = {
   "hajj.checked_by_ulama": "દરેક મસઅલો અહીં આવતા પહેલાં મસ્જિદના ઉલમા દ્વારા તપાસીને મંજૂર કરવામાં આવશે.",
   "hajj.until_then": "ત્યાં સુધી",
   "hajj.the_dua_book": "દુઆની ચોપડી",
-  "hajj.ask_the_ulama": "ઉલમાને પૂછો",
-  "hajj.tap_the_dial": "ડાયલ પર ટૅપ કરો. ફોન બંધ થઈ જાય તો પણ ગણતરી સચવાઈ રહે છે."
+  "hajj.ask_the_ulama": "ઉલમાને પૂછો"
  }
 };
