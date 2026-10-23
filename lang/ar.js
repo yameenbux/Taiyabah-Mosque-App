@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "d9bcc819c004",
+ "version": "531185e32b02",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -2132,6 +2132,7 @@ window.LANG_PACK = {
   "hajj.checked_by_ulama": "كُلُّ حُكْمٍ سَيُرَاجَعُ وَيُعْتَمَدُ مِنْ عُلَمَاءِ الْمَسْجِدِ قَبْلَ ظُهُورِهِ هُنَا.",
   "hajj.until_then": "حَتَّى ذَلِكَ الْحِين",
   "hajj.the_dua_book": "كِتَابُ الْأَدْعِيَة",
-  "hajj.ask_the_ulama": "اِسْأَلِ الْعُلَمَاء"
+  "hajj.ask_the_ulama": "اِسْأَلِ الْعُلَمَاء",
+  "hajj.tap_the_dial": "اِنْقُرْ عَلَى الْقُرْص. يُحْفَظُ الْعَدُّ حَتَّى إِنْ تَوَقَّفَ الْهَاتِف."
  }
 };

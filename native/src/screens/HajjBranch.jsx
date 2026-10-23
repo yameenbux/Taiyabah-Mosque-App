@@ -1,5 +1,6 @@
 /* One branch of the Hajj section — packing, heat, paperwork, iḥrām, the
  * rites, the duʿās, coming home.
+ * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
  * ONE SCREEN FOR ALL OF THEM, because they differ in what an entry carries,
  * not in how a person moves through them: a lead, then sections, then items.
@@ -14,36 +15,41 @@
  * THE PACKING LIST TICKS, and it saves on every tap rather than on leaving.
  * Somebody packs a case over a week, in four sittings, at eleven at night.
  * A list that forgets is worse than a list on paper.
+ *
+ * MISHKĀT. Same lamp, same frosted panels as the section front — the ticked
+ * item is the one thing that goes gold, because on this ground a tick that
+ * went plum would vanish.
  */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { View, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Svg, { Path } from "react-native-svg";
-import { C, F, R } from "../theme";
+import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
-import { Screen, Press } from "../ui";
+import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip } from "../hajj-ui";
 import { visibleSections } from "../hajj";
 import { branchById } from "../hajj-data";
 
 const KEY = "taiyabah.hajj.packed";
 
-/* Three verdicts, and only "dam" takes a colour — the same rule the tiles on
+/* Three verdicts, and only "dam" takes a colour — the same rule the panels on
    the section front follow, so the two cannot drift apart. */
 const VERDICT = {
-  allowed: { k: "hajj.allowed", en: "Allowed",  ink: () => C.ink,         bg: () => C.tintGreen, line: () => C.line },
-  avoid:   { k: "hajj.avoid",   en: "Avoid",    ink: () => C.ink,         bg: () => C.tintGold,  line: () => C.line },
-  dam:     { k: "hajj.dam_due", en: "Dam due",  ink: () => C.tintRoseInk, bg: () => C.tintRose,  line: () => C.tintRoseLine },
+  allowed: { k: "hajj.allowed", en: "Allowed", tone: "plain" },
+  avoid:   { k: "hajj.avoid",   en: "Avoid",   tone: "gold"  },
+  dam:     { k: "hajj.dam_due", en: "Dam due", tone: "warn"  },
 };
 
 function Tick({ on }) {
   return (
-    <View style={{ width: 24, height: 24, borderRadius: 7, alignItems: "center", justifyContent: "center",
-                   borderWidth: on ? 0 : 1.5, borderColor: C.line,
-                   backgroundColor: on ? C.brand600 : "transparent" }}>
+    <View style={{ width: 25, height: 25, borderRadius: 8, alignItems: "center",
+                   justifyContent: "center", borderWidth: on ? 0 : 1.5,
+                   borderColor: HJ.panelLine,
+                   backgroundColor: on ? HJ.gold : "transparent" }}>
       {on && (
-        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={C.cream}
-             strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={HJ.groundMid}
+             strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round">
           <Path d="M20 6 9 17l-5-5" />
         </Svg>
       )}
@@ -80,11 +86,11 @@ export default function HajjBranch({ route }) {
 
   if (!branch)
     return (
-      <Screen top={28}>
-        <Text style={{ fontFamily: F.display, fontSize: fs(22), color: C.ink, textAlign: "center" }}>
+      <HajjScreen top={30}>
+        <Text style={{ fontFamily: F.display, fontSize: fs(22), color: HJ.ink, textAlign: "center" }}>
           {t("hajj.nothing_here_yet", "Nothing here yet")}
         </Text>
-      </Screen>
+      </HajjScreen>
     );
 
   /* Empty is not what the public sees — the gate keeps a branch with nothing
@@ -92,44 +98,47 @@ export default function HajjBranch({ route }) {
      navigated straight to the route, and it names what is missing. */
   if (!sections.length)
     return (
-      <Screen top={28}>
-        <Text style={{ fontFamily: F.display, fontSize: fs(22), lineHeight: fs(28), color: C.ink,
+      <HajjScreen top={30}>
+        <Text style={{ fontFamily: F.display, fontSize: fs(22), lineHeight: fs(28), color: HJ.ink,
                        textAlign: "center" }}>
           {t("hajj.nothing_here_yet", "Nothing here yet")}
         </Text>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21), color: C.muted,
-                       textAlign: "center", marginTop: 10 }}>
+        <HajjLead center>
           {t("hajj.awaiting_ulama",
              "This section is waiting on the ʿulamā at the masjid. Until it arrives, the section stays shut.")}
-        </Text>
-      </Screen>
+        </HajjLead>
+      </HajjScreen>
     );
 
-  const total = sections.flatMap(s => s.items).filter(i => i.pack).length;
-  const done = sections.flatMap(s => s.items).filter(i => i.pack && packed[i.id]).length;
+  const all = sections.flatMap(s => s.items);
+  const total = all.filter(i => i.pack).length;
+  const done = all.filter(i => i.pack && packed[i.id]).length;
 
   return (
-    <Screen top={16}>
-      {!!branch.lead && (
-        <Text style={{ fontFamily: F.sans, fontSize: fs(14.5), lineHeight: fs(23), color: C.muted,
-                       textAlign: align }}>{branch.lead}</Text>)}
+    <HajjScreen top={16}>
+      {!!branch.lead && <HajjLead>{branch.lead}</HajjLead>}
 
       {/* A count, not a progress bar: it is a case being packed, not a task
-          being completed, and a bar implies a deadline nobody set. */}
+          being completed, and a bar implies a deadline nobody set. The ring
+          of pips is the same glance the counter's dial gives. */}
       {total > 0 && (
-        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), letterSpacing: 0.6, color: C.goldInk,
-                       marginTop: 12, textAlign: align }}>
-          {t("hajj.packed_count", "{a} of {b} packed")
-            .replace("{a}", String(done)).replace("{b}", String(total))}
-        </Text>)}
+        <Panel tone="gold" style={{ marginTop: 16, paddingVertical: 13,
+                                    flexDirection: rtl ? "row-reverse" : "row",
+                                    alignItems: "center", gap: 12 }}>
+          <Text style={{ fontFamily: F.display, fontSize: fs(26), color: HJ.ink }}>{done}</Text>
+          <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(12.5), letterSpacing: 0.6,
+                         color: HJ.inkSoft, textAlign: align }}>
+            {t("hajj.packed_count", "{a} of {b} packed")
+              .replace("{a}", String(done)).replace("{b}", String(total))}
+          </Text>
+        </Panel>)}
 
       {sections.map((s, si) => (
-        <View key={s.id} style={{ marginTop: si === 0 ? 20 : 26 }}>
-          <Text style={{ fontFamily: F.display, fontSize: fs(19), lineHeight: fs(25), color: C.ink,
-                         textAlign: align }}>{s.title}</Text>
+        <View key={s.id} style={{ marginTop: si === 0 ? 22 : 28 }}>
+          <HajjKicker>{s.title}</HajjKicker>
           {!!s.lead && (
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5), color: C.muted,
-                           marginTop: 6, textAlign: align }}>{s.lead}</Text>)}
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
+                           color: HJ.inkFaint, marginTop: 7, textAlign: align }}>{s.lead}</Text>)}
 
           {s.items.map((item, ii) => {
             const v = VERDICT[item.verdict];
@@ -139,56 +148,55 @@ export default function HajjBranch({ route }) {
             const body = (
               <>
                 {!!item.ar && (
-                  <Text style={{ fontFamily: F.arabic, fontSize: fs(22), lineHeight: fs(42), color: C.ink,
-                                 textAlign: "right", writingDirection: "rtl" }}>{item.ar}</Text>)}
+                  <Text style={{ fontFamily: F.arabic, fontSize: fs(22), lineHeight: fs(42),
+                                 color: HJ.ink, textAlign: "right", writingDirection: "rtl" }}>
+                    {item.ar}
+                  </Text>)}
                 {!!item.tr && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), lineHeight: fs(21),
-                                 color: C.brand600, marginTop: 6, textAlign: align }}>{item.tr}</Text>)}
+                                 color: HJ.gold, marginTop: 6, textAlign: align }}>{item.tr}</Text>)}
                 {!!v && (
-                  <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", borderWidth: 1,
-                                 borderColor: v.line(), backgroundColor: v.bg(), borderRadius: 7,
-                                 paddingHorizontal: 7, paddingVertical: 3, marginBottom: 8 }}>
-                    <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.6,
-                                   textTransform: "uppercase", color: v.ink() }}>{t(v.k, v.en)}</Text>
+                  <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginBottom: 9 }}>
+                    <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
                   </View>)}
-                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21),
-                               color: on ? C.muted : C.ink, textAlign: align,
+                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21.5),
+                               color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
                                textDecorationLine: on ? "line-through" : "none" }}>
                   {item.n ? `${item.n}. ` : ""}{item.t}
                 </Text>
                 {!!item.d && (
-                  <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5), color: C.muted,
-                                 marginTop: 4, textAlign: align }}>{item.d}</Text>)}
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
+                                 color: HJ.inkSoft, marginTop: 5, textAlign: align }}>{item.d}</Text>)}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
-                                 color: C.goldInk, marginTop: 7, textAlign: align }}>{item.when}</Text>)}
+                                 color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}
                 {!!src && (
-                  <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(17), color: C.muted,
-                                 marginTop: 8, textAlign: align }}>{src}</Text>)}
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(17),
+                                 color: HJ.inkFaint, marginTop: 9, textAlign: align }}>{src}</Text>)}
               </>
             );
 
-            const card = {
-              backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: R.card,
-              padding: 15, marginTop: ii === 0 ? 12 : 10,
-            };
+            /* A dam entry wears the warn panel, so the one thing on the screen
+               that costs money looks different from across the room. */
+            const tone = v && v.tone === "warn" ? "warn" : "plain";
+            const gap = { marginTop: ii === 0 ? 13 : 10 };
 
             if (!item.pack)
-              return <View key={item.id} style={card}>{body}</View>;
+              return <Panel key={item.id} tone={tone} style={gap}>{body}</Panel>;
 
             return (
-              <Press key={item.id} onPress={toggle(item.id)} dim={false}
+              <Panel key={item.id} tone={tone} onPress={toggle(item.id)}
                      accessibilityRole="checkbox" accessibilityState={{ checked: on }}
                      accessibilityLabel={item.t}
-                     style={[card, { flexDirection: rtl ? "row-reverse" : "row", gap: 12,
-                                     alignItems: "flex-start" }]}>
+                     style={[gap, { flexDirection: rtl ? "row-reverse" : "row", gap: 12,
+                                    alignItems: "flex-start" }]}>
                 <View style={{ paddingTop: 1 }}><Tick on={on} /></View>
                 <View style={{ flex: 1 }}>{body}</View>
-              </Press>
+              </Panel>
             );
           })}
         </View>
       ))}
-    </Screen>
+    </HajjScreen>
   );
 }

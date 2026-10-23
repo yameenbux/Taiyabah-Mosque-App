@@ -19,7 +19,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { C, F } from "./theme";
+import { C, F, HJ } from "./theme";
 import { COLUMN } from "./layout";
 import { tabBarFor, LABEL } from "./chrome";
 import { AppProvider, useApp } from "./store";
@@ -288,6 +288,12 @@ function Root() {
    * society's name and the bell — not a sheet header. They draw their own. */
   const page = { headerShown: false, contentStyle: { backgroundColor: C.paper } };
   const pushed = sheet, bare = sheet;
+  /* Hajj & Umrah is the one dark place in the app, and it is dark whatever
+     the phone's theme says — so its screens must not be handed the paper
+     background underneath. Without this the push animation slides a cream
+     card in and the section paints over it a frame later, which reads as a
+     flash every single time the section is opened. */
+  const hajj = { ...sheet, contentStyle: { backgroundColor: HJ.ground } };
 
   return (
     /* Keyed on the language so a switch rebuilds every title, in every stack,
@@ -330,12 +336,12 @@ function Root() {
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
         <Stack.Screen name="Ramadan"   component={Ramadan}   options={{ ...bare, title: t("ramadan.ramadan", "Ramadan") }} />
-        <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...pushed, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
-        <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...pushed, title: t("hajj.the_counters", "The counters") }} />
+        <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...hajj, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
+        <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...hajj, title: t("hajj.the_counters", "The counters") }} />
         {/* One screen for every branch, so the title comes from the data
             rather than from eight near-identical route registrations. */}
         <Stack.Screen name="HajjBranch" component={HajjBranch}
-          options={({ route }) => ({ ...pushed,
+          options={({ route }) => ({ ...hajj,
             title: (branchById(route?.params?.branch) || {}).title
                 || t("marriage.hajj_umrah", "Hajj / Umrah") })} />
         <Stack.Screen name="Holidays"  component={Holidays}  options={{ ...sheet, title: t("hol.holiday_planner", "Holiday Planner") }} />

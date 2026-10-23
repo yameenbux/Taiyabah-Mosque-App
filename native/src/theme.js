@@ -204,6 +204,52 @@ export const SHADOW = new Proxy({}, {
   has: (_, k) => k in SHADOWS[MODE],
 });
 
+/* ---- MISHKĀT: the Hajj & Umrah section, and only that section ----
+ *
+ * A THIRD PALETTE, and it does not switch. The app has light and dark; this
+ * is neither. The Hajj section is always this, the way the Ramadan guard is
+ * always plum whatever the setting — the dark is the section's identity, not
+ * a reading of the phone.
+ *
+ * Every pair below was MEASURED against both ends of the gradient, composited
+ * through the translucent panels rather than guessed at, and check-hajj.mjs
+ * re-measures them. Two values are where they are because of it: body ink sits
+ * at 0.70 rather than 0.62, which is what the gold counters tile needs
+ * (4.43:1 against 5.34:1), and the faint line at 0.60 rather than 0.45, which
+ * was 3.63:1 and would have been the society's own name, unreadable.
+ *
+ * WHY THESE ARE TOKENS. check-contrast.mjs reads every hex literal in the
+ * source and measures it against the dark card, with an allowlist. A section
+ * palette written as literals would be twenty entries on that list, each
+ * needing a reason that is really the same reason. Named here once instead.
+ */
+export const HJ = {
+  /* the ground, top to bottom */
+  groundTop: "#4B1136",
+  groundMid: "#3C0B2A",
+  ground:    "#1B0613",
+  /* the lamp. One warm source; everything else is lit by it. */
+  glow:      "rgba(198,162,76,0.30)",
+  glowSoft:  "rgba(198,162,76,0.00)",
+  /* frosted panels: a cream film, a hairline, and a highlight along the top */
+  panel:     "rgba(243,239,227,0.07)",
+  panelLine: "rgba(243,239,227,0.13)",
+  panelHi:   "rgba(243,239,227,0.14)",
+  /* the one panel that is lit rather than frosted */
+  goldPanel: "rgba(220,187,99,0.13)",
+  goldLine:  "rgba(220,187,99,0.30)",
+  goldFill:  "rgba(220,187,99,0.17)",
+  /* ink */
+  ink:       "#F3EFE3",
+  inkSoft:   "rgba(243,239,227,0.70)",   // measured: 5.34:1 on the gold panel
+  inkFaint:  "rgba(243,239,227,0.60)",   // measured: 4.53:1 on a panel
+  gold:      "#DCBB63",
+  /* dam, and only dam */
+  warn:      "#F0937A",
+  warnPanel: "rgba(240,147,122,0.10)",
+  warnLine:  "rgba(240,147,122,0.26)",
+};
+
 export const R = { card: 18, pill: 999, tile: 16 };
 
 /* The web app multiplies every size by --ts, defaulted to 1.12 because the

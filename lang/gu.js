@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "b9e8df8ba15c",
+ "version": "cf5c0a31e2c2",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -2132,6 +2132,7 @@ window.LANG_PACK = {
   "hajj.checked_by_ulama": "દરેક મસઅલો અહીં આવતા પહેલાં મસ્જિદના ઉલમા દ્વારા તપાસીને મંજૂર કરવામાં આવશે.",
   "hajj.until_then": "ત્યાં સુધી",
   "hajj.the_dua_book": "દુઆની ચોપડી",
-  "hajj.ask_the_ulama": "ઉલમાને પૂછો"
+  "hajj.ask_the_ulama": "ઉલમાને પૂછો",
+  "hajj.tap_the_dial": "ડાયલ પર ટૅપ કરો. ફોન બંધ થઈ જાય તો પણ ગણતરી સચવાઈ રહે છે."
  }
 };

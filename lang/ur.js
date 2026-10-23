@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "96d68f1edfc6",
+ "version": "ec65981e1aa4",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -2132,6 +2132,7 @@ window.LANG_PACK = {
   "hajj.checked_by_ulama": "ہر مسئلہ یہاں آنے سے پہلے مسجد کے علماء سے جانچ اور منظوری کے بعد ہی شامل کیا جائے گا۔",
   "hajj.until_then": "اس وقت تک",
   "hajj.the_dua_book": "دعاؤں کی کتاب",
-  "hajj.ask_the_ulama": "علماء سے پوچھیں"
+  "hajj.ask_the_ulama": "علماء سے پوچھیں",
+  "hajj.tap_the_dial": "ڈائل پر ٹیپ کریں۔ فون بند ہو جائے تو بھی شمار محفوظ رہتا ہے۔"
  }
 };
