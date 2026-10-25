@@ -30,6 +30,11 @@ const SCREENS = {
      both in one sheet. It was missing from this list while the app had only
      the guard, which is exactly the hole this check exists to find. */
   "ramadan": ["screens/Ramadan.jsx"],
+  /* Held, not absent. The sheet is locked on both platforms, so what it says
+     is mostly the locked state — and that is exactly the wording somebody
+     would forget to carry across, because nobody is reading it yet. */
+  "hajj": ["screens/Hajj.jsx"],
+  "hajjbranch": ["screens/HajjBranch.jsx"], "hajjcount": ["screens/HajjCounter.jsx"],
   "tab-qibla": ["screens/Qibla.jsx"], "tab-alerts": ["screens/Alerts.jsx"],
   "tab-donate": ["screens/Donate.jsx"], "tab-live": ["screens/Live.jsx"],
   "vids": ["screens/Videos.jsx"], "zakat": ["screens/Zakat.jsx"],
@@ -95,7 +100,12 @@ function sliceAt(open, tag) {
 }
 
 const anchors = [];
-for (const m of html.matchAll(/<div class="sheet" id="([\w-]+)"/g)) anchors.push([m.index, m[1], "div"]);
+/* `class="sheet …"`, not `class="sheet"`. A sheet that carries a second class
+   was invisible to this check — it matched the attribute exactly — and all
+   three that do are the Hajj ones (`sheet hj-sheet`). So the one section whose
+   wording nobody is reading yet was also the one section this could not see,
+   which is the worst pair of properties to have together. */
+for (const m of html.matchAll(/<div class="sheet(?:\s[^"]*)?" id="([\w-]+)"/g)) anchors.push([m.index, m[1], "div"]);
 for (const m of html.matchAll(/<main id="([\w-]+)"/g)) anchors.push([m.index, m[1], "main"]);
 anchors.sort((a, b) => a[0] - b[0]);
 
