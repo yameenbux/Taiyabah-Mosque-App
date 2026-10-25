@@ -161,6 +161,7 @@ const FIELDS = [
   ["itikaf.asks",               "it.asks"],
   ["fitrana.amount",            "fitrana.amount"],
   ["fitrana.note",              "fitrana.note"],
+  ["fitrana.payLink",           "fitrana.payLink"],
   ["eid.jamaats",               "eid.jamaats"],
   ["eid.venue",                 "eid.venue"],
   ["eid.note",                  "eid.note"],
@@ -282,7 +283,34 @@ for (const [what, src, name] of [["the app", screen, "onAirNow"], ["the website"
 ok("the app's Read goes to the muṣḥaf at a page", /go\("Mushaf", \{ page \}\)/.test(screen));
 ok("the website's does too", /openMushafAt\(/.test(html));
 
-/* ---- 6. the gate is asked once, in one place ------------------------- */
+/* ---- 6. the booking, and the two things that are not ours ----------- *
+ * The iʿtikāf form posts to a Postgres function and the fitrana button opens
+ * a Stripe Payment Link, and NEITHER EXISTS YET: the function is the masjid's
+ * database to create and the link is their Stripe account to create. Both are
+ * therefore built dark, and these assert they stay dark rather than offering
+ * a form that posts into nowhere or a button that opens nothing.
+ */
+ok("the app asks Postgres whether bookings are open", /itikafIsOpen\(\)/.test(screen));
+ok("the website asks the same function", /rpc\/itikaf_is_open/.test(html));
+ok("both post to the same function",
+   /rpc\("request_itikaf_place"/.test(screen) && /rpc\/request_itikaf_place/.test(html));
+ok("the app draws nothing until the answer is a definite yes",
+   /open !== true/.test(screen), "a three-valued probe must not be read as a boolean");
+ok("the website draws nothing until the same", /RM_BOOK\.open === true/.test(html));
+
+/* A Payment Link with no amount beside it is a button that asks for money
+   nobody has been told the size of. */
+ok("the app needs both a link and an amount", /payLink && RAMADAN\.fitrana\.amount/.test(screen));
+ok("the website needs both too", /payLink && C\.fitrana\.amount/.test(html));
+ok("neither is set yet, so neither button is drawn",
+   RAM.fitrana.payLink === null && RAM.fitrana.amount === null);
+
+/* "0 of 0 left" would read as fully booked. A null is not a zero. */
+ok("the app's booking stands down when places are unknown",
+   /left === null/.test(screen) && /it\.places == null \? null/.test(screen));
+ok("the website's does too", /\(it\.places == null\) \? null/.test(html));
+
+/* ---- 7. the gate is asked once, in one place ------------------------- */
 
 ok("the app asks ramadanAccess once", (screen.match(/ramadanAccess\(/g) || []).length === 1);
 ok("the app's month is behind that gate", /if \(access\.open\) return <Month/.test(screen));

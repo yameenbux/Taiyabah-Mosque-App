@@ -92,3 +92,45 @@ Two things on the drawn screens were not built, deliberately:
   The cushion won; Fajr is printed underneath it.
 - **The reminders toggle, the preparation tiles and the duʿā on the guard.**
   A screen that exists to say one thing should say one thing.
+
+## The two things the masjid has to create
+
+Both are built, and both are dark until somebody at the masjid does one thing.
+Neither needs an app release: the day the thing exists, the button appears on
+both platforms.
+
+### 1. iʿtikāf booking — two Postgres functions
+
+The form is written on both platforms and posts nowhere, because the database
+has no function to post to. It asks Postgres whether to show itself at all, so
+it is off by default and cannot be switched on by accident:
+
+| Function | What it must do |
+|---|---|
+| `itikaf_is_open()` | returns `true` when the committee is taking bookings. **Nothing is drawn until this answers true** — a missing function answers false, which is today. |
+| `request_itikaf_place(payload jsonb)` | takes `{masjid, name, phone, nights[]}`, holds the place, and returns `{reference}`. Where it raises with a sentence beginning with a capital — "There are no places left" — both platforms show that sentence rather than an apology over the top of it. |
+
+`request_hall_booking` is the worked example: same shape, same row-level
+security, same way of speaking to the applicant directly.
+
+The number of places and how many are taken are **not** in the database —
+they are `itikaf.places` and `itikaf.taken` in `ramadan/content.js`, because
+that is the committee's to set. Both null means the places row reads "To be
+confirmed" rather than "0 of 0 left", which would read as fully booked.
+
+### 2. Zakat al-Fitr — one Stripe Payment Link
+
+`fitrana.payLink` in `ramadan/content.js` is null. Only the masjid can make
+the link: it is their Stripe account, and the amount changes each year. The
+five links already on the giving screen are the shape to copy —
+`buy.stripe.com/…` with a `client_reference_id`.
+
+The button needs the link **and** `fitrana.amount`, because a payment button
+with no amount beside it asks for money nobody has been told the size of.
+
+### And one that will not work as drawn
+
+**A hadith a day.** `bukhari.json` holds only the index of the 97 books; the
+narrations are fetched over the network. So it needs either a connection in
+the masjid or the thirty chosen and stored before the month starts — and the
+masjid picking them is the better answer anyway. Not built.

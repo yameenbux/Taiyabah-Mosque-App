@@ -28,6 +28,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
 import Svg, { Polygon } from "react-native-svg";
 import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot, Press, tap, open } from "../ui";
+import { Field, ErrorBox, Submit, isPhone } from "../form";
+import { rpc, itikafIsOpen } from "../supabase";
 import { useApp } from "../store";
 import { allDays } from "../timetable";
 import { shortDate, dowDay } from "../dates";
@@ -403,8 +405,130 @@ function onAirNow(tm, now) {
   return now.getHours() * 60 + now.getMinutes() >= h * 60 + m;
 }
 
+/* ---- iʿtikāf: the one thing on this screen that has to be booked ------- *
+ *
+ * DARK UNTIL THE DATABASE HAS IT. itikaf_is_open() says whether the committee
+ * is taking bookings and request_itikaf_place() takes one; neither exists in
+ * the masjid's database as this is written, and itikafIsOpen() answers false
+ * to a function that is not there. So nobody is offered a form that would
+ * post into nowhere, and the day somebody creates the two and switches the
+ * first on, the button appears on both platforms with nothing to ship.
+ */
+function Booking({ st, open }) {
+  const { t, fs, rtl } = useApp();
+  const [form, setForm] = useState(false);
+  const [v, setV] = useState({ name: "", phone: "" });
+  const [nights, setNights] = useState([]);
+  const [state, setState] = useState({});
+  const [touched, setTouched] = useState(false);
+
+  const it = RAMADAN.itikaf;
+  const left = it.places == null ? null : Math.max(0, it.places - (it.taken || 0));
+  /* No night, no places set, or the committee is not taking them: the card
+     above still says what iʿtikāf is and when it begins. */
+  if (!st || open !== true || left === null) return null;
+
+  const okName = v.name.trim().length > 1;
+  const okPhone = isPhone(v.phone);
+  const valid = okName && okPhone && nights.length > 0;
+  const full = left === 0;
+
+  async function send() {
+    setTouched(true);
+    if (!valid) {
+      setState({ error: t("ramadan.fill_in_the_booking",
+        "Please give a name, a phone number the office can reach you on, and at least one night.") });
+      return;
+    }
+    setState({ sending: true });
+    const r = await rpc("request_itikaf_place", {
+      name: v.name.trim(), phone: v.phone.trim(), nights: [...nights].sort((a, b) => a - b),
+    });
+    /* Where the function speaks to the person directly — "there are no places
+       left" — say what it said rather than an apology over the top of it. */
+    if (r.ok) setState({ sent: true, reference: r.data.reference });
+    else setState({ error: r.message || t("ramadan.booking_couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.") });
+  }
+
+  if (state.sent)
+    return (
+      <Card style={{ gap: 4 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("ramadan.your_place_is_asked_for", "Your place is asked for")}
+        </Text>
+        <Note>{t("ramadan.the_office_will_ring_you", "The office will ring you to confirm it.")}</Note>
+        {!!state.reference && (
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), letterSpacing: 0.5,
+                         color: C.muted }}>{state.reference}</Text>)}
+      </Card>);
+
+  if (full && !form)
+    return (
+      <Card style={{ gap: 4 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("ramadan.fully_booked", "Fully booked")}
+        </Text>
+        <Note>{t("ramadan.every_place_is_taken",
+                 "Every place is taken. We will call you if one comes free.")}</Note>
+        <Submit label={t("ramadan.join_the_waiting_list", "Join the waiting list")}
+                onPress={() => { tap(); setForm(true); }} />
+      </Card>);
+
+  if (!form)
+    return (
+      <View style={{ marginTop: 12 }}>
+        <Submit label={t("ramadan.book_your_place", "Book your place")}
+                onPress={() => { tap(); setForm(true); }} />
+      </View>);
+
+  /* The last ten nights by number, from the month the timetable actually
+     published rather than a guess at 21–30. */
+  const first = Math.max(1, st.total - 9);
+  const choices = Array.from({ length: st.total - first + 1 }, (_, i) => first + i);
+
+  return (
+    <Card>
+      <Field label={t("ramadan.your_name", "Your name")} value={v.name}
+             onChange={x => setV({ ...v, name: x })} bad={touched && !okName} required />
+      <Field label={t("ramadan.phone_number", "Phone number")} value={v.phone} type="tel"
+             onChange={x => setV({ ...v, phone: x })} bad={touched && !okPhone} required />
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.muted, marginTop: 8,
+                     textAlign: rtl ? "right" : "left" }}>
+        {t("ramadan.which_nights", "Which nights")}
+      </Text>
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+        {choices.map(n => {
+          const on = nights.includes(n);
+          return (
+            <Press key={n} accessibilityRole="checkbox" accessibilityState={{ checked: on }}
+                   accessibilityLabel={`${n} ${t("ramadan.ramadan", "Ramadan")}`}
+                   onPress={() => { tap(); setNights(ns => on ? ns.filter(x => x !== n) : [...ns, n]); }}
+                   style={{ minWidth: 44, paddingVertical: 9, paddingHorizontal: 11, borderRadius: 11,
+                            alignItems: "center", borderWidth: 1,
+                            borderColor: on ? "transparent" : C.line,
+                            backgroundColor: on ? C.gold : C.paper }}>
+              <Text style={{ fontFamily: F.display, fontSize: fs(15),
+                             color: on ? C.brand900 : C.ink }}>{n}</Text>
+            </Press>);
+        })}
+      </View>
+      {!!state.error && <ErrorBox>{state.error}</ErrorBox>}
+      <Submit label={t("ramadan.send_this_booking", "Send this booking")}
+              sending={state.sending} onPress={send} />
+    </Card>
+  );
+}
+
 function Month({ access, now, navigation }) {
   const { t, fs, rtl } = useApp();
+  /* Whether the committee is taking iʿtikāf bookings, asked of Postgres
+     rather than of a flag in the app so the two platforms cannot disagree.
+     It answers false while the database has no such function. */
+  const [booking, setBooking] = useState(null);
+  useEffect(() => { itikafIsOpen().then(setBooking, () => setBooking(false)); }, []);
   /* "Who leads ›" goes to the rota further down this same screen, which on
      the website is an anchor and here is a measured offset. The ScrollView is
      reached through Screen's `...rest`; the rota reports where it landed. */
@@ -641,6 +765,7 @@ function Month({ access, now, navigation }) {
             <Note>{it.asks}</Note>
           </View>
         </RowGroup>
+        <Booking st={st} open={booking} />
 
         <Heading>{t("ramadan.zakat_al_fitr", "Zakat al-Fitr")}</Heading>
         <Card>
@@ -653,6 +778,14 @@ function Month({ access, now, navigation }) {
             <Note>{RAMADAN.fitrana.note}</Note>
           </View>
         </RowGroup>
+        {/* A Payment Link only the masjid can make. Null draws no button
+            rather than a button that goes nowhere — and no amount means there
+            is nothing to pay yet, whatever the link says. */}
+        {!!(RAMADAN.fitrana.payLink && RAMADAN.fitrana.amount) && (
+          <View style={{ marginTop: 12 }}>
+            <Submit label={t("ramadan.pay_fitrana", "Pay fitrana")}
+                    onPress={() => { tap(); open(RAMADAN.fitrana.payLink); }} />
+          </View>)}
 
         {/* Eid belongs on this screen the morning after the last night, which
             is the whole reason the section stays open a day past the month. */}
