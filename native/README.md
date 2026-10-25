@@ -32,16 +32,28 @@ Almost none of it was retyped.
 | | |
 |---|---|
 | `scripts/extract-content.mjs` | Opens the web app's `index.html` in a real browser and lifts each sheet out of the DOM as a block tree, keeping each `data-i18n` key beside its English. |
-| `scripts/check-extract.mjs` | Walks the DOM and the JSON side by side and reports anything dropped. It currently carries **645 of 665** text fragments across (97%) — forms excluded, since those are hand-written here. |
+| `scripts/check-extract.mjs` | Walks the DOM and the JSON side by side and reports anything dropped. It currently carries **647 of 665** text fragments across (97%) — forms excluded, since those are hand-written here. |
 | `scripts/check-parity.mjs` | Opens **both** apps in a browser and compares the home screen's sections, the twelve tiles *and their order*, and the More menu's groups and rows. This is the check behind "every link and button where the web app has it" — asserting that is easy, measuring it is the only version worth having. |
 | `scripts/extract-reminders.mjs` | Copies the home screen's fifty-four reminders out of `index.html` as source, predicates and all, and refuses to write the file if one of them calls a helper the generated module does not define. |
 | `scripts/build-logo.mjs` | Renders `logo.svg` to a bitmap for the top bar, at 3×. |
-| `scripts/build-i18n.mjs` | Builds `src/i18n/{en,ur,gu,ar}.json`. English comes off the markup; Urdu, Gujarati and Arabic come from `lang/src/*.json` unchanged, plus `src/i18n/app-extra.json` for the words the website does not have — 2,195 strings each, covering 1,271 of the 1,279 English keys (99%). |
+| `scripts/build-i18n.mjs` | Builds `src/i18n/{en,ur,gu,ar}.json`. English comes off the markup; Urdu, Gujarati and Arabic come from `lang/src/*.json` unchanged, plus `src/i18n/app-extra.json` for the words the website does not have — 2,337 strings each, covering 1,411 of the 1,419 English keys (99%). |
 | `scripts/build-data.mjs` | Bundles the Qur'an text, the surah and book headings, the muṣḥaf page map and the timetable. |
-| `scripts/import-content.mjs` | Executes `quran/athkar.js`, `duas.js` and `rabbanas.js` in a sandbox and writes them as JSON. |
+| `scripts/import-content.mjs` | Executes `quran/athkar.js`, `duas.js`, `rabbanas.js`, `hajj/content.js` and `ramadan/content.js` in a sandbox and writes them as JSON. Those last two are the masjid's own — the Hajj rulings and what the committee supplies for Ramadan — and they are written once and read by both platforms, because a taraweeh rota kept in two places is a rota that will disagree with itself. |
 
 Run all of them with `npm run content`. When the committee changes the copy on
 the website, that one command brings it here.
+
+**Two screens are not block trees.** Ramadan and Hajj & ʿUmrah are built by
+hand in `src/screens/Ramadan.jsx` and `src/screens/Hajj.jsx` rather than
+rendered from an extracted sheet, because almost nothing on them is prose: the
+night, the sehri and iftar times, tonight's juz and its page range are computed
+from the timetable and the muṣḥaf at the moment of asking, and the rest is the
+masjid's own content read out of the two files above. They still say exactly
+what the website says — `check-screens.mjs` holds the app to every `data-i18n`
+key those two sheets carry — and the rule each is gated by lives in a module of
+its own, `src/ramadan.js` and `src/hajj.js`, so it can be unit-tested rather
+than read. `check-ramadan.mjs` and `check-hajj.mjs` hold the two halves of each
+to one another.
 
 Because the i18n keys came across with the prose, picking a language redraws
 every one of those screens. A key a pack is missing falls through to English
@@ -58,7 +70,7 @@ rather than showing a blank, so a gap degrades rather than breaks.
 > **`src/i18n/app-extra.json`**, in the same shape, `"key": [Urdu, Gujarati,
 > Arabic]`. That file is merged in by the generator, so it survives.
 
-All 772 keys the screens use now have all three languages;
+All 905 keys the screens use now have all three languages;
 `src/i18n/TODO-translate.json` is the generator's list of what is still missing
 and is currently empty. Twelve of them were drafted here rather than taken from
 the website's checked wording, and are listed on their own in

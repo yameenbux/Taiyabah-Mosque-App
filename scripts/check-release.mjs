@@ -169,12 +169,30 @@ for (const f of ["index.html", "admin.html"]) {
     for (const m of src.matchAll(/class="[^"]*\barabic\b[^"]*"[^>]*>([^<]*)</g))
       if (EXT_A.test(m[1])) { offenders++; fail(`index.html renders "${m[1].trim().slice(0, 30)}" with the Amiri-only .arabic stack, but it contains marks Amiri has no glyph for`); }
 
-    // 2. U+08E2 is stripped before display, and nothing wider than that is
-    const strip = src.match(/const UNRENDERABLE_MARKS = ([^;]+);/);
-    if (!strip) fail("index.html no longer strips U+08E2 — it will render as a tofu box in every mus-haf font");
-    else if (!/^\/\\u08E2\/g$/.test(strip[1].trim()))
-      fail(`index.html strips more than U+08E2 from scripture (${strip[1].trim()}) — genuine waqf marks would be deleted from the Qur'an`);
-    else if (!offenders) ok("Arabic marks — scripture is on the Noto Naskh stack and only the unrenderable U+08E2 is stripped");
+    /* 2. U+08E2 IS DRAWN, NOT DELETED — AND THIS CHECK USED TO SAY THE OPPOSITE.
+       It demanded a `UNRENDERABLE_MARKS` regex that stripped the mark before
+       display, because for a long time no web font here could draw it: Google
+       carves a hole in its own Noto Naskh Arabic subset at exactly that
+       codepoint. "Give the app a font that can draw the Qurʼanic marks" cut
+       the single glyph out of the full face — 692 bytes — declared it after
+       fonts.css, and deleted the stripping, which is the right answer: the
+       muṣḥaf is shown as the muṣḥaf has it. The check was not updated, so the
+       release gate has been failing ever since ON THE FIX, which is worse
+       than not having the check at all — a gate that is red for a stale
+       reason teaches people to push past it.
+
+       So it now asserts the arrangement that is actually true, and it still
+       fails if somebody goes back to deleting scripture before display. */
+    const face = src.match(/@font-face\{[^}]*unicode-range:\s*U\+08E2\s*\}/i);
+    const url = face && face[0].match(/url\(([^)]+)\)/);
+    if (!face)
+      fail("index.html no longer serves U+08E2 its own face — the mark will render as a tofu box, because Google's Noto Naskh subset carves a hole at exactly that codepoint");
+    else if (!url || !existsSync(url[1].replace(/["']/g, "").trim()))
+      fail(`index.html declares the U+08E2 face but ${url ? url[1] : "no file"} is not in the repository`);
+    else if (/UNRENDERABLE_MARKS|replace\(\/\\u08E2/.test(src))
+      fail("index.html is stripping U+08E2 again — it has a font for it now, and deleting a mark out of the Qur'an is not a rendering strategy");
+    else if (!offenders)
+      ok("Arabic marks — scripture is on the Noto Naskh stack, and U+08E2 is served its own 692-byte face rather than deleted");
   }
 
   /* 3. the page actually gets the font that has the glyphs.

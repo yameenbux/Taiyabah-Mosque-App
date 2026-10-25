@@ -315,6 +315,70 @@ and appearing to ship. Current: `taiyabah-v164`.
 - Built-in diagnostics ("Having trouble?") so notification problems are
   self-serviceable rather than a support conversation
 
+**Ramadan**
+- The section opens **a week before the first night** and shuts a day after the
+  last. Nobody throws a switch: the day the committee publishes the year's
+  timetable, the countdown appears by itself. Before that a poster counts down —
+  the words, the count and the mark, and nothing else
+- **Which night it is**, with sehri and iftar and a live countdown to iftar.
+  Sehri is the masjid's own ten-minute cushion before Fajr, not Fajr itself,
+  and that number is defined once so the screen, the notification and the
+  website cannot give three different answers
+- **Tonight's juz with its page range**, read from the muṣḥaf's own index, and
+  the Isha jamāʿah the taraweeh follows
+- **Night by night** — the nights already kept folded into one row that
+  unfolds, tonight open, the rest ahead, and every row opens the muṣḥaf at the
+  page that night actually reads
+- **Taraweeh on the stream** while it is being prayed, for women and anyone
+  housebound. Offered from the Isha jamāʿah, never at four in the afternoon
+- **Sehri and iftar reminders**, two local notifications a night, the first
+  twenty minutes before sehri ends. Only days the *timetable* calls Ramadan get
+  one, so the switch is silent for the other eleven months and nobody has to
+  remember to turn it off. Off by default, unlike every other switch
+- The **taraweeh rota**, the two daily **bayaans**, the **last ten nights** with
+  the odd ones among them, **iʿtikāf**, **zakat al-fitr**, **Eid** on the
+  morning it matters, and parking with directions
+- Everything the committee has still to decide is `null` in `ramadan/content.js`
+  and reads **"To be confirmed"** rather than disappearing — a row that vanishes
+  looks like a row nobody promised. Nothing computable lives in that file: the
+  night, the times and the juz are read from the timetable at the moment of
+  asking, because a time copied into a content file is a time that will be wrong
+  the year the timetable moves
+- **Built and dark:** the iʿtikāf booking form and a Pay-fitrana button. Both
+  wait on something only the masjid can make — two Postgres functions and a
+  Stripe payment link — and the form asks the database whether to show itself at
+  all, so nobody is offered a form that posts into nowhere. A place is a place
+  for **all ten nights**; iʿtikāf is not booked a night at a time
+- The same screen on both platforms: `index.html#ramadan` and
+  `native/src/screens/Ramadan.jsx`, with the gate itself in `native/src/ramadan.js`
+  so it can be unit-tested rather than read. `native/scripts/check-ramadan.mjs`
+  holds the two halves to each other — 175 assertions. The drawn design and what
+  was deliberately not built from it are in
+  [`docs/design/ramadan/`](docs/design/ramadan/README.md)
+
+**Hajj & Umrah** *(built, and held)*
+- The section is complete and **locked**, and will stay locked until the masjid
+  says otherwise. The row that opens it is not dead: it says what is coming, and
+  sends people to the two things that already work with no signal
+- **Three locks, not one.** A release switch the masjid owns; each branch opens
+  on its own, so the packing list can be in somebody's hands months before the
+  rulings are written; and — the one that matters — **a fiqh entry counts only
+  if a scholar's name is in its `by` field.** The drafts in `hajj/content.js`
+  exist to save the ʿulamā a blank page. Until one is approved it is invisible
+  to every reader and cannot open anything, whoever flips the switch
+- What it carries: the duʿās for iḥrām, talbiyah, ṭawāf and saʿī with
+  transliteration; the packing list; heat guidance for a summer Hajj; the
+  papers; what iḥrām is and what breaks it, for **men and women**, with a toggle
+  rather than an endless scroll; the rites; and ṭawāf and saʿī counters that
+  work in the Ḥaram with no signal
+- **No photographs of faces anywhere**, which is a standing rule of this
+  repository rather than a decision made per picture. Where a picture needs a
+  person, the face is blurred past recognition or not shown
+- Pictures describe what they show and never which option passes — a drawing
+  cannot carry a ruling, and `native/scripts/check-hajj.mjs` enforces both that
+  and all three locks — 170 assertions, and **59 drafts are currently waiting on
+  the ʿulamā, none of them visible to anyone**
+
 **Recite**
 - **Qur'an** — two ways to read, chosen on opening:
   - **English Translation** — the complete Mus-haf in IndoPak script: 114 sūrahs,
@@ -429,7 +493,7 @@ and appearing to ship. Current: `taiyabah-v164`.
   community said it made them squint. One variable scales every font size in the
   app, so nothing is left behind
 - **Language** — English, Urdu, Gujarati and Arabic. Every word, number and date:
-  **2,024 strings per language**, digits in the reader's own numerals
+  **2,178 strings per language**, digits in the reader's own numerals
   (۰۱۲ / ٠١٢ / ૦૧૨), calendars mirrored right-to-left, and identifiers such as
   postcodes and phone numbers deliberately left in Latin so they still work.
   Packs download on demand, cache offline, and switch the interface instantly
@@ -578,6 +642,36 @@ Anything committed here is reachable by URL.
 │   ├── search.json               Built by scripts/build-bukhari.mjs.
 │   └── c/1.json … c/71.json
 │
+├── ramadan/content.js           What the COMMITTEE supplies for Ramadan — the
+│                                 taraweeh rota, the two bayaan slots, the
+│                                 iʿtikāf booking, the fitrana, Eid. Half of it
+│                                 is null on purpose; a null reads as "To be
+│                                 confirmed" rather than vanishing. Nothing
+│                                 computable lives here: the night, the times
+│                                 and the juz are read from the timetable at
+│                                 the moment of asking. One file, both
+│                                 platforms — the website loads it directly and
+│                                 native/scripts/import-content.mjs turns it
+│                                 into the app's ramadan.json.
+│
+├── hajj/content.js              The same arrangement for Hajj & ʿUmrah, and
+│                                 the section is HELD. Every ruling in here is
+│                                 a draft until a scholar's name is in its `by`
+│                                 field; without one it is invisible to every
+│                                 reader and cannot open its branch, whatever
+│                                 the release switch says. 59 are waiting.
+│
+├── docs/design/ramadan/         The Ramadan screens as they were drawn, kept
+│                                 so the build has something to be checked
+│                                 against — and a README recording what was
+│                                 deliberately NOT built from them, and the two
+│                                 things only the masjid can create.
+│
+├── native/                      The React Native app that is now on Play —
+│   ├── src/screens/              the same words as index.html, lifted rather
+│   ├── scripts/                   than retyped. Its own gate: 26 checks and
+│   └── README.md                  246 unit tests. See native/README.md.
+│
 ├── quran/                       Qur'anic content — lazy-loaded, so the main
 │   ├── surahs/index.json          app never pays for carrying it.
 │   │   └── 1.json … 114.json
@@ -614,7 +708,9 @@ them:
 | Qur'an complete | 114 sūrahs and 6,236 āyāt, every count against the canonical table |
 | 40 Rabbanā | each duʿā matched against the Qur'an text, not trusted as transcribed |
 | Duʿās | 12 categories pinned so a duʿā cannot be inserted mid-list and slide three languages of translation onto the wrong Arabic; the Qur'anic ones checked against `quran/surahs/`, the hadith ones against the text they were lifted from, and none repeating another |
-| Translations | 2,024 strings in all three languages, nothing missing and nothing spare |
+| Translations | 2,178 strings in all three languages, nothing missing and nothing spare |
+| **Ramadan** | the two platforms' gate numbers and month pattern agree; the gate is run on fixture months for the Fajr rollover and a 29-day month's last ten; no clock time can be typed into `ramadan/content.js`; no field in it is drawn nowhere; the booking stays dark until the database answers yes; and a null place count cannot become a zero, which would read as fully booked. `native/scripts/check-ramadan.mjs`, 175 assertions |
+| **Hajj & ʿUmrah** | all three locks — the release switch, the per-branch gate, and the rule that a fiqh entry counts only if a scholar's name is in its `by` field — plus the rule that a picture never says which option passes. `native/scripts/check-hajj.mjs`, 170 assertions |
 | Language packs | `lang/*.js` still matches what `lang/src` would build — twice now, a translation was edited and the generated pack was not rebuilt, leaving English on an Urdu screen |
 | Latin identifiers | 30 postcodes, phone numbers and account numbers that must **not** be re-numeralled — "Bolton BL1 8HD" once became "Bolton BL۱ ۸HD" |
 | Arabic marks | scripture on a font stack that actually has glyphs for the marks it ships |
@@ -651,8 +747,8 @@ Both are plain Node with no dependencies, and both run in CI anyway. Running
 them first saves a red build.
 
 **The native app has its own gate**, because the things that can be wrong in it
-are different ones: `npm run check` in `native/` is 14 checks and `npm test` is
-114 unit tests, and the release workflow adds four more that only matter when a
+are different ones: `npm run check` in `native/` is 26 checks and `npm test` is
+246 unit tests, and the release workflow adds four more that only matter when a
 bundle is being cut — a smoke run on that exact commit, the publishable key
 matching the website's, the permission list read back out of the merged
 manifest, and the signing certificate read back out of the finished `.aab`. See
@@ -916,6 +1012,30 @@ Still outstanding, roughly in the order it matters:
 - **The imam role handover.** The advice portal is live and the role exists; it
   is currently held alongside `admin` by the developer's account and should be
   granted to the imam through the portal's own access screen.
+- **The Hajj & ʿUmrah rulings.** The section is built and locked, and the lock
+  that matters is not the release switch: **59 fiqh drafts are waiting for a
+  scholar's name**, and until one has it, it is invisible to every reader and
+  cannot open its branch. The drafts exist to save the ʿulamā a blank page, not
+  to be published. Sending them is the single thing standing between this
+  section and release. The Islāmic Daʿwah Academy's written permission for the
+  ʿUmrah text is still to be obtained in person as well.
+- **Two things for Ramadan that only the masjid can make.** Both are built and
+  both are dark, and neither needs an app release — the day the thing exists,
+  the button appears on both platforms:
+  - `itikaf_is_open()` and `request_itikaf_place()` in the masjid's own
+    Postgres. The form asks the first before it shows itself, so a missing
+    function means nobody is offered a form that posts into nowhere.
+    `request_hall_booking` is the worked example.
+  - A **Stripe payment link for fitrana** — their account, and the amount
+    changes each year. `fitrana.payLink` is null and draws no button.
+- **Nine Ramadan blanks the committee owes**, each reading "To be confirmed" on
+  screen until it is filled: the four taraweeh students, the two bayaan
+  speakers, the number of iʿtikāf places, the booking deadline, the zakat
+  al-fitr amount and the Eid jamāʿah times.
+- **A hadith a day** was drawn for the Ramadan screen and is not built. Only the
+  index of the 97 books is bundled; the narrations are fetched. It needs the
+  thirty chosen and stored before the month starts — and the masjid picking them
+  is the better answer anyway.
 - **Course registration** — `register_for_course` exists in Postgres and nothing
   in `index.html` calls it. Both courses still say registration opens shortly and
   send people to the office.
@@ -936,6 +1056,15 @@ Still outstanding, roughly in the order it matters:
 
 ### Done since the first release
 
+- **Ramadan, built in full on both platforms, behind a gate that opens by
+  itself** a week before the first night and shuts a day after the last. The
+  night, the times, the juz and its pages are read from the timetable and the
+  muṣḥaf at the moment of asking; only what the masjid decides lives in a
+  content file, and what it has not decided reads "To be confirmed" rather than
+  vanishing. The month, night by night, the stream, the reminders, iʿtikāf,
+  fitrana and Eid — see *What the app does*
+- **Hajj & ʿUmrah, built and held** behind three locks, the strictest of which
+  is that no ruling is visible until a scholar's name is on it
 - **The native app replaced the Trusted Web Activity on Play** — version 2.0.1,
   version code 8. See [`native/README.md`](native/README.md)
 - **The app had been talking to nothing.** `native/src/supabase.js` shipped a
