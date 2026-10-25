@@ -108,7 +108,14 @@ it is off by default and cannot be switched on by accident:
 | Function | What it must do |
 |---|---|
 | `itikaf_is_open()` | returns `true` when the committee is taking bookings. **Nothing is drawn until this answers true** — a missing function answers false, which is today. |
-| `request_itikaf_place(payload jsonb)` | takes `{masjid, name, phone, nights[]}`, holds the place, and returns `{reference}`. Where it raises with a sentence beginning with a capital — "There are no places left" — both platforms show that sentence rather than an apology over the top of it. |
+| `request_itikaf_place(payload jsonb)` | takes `{masjid, name, phone}`, holds the place, and returns `{reference}`. Where it raises with a sentence beginning with a capital — "There are no places left" — both platforms show that sentence rather than an apology over the top of it. |
+
+**There is no `nights[]`, and there must not be.** Iʿtikāf is the whole of the
+last ten nights: entered once and kept to the end, not booked a night at a
+time. The first build offered ten nights to choose from, which is not a
+smaller version of this — it is a different thing, and one the masjid does not
+do. A place is a place for all ten. `check-ramadan.mjs` asserts neither
+platform sends a per-night selection.
 
 `request_hall_booking` is the worked example: same shape, same row-level
 security, same way of speaking to the applicant directly.

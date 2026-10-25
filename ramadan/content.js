@@ -75,7 +75,13 @@ window.RAMADAN = {
     places: null,
     taken: null,
     bookBy: null,
-    asks: "You will be asked for a name, a phone number and which nights.",
+    /* I'TIKAF IS THE WHOLE OF THE LAST TEN NIGHTS. It is entered once and
+       kept to the end — nobody books the 23rd and the 27th and goes home in
+       between — so there is no night to choose and the form does not ask for
+       one. The first build offered ten nights to pick from, which is not a
+       smaller version of this; it is a different thing, and one the masjid
+       does not do. */
+    asks: "You will be asked for a name and a phone number.",
   },
 
   /* ---------------------------------------------------------------- *

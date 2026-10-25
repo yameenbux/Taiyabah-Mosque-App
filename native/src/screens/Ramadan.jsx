@@ -418,7 +418,6 @@ function Booking({ st, open }) {
   const { t, fs, rtl } = useApp();
   const [form, setForm] = useState(false);
   const [v, setV] = useState({ name: "", phone: "" });
-  const [nights, setNights] = useState([]);
   const [state, setState] = useState({});
   const [touched, setTouched] = useState(false);
 
@@ -430,19 +429,21 @@ function Booking({ st, open }) {
 
   const okName = v.name.trim().length > 1;
   const okPhone = isPhone(v.phone);
-  const valid = okName && okPhone && nights.length > 0;
+  /* Two things, and there is no third: the booking is the whole of the last
+     ten nights, so there is no night to choose. */
+  const valid = okName && okPhone;
   const full = left === 0;
 
   async function send() {
     setTouched(true);
     if (!valid) {
       setState({ error: t("ramadan.fill_in_the_booking",
-        "Please give a name, a phone number the office can reach you on, and at least one night.") });
+        "Please give a name and a phone number the office can reach you on.") });
       return;
     }
     setState({ sending: true });
     const r = await rpc("request_itikaf_place", {
-      name: v.name.trim(), phone: v.phone.trim(), nights: [...nights].sort((a, b) => a - b),
+      name: v.name.trim(), phone: v.phone.trim(),
     });
     /* Where the function speaks to the person directly — "there are no places
        left" — say what it said rather than an apology over the top of it. */
@@ -484,37 +485,27 @@ function Booking({ st, open }) {
                 onPress={() => { tap(); setForm(true); }} />
       </View>);
 
-  /* The last ten nights by number, from the month the timetable actually
-     published rather than a guess at 21–30. */
-  const first = Math.max(1, st.total - 9);
-  const choices = Array.from({ length: st.total - first + 1 }, (_, i) => first + i);
-
   return (
     <Card>
       <Field label={t("ramadan.your_name", "Your name")} value={v.name}
              onChange={x => setV({ ...v, name: x })} bad={touched && !okName} required />
       <Field label={t("ramadan.phone_number", "Phone number")} value={v.phone} type="tel"
              onChange={x => setV({ ...v, phone: x })} bad={touched && !okPhone} required />
-      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.muted, marginTop: 8,
-                     textAlign: rtl ? "right" : "left" }}>
-        {t("ramadan.which_nights", "Which nights")}
+      {/* NOT A CHOICE OF NIGHTS. I'tikaf is the last ten nights, entered once
+          and kept to the end; nobody books the 23rd and the 27th. So the span
+          is STATED, with the dates from the month the timetable published —
+          a twenty-nine-day month puts them at 20–29. */}
+      <Text style={{ marginTop: 10, paddingHorizontal: 13, paddingVertical: 11, borderRadius: 11,
+                     backgroundColor: C.tintPlum, fontFamily: F.sans, fontSize: fs(13),
+                     lineHeight: fs(19.5), color: C.ink, textAlign: rtl ? "right" : "left" }}>
+        {/* Just what is being booked. It carried the `begins` line too, and
+            the two read as a contradiction — "21–30 Ramadan. After Maghrib,
+            20 Ramadan." Both are true, because the night of the 21st starts
+            at Maghrib on the 20th, but nobody should have to work that out
+            from a booking form. The card above has a Begins row already. */}
+        {t("ramadan.all_ten_nights_from", "All ten nights, {a}–{b} Ramadan.")
+           .replace("{a}", String(Math.max(1, st.total - 9))).replace("{b}", String(st.total))}
       </Text>
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        {choices.map(n => {
-          const on = nights.includes(n);
-          return (
-            <Press key={n} accessibilityRole="checkbox" accessibilityState={{ checked: on }}
-                   accessibilityLabel={`${n} ${t("ramadan.ramadan", "Ramadan")}`}
-                   onPress={() => { tap(); setNights(ns => on ? ns.filter(x => x !== n) : [...ns, n]); }}
-                   style={{ minWidth: 44, paddingVertical: 9, paddingHorizontal: 11, borderRadius: 11,
-                            alignItems: "center", borderWidth: 1,
-                            borderColor: on ? "transparent" : C.line,
-                            backgroundColor: on ? C.gold : C.paper }}>
-              <Text style={{ fontFamily: F.display, fontSize: fs(15),
-                             color: on ? C.brand900 : C.ink }}>{n}</Text>
-            </Press>);
-        })}
-      </View>
       {!!state.error && <ErrorBox>{state.error}</ErrorBox>}
       <Submit label={t("ramadan.send_this_booking", "Send this booking")}
               sending={state.sending} onPress={send} />

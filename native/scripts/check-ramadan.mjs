@@ -305,6 +305,34 @@ ok("the website needs both too", /payLink && C\.fitrana\.amount/.test(html));
 ok("neither is set yet, so neither button is drawn",
    RAM.fitrana.payLink === null && RAM.fitrana.amount === null);
 
+/* A PLACE IS A PLACE FOR ALL TEN NIGHTS.
+ *
+ * Iʿtikāf is entered once and kept to the end; nobody books the 23rd and the
+ * 27th and goes home in between. The first build of this form offered ten
+ * nights to pick from, and that is not a smaller version of the real thing —
+ * it is a different thing, and one the masjid does not do. A booking that
+ * carries a list of nights would let the office fill a place twice over. */
+/* ANCHORED ON THE CALL, NOT ON THE NAME. A first attempt sliced a window
+   around the first occurrence of "request_itikaf_place", which in both files
+   is the header comment explaining it — so the guard read prose, found no
+   payload, and passed while a nights[] was being posted four hundred
+   characters further down. Both mutations walked straight past it. */
+for (const [what, src, call] of [["the app", screen, 'rpc("request_itikaf_place"'],
+                                 ["the website", html, "rpc/request_itikaf_place"]]) {
+  const at = src.indexOf(call);
+  ok(`${what}'s booking call is where this expects it`, at > 0,
+     `nothing matching ${call} — the guard below would read nothing`);
+  ok(`${what} books all ten nights, not a choice of them`,
+     at > 0 && !/\bnights\b/.test(src.slice(at, at + 500)),
+     "the booking payload carries a per-night selection");
+}
+ok("the app states the span instead of offering a picker",
+   /all_ten_nights_from/.test(screen) && !/setNights/.test(screen));
+ok("the website does the same",
+   /all_ten_nights_from/.test(html) && !/rm-f-nights/.test(html) && !/rm-pick/.test(html));
+ok("and the note no longer promises to ask which nights",
+   !/which nights/i.test(RAM.itikaf.asks), `it says: "${RAM.itikaf.asks}"`);
+
 /* "0 of 0 left" would read as fully booked. A null is not a zero. */
 ok("the app's booking stands down when places are unknown",
    /left === null/.test(screen) && /it\.places == null \? null/.test(screen));
