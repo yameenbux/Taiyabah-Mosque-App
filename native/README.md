@@ -34,7 +34,7 @@ Almost none of it was retyped.
 | `scripts/extract-content.mjs` | Opens the web app's `index.html` in a real browser and lifts each sheet out of the DOM as a block tree, keeping each `data-i18n` key beside its English. |
 | `scripts/check-extract.mjs` | Walks the DOM and the JSON side by side and reports anything dropped. It currently carries **647 of 665** text fragments across (97%) — forms excluded, since those are hand-written here. |
 | `scripts/check-parity.mjs` | Opens **both** apps in a browser and compares the home screen's sections, the twelve tiles *and their order*, and the More menu's groups and rows. This is the check behind "every link and button where the web app has it" — asserting that is easy, measuring it is the only version worth having. |
-| `scripts/extract-reminders.mjs` | Copies the home screen's fifty-four reminders out of `index.html` as source, predicates and all, and refuses to write the file if one of them calls a helper the generated module does not define. |
+| `scripts/extract-reminders.mjs` | Copies the home screen's **31** reminders out of `index.html` as source, predicates and all — 18 contextual and 13 calendar days — and refuses to write the file if one of them calls a helper the generated module does not define. The number is what the script itself counts and prints; this line said fifty-four for long enough that nobody could have checked it. |
 | `scripts/build-logo.mjs` | Renders `logo.svg` to a bitmap for the top bar, at 3×. |
 | `scripts/build-i18n.mjs` | Builds `src/i18n/{en,ur,gu,ar}.json`. English comes off the markup; Urdu, Gujarati and Arabic come from `lang/src/*.json` unchanged, plus `src/i18n/app-extra.json` for the words the website does not have — 2,337 strings each, covering 1,411 of the 1,419 English keys (99%). |
 | `scripts/build-data.mjs` | Bundles the Qur'an text, the surah and book headings, the muṣḥaf page map and the timetable. |
@@ -72,11 +72,15 @@ rather than showing a blank, so a gap degrades rather than breaks.
 
 All 905 keys the screens use now have all three languages;
 `src/i18n/TODO-translate.json` is the generator's list of what is still missing
-and is currently empty. Twelve of them were drafted here rather than taken from
-the website's checked wording, and are listed on their own in
+and is currently empty. **Thirteen** of them were drafted here rather than taken
+from the website's checked wording, and are listed on their own in
 **`src/i18n/NEEDS-A-NATIVE-SPEAKER.md`** with English, Urdu, Gujarati and Arabic
-side by side and where each appears on screen. That is the file to hand to
-whoever confirms them.
+side by side and where each appears on screen.
+
+That file is **not the whole list any more.** The Ramadan section's **97**
+strings were drafted the same way and live in `lang/src/28-ramadan.json`,
+because they belong to the website as well — its `_note` says so at the top of
+the file. Anybody being handed translations to confirm needs both.
 
 ## What is bundled and what is fetched
 

@@ -9,6 +9,13 @@ They are held in `native/src/i18n/app-extra.json` as `"key": [Urdu, Gujarati, Ar
 Change them there and run `npm run content`; do not edit `ur.json`, `gu.json` or
 `ar.json`, which that command rewrites.
 
+> **This is no longer the whole list.** The Ramadan section added **97** more
+> strings drafted the same way — the times, the rota, night by night, iʿtikāf,
+> the reminders and the booking. They are not here because they belong to the
+> website too, so they live in **`lang/src/28-ramadan.json`**, in the same
+> `"key": [Urdu, Gujarati, Arabic]` shape, and that file's `_note` says at the
+> top that they are drafts. Please read those as well.
+
 ---
 
 ### bukhari.nothing_matches
