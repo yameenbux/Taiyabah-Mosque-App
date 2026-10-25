@@ -19,6 +19,12 @@ export function shortDate(t, d) {
 export function dayMonthYear(t, d) {
   return `${d.getDate()} ${t(`date.fullmon.${d.getMonth()}`, MON[d.getMonth()])} ${d.getFullYear()}`;
 }
+/* "Tue 24" — the weekday and the day of the month, and nothing else. Written
+   out rather than taken off the end of shortDate(): that works in English and
+   quietly mangles a language whose month name is not one word. */
+export function dowDay(t, d) {
+  return `${t(`date.dow.${d.getDay()}`, DOW[d.getDay()].slice(0, 3))} ${d.getDate()}`;
+}
 export function fullDow(t, d) {
   return t(`date.fulldow.${d.getDay()}`, DOW[d.getDay()]);
 }

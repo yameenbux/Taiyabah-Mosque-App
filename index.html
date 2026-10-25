@@ -1045,6 +1045,109 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     text-transform:uppercase;color:var(--gold-ink,#7A5D14);padding:14px 0 2px}
   .rm-note{font-size:calc(12.5px * var(--ts));line-height:1.55;color:var(--ink-faint,#7A6B74);
     padding:12px 0 14px;border-top:1px solid rgba(0,0,0,.07);margin-top:2px}
+  /* --- what the month has got to in the Qurʼan --- */
+  .rm-ah{text-align:start;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:2.2px;
+    text-transform:uppercase;color:var(--gold,#C6A24C);opacity:.85;margin-bottom:9px}
+  .rm-prog{margin-top:12px}
+  .rm-prog-h{display:flex;align-items:center;gap:10px}
+  .rm-prog-t{flex-grow:1;min-width:0}
+  .rm-prog-t b{display:block;font-size:calc(14px * var(--ts));font-weight:600}
+  .rm-prog-t > span{display:block;font-size:calc(12px * var(--ts));
+    color:var(--ink-soft,#5B4A54);margin-top:2px}
+  .rm-pill{flex:0 0 auto;font-size:calc(12.5px * var(--ts));font-weight:600;color:var(--gold-ink,#7A5D14);
+    border:1px solid var(--line,#E4DECF);border-radius:999px;padding:7px 13px;text-decoration:none;
+    background:none;font-family:inherit;cursor:pointer}
+  .rm-bar{margin-top:12px;height:7px;border-radius:999px;background:var(--line,#E4DECF);overflow:hidden}
+  .rm-bar i{display:block;height:7px;border-radius:999px;
+    background:linear-gradient(90deg,var(--brand-700,#5E1844),var(--brand-600,#772157))}
+  .rm-prog-f{margin-top:6px;display:flex;justify-content:space-between;gap:8px;
+    font-size:calc(11px * var(--ts));color:var(--ink-soft,#5B4A54)}
+  .rm-prog-f b{font-weight:600}
+  /* --- who is leading, and whether it is going out on the stream --- */
+  .rm-two-rows{margin-top:12px;overflow:hidden}
+  .rm-r{display:flex;align-items:center;gap:12px;padding:13px 16px}
+  .rm-r + .rm-r{border-top:1px solid rgba(0,0,0,.07)}
+  .rm-r-t{flex-grow:1;min-width:0}
+  .rm-r-t b{display:block;font-size:calc(14px * var(--ts));font-weight:600}
+  .rm-r-t span{display:block;font-size:calc(12px * var(--ts));color:var(--ink-soft,#5B4A54);margin-top:2px}
+  .rm-r.lit{background:var(--tint-plum,#F0E9ED)}
+  .rm-dot{width:8px;height:8px;border-radius:999px;background:#3FBE73;flex:0 0 auto}
+  .rm-go{flex:0 0 auto;font-size:calc(12.5px * var(--ts));font-weight:600;color:#F3EFE3;
+    background:var(--brand-700,#5E1844);border-radius:999px;padding:8px 15px;text-decoration:none;
+    border:none;font-family:inherit;cursor:pointer}
+  .rm-link{flex:0 0 auto;font-size:calc(12.5px * var(--ts));font-weight:600;
+    color:var(--gold-ink,#7A5D14);text-decoration:none;background:none;border:none;
+    font-family:inherit;cursor:pointer;padding:0}
+  /* --- the reminder opt-in --- */
+  .rm-remind{margin-top:12px;background:var(--tint-plum,#F0E9ED);border-radius:18px;
+    padding:15px 16px;display:flex;align-items:center;gap:13px}
+  .rm-remind .rm-r-t span{line-height:1.5;margin-top:3px}
+  /* --- the three things people reach for --- */
+  .rm-tiles{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+  .rm-tile{background:var(--card,#FCFAF3);border:1px solid var(--line,#E4DECF);border-radius:16px;
+    padding:13px 10px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;
+    gap:7px;text-align:center;font-family:inherit;cursor:pointer;color:inherit}
+  .rm-tile svg{width:19px;height:19px;color:var(--brand-700,#5E1844)}
+  .rm-tile span{font-size:calc(11.5px * var(--ts));font-weight:600;line-height:1.3}
+  /* --- night by night --- */
+  .rm-nights{margin-top:12px;overflow:hidden}
+  .rm-n{display:flex;align-items:center;gap:11px;padding:11px 14px;width:100%;text-align:left;
+    background:none;border:none;font-family:inherit;color:inherit}
+  .rm-n + .rm-n, .rm-n + .rm-all{border-top:1px solid rgba(0,0,0,.07)}
+  .rm-n-no{width:40px;flex:0 0 auto;text-align:center}
+  .rm-n-no b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
+    font-weight:600;line-height:1}
+  .rm-n-no span{display:block;font-size:calc(9px * var(--ts));font-weight:600;letter-spacing:.5px;
+    text-transform:uppercase;color:var(--ink-soft,#5B4A54);margin-top:1px}
+  .rm-n-t{flex-grow:1;min-width:0}
+  .rm-n-t b{display:block;font-size:calc(13.5px * var(--ts));font-weight:600}
+  .rm-n-t span{display:block;font-size:calc(11.5px * var(--ts));color:var(--ink-soft,#5B4A54);margin-top:2px}
+  .rm-n.past{background:var(--paper,#F5F1E8);cursor:pointer}
+  .rm-n.past .rm-n-no b{font-size:calc(15px * var(--ts));color:var(--ink-soft,#5B4A54)}
+  .rm-n.past .rm-n-t b{color:var(--ink-soft,#5B4A54)}
+  .rm-n.now{background:var(--tint-plum,#F0E9ED)}
+  .rm-n.now .rm-n-no b{font-size:calc(18px * var(--ts));color:var(--brand-700,#5E1844)}
+  .rm-n-read{flex:0 0 auto;font-size:calc(11.5px * var(--ts));font-weight:600;
+    color:var(--gold-ink,#7A5D14);border:1px solid var(--line,#E4DECF);border-radius:999px;
+    padding:6px 12px;text-decoration:none;background:none;font-family:inherit;cursor:pointer}
+  .rm-n.now .rm-n-read{color:#F3EFE3;background:var(--brand-700,#5E1844);border-color:transparent;padding:7px 13px}
+  .rm-all{display:block;width:100%;padding:12px 14px;text-align:center;
+    font-size:calc(12.5px * var(--ts));font-weight:600;color:var(--gold-ink,#7A5D14);
+    background:none;border:none;border-top:1px solid rgba(0,0,0,.07);font-family:inherit;cursor:pointer}
+  .rm-chev{flex:0 0 auto;width:16px;height:16px;color:var(--ink-soft,#5B4A54)}
+  /* --- the i'tikaf booking --- */
+  .rm-book{margin-top:12px}
+  .rm-book-go{display:block;width:100%;margin-top:12px;padding:13px 16px;border:none;
+    border-radius:12px;background:var(--brand-700,#5E1844);color:#F3EFE3;font-family:inherit;
+    font-size:calc(14px * var(--ts));font-weight:600;cursor:pointer}
+  .rm-book-go[disabled]{opacity:.55;cursor:default}
+  .rm-full{display:flex;flex-direction:column;gap:4px}
+  .rm-full b{font-size:calc(14px * var(--ts));font-weight:600}
+  .rm-full span{font-size:calc(12.5px * var(--ts));line-height:1.55;color:var(--ink-soft,#5B4A54)}
+  .rm-form{display:flex;flex-direction:column;gap:6px}
+  .rm-l{font-size:calc(11.5px * var(--ts));font-weight:600;letter-spacing:.3px;
+    color:var(--ink-soft,#5B4A54);margin-top:8px}
+  .rm-i{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line,#E4DECF);
+    border-radius:11px;background:var(--paper,#F5F1E8);font-family:inherit;
+    font-size:calc(15px * var(--ts));color:var(--ink,#261B22)}
+  .rm-i.bad{border-color:var(--danger,#B4532F)}
+  .rm-nights-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .rm-pick{min-width:44px;padding:9px 11px;border:1px solid var(--line,#E4DECF);border-radius:11px;
+    background:var(--paper,#F5F1E8);font-family:"Fraunces",Georgia,serif;
+    font-size:calc(15px * var(--ts));color:var(--ink,#261B22);cursor:pointer}
+  .rm-pick[aria-pressed="true"]{background:var(--gold,#C6A24C);border-color:transparent;
+    color:var(--brand-900,#3C0B2A);font-weight:600}
+  .rm-err{font-size:calc(12.5px * var(--ts));line-height:1.5;color:var(--danger,#B4532F);margin:8px 0 0}
+  .rm-done{display:flex;flex-direction:column;gap:4px}
+  .rm-done b{font-size:calc(14px * var(--ts));font-weight:600}
+  .rm-done span{font-size:calc(12.5px * var(--ts));line-height:1.55;color:var(--ink-soft,#5B4A54)}
+  .rm-ref{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.5px}
+  /* --- directions, at the foot of the parking card --- */
+  .rm-dir{display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:12px;
+    border-top:1px solid rgba(0,0,0,.07);text-decoration:none;color:var(--ink,#261B22);
+    font-size:calc(13.5px * var(--ts));font-weight:600}
+  .rm-dir svg{width:18px;height:18px;flex:0 0 auto;color:var(--brand-700,#5E1844)}
+  .rm-dir span:first-of-type{flex-grow:1}
   .rm-odds{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
   .rm-odd{min-width:52px;text-align:center;border-radius:12px;padding:11px 8px;
     background:#DCBB63;color:#3C0B2A;font-family:"Fraunces",Georgia,serif;
@@ -2739,6 +2842,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <div class="tg">
           <div class="txt"><div class="t" data-i18n="sheet.surah_al_kahf">Sūrah al-Kahf</div><div class="d" data-i18n="sheet.friday_morning_reminder">Friday morning, a reminder to read it</div></div>
           <label class="switch"><input type="checkbox" checked id="tg-kahf"><span class="sl"></span></label>
+        </div>
+        <!-- Off by default: it is two notifications a night and only for one
+             month of the year, so it is opted INTO rather than out of. The
+             switch on the Ramadan screen is this same setting, seen from the
+             screen where somebody actually wants it. -->
+        <div class="tg">
+          <div class="txt"><div class="t" data-i18n="ramadan.sehri_iftar_reminders">Sehri &amp; iftar reminders</div><div class="d" data-i18n="ramadan.in_ramadan_only">In Ramadan only</div></div>
+          <label class="switch"><input type="checkbox" id="tg-ram"><span class="sl"></span></label>
         </div>
         <button class="save" id="a-save" data-i18n="sheet.save">Save</button>
       </div>
@@ -5256,6 +5367,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </div>
 
           <div id="rm-tonight"></div>
+          <!-- Where the month has got to in the Qurʼan, who is leading it
+               tonight, whether it is going out on the stream, the reminder
+               people actually want, and the three things they reach for.
+               All five filled by renderRamadanOpen(). -->
+          <div id="rm-progress"></div>
+          <div id="rm-leading"></div>
+          <div id="rm-remind"></div>
+          <div id="rm-tiles"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.on_sighting_the_new_moon">On sighting the new moon</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -5275,6 +5394,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </div>
 
           <div id="rm-rota"></div>
+          <!-- One juz a night, laid out night by night: the ones already kept
+               folded into a single row, tonight open, and the rest ahead. -->
+          <div id="rm-nights"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.bayaan">Bayaan</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -5292,12 +5414,55 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
           <div id="rm-itikaf"></div>
 
+          <!-- THE BOOKING, AND IT IS DARK.
+               Two things have to exist in the masjid's own database before
+               anybody is offered this: itikaf_is_open(), which says whether
+               the committee is taking bookings, and request_itikaf_place(),
+               which takes one. Neither exists as this is written, and
+               itikafIsOpen() answers false to a function that is not there —
+               so this section stays hidden rather than offering a form that
+               would post into nowhere.
+
+               It is written in the markup rather than built by
+               renderRamadanOpen() for one reason: that function runs again
+               every fifteen seconds, and a form rebuilt under somebody's
+               hands loses what they have typed into it. Only the parts that
+               change are written to. -->
+          <section class="rm-book" id="rm-book" hidden>
+            <button class="rm-book-go" type="button" id="rm-book-go" data-i18n="ramadan.book_your_place">Book your place</button>
+            <div class="card rm-card rm-full" id="rm-full" hidden>
+              <b data-i18n="ramadan.fully_booked">Fully booked</b>
+              <span data-i18n="ramadan.every_place_is_taken">Every place is taken. We will call you if one comes free.</span>
+              <button class="rm-book-go" type="button" id="rm-wait-go" data-i18n="ramadan.join_the_waiting_list">Join the waiting list</button>
+            </div>
+            <form class="card rm-card rm-form" id="rm-form" hidden novalidate>
+              <label class="rm-l" for="rm-f-name" data-i18n="ramadan.your_name">Your name</label>
+              <input class="rm-i" id="rm-f-name" type="text" autocomplete="name" maxlength="80">
+              <label class="rm-l" for="rm-f-phone" data-i18n="ramadan.phone_number">Phone number</label>
+              <input class="rm-i" id="rm-f-phone" type="tel" autocomplete="tel" maxlength="24" data-i18n-latin>
+              <span class="rm-l" id="rm-f-nights-l" data-i18n="ramadan.which_nights">Which nights</span>
+              <div class="rm-nights-pick" id="rm-f-nights" role="group" aria-labelledby="rm-f-nights-l"></div>
+              <p class="rm-err" id="rm-f-err" hidden></p>
+              <button class="rm-book-go" type="submit" id="rm-f-send" data-i18n="ramadan.send_this_booking">Send this booking</button>
+            </form>
+            <div class="card rm-card rm-done" id="rm-f-done" hidden>
+              <b data-i18n="ramadan.your_place_is_asked_for">Your place is asked for</b>
+              <span data-i18n="ramadan.the_office_will_ring_you">The office will ring you to confirm it.</span>
+              <span class="rm-ref" id="rm-f-ref"></span>
+            </div>
+          </section>
+
           <div class="sec-h"><h2 data-i18n="ramadan.zakat_al_fitr">Zakat al-Fitr</h2><span class="rule"></span></div>
           <div class="card rm-card">
             <p data-i18n="ramadan.due_per_person_in_the">Due per person in the household, before the Eid prayer.</p>
           </div>
 
           <div id="rm-fitrana"></div>
+          <!-- Only the masjid can make a Stripe Payment Link: it is their
+               Stripe account and the amount changes each year. Null in
+               ramadan/content.js draws no button, rather than a button that
+               goes nowhere. -->
+          <div id="rm-pay"></div>
           <div id="rm-eid"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.parking">Parking</h2><span class="rule"></span></div>
@@ -5305,6 +5470,13 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <p data-i18n="ramadan.the_masjid_car_park_is">The masjid car park is on Draycott Street. Please use it first.</p>
             <p data-i18n="ramadan.when_it_is_full_park">When it is full, park with consideration for our neighbours and the wider
                community &mdash; never across a driveway. The masjid sits on a main road, so take care pulling out, and keep hold of children.</p>
+            <!-- Somebody reading the parking advice is on their way. The
+                 address is the masjid's own, not the Centre's. -->
+            <a class="rm-dir" href="https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD" target="_blank" rel="noopener">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 17.5s6-4.6 6-9a6 6 0 1 0-12 0c0 4.4 6 9 6 9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="8.4" r="2.1" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span data-i18n="ramadan.directions">Directions</span>
+              <span class="dr-ch">&rsaquo;</span>
+            </a>
           </div>
 
           <div id="rm-lastten"></div>
@@ -6918,7 +7090,7 @@ function ramState(d){
   if(!total) return null;
   const night = h.day;
   return {
-    night, total, iso: ymd(d),
+    night, total, iso: ymd(d), year: h.year,
     juz: Math.min(night, 30),
     /* a 29-day month puts the last ten at night 20, not 21 */
     lastTen: night > total - 10,
@@ -6945,13 +7117,14 @@ function ramStateOrLast(){
   return null;
 }
 
-/* Sehri is ten minutes before Fajr begins, which is the masjid's own cushion
-   and the same one the reminder cards use. Iftar is Maghrib to the minute. */
+/* Sehri is RAM_SEHRI_CUSHION minutes before Fajr begins, which is the masjid's
+   own cushion and the same one the reminder cards use. Iftar is Maghrib to the
+   minute. */
 function ramTimes(iso){
   const rec = DATA && DATA.days && DATA.days[iso];
   if(!rec || !rec.begins) return null;
   return {
-    sehri:  rec.begins.fajr ? minusMins(rec.begins.fajr, 10) : null,
+    sehri:  rec.begins.fajr ? minusMins(rec.begins.fajr, RAM_SEHRI_CUSHION) : null,
     fajr:   rec.begins.fajr || null,
     iftar:  rec.begins.maghrib || null,
     isha:   (rec.jamaat && rec.jamaat.isha) || null,
@@ -7046,7 +7219,8 @@ function renderRamadanOpen(){
   } else {
     const until = rmUntilIftar(st.iso, tm.iftar);
     put("rm-live",
-        `<div class="rm-day"><b>${esc(t("ramadan.day_n","Day {n}").replace("{n}", num(st.night)))}</b>`
+        `<div class="rm-ah">${esc(t("ramadan.n_ah","{n} AH").replace("{n}", num(st.year)))}</div>`
+      + `<div class="rm-day"><b>${esc(t("ramadan.day_n","Day {n}").replace("{n}", num(st.night)))}</b>`
       + `<span>${esc(rmShortDate(st.iso))} · ${esc(num(st.night))} ${esc(t("ramadan.ramadan","Ramadan"))}</span></div>`
       + `<div class="rm-two">`
       + `<div class="rm-time"><span>${esc(t("ramadan.sehri_ends","Sehri ends"))}</span>`
@@ -7067,18 +7241,20 @@ function renderRamadanOpen(){
     put("rm-tonight",
         `<div class="sec-h"><h2>${esc(t("ramadan.tonight","Tonight"))}</h2><span class="rule"></span>`
       + `<span class="rm-juz">${esc(t("ramadan.juz_n","Juz {n}").replace("{n}", num(st.juz)))}</span></div>`
+      /* The juz used to be a second row here and again, by name, on the
+         progress card below — the same two words twice on one screen, which
+         reads as a bug rather than as emphasis. It belongs on the card that
+         can say more about it than its own name. */
       + `<div class="card rm-card rm-list">`
       + rmRow(t("ramadan.isha_jamaah","Isha jamāʿah"), tm.isha ? hm12(tm.isha) : rmTbc())
-      + rmRow(t("ramadan.tonights_juz","Tonight’s juz"),
-              t("ramadan.juz_n","Juz {n}").replace("{n}", num(st.juz))
-              + (pages ? " · " + t("ramadan.pages_a_b","pages {a}–{b}")
-                   .replace("{a}", num(pages.from)).replace("{b}", num(pages.to)) : ""))
       + `</div>`);
 
     const odd = st.lastTen
       ? st.nights.filter(n => n.night > st.total - 10 && n.night % 2 === 1) : [];
     put("rm-lastten", odd.length
-      ? `<div class="sec-h"><h2>${esc(t("ramadan.the_last_ten_nights","The last ten nights"))}</h2><span class="rule"></span></div>`
+      ? `<div class="sec-h"><h2>${esc(t("ramadan.the_last_ten_nights","The last ten nights"))}</h2><span class="rule"></span>`
+        + `<span class="tag">${esc(t("ramadan.a_b_ramadan","{a} – {b} Ramadan")
+             .replace("{a}", num(st.total - 9)).replace("{b}", num(st.total)))}</span></div>`
         + `<div class="card rm-card">`
         + `<div class="rm-sub">${esc(C.lastTen.kicker)}</div>`
         + `<p>${esc(C.lastTen.lead)}</p>`
@@ -7125,6 +7301,20 @@ function renderRamadanOpen(){
     + rmRow(t("ramadan.amount","Amount"), C.fitrana.amount || rmTbc())
     + `<p class="rm-note">${esc(C.fitrana.note)}</p></div>`);
 
+  /* A Payment Link only the masjid can make. Null draws no button rather than
+     a button that goes nowhere — and no amount means there is nothing to pay
+     yet whatever the link says. */
+  put("rm-pay", (C.fitrana.payLink && C.fitrana.amount)
+    ? `<a class="rm-book-go" href="${esc(C.fitrana.payLink)}" target="_blank" rel="noopener">`
+      + `${esc(t("ramadan.pay_fitrana","Pay fitrana"))}</a>`
+    : "");
+
+  rmBookState(st, C);
+
+  /* ---- and the layer on top: progress, leading, the nudge, the tiles
+         and night by night, all of which need a night ---- */
+  renderRamadanLayer(st, C, tm);
+
   /* ---- and Eid, from the last night until the morning after it ---- */
   put("rm-eid", last && last.nightsToEid <= 0
     ? `<div class="sec-h"><h2>${esc(t("ramadan.eid_al_fitr","Eid al-Fitr"))}</h2><span class="rule"></span></div>`
@@ -7132,6 +7322,393 @@ function renderRamadanOpen(){
       + rmRow(t("ramadan.jamaah","Jamāʿah"), C.eid.jamaats || rmTbc(), C.eid.venue)
       + `<p class="rm-note">${esc(C.eid.note)}</p></div>`
     : "");
+}
+
+/* ---- Ramadan: the layer on top of the month --------------------------- *
+ *
+ * The month screen above answers "what is happening". This answers "and what
+ * do I do about it": read tonight's juz, hear taraweeh if you cannot get to
+ * the masjid, be told when sehri ends, and get to the timetable, the zakat
+ * calculator or the car park without going back to the menu.
+ */
+
+/* How many nights are shown ahead of tonight before "All 30 nights", and
+   whether the nights already kept have been unfolded. Module state rather
+   than markup, because the list is redrawn every fifteen seconds. */
+const RM_AHEAD = 4;
+let RM_ALL = false, RM_PAST = false;
+
+/* The muṣḥaf, opened at a page chosen somewhere else.
+ *
+ * It CLOSES Ramadan rather than stacking a second sheet on top of it. The
+ * back-button watcher recognises a close and an open inside 120ms as one
+ * journey and leaves a way back, which is what the twelve existing sheet-to
+ * sheet links rely on — a sheet opened over another gets two Dones and a
+ * person who has to press Back twice to leave one screen. */
+async function openMushafAt(page){
+  closeRamadan();
+  openQuran();
+  await openMushaf();
+  /* The licensed pages may not be installed, in which case openMushaf() has
+     put up the "not installed yet" panel and there is no page to turn to. */
+  if(page && !document.getElementById('mu-reader').hidden) await showMushafPage(page);
+}
+
+/* Tonight's two times, as a line somebody can send to their family.
+   navigator.share where it exists — which on a phone is everywhere that
+   matters — and the clipboard behind it, so the button is never dead. */
+async function rmShare(tile){
+  const st = ramState();
+  if(!st) return;
+  const tm = ramTimes(st.iso) || {};
+  const text = [
+    t("ramadan.day_n","Day {n}").replace("{n}", num(st.night)) + " · " + rmShortDate(st.iso),
+    t("ramadan.sehri_ends","Sehri ends") + " " + (tm.sehri ? hm12(tm.sehri) : "—"),
+    t("ramadan.iftar","Iftar") + " " + (tm.iftar ? hm12(tm.iftar) : "—"),
+    "Taiyabah Masjid",
+  ].join("\n");
+  try{
+    if(navigator.share) { await navigator.share({ text }); return; }
+    await navigator.clipboard.writeText(text);
+    /* There is no toast on this site and one tile is not a reason to add a
+       notification system. The tile says what it did and goes back to its
+       own label — which is also where somebody is already looking. */
+    const lab = tile && tile.querySelector('span:not(.rm-tile-i)');
+    if(lab){
+      const was = lab.textContent;
+      lab.textContent = t("ramadan.copied","Copied");
+      setTimeout(() => { lab.textContent = was; }, 1600);
+    }
+  }catch(e){ /* a share the person cancelled is not a failure */ }
+}
+
+/* The sehri and iftar nudge is one of the categories the masjid can send to,
+   so it is stored and tagged exactly like Announcements and Sūrah al-Kahf
+   rather than inventing a second place to keep the same answer. The switch on
+   the Ramadan screen and the one on the Notifications screen are two views of
+   one setting. */
+function rmRemindOn(){
+  const p = prefStore.get("alerts", null);
+  return !!(p && p.ram);
+}
+function rmSetRemind(on){
+  const p = prefStore.get("alerts", null) || currentPrefs();
+  p.ram = !!on;
+  prefStore.set("alerts", p);
+  prefStore.set("alertsSet", true);
+  applyPrefs(p);
+  pushTopicTags(p);
+  renderRamadanOpen();
+}
+
+/* One night: its number and date on the left, its juz and pages in the
+   middle, and a way into the muṣḥaf on the right. */
+function rmNightRow(n, st){
+  const pages = ramJuzPages(n.juz);
+  const d = new Date(n.iso + "T12:00:00");
+  const now = n.night === st.night;
+  return `<button type="button" class="rm-n${now ? " now" : ""}" data-rm="read" data-page="${pages ? pages.from : ""}">`
+    + `<span class="rm-n-no"><b>${esc(num(n.night))}</b>`
+    + `<span>${esc(dow(d.getDay()))} ${esc(num(d.getDate()))}</span></span>`
+    + `<span class="rm-n-t"><b>${esc(t("ramadan.juz_n","Juz {n}").replace("{n}", num(n.juz)))}</b>`
+    + `<span>${esc(pages ? t("ramadan.pages_a_b","pages {a}–{b}")
+         .replace("{a}", num(pages.from)).replace("{b}", num(pages.to)) : "")}</span></span>`
+    + `<span class="rm-n-read">${esc(t("ramadan.read","Read"))}</span></button>`;
+}
+
+/* Everything that needs a night, drawn under the month itself. */
+function renderRamadanLayer(st, C, tm){
+  const put = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+
+  /* WHICH OF THESE NEED A NIGHT, AND WHICH DO NOT. The progress through the
+     Qurʼan and the night-by-night list are nothing without one. The reminder
+     switch and the three tiles are the opposite: the week before Ramadan is
+     exactly when somebody wants to turn the nudge on, and a blank where the
+     switch should be is the week it is most needed going to waste. Leading
+     is the committee's own and needs nothing either — the stream row inside
+     it asks for a jamāʿah time and gets none, so it simply does not appear. */
+  const pages = st ? ramJuzPages(st.juz) : null;
+  put("rm-progress", !st ? "" :
+      `<div class="card rm-card rm-prog"><div class="rm-prog-h">`
+    + `<span class="rm-prog-t"><b>${esc(t("ramadan.tonights_juz","Tonight’s juz"))}</b>`
+    + `<span>${esc(t("ramadan.juz_n","Juz {n}").replace("{n}", num(st.juz))
+         + (pages ? " · " + t("ramadan.pages_a_b","pages {a}–{b}")
+              .replace("{a}", num(pages.from)).replace("{b}", num(pages.to)) : ""))}</span></span>`
+    + `<button type="button" class="rm-pill" data-rm="read" data-page="${pages ? pages.from : ""}">`
+    + `${esc(t("ramadan.read_it","Read it"))}</button></div>`
+    + `<div class="rm-bar"><i style="width:${(st.night / st.total * 100).toFixed(1)}%"></i></div>`
+    + `<div class="rm-prog-f">`
+    + `<b>${esc(t("ramadan.juz_n_of_m","Juz {n} of {m}")
+         .replace("{n}", num(st.juz)).replace("{m}", num(Math.min(st.total, 30))))}</b>`
+    + `<span>${esc(st.nightsToEid > 0
+         ? t("ramadan.n_nights_to_go","{n} nights to go").replace("{n}", num(st.nightsToEid))
+         : t("ramadan.the_last_night","The last night"))}</span>`
+    + `</div></div>`);
+
+  /* --- who is leading it, and whether it is going out on the stream ---
+     "Mufti Faiyaz and four students" is BUILT from the rota rather than
+     written out, so the summary cannot come to disagree with the list it is
+     summarising — which is exactly what a hand-written summary does the year
+     the arrangement changes. */
+  const ls = C.taraweeh.leaders || [];
+  const named = ls.filter(l => l.name);
+  const rest = ls.length - named.length;
+  const who = !named.length ? rmTbc()
+    : rest ? t("ramadan.x_and_n_students","{who} and {n} students")
+               .replace("{who}", named.map(l => l.name).join(", ")).replace("{n}", num(rest))
+           : named.map(l => l.name).join(", ");
+
+  put("rm-leading",
+      `<div class="card rm-card rm-two-rows" style="padding:0">`
+    + `<div class="rm-r"><span class="rm-r-t"><b>${esc(t("ramadan.leading","Leading"))}</b>`
+    + `<span>${esc(who)}</span></span>`
+    + `<button type="button" class="rm-link" data-rm="rota">${esc(t("ramadan.who_leads","Who leads"))} &rsaquo;</button></div>`
+    /* The stream is offered during taraweeh and not at four in the afternoon,
+       when "Taraweeh is on air" would simply be untrue. */
+    + (rmTaraweehHour(tm)
+        ? `<div class="rm-r lit"><span class="rm-dot" aria-hidden="true"></span>`
+          + `<span class="rm-r-t"><b>${esc(t("ramadan.taraweeh_is_on_air","Taraweeh is on air"))}</b>`
+          + `<span>${esc(t("ramadan.listen_from_home","Listen from home"))}</span></span>`
+          + `<button type="button" class="rm-go" data-rm="listen">${esc(t("home.listen","Listen"))}</button></div>`
+        : "")
+    + `</div>`);
+
+  /* --- the nudge people actually want --- */
+  const on = rmRemindOn();
+  put("rm-remind",
+      `<div class="rm-remind"><span class="rm-r-t">`
+    + `<b>${esc(t("ramadan.sehri_iftar_reminders","Sehri & iftar reminders"))}</b>`
+    + `<span>${esc(t("ramadan.a_nudge_before_sehri_ends","A nudge 20 minutes before sehri ends, and one at iftar."))}</span>`
+    + `</span><label class="switch"><input type="checkbox" data-rm="remind"${on ? " checked" : ""}`
+    + ` aria-label="${esc(t("ramadan.sehri_iftar_reminders","Sehri & iftar reminders"))}"><span class="sl"></span></label></div>`);
+
+  /* --- the three things people reach for --- */
+  put("rm-tiles",
+      `<div class="rm-tiles">`
+    + `<button type="button" class="rm-tile" data-rm="times">`
+    + `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="15" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h15M6.5 2v3M13.5 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
+    + `<span>${esc(t("ramadan.timetable","Timetable"))}</span></button>`
+    + `<button type="button" class="rm-tile" data-rm="share">`
+    + `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5v10M10 2.5 6.5 6M10 2.5 13.5 6M3.5 11.5v4a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    + `<span>${esc(t("ramadan.share","Share"))}</span></button>`
+    + `<button type="button" class="rm-tile" data-rm="zakat">`
+    + `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.6 12.3 7.3l5.2.76-3.75 3.66.89 5.18L10 14.46l-4.64 2.44.89-5.18L2.5 8.06l5.2-.76L10 2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`
+    + `<span>${esc(t("ramadan.zakat","Zakat"))}</span></button></div>`);
+
+  /* --- night by night --- */
+  if(!st){ put("rm-nights", ""); return; }
+  const behind = st.nights.filter(n => n.night < st.night);
+  const ahead  = st.nights.filter(n => n.night > st.night);
+  const shown  = RM_ALL ? ahead : ahead.slice(0, RM_AHEAD);
+  const fold = behind.length && !RM_PAST
+    ? `<button type="button" class="rm-n past" data-rm="past">`
+      + `<span class="rm-n-no"><b>${esc(num(1))}–${esc(num(behind.length))}</b></span>`
+      + `<span class="rm-n-t"><b>${esc(t("ramadan.n_nights_behind_you","{n} nights behind you")
+           .replace("{n}", num(behind.length)))}</b>`
+      + `<span>${esc(t("ramadan.juz_a_to_b_look_back","Juz {a} to {b} · tap to look back")
+           .replace("{a}", num(1)).replace("{b}", num(behind.length)))}</span></span>`
+      + `<svg class="rm-chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      + `</button>`
+    : behind.map(n => rmNightRow(n, st)).join("");
+
+  put("rm-nights",
+      `<div class="sec-h"><h2>${esc(t("ramadan.night_by_night","Night by night"))}</h2><span class="rule"></span>`
+    + `<span class="tag">${esc(t("ramadan.one_juz","One juz"))}</span></div>`
+    + `<div class="card rm-card rm-nights" style="padding:0">`
+    + fold
+    + rmNightRow(st.tonight || st.nights[st.night - 1], st)
+    + shown.map(n => rmNightRow(n, st)).join("")
+    + (ahead.length > RM_AHEAD
+        ? `<button type="button" class="rm-all" data-rm="all">`
+          + esc(RM_ALL ? t("ramadan.fewer_nights","Fewer nights")
+                       : t("ramadan.all_n_nights","All {n} nights").replace("{n}", num(st.total)))
+          + ` &rsaquo;</button>`
+        : "")
+    + `</div>`);
+}
+
+
+/* ---- iʿtikāf: the one thing on this screen that has to be booked ------- *
+ *
+ * DARK UNTIL THE DATABASE HAS IT. itikaf_is_open() says whether the committee
+ * is taking bookings and request_itikaf_place() takes one; neither exists in
+ * the masjid's database as this is written, and a function that is not there
+ * answers false. So nobody is offered a form that would post into nowhere,
+ * and the day somebody creates the two and switches the first on, the button
+ * appears on both platforms with nothing to ship.
+ *
+ * The form is in the markup, not built here: renderRamadanOpen() runs again
+ * every fifteen seconds and a form rebuilt under somebody's hands loses what
+ * they have typed. Only what changes is written to.
+ */
+const RM_BOOK = { open: null, nights: [], sent: false };
+
+function rmBookProbe(){
+  if(RM_BOOK.open !== null) return Promise.resolve(RM_BOOK.open);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  return fetch(`${supaBase()}/rest/v1/rpc/itikaf_is_open`, {
+    method: "POST", signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: "{}",
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    RM_BOOK.open = res.ok && String(body).trim() === "true";
+    return RM_BOOK.open;
+  })).catch(() => { clearTimeout(timer); RM_BOOK.open = false; return false; });
+}
+
+/* Which nights there are to choose from: the last ten, by number, from the
+   month the timetable actually published rather than a guess at 21–30. */
+function rmFillNights(st){
+  const host = document.getElementById('rm-f-nights');
+  if(!host || host.childElementCount) return;
+  const first = Math.max(1, st.total - 9);
+  let html = "";
+  for(let n = first; n <= st.total; n++)
+    html += `<button type="button" class="rm-pick" aria-pressed="false" data-night="${n}">${esc(num(n))}</button>`;
+  host.innerHTML = html;
+}
+
+/* Shown, hidden, or fully booked — decided here and nowhere else, so the
+   three states cannot be drawn two at a time. */
+function rmBookState(st, C){
+  const sec = document.getElementById('rm-book');
+  if(!sec) return;
+  const it = C.itikaf;
+  /* No night to book, no places set, or the committee is not taking them:
+     the card above still says what iʿtikāf is and when it begins. */
+  const left = (it.places == null) ? null : Math.max(0, it.places - (it.taken || 0));
+  sec.hidden = !(st && RM_BOOK.open === true && left !== null);
+  if(sec.hidden) return;
+  rmFillNights(st);
+  const full = left === 0;
+  const done = RM_BOOK.sent;
+  document.getElementById('rm-book-go').hidden = full || done || !document.getElementById('rm-form').hidden;
+  document.getElementById('rm-full').hidden    = !full || done;
+  document.getElementById('rm-f-done').hidden  = !done;
+  if(done || full) document.getElementById('rm-form').hidden = true;
+}
+
+function rmBookShow(){
+  document.getElementById('rm-form').hidden = false;
+  document.getElementById('rm-book-go').hidden = true;
+  document.getElementById('rm-full').hidden = true;
+  document.getElementById('rm-f-name').focus();
+}
+
+function rmBookSend(e){
+  e.preventDefault();
+  const err = document.getElementById('rm-f-err');
+  const btn = document.getElementById('rm-f-send');
+  const name = document.getElementById('rm-f-name');
+  const phone = document.getElementById('rm-f-phone');
+  const nights = [...document.querySelectorAll('#rm-f-nights .rm-pick[aria-pressed="true"]')]
+                   .map(b => +b.dataset.night);
+
+  /* The three things the note promises it will ask for, and nothing else. */
+  const okName = name.value.trim().length > 1;
+  const okPhone = phone.value.replace(/[^0-9]/g, "").length >= 10;
+  name.classList.toggle("bad", !okName);
+  phone.classList.toggle("bad", !okPhone);
+  if(!okName || !okPhone || !nights.length){
+    err.hidden = false;
+    err.textContent = t("ramadan.fill_in_the_booking",
+      "Please give a name, a phone number the office can reach you on, and at least one night.");
+    return;
+  }
+  err.hidden = true;
+  btn.disabled = true;
+  btn.textContent = t("ramadan.sending", "Sending…");
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  fetch(`${supaBase()}/rest/v1/rpc/request_itikaf_place`, {
+    method: "POST", signal: ctrl.signal,
+    headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ payload: { masjid: SUPA.masjid, name: name.value.trim(),
+                                      phone: phone.value.trim(), nights } }),
+  }).then(res => res.text().then(body => {
+    clearTimeout(timer);
+    if(res.ok){
+      RM_BOOK.sent = true;
+      let ref = null;
+      try{ ref = JSON.parse(body).reference; }catch(_){}
+      document.getElementById('rm-f-ref').textContent = ref || "";
+      renderRamadanOpen();
+      return;
+    }
+    /* Where the function speaks to the person directly — "there are no places
+       left", "that does not look like a phone number" — say what it said
+       rather than an apology over the top of it. */
+    let msg = null;
+    try{ const j = JSON.parse(body); if(j && j.message && /^[A-Z]/.test(j.message)) msg = j.message; }catch(_){}
+    btn.disabled = false;
+    btn.textContent = t("ramadan.send_this_booking", "Send this booking");
+    err.hidden = false;
+    err.textContent = msg || t("ramadan.booking_couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  })).catch(() => {
+    clearTimeout(timer);
+    btn.disabled = false;
+    btn.textContent = t("ramadan.send_this_booking", "Send this booking");
+    err.hidden = false;
+    err.textContent = t("ramadan.booking_couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.");
+  });
+}
+
+function initRamadanBooking(){
+  const go = document.getElementById('rm-book-go');
+  const wait = document.getElementById('rm-wait-go');
+  const form = document.getElementById('rm-form');
+  if(!go || !form) return;
+  go.addEventListener('click', rmBookShow);
+  if(wait) wait.addEventListener('click', rmBookShow);
+  form.addEventListener('submit', rmBookSend);
+  document.getElementById('rm-f-nights').addEventListener('click', e => {
+    const b = e.target.closest('.rm-pick');
+    if(b) b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+  });
+}
+
+/* Taraweeh is prayed after Isha. "On air" is offered from the Isha jamāʿah
+   until midnight, which is the window the stream is actually carrying it in —
+   a row that says the masjid is broadcasting when it is not is worse than no
+   row, and this one sends people to a player that would play silence. */
+function rmTaraweehHour(tm){
+  if(!tm || !tm.isha) return false;
+  const [h, m] = String(tm.isha).split(":").map(Number);
+  if(!Number.isFinite(h) || !Number.isFinite(m)) return false;
+  const now = nowLondon();
+  return now.getHours() * 60 + now.getMinutes() >= h * 60 + m;
+}
+
+/* One listener for the whole section, attached once. The containers above are
+   redrawn every fifteen seconds, so a listener on a button inside them would
+   be thrown away with the button that carried it. */
+function initRamadanLayer(){
+  const body = document.querySelector('#ramadan .sh-body');
+  if(!body) return;
+  body.addEventListener('click', e => {
+    const el = e.target.closest('[data-rm]');
+    if(!el || el.dataset.rm === "remind") return;
+    const act = el.dataset.rm;
+    if(act === "read"){ const p = +el.dataset.page; if(p) openMushafAt(p); return; }
+    if(act === "rota"){ document.getElementById('rm-rota').scrollIntoView({ block:"start", behavior:"smooth" }); return; }
+    if(act === "listen"){ closeRamadan(); openLive(); return; }
+    if(act === "times"){ closeRamadan(); switchTab('times'); return; }
+    if(act === "zakat"){ closeRamadan(); setTimeout(openZakat, 120); return; }
+    if(act === "share"){ rmShare(el); return; }
+    if(act === "past"){ RM_PAST = true; renderRamadanOpen(); return; }
+    if(act === "all"){ RM_ALL = !RM_ALL; renderRamadanOpen(); return; }
+  });
+  body.addEventListener('change', e => {
+    const el = e.target.closest('[data-rm="remind"]');
+    if(el) rmSetRemind(el.checked);
+  });
 }
 
 /* ---------------- Ramadan: the guard ----------------
@@ -7158,6 +7735,12 @@ function renderRamadanOpen(){
    the native screen says too.
 ---------------------------------------------------- */
 const RAM_OPEN_BEFORE = 7;                   /* ramadan.js OPEN_DAYS_BEFORE */
+/* Sehri is the masjid's own cushion before Fajr, and WARN is how long before
+   THAT the app's nightly notification goes. Both are ramadan.js's to decide —
+   written here so check-ramadan.mjs can assert the two platforms agree, which
+   is the whole point of naming a number rather than typing a 10. */
+const RAM_SEHRI_CUSHION = 10;                /* ramadan.js SEHRI_CUSHION_MIN */
+const RAM_SEHRI_WARN = 20;                   /* ramadan.js SEHRI_WARN_MIN */
 /* How long it stays open past the last night. Eid al-Fitr and the fitrana
    deadline are both on that screen and both matter on the morning after, and
    the hours between midnight and Fajr belong to the night before them.
@@ -11602,6 +12185,10 @@ async function openRamadan(){
      for it here. If it does not arrive the row prints the juz without pages
      rather than waiting on it. */
   loadMushafMeta().then(renderRamadanGuard, () => {});
+  /* Whether the committee is taking iʿtikāf bookings, asked once and then
+     remembered. It answers false while the database has no such function,
+     which is the state it is in — see rmBookProbe. */
+  rmBookProbe().then(renderRamadanGuard, () => {});
   renderRamadanGuard();
   document.getElementById('ramadan').dataset.open="1";
   document.body.style.overflow="hidden";
@@ -12120,6 +12707,8 @@ function initHajj(){
 }
 
 function initRamadan(){
+  initRamadanLayer();
+  initRamadanBooking();
   document.getElementById('rm-close').addEventListener('click',closeRamadan);
   document.getElementById('rm-scrim').addEventListener('click',closeRamadan);
   document.addEventListener('keydown',e=>{
@@ -14558,6 +15147,7 @@ function currentPrefs(){
     ann:document.getElementById('tg-ann').checked,
     evt:document.getElementById('tg-evt').checked,
     kahf:document.getElementById('tg-kahf').checked,
+    ram:document.getElementById('tg-ram').checked,
   };
 }
 
@@ -14568,6 +15158,7 @@ function summarise(p){
   if(p.ann) on.push(t("alerts.announcements","Announcements"));
   if(p.evt) on.push(t("alerts.events","Events"));
   if(p.kahf === undefined || p.kahf) on.push(t("alerts.surah_al_kahf","Sūrah al-Kahf"));
+  if(p.ram) on.push(t("ramadan.sehri_iftar","Sehri & iftar"));
   return on.length ? on.join(" · ") : t("alerts.none_selected","No alerts selected");
 }
 
@@ -14591,6 +15182,10 @@ function applyPrefs(p){
   document.getElementById('tg-ann').checked=p.ann;
   document.getElementById('tg-evt').checked=p.evt;
   document.getElementById('tg-kahf').checked = p.kahf === undefined ? true : p.kahf;
+  /* Undefined is OFF here, the opposite way round from Sūrah al-Kahf: nobody
+     who saved their choices before this existed asked for two notifications a
+     night. */
+  document.getElementById('tg-ram').checked = !!p.ram;
   document.getElementById('mins').value=p.mins;
   document.getElementById('mins').disabled=!p.jam;
 }

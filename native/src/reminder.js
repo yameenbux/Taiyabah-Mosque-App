@@ -6,12 +6,11 @@
  */
 import { REMINDERS, setReminderTranslator } from "./reminders-data";
 import { dayFor, nowLondon } from "./prayer";
+/* Sehri is the masjid's own cushion before Fajr and ramadan.js owns the
+   number — this file used to carry its own copy of both the arithmetic and
+   the ten. */
+import { sehriEnds } from "./ramadan";
 
-const minusMins = (hhmm, n) => {
-  const [h, m] = hhmm.split(":").map(Number);
-  let v = h * 60 + m - n; if (v < 0) v += 1440;
-  return `${String(Math.floor(v / 60)).padStart(2, "0")}:${String(v % 60).padStart(2, "0")}`;
-};
 const at = (d, hhmm) => {
   const [h, m] = hhmm.split(":").map(Number);
   const x = new Date(d); x.setHours(h, m, 0, 0); return x;
@@ -33,7 +32,7 @@ export function context(now = nowLondon()) {
     c.tDow = tmr.getDay();
     c.tDay = thm ? parseInt(thm[1], 10) : 0;
     c.tMonth = thm ? thm[2] : "";
-    c.suhoor = tRec.begins.fajr ? minusMins(tRec.begins.fajr, 10) : null;
+    c.suhoor = sehriEnds(tRec.begins.fajr);
   } else { c.tDow = -1; c.tDay = 0; c.tMonth = ""; }
 
   c.afterFajr     = now >= at(now, rec.begins.fajr);

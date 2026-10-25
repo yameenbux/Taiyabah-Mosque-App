@@ -143,6 +143,27 @@ export async function adviceIsOpen() {
   } catch { return false; }
 }
 
+/* Is the masjid taking iʿtikāf bookings?
+ *
+ * ASKED OF POSTGRES, NOT OF A FLAG IN THE APP, for the same reason the imams'
+ * questions are: the website and the app must not be able to disagree about
+ * whether a form is live, and the committee must be able to close it without
+ * a release.
+ *
+ * It answers FALSE while the function does not exist, which is the state the
+ * masjid's database is in as this is written. That is deliberate and it is
+ * the whole shape of this feature: the booking is built, and it is dark. The
+ * day somebody creates itikaf_is_open() and request_itikaf_place() and turns
+ * the first one on, the button appears on both platforms with nothing to
+ * ship. Until then nobody is offered a form that would post into nowhere. */
+export async function itikafIsOpen() {
+  try {
+    const res = await go("rpc/itikaf_is_open", { method: "POST", body: "{}" });
+    if (!res.ok) return false;
+    return (await res.text()).trim() === "true";
+  } catch { return false; }
+}
+
 export async function isOpen(fn) {
   try {
     const r = await rpc(fn, {});

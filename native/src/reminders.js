@@ -13,6 +13,7 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { dayFor, nowLondon, londonInstant, NAMES, ORDER } from "./prayer";
+import { isRamadanMonth, hijriOf, sehriEnds, SEHRI_CUSHION_MIN, SEHRI_WARN_MIN } from "./ramadan";
 import { at, weekly, FRIDAY } from "./triggers";
 /* Re-exported so a caller needs one import, not two; it lives in its own file
    because that one has no native imports and can therefore be tested. */
@@ -39,7 +40,7 @@ export async function arm(reminders, extras = {}) {
   await Notifications.cancelAllScheduledNotificationsAsync();
 
   const wanted = Object.entries(reminders || {}).filter(([, v]) => v !== undefined && v !== null && v !== false);
-  if (!wanted.length && !extras.kahf) return 0;
+  if (!wanted.length && !extras.kahf && !extras.ramadan) return 0;
   if (!(await ask())) return 0;
 
   if (Platform.OS === "android")
@@ -86,6 +87,57 @@ export async function arm(reminders, extras = {}) {
         trigger: at(when, Platform.OS === "android" ? "prayer" : undefined),
       });
       armed++;
+    }
+  }
+
+  /* SEHRI AND IFTAR, every night of Ramadan.
+   *
+   * These are the two moments of a fasting day, and the website cannot send
+   * them: a push for each would be sixty sends the masjid has to remember to
+   * make, on times that differ every day. Here they are read off the same
+   * timetable the rest of the app reads and set on the phone itself, so they
+   * are right with no signal and cost nothing.
+   *
+   * SEHRI IS NOT FAJR. The masjid's own cushion is ten minutes, which is what
+   * the eve-of-fast cards have said for a year, and the nudge goes twenty
+   * minutes before THAT — half an hour before Fajr begins. Somebody told at
+   * the moment sehri ends has been told too late to do anything about it.
+   *
+   * Only the days the timetable itself calls Ramadan get them, so this is
+   * silent for eleven months whether the switch is on or not — which is why
+   * it is safe to leave on, and why nobody has to remember to turn it off. */
+  if (extras.ramadan) {
+    for (let d = 0; d < DAYS_AHEAD; d++) {
+      const date = new Date(london); date.setDate(date.getDate() + d);
+      const day = dayFor(date);
+      const h = hijriOf(day);
+      if (!h || !isRamadanMonth(h.month) || !day.begins) continue;
+
+      if (day.begins.fajr) {
+        const sehri = new Date(londonInstant(date, day.begins.fajr).getTime()
+                               - (SEHRI_CUSHION_MIN + SEHRI_WARN_MIN) * 60000);
+        if (sehri > realNow) {
+          await Notifications.scheduleNotificationAsync({
+            content: { title: "Sehri ends soon",
+                       body: `${SEHRI_WARN_MIN} minutes left — sehri ends `
+                             + `${pretty(sehriEnds(day.begins.fajr))}.`,
+                       sound: "default" },
+            trigger: at(sehri, Platform.OS === "android" ? "prayer" : undefined),
+          });
+          armed++;
+        }
+      }
+      if (day.begins.maghrib) {
+        const iftar = londonInstant(date, day.begins.maghrib);
+        if (iftar > realNow) {
+          await Notifications.scheduleNotificationAsync({
+            content: { title: "Iftar", body: `Maghrib ${pretty(day.begins.maghrib)} — time to open the fast.`,
+                       sound: "default" },
+            trigger: at(iftar, Platform.OS === "android" ? "prayer" : undefined),
+          });
+          armed++;
+        }
+      }
     }
   }
 

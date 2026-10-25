@@ -146,7 +146,7 @@ export default function Alerts() {
   useEffect(() => {
     if (!granted) return undefined;
     const id = setTimeout(async () => {
-      const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf;
+      const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf || alerts.ramadan;
       if (wantsAny) await optIn(); else await optOut();
       setTagState(await syncTags(alerts));
       setSaved(true);
@@ -157,7 +157,7 @@ export default function Alerts() {
   const saveAll = async () => {
     tap(); setSaved(true);
     await rearm({});
-    const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf;
+    const wantsAny = alerts.janazah || alerts.announcements || alerts.events || alerts.kahf || alerts.ramadan;
     if (wantsAny) await optIn(); else await optOut();
     setTagState(await syncTags(alerts));
   };
@@ -264,6 +264,14 @@ export default function Alerts() {
           <Row title={t("sheet.surah_al_kahf", "Sūrah al-Kahf")}
             sub={t("sheet.friday_morning_reminder", "Friday morning, a reminder to read it")}
             value={!!alerts.kahf} onChange={v => set({ kahf: v })} />
+          {/* Off by default, unlike the rest: two notifications a night, for
+              one month of the year. It is silent for the other eleven whether
+              it is on or not, because only the days the timetable itself calls
+              Ramadan get one — so nobody has to remember to turn it off. The
+              switch on the Ramadan screen is this same setting. */}
+          <Row title={t("ramadan.sehri_iftar_reminders", "Sehri & iftar reminders")}
+            sub={t("ramadan.in_ramadan_only", "In Ramadan only")}
+            value={!!alerts.ramadan} onChange={v => set({ ramadan: v })} />
         </View>
 
         {/* .save: the filled interactive plum, cream text, 12px of radius,

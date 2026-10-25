@@ -161,6 +161,7 @@ const FIELDS = [
   ["itikaf.asks",               "it.asks"],
   ["fitrana.amount",            "fitrana.amount"],
   ["fitrana.note",              "fitrana.note"],
+  ["fitrana.payLink",           "fitrana.payLink"],
   ["eid.jamaats",               "eid.jamaats"],
   ["eid.venue",                 "eid.venue"],
   ["eid.note",                  "eid.note"],
@@ -223,7 +224,93 @@ ok("the app stands the night down on the trailing morning",
    /access\.trailing \? null : last/.test(screen));
 ok("the app draws the rota without a night", /RAMADAN\.taraweeh\.leaders\.map/.test(screen));
 
-/* ---- 5. the gate is asked once, in one place ------------------------- */
+/* ---- 5. the layer on top, and the numbers it shares ------------------ */
+
+const reminders = fs.readFileSync(path.join(root, "src/reminders.js"), "utf8");
+
+eq("SEHRI_CUSHION_MIN / RAM_SEHRI_CUSHION", num(logic, "SEHRI_CUSHION_MIN"), num(html, "RAM_SEHRI_CUSHION"));
+eq("SEHRI_WARN_MIN / RAM_SEHRI_WARN",       num(logic, "SEHRI_WARN_MIN"),    num(html, "RAM_SEHRI_WARN"));
+
+/* The cushion is the masjid's own and the app says it in four places. It is
+   defined ONCE; a second literal in any of them is how two sehri times get
+   into one app. */
+for (const [what, src] of [["the app's screen", screen], ["the nightly reminder", reminders],
+                           ["the reminder cards", fs.readFileSync(path.join(root, "src/reminder.js"), "utf8")]])
+  ok(`${what} takes the cushion from ramadan.js`, /sehriEnds\(/.test(src) && !/begins\.fajr,\s*10\b/.test(src),
+     "it has its own copy of the ten minutes");
+
+/* The English the switch promises and the number the phone actually uses have
+   to be the same, or the app says twenty minutes and buzzes at fifteen. */
+const nudge = JSON.parse(fs.readFileSync(path.join(root, "../lang/src/28-ramadan.json"), "utf8"));
+ok("the switch's wording matches SEHRI_WARN_MIN",
+   screen.includes(`A nudge ${num(logic, "SEHRI_WARN_MIN")} minutes before sehri ends`),
+   "the English promises a different number of minutes than the code uses");
+ok("the nudge is drafted in all three languages",
+   Array.isArray(nudge["ramadan.a_nudge_before_sehri_ends"])
+   && nudge["ramadan.a_nudge_before_sehri_ends"].every(x => typeof x === "string" && x.trim()));
+
+/* Night by night is what ramadanState's past/tonight/ahead were written for,
+   and the stream row is the only thing on the screen that can be untrue — it
+   must be bounded by a time, not shown all day. */
+ok("the app draws night by night", /<Nights st=\{st\}/.test(screen));
+ok("the website does too", /put\("rm-nights"/.test(html));
+/* Checked by reading the FUNCTION'S OWN BODY, not by finding its name.
+   A first attempt asserted that the name and the word "isha" both appeared
+   somewhere in the file, and a mutation that replaced the function with
+   `() => true` and left the old one beside it passed — which is the shape of
+   every check that greps a file instead of reading the thing it names. */
+function body(src, name) {
+  const i = src.indexOf(`function ${name}(`);
+  if (i < 0) return null;
+  const open = src.indexOf("{", i);
+  let depth = 0;
+  for (let j = open; j < src.length; j++) {
+    if (src[j] === "{") depth++;
+    else if (src[j] === "}" && --depth === 0) return src.slice(open, j + 1);
+  }
+  return null;
+}
+for (const [what, src, name] of [["the app", screen, "onAirNow"], ["the website", html, "rmTaraweehHour"]]) {
+  const b = body(src, name);
+  ok(`${what} has one ${name}`, !!b && src.split(`function ${name}(`).length === 2,
+     b ? "it is defined more than once" : "it is not defined at all");
+  ok(`${what} bounds the stream row by the Isha jamāʿah`,
+     !!b && /isha/.test(b) && />=/.test(b),
+     "the body does not compare the clock against the Isha jamāʿah");
+}
+
+/* Both platforms open the muṣḥaf at the page the night actually reads. */
+ok("the app's Read goes to the muṣḥaf at a page", /go\("Mushaf", \{ page \}\)/.test(screen));
+ok("the website's does too", /openMushafAt\(/.test(html));
+
+/* ---- 6. the booking, and the two things that are not ours ----------- *
+ * The iʿtikāf form posts to a Postgres function and the fitrana button opens
+ * a Stripe Payment Link, and NEITHER EXISTS YET: the function is the masjid's
+ * database to create and the link is their Stripe account to create. Both are
+ * therefore built dark, and these assert they stay dark rather than offering
+ * a form that posts into nowhere or a button that opens nothing.
+ */
+ok("the app asks Postgres whether bookings are open", /itikafIsOpen\(\)/.test(screen));
+ok("the website asks the same function", /rpc\/itikaf_is_open/.test(html));
+ok("both post to the same function",
+   /rpc\("request_itikaf_place"/.test(screen) && /rpc\/request_itikaf_place/.test(html));
+ok("the app draws nothing until the answer is a definite yes",
+   /open !== true/.test(screen), "a three-valued probe must not be read as a boolean");
+ok("the website draws nothing until the same", /RM_BOOK\.open === true/.test(html));
+
+/* A Payment Link with no amount beside it is a button that asks for money
+   nobody has been told the size of. */
+ok("the app needs both a link and an amount", /payLink && RAMADAN\.fitrana\.amount/.test(screen));
+ok("the website needs both too", /payLink && C\.fitrana\.amount/.test(html));
+ok("neither is set yet, so neither button is drawn",
+   RAM.fitrana.payLink === null && RAM.fitrana.amount === null);
+
+/* "0 of 0 left" would read as fully booked. A null is not a zero. */
+ok("the app's booking stands down when places are unknown",
+   /left === null/.test(screen) && /it\.places == null \? null/.test(screen));
+ok("the website's does too", /\(it\.places == null\) \? null/.test(html));
+
+/* ---- 7. the gate is asked once, in one place ------------------------- */
 
 ok("the app asks ramadanAccess once", (screen.match(/ramadanAccess\(/g) || []).length === 1);
 ok("the app's month is behind that gate", /if \(access\.open\) return <Month/.test(screen));

@@ -21,17 +21,20 @@
  * it was defensible and all of it was wrong: a screen that exists to say one
  * thing should say one thing. Everything that was explaining itself has gone.
  */
-import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Image } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { View, Text, Image, Switch, Share } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
 import Svg, { Polygon } from "react-native-svg";
-import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot } from "../ui";
+import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot, Press, tap, open } from "../ui";
+import { Field, ErrorBox, Submit, isPhone } from "../form";
+import { rpc, itikafIsOpen } from "../supabase";
 import { useApp } from "../store";
 import { allDays } from "../timetable";
-import { shortDate } from "../dates";
+import { shortDate, dowDay } from "../dates";
 import { nowLondon, pretty } from "../prayer";
-import { ramadanAccess, firstNightBegins, countdown } from "../ramadan";
+import { ramadanAccess, firstNightBegins, countdown, sehriEnds } from "../ramadan";
 import MUSHAF from "../data/mushaf.json";
 import RAMADAN from "../data/ramadan.json";
 
@@ -56,19 +59,14 @@ function Star({ size, color, opacity, width }) {
 
 /* ---- the month, once the gate has opened ------------------------------- */
 
-/* Sehri is ten minutes before Fajr begins, which is the masjid's own cushion
-   and the same one the reminder cards use. Iftar is Maghrib to the minute. */
-const minusMins = (hhmm, n) => {
-  const [h, m] = hhmm.split(":").map(Number);
-  const mins = (((h * 60 + m - n) % 1440) + 1440) % 1440;
-  return `${pad2(Math.floor(mins / 60))}:${pad2(mins % 60)}`;
-};
-
+/* Sehri is the masjid's own cushion before Fajr — ramadan.js owns the number,
+   because the reminder cards, the nightly notification and the website all
+   have to agree with it. Iftar is Maghrib to the minute. */
 function ramTimes(iso, days) {
   const rec = days && days[iso];
   if (!rec || !rec.begins) return {};
   return {
-    sehri: rec.begins.fajr ? minusMins(rec.begins.fajr, 10) : null,
+    sehri: sehriEnds(rec.begins.fajr),
     fajr:  rec.begins.fajr || null,
     iftar: rec.begins.maghrib || null,
     isha:  (rec.jamaat && rec.jamaat.isha) || null,
@@ -127,8 +125,417 @@ function Dua({ ar, tr, en, src }) {
 const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">'
            + '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>';
 
-function Month({ access, now }) {
+/* ---- the layer on top of the month ------------------------------------ *
+ *
+ * The month answers "what is happening". This answers "and what do I do about
+ * it": read tonight's juz, hear taraweeh if you cannot get to the masjid, be
+ * told when sehri ends, and reach the timetable, the zakāt calculator or the
+ * car park without going back to the menu. The website's own, component for
+ * component.
+ */
+
+/* How many nights are shown ahead of tonight before "All 30 nights". */
+const AHEAD = 4;
+
+/* Where the month has got to in the Qurʼan. */
+function Progress({ st, onRead }) {
   const { t, fs, rtl } = useApp();
+  const pages = juzPages(st.juz);
+  return (
+    <Card>
+      <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("ramadan.tonights_juz", "Tonight’s juz")}
+          </Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 2,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("ramadan.juz_n", "Juz {n}").replace("{n}", String(st.juz))
+              + (pages ? " · " + t("ramadan.pages_a_b", "pages {a}–{b}")
+                   .replace("{a}", String(pages.from)).replace("{b}", String(pages.to)) : "")}
+          </Text>
+        </View>
+        <Press onPress={() => { tap(); onRead(pages && pages.from); }}
+               style={{ borderWidth: 1, borderColor: C.line, borderRadius: R.pill,
+                        paddingHorizontal: 13, paddingVertical: 7 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldInk }}>
+            {t("ramadan.read_it", "Read it")}
+          </Text>
+        </Press>
+      </View>
+      <View style={{ height: 7, borderRadius: R.pill, backgroundColor: C.line, overflow: "hidden" }}>
+        <View style={{ width: `${(st.night / st.total * 100).toFixed(1)}%`, height: 7,
+                       borderRadius: R.pill, backgroundColor: C.brand700 }} />
+      </View>
+      <View style={{ flexDirection: rtl ? "row-reverse" : "row", justifyContent: "space-between", gap: 8 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.muted }}>
+          {t("ramadan.juz_n_of_m", "Juz {n} of {m}")
+            .replace("{n}", String(st.juz)).replace("{m}", String(Math.min(st.total, 30)))}
+        </Text>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
+          {st.nightsToEid > 0
+            ? t("ramadan.n_nights_to_go", "{n} nights to go").replace("{n}", String(st.nightsToEid))
+            : t("ramadan.the_last_night", "The last night")}
+        </Text>
+      </View>
+    </Card>
+  );
+}
+
+/* Who is leading it, and — while it is actually being prayed — the stream. */
+function Leading({ onAir, onRota, onListen }) {
+  const { t, fs, rtl } = useApp();
+  const tbc = t("ramadan.to_be_confirmed", "To be confirmed");
+  /* BUILT from the rota rather than written out, so the summary cannot come
+     to disagree with the list it summarises — which is exactly what a
+     hand-written summary does the year the arrangement changes. */
+  const ls = RAMADAN.taraweeh.leaders || [];
+  const named = ls.filter(l => l.name);
+  const rest = ls.length - named.length;
+  const who = !named.length ? tbc
+    : rest ? t("ramadan.x_and_n_students", "{who} and {n} students")
+               .replace("{who}", named.map(l => l.name).join(", ")).replace("{n}", String(rest))
+           : named.map(l => l.name).join(", ");
+  const row = { flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                gap: 12, paddingVertical: 13, paddingHorizontal: 16 };
+  return (
+    <RowGroup>
+      <View style={row}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("ramadan.leading", "Leading")}
+          </Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 2,
+                         textAlign: rtl ? "right" : "left" }}>{who}</Text>
+        </View>
+        <Press onPress={() => { tap(); onRota(); }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldInk }}>
+            {t("ramadan.who_leads", "Who leads")} ›
+          </Text>
+        </Press>
+      </View>
+      {onAir ? (
+        <View style={[row, { backgroundColor: C.tintPlum }]}>
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.onAir }} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                           textAlign: rtl ? "right" : "left" }}>
+              {t("ramadan.taraweeh_is_on_air", "Taraweeh is on air")}
+            </Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 2,
+                           textAlign: rtl ? "right" : "left" }}>
+              {t("ramadan.listen_from_home", "Listen from home")}
+            </Text>
+          </View>
+          <Press onPress={() => { tap(); onListen(); }}
+                 style={{ backgroundColor: C.brand700, borderRadius: R.pill,
+                          paddingHorizontal: 15, paddingVertical: 8 }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.cream }}>
+              {t("home.listen", "Listen")}
+            </Text>
+          </Press>
+        </View>) : null}
+    </RowGroup>
+  );
+}
+
+/* The nudge people actually want, and the one place in the app they will say
+   yes to it. The same setting as the switch on Notifications — KeepReminders
+   watches the prefs and re-arms the week the moment either one moves. */
+function Remind() {
+  const { t, fs, rtl, alerts, setAlerts } = useApp();
+  const title = t("ramadan.sehri_iftar_reminders", "Sehri & iftar reminders");
+  const sub = t("ramadan.a_nudge_before_sehri_ends",
+                "A nudge 20 minutes before sehri ends, and one at iftar.");
+  return (
+    <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
+                   backgroundColor: C.tintPlum, borderRadius: R.card,
+                   paddingHorizontal: 16, paddingVertical: 15, marginTop: 12 }}>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>{title}</Text>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18), color: C.muted,
+                       marginTop: 3, textAlign: rtl ? "right" : "left" }}>{sub}</Text>
+      </View>
+      <Switch value={!!alerts.ramadan} onValueChange={v => { tap(); setAlerts({ ramadan: v }); }}
+              accessibilityLabel={`${title}. ${sub}`}
+              trackColor={{ false: "#D9D2C0", true: C.brand600 }}
+              thumbColor="#FFFFFF" activeThumbColor="#FFFFFF" ios_backgroundColor={C.line} />
+    </View>
+  );
+}
+
+/* The three things people reach for. */
+function Tiles({ onTimes, onShare, onZakat }) {
+  const { t, fs } = useApp();
+  const [said, setSaid] = useState(false);
+  const tile = { flex: 1, backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
+                 borderRadius: R.tile, paddingTop: 13, paddingBottom: 12, paddingHorizontal: 10,
+                 alignItems: "center", gap: 7 };
+  const lab = { fontFamily: F.sansSemi, fontSize: fs(11.5), lineHeight: fs(15),
+                color: C.ink, textAlign: "center" };
+  return (
+    <View style={{ flexDirection: "row", gap: 9, marginTop: 12 }}>
+      <Press onPress={() => { tap(); onTimes(); }} style={tile}>
+        <Ionicons name="calendar-outline" size={19} color={C.brand700} />
+        <Text style={lab}>{t("ramadan.timetable", "Timetable")}</Text>
+      </Press>
+      <Press onPress={async () => { tap(); if (await onShare()) { setSaid(true); setTimeout(() => setSaid(false), 1600); } }}
+             style={tile}>
+        <Ionicons name="share-outline" size={19} color={C.brand700} />
+        <Text style={lab}>{said ? t("ramadan.copied", "Copied") : t("ramadan.share", "Share")}</Text>
+      </Press>
+      <Press onPress={() => { tap(); onZakat(); }} style={tile}>
+        <Ionicons name="star-outline" size={19} color={C.brand700} />
+        <Text style={lab}>{t("ramadan.zakat", "Zakat")}</Text>
+      </Press>
+    </View>
+  );
+}
+
+/* One night: its number and date, its juz and pages, and a way in. */
+function NightRow({ n, now, onRead }) {
+  const { t, fs, rtl } = useApp();
+  const pages = juzPages(n.juz);
+  const d = new Date(n.iso + "T12:00:00");
+  return (
+    <Press onPress={() => { tap(); onRead(pages && pages.from); }}
+           style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 11,
+                    paddingVertical: 11, paddingHorizontal: 14,
+                    backgroundColor: now ? C.tintPlum : "transparent" }}>
+      <View style={{ width: 40, alignItems: "center" }}>
+        <Text style={{ fontFamily: F.display, fontSize: fs(now ? 18 : 17),
+                       color: now ? C.brand700 : C.ink }}>{n.night}</Text>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(9), letterSpacing: 0.5,
+                       textTransform: "uppercase", color: C.muted, marginTop: 1 }}>
+          {dowDay(t, d)}
+        </Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("ramadan.juz_n", "Juz {n}").replace("{n}", String(n.juz))}
+        </Text>
+        {!!pages && (
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 2,
+                         textAlign: rtl ? "right" : "left" }}>
+            {t("ramadan.pages_a_b", "pages {a}–{b}")
+              .replace("{a}", String(pages.from)).replace("{b}", String(pages.to))}
+          </Text>)}
+      </View>
+      <View style={{ borderRadius: R.pill, paddingHorizontal: now ? 13 : 12,
+                     paddingVertical: now ? 7 : 6,
+                     backgroundColor: now ? C.brand700 : "transparent",
+                     borderWidth: now ? 0 : 1, borderColor: C.line }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5),
+                       color: now ? C.cream : C.goldInk }}>{t("ramadan.read", "Read")}</Text>
+      </View>
+    </Press>
+  );
+}
+
+/* One juz a night, laid out night by night. */
+function Nights({ st, onRead }) {
+  const { t, fs, rtl } = useApp();
+  const [all, setAll] = useState(false);
+  const [past, setPast] = useState(false);
+  const nights = [...st.past, st.tonight, ...st.ahead];
+  const behind = nights.filter(n => n.night < st.night);
+  const ahead = nights.filter(n => n.night > st.night);
+  const shown = all ? ahead : ahead.slice(0, AHEAD);
+
+  return (
+    <View>
+      <Heading tag={t("ramadan.one_juz", "One juz")}>
+        {t("ramadan.night_by_night", "Night by night")}
+      </Heading>
+      <RowGroup>
+        {behind.length && !past ? (
+          <Press onPress={() => { tap(); setPast(true); }}
+                 style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                          gap: 11, paddingVertical: 12, paddingHorizontal: 14,
+                          backgroundColor: C.paper }}>
+            <View style={{ width: 40, alignItems: "center" }}>
+              <Text style={{ fontFamily: F.display, fontSize: fs(15), color: C.muted }}>
+                {`1–${behind.length}`}
+              </Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.muted,
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("ramadan.n_nights_behind_you", "{n} nights behind you")
+                  .replace("{n}", String(behind.length))}
+              </Text>
+              <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 2,
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("ramadan.juz_a_to_b_look_back", "Juz {a} to {b} · tap to look back")
+                  .replace("{a}", "1").replace("{b}", String(behind.length))}
+              </Text>
+            </View>
+            <Ionicons name="chevron-down" size={16} color={C.muted} />
+          </Press>
+        ) : behind.map(n => <NightRow key={n.night} n={n} onRead={onRead} />)}
+
+        <NightRow n={st.tonight} now onRead={onRead} />
+        {shown.map(n => <NightRow key={n.night} n={n} onRead={onRead} />)}
+
+        {ahead.length > AHEAD ? (
+          <Press onPress={() => { tap(); setAll(v => !v); }}
+                 style={{ paddingVertical: 12, paddingHorizontal: 14, alignItems: "center" }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldInk }}>
+              {(all ? t("ramadan.fewer_nights", "Fewer nights")
+                    : t("ramadan.all_n_nights", "All {n} nights").replace("{n}", String(st.total)))} ›
+            </Text>
+          </Press>) : null}
+      </RowGroup>
+    </View>
+  );
+}
+
+/* Taraweeh is prayed after Isha. "On air" is offered from the Isha jamāʿah
+   until the clock turns over, which is the window the stream actually carries
+   it in — a row saying the masjid is broadcasting when it is not sends people
+   to a player that would play silence. */
+function onAirNow(tm, now) {
+  if (!tm || !tm.isha) return false;
+  const [h, m] = String(tm.isha).split(":").map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return false;
+  return now.getHours() * 60 + now.getMinutes() >= h * 60 + m;
+}
+
+/* ---- iʿtikāf: the one thing on this screen that has to be booked ------- *
+ *
+ * DARK UNTIL THE DATABASE HAS IT. itikaf_is_open() says whether the committee
+ * is taking bookings and request_itikaf_place() takes one; neither exists in
+ * the masjid's database as this is written, and itikafIsOpen() answers false
+ * to a function that is not there. So nobody is offered a form that would
+ * post into nowhere, and the day somebody creates the two and switches the
+ * first on, the button appears on both platforms with nothing to ship.
+ */
+function Booking({ st, open }) {
+  const { t, fs, rtl } = useApp();
+  const [form, setForm] = useState(false);
+  const [v, setV] = useState({ name: "", phone: "" });
+  const [nights, setNights] = useState([]);
+  const [state, setState] = useState({});
+  const [touched, setTouched] = useState(false);
+
+  const it = RAMADAN.itikaf;
+  const left = it.places == null ? null : Math.max(0, it.places - (it.taken || 0));
+  /* No night, no places set, or the committee is not taking them: the card
+     above still says what iʿtikāf is and when it begins. */
+  if (!st || open !== true || left === null) return null;
+
+  const okName = v.name.trim().length > 1;
+  const okPhone = isPhone(v.phone);
+  const valid = okName && okPhone && nights.length > 0;
+  const full = left === 0;
+
+  async function send() {
+    setTouched(true);
+    if (!valid) {
+      setState({ error: t("ramadan.fill_in_the_booking",
+        "Please give a name, a phone number the office can reach you on, and at least one night.") });
+      return;
+    }
+    setState({ sending: true });
+    const r = await rpc("request_itikaf_place", {
+      name: v.name.trim(), phone: v.phone.trim(), nights: [...nights].sort((a, b) => a - b),
+    });
+    /* Where the function speaks to the person directly — "there are no places
+       left" — say what it said rather than an apology over the top of it. */
+    if (r.ok) setState({ sent: true, reference: r.data.reference });
+    else setState({ error: r.message || t("ramadan.booking_couldnt_send",
+      "That didn't send. Please try again, or ring the office on 01204 535 997.") });
+  }
+
+  if (state.sent)
+    return (
+      <Card style={{ gap: 4 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("ramadan.your_place_is_asked_for", "Your place is asked for")}
+        </Text>
+        <Note>{t("ramadan.the_office_will_ring_you", "The office will ring you to confirm it.")}</Note>
+        {!!state.reference && (
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), letterSpacing: 0.5,
+                         color: C.muted }}>{state.reference}</Text>)}
+      </Card>);
+
+  if (full && !form)
+    return (
+      <Card style={{ gap: 4 }}>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
+                       textAlign: rtl ? "right" : "left" }}>
+          {t("ramadan.fully_booked", "Fully booked")}
+        </Text>
+        <Note>{t("ramadan.every_place_is_taken",
+                 "Every place is taken. We will call you if one comes free.")}</Note>
+        <Submit label={t("ramadan.join_the_waiting_list", "Join the waiting list")}
+                onPress={() => { tap(); setForm(true); }} />
+      </Card>);
+
+  if (!form)
+    return (
+      <View style={{ marginTop: 12 }}>
+        <Submit label={t("ramadan.book_your_place", "Book your place")}
+                onPress={() => { tap(); setForm(true); }} />
+      </View>);
+
+  /* The last ten nights by number, from the month the timetable actually
+     published rather than a guess at 21–30. */
+  const first = Math.max(1, st.total - 9);
+  const choices = Array.from({ length: st.total - first + 1 }, (_, i) => first + i);
+
+  return (
+    <Card>
+      <Field label={t("ramadan.your_name", "Your name")} value={v.name}
+             onChange={x => setV({ ...v, name: x })} bad={touched && !okName} required />
+      <Field label={t("ramadan.phone_number", "Phone number")} value={v.phone} type="tel"
+             onChange={x => setV({ ...v, phone: x })} bad={touched && !okPhone} required />
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.muted, marginTop: 8,
+                     textAlign: rtl ? "right" : "left" }}>
+        {t("ramadan.which_nights", "Which nights")}
+      </Text>
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+        {choices.map(n => {
+          const on = nights.includes(n);
+          return (
+            <Press key={n} accessibilityRole="checkbox" accessibilityState={{ checked: on }}
+                   accessibilityLabel={`${n} ${t("ramadan.ramadan", "Ramadan")}`}
+                   onPress={() => { tap(); setNights(ns => on ? ns.filter(x => x !== n) : [...ns, n]); }}
+                   style={{ minWidth: 44, paddingVertical: 9, paddingHorizontal: 11, borderRadius: 11,
+                            alignItems: "center", borderWidth: 1,
+                            borderColor: on ? "transparent" : C.line,
+                            backgroundColor: on ? C.gold : C.paper }}>
+              <Text style={{ fontFamily: F.display, fontSize: fs(15),
+                             color: on ? C.brand900 : C.ink }}>{n}</Text>
+            </Press>);
+        })}
+      </View>
+      {!!state.error && <ErrorBox>{state.error}</ErrorBox>}
+      <Submit label={t("ramadan.send_this_booking", "Send this booking")}
+              sending={state.sending} onPress={send} />
+    </Card>
+  );
+}
+
+function Month({ access, now, navigation }) {
+  const { t, fs, rtl } = useApp();
+  /* Whether the committee is taking iʿtikāf bookings, asked of Postgres
+     rather than of a flag in the app so the two platforms cannot disagree.
+     It answers false while the database has no such function. */
+  const [booking, setBooking] = useState(null);
+  useEffect(() => { itikafIsOpen().then(setBooking, () => setBooking(false)); }, []);
+  /* "Who leads ›" goes to the rota further down this same screen, which on
+     the website is an anchor and here is a measured offset. The ScrollView is
+     reached through Screen's `...rest`; the rota reports where it landed. */
+  const scroller = useRef(null);
+  const rotaY = useRef(0);
+  const go = (name, params) => navigation && navigation.navigate(name, params);
+  const read = page => { if (page) go("Mushaf", { page }); };
   /* TWO STATES, AND THE DIFFERENCE MATTERS ON ONE MORNING A YEAR. `st` is the
      night being prayed right now, and is null for both states this section is
      deliberately open in without one: the WEEK BEFORE, and the MORNING AFTER.
@@ -179,12 +586,32 @@ function Month({ access, now }) {
         .filter(n => n > st.total - 10 && n % 2 === 1)
     : [];
 
+  /* Tonight's two times, as a line somebody can send to their family. */
+  const share = async () => {
+    if (!st) return false;
+    const message = [
+      t("ramadan.day_n", "Day {n}").replace("{n}", String(st.night)) + " · "
+        + shortDate(t, new Date(iso + "T12:00:00")),
+      t("ramadan.sehri_ends", "Sehri ends") + " " + (tm.sehri ? pretty(tm.sehri) : "—"),
+      t("ramadan.iftar", "Iftar") + " " + (tm.iftar ? pretty(tm.iftar) : "—"),
+      "Taiyabah Masjid",
+    ].join("\n");
+    try { await Share.share({ message }); } catch { /* cancelled is not failed */ }
+    return false;
+  };
+
   return (
-    <Screen pad={false}>
+    <Screen pad={false} ref={scroller}>
       <Hero ring={MOON} lines={[{ k: "ramadan.ramadan", t: "Ramadan", w: "eyebrow" }]}>
         {!!st && (
           <View>
-            <View style={{ alignItems: "center", marginTop: 4 }}>
+            <View style={{ alignItems: rtl ? "flex-end" : "flex-start", marginTop: 4 }}>
+              {!!st.year && (
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(10), letterSpacing: 2.2,
+                               textTransform: "uppercase", color: C.gold, opacity: 0.85,
+                               marginBottom: 9 }}>
+                  {t("ramadan.n_ah", "{n} AH").replace("{n}", String(st.year))}
+                </Text>)}
               <Text style={{ fontFamily: F.display, fontSize: fs(30), color: C.cream }}>
                 {t("ramadan.day_n", "Day {n}").replace("{n}", String(st.night))}
               </Text>
@@ -257,16 +684,26 @@ function Month({ access, now }) {
             <Heading tag={t("ramadan.juz_n", "Juz {n}").replace("{n}", String(st.juz))}>
               {t("ramadan.tonight", "Tonight")}
             </Heading>
+            {/* The juz used to be a second row here and again, by name, on
+                the progress card below — the same two words twice on one
+                screen, which reads as a bug rather than as emphasis. It
+                belongs on the card that can say more about it than its own
+                name. */}
             <RowGroup>
               <RmRow first k={t("ramadan.isha_jamaah", "Isha jamāʿah")}
                      v={tm.isha ? pretty(tm.isha) : tbc} />
-              <RmRow first k={t("ramadan.tonights_juz", "Tonight’s juz")}
-                     v={t("ramadan.juz_n", "Juz {n}").replace("{n}", String(st.juz))
-                        + (pages ? " · " + t("ramadan.pages_a_b", "pages {a}–{b}")
-                             .replace("{a}", String(pages.from))
-                             .replace("{b}", String(pages.to)) : "")} />
             </RowGroup>
+            <Progress st={st} onRead={read} />
           </View>)}
+
+        {/* Leading, the nudge and the tiles need no night: the week before
+            Ramadan is exactly when somebody turns the reminder on, and a
+            blank where the switch should be is that week going to waste. */}
+        <Leading onAir={onAirNow(tm, now)} onListen={() => go("Live")}
+                 onRota={() => scroller.current
+                   && scroller.current.scrollTo({ y: Math.max(0, rotaY.current - 12), animated: true })} />
+        <Remind />
+        <Tiles onTimes={() => go("Timetable")} onZakat={() => go("Zakat")} onShare={share} />
 
         <Heading>{t("ramadan.on_sighting_the_new_moon", "On sighting the new moon")}</Heading>
         <Dua ar="اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلاَمَةِ وَالإِسْلاَمِ رَبِّي وَرَبُّكَ اللَّهُ"
@@ -278,6 +715,7 @@ function Month({ access, now }) {
                    + "Islam. My Lord and your Lord is Allah.")}
              src={t("ramadan.jami_al_tirmidhi", "Jāmiʿ al-Tirmidhī")} />
 
+        <View onLayout={e => { rotaY.current = e.nativeEvent.layout.y; }}>
         <Heading>{t("ramadan.taraweeh", "Taraweeh")}</Heading>
         <Card>
           <P>{t("ramadan.twenty_rak_ahs_each_night",
@@ -298,6 +736,8 @@ function Month({ access, now }) {
           {RAMADAN.taraweeh.leaders.map(l => (
             <RmRow key={l.rakahs} k={l.rakahs} v={l.name || tbc} sub={l.role} first />))}
         </RowGroup>
+        </View>
+        {!!st && <Nights st={st} onRead={read} />}
 
         <Heading>{t("ramadan.bayaan", "Bayaan")}</Heading>
         <Card>
@@ -325,6 +765,7 @@ function Month({ access, now }) {
             <Note>{it.asks}</Note>
           </View>
         </RowGroup>
+        <Booking st={st} open={booking} />
 
         <Heading>{t("ramadan.zakat_al_fitr", "Zakat al-Fitr")}</Heading>
         <Card>
@@ -337,6 +778,14 @@ function Month({ access, now }) {
             <Note>{RAMADAN.fitrana.note}</Note>
           </View>
         </RowGroup>
+        {/* A Payment Link only the masjid can make. Null draws no button
+            rather than a button that goes nowhere — and no amount means there
+            is nothing to pay yet, whatever the link says. */}
+        {!!(RAMADAN.fitrana.payLink && RAMADAN.fitrana.amount) && (
+          <View style={{ marginTop: 12 }}>
+            <Submit label={t("ramadan.pay_fitrana", "Pay fitrana")}
+                    onPress={() => { tap(); open(RAMADAN.fitrana.payLink); }} />
+          </View>)}
 
         {/* Eid belongs on this screen the morning after the last night, which
             is the whole reason the section stays open a day past the month. */}
@@ -360,12 +809,27 @@ function Month({ access, now }) {
                 "When it is full, park with consideration for our neighbours and the wider "
                 + "community — never across a driveway. The masjid sits on a main road, so "
                 + "take care pulling out, and keep hold of children.")}</P>
+          {/* Somebody reading the parking advice is on their way. The address
+              is the masjid's own, not the Centre's. */}
+          <Press onPress={() => { tap(); open("https://maps.apple.com/?q=31a+Draycott+Street+Bolton+BL1+8HD"); }}
+                 style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
+                          paddingTop: 12, borderTopWidth: 1, borderTopColor: C.line }}>
+            <Ionicons name="location-outline" size={18} color={C.brand700} />
+            <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5), color: C.ink,
+                           textAlign: rtl ? "right" : "left" }}>
+              {t("ramadan.directions", "Directions")}
+            </Text>
+            <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={16} color={C.muted} />
+          </Press>
         </Card>
 
         {/* ---- the last ten nights, once they are the ones being prayed ---- */}
         {!!(st && st.lastTen) && (
           <View>
-            <Heading>{t("ramadan.the_last_ten_nights", "The last ten nights")}</Heading>
+            <Heading tag={t("ramadan.a_b_ramadan", "{a} – {b} Ramadan")
+                          .replace("{a}", String(st.total - 9)).replace("{b}", String(st.total))}>
+              {t("ramadan.the_last_ten_nights", "The last ten nights")}
+            </Heading>
             <Card>
               <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.9,
                              textTransform: "uppercase", color: C.goldInk, textAlign: align }}>
@@ -402,7 +866,7 @@ function Month({ access, now }) {
   );
 }
 
-export default function Ramadan() {
+export default function Ramadan({ navigation }) {
   const { t, fs } = useApp();
 
   /* Re-read the clock every second but only re-render when the MINUTE turns,
@@ -456,7 +920,7 @@ export default function Ramadan() {
   /* THE GATE, AND THE ONLY PLACE IT IS ASKED. Everything below this line is
      the poster; everything in Month is the month. src/ramadan.js decides
      which, so the rule is tested rather than read. */
-  if (access.open) return <Month access={access} now={now} />;
+  if (access.open) return <Month access={access} now={now} navigation={navigation} />;
 
   return (
     <Screen scroll={false} pad={false} bg={C.brand900}>

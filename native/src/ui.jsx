@@ -117,7 +117,12 @@ export function Arabic({ children, size = 26, center = true }) {
 
 /* --- structure ----------------------------------------------------------- */
 
-export function Screen({ children, scroll = true, pad = true, bg = C.paper, top = 0, ...rest }) {
+/* forwardRef so a screen can scroll ITSELF — the Ramadan screen's "Who leads"
+   goes to the rota further down the same page, which on the website is an
+   anchor and here is a scrollTo. Without this the ref lands on a function
+   component and is silently dropped. */
+export const Screen = React.forwardRef(function Screen(
+  { children, scroll = true, pad = true, bg = C.paper, top = 0, ...rest }, ref) {
   const insets = useSafeAreaInsets();
   const style = { backgroundColor: bg };
   /* THE COLUMN. Every screen in the app goes through here, so the website's
@@ -140,14 +145,14 @@ export function Screen({ children, scroll = true, pad = true, bg = C.paper, top 
         <View style={{ flex: 1, width: "100%", maxWidth: COLUMN }}>{children}</View>
       </View>);
   return (
-    <ScrollView style={[{ flex: 1 }, style]} contentContainerStyle={inner}
+    <ScrollView ref={ref} style={[{ flex: 1 }, style]} contentContainerStyle={inner}
                 /* the platform's own overscroll, which is half of why a list
                    feels native rather than scripted */
                 showsVerticalScrollIndicator={false} {...rest}>
       {children}
     </ScrollView>
   );
-}
+});
 
 /* The eight-point motif from the masjid's own artwork, used the same way the
  * web app uses it: behind a hero, never as decoration on its own.

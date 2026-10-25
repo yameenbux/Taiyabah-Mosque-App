@@ -83,6 +83,12 @@ window.RAMADAN = {
    * ---------------------------------------------------------------- */
   fitrana: {
     amount: null,
+    /* The masjid's own Stripe Payment Link for fitrana, which only the masjid
+       can create — it is their Stripe account and the amount changes each
+       year. Null until they make one, and null draws no Pay button rather
+       than a button that goes nowhere. The five links already on the giving
+       screen are the shape: buy.stripe.com/… with a client_reference_id. */
+    payLink: null,
     note: "The amount is set by the committee each year and announced in the masjid.",
   },
 

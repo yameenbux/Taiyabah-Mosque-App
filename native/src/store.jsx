@@ -53,8 +53,12 @@ const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favou
                    /* The website's own five switches and its ten-minute default,
                     * so somebody who set this up on the website finds the same
                     * choices here rather than a different set. */
+                   /* `ramadan` is OFF where the rest are on: it is two
+                    * notifications a night, and only for one month of the
+                    * year, so it is opted INTO rather than out of. */
                    alerts: { jamaah: true, mins: 10, janazah: true,
-                             announcements: true, events: false, kahf: true },
+                             announcements: true, events: false, kahf: true,
+                             ramadan: false },
                    /* Whether this phone has been offered reminders. The system
                     * dialog can only be raised once — after that it is the
                     * settings app or nothing — so the offer is made once, on
