@@ -26,6 +26,10 @@ const SCREENS = {
    * that pane's slice even though the app splits it into a screen of its own. */
   "tab-times": ["screens/PrayerTimes.jsx", "screens/Timetable.jsx"],
   "sheet": ["screens/Timetable.jsx"], "tab-notices": ["screens/Notices.jsx"],
+  /* The guard AND the month, both in one file, the same as the website keeps
+     both in one sheet. It was missing from this list while the app had only
+     the guard, which is exactly the hole this check exists to find. */
+  "ramadan": ["screens/Ramadan.jsx"],
   "tab-qibla": ["screens/Qibla.jsx"], "tab-alerts": ["screens/Alerts.jsx"],
   "tab-donate": ["screens/Donate.jsx"], "tab-live": ["screens/Live.jsx"],
   "vids": ["screens/Videos.jsx"], "zakat": ["screens/Zakat.jsx"],

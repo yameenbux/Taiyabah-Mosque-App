@@ -1013,6 +1013,43 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     background:rgba(198,162,76,.16);border:1px solid rgba(198,162,76,.4);color:var(--gold-bright);margin-bottom:16px}
   .rm-ring svg{width:26px;height:26px}
   .rm-en{font-family:"Fraunces",Georgia,serif;font-size:calc(20px * var(--ts));font-weight:600;color:#F3EFE3}
+  /* ---- the open month ---- */
+  .rm-live{width:100%;margin-top:18px}
+  .rm-day{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:13px}
+  .rm-day b{font-family:"Fraunces",Georgia,serif;font-size:calc(30px * var(--ts));
+    line-height:1;color:#F3EFE3;font-weight:400}
+  .rm-day span{font-size:calc(13px * var(--ts));color:rgba(243,239,227,.66)}
+  .rm-two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .rm-time{border:1px solid rgba(243,239,227,.16);border-radius:16px;padding:13px 14px;
+    background:rgba(243,239,227,.05)}
+  .rm-time.lit{border-color:rgba(220,187,99,.45);background:rgba(220,187,99,.10)}
+  .rm-time span{display:block;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:2px;
+    text-transform:uppercase;color:#DCBB63}
+  .rm-time b{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(26px * var(--ts));
+    line-height:1.15;color:#F3EFE3;font-weight:400;margin-top:4px}
+  .rm-time i{display:block;font-style:normal;font-size:calc(11.5px * var(--ts));
+    color:rgba(243,239,227,.55);margin-top:2px}
+  .rm-until{margin-top:11px;border-radius:999px;padding:9px 15px;background:rgba(0,0,0,.26);
+    font-size:calc(13px * var(--ts));color:#F3EFE3}
+  .rm-juz{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:2px;
+    text-transform:uppercase;color:var(--gold-ink,#7A5D14)}
+  .rm-list{padding:4px 16px}
+  .rm-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+    padding:12px 0;border-top:1px solid rgba(0,0,0,.07)}
+  .rm-row:first-child{border-top:0}
+  .rm-row span{font-size:calc(14px * var(--ts));color:var(--ink-soft,#5B4A54)}
+  .rm-row b{font-size:calc(14.5px * var(--ts));font-weight:600;text-align:right}
+  .rm-row b i{display:block;font-size:calc(11.5px * var(--ts));font-weight:400;
+    font-style:normal;color:var(--ink-faint,#7A6B74);margin-top:2px}
+  .rm-sub{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:2.2px;
+    text-transform:uppercase;color:var(--gold-ink,#7A5D14);padding:14px 0 2px}
+  .rm-note{font-size:calc(12.5px * var(--ts));line-height:1.55;color:var(--ink-faint,#7A6B74);
+    padding:12px 0 14px;border-top:1px solid rgba(0,0,0,.07);margin-top:2px}
+  .rm-odds{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+  .rm-odd{min-width:52px;text-align:center;border-radius:12px;padding:11px 8px;
+    background:#DCBB63;color:#3C0B2A;font-family:"Fraunces",Georgia,serif;
+    font-size:calc(19px * var(--ts))}
+  .rm-odd.now{outline:2px solid #5E1844;outline-offset:2px}
   .rm-card{padding:16px}
   .rm-card p{font-size:calc(14px * var(--ts));line-height:1.65;color:var(--ink)}
   .rm-card p+p{margin-top:11px}
@@ -5205,6 +5242,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             </svg>
           </span>
           <div class="rm-en" data-i18n="ramadan.ramadan">Ramadan</div>
+          <!-- Day N, sehri, iftar and the countdown. Filled by renderRamadanOpen()
+               because every figure in it comes from the timetable, not the markup. -->
+          <div class="rm-live" id="rm-live"></div>
         </section>
 
         <div class="ab-wrap">
@@ -5214,6 +5254,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <p data-i18n="ramadan.everything_the_masjid_is_running">Everything the masjid is running this month is here: who is leading
                taraweeh, who is speaking, and how to book i&rsquo;tikaf.</p>
           </div>
+
+          <div id="rm-tonight"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.on_sighting_the_new_moon">On sighting the new moon</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -5232,11 +5274,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                juz of the Qur&rsquo;an is read each night, so the whole Qur&rsquo;an is completed in taraweeh by the end of the month.</p>
           </div>
 
+          <div id="rm-rota"></div>
+
           <div class="sec-h"><h2 data-i18n="ramadan.bayaan">Bayaan</h2><span class="rule"></span></div>
           <div class="card rm-card">
             <p data-i18n="ramadan.two_talks_a_day_one">Two talks a day, one after Asr and one after Isha.</p>
             <p data-i18n="ramadan.changes_are_announced_in_the">Changes are announced in the app.</p>
           </div>
+
+          <div id="rm-slots"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.i_tikaf">I&rsquo;tikaf</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -5244,10 +5290,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <p data-i18n="ramadan.places_are_limited_so_booking">Places are limited, so booking is asked for &mdash; book your place in the app.</p>
           </div>
 
+          <div id="rm-itikaf"></div>
+
           <div class="sec-h"><h2 data-i18n="ramadan.zakat_al_fitr">Zakat al-Fitr</h2><span class="rule"></span></div>
           <div class="card rm-card">
             <p data-i18n="ramadan.due_per_person_in_the">Due per person in the household, before the Eid prayer.</p>
           </div>
+
+          <div id="rm-fitrana"></div>
+          <div id="rm-eid"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.parking">Parking</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -5255,6 +5306,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <p data-i18n="ramadan.when_it_is_full_park">When it is full, park with consideration for our neighbours and the wider
                community &mdash; never across a driveway. The masjid sits on a main road, so take care pulling out, and keep hold of children.</p>
           </div>
+
+          <div id="rm-lastten"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.on_laylat_al_qadr">On Laylat al-Qadr</h2><span class="rule"></span></div>
           <div class="card rm-card">
@@ -6820,6 +6873,267 @@ function renderRamadan(){
     t("ramadan.subject_to_moon_sighting","Subject to moon sighting") + (r.year?` · ${num(r.year)}`:"");
 }
 
+/* ---------------- Ramadan: which night it is ----------------
+
+   THE SAME ANSWER ramadan.js GIVES, computed here because the website has no
+   access to the app's module. The shape is deliberately identical — night,
+   total, juz, lastTen, odd, nightsToEid — and check-ramadan.mjs runs both
+   over the same fixtures and fails if they ever disagree. Two implementations
+   of one rule is a risk; two that nobody compares is a certainty.
+
+   THE NIGHT ROLLS OVER AT FAJR, NOT MIDNIGHT. Taraweeh for the 24th night is
+   prayed on the evening of 24 Ramadan and carries on past midnight for anyone
+   sitting with the Qur'an afterwards. A screen that turns over at midnight
+   folds the night away while people are still in the masjid praying it, so
+   before Fajr the active date is yesterday. */
+function ramActiveDate(){
+  const now = nowLondon(), t0 = today0();
+  const rec = DATA && DATA.days && DATA.days[ymd(t0)];
+  const fajr = rec && rec.begins && rec.begins.fajr;
+  if(fajr){
+    const [h, m] = fajr.split(":").map(Number);
+    const f = new Date(t0); f.setHours(h, m, 0, 0);
+    if(now < f) return new Date(t0.getTime() - 86400000);
+  }
+  return t0;
+}
+
+/* Every date in the Ramadan of a given hijri year, in order. */
+function ramMonthDays(year){
+  const out = [];
+  for(const iso in (DATA && DATA.days) || {}){
+    const m = String(DATA.days[iso].hijri || "").match(/^(\d+)\s+(.+?)\s+(\d+)/);
+    if(m && RAM_MONTH.test(m[2].trim()) && +m[3] === year) out.push(iso);
+  }
+  return out.sort();
+}
+
+/** null outside the month; otherwise the night and everything derived. */
+function ramState(d){
+  d = d || ramActiveDate();
+  const h = ramHijri(d);
+  if(!h || !RAM_MONTH.test(h.month)) return null;
+  const month = ramMonthDays(h.year);
+  const total = month.length;
+  if(!total) return null;
+  const night = h.day;
+  return {
+    night, total, iso: ymd(d),
+    juz: Math.min(night, 30),
+    /* a 29-day month puts the last ten at night 20, not 21 */
+    lastTen: night > total - 10,
+    odd: night % 2 === 1,
+    nightsToEid: total - night,
+    nights: month.map((iso, i) => ({ night: i + 1, iso, juz: Math.min(i + 1, 30) })),
+  };
+}
+
+/* THE MORNING AFTER THE LAST NIGHT still belongs to this screen, because Eid
+   al-Fitr and the fitrana deadline are both on it. By then the active date is
+   1 Shawwal and ramState() is null for it, so the screen had the guard down —
+   open, correctly — and rendered nothing at all into it: on the one morning
+   the Eid times matter, a Ramadan section of empty cards. Asked for the day
+   before, the last night answers, nightsToEid is 0 and the Eid card appears.
+   This is the website half of ramadan.js's `trailing` branch. */
+function ramStateOrLast(){
+  const now = ramState();
+  if(now) return now;
+  for(let back = 1; back <= RAM_OPEN_AFTER; back++){
+    const was = ramState(addDays(ramActiveDate(), -back));
+    if(was && was.night === was.total) return was;
+  }
+  return null;
+}
+
+/* Sehri is ten minutes before Fajr begins, which is the masjid's own cushion
+   and the same one the reminder cards use. Iftar is Maghrib to the minute. */
+function ramTimes(iso){
+  const rec = DATA && DATA.days && DATA.days[iso];
+  if(!rec || !rec.begins) return null;
+  return {
+    sehri:  rec.begins.fajr ? minusMins(rec.begins.fajr, 10) : null,
+    fajr:   rec.begins.fajr || null,
+    iftar:  rec.begins.maghrib || null,
+    isha:   (rec.jamaat && rec.jamaat.isha) || null,
+  };
+}
+
+/* Juz to its page range, out of the muṣḥaf the app already ships. */
+function ramJuzPages(juz){
+  /* MUSHAF.meta is the muṣḥaf's own index, fetched the first time the reader
+     is opened. Before that there is no page range to give, so the row says
+     the juz and leaves the pages off rather than guessing at them. */
+  const m = MUSHAF && MUSHAF.meta;
+  const jp = m && m.juzPage;
+  if(!jp || !jp[juz]) return null;
+  const from = +jp[juz], to = jp[juz + 1] ? +jp[juz + 1] - 1 : (m.pages || from);
+  return { from, to };
+}
+
+/* ---------------- Ramadan: the month, once it opens ----------------
+
+   The prose in the sheet is static markup and stays there — it is the same
+   every year. Everything with a figure in it is rendered here instead,
+   because the night, the times, the juz and the rota all change daily and a
+   number typed into markup is a number that goes stale.
+
+   A BLANK IS DRAWN, NOT DROPPED. Anything the committee has not yet given is
+   null in ramadan/content.js and comes out as "To be confirmed". A row that
+   quietly disappears reads as something the masjid is not doing; a row that
+   says the answer is coming reads as what it is. */
+const RM = () => (window.RAMADAN || null);
+const rmTbc = () => t("ramadan.to_be_confirmed", "To be confirmed");
+
+/* "3 hr 12 min", or null once Maghrib has gone. */
+function rmUntilIftar(iso, iftar){
+  if(!iftar) return null;
+  const [h, m] = iftar.split(":").map(Number);
+  const at = new Date(iso + "T00:00:00"); at.setHours(h, m, 0, 0);
+  const ms = at - nowLondon();
+  if(ms <= 0) return null;
+  const mins = Math.round(ms / 60000);
+  return mins >= 60
+    ? t("ramadan.hr_min", "{h} hr {m} min").replace("{h}", num(Math.floor(mins/60))).replace("{m}", num(mins%60))
+    : t("ramadan.n_min", "{m} min").replace("{m}", num(mins));
+}
+
+/* "Tue 24 Feb", in the reader's own day and month names and digits. */
+function rmShortDate(iso){
+  const d = new Date(iso + "T12:00:00");
+  return `${dow(d.getDay())} ${num(d.getDate())} ${mon(d.getMonth())}`;
+}
+
+/* A quiet line under the figure — the leader's role, the bayaan's subject,
+   the Eid venue. Those are fields the committee fills in, so a row that had
+   nowhere to put them was a row that threw them away. A row with nothing
+   extra to say does not grow a blank line. */
+function rmRow(label, value, sub){
+  return `<div class="rm-row"><span>${esc(label)}</span>`
+       + `<b>${esc(value)}${sub ? `<i>${esc(sub)}</i>` : ""}</b></div>`;
+}
+
+/* TWO KINDS OF THING ON ONE SCREEN, and only one of them needs a night.
+   Which night it is, the sehri and iftar times and tonight's juz are all
+   read from the timetable, so they need a night to be read for. The rota,
+   the bayaan slots, the iʿtikāf booking and the fitrana are the committee's
+   arrangements for the month and need nothing at all.
+
+   This used to return early when there was no night, which made the section
+   blank for exactly the two states it is opened for: the WEEK BEFORE, when
+   iʿtikāf has to be bookable and there is no night yet, and the MORNING
+   AFTER, when the Eid times matter. A person who opened it in either saw
+   prose with holes in it. So a night is optional here, and each part that
+   needs one says so. */
+function renderRamadanOpen(){
+  const C  = RM();
+  if(!C) return;
+  /* TWO STATES, AND THE DIFFERENCE MATTERS ON ONE MORNING A YEAR.
+     `st` is the night being prayed right now, and is null for both states
+     this section is deliberately open in without one: the WEEK BEFORE, and
+     the MORNING AFTER. `last` falls back to the night just kept, which is
+     what puts the Eid times on the screen on the morning they are needed.
+     Nothing else uses it: on Eid morning there is no taraweeh tonight and no
+     juz to read, so the hero and "Tonight" stand down rather than print the
+     thirtieth night over the top of Eid. */
+  const st   = ramState();
+  const last = ramStateOrLast();
+  const tm   = st ? (ramTimes(st.iso) || {}) : {};
+  const put  = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+
+  /* ---- what needs a night: the hero, tonight, the last ten ---- */
+  if(!st){
+    for(const id of ["rm-live", "rm-tonight", "rm-lastten"]) put(id, "");
+  } else {
+    const until = rmUntilIftar(st.iso, tm.iftar);
+    put("rm-live",
+        `<div class="rm-day"><b>${esc(t("ramadan.day_n","Day {n}").replace("{n}", num(st.night)))}</b>`
+      + `<span>${esc(rmShortDate(st.iso))} · ${esc(num(st.night))} ${esc(t("ramadan.ramadan","Ramadan"))}</span></div>`
+      + `<div class="rm-two">`
+      + `<div class="rm-time"><span>${esc(t("ramadan.sehri_ends","Sehri ends"))}</span>`
+      + `<b>${esc(tm.sehri ? hm12(tm.sehri) : "—")}</b>`
+      /* THE DESIGN PUT FAJR ITSELF UNDER "SEHRI ENDS" and the app has been
+         telling people something else for a year: the reminder cards say suhūr
+         ends ten minutes before Fajr, which is the masjid's own cushion. Two
+         screens in one app giving two sehri times is worse than either choice,
+         so the cushion wins and Fajr is printed underneath it rather than
+         standing in for it. */
+      + `<i>${esc(t("ramadan.fajr_at","Fajr {t}").replace("{t}", tm.fajr ? hm12(tm.fajr) : "—"))}</i></div>`
+      + `<div class="rm-time lit"><span>${esc(t("ramadan.iftar","Iftar"))}</span>`
+      + `<b>${esc(tm.iftar ? hm12(tm.iftar) : "—")}</b>`
+      + `<i>${esc(t("ramadan.maghrib_lbl","Maghrib"))}</i></div></div>`
+      + (until ? `<div class="rm-until">${esc(t("ramadan.iftar_in","Iftar in {t}").replace("{t}", until))}</div>` : ""));
+
+    const pages = ramJuzPages(st.juz);
+    put("rm-tonight",
+        `<div class="sec-h"><h2>${esc(t("ramadan.tonight","Tonight"))}</h2><span class="rule"></span>`
+      + `<span class="rm-juz">${esc(t("ramadan.juz_n","Juz {n}").replace("{n}", num(st.juz)))}</span></div>`
+      + `<div class="card rm-card rm-list">`
+      + rmRow(t("ramadan.isha_jamaah","Isha jamāʿah"), tm.isha ? hm12(tm.isha) : rmTbc())
+      + rmRow(t("ramadan.tonights_juz","Tonight’s juz"),
+              t("ramadan.juz_n","Juz {n}").replace("{n}", num(st.juz))
+              + (pages ? " · " + t("ramadan.pages_a_b","pages {a}–{b}")
+                   .replace("{a}", num(pages.from)).replace("{b}", num(pages.to)) : ""))
+      + `</div>`);
+
+    const odd = st.lastTen
+      ? st.nights.filter(n => n.night > st.total - 10 && n.night % 2 === 1) : [];
+    put("rm-lastten", odd.length
+      ? `<div class="sec-h"><h2>${esc(t("ramadan.the_last_ten_nights","The last ten nights"))}</h2><span class="rule"></span></div>`
+        + `<div class="card rm-card">`
+        + `<div class="rm-sub">${esc(C.lastTen.kicker)}</div>`
+        + `<p>${esc(C.lastTen.lead)}</p>`
+        + `<div class="rm-odds">` + odd.map(n =>
+            `<span class="rm-odd${n.night === st.night ? " now" : ""}">${esc(num(n.night))}</span>`).join("")
+        + `</div></div>`
+      : "");
+  }
+
+  /* ---- what needs nothing: the month's own arrangements ----
+     The rota, the bayaan slots, the iʿtikāf booking and the fitrana are the
+     committee's, not the timetable's, and they are the whole reason the
+     section opens a week early — iʿtikāf has to be bookable before Ramadan
+     starts. They used to sit behind the same `if` as the night above, so in
+     that week, and again on Eid morning, a person found prose with holes in
+     it where the booking should have been. */
+  put("rm-rota",
+      `<div class="card rm-card rm-list">`
+    + `<div class="rm-sub">${esc(t("ramadan.who_leads","Who leads"))}</div>`
+    + (C.taraweeh.leaders || []).map(l => rmRow(l.rakahs, l.name || rmTbc(), l.role)).join("")
+    + `</div>`);
+
+  put("rm-slots",
+      `<div class="card rm-card rm-list">`
+    + (C.bayaan.slots || []).map(b => rmRow(b.when, b.speaker || rmTbc(), b.subject)).join("")
+    + `</div>`);
+
+  /* ---- i'tikaf: the one thing here that has to be booked ---- */
+  const it = C.itikaf;
+  const places = it.places == null
+    ? rmTbc()
+    : t("ramadan.n_of_m_left","{a} of {b} left")
+        .replace("{a}", num(Math.max(0, it.places - (it.taken || 0)))).replace("{b}", num(it.places));
+  put("rm-itikaf",
+      `<div class="card rm-card rm-list">`
+    + rmRow(t("ramadan.begins","Begins"), it.begins)
+    + rmRow(t("ramadan.who","Who"), it.who)
+    + rmRow(t("ramadan.places","Places"), places)
+    + rmRow(t("ramadan.book_by","Book by"), it.bookBy || rmTbc())
+    + `<p class="rm-note">${esc(it.asks)}</p></div>`);
+
+  put("rm-fitrana",
+      `<div class="card rm-card rm-list">`
+    + rmRow(t("ramadan.amount","Amount"), C.fitrana.amount || rmTbc())
+    + `<p class="rm-note">${esc(C.fitrana.note)}</p></div>`);
+
+  /* ---- and Eid, from the last night until the morning after it ---- */
+  put("rm-eid", last && last.nightsToEid <= 0
+    ? `<div class="sec-h"><h2>${esc(t("ramadan.eid_al_fitr","Eid al-Fitr"))}</h2><span class="rule"></span></div>`
+      + `<div class="card rm-card rm-list">`
+      + rmRow(t("ramadan.jamaah","Jamāʿah"), C.eid.jamaats || rmTbc(), C.eid.venue)
+      + `<p class="rm-note">${esc(C.eid.note)}</p></div>`
+    : "");
+}
+
 /* ---------------- Ramadan: the guard ----------------
    The section below the poster is built — taraweeh, bayaan, i’tikaf, zakat
    al-Fitr, the two du’as — and none of it has anything to say until the
@@ -6843,7 +7157,14 @@ function renderRamadan(){
    there is one the poster says the dates are to be confirmed, which is what
    the native screen says too.
 ---------------------------------------------------- */
-const RAM_OPEN_BEFORE = 10;                  /* ramadan.js OPEN_DAYS_BEFORE */
+const RAM_OPEN_BEFORE = 7;                   /* ramadan.js OPEN_DAYS_BEFORE */
+/* How long it stays open past the last night. Eid al-Fitr and the fitrana
+   deadline are both on that screen and both matter on the morning after, and
+   the hours between midnight and Fajr belong to the night before them.
+   It was the literal [today, yesterday] below — the same number as the app's,
+   written as an array rather than as a number, so check-ramadan.mjs could not
+   see that the two platforms agreed. */
+const RAM_OPEN_AFTER = 1;                    /* ramadan.js OPEN_DAYS_AFTER */
 /* Ramadhan and Ramaḍān both turn up in real calendars, so all three spellings
    are matched — the same regex as ramadan.js. */
 const RAM_MONTH = /^rama[dḍ]h?[aā]n$/i;
@@ -6860,8 +7181,8 @@ function ramHijri(d){
    belongs to the day before it. */
 function ramInMonth(){
   const t0 = today0();
-  for(const d of [t0, new Date(t0.getTime() - 86400000)]){
-    const h = ramHijri(d);
+  for(let back = 0; back <= RAM_OPEN_AFTER; back++){
+    const h = ramHijri(new Date(t0.getTime() - back * 86400000));
     if(h && RAM_MONTH.test(h.month)) return true;
   }
   return false;
@@ -6923,7 +7244,15 @@ function renderRamadanGuard(){
      the day the section opens there is nothing to go wrong. */
   g.hidden = s.open;
   hero.hidden = body.hidden = !s.open;
-  if(s.open){ ramStopTick(); return; }
+  if(s.open){
+    ramStopTick();
+    renderRamadanOpen();
+    /* The iftar countdown is the only thing on the open screen that moves.
+       A quarter-minute is close enough for a figure given in whole minutes,
+       and the interval only runs while the sheet is open. */
+    RAM_TICK = setInterval(renderRamadanOpen, 15000);
+    return;
+  }
 
   const cells = document.getElementById('rmg-cells');
   const phr   = document.getElementById('rmg-phrase');
@@ -11262,7 +11591,17 @@ function initAdvice(){
    The one exception is the guard: until the section opens, the sheet shows
    renderRamadanGuard()'s poster and the prose below it is hidden, because
    that is what the native screen shows and the two have to match. */
-function openRamadan(){
+async function openRamadan(){
+  /* The content is a couple of KB and only matters once somebody opens the
+     section, so it is fetched here rather than carried by every visitor —
+     the same arrangement hajj/content.js has. */
+  await loadOnce('ramadan/content.js', 'RAMADAN_LOADED');
+  /* Tonight's juz is given with its page range, which lives in the muṣḥaf's
+     own index. It is normally fetched the first time the reader is opened,
+     and somebody may well reach Ramadan before they reach the Qur'an, so ask
+     for it here. If it does not arrive the row prints the juz without pages
+     rather than waiting on it. */
+  loadMushafMeta().then(renderRamadanGuard, () => {});
   renderRamadanGuard();
   document.getElementById('ramadan').dataset.open="1";
   document.body.style.overflow="hidden";

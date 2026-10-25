@@ -1,6 +1,6 @@
 {
   "_note": [
-    "The Ramadan sheet (app sheet + website index.html#ramadan). Drafted by Claude from its own language knowledge, not by a native speaker — flagged here for a community read-through before it is treated as finished, particularly the two du'as and the parking wording.",
+    "The Ramadan sheet (app sheet + website index.html#ramadan). Drafted by Claude from its own language knowledge, not by a native speaker — flagged here for a community read-through before it is treated as finished, particularly the two du'as, the parking wording, and the 28 interface strings added when the in-month screen was built (the times, the rota, i'tikaf and the last ten nights).",
     "",
     ""
   ],
@@ -168,5 +168,125 @@
     "منٹ",
     "મિનિટ",
     "دقائق"
+  ],
+  "ramadan.day_n": [
+    "دن {n}",
+    "દિવસ {n}",
+    "اليوم {n}"
+  ],
+  "ramadan.sehri_ends": [
+    "سحری ختم",
+    "સેહરી પૂરી",
+    "ينتهي السحور"
+  ],
+  "ramadan.fajr_at": [
+    "فجر {t}",
+    "ફજર {t}",
+    "الفجر {t}"
+  ],
+  "ramadan.iftar": [
+    "افطار",
+    "ઇફ્તાર",
+    "الإفطار"
+  ],
+  "ramadan.maghrib_lbl": [
+    "مغرب",
+    "મગરિબ",
+    "المغرب"
+  ],
+  "ramadan.iftar_in": [
+    "افطار میں {t}",
+    "ઇફ્તારમાં {t}",
+    "الإفطار بعد {t}"
+  ],
+  "ramadan.hr_min": [
+    "{h} گھنٹے {m} منٹ",
+    "{h} કલાક {m} મિનિટ",
+    "{h} ساعة {m} دقيقة"
+  ],
+  "ramadan.n_min": [
+    "{m} منٹ",
+    "{m} મિનિટ",
+    "{m} دقيقة"
+  ],
+  "ramadan.tonight": [
+    "آج رات",
+    "આજ રાત",
+    "الليلة"
+  ],
+  "ramadan.juz_n": [
+    "پارہ {n}",
+    "પારો {n}",
+    "الجزء {n}"
+  ],
+  "ramadan.tonights_juz": [
+    "آج رات کا پارہ",
+    "આજ રાતનો પારો",
+    "جزء الليلة"
+  ],
+  "ramadan.pages_a_b": [
+    "صفحات {a}–{b}",
+    "પાના {a}–{b}",
+    "الصفحات {a}–{b}"
+  ],
+  "ramadan.isha_jamaah": [
+    "عشاء کی جماعت",
+    "ઇશાની જમાત",
+    "جماعة العشاء"
+  ],
+  "ramadan.who_leads": [
+    "امامت کون کرے گا",
+    "ઇમામત કોણ કરશે",
+    "من يؤمّ"
+  ],
+  "ramadan.the_last_ten_nights": [
+    "آخری دس راتیں",
+    "છેલ્લી દસ રાતો",
+    "العشر الأواخر"
+  ],
+  "ramadan.begins": [
+    "شروع",
+    "શરૂ",
+    "يبدأ"
+  ],
+  "ramadan.who": [
+    "کون",
+    "કોણ",
+    "لمن"
+  ],
+  "ramadan.places": [
+    "جگہیں",
+    "જગ્યાઓ",
+    "الأماكن"
+  ],
+  "ramadan.n_of_m_left": [
+    "{b} میں سے {a} باقی",
+    "{b} માંથી {a} બાકી",
+    "{a} من {b} متبقية"
+  ],
+  "ramadan.book_by": [
+    "بکنگ کی آخری تاریخ",
+    "બુકિંગની છેલ્લી તારીખ",
+    "آخر موعد للحجز"
+  ],
+  "ramadan.amount": [
+    "رقم",
+    "રકમ",
+    "المبلغ"
+  ],
+  "ramadan.eid_al_fitr": [
+    "عید الفطر",
+    "ઈદ અલ-ફિત્ર",
+    "عيد الفطر"
+  ],
+  "ramadan.jamaah": [
+    "جماعت",
+    "જમાત",
+    "الجماعة"
+  ],
+  "ramadan.to_be_confirmed": [
+    "ابھی طے نہیں",
+    "હજી નક્કી નથી",
+    "لم يُحدَّد بعد"
   ]
 }

@@ -25,6 +25,7 @@ const files = [
   ["../quran/duas.js",     "DUAS",     "duas.json"],
   ["../quran/rabbanas.js", "RABBANAS", "rabbanas.json"],
   ["../hajj/content.js",   "HAJJ",     "hajj.json"],
+  ["../ramadan/content.js", "RAMADAN", "ramadan.json"],
 ];
 
 for (const [file, global_, out] of files) {

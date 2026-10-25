@@ -130,17 +130,23 @@ export function ramadanState(now, days) {
  * the congregation no warning. The taraweeh leaders are settled about a month
  * beforehand, so by then there is a real schedule to read as well.
  *
- * Ten days is the window. It is long enough for i'tikaf to be booked and the
- * rota to be read before anybody is fasting, and short enough that the
- * countdown — which by then has been running for months — still gets to do
- * its job. Below thirty days the poster changes its own tune without opening
- * anything.
+ * A WEEK is the window, which is the masjid's own call. It was ten days when
+ * this was first written and the committee asked for seven: long enough for
+ * i'tikaf to be booked and the rota to be read before anybody is fasting,
+ * and short enough that the countdown — which by then has been running for
+ * months — still gets to do its job. Below thirty days the poster changes
+ * its own tune without opening anything.
+ *
+ * Change it here and nowhere else. index.html reads this number through
+ * RAM_OPEN_BEFORE and check-ramadan.mjs asserts the two agree, because a
+ * website that opens three days before the app is a section that contradicts
+ * itself in public.
  *
  * IT STAYS OPEN ONE DAY PAST THE END, because Eid al-Fitr and the fitrana
  * deadline are on that screen and both matter on the morning after the last
  * night. Then it closes and the poster comes back, counting to next year.
  */
-export const OPEN_DAYS_BEFORE = 10;
+export const OPEN_DAYS_BEFORE = 7;
 export const OPEN_DAYS_AFTER = 1;
 export const NEAR_DAYS = 30;
 

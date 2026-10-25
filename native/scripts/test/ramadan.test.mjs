@@ -217,7 +217,7 @@ test("a date the committee published always beats the estimate", () => {
   const a = ramadanAccess(at("2026-12-01", 12, 0), days);
   assert.equal(a.iso, "2027-01-20");
   assert.ok(!a.estimated, "a real date is not flagged as a guess");
-  assert.equal(ramadanAccess(at("2027-01-10", 12, 0), days).open, true, "ten days out it opens");
+  assert.equal(ramadanAccess(at("2027-02-01", 12, 0), days).open, true, "a week out it opens");
 });
 
 test("once the estimate is behind us too, there is nothing honest left", () => {
@@ -246,12 +246,12 @@ test("inside thirty days the guard changes its tune but still guards", () => {
   assert.equal(a.daysUntil, 19);
 });
 
-test("it opens ten days early, so i'tikaf can be booked before anybody fasts", () => {
+test("it opens a week early, so i'tikaf can be booked before anybody fasts", () => {
   const days = fixture("2027-02-08", 29, 1448);
-  const shut = ramadanAccess(at("2027-01-28", 12, 0), days);   /* 11 days out */
-  const open = ramadanAccess(at("2027-01-29", 12, 0), days);   /* 10 days out */
-  assert.equal(shut.open, false, "eleven days out is still the poster");
-  assert.equal(open.open, true, "ten days out the section opens");
+  const shut = ramadanAccess(at("2027-01-31", 12, 0), days);   /* 8 days out */
+  const open = ramadanAccess(at("2027-02-01", 12, 0), days);   /* 7 days out */
+  assert.equal(shut.open, false, "eight days out is still the poster");
+  assert.equal(open.open, true, "a week out the section opens");
   assert.equal(open.early, true);
   assert.equal(open.daysUntil, OPEN_DAYS_BEFORE);
   assert.equal(open.state, null, "open early, but no night is being prayed yet");

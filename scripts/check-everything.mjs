@@ -14,7 +14,13 @@
  * therefore NOT covered: a green run does not mean those work. Neither is the
  * Android shell — this is the web app only.
  */
-import pw from "playwright";
+/* Playwright is deliberately not a dependency — it pulls browser binaries a
+   build machine would never use — so it is resolved from wherever it actually
+   is, the same way the twenty-two scripts under native/ already do. A bare
+   `import "playwright"` only resolved on a machine with it installed at the
+   repository root, which is not where it is installed. */
+import { requirePlaywright } from "../native/scripts/lib/playwright.mjs";
+const pw = await requirePlaywright(import.meta.filename.split("/").pop());
 
 const BASE = "http://127.0.0.1:8111";
 let pass=0, fail=0, warn=0;
