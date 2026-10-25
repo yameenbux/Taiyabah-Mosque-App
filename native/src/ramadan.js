@@ -85,6 +85,7 @@ function monthDays(days, year) {
  *
  *   night        which night is being prayed, 1-based
  *   total        how many days this Ramadan has, counted from the timetable
+ *   year         the hijri year it belongs to, for the screen to name
  *   juz          the juz for tonight, never above 30
  *   lastTen      is tonight one of the last ten
  *   odd          is tonight an odd night (only meaningful in the last ten)
@@ -109,6 +110,7 @@ export function ramadanState(now, days) {
   return {
     night,
     total,
+    year: h.year,
     juz: Math.min(night, 30),
     lastTen: night > total - 10,
     odd: night % 2 === 1,
@@ -146,6 +148,31 @@ export function ramadanState(now, days) {
  * deadline are on that screen and both matter on the morning after the last
  * night. Then it closes and the poster comes back, counting to next year.
  */
+/* SEHRI IS NOT FAJR, AND THE DIFFERENCE IS THE MASJID'S OWN.
+ *
+ * Ten minutes before Fajr begins, which is what the eve-of-fast reminder
+ * cards have said for a year. It was written out as a bare `10` in four
+ * places — the reminder cards, the nightly notification, the app's Ramadan
+ * screen and the website's — and four copies of a number the masjid could
+ * change is four chances for the app to give two different sehri times.
+ *
+ * WARN is how long before THAT the nightly notification goes: somebody told
+ * at the moment sehri ends has been told too late to do anything about it.
+ * check-ramadan.mjs asserts the website carries the same two numbers. */
+export const SEHRI_CUSHION_MIN = 10;
+export const SEHRI_WARN_MIN = 20;
+
+/** "05:25" less n minutes, wrapping at midnight. */
+export function minusMins(hhmm, n) {
+  const [h, m] = String(hhmm).split(":").map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+  const mins = (((h * 60 + m - n) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+}
+
+/** When sehri ends on a day whose Fajr begins at `fajr`. */
+export const sehriEnds = fajr => (fajr ? minusMins(fajr, SEHRI_CUSHION_MIN) : null);
+
 export const OPEN_DAYS_BEFORE = 7;
 export const OPEN_DAYS_AFTER = 1;
 export const NEAR_DAYS = 30;

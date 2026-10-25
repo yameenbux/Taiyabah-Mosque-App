@@ -26,6 +26,7 @@ import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { arm, plan } from "../../src/reminders.js";
 import { ORDER } from "../../src/prayer.js";
+import { sehriEnds, SEHRI_CUSHION_MIN, SEHRI_WARN_MIN } from "../../src/ramadan.js";
 /* scripts/test-loader.mjs points expo-notifications at this file, so what the
    app just talked to and what is read back here are one module. Run through
    `npm test`, which registers that loader. */
@@ -99,6 +100,41 @@ test("every prayer in ORDER gets a reminder on at least one day", async () => {
   }
   assert.equal(new Set(stub.log.scheduled.map(r => r.content.title)).size >= ORDER.length, true,
     `fewer distinct prayers than expected: ${titles}`);
+});
+
+/* THE SWITCH THAT IS SAFE TO LEAVE ON.
+ *
+ * Sehri and iftar are two notifications a night, and the whole reason they can
+ * be opted into once and forgotten is that they are silent for the other
+ * eleven months: only days the TIMETABLE itself calls Ramadan get one. If that
+ * gate ever came off, every phone with the switch on would be woken twice a
+ * night all year, and nobody would connect it to this file.
+ *
+ * The bundled timetable's Ramadan is in the past, so there is no Ramadan in
+ * the rolling week and the correct answer here is zero. That is the assertion:
+ * not that it does nothing, but that it does nothing OUTSIDE the month while
+ * still clearing the queue like every other path through arm(). */
+test("sehri and iftar are silent outside Ramadan", async () => {
+  const { per, extras } = plan({ jamaah: false, ramadan: true });
+  assert.equal(extras.ramadan, true, "plan() did not carry the switch");
+  const held = await arm(per, extras);
+  const inRamadan = stub.log.scheduled.filter(r => /Sehri|Iftar/.test(r.content.title));
+  assert.equal(inRamadan.length, 0,
+    "a sehri or iftar reminder was scheduled on a day the timetable does not call Ramadan");
+  assert.equal(held, 0);
+  assert.equal(stub.log.cancels, 1, "it must still clear what was armed before");
+});
+
+test("the sehri nudge lands before sehri, not after it", async () => {
+  /* The arithmetic, checked where it is decided rather than where it is used:
+     sehri is the cushion before Fajr, and the nudge is WARN before that, so a
+     phone buzzes with time to do something about it. Getting the sign wrong
+     would wake somebody up after the fast had already begun. */
+  assert.equal(sehriEnds("05:25"), "05:15");
+  assert.equal(sehriEnds("00:05"), "23:55", "it has to wrap at midnight");
+  assert.equal(SEHRI_CUSHION_MIN + SEHRI_WARN_MIN, 30,
+    "the nudge is half an hour before Fajr; change either number knowingly");
+  assert.equal(sehriEnds(null), null);
 });
 
 test("nothing wanted schedules nothing, and still clears the old set", async () => {

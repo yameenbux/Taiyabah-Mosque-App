@@ -45,6 +45,12 @@ test("jamāʿah off arms no prayers at all", () => {
 test("Kahf is independent of the jamāʿah switch", () => {
   assert.equal(plan({ jamaah: false, kahf: true }).extras.kahf, true);
   assert.equal(plan({ jamaah: true, mins: 5, kahf: false }).extras.kahf, false);
+  /* Ramadan is carried the same way and defaults the other way: absent means
+     off, because nobody who saved their choices before it existed asked for
+     two notifications a night. */
+  assert.equal(plan({ jamaah: false, ramadan: true }).extras.ramadan, true);
+  assert.equal(plan({ jamaah: false }).extras.ramadan, false);
+  assert.equal(plan({ jamaah: false, ramadan: false }).extras.ramadan, false);
 });
 
 test("zero minutes means at the jamāʿah, not off", () => {
@@ -56,8 +62,8 @@ test("zero minutes means at the jamāʿah, not off", () => {
 });
 
 test("nothing set at all does not throw", () => {
-  assert.deepEqual(plan(undefined), { per: {}, extras: { kahf: false } });
-  assert.deepEqual(plan({}), { per: {}, extras: { kahf: false } });
+  assert.deepEqual(plan(undefined), { per: {}, extras: { kahf: false, ramadan: false } });
+  assert.deepEqual(plan({}), { per: {}, extras: { kahf: false, ramadan: false } });
 });
 
 test("the week is armed on launch, not only from the settings screen", () => {
