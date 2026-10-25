@@ -14,6 +14,15 @@
    a time copied into a content file is a time that will be wrong the year
    the timetable moves.
 
+   AND NOTHING THAT IS ALREADY TRANSLATED. The parking advice, the taraweeh
+   arrangement, the iʿtikāf lead-in and the fitrana rule are prose the whole
+   site carries in Urdu, Gujarati and Arabic through lang/src. A second
+   English copy in here is the copy a non-English reader would have been
+   shown, so prose that has a key stays in the packs and this file holds only
+   what the committee fills in — names, numbers, dates. Every field left in
+   here is drawn on both platforms; one that is drawn nowhere is a thing the
+   committee filled in and nobody ever sees.
+
    HOW A BLANK BEHAVES, AND WHY IT IS A null RATHER THAN A GUESS. The four
    taraweeh students are settled about a month before Ramadan. The number of
    iʿtikāf places, the booking deadline and the fitrana amount are set each
@@ -32,7 +41,6 @@ window.RAMADAN = {
    *  TARAWEEH — settled practice, with this year's names to come
    * ---------------------------------------------------------------- */
   taraweeh: {
-    rakahs: 20,
     /* Five lead between them: the Imam takes the first four and four
        students of the masjid take the rest. That much is the masjid's
        long-standing arrangement and does not change year to year. */
@@ -43,7 +51,6 @@ window.RAMADAN = {
       { rakahs: "13–16", name: null, role: "Student of the masjid" },
       { rakahs: "17–20", name: null, role: "Student of the masjid" },
     ],
-    note: "The four students are confirmed about a month before Ramadan, and this list updates in the app when they are.",
   },
 
   /* ---------------------------------------------------------------- *
@@ -54,7 +61,6 @@ window.RAMADAN = {
       { when: "After Asr",  speaker: null, subject: null },
       { when: "After Isha", speaker: null, subject: null },
     ],
-    note: "Changes are announced in the app. Turn on Announcements to hear about them.",
   },
 
   /* ---------------------------------------------------------------- *
@@ -69,7 +75,6 @@ window.RAMADAN = {
     places: null,
     taken: null,
     bookBy: null,
-    lead: "Staying in the masjid for the last ten nights. Places are limited, so the committee asks that you book.",
     asks: "You will be asked for a name, a phone number and which nights.",
   },
 
@@ -78,8 +83,6 @@ window.RAMADAN = {
    * ---------------------------------------------------------------- */
   fitrana: {
     amount: null,
-    per: "Per person in the household, including children.",
-    deadline: "Before the Eid prayer.",
     note: "The amount is set by the committee each year and announced in the masjid.",
   },
 
@@ -98,13 +101,5 @@ window.RAMADAN = {
   lastTen: {
     lead: "Laylat al-Qadr is better than a thousand months. The masjid stays open through each of these nights.",
     kicker: "Seek it in the odd nights",
-  },
-
-  /* ---------------------------------------------------------------- *
-   *  PARKING — unchanged from the sheet it replaces
-   * ---------------------------------------------------------------- */
-  parking: {
-    lead: "The masjid car park is on Draycott Street. Please use it first.",
-    note: "When it is full, park with consideration for our neighbours and the wider community — never across a driveway. The masjid sits on a main road, so take care pulling out, and keep hold of children.",
   },
 };

@@ -47,11 +47,18 @@ The guard stands in front of everything else until all of this is true:
   Ramadan falls in, there is no sehri time, no iftar time and no date to count
   to. This is the state the app is in as this is written: its calendar stops at
   22 Rajab 1448, and Ramadan 1448 is in 2027.
-- **Ramadan is within ten days.** Not the first night — iʿtikāf places are
+- **Ramadan is within a week.** Not the first night — iʿtikāf places are
   limited and have to be booked, and a booking screen that appears on the first
   night gives the committee no lead time and the congregation no warning. The
   taraweeh leaders are settled about a month beforehand, so there is a real
-  rota to read by then too.
+  rota to read by then too. A week is the masjid's own call; the number lives
+  in `native/src/ramadan.js` as `OPEN_DAYS_BEFORE` and nowhere else, and
+  `scripts/check-ramadan.mjs` asserts the website's copy agrees with it.
+
+  In that week there is no night yet, so the hero, "Tonight" and the last ten
+  stand down and the screen is the month's arrangements alone. That is the
+  point of opening early: the booking has to be reachable before Ramadan
+  starts.
 
 It stays open one day past the last night, because Eid al-Fitr and the fitrana
 deadline are on that screen and both matter on the morning after. Then it
@@ -61,9 +68,27 @@ Nobody has to throw a switch for any of this. The app already downloads a
 published year and lays it over the bundled one, so the count appears by
 itself the day the committee presses publish.
 
-## Before this can ship
+## What was built, and where it went
 
-`check-screens` requires the app to say what the website says. The Ramadan
-page does not exist on the website, so wiring these screens in fails
-`npm run check` until it does — or until somebody decides, deliberately, that
-Ramadan is the exception. That decision has not been made.
+Both halves are built and both sit behind the guard above.
+
+| Where | What |
+|---|---|
+| `ramadan/content.js` | the committee's own: the rota, the bayaan slots, the iʿtikāf booking, the fitrana, Eid. Half of it is `null` on purpose — see its header. |
+| `index.html` | `ramState()`, `ramTimes()`, `ramJuzPages()` and `renderRamadanOpen()`, filling eight containers in the Ramadan sheet |
+| `native/src/screens/Ramadan.jsx` | the same screen: `Month` below the guard, in one file with it |
+| `native/scripts/check-ramadan.mjs` | 140 assertions — both platforms' numbers agree, the gate runs on fixture months, no clock time is typed into content.js, and no field in it is drawn nowhere |
+
+`check-screens` requires the app to say what the website says, and `ramadan`
+is now in its list of screens: all 31 strings the website shows on that sheet
+are in the app. It was missing from that list for as long as the app had only
+the guard, which is exactly the hole the check exists to find.
+
+Two things on the drawn screens were not built, deliberately:
+
+- **The sehri time.** The design puts Fajr itself under "Sehri ends". The
+  shipped reminder cards say suhūr ends ten minutes before Fajr, which is the
+  masjid's own cushion, and two sehri times in one app is worse than either.
+  The cushion won; Fajr is printed underneath it.
+- **The reminders toggle, the preparation tiles and the duʿā on the guard.**
+  A screen that exists to say one thing should say one thing.

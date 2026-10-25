@@ -29,7 +29,13 @@
    including "Back left the page — in a TWA the app closes", which is the
    reported bug reproduced as an assertion.
    =========================================================================== */
-import { chromium } from "playwright";
+/* Playwright is deliberately not a dependency — it pulls browser binaries a
+   build machine would never use — so it is resolved from wherever it actually
+   is, the same way the scripts under native/ already do. A bare
+   `import "playwright"` only resolved on a machine with it installed at the
+   repository root, which is not where it is installed. */
+import { requirePlaywright } from "../native/scripts/lib/playwright.mjs";
+const { chromium } = await requirePlaywright("check-back-button.mjs");
 
 const b = await chromium.launch();
 let pass = 0; const fails = [];
