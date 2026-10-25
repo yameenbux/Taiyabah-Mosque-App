@@ -1131,12 +1131,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     border-radius:11px;background:var(--paper,#F5F1E8);font-family:inherit;
     font-size:calc(15px * var(--ts));color:var(--ink,#261B22)}
   .rm-i.bad{border-color:var(--danger,#B4532F)}
-  .rm-nights-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-  .rm-pick{min-width:44px;padding:9px 11px;border:1px solid var(--line,#E4DECF);border-radius:11px;
-    background:var(--paper,#F5F1E8);font-family:"Fraunces",Georgia,serif;
-    font-size:calc(15px * var(--ts));color:var(--ink,#261B22);cursor:pointer}
-  .rm-pick[aria-pressed="true"]{background:var(--gold,#C6A24C);border-color:transparent;
-    color:var(--brand-900,#3C0B2A);font-weight:600}
+  .rm-span{margin:10px 0 2px;padding:11px 13px;border-radius:11px;
+    background:var(--tint-plum,#F0E9ED);font-size:calc(13px * var(--ts));line-height:1.5;
+    color:var(--ink,#261B22)}
   .rm-err{font-size:calc(12.5px * var(--ts));line-height:1.5;color:var(--danger,#B4532F);margin:8px 0 0}
   .rm-done{display:flex;flex-direction:column;gap:4px}
   .rm-done b{font-size:calc(14px * var(--ts));font-weight:600}
@@ -5440,8 +5437,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <input class="rm-i" id="rm-f-name" type="text" autocomplete="name" maxlength="80">
               <label class="rm-l" for="rm-f-phone" data-i18n="ramadan.phone_number">Phone number</label>
               <input class="rm-i" id="rm-f-phone" type="tel" autocomplete="tel" maxlength="24" data-i18n-latin>
-              <span class="rm-l" id="rm-f-nights-l" data-i18n="ramadan.which_nights">Which nights</span>
-              <div class="rm-nights-pick" id="rm-f-nights" role="group" aria-labelledby="rm-f-nights-l"></div>
+              <!-- NOT A CHOICE OF NIGHTS. I'tikaf is the last ten nights,
+                   entered once and kept to the end; nobody books the 23rd and
+                   the 27th. The first build offered ten chips to pick from,
+                   which is not a smaller version of this — it is a different
+                   thing, and one the masjid does not do. So the span is
+                   STATED, with the dates filled in from the month the
+                   timetable published. -->
+              <p class="rm-span" id="rm-f-span"></p>
               <p class="rm-err" id="rm-f-err" hidden></p>
               <button class="rm-book-go" type="submit" id="rm-f-send" data-i18n="ramadan.send_this_booking">Send this booking</button>
             </form>
@@ -7559,16 +7562,21 @@ function rmBookProbe(){
   })).catch(() => { clearTimeout(timer); RM_BOOK.open = false; return false; });
 }
 
-/* Which nights there are to choose from: the last ten, by number, from the
-   month the timetable actually published rather than a guess at 21–30. */
-function rmFillNights(st){
-  const host = document.getElementById('rm-f-nights');
-  if(!host || host.childElementCount) return;
-  const first = Math.max(1, st.total - 9);
-  let html = "";
-  for(let n = first; n <= st.total; n++)
-    html += `<button type="button" class="rm-pick" aria-pressed="false" data-night="${n}">${esc(num(n))}</button>`;
-  host.innerHTML = html;
+/* What is being booked, in words: all ten nights, with the dates from the
+   month the timetable actually published rather than a guess at 21–30. A
+   twenty-nine-day month puts them at 20–29, and that is the committee's
+   arrangement rather than ours to paper over. */
+function rmFillSpan(st, C){
+  const el = document.getElementById('rm-f-span');
+  if(!el) return;
+  /* JUST WHAT IS BEING BOOKED. It carried the `begins` line as well, and the
+     two read as a contradiction — "21–30 Ramadan. After Maghrib, 20 Ramadan."
+     Both are true, because the night of the 21st starts at Maghrib on the
+     20th, but nobody should have to work that out from a booking form. The
+     card above this already has a Begins row. */
+  el.textContent =
+    t("ramadan.all_ten_nights_from","All ten nights, {a}–{b} Ramadan.")
+      .replace("{a}", num(Math.max(1, st.total - 9))).replace("{b}", num(st.total));
 }
 
 /* Shown, hidden, or fully booked — decided here and nowhere else, so the
@@ -7582,7 +7590,7 @@ function rmBookState(st, C){
   const left = (it.places == null) ? null : Math.max(0, it.places - (it.taken || 0));
   sec.hidden = !(st && RM_BOOK.open === true && left !== null);
   if(sec.hidden) return;
-  rmFillNights(st);
+  rmFillSpan(st, C);
   const full = left === 0;
   const done = RM_BOOK.sent;
   document.getElementById('rm-book-go').hidden = full || done || !document.getElementById('rm-form').hidden;
@@ -7604,18 +7612,16 @@ function rmBookSend(e){
   const btn = document.getElementById('rm-f-send');
   const name = document.getElementById('rm-f-name');
   const phone = document.getElementById('rm-f-phone');
-  const nights = [...document.querySelectorAll('#rm-f-nights .rm-pick[aria-pressed="true"]')]
-                   .map(b => +b.dataset.night);
-
-  /* The three things the note promises it will ask for, and nothing else. */
+  /* The two things the note promises it will ask for, and nothing else.
+     There is no third: the booking is the whole of the last ten nights. */
   const okName = name.value.trim().length > 1;
   const okPhone = phone.value.replace(/[^0-9]/g, "").length >= 10;
   name.classList.toggle("bad", !okName);
   phone.classList.toggle("bad", !okPhone);
-  if(!okName || !okPhone || !nights.length){
+  if(!okName || !okPhone){
     err.hidden = false;
     err.textContent = t("ramadan.fill_in_the_booking",
-      "Please give a name, a phone number the office can reach you on, and at least one night.");
+      "Please give a name and a phone number the office can reach you on.");
     return;
   }
   err.hidden = true;
@@ -7629,7 +7635,7 @@ function rmBookSend(e){
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
     body: JSON.stringify({ payload: { masjid: SUPA.masjid, name: name.value.trim(),
-                                      phone: phone.value.trim(), nights } }),
+                                      phone: phone.value.trim() } }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     if(res.ok){
@@ -7668,10 +7674,6 @@ function initRamadanBooking(){
   go.addEventListener('click', rmBookShow);
   if(wait) wait.addEventListener('click', rmBookShow);
   form.addEventListener('submit', rmBookSend);
-  document.getElementById('rm-f-nights').addEventListener('click', e => {
-    const b = e.target.closest('.rm-pick');
-    if(b) b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
-  });
 }
 
 /* Taraweeh is prayed after Isha. "On air" is offered from the Isha jamāʿah
