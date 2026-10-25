@@ -6820,6 +6820,86 @@ function renderRamadan(){
     t("ramadan.subject_to_moon_sighting","Subject to moon sighting") + (r.year?` · ${num(r.year)}`:"");
 }
 
+/* ---------------- Ramadan: which night it is ----------------
+
+   THE SAME ANSWER ramadan.js GIVES, computed here because the website has no
+   access to the app's module. The shape is deliberately identical — night,
+   total, juz, lastTen, odd, nightsToEid — and check-ramadan.mjs runs both
+   over the same fixtures and fails if they ever disagree. Two implementations
+   of one rule is a risk; two that nobody compares is a certainty.
+
+   THE NIGHT ROLLS OVER AT FAJR, NOT MIDNIGHT. Taraweeh for the 24th night is
+   prayed on the evening of 24 Ramadan and carries on past midnight for anyone
+   sitting with the Qur'an afterwards. A screen that turns over at midnight
+   folds the night away while people are still in the masjid praying it, so
+   before Fajr the active date is yesterday. */
+function ramActiveDate(){
+  const now = nowLondon(), t0 = today0();
+  const rec = DATA && DATA.days && DATA.days[ymd(t0)];
+  const fajr = rec && rec.begins && rec.begins.fajr;
+  if(fajr){
+    const [h, m] = fajr.split(":").map(Number);
+    const f = new Date(t0); f.setHours(h, m, 0, 0);
+    if(now < f) return new Date(t0.getTime() - 86400000);
+  }
+  return t0;
+}
+
+/* Every date in the Ramadan of a given hijri year, in order. */
+function ramMonthDays(year){
+  const out = [];
+  for(const iso in (DATA && DATA.days) || {}){
+    const m = String(DATA.days[iso].hijri || "").match(/^(\d+)\s+(.+?)\s+(\d+)/);
+    if(m && RAM_MONTH.test(m[2].trim()) && +m[3] === year) out.push(iso);
+  }
+  return out.sort();
+}
+
+/** null outside the month; otherwise the night and everything derived. */
+function ramState(){
+  const d = ramActiveDate();
+  const h = ramHijri(d);
+  if(!h || !RAM_MONTH.test(h.month)) return null;
+  const month = ramMonthDays(h.year);
+  const total = month.length;
+  if(!total) return null;
+  const night = h.day;
+  return {
+    night, total, iso: ymd(d),
+    juz: Math.min(night, 30),
+    /* a 29-day month puts the last ten at night 20, not 21 */
+    lastTen: night > total - 10,
+    odd: night % 2 === 1,
+    nightsToEid: total - night,
+    nights: month.map((iso, i) => ({ night: i + 1, iso, juz: Math.min(i + 1, 30) })),
+  };
+}
+
+/* Sehri is ten minutes before Fajr begins, which is the masjid's own cushion
+   and the same one the reminder cards use. Iftar is Maghrib to the minute. */
+function ramTimes(iso){
+  const rec = DATA && DATA.days && DATA.days[iso];
+  if(!rec || !rec.begins) return null;
+  return {
+    sehri:  rec.begins.fajr ? minusMins(rec.begins.fajr, 10) : null,
+    fajr:   rec.begins.fajr || null,
+    iftar:  rec.begins.maghrib || null,
+    isha:   (rec.jamaat && rec.jamaat.isha) || null,
+  };
+}
+
+/* Juz to its page range, out of the muṣḥaf the app already ships. */
+function ramJuzPages(juz){
+  /* MUSHAF.meta is the muṣḥaf's own index, fetched the first time the reader
+     is opened. Before that there is no page range to give, so the row says
+     the juz and leaves the pages off rather than guessing at them. */
+  const m = MUSHAF && MUSHAF.meta;
+  const jp = m && m.juzPage;
+  if(!jp || !jp[juz]) return null;
+  const from = +jp[juz], to = jp[juz + 1] ? +jp[juz + 1] - 1 : (m.pages || from);
+  return { from, to };
+}
+
 /* ---------------- Ramadan: the guard ----------------
    The section below the poster is built — taraweeh, bayaan, i’tikaf, zakat
    al-Fitr, the two du’as — and none of it has anything to say until the
@@ -6843,7 +6923,7 @@ function renderRamadan(){
    there is one the poster says the dates are to be confirmed, which is what
    the native screen says too.
 ---------------------------------------------------- */
-const RAM_OPEN_BEFORE = 10;                  /* ramadan.js OPEN_DAYS_BEFORE */
+const RAM_OPEN_BEFORE = 7;                   /* ramadan.js OPEN_DAYS_BEFORE */
 /* Ramadhan and Ramaḍān both turn up in real calendars, so all three spellings
    are matched — the same regex as ramadan.js. */
 const RAM_MONTH = /^rama[dḍ]h?[aā]n$/i;
