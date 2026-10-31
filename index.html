@@ -12562,9 +12562,15 @@ function hjItemHtml(x){
     /* The chip used to sit ABOVE the title, so "ALLOWED" was the first word
        read and the least informative one on the card. */
     + (v ? `<span class="hj-chip${v[1]?" "+v[1]:""}">${esc(v[0])}</span>` : "")
+    /* PARAGRAPHS WHERE THE WRITER PUT THEM, the same rule HajjBranch.jsx
+       follows: a blank line in the entry breaks the body, and an entry
+       without one is unchanged. A day of Hajj runs to a hundred and fifty
+       words and as one block it is a wall however soft the ink. */
     + (x.d ? (() => { const { lead, rest } = hjLeadOf(x.d);
         return `<div class="hl-lead">${esc(lead)}</div>`
-             + (rest ? `<div class="hl-a">${esc(rest)}</div>` : ""); })() : "")
+             + (rest ? rest.split(/\n\s*\n/).filter(Boolean)
+                           .map(pa => `<div class="hl-a">${esc(pa.trim())}</div>`).join("")
+                     : ""); })() : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)
     + (src ? `<div class="hl-src">${esc(src)}</div>` : "");

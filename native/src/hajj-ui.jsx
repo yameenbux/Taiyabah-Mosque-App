@@ -16,10 +16,12 @@
  * phone is set to light or dark, the way the Ramadan screen is always plum.
  * HJ in theme.js holds the values and the measurement behind each one.
  */
-import React from "react";
-import { View, Text, Image, Pressable, Platform, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, Pressable, Platform, ScrollView, AccessibilityInfo } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, RadialGradient, LinearGradient, Stop, Rect, Path } from "react-native-svg";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, Easing }
+  from "react-native-reanimated";
 import { F, R, HJ } from "./theme";
 import { useApp } from "./store";
 import { Screen } from "./ui";
@@ -329,6 +331,92 @@ export function HajjTileGrid({ children }) {
 /* The chevron, drawn rather than taken from Ionicons so that it is the same
    stroke weight as the rest of the section's line work and the same mark the
    website draws. The subset font's chevron is heavier and sits differently. */
+
+/* A SEQUENCE LOOKS LIKE A SEQUENCE.
+ *
+ * The rites of ʿUmrah and the days of Hajj are both ordered: do this, then
+ * this, then this. Rendered as a stack of identical cards with "1." and "2."
+ * glued to the front of each title, that order is something a reader has to
+ * reconstruct from the numbers. The numbers were doing a job the layout
+ * should do.
+ *
+ * So a rail down the leading edge with a node at each step, which is how
+ * BlaBlaCar draws a route and Pangea an itinerary. The number moves out of
+ * the sentence and into the node, where it is a position rather than a word,
+ * and the line between nodes says "and then" without anybody writing it.
+ *
+ * THE RAIL STOPS AT THE LAST NODE. A line continuing past the final step
+ * promises another one.
+ */
+export function HajjStep({ n, first, last, children }) {
+  const { fs, rtl } = useApp();
+  const size = 27;
+  return (
+    <View style={{ flexDirection: rtl ? "row-reverse" : "row",
+                   paddingTop: first ? 2 : 0 }}>
+      {/* the rail and its node */}
+      <View style={{ width: size, alignItems: "center" }}>
+        {/* the length above the node, absent on the first step */}
+        <View style={{ width: 1.5, height: first ? 0 : 14,
+                       backgroundColor: HJ.goldLine }} />
+        <View style={{ width: size, height: size, borderRadius: size / 2,
+                       alignItems: "center", justifyContent: "center",
+                       borderWidth: 1.5, borderColor: HJ.goldLine,
+                       backgroundColor: HJ.goldPanel }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: HJ.gold }}>
+            {n}
+          </Text>
+        </View>
+        {/* and the length below it, absent on the last */}
+        {!last && <View style={{ flex: 1, width: 1.5, minHeight: 18,
+                                 backgroundColor: HJ.goldLine }} />}
+      </View>
+      <View style={{ flex: 1, paddingBottom: last ? 0 : 14,
+                     [rtl ? "paddingRight" : "paddingLeft"]: 13 }}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+/* ARRIVING, RATHER THAN BEING THERE ALREADY.
+ *
+ * A step list that fades up in order reads as a sequence before a word of it
+ * is read — the motion is the same information the rail carries. It is small
+ * on purpose: 10pt and 260ms, because this is a page somebody opens in the
+ * Ḥaram to find one thing, not a splash screen.
+ *
+ * IT TURNS ITSELF OFF. Opening.jsx already asks the system whether motion is
+ * wanted and this asks the same way, because somebody who has set that switch
+ * has usually set it for a reason that matters more than a nice entrance. The
+ * stagger is capped so a long branch does not keep a reader waiting on the
+ * tenth step, and every step lands within half a second whatever its index. */
+export function Reveal({ index = 0, children, style }) {
+  const [still, setStill] = useState(false);
+  const o = useSharedValue(0);
+  const y = useSharedValue(10);
+
+  useEffect(() => {
+    let alive = true;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(off => {
+        if (!alive) return;
+        if (off) { setStill(true); return; }
+        const wait = Math.min(index, 8) * 45;
+        o.value = withDelay(wait, withTiming(1, { duration: 260, easing: Easing.out(Easing.quad) }));
+        y.value = withDelay(wait, withTiming(0, { duration: 260, easing: Easing.out(Easing.quad) }));
+      })
+      .catch(() => { if (alive) setStill(true); });   // no answer is not a reason to hide
+    return () => { alive = false; };
+  }, [index]);
+
+  const anim = useAnimatedStyle(() => ({ opacity: o.value, transform: [{ translateY: y.value }] }));
+  /* Reduce motion means no movement, not no content: the step is simply
+     already where it was going. */
+  if (still) return <View style={style}>{children}</View>;
+  return <Animated.View style={[style, anim]}>{children}</Animated.View>;
+}
+
 export function HajjChevron({ color = HJ.inkFaint, size = 18, back }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}

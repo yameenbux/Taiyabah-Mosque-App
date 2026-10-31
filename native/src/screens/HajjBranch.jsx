@@ -28,8 +28,8 @@ import Svg, { Path } from "react-native-svg";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
 import { Press } from "../ui";
-import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar }
-  from "../hajj-ui";
+import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar,
+         HajjStep, Reveal } from "../hajj-ui";
 import HajjArt from "../hajj-art";
 import { visibleSections, leadOf } from "../hajj";
 import { branchById } from "../hajj-data";
@@ -162,7 +162,15 @@ export default function HajjBranch({ route }) {
               its own frame — a panel for a drawing, none for a photograph. */}
           {!!s.art && <HajjArt art={s.art} style={{ marginTop: 13 }} />}
 
-          {s.items.map((item, ii) => {
+          {/* AN ORDERED SECTION IS DRAWN AS ONE. Every item carrying an `n`
+              means the section is a sequence — the rites in order, the days of
+              Hajj — and hajj-ui's rail says so better than a number glued to
+              the front of each title. A section where only some items are
+              numbered is not a sequence and keeps the plain stack. */}
+          {(() => {
+            const stepped = s.items.length > 1
+              && s.items.every(i => typeof i.n === "number");
+            return s.items.map((item, ii) => {
             const v = VERDICT[item.verdict];
             const src = [item.by, item.source].filter(Boolean).join(" · ");
             const on = !!packed[item.id];
@@ -183,7 +191,7 @@ export default function HajjBranch({ route }) {
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21.5),
                                color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
                                textDecorationLine: on ? "line-through" : "none" }}>
-                  {item.n ? `${item.n}. ` : ""}{item.t}
+                  {item.n && !stepped ? `${item.n}. ` : ""}{item.t}
                 </Text>
                 {!!v && (
                   <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginTop: 8 }}>
@@ -203,10 +211,16 @@ export default function HajjBranch({ route }) {
                       <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5),
                                      lineHeight: fs(21.5), color: HJ.ink, marginTop: 6,
                                      textAlign: align }}>{lead}</Text>
-                      {!!rest && (
-                        <Text style={{ fontFamily: F.sans, fontSize: fs(12.5),
-                                       lineHeight: fs(20), color: HJ.inkFaint, marginTop: 7,
-                                       textAlign: align }}>{rest}</Text>)}
+                      {/* PARAGRAPHS WHERE THE WRITER PUT THEM. A day of Hajj
+                          runs to a hundred and fifty words and as one block it
+                          is a wall, however soft the ink. A blank line in the
+                          entry breaks it; an entry without one is unchanged,
+                          so nothing already written moves. */}
+                      {rest.split(/\n\s*\n/).filter(Boolean).map((para, pi) => (
+                        <Text key={pi}
+                              style={{ fontFamily: F.sans, fontSize: fs(12.5),
+                                       lineHeight: fs(20), color: HJ.inkFaint,
+                                       marginTop: 7, textAlign: align }}>{para.trim()}</Text>))}
                     </>
                   );
                 })()}
@@ -225,8 +239,18 @@ export default function HajjBranch({ route }) {
             const tone = v && v.tone === "warn" ? "warn" : "plain";
             const gap = { marginTop: ii === 0 ? 13 : 10 };
 
-            if (!item.pack)
-              return <Panel key={item.id} tone={tone} style={gap}>{body}</Panel>;
+            if (!item.pack) {
+              const panel = <Panel tone={tone} style={stepped ? null : gap}>{body}</Panel>;
+              if (!stepped)
+                return <Reveal key={item.id} index={ii}>{panel}</Reveal>;
+              return (
+                <Reveal key={item.id} index={ii} style={{ marginTop: ii === 0 ? 13 : 0 }}>
+                  <HajjStep n={item.n} first={ii === 0} last={ii === s.items.length - 1}>
+                    {panel}
+                  </HajjStep>
+                </Reveal>
+              );
+            }
 
             /* A PACKING LIST IS A LIST. Thirty-five full cards was a wall
                three screens tall; a row with a hairline above it is half the
@@ -245,7 +269,8 @@ export default function HajjBranch({ route }) {
                 <View style={{ flex: 1 }}>{body}</View>
               </Press>
             );
-          })}
+            });
+          })()}
         </View>
       ))}
     </HajjScreen>
