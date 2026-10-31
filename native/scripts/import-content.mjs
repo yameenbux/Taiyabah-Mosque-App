@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import vm from "node:vm";
 import { basename } from "node:path";
+import { approved } from "../src/hajj.js";
 
 /* Each entry names its own path now: the shared content is no longer all
    under quran/, and filing Hajj guidance there to save one line would mislead
@@ -35,9 +36,46 @@ for (const [file, global_, out] of files) {
   vm.runInContext(code, sandbox, { filename: file });
   const data = sandbox.window[global_];
   if (!data) { console.error(`  FAIL ${file}: window.${global_} was not set`); process.exit(1); }
+  if (global_ === "HAJJ") redactHajj(data);
   writeFileSync(`${OUT}/${out}`, JSON.stringify(data));
   const size = (readFileSync(`${OUT}/${out}`).length / 1024).toFixed(0);
   const count = data.branches?.length ?? data.sections?.length ?? data.categories?.length
              ?? (Array.isArray(data) ? data.length : Object.keys(data).length);
   console.log(`  ok   ${basename(file).padEnd(13)} -> ${out.padEnd(14)} ${size}KB, ${count} groups`);
+}
+
+/* THE BUNDLE CARRIES ONLY WHAT A READER COULD SEE.
+ *
+ * hajj.js has always hidden an unapproved fiqh entry from every reader: a
+ * ruling counts only once a scholar's name is on it. That rule governed what
+ * was DRAWN, and the drafts were shipped inside the binary anyway — 59 of
+ * them, 46 carrying the Islāmic Daʿwah Academy's booklet as their source,
+ * which the masjid has no written permission for.
+ *
+ * Unreachable is not the same as absent. App Review asks an applicant to
+ * declare the protected third-party material it is authorised to include;
+ * answering that question while the text sits in the bundle is a false
+ * declaration, and answering it accurately raises a question nobody can
+ * answer until the permission is signed.
+ *
+ * So the same rule now governs what is SHIPPED. A practical branch is the
+ * masjid's own travel and safety writing and needs no scholar, so it comes
+ * across whole. A fiqh branch brings only its approved entries, which today
+ * is none of them. The drafts stay in hajj/content.js, where they belong:
+ * they exist to save the ʿulamā a blank page, not to be published.
+ *
+ * As each ruling is approved it appears here by itself, with no switch to
+ * remember — which is the same reason the display rule was written this way.
+ */
+function redactHajj(data) {
+  let dropped = 0;
+  for (const b of (data.branches || [])) {
+    if (b.kind !== "fiqh") continue;
+    for (const sec of (b.sections || [])) {
+      const before = (sec.items || []).length;
+      sec.items = (sec.items || []).filter(approved);
+      dropped += before - sec.items.length;
+    }
+  }
+  if (dropped) console.log(`  held ${dropped} unapproved fiqh entries out of the bundle`);
 }
