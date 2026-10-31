@@ -121,35 +121,42 @@ export function MaTafPlan({ full = true }) {
           {[0, 90, 180, 270].map(d => <Arrow key={d} deg={d} r={r} />)}
         </G>)}
       {/* the line every circuit starts and ends on, out through the stone */}
-      <Path d={`M127 128 L${full ? "157 157" : "148 149"}`} stroke={GOLD} strokeWidth={1.2}
+      <Path d={`M124 129 L${full ? "156 159" : "150 152"}`} stroke={GOLD} strokeWidth={1.2}
             strokeDasharray={[2.5, 4]} opacity={0.75} />
-      {/* THE ḤAṬĪM REACHES BOTH CORNERS. It was drawn as a smaller arc against
-          the middle of the wall, its ends stopping well short of the stone at
-          either side. The wall runs corner to corner across this face — from
-          the Shāmī corner to the ʿIrāqī — so drawn short it reads as a bay
-          against one part of the building rather than as the enclosure a
-          pilgrim must walk outside of, which is the one thing this picture
-          exists to show. It now spans the full 54 of the wall: radius 27.
+      {/* THE BUILDING IS NOT SQUARE, and which wall is the long one matters.
+          It was drawn 54 across by 52 down, which put the LONG side on the
+          Ḥaṭīm wall and the short side on the door wall. That is the wrong way
+          round: the door side, al-Multazam, is about 12.84m and the Ḥijr side
+          about 11.28m. Anyone who has stood there knows the door wall is the
+          long one, and a plan that says otherwise is wrong in the one way a
+          plan cannot afford. Now 48 across by 55 down — the same 1.14 — with
+          the corners at Shāmī (76,74), ʿIrāqī (124,74), Yamānī (76,129) and
+          the Black Stone (124,129).
 
-          The real wall stands a little clear of the building at each end, and
-          those openings are how people go in. At this size two gaps of a pixel
-          or so would read as a drawing error rather than as doorways, so the
-          arc is closed and the caption carries the meaning instead. */}
-      <Path d="M73 76 A27 27 0 0 1 127 76 Z" fill="rgba(220,187,99,.13)" />
-      <Path d="M73 76 a27 27 0 0 1 54 0" fill="none" stroke={GOLD}
+          THE ḤAṬĪM STANDS CLEAR OF IT. The wall is opposite the Kaʿbah's
+          north-west face, not joined to it: there is an opening at each end
+          and that is how people walk in. It was first drawn far too short, a
+          bay against the middle of the wall; closing it corner to corner
+          fixed the span but welded it on. A true semicircle, since that is what the caption calls it. It springs from just inside
+          each corner, so it reads as the separate enclosure it is — the thing
+          a pilgrim has to walk around the outside of. */}
+      <Path d="M81 74 A19 19 0 0 1 119 74 Z" fill="rgba(220,187,99,.13)" />
+      <Path d="M81 74 a19 19 0 0 1 38 0" fill="none" stroke={GOLD}
             strokeWidth={1.6} strokeLinecap="round" />
-      <Rect x="73" y="76" width="54" height="52" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
+      <Rect x="76" y="74" width="48" height="55" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
       {/* NO LINE ACROSS THE BUILDING. A band ran the full width at y=90, which
           is a thing you would see on an elevation — the kiswah's belt, seen
           from the side. This picture is a plan, looked down on from above, and
           from above that band is the top of a wall you cannot see. Drawn
           anyway it split the roof in two and made the square read as two
           rooms. The caption says "from above"; the drawing now agrees. */}
-      <Path d="M127 101 L127 114" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
-      {full && <Rect x="152" y="92" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
-      {[[73, 76], [127, 76], [73, 128], [127, 128]].map(([x, y]) =>
+      {/* The door, on the long wall and nearer the Black Stone corner than the
+          ʿIrāqī one, which is where it actually sits. */}
+      <Path d="M124 103 L124 116" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
+      {full && <Rect x="150" y="89" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
+      {[[76, 74], [124, 74], [76, 129], [124, 129]].map(([x, y]) =>
         <Circle key={`${x}-${y}`} cx={x} cy={y} r={2.4} fill={GOLD} opacity={0.55} />)}
-      <Circle cx="127" cy="128" r={7} fill={GOLD} />
+      <Circle cx="124" cy="129" r={7} fill={GOLD} />
     </Svg>
   );
 }
