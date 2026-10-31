@@ -42,7 +42,7 @@
 
 /* The masjid's own switch. Held until they say otherwise; check-hajj.mjs
    makes sure the website and the app never disagree about it. */
-export const RELEASED = false;
+export const RELEASED = true;
 
 /* A fiqh entry is only real when somebody is willing to be named for it. An
    empty string, a whitespace string and a missing field all mean the same
