@@ -27,7 +27,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 import path from "node:path";
 import {
-  hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches,
+  hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches, leadOf,
   tick, untick, isComplete, saiFrom, progress, RELEASED,
 } from "../src/hajj.js";
 
@@ -111,6 +111,45 @@ ok(branches.length > 0, "hajj/content.js has no branches");
 const shipped = JSON.parse(fs.readFileSync(path.join(here, "src/data/hajj.json"), "utf8"));
 ok((shipped.branches || []).length > 0,
    "src/data/hajj.json has no branches — run npm run content");
+
+/* ---- the lead sentence ------------------------------------------------
+   An entry is drawn as a lead in full ink and the remainder beneath it in
+   the faint. The rule is cheap to get subtly wrong and expensive to notice:
+   a split inside a duʿā strands its closing quote, and a split that drops a
+   clause silently removes guidance. */
+is(leadOf("All the way round. Not your back to it."),
+   { lead: "All the way round.", rest: "Not your back to it." },
+   "a four-word sentence is a lead — an earlier minimum length ate it");
+is(leadOf("\u201cO Allah, forgive me.\u201d Said at \u1e62af\u0101."),
+   { lead: "\u201cO Allah, forgive me.\u201d", rest: "Said at \u1e62af\u0101." },
+   "a duʿā is the lead and when to say it is the remainder");
+is(leadOf("\u201cHere I am. Here I am.\u201d Three times.").lead,
+   "\u201cHere I am. Here I am.\u201d",
+   "a full stop INSIDE the quote does not split it");
+/* That case is caught by the opening-quote rule before the sentence scan
+   ever runs, so on its own it leaves the balance guard inside the scan
+   untested — proved by removing the guard and watching nothing fail. This
+   one starts in prose and quotes afterwards, which is the only way in. */
+is(leadOf("Say it at \u1e62af\u0101: \u201cAllah is the greatest. There is no god but Allah.\u201d Three times.").lead,
+   "Say it at \u1e62af\u0101: \u201cAllah is the greatest. There is no god but Allah.\u201d",
+   "a quote opened mid-sentence is not split at the full stop inside it");
+is(leadOf("One sentence only."), { lead: "One sentence only.", rest: "" },
+   "nothing to split is not a split");
+is(leadOf(undefined), { lead: "", rest: "" }, "and a missing body is not a crash");
+
+/* THE SPLIT LOSES NOTHING. Run over every entry that actually ships: the
+   lead and the remainder put back together must be the body again, give or
+   take the one space between them. A rule that quietly dropped a sentence
+   would read perfectly well and be missing a ruling. */
+for (const b of branches)
+  for (const it of b.sections.flatMap(s => s.items || [])) {
+    if (!it.d) continue;
+    const { lead, rest } = leadOf(it.d);
+    ok(lead.length > 0, `${b.id}/${it.id} has a body but no lead sentence`);
+    ok(lead.replace(/\s+/g, " ") + (rest ? " " + rest.replace(/\s+/g, " ") : "")
+         === it.d.replace(/\s+/g, " "),
+       `${b.id}/${it.id} loses text when it is split into lead and remainder`);
+  }
 
 /* NOTHING UNAPPROVED REACHES THE BINARY. A draft is invisible to readers by
    hajj.js's rule, which governed what was drawn; this governs what is

@@ -1463,7 +1463,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     color:var(--hj-ink);margin-top:9px}
   .hl-q:first-child{margin-top:0}
   .hl-q + .hj-chip{margin-top:8px}
-  .hl-a{font-size:calc(13px * var(--ts));line-height:1.6;color:var(--hj-ink-soft);margin-top:5px}
+  /* The lead sentence in full ink, the remainder beneath it in the faint:
+     the eye lands on what to do and the why sits behind it. */
+  .hl-lead{font-size:calc(13.5px * var(--ts));font-weight:500;line-height:1.59;
+    color:var(--hj-ink);margin-top:6px}
+  .hl-a{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--hj-ink-faint);margin-top:7px}
   .hl-when{font-size:calc(12.5px * var(--ts));font-weight:500;line-height:1.5;
     color:var(--hj-gold);margin-top:8px}
   .hl-src{font-size:calc(11.5px * var(--ts));line-height:1.45;color:var(--hj-ink-faint);margin-top:9px}
@@ -12523,6 +12527,29 @@ const HJ_VERDICT = {
   dam:     () => [t("hajj.dam_due","Dam due"), "dam"],
 };
 
+/* LEAD FIRST. Mirrors leadOf() in native/src/hajj.js, which carries the
+   reasoning and the two traps — a duʿā's own full stops, and a four-word
+   sentence that is a perfect lead. Keep the two in step. */
+function hjLeadOf(d){
+  const t = typeof d === "string" ? d : "";
+  if(t.startsWith("\u201c")){
+    const end = t.indexOf("\u201d");
+    if(end > 0 && end < t.length - 2)
+      return { lead: t.slice(0, end + 1), rest: t.slice(end + 1).trim() };
+  }
+  /* The closing quote comes AFTER the full stop: `.”` rather than `.`.
+     Without the optional mark the scan walks past such an ending. */
+  const re = /([.!?][\u201d"]?)(\s+)(?=[\u201c"A-Z\u0100\u1e24\u1e6c\u1e62\u02bf\u02be])/g;
+  let m;
+  while((m = re.exec(t))){
+    const head = (t).slice(0, m.index + m[1].length);
+    if(head.length < 10) continue;
+    if((head.match(/\u201c/g)||[]).length !== (head.match(/\u201d/g)||[]).length) continue;
+    return { lead: head, rest: (t).slice(m.index + m[1].length + m[2].length) };
+  }
+  return { lead: t, rest: "" };
+}
+
 function hjItemHtml(x){
   const v = HJ_VERDICT[x.verdict] ? HJ_VERDICT[x.verdict]() : null;
   const src = [x.by, x.source].filter(Boolean).join(" · ");
@@ -12534,7 +12561,9 @@ function hjItemHtml(x){
     /* The chip used to sit ABOVE the title, so "ALLOWED" was the first word
        read and the least informative one on the card. */
     + (v ? `<span class="hj-chip${v[1]?" "+v[1]:""}">${esc(v[0])}</span>` : "")
-    + (x.d ? `<div class="hl-a">${esc(x.d)}</div>` : "")
+    + (x.d ? (() => { const { lead, rest } = hjLeadOf(x.d);
+        return `<div class="hl-lead">${esc(lead)}</div>`
+             + (rest ? `<div class="hl-a">${esc(rest)}</div>` : ""); })() : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)
     + (src ? `<div class="hl-src">${esc(src)}</div>` : "");
