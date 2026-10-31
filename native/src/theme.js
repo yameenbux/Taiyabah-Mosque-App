@@ -244,6 +244,11 @@ export const HJ = {
   inkSoft:   "rgba(243,239,227,0.70)",   // measured: 5.34:1 on the gold panel
   inkFaint:  "rgba(243,239,227,0.60)",   // measured: 4.53:1 on a panel
   gold:      "#DCBB63",
+  /* the fixed jump bar sits ON the ground rather than floating over it: a
+     translucent bar lets a paragraph scroll under the chips and the labels
+     stop being readable, which on the one screen read mid-ṭawāf is the
+     whole point of the bar. */
+  barGround: "#200815",
   /* dam, and only dam */
   warn:      "#F0937A",
   warnPanel: "rgba(240,147,122,0.10)",

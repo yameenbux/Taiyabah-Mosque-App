@@ -1225,6 +1225,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     --hj-ground-top:#4B1136; --hj-ground-mid:#3C0B2A; --hj-ground:#1B0613;
     --hj-panel:rgba(243,239,227,.07); --hj-panel-line:rgba(243,239,227,.13);
     --hj-panel-hi:rgba(243,239,227,.14);
+    --hj-bar:#200815;
     --hj-gold-panel:rgba(220,187,99,.13); --hj-gold-line:rgba(220,187,99,.30);
     --hj-gold-fill:rgba(220,187,99,.17);
     --hj-ink:#F3EFE3; --hj-ink-soft:rgba(243,239,227,.70); --hj-ink-faint:rgba(243,239,227,.60);
@@ -1320,6 +1321,18 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hj-tiles > .hj-tile:last-child:nth-child(odd){grid-column:span 2;flex-direction:row;
     align-items:center;min-height:68px;gap:11px}
   .hj-tiles > .hj-tile:last-child:nth-child(odd) > span:last-child{flex:1;min-width:0}
+  /* Opaque, not translucent: a paragraph scrolling under the chips makes the
+     labels unreadable, and this is the bar read mid-ṭawāf. */
+  .hj-jump{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;
+    overflow-x:auto;scrollbar-width:none;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+    background:var(--hj-bar);border-top:1px solid var(--hj-panel-line)}
+  .hj-jump::-webkit-scrollbar{display:none}
+  .hj-jump button{flex:0 0 auto;min-height:42px;padding:0 14px;border-radius:999px;
+    border:1px solid var(--hj-panel-line);background:var(--hj-panel);color:var(--hj-ink-soft);
+    font-size:calc(12.5px * var(--ts));font-weight:600;white-space:nowrap;cursor:pointer}
+  .hj-jump button:active{border-color:var(--hj-gold-line);background:var(--hj-panel-hi)}
+  /* room so the bar never covers the last entry */
+  #hajjbranch .sh-body.has-jump{padding-bottom:72px}
   .hj-head-sm{font-size:calc(22px * var(--ts))}
   .hj-tile .hj-tt{font-size:calc(14.5px * var(--ts));line-height:1.31;font-weight:600;
     color:var(--hj-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
@@ -5693,6 +5706,13 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="sh-close" id="hb-close" data-i18n="ramadan.done">Done</button>
       </div>
       <div class="sh-body ab-wrap" id="hb-body"></div>
+      <!-- THE JUMP BAR. A branch is one scroll of everything it holds, which
+           is right at home and wrong in the Ḥaram: during ṭawāf you want
+           "Ṭawāf, point by point" and reaching it means scrolling past
+           thirteen entries you are not doing now. At the BOTTOM because that
+           is where the thumb already is. Mirrors HajjJumpBar in
+           native/src/hajj-ui.jsx. -->
+      <div class="hj-jump" id="hb-jump" hidden></div>
     </div>
   </div>
 
@@ -12559,9 +12579,29 @@ function openHajjBranch(id){
        list entirely. This is what a developer sees opening it directly. */
     : `<div class="hl-none"><h2>${esc(t("hajj.nothing_here_yet","Nothing here yet"))}</h2>`
       + `<p>${esc(t("hajj.awaiting_ulama","This section is waiting on the ʿulamā at the masjid. Until it arrives, the section stays shut."))}</p></div>`;
+  const body = document.getElementById("hb-body");
+  const jump = document.getElementById("hb-jump");
+  /* One section is not a choice, so there is no bar for it. */
+  if (secs.length > 1) {
+    /* A section's name is the part before its comma — "Ṭawāf", "Saʿī",
+       "For women". The full headings filled the bar twice over. Mirrors
+       chipOf in native/src/hajj-ui.jsx. */
+    const chipOf = s => String(s || "").split(/[,،—]/)[0].trim() || s;
+    jump.innerHTML = secs.map((sec, i) =>
+      `<button type="button" data-jump="${i}">${esc(chipOf(sec.title))}</button>`).join("");
+    jump.hidden = false;
+    body.classList.add("has-jump");
+    [...jump.querySelectorAll("[data-jump]")].forEach(btn =>
+      btn.addEventListener("click", () => {
+        const el = body.querySelectorAll(".hl-sec")[+btn.dataset.jump];
+        if (el) body.scrollTo({ top: el.offsetTop - 10, behavior: "smooth" });
+      }));
+  } else {
+    jump.innerHTML = ""; jump.hidden = true; body.classList.remove("has-jump");
+  }
   document.getElementById("hajjbranch").dataset.open="1";
   document.body.style.overflow="hidden";
-  document.getElementById("hb-body").scrollTop=0;
+  body.scrollTop=0;
 }
 function closeHajjBranch(){ document.getElementById("hajjbranch").dataset.open="0"; document.body.style.overflow=""; }
 
