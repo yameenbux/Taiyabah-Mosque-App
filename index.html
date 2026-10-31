@@ -12848,7 +12848,13 @@ function iaProbe(){
     signal: ctrl.signal,
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
-    body: "{}",
+    /* THE SLUG, like every other call. advice_is_open() stopped guessing which
+       masjid is asking when the database became multi-masjid — it raises
+       rather than answer for somebody else's imams. An empty body came back
+       400, res.ok was false, and false is indistinguishable here from "no imam
+       is on duty", so this page told people written questions were closed
+       while the masjid was taking them. */
+    body: JSON.stringify({ p_masjid: SUPA.masjid }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     IA.open = res.ok && String(body).trim() === "true";

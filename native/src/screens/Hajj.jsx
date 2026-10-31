@@ -29,7 +29,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { C, F, HJ } from "../theme";
 import { useApp } from "../store";
-import { Screen, Star } from "../ui";
+import { Screen, StarField } from "../ui";
 import { HajjScreen, HajjTitle, HajjLead, HajjKicker, HajjRow, HajjTile, HajjTileGrid,
          HajjChevron } from "../hajj-ui";
 import { hajjAccess, visibleItems } from "../hajj";
@@ -162,8 +162,9 @@ export default function Hajj({ navigation }) {
         style={{ flex: 1, alignItems: "center", justifyContent: "space-between",
                  paddingHorizontal: 34, paddingTop: 54, paddingBottom: 40 }}>
 
-        <Star size={560} color={C.gold} opacity={0.3} width={0.35} />
-        <Star size={330} color={C.goldBright} opacity={0.22} width={0.5} />
+        {/* Sized to the phone and centred on the whole poster — ui.jsx
+            says why the fixed 560 was wider than the screen. */}
+        <StarField gold={C.gold} bright={C.goldBright} />
 
         {/* 1. the words */}
         <View style={{ alignItems: "center" }}>

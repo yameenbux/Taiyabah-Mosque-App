@@ -7,7 +7,7 @@
  * or the text size redraws the whole app with no screen knowing about it.
  */
 import React from "react";
-import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet, Image, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -212,13 +212,44 @@ export function Girih({ size = 230, color = C.gold, opacity = 0.08, style }) {
  * words rather than a mark behind them. */
 export function Star({ size, color, opacity, width }) {
   return (
-    <View pointerEvents="none"
-          style={{ position: "absolute", top: "50%", left: "50%",
-                   marginLeft: -size / 2, marginTop: -size / 2, opacity }}>
+    <View pointerEvents="none" style={{ position: "absolute", opacity }}>
       <Svg width={size} height={size} viewBox="0 0 100 100">
         <Polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"
                  fill="none" stroke={color} strokeWidth={width} />
       </Svg>
+    </View>
+  );
+}
+
+/* THE TWO STARS BEHIND A POSTER, sized to the phone and centred on the poster.
+ *
+ * They used to be fixed at 560 and 330 and to place themselves with top/left
+ * 50% and a negative margin. Both halves of that were wrong on a real phone.
+ *
+ * 560pt is wider than every iPhone made — 393 on a 16 Pro — so the left and
+ * right points of the big star were cut off by the screen edges. A symmetrical
+ * shape clipped on two sides is no longer symmetrical, and it stops reading as
+ * centred however exactly it is placed.
+ *
+ * And it was not exactly placed: 50% of an absolutely positioned child
+ * resolves against the parent's CONTENT box, and the poster is padded 54 at
+ * the top and 40 at the bottom, so the true centre of the star sat below the
+ * optical centre of the screen. The gold wordmark at the foot pulls the eye
+ * down as well, which made it read lower still.
+ *
+ * So the field is its own full-bleed layer, centred by flex rather than by
+ * arithmetic, and the stars are a fraction of the screen's width: the big one
+ * just inside the edges, the small one a little over half of it. The cap stops
+ * it ballooning on an iPad. */
+export function StarField({ gold, bright }) {
+  const { width } = useWindowDimensions();
+  const big = Math.min(width * 0.92, 430);
+  return (
+    <View pointerEvents="none"
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                   alignItems: "center", justifyContent: "center" }}>
+      <Star size={big} color={gold} opacity={0.3} width={0.35} />
+      <Star size={big * 0.59} color={bright} opacity={0.22} width={0.5} />
     </View>
   );
 }
