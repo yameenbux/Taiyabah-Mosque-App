@@ -36,6 +36,18 @@ import { BRANCHES } from "../hajj-data";
 
 
 
+
+/* TEMPORARY. Lets the three candidate designs be looked at side by side on
+   one build while the masjid chooses between them. It goes with the two that
+   are not chosen. */
+function pickVariant() {
+  try {
+    const v = globalThis?.localStorage?.getItem("hajjVariant");
+    if (v === "a" || v === "b" || v === "c") return v;
+  } catch {}
+  return "a";
+}
+
 /* ONE JOURNEY, AS A CARD. The picture carries the place and the words carry
  * the promise, laid out the way a phone is held: the image on the leading
  * edge where the eye starts, the label beside it, the chevron where the thumb
@@ -77,75 +89,177 @@ export default function Hajj({ navigation }) {
   const { t, fs, rtl } = useApp();
   const access = hajjAccess(BRANCHES);
 
-  /* WHICH JOURNEY, ASKED FIRST. The section used to open onto eight tiles,
-     which is a question — "pick a branch" — put to somebody who has not yet
-     said which trip they are on. ʿUmrah can be done in an afternoon and Hajj
-     is five days in a tent; a person planning one is not served by being
-     handed the furniture of the other.
+  /* THREE DESIGNS, SWITCHABLE WHILE THEY ARE BEING CHOSEN BETWEEN.
+     TEMPORARY SCAFFOLDING — the chosen one stays and this switch goes. */
+  const JOURNEYS = [
+    { img: require("../../assets/journey-umrah.png"),
+      label: t("hajj.plan_your_umrah", "Plan your journey: ʿUmrah"),
+      detail: t("hajj.the_rites_in_order", "The rites in order, iḥrām, and the duʿās"),
+      go: () => navigation.navigate("HajjJourney", { journey: "umrah" }) },
+    { img: require("../../assets/journey-hajj.png"),
+      label: t("hajj.plan_your_hajj", "Plan your journey: Hajj"),
+      detail: t("hajj.the_case_the_heat", "The case, the heat, the paperwork and coming home"),
+      go: () => navigation.navigate("HajjJourney", { journey: "hajj" }) },
+  ];
 
-     Two cards, each carrying the place it belongs to, on the Ramadan poster's
-     own gradient so the two screens are one design. The pictures are of the
-     places and not of people — CLAUDE.md allows no face anywhere, and a
-     photograph of the Ḥaram taken at any ordinary hour is nothing but faces,
-     so both were made deliberately empty.
+  if (access.open) {
+    const v = pickVariant();
 
-     The mark at the foot is the same one the held poster wears, smaller: it
-     closes the page without competing with the two things on it. */
-  if (access.open)
-    return (
-      <Screen scroll={false} pad={false} bg={HJ.ground}>
-        <LinearGradient
-          colors={[HJ.groundTop, HJ.groundMid, HJ.ground]}
-          locations={[0, 0.45, 1]}
-          style={{ flex: 1, justifyContent: "space-between",
-                   paddingHorizontal: 20, paddingTop: 30, paddingBottom: 26 }}>
-
-          {/* 1. what this is, in one line */}
-          <View>
+    /* A — FULL-BLEED CARDS. The picture is the button. Careem's city list and
+       Google Photos' memory cards both work this way: a tall photograph, the
+       words sitting on a scrim at its foot, nothing else on the row. It fills
+       the height the first design left empty, and at this size the Ḥaram and
+       the tents are legible as places rather than as stamps. */
+    if (v === "a")
+      return (
+        <Screen scroll={false} pad={false} bg={HJ.ground}>
+          <LinearGradient colors={[HJ.groundTop, HJ.groundMid, HJ.ground]} locations={[0, 0.45, 1]}
+                          style={{ flex: 1, paddingHorizontal: 16, paddingTop: 22, paddingBottom: 18 }}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: HJ.gold,
-                           letterSpacing: 3.4, textTransform: "uppercase",
-                           textAlign: "center" }}>
+                           letterSpacing: 3.4, textTransform: "uppercase" }}>
               {t("marriage.hajj_umrah", "Hajj / Umrah")}
             </Text>
-            <Text style={{ fontFamily: F.display, fontSize: fs(27), lineHeight: fs(33),
-                           color: HJ.ink, textAlign: "center", marginTop: 10 }}>
+            <Text style={{ fontFamily: F.display, fontSize: fs(26), lineHeight: fs(31),
+                           color: HJ.ink, marginTop: 7 }}>
               {t("hajj.before_you_travel", "Before you travel")}
             </Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
-                           color: HJ.inkFaint, textAlign: "center", marginTop: 9 }}>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20),
+                           color: HJ.inkFaint, marginTop: 6 }}>
               {t("hajj.choose_the_journey",
                  "Choose the journey you are making. The packing, the heat and the paperwork are the same for both.")}
             </Text>
-          </View>
 
-          {/* 2. the two journeys, holding the middle */}
-          <View>
-            <JourneyCard
-              image={require("../../assets/journey-umrah.png")}
-              label={t("hajj.plan_your_umrah", "Plan your journey: ʿUmrah")}
-              detail={t("hajj.the_rites_in_order", "The rites in order, iḥrām, and the duʿās")}
-              onPress={() => navigation.navigate("HajjJourney", { journey: "umrah" })} />
-            <JourneyCard
-              image={require("../../assets/journey-hajj.png")}
-              label={t("hajj.plan_your_hajj", "Plan your journey: Hajj")}
-              detail={t("hajj.the_case_the_heat", "The case, the heat, the paperwork and coming home")}
-              onPress={() => navigation.navigate("HajjJourney", { journey: "hajj" })} />
-          </View>
+            <View style={{ flex: 1, justifyContent: "center", gap: 13, marginTop: 14 }}>
+              {JOURNEYS.map(jn => (
+                <Press key={jn.label} onPress={jn.go} accessibilityRole="button"
+                       accessibilityLabel={jn.label}
+                       style={{ flex: 1, maxHeight: 210, borderRadius: R.card, overflow: "hidden",
+                                borderWidth: 1, borderColor: HJ.goldLine }}>
+                  <Image source={jn.img} style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
+                  <LinearGradient colors={["rgba(27,6,19,0)", "rgba(27,6,19,0.55)", "rgba(27,6,19,0.92)"]}
+                                  locations={[0, 0.45, 1]}
+                                  style={{ position: "absolute", left: 0, right: 0, bottom: 0, top: 0,
+                                           justifyContent: "flex-end", padding: 15 }}>
+                    <Text style={{ fontFamily: F.sansSemi, fontSize: fs(17), color: HJ.ink }}>{jn.label}</Text>
+                    <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(18.5),
+                                   color: HJ.inkSoft, marginTop: 3 }}>{jn.detail}</Text>
+                  </LinearGradient>
+                </Press>
+              ))}
+            </View>
 
-          {/* 3. the mark */}
-          <View style={{ alignItems: "center" }}>
             <Image source={require("../../assets/logo.png")}
-                   style={{ width: 104, height: 74, resizeMode: "contain" }}
+                   style={{ width: 86, height: 62, resizeMode: "contain", alignSelf: "center", marginTop: 12 }}
                    accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(8), color: HJ.inkFaint,
-                           letterSpacing: 2.2, textTransform: "uppercase",
-                           marginTop: 10, textAlign: "center" }}>
-              {t("app.bolton_central_islamic_society", "Bolton Central Islamic Society")}
-            </Text>
+          </LinearGradient>
+        </Screen>
+      );
+
+    /* B — THE SCREEN IS THE CHOICE. Two halves, edge to edge, nothing around
+       them. There is no third thing on this page, so the furniture that
+       usually separates a question from its answers has nothing to do. The
+       title sits over the top half and the mark over the bottom, both on the
+       photographs' own darkness. The boldest of the three and the least
+       forgiving if a picture is ever weak. */
+    if (v === "b")
+      return (
+        <Screen scroll={false} pad={false} bg={HJ.ground}>
+          <View style={{ flex: 1 }}>
+            {JOURNEYS.map((jn, k) => (
+              <Press key={jn.label} onPress={jn.go} accessibilityRole="button"
+                     accessibilityLabel={jn.label} dim={false}
+                     style={{ flex: 1, borderTopWidth: k ? 1 : 0, borderTopColor: HJ.goldLine }}>
+                <Image source={jn.img} style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
+                <LinearGradient colors={["rgba(27,6,19,0.86)", "rgba(27,6,19,0.42)", "rgba(27,6,19,0.86)"]}
+                                locations={[0, 0.5, 1]}
+                                style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                                         alignItems: "center", justifyContent: "center", paddingHorizontal: 28 }}>
+                  {k === 0 && (
+                    <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: HJ.gold,
+                                   letterSpacing: 3.4, textTransform: "uppercase", marginBottom: 12 }}>
+                      {t("marriage.hajj_umrah", "Hajj / Umrah")}
+                    </Text>)}
+                  <Text style={{ fontFamily: F.display, fontSize: fs(25), lineHeight: fs(31),
+                                 color: HJ.ink, textAlign: "center" }}>{jn.label}</Text>
+                  <View style={{ width: 38, height: 2, backgroundColor: HJ.gold, opacity: 0.9, marginTop: 13 }} />
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19),
+                                 color: HJ.inkSoft, textAlign: "center", marginTop: 13 }}>{jn.detail}</Text>
+                  {k === 1 && (
+                    <Image source={require("../../assets/logo.png")}
+                           style={{ width: 78, height: 56, resizeMode: "contain", marginTop: 20 }}
+                           accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />)}
+                </LinearGradient>
+              </Press>
+            ))}
           </View>
-        </LinearGradient>
-      </Screen>
-    );
+        </Screen>
+      );
+
+    /* C — ONE PICTURE, THEN THE TWO WAYS ON. A single photograph at the head
+       of the page says where this is about, and the choice underneath is made
+       in words at row height. The quietest of the three and the quickest to
+       run an eye down; it is also the only one that still reads at the largest
+       text size, because the rows grow and the picture does not have to. */
+    if (v === "c")
+      return (
+        <Screen scroll={false} pad={false} bg={HJ.ground}>
+          <LinearGradient colors={[HJ.groundTop, HJ.groundMid, HJ.ground]} locations={[0, 0.45, 1]}
+                          style={{ flex: 1, paddingBottom: 20 }}>
+            <View style={{ height: 250 }}>
+              <Image source={JOURNEYS[0].img}
+                     style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
+              <LinearGradient colors={["rgba(27,6,19,0.25)", "rgba(27,6,19,0.55)", HJ.groundMid]}
+                              locations={[0, 0.55, 1]}
+                              style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                                       justifyContent: "flex-end", paddingHorizontal: 20, paddingBottom: 16 }}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: HJ.gold,
+                               letterSpacing: 3.4, textTransform: "uppercase" }}>
+                  {t("marriage.hajj_umrah", "Hajj / Umrah")}
+                </Text>
+                <Text style={{ fontFamily: F.display, fontSize: fs(28), lineHeight: fs(34),
+                               color: HJ.ink, marginTop: 6 }}>
+                  {t("hajj.before_you_travel", "Before you travel")}
+                </Text>
+              </LinearGradient>
+            </View>
+
+            <View style={{ paddingHorizontal: 20, flex: 1 }}>
+              <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
+                             color: HJ.inkFaint, marginTop: 16 }}>
+                {t("hajj.choose_the_journey",
+                   "Choose the journey you are making. The packing, the heat and the paperwork are the same for both.")}
+              </Text>
+              <View style={{ marginTop: 18 }}>
+                {JOURNEYS.map(jn => (
+                  <Press key={jn.label} onPress={jn.go} accessibilityRole="button"
+                         accessibilityLabel={jn.label}
+                         style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                                  gap: 14, paddingVertical: 17, paddingHorizontal: 16, marginTop: 11,
+                                  backgroundColor: HJ.panel, borderRadius: R.card,
+                                  borderWidth: 1, borderColor: HJ.panelLine }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15.5), color: HJ.ink,
+                                     textAlign: rtl ? "right" : "left" }}>{jn.label}</Text>
+                      <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(18.5),
+                                     color: HJ.inkFaint, marginTop: 4,
+                                     textAlign: rtl ? "right" : "left" }}>{jn.detail}</Text>
+                    </View>
+                    <HajjChevron />
+                  </Press>
+                ))}
+              </View>
+            </View>
+
+            <View style={{ alignItems: "center" }}>
+              <Image source={require("../../assets/logo.png")}
+                     style={{ width: 92, height: 66, resizeMode: "contain" }}
+                     accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />
+            </View>
+          </LinearGradient>
+        </Screen>
+      );
+
+  }
 
   /* THE HELD SCREEN. Built on the Ramadan countdown's own furniture — the
      same gradient, the same Star out of ui.jsx, the same three-part stack of
