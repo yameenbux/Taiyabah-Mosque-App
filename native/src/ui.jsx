@@ -172,6 +172,29 @@ export function Girih({ size = 230, color = C.gold, opacity = 0.08, style }) {
   );
 }
 
+/* THE SAME STAR, UNFILLED AND CENTRED, which is what the two poster screens
+ * stand on — the Ramadan countdown and the Hajj held screen. It lived in
+ * Ramadan.jsx while there was one of them. The website's .rmg-star is one
+ * rule serving both sheets, and this is that rule: a second copy is how the
+ * two drift apart.
+ *
+ * Girih above fills the polygon and sits in a corner as a watermark. This one
+ * is a hairline outline on the middle of the screen, which at 560px is a
+ * different thing entirely — filled at that size it is a stain across the
+ * words rather than a mark behind them. */
+export function Star({ size, color, opacity, width }) {
+  return (
+    <View pointerEvents="none"
+          style={{ position: "absolute", top: "50%", left: "50%",
+                   marginLeft: -size / 2, marginTop: -size / 2, opacity }}>
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        <Polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"
+                 fill="none" stroke={color} strokeWidth={width} />
+      </Svg>
+    </View>
+  );
+}
+
 /* The bar the web app carries above every tab: the masjid's own wordmark, the
  * society's name, and a bell that goes to Notices. It sits on the plum so it
  * runs into the hero below it rather than sitting on top of one. */

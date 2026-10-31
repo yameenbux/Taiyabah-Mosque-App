@@ -1,29 +1,36 @@
 /* Hajj & Umrah — the front of the section, and the gate.
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
- * HELD, which is what the public sees today: the row that reaches this screen
- * used to be dead on both platforms, so somebody going for Hajj tapped it and
- * got silence. This says what the section will carry and sends them to the
- * two things that already work with no signal. It promises nothing it cannot
- * keep: nothing here reaches the masjid and nobody is signed up for anything.
+ * HELD, which is what the public sees today: a poster on the Ramadan
+ * countdown's own furniture, offering the two things that already work with
+ * no signal — the duʿā book and the way to reach the ʿulamā. It promises
+ * nothing it cannot keep: nothing here reaches the masjid and nobody is
+ * signed up for anything.
  *
- * OPEN, once the masjid releases it: the same screen becomes the way in, and
- * the four panels give way to the branches that are actually ready. hajj.js
- * decides which those are — a fiqh branch whose entries carry no approver's
- * name is not offered at all, so the drafts in hajj/content.js cannot appear
- * here however the switch is thrown.
+ * It used to be a COMING SOON chip over four tiles previewing the duʿās, the
+ * counters, the steps and the rulings. That is placeholder content, which
+ * guideline 2.1 asks to have scrubbed before submission, and it was found by
+ * App Review. The screen now states what the masjid offers today rather than
+ * what the app will offer later.
+ *
+ * OPEN, once the masjid releases it: a different screen entirely, listing the
+ * branches that are actually ready. hajj.js decides which those are — a fiqh
+ * branch whose entries carry no approver's name is not offered at all, so the
+ * drafts in hajj/content.js cannot appear here however the switch is thrown.
  *
  * MISHKĀT. The section is the one dark place in the app: the lamp at the top,
  * frosted panels, the masjid's mark at the foot. hajj-ui.jsx holds that and
  * index.html#hajj is the same screen on the website.
  */
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { F, R, HJ } from "../theme";
+import { C, F, HJ } from "../theme";
 import { useApp } from "../store";
-import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjRow, HajjChevron }
+import { Screen, Star } from "../ui";
+import { HajjScreen, HajjTitle, HajjLead, HajjKicker, HajjRow, HajjChevron }
   from "../hajj-ui";
 import { hajjAccess, visibleItems } from "../hajj";
 import { BRANCHES, byStage } from "../hajj-data";
@@ -31,25 +38,6 @@ import { BRANCHES, byStage } from "../hajj-data";
 /* The packing list's own key, read here so the branch row can say how far
    through the case somebody is rather than how many lines the branch has. */
 const PACKED = "taiyabah.hajj.packed";
-
-/* One of the four panels on the held screen. `lit` is the gold one — the
-   counters, because they are the one thing on this screen that already
-   works. */
-function Tile({ lit, top, title, detail, fs, rtl }) {
-  return (
-    <Panel tone={lit ? "gold" : "plain"}
-           style={{ flex: 1, minHeight: 154, paddingHorizontal: 14, paddingTop: 15,
-                    paddingBottom: 16, justifyContent: "space-between" }}>
-      <View>{top}</View>
-      <View>
-        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: HJ.ink,
-                       textAlign: rtl ? "right" : "left" }}>{title}</Text>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18), marginTop: 3,
-                       color: HJ.inkFaint, textAlign: rtl ? "right" : "left" }}>{detail}</Text>
-      </View>
-    </Panel>
-  );
-}
 
 /* Each branch keeps the same glyph on both platforms. check-icons.mjs refuses
    any name that is not in the app's 33KB Ionicons subset, so a wrong guess
@@ -149,93 +137,75 @@ export default function Hajj({ navigation }) {
       </HajjScreen>
     );
 
+  /* THE HELD SCREEN. Built on the Ramadan countdown's own furniture — the
+     same gradient, the same Star out of ui.jsx, the same three-part stack of
+     words, middle and mark — so the two posters are one design rather than
+     two that resemble each other. No countdown: Ramadan has a date to count
+     to and this does not.
+
+     IT SAYS NOTHING IN THE FUTURE TENSE, and that is deliberate. What stood
+     here was a COMING SOON chip over four tiles previewing the duʿās, the
+     counters, the steps and the rulings, under a line promising they would
+     be checked "before it appears here". Guideline 2.1 asks for placeholder
+     and temporary content to be scrubbed before submission, and a screen
+     whose whole message is that a feature does not exist yet is the thing
+     that rule names. This says what the masjid has for the journey TODAY,
+     and both rows work offline. */
   return (
-    <HajjScreen>
-      <View style={{ alignSelf: rtl ? "flex-end" : "flex-start" }}>
-        <HajjChip tone="gold" style={{ borderRadius: R.pill, paddingHorizontal: 10 }}>
-          {t("marriage.coming_soon", "Coming soon")}
-        </HajjChip>
-      </View>
+    <Screen scroll={false} pad={false} bg={C.brand900}>
+      <LinearGradient
+        colors={[C.brand700, C.brand800, C.brand900]}
+        locations={[0, 0.44, 1]}
+        style={{ flex: 1, alignItems: "center", justifyContent: "space-between",
+                 paddingHorizontal: 34, paddingTop: 54, paddingBottom: 40 }}>
 
-      <View style={{ marginTop: 14 }}>
-        <HajjTitle>{t("hajj.what_you_will_carry", "What you will carry with you")}</HajjTitle>
-      </View>
-      <HajjLead>
-        {t("hajj.four_things_offline",
-           "Four things, on your phone, working without signal in the Ḥaram.")}
-      </HajjLead>
+        <Star size={560} color={C.gold} opacity={0.3} width={0.35} />
+        <Star size={330} color={C.goldBright} opacity={0.22} width={0.5} />
 
-      <View style={[row, { marginTop: 20 }]}>
-        <Tile fs={fs} rtl={rtl}
-              top={<Text style={{ fontFamily: F.arabic, fontSize: fs(20), lineHeight: fs(34),
-                                  color: HJ.gold, textAlign: "right" }}>
-                     لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ
-                   </Text>}
-              title={t("hajj.the_duas", "The duʿās")}
-              detail={t("hajj.duas_detail", "Iḥrām, talbiyah, ṭawāf, saʿī, with the transliteration")} />
+        {/* 1. the words */}
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: C.gold,
+                         letterSpacing: 3.4, textTransform: "uppercase" }}>
+            {t("marriage.hajj_umrah", "Hajj / Umrah")}
+          </Text>
+          <Text style={{ fontFamily: F.display, fontSize: fs(38), lineHeight: fs(42),
+                         color: C.cream, textAlign: "center", marginTop: 14 }}>
+            {t("hajj.before_you_travel", "Before you travel")}
+          </Text>
+          <View style={{ width: 46, height: 2, backgroundColor: C.gold,
+                         opacity: 0.9, marginTop: 20 }} />
+        </View>
 
-        <Tile lit fs={fs} rtl={rtl}
-              top={<View style={{ flexDirection: "row", alignItems: "baseline", gap: 5 }}>
-                     <Text style={{ fontFamily: F.display, fontSize: fs(40), color: HJ.ink }}>4</Text>
-                     <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: HJ.gold }}>
-                       {t("hajj.of_seven", "of 7")}
-                     </Text>
-                   </View>}
-              title={t("hajj.the_counters", "The counters")}
-              detail={t("hajj.counters_detail", "Ṭawāf and saʿī without losing count, and a tasbīḥ")} />
-      </View>
+        {/* 2. the two things that already work, holding the middle where the
+               Ramadan poster holds its count */}
+        <View style={{ alignItems: "center", width: "100%" }}>
+          <HajjRow icon={<Ionicons name="book-outline" size={19} color={HJ.inkSoft} />}
+                   label={t("hajj.the_dua_book", "The duʿā book")}
+                   trail={<HajjChevron />}
+                   onPress={() => navigation.navigate("Duas")} />
+          <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.inkSoft} />}
+                   label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
+                   trail={<HajjChevron />}
+                   onPress={() => navigation.navigate("Contact")} />
+          <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5),
+                         color: "rgba(243,239,227,0.6)", textAlign: "center", marginTop: 22 }}>
+            {t("hajj.ulama_answer_in_person",
+               "The masjid’s ʿulamā answer questions on Ḥajj and ʿUmrah in person and by telephone.")}
+          </Text>
+        </View>
 
-      <View style={[row, { marginTop: 12 }]}>
-        <Tile fs={fs} rtl={rtl}
-              top={<View>
-                     {[1, 2, 3].map(n => (
-                       <View key={n} style={{ flexDirection: "row", alignItems: "center", gap: 7,
-                                              marginTop: n === 1 ? 0 : 6 }}>
-                         <View style={{ width: 18, height: 18, borderRadius: R.pill,
-                                        alignItems: "center", justifyContent: "center",
-                                        borderWidth: 1,
-                                        borderColor: n === 1 ? HJ.goldLine : HJ.panelLine,
-                                        backgroundColor: n === 1 ? HJ.goldFill : "transparent" }}>
-                           <Text style={{ fontFamily: F.sansBold, fontSize: fs(9),
-                                          color: n === 1 ? HJ.gold : HJ.inkFaint }}>{n}</Text>
-                         </View>
-                         <View style={{ flex: 1, height: 2, borderRadius: 2,
-                                        backgroundColor: n === 1 ? HJ.goldLine : HJ.panelLine }} />
-                       </View>
-                     ))}
-                   </View>}
-              title={t("hajj.the_steps", "The steps")}
-              detail={t("hajj.steps_detail", "How each rite is performed, in order, one step at a time")} />
-
-        <Tile fs={fs} rtl={rtl}
-              /* Allowed is the ordinary state and takes the ordinary ink; dam
-                 is the exception and is the only one that takes a colour. A
-                 green/red pair would have leaned on hue alone. */
-              top={<View style={{ gap: 6, alignItems: rtl ? "flex-end" : "flex-start" }}>
-                     <HajjChip>{t("hajj.allowed", "Allowed")}</HajjChip>
-                     <HajjChip tone="warn">{t("hajj.dam_due", "Dam due")}</HajjChip>
-                   </View>}
-              title={t("hajj.the_rulings", "The rulings")}
-              detail={t("hajj.rulings_detail", "In iḥrām, shortening salāh, and when a dam is owed")} />
-      </View>
-
-      <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
-                     color: HJ.inkFaint, textAlign: "center", marginTop: 18 }}>
-        {t("hajj.checked_by_ulama",
-           "Every ruling will be checked and approved by the ʿulamā at the masjid before it appears here.")}
-      </Text>
-
-      {/* The two things that already exist and already work offline, which is
-          the whole reason they are what is offered meanwhile. */}
-      <HajjKicker style={{ marginTop: 26 }}>{t("hajj.until_then", "Until then")}</HajjKicker>
-      <HajjRow icon={<Ionicons name="book-outline" size={19} color={HJ.inkSoft} />}
-               label={t("hajj.the_dua_book", "The duʿā book")}
-               trail={<HajjChevron />}
-               onPress={() => navigation.navigate("Duas")} />
-      <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.inkSoft} />}
-               label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
-               trail={<HajjChevron />}
-               onPress={() => navigation.navigate("Contact")} />
-    </HajjScreen>
+        {/* 3. the mark */}
+        <View style={{ alignItems: "center" }}>
+          <Image source={require("../../assets/logo.png")}
+                 style={{ width: 164, height: 116, resizeMode: "contain" }}
+                 accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(8.5),
+                         color: "rgba(243,239,227,0.42)", letterSpacing: 2.2,
+                         textTransform: "uppercase", marginTop: 16, textAlign: "center" }}>
+            {t("app.bolton_central_islamic_society", "Bolton Central Islamic Society")}
+          </Text>
+        </View>
+      </LinearGradient>
+    </Screen>
   );
 }

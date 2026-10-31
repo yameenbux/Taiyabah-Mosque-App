@@ -26,8 +26,7 @@ import { View, Text, Image, Switch, Share } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
-import Svg, { Polygon } from "react-native-svg";
-import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot, Press, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot, Press, Star, tap, open } from "../ui";
 import { Field, ErrorBox, Submit, isPhone } from "../form";
 import { rpc, itikafIsOpen } from "../supabase";
 import { useApp } from "../store";
@@ -39,23 +38,6 @@ import MUSHAF from "../data/mushaf.json";
 import RAMADAN from "../data/ramadan.json";
 
 const pad2 = n => String(n).padStart(2, "0");
-
-/* The app's own eight-point girih, unfilled and centred on the screen. */
-const POINTS = "50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 "
-             + "57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 "
-             + "16.1,16.1 42.7,32.4";
-
-function Star({ size, color, opacity, width }) {
-  return (
-    <View pointerEvents="none"
-          style={{ position: "absolute", top: "50%", left: "50%",
-                   marginLeft: -size / 2, marginTop: -size / 2, opacity }}>
-      <Svg width={size} height={size} viewBox="0 0 100 100">
-        <Polygon points={POINTS} fill="none" stroke={color} strokeWidth={width} />
-      </Svg>
-    </View>
-  );
-}
 
 /* ---- the month, once the gate has opened ------------------------------- */
 

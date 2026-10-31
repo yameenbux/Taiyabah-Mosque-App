@@ -1195,6 +1195,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .rmg-phrase{font-family:"Fraunces",Georgia,serif;font-size:calc(34px * var(--ts));
     line-height:1.18;color:#F3EFE3}
   .rmg-when{font-size:calc(12.5px * var(--ts));font-weight:500;color:rgba(243,239,227,.6);margin-top:22px}
+  /* The Hajj poster puts rows where Ramadan puts the countdown cells, and a
+     row's label is read from its icon, not from the middle of the card:
+     .rmg-mid centres its children, which left "The duʿā book" floating
+     between the glyph and the chevron. */
+  #hjg .hj-row{text-align:start}
+  #hjg .hj-row + .hj-row{margin-top:10px}
   .rmg-logo{display:block;width:164px;height:116px;object-fit:contain;margin-inline:auto}
   .rmg-soc{font-size:calc(8.5px * var(--ts));font-weight:600;color:rgba(243,239,227,.42);
     letter-spacing:2.2px;text-transform:uppercase;margin-top:16px}
@@ -3729,14 +3735,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <div class="ab-wrap">
           <div class="ad-note">
             <span class="lab" data-i18n="member.membership_2">Membership</span>
-            <h4 data-i18n="member.checking_online_comes_soon">Checking online comes soon</h4>
-            <p data-i18n="member.you_will_be_able_to_sign_in">You will be able to sign in here and see whether this year&rsquo;s fee has been
-               received and the date the next one falls due. Until that is connected, the
-               office holds the record and can tell you in a moment.</p>
+            <h4 data-i18n="member.checking_your_membership">Checking your membership</h4>
+            <p data-i18n="member.the_office_holds_the_record">The office holds the membership record. Ring during office hours and they
+               will tell you whether this year&rsquo;s fee has been received and the date
+               the next one falls due.</p>
             <p><strong data-i18n="member.the_office_takes_calls">The office takes calls between 5pm and 7pm.</strong></p>
           </div>
 
-          <div class="sec-h"><h2 data-i18n="member.what_membership_covers">What it will show</h2><span class="rule"></span></div>
+          <div class="sec-h"><h2 data-i18n="member.what_the_office_can_tell_you">What the office can tell you</h2><span class="rule"></span></div>
           <dl class="card ad-dl">
             <div class="ad-d"><dt data-i18n="member.this_year">This year</dt><dd data-i18n="member.whether_the_fee_has_been">Whether the fee has been received, and the date it was paid.</dd></div>
             <div class="ad-d"><dt data-i18n="member.next_due">Next due</dt><dd data-i18n="member.the_date_the_next_years">The date the next year&rsquo;s fee falls due, so it does not come as a surprise.</dd></div>
@@ -4130,15 +4136,18 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
 
-          <button class="md-row soon" disabled aria-disabled="true">
+          <!-- A row, not a button: there is nothing to press. It was a
+               disabled control wearing a COMING SOON tag, which is a dead
+               control and a placeholder in one. The sentence is real and the
+               office's number is directly below it. -->
+          <div class="md-row">
             <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></span>
             <span class="md-t">
               <span class="md-t1" data-i18n="edu.more_courses">More courses</span>
-              <span class="md-t2" data-i18n="edu.tajweed_seerah_a_womens_circle">Tajweed, Seerah, a women&rsquo;s circle &mdash; tell the office what
-                you&rsquo;d like taught</span>
+              <span class="md-t2" data-i18n="edu.tell_the_office_what_youd_like">Tajweed, Seerah, a women&rsquo;s circle &mdash; ring the office and tell
+                them what you&rsquo;d like taught</span>
             </span>
-            <span class="soon-tag" data-i18n="edu.coming_soon">Coming soon</span>
-          </button>
+          </div>
 
           <a class="hh-call" href="tel:01204535997"><span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span><span class="hh-call-t"><span class="hh-call-k" data-i18n="edu.masjid_office_5_7pm">Masjid office &middot; 5pm&ndash;7pm</span><span class="hh-call-v tnum" data-i18n-latin>01204 535 997</span></span><span class="dr-ch">&rsaquo;</span></a>
           <p class="hh-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
@@ -4513,7 +4522,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5"/><path d="M10 8.4 13.6 12 10 15.6"/><path d="M13.6 12H4.5"/></svg></span>
             <span class="md-t">
               <span class="md-t1" data-i18n="portals.madrasah_portal">Madrasah Portal</span>
-              <span class="md-t2" data-i18n="madrasah.sign_in_registers_still_being_built">Sign in · registers and pupil records still being built</span>
+              <span class="md-t2" data-i18n="portals.madrasah_signin">Sign in with your madrasah account</span>
             </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
           </a>
           <button class="md-row" id="mdr-go-curriculum">
@@ -5518,75 +5527,61 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="sh-close" id="hj-close" data-i18n="ramadan.done">Done</button>
       </div>
       <div class="sh-body">
-       <div class="ab-wrap">
-        <span class="soon-tag" id="hj-soon" data-i18n="marriage.coming_soon">Coming soon</span>
-        <!-- Two headlines, two by-lines, two sub-headings, one of each
-             hidden. Setting textContent instead would be overwritten the
-             next time the language changes, because data-i18n is what
-             owns these strings. -->
-        <h2 class="hj-head" id="hj-head-held" data-i18n="hajj.what_you_will_carry">What you will carry with you</h2>
-        <h2 class="hj-head" id="hj-head-open" data-i18n="hajj.what_you_carry" hidden>What you carry with you</h2>
-        <p class="hj-lede" id="hj-lede-held" data-i18n="hajj.four_things_offline">Four things, on your phone, working without signal in the &#7716;aram.</p>
-        <p class="hj-lede" id="hj-lede-open" data-i18n="hajj.what_is_ready" hidden>Everything the masjid has ready for the journey, working without signal in the &#7716;aram.</p>
+        <!-- THE HELD SCREEN. Built on .rmg, which is the Ramadan guard's
+             own CSS, so the two posters cannot drift apart. No countdown:
+             Ramadan has a date to count to and this does not.
 
-        <div class="hj-grid" id="hj-grid">
-          <button type="button" class="hj-panel hj-tile" id="hj-t-duas" disabled>
-            <div class="hj-ar" lang="ar">&#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614; &#1575;&#1604;&#1604;&#1617;&#1614;&#1607;&#1615;&#1605;&#1617;&#1614; &#1604;&#1614;&#1576;&#1617;&#1614;&#1610;&#1618;&#1603;&#1614;</div>
-            <div>
-              <div class="hj-t" data-i18n="hajj.the_duas">The du&#703;&#257;s</div>
-              <div class="hj-d" data-i18n="hajj.duas_detail">I&#7717;r&#257;m, talbiyah, &#7789;aw&#257;f, sa&#703;&#299;, with the transliteration</div>
-            </div>
-          </button>
+             It carries no "coming soon" and nothing in the future tense.
+             Guideline 2.1 asks for placeholder and temporary content to be
+             scrubbed before submission, and a screen whose message is that
+             a feature does not exist yet is the thing that rule names. So
+             this says what the masjid offers for the journey TODAY, and
+             both rows below work. -->
+        <section class="rmg" id="hjg" hidden>
+        <svg class="rmg-star rmg-star-a" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="currentColor" stroke-width=".35"/></svg>
+        <svg class="rmg-star rmg-star-b" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" fill="none" stroke="currentColor" stroke-width=".5"/></svg>
 
-          <button type="button" class="hj-panel gold hj-tile" id="hj-t-count" disabled>
-            <div class="hj-count"><b data-i18n-latin>4</b><span data-i18n="hajj.of_seven">of 7</span></div>
-            <div>
-              <div class="hj-t" data-i18n="hajj.the_counters">The counters</div>
-              <div class="hj-d" data-i18n="hajj.counters_detail">&#7788;aw&#257;f and sa&#703;&#299; without losing count, and a tasb&#299;&#7717;</div>
-            </div>
-          </button>
+          <div class="rmg-top">
+            <div class="rmg-kicker" data-i18n="marriage.hajj_umrah">Hajj / Umrah</div>
+            <h2 class="rmg-head" data-i18n="hajj.before_you_travel">Before you travel</h2>
+            <span class="rmg-rule" aria-hidden="true"></span>
+          </div>
 
-          <button type="button" class="hj-panel hj-tile" id="hj-t-steps" disabled>
-            <div>
-              <div class="hj-step now"><i>1</i><em></em></div>
-              <div class="hj-step" style="margin-top:6px"><i>2</i><em></em></div>
-              <div class="hj-step" style="margin-top:6px"><i>3</i><em></em></div>
-            </div>
-            <div>
-              <div class="hj-t" data-i18n="hajj.the_steps">The steps</div>
-              <div class="hj-d" data-i18n="hajj.steps_detail">How each rite is performed, in order, one step at a time</div>
-            </div>
-          </button>
+          <div class="rmg-mid">
+            <button class="hj-panel hj-row" id="hjg-duas">
+              <span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M8 7.5h7M8 11.5h7"/></svg></span><span class="hj-rt" data-i18n="hajj.the_dua_book">The du&#703;&#257; book</span><span class="hj-ch" aria-hidden="true">&rsaquo;</span>
+            </button>
+            <button class="hj-panel hj-row" id="hjg-contact">
+              <span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.3 17.3 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.8 5.5a1.8 1.8 0 0 1 1.8-2h2.6a1.8 1.8 0 0 1 1.8 1.6c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14 14 0 0 0 5.3 5.3l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6a1.8 1.8 0 0 1 1.6 1.9Z"/></svg></span><span class="hj-rt" data-i18n="hajj.ask_the_ulama">Ask the &#703;ulam&#257;</span><span class="hj-ch" aria-hidden="true">&rsaquo;</span>
+            </button>
+            <div class="rmg-when" data-i18n="hajj.ulama_answer_in_person">The masjid&rsquo;s &#703;ulam&#257; answer questions on &#7716;ajj and &#703;Umrah in person and by telephone.</div>
+          </div>
 
-          <button type="button" class="hj-panel hj-tile" id="hj-t-rulings" disabled>
-            <div class="hj-chips">
-              <span class="hj-chip" data-i18n="hajj.allowed">Allowed</span>
-              <span class="hj-chip dam" data-i18n="hajj.dam_due">Dam due</span>
-            </div>
-            <div>
-              <div class="hj-t" data-i18n="hajj.the_rulings">The rulings</div>
-              <div class="hj-d" data-i18n="hajj.rulings_detail">In i&#7717;r&#257;m, shortening sal&#257;h, and when a dam is owed</div>
-            </div>
-          </button>
-        </div>
+          <div class="rmg-foot">
+            <img class="rmg-logo" src="logo.svg" alt="Taiyabah Masjid" width="164" height="116"
+                 data-i18n-attr="alt:a11y.taiyabah_masjid">
+            <div class="rmg-soc" data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</div>
+          </div>
+        </section>
 
-        <p class="hj-by" id="hj-by-held" data-i18n="hajj.checked_by_ulama">Every ruling will be checked and approved by the &#703;ulam&#257; at the masjid before it appears here.</p>
+       <div class="ab-wrap" id="hj-open-wrap" hidden>
+        <!-- One headline and one lede. The held copies went with the four
+             preview tiles: this wrap is only ever drawn once the section is
+             open, and #hjg above is the held screen. -->
+        <h2 class="hj-head" id="hj-head-open" data-i18n="hajj.what_you_carry">What you carry with you</h2>
+        <p class="hj-lede" id="hj-lede-open" data-i18n="hajj.what_is_ready">Everything the masjid has ready for the journey, working without signal in the &#7716;aram.</p>
 
         <!-- Drawn once the section opens; the four tiles above give way
              to the branches that are actually ready. -->
         <div id="hj-branches" hidden></div>
 
-        <div class="hj-sub" id="hj-sub-held" data-i18n="hajj.until_then">Until then</div>
-        <div class="hj-sub" id="hj-sub-open" data-i18n="hajj.a_question" hidden>A question</div>
-        <button class="hj-panel hj-row" id="hj-duas">
-          <span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M8 7.5h7M8 11.5h7"/></svg></span><span class="hj-rt" data-i18n="hajj.the_dua_book">The du&#703;&#257; book</span><span class="hj-ch" aria-hidden="true">&rsaquo;</span>
-        </button>
+        <div class="hj-sub" id="hj-sub-open" data-i18n="hajj.a_question">A question</div>
         <button class="hj-panel hj-row" id="hj-contact">
           <span class="hj-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.3 17.3 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.8 5.5a1.8 1.8 0 0 1 1.8-2h2.6a1.8 1.8 0 0 1 1.8 1.6c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14 14 0 0 0 5.3 5.3l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6a1.8 1.8 0 0 1 1.6 1.9Z"/></svg></span><span class="hj-rt" data-i18n="hajj.ask_the_ulama">Ask the &#703;ulam&#257;</span><span class="hj-ch" aria-hidden="true">&rsaquo;</span>
         </button>
         <!-- Provenance, so it sits with the mark at the foot rather than as a
              banner between the title and the content. -->
-        <p class="hj-by" id="hj-by-open" data-i18n="hajj.approved_by_ulama" hidden>Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
+        <p class="hj-by" id="hj-by-open" hidden data-i18n="hajj.approved_by_ulama">Every ruling here was checked and approved by the &#703;ulam&#257; at the masjid.</p>
         <!-- The mark at the foot, the same two lines the Ramadan guard ends
              on and the same two the app draws. -->
         <div class="hj-foot">
@@ -6147,7 +6142,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M10 9.3v5.4l4.5-2.7L10 9.3Z"/></svg></span><span class="dr-t" data-i18n="marriage.videos_bayaans">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="hajj">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="11" rx="1.5"/><path d="M4 19.5h16"/><path d="M6.5 8h11"/></svg></span><span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
+          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="11" rx="1.5"/><path d="M4 19.5h16"/><path d="M6.5 8h11"/></svg></span><span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <button class="dr-row" data-act="ramadan">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="dr-t" data-i18n="ramadan.ramadan">Ramadan</span><span class="dr-ch">&rsaquo;</span>
@@ -6170,13 +6165,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         </button>
         <!-- One portal serves parents, teaching staff and administrators, so it
              replaces the two "coming soon" rows that used to stand for it. The
-             sign-in and roles work today; the registers and pupil records do
-             not, and the note says so rather than letting someone set up
-             two-step verification only to find an empty page. -->
+             note says who it is for; what it does NOT yet hold is the office's
+             to answer, and the row below it is the office. Saying "still being
+             built" on the menu advertised an unfinished feature, which is what
+             guideline 2.1 asks to have scrubbed. -->
         <a class="dr-row" href="https://taiyabahwebsite.ysbdesigns.uk/portal/" target="_blank" rel="noopener">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5"/><path d="M10 8.4 13.6 12 10 15.6"/><path d="M13.6 12H4.5"/></svg></span><span class="dr-t">
             <span data-i18n="portals.madrasah_portal">Madrasah Portal</span>
-            <small class="dr-note" data-i18n="portals.madrasah_note">Sign in &middot; registers and pupil records still being built</small>
+            <small class="dr-note" data-i18n="portals.madrasah_signin">Sign in with your madrasah account</small>
           </span><span class="dr-ext" aria-hidden="true">&#8599;</span>
         </a>
 
@@ -6205,9 +6201,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         </button>
         <button class="dr-row" data-act="education">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z"/><path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7"/></svg></span><span class="dr-t" data-i18n="marriage.education">Education</span><span class="dr-ch">&rsaquo;</span>
-        </button>
-        <button class="dr-row soon" disabled aria-disabled="true">
-          <span class="dr-t" data-i18n="marriage.tours_visits">Tours &amp; Visits</span><span class="soon-tag" data-i18n="marriage.coming_soon">Coming soon</span>
         </button>
 
         <div class="dr-h" data-i18n="menu.settings">Settings</div>
@@ -12567,21 +12560,17 @@ const HJ_ICON = {
 function renderHajj(){
   const access = hajjAccess(HAJJ_BRANCHES);
   const open = access.open;
-  document.getElementById("hj-soon").hidden = open;
-  for(const base of ["hj-head","hj-lede","hj-sub"]){
-    document.getElementById(base+"-held").hidden = open;
-    document.getElementById(base+"-open").hidden = !open;
-  }
+  /* ONE SWITCH, TWO SCREENS. Held draws the poster and nothing else; open
+     draws the section and nothing else. There is no longer a third state
+     where part of the open markup shows a held version of itself, which is
+     what the per-element -held/-open pairs were. */
+  document.getElementById("hjg").hidden = open;
+  document.getElementById("hj-open-wrap").hidden = !open;
   /* The by-line claims every ruling here was approved. That is only true
      when a ruling is actually showing: with every fiqh branch still shut it
      would be a boast about content nobody can see. */
   const anyFiqh = (access.branches||[]).some(b => b.kind === "fiqh");
-  document.getElementById("hj-by-held").hidden = open;
   document.getElementById("hj-by-open").hidden = !(open && anyFiqh);
-  document.getElementById("hj-grid").hidden = open;
-  /* The duʿā book row is what is offered INSTEAD of the section; once the
-     section carries its own, only the office stays. */
-  document.getElementById("hj-duas").hidden = open;
 
   const list = document.getElementById("hj-branches");
   list.hidden = !open;
@@ -12647,7 +12636,8 @@ function initHajj(){
   document.getElementById('hj-scrim').addEventListener('click',closeHajj);
   /* Both of these already exist and already work offline, which is the whole
      reason they are what is offered while the section is locked. */
-  document.getElementById('hj-duas').addEventListener('click',()=>{ closeHajj(); setTimeout(openDuas,120); });
+  document.getElementById('hjg-duas').addEventListener('click',()=>{ closeHajj(); setTimeout(openDuas,120); });
+  document.getElementById('hjg-contact').addEventListener('click',()=>{ closeHajj(); setTimeout(openContact,120); });
   document.getElementById('hj-contact').addEventListener('click',()=>{ closeHajj(); setTimeout(openContact,120); });
 
   /* The counters. Every press writes, so a phone that dies mid-ṭawāf comes

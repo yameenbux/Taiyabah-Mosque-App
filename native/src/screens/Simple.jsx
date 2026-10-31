@@ -20,8 +20,8 @@ export function Portal() {
         <Card>
           <P>{t("portal.body",
             "The portal is where staff take the register and where parents will be able to see attendance and fees. It signs in against the masjid's own records, so it opens on the website rather than inside the app.")}</P>
-          <Note>{t("portal.still_building",
-            "Registers and pupil records are still being built. If you are a parent, the office can answer anything the portal does not yet show.")}</Note>
+          <Note>{t("portal.office_answers",
+            "If you are a parent and the portal does not show what you need, the office can answer it on the phone between 5pm and 7pm.")}</Note>
         </Card>
         <CTA label={t("portal.open", "Open the portal")} href="https://taiyabahwebsite.ysbdesigns.uk/portal/" />
         <RowGroup>
