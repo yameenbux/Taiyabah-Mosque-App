@@ -1150,6 +1150,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     background:#DCBB63;color:#3C0B2A;font-family:"Fraunces",Georgia,serif;
     font-size:calc(19px * var(--ts))}
   .rm-odd.now{outline:2px solid #5E1844;outline-offset:2px}
+  /* A SECTION'S OWN SENTENCE, under its heading rather than in a card above
+     the facts — the twin of ui.jsx's <Lead>. Six Ramadan sections were a
+     heading, a cream card explaining the thing, then the rows that answer the
+     question somebody actually came with; the card was the heavier of the two
+     and came first. Same words, at the weight of a caption, where a caption
+     sits. Nothing is reworded: a key owns its translation in three languages. */
+  .rm-lead{font-size:calc(13px * var(--ts));line-height:1.58;color:var(--muted);margin:-2px 0 2px}
+  .rm-lead+.rm-lead{margin-top:7px}
   .rm-card{padding:16px}
   .rm-card p{font-size:calc(14px * var(--ts));line-height:1.65;color:var(--ink)}
   .rm-card p+p{margin-top:11px}
@@ -5404,13 +5412,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         </section>
 
         <div class="ab-wrap">
-          <div class="card rm-card">
-            <p data-i18n="ramadan.ramadan_is_the_month_the">Ramadan is the month the Qur&rsquo;an was sent down &mdash; a month of fasting
-               from first light until sunset, of standing in prayer at night, and of giving.</p>
-            <p data-i18n="ramadan.everything_the_masjid_is_running">Everything the masjid is running this month is here: who is leading
-               taraweeh, who is speaking, and how to book i&rsquo;tikaf.</p>
-          </div>
-
+          <!-- NO EXPLAINER HERE. Sixty words — what Ramadan is, to people
+               keeping it, then a list of what is below — stood between the
+               hero and Tonight, pushing the isha time and the juz off the
+               first screen on a phone. A screen does not need to introduce
+               itself. Removed from Ramadan.jsx in the same commit; both keys
+               keep their translations. -->
           <div id="rm-tonight"></div>
           <!-- Where the month has got to in the Qurʼan, who is leading it
                tonight, whether it is going out on the stream, the reminder
@@ -5431,12 +5438,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.taraweeh">Taraweeh</h2><span class="rule"></span></div>
-          <div class="card rm-card">
-            <p data-i18n="ramadan.twenty_rak_ahs_each_night">Twenty rak&rsquo;ahs each night, led by five. Mufti Faiyaz, the Imam of the
-               masjid, leads the first four rak&rsquo;ahs, and four students of the masjid lead the rest.</p>
-            <p data-i18n="ramadan.the_four_students_are_confirmed">The four students are confirmed around a month before Ramadan begins. One
-               juz of the Qur&rsquo;an is read each night, so the whole Qur&rsquo;an is completed in taraweeh by the end of the month.</p>
-          </div>
+          <p class="rm-lead" data-i18n="ramadan.twenty_rak_ahs_each_night">Twenty rak&rsquo;ahs each night, led by five. Mufti Faiyaz, the Imam of the
+             masjid, leads the first four rak&rsquo;ahs, and four students of the masjid lead the rest.</p>
+          <!-- Next to the rota, not above it: four of the five rows read "To be
+               confirmed" until a month before the month, and this says why. -->
+          <p class="rm-lead" data-i18n="ramadan.the_four_students_are_confirmed">The four students are confirmed around a month before Ramadan begins. One
+             juz of the Qur&rsquo;an is read each night, so the whole Qur&rsquo;an is completed in taraweeh by the end of the month.</p>
 
           <div id="rm-rota"></div>
           <!-- One juz a night, laid out night by night: the ones already kept
@@ -5444,18 +5451,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <div id="rm-nights"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.bayaan">Bayaan</h2><span class="rule"></span></div>
-          <div class="card rm-card">
-            <p data-i18n="ramadan.two_talks_a_day_one">Two talks a day, one after Asr and one after Isha.</p>
-            <p data-i18n="ramadan.changes_are_announced_in_the">Changes are announced in the app.</p>
-          </div>
+          <p class="rm-lead"><span data-i18n="ramadan.two_talks_a_day_one">Two talks a day, one after Asr and one after Isha.</span>
+             <span data-i18n="ramadan.changes_are_announced_in_the">Changes are announced in the app.</span></p>
 
           <div id="rm-slots"></div>
 
           <div class="sec-h"><h2 data-i18n="ramadan.i_tikaf">I&rsquo;tikaf</h2><span class="rule"></span></div>
-          <div class="card rm-card">
-            <p data-i18n="ramadan.staying_in_the_masjid_for">Staying in the masjid for the last ten nights of Ramadan, brothers only.</p>
-            <p data-i18n="ramadan.places_are_limited_so_booking">Places are limited, so booking is asked for &mdash; book your place in the app.</p>
-          </div>
+          <p class="rm-lead"><span data-i18n="ramadan.staying_in_the_masjid_for">Staying in the masjid for the last ten nights of Ramadan, brothers only.</span>
+             <span data-i18n="ramadan.places_are_limited_so_booking">Places are limited, so booking is asked for &mdash; book your place in the app.</span></p>
 
           <div id="rm-itikaf"></div>
 
@@ -5504,9 +5507,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </section>
 
           <div class="sec-h"><h2 data-i18n="ramadan.zakat_al_fitr">Zakat al-Fitr</h2><span class="rule"></span></div>
-          <div class="card rm-card">
-            <p data-i18n="ramadan.due_per_person_in_the">Due per person in the household, before the Eid prayer.</p>
-          </div>
+          <p class="rm-lead" data-i18n="ramadan.due_per_person_in_the">Due per person in the household, before the Eid prayer.</p>
 
           <div id="rm-fitrana"></div>
           <!-- Only the masjid can make a Stripe Payment Link: it is their
