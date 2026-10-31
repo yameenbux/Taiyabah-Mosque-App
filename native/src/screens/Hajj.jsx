@@ -131,8 +131,8 @@ export default function Hajj({ navigation }) {
         {access.branches.some(b => b.kind === "fiqh") && (
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
                          color: HJ.inkFaint, marginTop: 30, textAlign: "center" }}>
-            {t("hajj.approved_by_ulama",
-               "Every ruling here was checked and approved by the ʿulamā at the masjid.")}
+            {t("hajj.published_by_the_masjid",
+               "Published by Taiyabah Masjid, following the Islāmic Daʿwah Academy’s How to Perform ʿUmrah. For your own case, ask the ʿulamā.")}
           </Text>)}
       </HajjScreen>
     );

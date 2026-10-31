@@ -28,11 +28,26 @@ public contact address is **support@ysbdesigns.uk**.
 
 ## The Hajj section asserts no fiqh
 
-Every ruling in `hajj/content.js` is a draft until a scholar's name is in
-its `by` field. An entry without one is invisible and cannot open its
-branch, whatever the release switch says. Pictures in that section describe
-what they show and never which option passes — `scripts/check-hajj.mjs`
-enforces both, and `native/src/hajj-art.jsx` explains why.
+Every ruling in `hajj/content.js` is a draft until the `by` field names who
+stands behind it. An entry without one is invisible, is held out of the app
+bundle and the website's copy by the importer, and cannot open its branch,
+whatever the release switch says.
+
+**`by` records who takes responsibility, not who wrote the source.** The
+entries are the masjid's own restatements of the Islāmic Daʿwah Academy's
+*How to Perform ʿUmrah*; they carry `by: "Taiyabah Masjid"` because the
+trustees publish them on the charity's authority. Do not put a scholar's
+name on wording that scholar has not read — the screen says what the
+guidance follows, and that is the honest claim.
+
+Seven entries are still held: the six days of Hajj, which the ʿUmrah booklet
+never covered and four of which were never written, and "Contracting a
+marriage", whose body is empty. A day-by-day guide missing four of its days
+is worse than no guide, so the whole section stays dark until it is written.
+
+Pictures in that section describe what they show and never which option
+passes — `scripts/check-hajj.mjs` enforces all of this, and
+`native/src/hajj-art.jsx` explains why.
 
 ## Before pushing
 

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "edcf6f4d1917",
+ "version": "542397d23a20",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -2167,6 +2167,7 @@ window.LANG_PACK = {
   "hajj.before_you_travel": "قَبْلَ السَّفَر",
   "hajj.ulama_answer_in_person": "عُلَمَاءُ الْمَسْجِدِ يُجِيبُونَ عَنْ أَسْئِلَةِ الْحَجِّ وَالْعُمْرَةِ مُشَافَهَةً وَعَبْرَ الْهَاتِف.",
   "hajj.approved_by_ulama": "كُلُّ حُكْمٍ هُنَا رَاجَعَهُ وَاعْتَمَدَهُ عُلَمَاءُ الْمَسْجِد.",
+  "hajj.published_by_the_masjid": "تَنْشُرُهُ مَسْجِدُ طَيِّبَة، اتِّبَاعًا لِكِتَابِ الْأَكَادِيمِيَّةِ الْإِسْلَامِيَّةِ لِلدَّعْوَة How to Perform ʿUmrah. وَلِمَسْأَلَتِكَ الْخَاصَّةِ اسْأَلِ الْعُلَمَاء.",
   "hajj.a_question": "سُؤَال",
   "hajj.which_counter": "أَيُّ عَدَّاد",
   "hajj.mode_tawaf": "الطَّوَاف",

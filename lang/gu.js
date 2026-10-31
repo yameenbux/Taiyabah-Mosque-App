@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "2c6a6f3aeed3",
+ "version": "5c4a7b1ace24",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -2167,6 +2167,7 @@ window.LANG_PACK = {
   "hajj.before_you_travel": "મુસાફરી પહેલાં",
   "hajj.ulama_answer_in_person": "મસ્જિદના ઉલમા હજ અને ઉમરાહ વિશેના સવાલોના જવાબ રૂબરૂ અને ટેલિફોન પર આપે છે.",
   "hajj.approved_by_ulama": "અહીંનો દરેક મસઅલો મસ્જિદના ઉલમાએ તપાસીને મંજૂર કર્યો છે.",
+  "hajj.published_by_the_masjid": "તૈયબા મસ્જિદ દ્વારા પ્રકાશિત, ઇસ્લામિક દાવાહ અકાદમીની How to Perform ʿUmrah અનુસાર. તમારા પોતાના પ્રશ્ન માટે ઉલમાને પૂછો.",
   "hajj.a_question": "એક સવાલ",
   "hajj.which_counter": "કયું ગણતર",
   "hajj.mode_tawaf": "તવાફ",

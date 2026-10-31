@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "74399c660f44",
+ "version": "512a73e60077",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -2167,6 +2167,7 @@ window.LANG_PACK = {
   "hajj.before_you_travel": "سفر سے پہلے",
   "hajj.ulama_answer_in_person": "مسجد کے علماء حج و عمرہ کے سوالات کا جواب بالمشافہ اور ٹیلیفون پر دیتے ہیں۔",
   "hajj.approved_by_ulama": "یہاں کا ہر مسئلہ مسجد کے علماء نے جانچ کر منظور کیا ہے۔",
+  "hajj.published_by_the_masjid": "طیبہ مسجد کی جانب سے شائع کردہ، اسلامک دعوہ اکیڈمی کی کتاب How to Perform ʿUmrah کی روشنی میں۔ اپنے مخصوص مسئلے کے لیے علماء سے رجوع کیجیے۔",
   "hajj.a_question": "ایک سوال",
   "hajj.which_counter": "کون سا شمار",
   "hajj.mode_tawaf": "طواف",
