@@ -107,8 +107,11 @@ export function MaTafPlan({ full = true }) {
   /* The dial crops in to the building. The full box is framed for the maṭāf
      ring, and reusing it there would leave a cube the size of a thumbnail in
      the middle of a 276pt dial. */
+  /* The dial's crop had to open up when the Ḥaṭīm grew. Its apex is now at
+     y=49 where the old arc topped out at 57, so the old "56 54 88 88" would
+     have sliced the top off the wall on the counter screen. */
   return (
-    <Svg viewBox={full ? "8 8 184 184" : "56 54 88 88"} width="100%" height="100%">
+    <Svg viewBox={full ? "8 8 184 184" : "52 42 96 96"} width="100%" height="100%">
       {full && (
         <G>
           {/* the maṭāf — the floor walked on, not a line drawn round it */}
@@ -120,11 +123,28 @@ export function MaTafPlan({ full = true }) {
       {/* the line every circuit starts and ends on, out through the stone */}
       <Path d={`M127 128 L${full ? "157 157" : "148 149"}`} stroke={GOLD} strokeWidth={1.2}
             strokeDasharray={[2.5, 4]} opacity={0.75} />
-      <Path d="M84 73 A16 16 0 0 1 116 73 L116 77 L84 77 Z" fill="rgba(220,187,99,.13)" />
-      <Path d="M84 73 a16 16 0 0 1 32 0" fill="none" stroke={GOLD}
+      {/* THE ḤAṬĪM REACHES BOTH CORNERS. It was drawn as a smaller arc against
+          the middle of the wall, its ends stopping well short of the stone at
+          either side. The wall runs corner to corner across this face — from
+          the Shāmī corner to the ʿIrāqī — so drawn short it reads as a bay
+          against one part of the building rather than as the enclosure a
+          pilgrim must walk outside of, which is the one thing this picture
+          exists to show. It now spans the full 54 of the wall: radius 27.
+
+          The real wall stands a little clear of the building at each end, and
+          those openings are how people go in. At this size two gaps of a pixel
+          or so would read as a drawing error rather than as doorways, so the
+          arc is closed and the caption carries the meaning instead. */}
+      <Path d="M73 76 A27 27 0 0 1 127 76 Z" fill="rgba(220,187,99,.13)" />
+      <Path d="M73 76 a27 27 0 0 1 54 0" fill="none" stroke={GOLD}
             strokeWidth={1.6} strokeLinecap="round" />
       <Rect x="73" y="76" width="54" height="52" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
-      <Path d="M73 90 H127" stroke={GOLD} strokeWidth={2.4} opacity={0.45} />
+      {/* NO LINE ACROSS THE BUILDING. A band ran the full width at y=90, which
+          is a thing you would see on an elevation — the kiswah's belt, seen
+          from the side. This picture is a plan, looked down on from above, and
+          from above that band is the top of a wall you cannot see. Drawn
+          anyway it split the roof in two and made the square read as two
+          rooms. The caption says "from above"; the drawing now agrees. */}
       <Path d="M127 101 L127 114" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
       {full && <Rect x="152" y="92" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
       {[[73, 76], [127, 76], [73, 128], [127, 128]].map(([x, y]) =>
