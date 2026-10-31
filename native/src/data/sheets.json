@@ -291,13 +291,13 @@
      "t": "Membership"
     },
     "h": {
-     "k": "member.checking_online_comes_soon",
-     "t": "Checking online comes soon"
+     "k": "member.checking_your_membership",
+     "t": "Checking your membership"
     },
     "ps": [
      {
-      "k": "member.you_will_be_able_to_sign_in",
-      "t": "You will be able to sign in here and see whether this year’s fee has been received and the date the next one falls due. Until that is connected, the office holds the record and can tell you in a moment."
+      "k": "member.the_office_holds_the_record",
+      "t": "The office holds the membership record. Ring during office hours and they will tell you whether this year’s fee has been received and the date the next one falls due."
      },
      {
       "t": "*The office takes calls between 5pm and 7pm.*"
@@ -309,8 +309,8 @@
    },
    {
     "type": "heading",
-    "k": "member.what_membership_covers",
-    "t": "What it will show",
+    "k": "member.what_the_office_can_tell_you",
+    "t": "What the office can tell you",
     "tag": null
    },
    {
@@ -1263,18 +1263,15 @@
      "t": "More courses"
     },
     "sub": {
-     "k": "edu.tajweed_seerah_a_womens_circle",
-     "t": "Tajweed, Seerah, a women’s circle — tell the office what you’d like taught"
+     "k": "edu.tell_the_office_what_youd_like",
+     "t": "Tajweed, Seerah, a women’s circle — ring the office and tell them what you’d like taught"
     },
     "card": true,
     "ext": false,
     "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path d=\"M12 8v8M8 12h8\"></path></svg>",
     "href": null,
     "id": null,
-    "soon": {
-     "k": "edu.coming_soon",
-     "t": "Coming soon"
-    }
+    "soon": null
    },
    {
     "type": "call",
@@ -2004,8 +2001,8 @@
      "t": "Madrasah Portal"
     },
     "sub": {
-     "k": "madrasah.sign_in_registers_still_being_built",
-     "t": "Sign in · registers and pupil records still being built"
+     "k": "portals.madrasah_signin",
+     "t": "Sign in with your madrasah account"
     },
     "card": true,
     "ext": true,

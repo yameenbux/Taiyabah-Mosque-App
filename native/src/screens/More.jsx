@@ -1,7 +1,7 @@
 /* The menu.
  *
  * This is the web app's drawer, row for row: the same five groups in the same
- * order, the same seventeen rows, the same two "coming soon" entries, the same
+ * order, the same sixteen rows, every one of which goes somewhere, the same
  * social strip and the same footer with the radio frequency on it. Anything the
  * web app reaches from a tile or a sheet is reached the same way here.
  *
@@ -44,11 +44,7 @@ const GROUPS = [
   { k: "menu.resources", t: "Resources", rows: [
     { to: "Timetable", icon: "calendar-outline",   k: "menu.timetable",        t: "Full prayer timetable" },
     { to: "Videos",    icon: "play-circle-outline", k: "marriage.videos_bayaans", t: "Videos & bayaans" },
-    /* `soon` is the gold tag, `to` is where it goes. The two are separate
-       now: this row still says Coming soon, and it opens a screen that
-       says what is coming. Tours & Visits below has no `to` and stays the
-       dead row it was. */
-    { soon: true, to: "Hajj", icon: "airplane-outline", k: "marriage.hajj_umrah", t: "Hajj / Umrah" },
+    { to: "Hajj", icon: "airplane-outline", k: "marriage.hajj_umrah", t: "Hajj / Umrah" },
     { to: "Ramadan",   icon: "moon-outline",        k: "ramadan.ramadan", t: "Ramadan" },
     { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
   ]},
@@ -56,7 +52,7 @@ const GROUPS = [
     { to: "Admissions", icon: "clipboard-outline",  k: "adm.admissions_fees",  t: "Admissions & Fees" },
     { to: "Holidays",   icon: "calendar-outline",   k: "hol.holiday_planner",  t: "Holiday Planner" },
     { to: "Portal",     icon: "log-in-outline",     k: "portals.madrasah_portal", t: "Madrasah Portal",
-      note: { k: "portals.madrasah_note", t: "Sign in · registers and pupil records still being built" },
+      note: { k: "portals.madrasah_signin", t: "Sign in with your madrasah account" },
       external: true },
   ]},
   { k: "marriage.the_masjid", t: "The masjid", rows: [
@@ -69,7 +65,6 @@ const GROUPS = [
     { to: "MarriageDeath", icon: "git-branch-outline", k: "marriage.birth_marriage_death", t: "Birth, Marriage & Death" },
     { to: "Advice",     icon: "chatbubbles-outline", k: "marriage.imams_advice", t: "Imams’ Advice" },
     { to: "Education",  icon: "ribbon-outline",      k: "marriage.education",   t: "Education" },
-    { soon: true,       icon: "walk-outline",        k: "marriage.tours_visits", t: "Tours & Visits" },
   ]},
   { k: "menu.settings", t: "Settings", rows: [
     { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications", t: "Notifications" },
@@ -155,17 +150,13 @@ function Row({ row, first, nav }) {
   const act = row.to ? () => nav.navigate(row.to) : row.href ? () => open(row.href) : null;
   return (
     <Press onPress={act} disabled={!act} dim={false}
-      /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13.
-         .dr-row.soon mutes the TITLE and nothing else: the row keeps its
-         strength and the gold COMING SOON tag stays gold. */
+      /* .dr-row — 13/8 of padding with 10px between, not 14/15 with 13. */
       style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10,
                paddingVertical: 13, paddingHorizontal: 12,
                borderTopWidth: first ? 0 : 1, borderTopColor: C.line }}>
-      {/* .dr-row.soon has NO icon at all on the website — not a greyed one.
-          A row with nothing behind it yet does not get a glyph, and its label
-          starts where the others' icons do. And .dr-ico is a 29px #F0E9ED
-          square at 9px of radius with a 16px glyph, not a bare 19px mark on
-          the card. */}
+      {/* .dr-ico is a 29px #F0E9ED square at 9px of radius with a 16px
+          glyph, not a bare 19px mark on the card. Every row has somewhere to
+          go now, so every row has its glyph. */}
       {!!act && (
         <View style={{ width: 29, height: 29, borderRadius: 9, alignItems: "center",
                        justifyContent: "center", backgroundColor: C.tintPlum }}>
@@ -181,19 +172,9 @@ function Row({ row, first, nav }) {
                          marginTop: 2, textAlign: rtl ? "right" : "left" }}>
             {t(row.note.k, row.note.t)}</Text>)}
       </View>
-      {row.soon
-        /* .soon-tag — 9.5px BOLD in the gold itself inside a 45% gold
-           hairline, 3/8 of padding. It was medium weight in the darker
-           gold-ink inside a 55% border. */
-        ? <View style={{ borderWidth: 1, borderColor: "rgba(198,162,76,.45)", borderRadius: R.pill,
-                         paddingHorizontal: 8, paddingVertical: 3 }}>
-            <Text style={{ fontFamily: F.sansBold, fontSize: fs(9.5), letterSpacing: 0.95,
-                           textTransform: "uppercase", color: C.gold }}>
-              {t("marriage.coming_soon", "Coming soon")}</Text>
-          </View>
-        : row.external
-          ? <ExtArrow size={15} color={C.gold} opacity={1} />
-          : <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} />}
+      {row.external
+        ? <ExtArrow size={15} color={C.gold} opacity={1} />
+        : <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} />}
     </Press>
   );
 }
