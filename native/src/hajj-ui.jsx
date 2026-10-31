@@ -208,6 +208,70 @@ export function HajjRow({ icon, label, detail, trail, tone, onPress }) {
   );
 }
 
+/** A branch as a TILE rather than a row.
+ *
+ *  WHY THE SECTION FRONT IS A GRID. A full-width row is 88px of screen to
+ *  carry a glyph and two short lines, and seven of them under three headings
+ *  do not fit a phone — so the one screen a pilgrim opens in the Ḥaram asked
+ *  them to scroll to find the counters. Two columns put every branch above
+ *  the fold and inside the thumb's arc, which is the whole requirement: one
+ *  hand, the other holding the izār, in a crowd, in the sun.
+ *
+ *  The tile keeps the row's skin so the section still looks like itself, and
+ *  `lit` still marks the counters — the one thing here that is a tool rather
+ *  than a text, and the one most likely to be opened mid-ṭawāf. */
+export function HajjTile({ icon, label, detail, tone, wide, onPress }) {
+  const { fs, rtl } = useApp();
+  const lit = tone === "gold";
+  return (
+    <Panel tone={tone} onPress={onPress} accessibilityLabel={label}
+           style={wide
+             ? { flex: 1, minHeight: 68, padding: 11, gap: 11, alignItems: "center",
+                 flexDirection: rtl ? "row-reverse" : "row" }
+             : { flex: 1, minHeight: 98, padding: 11, justifyContent: "space-between" }}>
+      <View style={[{ width: 30, height: 30, alignItems: "center", justifyContent: "center" },
+                    lit && { borderRadius: 10, backgroundColor: HJ.goldFill }]}>
+        {icon}
+      </View>
+      <View style={wide ? { flex: 1 } : null}>
+        <Text numberOfLines={2}
+              style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(19),
+                       color: HJ.ink, textAlign: rtl ? "right" : "left" }}>{label}</Text>
+        {!!detail && (
+          <Text numberOfLines={2}
+                style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(15.5),
+                         color: HJ.inkFaint, marginTop: 2,
+                         textAlign: rtl ? "right" : "left" }}>{detail}</Text>)}
+      </View>
+    </Panel>
+  );
+}
+
+/** Tiles laid two to a row, with an odd one left at its own width rather than
+ *  stretched across — a half-width tile beside a gap reads as a grid; a
+ *  full-width one reads as a row that lost its friends. */
+export function HajjTileGrid({ children }) {
+  const { rtl } = useApp();
+  const items = React.Children.toArray(children);
+  const rows = [];
+  for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
+  return (
+    <View style={{ marginTop: 9 }}>
+      {rows.map((row, i) => (
+        <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 10,
+                               marginTop: i === 0 ? 0 : 10 }}>
+          {/* An odd branch count left half the row empty on three of the four
+              stages — a third of the screen carrying nothing, on the screen
+              that most needs the room. A lone tile takes the whole width and
+              lays itself out sideways instead, which is a different shape
+              rather than a stretched one. */}
+          {row.length === 1 ? React.cloneElement(row[0], { wide: true }) : row}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 /* The chevron, drawn rather than taken from Ionicons so that it is the same
    stroke weight as the rest of the section's line work and the same mark the
    website draws. The subset font's chevron is heavier and sits differently. */

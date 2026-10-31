@@ -30,8 +30,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { C, F, HJ } from "../theme";
 import { useApp } from "../store";
 import { Screen, Star } from "../ui";
-import { HajjScreen, HajjTitle, HajjLead, HajjKicker, HajjRow, HajjChevron }
-  from "../hajj-ui";
+import { HajjScreen, HajjTitle, HajjLead, HajjKicker, HajjRow, HajjTile, HajjTileGrid,
+         HajjChevron } from "../hajj-ui";
 import { hajjAccess, visibleItems } from "../hajj";
 import { BRANCHES, byStage } from "../hajj-data";
 
@@ -91,34 +91,37 @@ export default function Hajj({ navigation }) {
   if (access.open)
     return (
       <HajjScreen>
-        <HajjTitle>{t("hajj.what_you_carry", "What you carry with you")}</HajjTitle>
-        {/* "Four things" is the held screen's promise about four panels, and
-            it is false once the branches are listed. */}
-        <HajjLead>
-          {t("hajj.what_is_ready",
-             "Everything the masjid has ready for the journey, working without signal in the Ḥaram.")}
-        </HajjLead>
+        {/* SMALLER, AND WITHOUT THE LEAD. The sentence under this title was
+            a nicety at home and a hundred pixels in the Ḥaram: it pushed the
+            last two branches and the office off the first screen. The title
+            carries the meaning on its own, and what the section holds is
+            legible from the tiles themselves. */}
+        <HajjTitle size={22}>{t("hajj.what_you_carry", "What you carry with you")}</HajjTitle>
 
-        {/* GROUPED BY THE JOURNEY, which the branches were already ordered by
-            and which the screen used to throw away: eight rows at one weight
-            is a menu. A branch no stage names falls to the end under no
-            heading rather than disappearing. */}
+        {/* GROUPED BY THE JOURNEY, and laid out two to a row. The grouping
+            was always right — eight items at one weight is a menu — but the
+            rows were 88px each, so seven branches under three headings did
+            not fit a phone and the counters were below the fold. A pilgrim
+            opening this in the Ḥaram has one hand. Tiles put every branch on
+            the first screen and inside the thumb's arc. */}
         {byStage(access.branches).map((g, gi) => (
-          <View key={g.id} style={{ marginTop: gi === 0 ? 20 : 26 }}>
+          <View key={g.id} style={{ marginTop: gi === 0 ? 16 : 20 }}>
             {!!g.title && <HajjKicker style={{ marginBottom: 2 }}>{g.title}</HajjKicker>}
-            {g.branches.map(b => {
-              const lit = b.kind === "tool";
-              return (
-                <HajjRow key={b.id} icon={glyph(b.id, lit)} label={b.title}
-                         tone={lit ? "gold" : "plain"} detail={detailFor(b)}
-                         onPress={() => navigation.navigate(
-                           b.route || "HajjBranch", b.route ? undefined : { branch: b.id })} />
-              );
-            })}
+            <HajjTileGrid>
+              {g.branches.map(b => {
+                const lit = b.kind === "tool";
+                return (
+                  <HajjTile key={b.id} icon={glyph(b.id, lit)} label={b.title}
+                            tone={lit ? "gold" : "plain"} detail={detailFor(b)}
+                            onPress={() => navigation.navigate(
+                              b.route || "HajjBranch", b.route ? undefined : { branch: b.id })} />
+                );
+              })}
+            </HajjTileGrid>
           </View>
         ))}
 
-        <HajjKicker style={{ marginTop: 26 }}>{t("hajj.a_question", "A question")}</HajjKicker>
+        <HajjKicker style={{ marginTop: 20 }}>{t("hajj.a_question", "A question")}</HajjKicker>
         <HajjRow icon={<Ionicons name="call-outline" size={19} color={HJ.inkSoft} />}
                  label={t("hajj.ask_the_ulama", "Ask the ʿulamā")}
                  trail={<HajjChevron />}

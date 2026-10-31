@@ -1305,6 +1305,28 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   /* A row that goes somewhere: a branch on the front, a link at the foot.
      Its own class rather than .dr-row, which half the site's sheets share and
      which is paper everywhere else. */
+  /* THE SECTION FRONT IS A GRID, not a list. A full-width row is 88px to
+     carry a glyph and two short lines, and seven of them under three
+     headings do not fit a phone — so the counters sat below the fold on the
+     one screen somebody opens in the Ḥaram. Two columns put every branch on
+     the first screen and inside the thumb's arc. Mirrors HajjTile and
+     HajjTileGrid in native/src/hajj-ui.jsx. */
+  .hj-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:9px}
+  .hj-tile{display:flex;flex-direction:column;justify-content:space-between;
+    min-height:98px;padding:11px;text-align:start;gap:9px}
+  .hj-tile .hj-ico{width:30px;height:30px}
+  /* A lone tile at the end of an odd-length grid takes the whole width and
+     turns sideways, rather than leaving a third of the screen empty. */
+  .hj-tiles > .hj-tile:last-child:nth-child(odd){grid-column:span 2;flex-direction:row;
+    align-items:center;min-height:68px;gap:11px}
+  .hj-tiles > .hj-tile:last-child:nth-child(odd) > span:last-child{flex:1;min-width:0}
+  .hj-head-sm{font-size:calc(22px * var(--ts))}
+  .hj-tile .hj-tt{font-size:calc(14.5px * var(--ts));line-height:1.31;font-weight:600;
+    color:var(--hj-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden}
+  .hj-tile .hj-td{font-size:calc(11.5px * var(--ts));line-height:1.35;color:var(--hj-ink-faint);
+    margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden}
   .hj-row{display:flex;align-items:center;gap:14px;padding:15px 16px;margin-top:11px}
   /* Only the lit row gets a gold tile behind its glyph; the rest carry the
      glyph on its own, and the chevron goes with them. */
@@ -5568,8 +5590,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <!-- One headline and one lede. The held copies went with the four
              preview tiles: this wrap is only ever drawn once the section is
              open, and #hjg above is the held screen. -->
-        <h2 class="hj-head" id="hj-head-open" data-i18n="hajj.what_you_carry">What you carry with you</h2>
-        <p class="hj-lede" id="hj-lede-open" data-i18n="hajj.what_is_ready">Everything the masjid has ready for the journey, working without signal in the &#7716;aram.</p>
+        <h2 class="hj-head hj-head-sm" id="hj-head-open" data-i18n="hajj.what_you_carry">What you carry with you</h2>
 
         <!-- Drawn once the section opens; the four tiles above give way
              to the branches that are actually ready. -->
@@ -12588,23 +12609,23 @@ function renderHajj(){
     }
     return b.sub || "";
   };
-  const rowHtml = b => {
+  const tileHtml = b => {
     /* The counters are the one branch that is a tool rather than a text, and
        they get the lit panel — one per screen, or it stops meaning anything.
        Only that row gets a gold tile behind its glyph: eight of them drew a
        bright stripe down the left edge louder than any of the titles. */
     const tone = b.kind === "tool" ? " gold" : "";
-    return `<button type="button" class="hj-panel${tone} hj-row" data-branch="${esc(b.id)}" data-sheet="${esc(b.sheet||"")}">`
+    return `<button type="button" class="hj-panel${tone} hj-tile" data-branch="${esc(b.id)}" data-sheet="${esc(b.sheet||"")}">`
       + `<span class="hj-ico${tone}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"`
       + ` stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${HJ_ICON[b.id]||""}</svg></span>`
-      + `<span class="hj-rt">${esc(b.title)}<span class="hj-rd">${esc(detailFor(b))}</span></span>`
-      + `<span class="hj-ch" aria-hidden="true">&rsaquo;</span></button>`;
+      + `<span><span class="hj-tt">${esc(b.title)}</span>`
+      + `<span class="hj-td">${esc(detailFor(b))}</span></span></button>`;
   };
   /* GROUPED BY THE JOURNEY, which the branches were already ordered by and
      which the screen used to throw away: eight rows at one weight is a menu. */
   list.innerHTML = hajjByStage(access.branches).map(g =>
     (g.title ? `<div class="hj-sub">${esc(g.title)}</div>` : "")
-    + g.branches.map(rowHtml).join("")).join("");
+    + `<div class="hj-tiles">` + g.branches.map(tileHtml).join("") + `</div>`).join("");
   [...list.querySelectorAll("[data-branch]")].forEach(btn =>
     btn.addEventListener("click", () => {
       const id = btn.dataset.branch;
