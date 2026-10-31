@@ -37,17 +37,6 @@ import { BRANCHES } from "../hajj-data";
 
 
 
-/* TEMPORARY. Lets the three candidate designs be looked at side by side on
-   one build while the masjid chooses between them. It goes with the two that
-   are not chosen. */
-function pickVariant() {
-  try {
-    const v = globalThis?.localStorage?.getItem("hajjVariant");
-    if (v === "a" || v === "b" || v === "c") return v;
-  } catch {}
-  return "a";
-}
-
 /* ONE JOURNEY, AS A CARD. The picture carries the place and the words carry
  * the promise, laid out the way a phone is held: the image on the leading
  * edge where the eye starts, the label beside it, the chevron where the thumb
@@ -103,14 +92,20 @@ export default function Hajj({ navigation }) {
   ];
 
   if (access.open) {
-    const v = pickVariant();
 
-    /* A — FULL-BLEED CARDS. The picture is the button. Careem's city list and
-       Google Photos' memory cards both work this way: a tall photograph, the
-       words sitting on a scrim at its foot, nothing else on the row. It fills
-       the height the first design left empty, and at this size the Ḥaram and
-       the tents are legible as places rather than as stamps. */
-    if (v === "a")
+    /* THE PICTURE IS THE BUTTON. Careem's city list and Google Photos' memory
+       cards both work this way: a photograph at the full width of the row, the
+       words on a scrim at its foot, nothing else. It fills the height the
+       first design left empty, and at this size the Ḥaram and the tents read
+       as places rather than as stamps.
+
+       THE PHOTOGRAPHS ARE CUT FOR THIS ROW AND NOT FOR A THUMBNAIL. Both were
+       square, with their subject low in the frame, and a square dropped into a
+       361×210 row is centre-cropped — which took the Kaʿbah out of the ʿUmrah
+       card and left it a picture of some towers. They are now cut at the row's
+       own 1.72, with the Kaʿbah where the eye lands and the valley at Minā
+       carrying its hills, and both still stop above the crowd. An asset for a
+       row is not an asset for a square. */
       return (
         <Screen scroll={false} pad={false} bg={HJ.ground}>
           <LinearGradient colors={[HJ.groundTop, HJ.groundMid, HJ.ground]} locations={[0, 0.45, 1]}
@@ -136,8 +131,14 @@ export default function Hajj({ navigation }) {
                        style={{ flex: 1, maxHeight: 210, borderRadius: R.card, overflow: "hidden",
                                 borderWidth: 1, borderColor: HJ.goldLine }}>
                   <Image source={jn.img} style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
-                  <LinearGradient colors={["rgba(27,6,19,0)", "rgba(27,6,19,0.55)", "rgba(27,6,19,0.92)"]}
-                                  locations={[0, 0.45, 1]}
+                  {/* THE SCRIM STARTS LATE AND STAYS OFF THE SUBJECT. Run from
+                      the top at 0.55 it greyed the whole photograph and left
+                      the Kaʿbah a shape behind the title. It now does nothing
+                      for the first half of the card and only darkens where the
+                      words actually sit — and the ʿUmrah picture is cut so the
+                      Kaʿbah stands to the right of them, clear of the text. */}
+                  <LinearGradient colors={["rgba(27,6,19,0)", "rgba(27,6,19,0.08)", "rgba(27,6,19,0.80)"]}
+                                  locations={[0, 0.5, 1]}
                                   style={{ position: "absolute", left: 0, right: 0, bottom: 0, top: 0,
                                            justifyContent: "flex-end", padding: 15 }}>
                     <Text style={{ fontFamily: F.sansSemi, fontSize: fs(17), color: HJ.ink }}>{jn.label}</Text>
@@ -151,110 +152,6 @@ export default function Hajj({ navigation }) {
             <Image source={require("../../assets/logo.png")}
                    style={{ width: 86, height: 62, resizeMode: "contain", alignSelf: "center", marginTop: 12 }}
                    accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />
-          </LinearGradient>
-        </Screen>
-      );
-
-    /* B — THE SCREEN IS THE CHOICE. Two halves, edge to edge, nothing around
-       them. There is no third thing on this page, so the furniture that
-       usually separates a question from its answers has nothing to do. The
-       title sits over the top half and the mark over the bottom, both on the
-       photographs' own darkness. The boldest of the three and the least
-       forgiving if a picture is ever weak. */
-    if (v === "b")
-      return (
-        <Screen scroll={false} pad={false} bg={HJ.ground}>
-          <View style={{ flex: 1 }}>
-            {JOURNEYS.map((jn, k) => (
-              <Press key={jn.label} onPress={jn.go} accessibilityRole="button"
-                     accessibilityLabel={jn.label} dim={false}
-                     style={{ flex: 1, borderTopWidth: k ? 1 : 0, borderTopColor: HJ.goldLine }}>
-                <Image source={jn.img} style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
-                <LinearGradient colors={["rgba(27,6,19,0.86)", "rgba(27,6,19,0.42)", "rgba(27,6,19,0.86)"]}
-                                locations={[0, 0.5, 1]}
-                                style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                                         alignItems: "center", justifyContent: "center", paddingHorizontal: 28 }}>
-                  {k === 0 && (
-                    <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: HJ.gold,
-                                   letterSpacing: 3.4, textTransform: "uppercase", marginBottom: 12 }}>
-                      {t("marriage.hajj_umrah", "Hajj / Umrah")}
-                    </Text>)}
-                  <Text style={{ fontFamily: F.display, fontSize: fs(25), lineHeight: fs(31),
-                                 color: HJ.ink, textAlign: "center" }}>{jn.label}</Text>
-                  <View style={{ width: 38, height: 2, backgroundColor: HJ.gold, opacity: 0.9, marginTop: 13 }} />
-                  <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(19),
-                                 color: HJ.inkSoft, textAlign: "center", marginTop: 13 }}>{jn.detail}</Text>
-                  {k === 1 && (
-                    <Image source={require("../../assets/logo.png")}
-                           style={{ width: 78, height: 56, resizeMode: "contain", marginTop: 20 }}
-                           accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />)}
-                </LinearGradient>
-              </Press>
-            ))}
-          </View>
-        </Screen>
-      );
-
-    /* C — ONE PICTURE, THEN THE TWO WAYS ON. A single photograph at the head
-       of the page says where this is about, and the choice underneath is made
-       in words at row height. The quietest of the three and the quickest to
-       run an eye down; it is also the only one that still reads at the largest
-       text size, because the rows grow and the picture does not have to. */
-    if (v === "c")
-      return (
-        <Screen scroll={false} pad={false} bg={HJ.ground}>
-          <LinearGradient colors={[HJ.groundTop, HJ.groundMid, HJ.ground]} locations={[0, 0.45, 1]}
-                          style={{ flex: 1, paddingBottom: 20 }}>
-            <View style={{ height: 250 }}>
-              <Image source={JOURNEYS[0].img}
-                     style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
-              <LinearGradient colors={["rgba(27,6,19,0.25)", "rgba(27,6,19,0.55)", HJ.groundMid]}
-                              locations={[0, 0.55, 1]}
-                              style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                                       justifyContent: "flex-end", paddingHorizontal: 20, paddingBottom: 16 }}>
-                <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), color: HJ.gold,
-                               letterSpacing: 3.4, textTransform: "uppercase" }}>
-                  {t("marriage.hajj_umrah", "Hajj / Umrah")}
-                </Text>
-                <Text style={{ fontFamily: F.display, fontSize: fs(28), lineHeight: fs(34),
-                               color: HJ.ink, marginTop: 6 }}>
-                  {t("hajj.before_you_travel", "Before you travel")}
-                </Text>
-              </LinearGradient>
-            </View>
-
-            <View style={{ paddingHorizontal: 20, flex: 1 }}>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
-                             color: HJ.inkFaint, marginTop: 16 }}>
-                {t("hajj.choose_the_journey",
-                   "Choose the journey you are making. The packing, the heat and the paperwork are the same for both.")}
-              </Text>
-              <View style={{ marginTop: 18 }}>
-                {JOURNEYS.map(jn => (
-                  <Press key={jn.label} onPress={jn.go} accessibilityRole="button"
-                         accessibilityLabel={jn.label}
-                         style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                                  gap: 14, paddingVertical: 17, paddingHorizontal: 16, marginTop: 11,
-                                  backgroundColor: HJ.panel, borderRadius: R.card,
-                                  borderWidth: 1, borderColor: HJ.panelLine }}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15.5), color: HJ.ink,
-                                     textAlign: rtl ? "right" : "left" }}>{jn.label}</Text>
-                      <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(18.5),
-                                     color: HJ.inkFaint, marginTop: 4,
-                                     textAlign: rtl ? "right" : "left" }}>{jn.detail}</Text>
-                    </View>
-                    <HajjChevron />
-                  </Press>
-                ))}
-              </View>
-            </View>
-
-            <View style={{ alignItems: "center" }}>
-              <Image source={require("../../assets/logo.png")}
-                     style={{ width: 92, height: 66, resizeMode: "contain" }}
-                     accessibilityLabel={t("a11y.taiyabah_masjid", "Taiyabah Masjid")} />
-            </View>
           </LinearGradient>
         </Screen>
       );
