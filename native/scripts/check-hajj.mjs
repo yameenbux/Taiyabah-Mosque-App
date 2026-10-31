@@ -28,6 +28,7 @@ import vm from "node:vm";
 import path from "node:path";
 import {
   hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches, leadOf,
+  forJourney,
   tick, untick, isComplete, saiFrom, progress, RELEASED,
 } from "../src/hajj.js";
 
@@ -327,6 +328,60 @@ is(progress("tawaf", 0), 0, "the ring is empty at zero");
 is(progress("tawaf", 7), 1, "the ring is full at seven");
 is(progress("tawaf", 99), 1, "the ring never over-fills");
 is(progress("tasbih", 99), 0, "the tasbīḥ ring comes round on its mark");
+
+
+/* ---- which trip is this for? ------------------------------------------ *
+ *
+ * Most of the section is the same journey twice over, so the default has to
+ * be "both" and it has to be the thing that happens when nobody said
+ * otherwise. The failure worth testing for is the quiet one: a tag that
+ * silently hides shared material from one of the two trips, or a journey
+ * that leaks the other's rites.
+ */
+{
+  const u = forJourney("umrah"), h = forJourney("hajj"), any = forJourney(undefined);
+
+  is(u({}), true,  "an untagged item belongs to both journeys");
+  is(h({}), true,  "and to the other one as well");
+  is(any({ journey: "hajj" }), true, "asked with no journey, everything matches");
+  is(u({ journey: "umrah" }), true,  "an ʿUmrah item is on the ʿUmrah journey");
+  is(u({ journey: "hajj" }),  false, "a Hajj item is not");
+  is(h({ journey: "hajj" }),  true,  "and the other way round");
+  is(forJourney("nonsense")({ journey: "hajj" }), true,
+     "an unknown journey filters nothing rather than emptying the section");
+
+  const rites = shipped.branches.find(b => b.id === "rites");
+  ok(!!rites, "the rites branch ships");
+  const sec = j => visibleSections(rites, j).map(x => x.id);
+
+  ok(sec("umrah").includes("rites-umrah"), "the ʿUmrah rites are on the ʿUmrah journey");
+  ok(!sec("hajj").includes("rites-umrah"),
+     "and are NOT shown to somebody planning Hajj — the bug this split exists to fix");
+  ok(!sec("umrah").includes("rites-hajj"), "the days of Hajj are not on the ʿUmrah journey");
+
+  /* Shared is the default and the common case, so it is the thing most worth
+     pinning: ṭawāf and saʿī are done on both trips and must appear on both. */
+  for (const id of ["rites-women", "rites-tawaf", "rites-sai"])
+    ok(sec("umrah").includes(id) && sec("hajj").includes(id),
+       `${id} is shared, so it shows on both journeys`);
+
+  /* The five days are still unwritten, so the Hajj journey has no rites of
+     its own yet. When they are written this assertion is the one that fails,
+     and that is the intended signal to flip it. */
+  ok(!sec("hajj").includes("rites-hajj"),
+     "the days of Hajj are still empty, so Hajj shows no rites section of its own");
+
+  /* A practical branch is the same on both trips and must not be narrowed by
+     accident — the paperwork is where Nusuk and the certificate live. */
+  const papers = shipped.branches.find(b => b.id === "papers");
+  is(visibleItems(papers, "umrah").length, visibleItems(papers, "hajj").length,
+     "the paperwork branch is the same on both journeys");
+  const ids = visibleItems(papers).map(i => i.id);
+  ok(ids.includes("d-nusuk"), "Nusuk ships: the permits are issued through it");
+  ok(ids.includes("d-mening"), "the meningitis certificate ships");
+  ok(branchOpen(papers, "hajj") && branchOpen(papers, "umrah"),
+     "and the branch opens on both");
+}
 
 console.log(`\n${pass} passed, ${bad.length} failed`);
 bad.forEach(b => console.log(`  FAIL  ${b}`));

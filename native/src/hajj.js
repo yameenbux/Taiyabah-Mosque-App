@@ -52,32 +52,61 @@ export function approved(item) {
 }
 
 /** Every item of a branch that a reader may actually see. */
-export function visibleItems(branch) {
+/** WHICH TRIP IS THIS FOR?
+ *
+ * Most of the section is the same journey twice over: a case is packed the
+ * same way, the heat is the same heat, the paperwork is the same paperwork.
+ * A few things are not. The five days belong to Hajj and to nothing else, and
+ * some of what has to be arranged before flying is enforced far harder for
+ * Hajj than for ʿUmrah.
+ *
+ * So anything in content.js may carry `journey: "hajj"` or `journey: "umrah"`,
+ * and anything that carries neither belongs to both — which is the common case
+ * and therefore the default. A branch, a section and an item can each say it,
+ * and the narrowest one that applies wins, because a Hajj-only section inside
+ * a shared branch is a real shape and the opposite is not.
+ *
+ * Asked with no journey at all, everything matches. That is what the check
+ * scripts do, and what a developer navigating straight to a route gets. */
+export function forJourney(journey) {
+  const j = journey === "hajj" || journey === "umrah" ? journey : null;
+  return node => !j || !node || !node.journey || node.journey === j;
+}
+
+export function visibleItems(branch, journey) {
   if (!branch || !Array.isArray(branch.sections)) return [];
-  const all = branch.sections.flatMap(s => (Array.isArray(s.items) ? s.items : []));
+  const fits = forJourney(journey);
+  if (!fits(branch)) return [];
+  const all = branch.sections.filter(fits)
+    .flatMap(s => (Array.isArray(s.items) ? s.items : []))
+    .filter(fits);
   /* Practical branches are travel and safety guidance written in the repo and
      need no scholar. Fiqh branches show only what has been approved. */
   return branch.kind === "fiqh" ? all.filter(approved) : all;
 }
 
 /** The branch's sections, with unapproved entries and emptied sections gone. */
-export function visibleSections(branch) {
+export function visibleSections(branch, journey) {
   if (!branch || !Array.isArray(branch.sections)) return [];
+  const fits = forJourney(journey);
+  if (!fits(branch)) return [];
   const keep = branch.kind === "fiqh" ? approved : () => true;
   return branch.sections
-    .map(s => ({ ...s, items: (Array.isArray(s.items) ? s.items : []).filter(keep) }))
+    .filter(fits)
+    .map(s => ({ ...s, items: (Array.isArray(s.items) ? s.items : []).filter(i => keep(i) && fits(i)) }))
     .filter(s => s.items.length > 0);
 }
 
 /** A tool is always ready. Anything else needs something to show. */
-export function branchOpen(branch) {
+export function branchOpen(branch, journey) {
   if (!branch) return false;
+  if (!forJourney(journey)(branch)) return false;
   if (branch.kind === "tool") return true;
-  return visibleItems(branch).length > 0;
+  return visibleItems(branch, journey).length > 0;
 }
 
-export function openBranches(branches) {
-  return (Array.isArray(branches) ? branches : []).filter(branchOpen);
+export function openBranches(branches, journey) {
+  return (Array.isArray(branches) ? branches : []).filter(b => branchOpen(b, journey));
 }
 
 /**

@@ -8,13 +8,16 @@
  * one is not helped by the furniture of the other. Hajj.jsx now asks that
  * question first and this screen answers it.
  *
- * WHAT `journey` CHANGES, for now, is the title and nothing else. Seven of
- * the eight branches — the case, the heat, the paperwork, iḥrām, the duʿās,
- * the counters, coming home — are the same whichever trip it is, because they
- * are. The rites are where the two part, and the Hajj days are still held, so
- * splitting the tiles today would mean showing a Hajj pilgrim a shorter list
- * and no explanation of why. The param is carried so that the day the days
- * are written, this is the one place that needs the filter.
+ * WHAT `journey` CHANGES. Most of this is the same trip twice: a case is
+ * packed the same way, the heat is the same heat, the duʿās are the same
+ * duʿās. hajj.js holds the rule — anything in content.js may say
+ * `journey: "hajj"` or `journey: "umrah"`, and anything that says neither
+ * belongs to both, which is the common case.
+ *
+ * So the grid here drops a branch that has nothing for this journey, the
+ * journey travels on into each branch, and the rites part in two: the ʿUmrah
+ * rites are tagged for ʿUmrah and the five days for Hajj. Ṭawāf, saʿī and the
+ * section for women stay on both, because they are on both.
  *
  * MISHKĀT, like the rest of the section.
  */
@@ -26,7 +29,7 @@ import { F, HJ } from "../theme";
 import { useApp } from "../store";
 import { HajjScreen, HajjTitle, HajjKicker, HajjRow, HajjTile, HajjTileGrid,
          HajjChevron } from "../hajj-ui";
-import { hajjAccess, visibleItems } from "../hajj";
+import { hajjAccess, visibleItems, branchOpen } from "../hajj";
 import { BRANCHES, byStage } from "../hajj-data";
 
 const PACKED = "taiyabah.hajj.packed";
@@ -65,7 +68,7 @@ export default function HajjJourney({ navigation, route }) {
      somebody is; every other branch carries its own one-line `sub`. */
   const detailFor = b => {
     if (b.id === "pack" && packed) {
-      const all = visibleItems(b).filter(i => i.pack);
+      const all = visibleItems(b, journey).filter(i => i.pack);
       if (all.length)
         return t("hajj.packed_count", "{a} of {b} packed")
           .replace("{a}", String(all.filter(i => packed[i.id]).length))
@@ -82,7 +85,7 @@ export default function HajjJourney({ navigation, route }) {
           menu; 88px rows put the counters below the fold. A pilgrim opening
           this in the Ḥaram has one hand, so every branch sits on the first
           screen and inside the thumb's arc. */}
-      {byStage(access.branches).map((g, gi) => (
+      {byStage(access.branches.filter(b => branchOpen(b, journey))).map((g, gi) => (
         <View key={g.id} style={{ marginTop: gi === 0 ? 16 : 20 }}>
           {!!g.title && <HajjKicker style={{ marginBottom: 2 }}>{g.title}</HajjKicker>}
           <HajjTileGrid>
@@ -92,7 +95,8 @@ export default function HajjJourney({ navigation, route }) {
                 <HajjTile key={b.id} icon={glyph(b.id, lit)} label={b.title}
                           tone={lit ? "gold" : "plain"} detail={detailFor(b)}
                           onPress={() => navigation.navigate(
-                            b.route || "HajjBranch", b.route ? undefined : { branch: b.id })} />
+                            b.route || "HajjBranch",
+                            b.route ? undefined : { branch: b.id, journey })} />
               );
             })}
           </HajjTileGrid>
@@ -105,7 +109,7 @@ export default function HajjJourney({ navigation, route }) {
                trail={<HajjChevron />}
                onPress={() => navigation.navigate("Contact")} />
 
-      {access.branches.some(b => b.kind === "fiqh") && (
+      {access.branches.some(b => b.kind === "fiqh" && branchOpen(b, journey)) && (
         <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
                        color: HJ.inkFaint, marginTop: 30, textAlign: "center" }}>
           {t("hajj.published_by_the_masjid",

@@ -279,6 +279,15 @@ window.HAJJ = {
           items: [
             { id: "d-visa", t: "Your visa and permit",
               d: "Hajj and ʿUmrah are issued differently and through official channels. Use the Saudi government's own route and your tour operator; do not rely on what somebody was told two years ago." },
+            /* NUSUK IS NOT OPTIONAL AND IT IS NOT A TRAVEL APP. The permits
+               are issued through it, so somebody who has not set it up has
+               not finished booking — whatever the operator has told them.
+               Practical, not fiqh, which is why it sits here and carries no
+               approver: it states no ruling, only what has to be arranged. */
+            { id: "d-nusuk", t: "Set up Nusuk before you fly",
+              d: "Nusuk is the Saudi ministry\u2019s own app and the permits are issued through it, so install it and get the account working at home rather than in a queue at the other end. The \u02bfUmrah permit is booked in it. So is the permit for the Raw\u1e0dah at the Prophet\u2019s Masjid in Mad\u012bnah \uFDFA, which is released in timed slots and goes quickly \u2014 people who leave that one until they arrive often do not get it." },
+            { id: "d-mening", t: "The meningitis certificate",
+              d: "Proof of meningococcal vaccination is asked for at the border, not at the airport here, and a certificate that has expired counts the same as none at all. Book it with your GP or a travel clinic well ahead, because it has to be given a set time before you travel to be accepted and the surgery may not have it in stock. For Hajj treat this as an entry requirement rather than as advice: it is checked, and it is checked harder than for \u02bfUmrah." },
             { id: "d-vacc", t: "Vaccinations",
               d: "Saudi Arabia sets vaccination requirements for pilgrims and they are revised. Ask your GP or practice nurse well ahead, and check the UK's own travel health service, because some need more than one dose or time to take effect." },
             { id: "d-fcdo", t: "The UK's travel advice for Saudi Arabia",
@@ -489,7 +498,7 @@ window.HAJJ = {
       lead: "What is done, when, and in what order.",
       sections: [
         {
-          id: "rites-umrah",
+          id: "rites-umrah", journey: "umrah",
           title: "ʿUmrah",
           items: [
             { id: "r-u-1", by: "Taiyabah Masjid", n: 1, t: "Iḥrām and the intention",
@@ -608,7 +617,7 @@ window.HAJJ = {
           ],
         },
         {
-          id: "rites-hajj",
+          id: "rites-hajj", journey: "hajj",
           title: "The days of Hajj",
           items: [
             { id: "r-h-8", by: null, n: 8, t: "8 Dhul Ḥijjah — Minā" , d: "DRAFT FOR REVIEW." },

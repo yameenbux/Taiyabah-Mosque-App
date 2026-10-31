@@ -67,8 +67,9 @@ function Tick({ on }) {
 export default function HajjBranch({ route }) {
   const { t, fs, rtl } = useApp();
   const id = route?.params?.branch;
+  const journey = route?.params?.journey;
   const branch = branchById(id);
-  const sections = visibleSections(branch);
+  const sections = visibleSections(branch, journey);
   const align = rtl ? "right" : "left";
 
   const [packed, setPacked] = useState({});
