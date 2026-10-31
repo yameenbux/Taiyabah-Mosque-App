@@ -131,18 +131,28 @@ export function MaTafPlan({ full = true }) {
           long one, and a plan that says otherwise is wrong in the one way a
           plan cannot afford. Now 48 across by 55 down — the same 1.14 — with
           the corners at Shāmī (76,74), ʿIrāqī (124,74), Yamānī (76,129) and
-          the Black Stone (124,129).
+          the Black Stone (124,129). At that scale one unit is about 0.235m.
 
-          THE ḤAṬĪM STANDS CLEAR OF IT. The wall is opposite the Kaʿbah's
-          north-west face, not joined to it: there is an opening at each end
-          and that is how people walk in. It was first drawn far too short, a
-          bay against the middle of the wall; closing it corner to corner
-          fixed the span but welded it on. A true semicircle, since that is what the caption calls it. It springs from just inside
-          each corner, so it reads as the separate enclosure it is — the thing
-          a pilgrim has to walk around the outside of. */}
-      <Path d="M81 74 A19 19 0 0 1 119 74 Z" fill="rgba(220,187,99,.13)" />
-      <Path d="M81 74 a19 19 0 0 1 38 0" fill="none" stroke={GOLD}
-            strokeWidth={1.6} strokeLinecap="round" />
+          THE ḤAṬĪM IS A WALL, AND IT STANDS APART. Two mistakes, made one
+          after the other. It was first a thin arc against the middle of the
+          wall, far too short. Taking it corner to corner fixed the span and
+          welded it to the building, which is worse: it is opposite the
+          north-west face and joined to it at neither end, and the two openings
+          are how people walk in.
+
+          It is also not a line. A wall seen from above is a band with two
+          faces, and this one is about 0.9m of marble — drawn as a single
+          stroke it read as a boundary somebody had marked on the floor rather
+          than as masonry you cannot step through. So: an arc band struck from
+          the midpoint of the north-west wall, outer face at 22 and inner at
+          18.5, running from 18° to 162° so each end stops about 1.75m short of
+          its corner. Filled, because in plan a wall is solid. */}
+      {/* the ground the wall encloses, which is walked around and not through */}
+      <Path d="M76 74 L124 74 L117.59 68.28 A18.5 18.5 0 0 0 82.41 68.28 Z"
+            fill="rgba(220,187,99,.10)" />
+      {/* the masonry itself */}
+      <Path d="M79.08 67.20 A22 22 0 0 1 120.92 67.20 L117.59 68.28 A18.5 18.5 0 0 0 82.41 68.28 Z"
+            fill={GOLD} opacity={0.85} />
       <Rect x="76" y="74" width="48" height="55" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
       {/* NO LINE ACROSS THE BUILDING. A band ran the full width at y=90, which
           is a thing you would see on an elevation — the kiswah's belt, seen

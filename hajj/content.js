@@ -506,7 +506,7 @@ window.HAJJ = {
                 marks: [
                   { n: 1, x: 0.63, y: 0.658, t: "Al-Ḥajar al-Aswad, set in this corner." },
                   { n: 2, x: 0.679, y: 0.549, t: "The door, on the wall between that corner and the ʿIrāqī corner." },
-                  { n: 3, x: 0.5, y: 0.293, t: "The Ḥaṭīm, the low semicircular wall, and the ground it encloses." },
+                  { n: 3, x: 0.5, y: 0.321, t: "The Ḥaṭīm, the low semicircular wall, and the ground it encloses." },
                   { n: 4, x: 0.804, y: 0.473, t: "Maqām Ibrāhīm." },
                 ],
               },
