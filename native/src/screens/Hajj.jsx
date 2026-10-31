@@ -55,11 +55,11 @@ function JourneyCard({ image, label, detail, onPress }) {
                     gap: 14, padding: 12, marginTop: 12,
                     backgroundColor: HJ.panel, borderRadius: R.card,
                     borderWidth: 1, borderColor: HJ.panelLine }}>
-      <View style={{ width: 84, height: 84, borderRadius: 13, overflow: "hidden",
+      <View style={{ width: 92, height: 92, borderRadius: 14, overflow: "hidden",
                      borderWidth: 1, borderColor: HJ.goldLine }}>
         <Image source={image} style={{ width: "100%", height: "100%", resizeMode: "cover" }} />
         <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                       backgroundColor: "rgba(27,6,19,0.34)" }} />
+                       backgroundColor: "rgba(27,6,19,0.16)" }} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15), lineHeight: fs(21),
