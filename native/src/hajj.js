@@ -155,3 +155,57 @@ export function progress(mode, n) {
   const mark = c.marks[c.marks.length - 1] || 100;
   return (n % mark) / mark;
 }
+
+/* ------------------------------------------------------------------ *
+ *  THE LEAD SENTENCE
+ * ------------------------------------------------------------------ */
+
+/* WHY AN ENTRY IS SPLIT IN TWO. The bodies run to sixty and ninety words,
+ * which is right at a kitchen table and wrong in the Ḥaram: a pilgrim with
+ * one hand free, in a crowd, gets a wall of text where they wanted the next
+ * thing to do. Nearly every entry here is already written lead-first — what
+ * to do, then why and what catches people — so the shape is in the prose
+ * and only the rendering throws it away.
+ *
+ * So the first sentence is drawn in full ink and the remainder beneath it in
+ * the faint. Nothing is hidden, nothing is reworded, nothing is truncated:
+ * the eye simply gets somewhere to land. Lyft and Nike Training Club do the
+ * same thing — a bold clause carrying the instruction, the detail behind it
+ * in grey.
+ *
+ * TWO TRAPS, both found by running this over all thirty entries rather than
+ * by thinking about it:
+ *
+ *   A duʿā's own words contain full stops. Splitting on the first one left
+ *   "“O Allah, I intend to perform ʿUmrah." on one line and the closing
+ *   quote stranded on the next. A split is only allowed where the curly
+ *   quotes balance — and when an entry OPENS with a duʿā, the duʿā is the
+ *   lead and when to say it is the remainder, which is the right way round
+ *   for the one screen somebody holds up at Ṣafā.
+ *
+ *   "All the way round." is a four-word sentence and a perfect lead. An
+ *   earlier minimum length swallowed it and the sentence after it.
+ */
+export function leadOf(text) {
+  const d = typeof text === "string" ? text : "";
+  if (d.startsWith("“")) {
+    const end = d.indexOf("”");
+    if (end > 0 && end < d.length - 2)
+      return { lead: d.slice(0, end + 1), rest: d.slice(end + 1).trim() };
+  }
+  /* The closing quote comes AFTER the full stop, so a sentence ending on a
+     quotation ends `.”` rather than `.`. Without the optional mark the scan
+     walked straight past such an ending and never split the entry at all —
+     found by a test that failed before any mutation was applied to it. */
+  const re = /([.!?][”"]?)(\s+)(?=[“"A-ZĀḤṬṢʿʾ])/g;
+  let m;
+  while ((m = re.exec(d))) {
+    const head = (d).slice(0, m.index + m[1].length);
+    if (head.length < 10) continue;
+    const opens = (head.match(/“/g) || []).length;
+    const closes = (head.match(/”/g) || []).length;
+    if (opens !== closes) continue;
+    return { lead: head, rest: (d).slice(m.index + m[1].length + m[2].length) };
+  }
+  return { lead: d, rest: "" };
+}

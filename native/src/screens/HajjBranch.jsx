@@ -31,7 +31,7 @@ import { Press } from "../ui";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar }
   from "../hajj-ui";
 import HajjArt from "../hajj-art";
-import { visibleSections } from "../hajj";
+import { visibleSections, leadOf } from "../hajj";
 import { branchById } from "../hajj-data";
 
 const KEY = "taiyabah.hajj.packed";
@@ -188,9 +188,27 @@ export default function HajjBranch({ route }) {
                   <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginTop: 8 }}>
                     <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
                   </View>)}
-                {!!item.d && (
-                  <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
-                                 color: HJ.inkSoft, marginTop: 5, textAlign: align }}>{item.d}</Text>)}
+                {/* LEAD FIRST. The body runs to sixty and ninety words, which
+                    is a wall on the one screen somebody reads mid-ṭawāf. The
+                    prose is already written lead-first — what to do, then why
+                    and what catches people — so the first sentence is drawn in
+                    full ink and the rest beneath it in the soft. Nothing is
+                    hidden, reworded or truncated; the eye gets somewhere to
+                    land. hajj.js owns the rule and tests it. */}
+                {!!item.d && (() => {
+                  const { lead, rest } = leadOf(item.d);
+                  return (
+                    <>
+                      <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5),
+                                     lineHeight: fs(21.5), color: HJ.ink, marginTop: 6,
+                                     textAlign: align }}>{lead}</Text>
+                      {!!rest && (
+                        <Text style={{ fontFamily: F.sans, fontSize: fs(12.5),
+                                       lineHeight: fs(20), color: HJ.inkFaint, marginTop: 7,
+                                       textAlign: align }}>{rest}</Text>)}
+                    </>
+                  );
+                })()}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
                                  color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}
