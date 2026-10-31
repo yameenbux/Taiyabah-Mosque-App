@@ -12217,7 +12217,7 @@ function closeRamadan(){
    check-hajj.mjs asserts all three, and asserts this constant and the app's
    RELEASED never disagree — a website that releases while the app holds is
    the same bug in a different hat. */
-const HAJJ_RELEASED = false;
+const HAJJ_RELEASED = true;
 
 /* The counters have no text to import: they are a tool, they are finished,
    and `kind:"tool"` is what exempts them from the content rule. */
@@ -12627,7 +12627,7 @@ async function openHajj(){
      has no written permission for. The app's importer now holds the same
      entries out of its bundle, for the same reason. */
   if(HAJJ_RELEASED){
-    await loadOnce('hajj/content.js', 'HAJJ_LOADED');
+    await loadOnce('hajj/content.public.js', 'HAJJ_LOADED');
     hajjAdopt(window.HAJJ);
   }
   renderHajj();
