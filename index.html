@@ -1473,6 +1473,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hl-q + .hj-chip{margin-top:8px}
   /* The lead sentence in full ink, the remainder beneath it in the faint:
      the eye lands on what to do and the why sits behind it. */
+  .hl-logo{width:34px;height:34px;border-radius:8px;object-fit:contain;
+           float:inline-start;margin-inline-end:11px;margin-bottom:2px}
+  .hl-link{display:flex;align-items:center;gap:9px;margin-top:12px;
+           padding:11px 13px;border-radius:14px;clear:both;
+           background:rgba(220,187,99,.13);border:1px solid rgba(220,187,99,.30);
+           color:#DCBB63;font-weight:600;font-size:calc(13.5px * var(--ts));
+           text-decoration:none}
+  .hl-link-ic{margin-inline-start:auto;font-size:1.05em}
   .hl-lead{font-size:calc(13.5px * var(--ts));font-weight:500;line-height:1.59;
     color:var(--hj-ink);margin-top:6px}
   .hl-a{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--hj-ink-faint);margin-top:7px}
@@ -12566,11 +12574,20 @@ function hjItemHtml(x){
        follows: a blank line in the entry breaks the body, and an entry
        without one is unchanged. A day of Hajj runs to a hundred and fifty
        words and as one block it is a wall however soft the ink. */
+    /* The icon sits with the title: a label on the entry, not its subject —
+       a picture of the thing to look for in a store full of near-misses. */
+    + (x.logo ? `<img class="hl-logo" src="hajj/${esc(x.logo)}.png" alt="" width="34" height="34">` : "")
     + (x.d ? (() => { const { lead, rest } = hjLeadOf(x.d);
         return `<div class="hl-lead">${esc(lead)}</div>`
              + (rest ? rest.split(/\n\s*\n/).filter(Boolean)
                            .map(pa => `<div class="hl-a">${esc(pa.trim())}</div>`).join("")
                      : ""); })() : "")
+    /* One tap to the store. The URL lives in content.js so check-links tests
+       it with every other link rather than it being the one nobody watches. */
+    + (x.link && x.link.url
+        ? `<a class="hl-link" href="${esc(x.link.url)}" target="_blank" rel="noopener noreferrer">`
+          + `${esc(x.link.t)}<span class="hl-link-ic" aria-hidden="true">\u2197</span></a>`
+        : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)
     + (src ? `<div class="hl-src">${esc(src)}</div>` : "");

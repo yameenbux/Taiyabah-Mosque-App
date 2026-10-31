@@ -25,12 +25,13 @@ import { View, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Svg, { Path } from "react-native-svg";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
-import { Press } from "../ui";
+import { Press, open, tap } from "../ui";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar,
          HajjStep, Reveal } from "../hajj-ui";
-import HajjArt from "../hajj-art";
+import HajjArt, { HajjLogo } from "../hajj-art";
 import { visibleSections, leadOf } from "../hajj";
 import { branchById } from "../hajj-data";
 
@@ -188,11 +189,19 @@ export default function HajjBranch({ route }) {
                 {/* The chip used to sit ABOVE the title, so "ALLOWED" was the
                     first word read on the card and the least informative one
                     there. It belongs with the thing it qualifies. */}
-                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21.5),
-                               color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
-                               textDecorationLine: on ? "line-through" : "none" }}>
-                  {item.n && !stepped ? `${item.n}. ` : ""}{item.t}
-                </Text>
+                {/* THE ICON SITS WITH THE TITLE, because it is a label on the
+                    entry rather than its subject — a picture of the thing to
+                    look for in a store that will offer several near-misses. */}
+                <View style={{ flexDirection: rtl ? "row-reverse" : "row",
+                               alignItems: "center", gap: item.logo ? 11 : 0 }}>
+                  {!!item.logo && <HajjLogo id={item.logo} />}
+                  <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(14.5),
+                                 lineHeight: fs(21.5),
+                                 color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
+                                 textDecorationLine: on ? "line-through" : "none" }}>
+                    {item.n && !stepped ? `${item.n}. ` : ""}{item.t}
+                  </Text>
+                </View>
                 {!!v && (
                   <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginTop: 8 }}>
                     <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
@@ -224,6 +233,24 @@ export default function HajjBranch({ route }) {
                     </>
                   );
                 })()}
+                {/* ONE TAP TO THE STORE. An instruction to go and find an app
+                    is a worse instruction than a way of getting there, and the
+                    URL lives in content.js so check-links tests it with every
+                    other link the app carries rather than it being the one
+                    nobody watches. */}
+                {!!(item.link && item.link.url) && (
+                  <Press onPress={() => { tap(); open(item.link.url); }}
+                         accessibilityRole="link"
+                         accessibilityLabel={item.link.t}
+                         style={{ flexDirection: rtl ? "row-reverse" : "row",
+                                  alignItems: "center", gap: 9, marginTop: 12,
+                                  paddingVertical: 11, paddingHorizontal: 13,
+                                  backgroundColor: HJ.goldPanel, borderRadius: R.card,
+                                  borderWidth: 1, borderColor: HJ.goldLine }}>
+                    <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5),
+                                   color: HJ.gold, textAlign: align }}>{item.link.t}</Text>
+                    <Ionicons name="open-outline" size={16} color={HJ.gold} />
+                  </Press>)}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
                                  color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}

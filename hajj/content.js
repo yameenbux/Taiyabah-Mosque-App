@@ -294,6 +294,9 @@ window.HAJJ = {
                Practical, not fiqh, which is why it sits here and carries no
                approver: it states no ruling, only what has to be arranged. */
             { id: "d-nusuk", t: "Set up Nusuk before you fly",
+              logo: "nusuk",
+              link: { t: "Get Nusuk on the App Store",
+                      url: "https://apps.apple.com/gb/app/nusuk-%D9%86%D8%B3%D9%83/id6469515422" },
               d: "Nusuk is the Saudi ministry\u2019s own app and the permits are issued through it, so install it and get the account working at home rather than in a queue at the other end. The \u02bfUmrah permit is booked in it. So is the permit for the Raw\u1e0dah at the Prophet\u2019s Masjid in Mad\u012bnah \uFDFA, which is released in timed slots and goes quickly \u2014 people who leave that one until they arrive often do not get it." },
             { id: "d-mening", t: "The meningitis certificate",
               d: "Proof of meningococcal vaccination is asked for at the border, not at the airport here, and a certificate that has expired counts the same as none at all. Book it with your GP or a travel clinic well ahead, because it has to be given a set time before you travel to be accepted and the surgery may not have it in stock. For Hajj treat this as an entry requirement rather than as advice: it is checked, and it is checked harder than for \u02bfUmrah." },
