@@ -136,8 +136,8 @@ export default function Prefs() {
           })}
         </Card>
         <View style={{ marginTop: 11 }}>
-          <Note>{t("sysprefs.lang_note",
-            "The Urdu, Gujarati and Arabic wording has not yet been checked by a native speaker. Anything not yet translated shows in English rather than as a blank.")}</Note>
+          <Note>{t("sysprefs.lang_fallback",
+            "The Urdu, Gujarati and Arabic have been read and corrected by native speakers. A string with no translation shows in English rather than as a blank.")}</Note>
         </View>
 
         {/* The website ends here, with the charity line under the language

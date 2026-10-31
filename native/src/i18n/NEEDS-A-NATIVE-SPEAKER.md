@@ -1,20 +1,28 @@
-# Thirteen strings needing a native speaker — app 2.0.1
+# The strings that were drafted, and who read them
 
-These thirteen are the only strings in the app whose Urdu, Gujarati and Arabic were
-**drafted rather than taken from the website**. Everything else the app says was
-already translated for the web app and checked. Please read these thirteen and
-correct anything that reads wrongly — the meaning matters more than the wording.
+> **DONE — the reading has happened.** Every string listed here, the 97 in
+> `lang/src/28-ramadan.json`, the Hajj strings in `lang/src/29-hajj.json` and
+> the handful added since have been read and corrected by native speakers of
+> Urdu, Gujarati and Arabic. Settings no longer warns the reader that the
+> wording is unchecked, because it is not.
+>
+> The file stays because the question it answers has changed rather than gone
+> away: not *what still needs reading* but *which strings were drafted rather
+> than taken from the website, and therefore what was read*. Anyone asking who
+> checked a wording starts here.
+
+These thirteen are the strings in the app whose Urdu, Gujarati and Arabic were
+**drafted rather than taken from the website**. Everything else the app says
+was already translated for the web app and checked there.
 
 They are held in `native/src/i18n/app-extra.json` as `"key": [Urdu, Gujarati, Arabic]`.
 Change them there and run `npm run content`; do not edit `ur.json`, `gu.json` or
 `ar.json`, which that command rewrites.
 
-> **This is no longer the whole list.** The Ramadan section added **97** more
-> strings drafted the same way — the times, the rota, night by night, iʿtikāf,
-> the reminders and the booking. They are not here because they belong to the
-> website too, so they live in **`lang/src/28-ramadan.json`**, in the same
-> `"key": [Urdu, Gujarati, Arabic]` shape, and that file's `_note` says at the
-> top that they are drafts. Please read those as well.
+**If you add a string after this, it has not been read.** The packs fall back
+to English for a missing key, so a gap degrades rather than breaks — but a new
+drafted wording is a new drafted wording, and belongs in front of the same
+readers before it is treated as finished.
 
 ---
 

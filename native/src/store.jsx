@@ -114,8 +114,9 @@ export function AppProvider({ children, fallback = null }) {
      * English pack is the fallback for a key with no wording at the call site.
      *
      * A key missing from a pack falls through to the English rather than
-     * showing a blank: the packs are not yet reviewed by a native speaker, and
-     * a gap must degrade, not break. */
+     * showing a blank. The packs have been read by native speakers now, but a
+     * key added after a reading has nothing to show, and a gap must degrade
+     * rather than break. */
     const t = (key, english) => (key && pack && pack[key]) || english || (key && EN[key]) || "";
     /* Blocks carry {k, t}: the key to translate by and the English to fall back
      * on. This is the form almost every call in the app actually uses. */

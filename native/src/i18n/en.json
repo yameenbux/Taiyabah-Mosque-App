@@ -1376,7 +1376,7 @@
  "sheet.second_jummah": "Second jamāʿah",
  "times.whole_year": "Every day of 2026, month by month",
  "times.remind_sub": "Be reminded before each jamāʿah",
- "sysprefs.lang_note": "The Urdu, Gujarati and Arabic wording has not yet been checked by a native speaker. Anything not yet translated shows in English rather than as a blank.",
+ "sysprefs.lang_fallback": "The Urdu, Gujarati and Arabic have been read and corrected by native speakers. A string with no translation shows in English rather than as a blank.",
  "qibla.true": "true",
  "qibla.denied": "Location is turned off for this app, so the bearing is the one from the masjid. Within Bolton the difference is a fraction of a degree.",
  "quran.continue": "Continue where you left off",
