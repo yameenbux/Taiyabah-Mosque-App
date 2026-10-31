@@ -63,7 +63,14 @@ export async function open(href) {
  * web app has without letting HTML into the native tree. */
 export function Rich({ children, style, arabic }) {
   const { rtl } = useApp();
-  const s = String(children ?? "");
+  /* JOINED, NOT STRINGIFIED. String(["a", " ", "b"]) is "a, ,b" — JavaScript
+     joins an array with commas — so a caller writing {one}{" "}{two} to put two
+     sentences in one paragraph got commas injected into the middle of the
+     prose. It is silent, it only shows up on the rendered screen, and it bit
+     the Ramadan section leads. Children that are already strings are joined
+     the way the caller plainly meant. */
+  const s = Array.isArray(children) ? children.filter(c => c != null).join("")
+                                    : String(children ?? "");
   const parts = s.split(/(\*[^*]+\*|_[^_]+_)/g).filter(Boolean);
   const base = [{ writingDirection: rtl ? "rtl" : "ltr" }, style];
   if (parts.length === 1 && !/^[*_]/.test(parts[0]))
@@ -89,6 +96,27 @@ export function P({ children, muted, center, style }) {
   return <Rich style={[{ fontFamily: F.sans, fontSize: fs(14.5), lineHeight: fs(23),
                          color: muted ? C.muted : C.ink,
                          textAlign: center ? "center" : rtl ? "right" : "left" }, style]}>{children}</Rich>;
+}
+
+/* A SECTION'S OWN SENTENCE, under its heading rather than in a card above the
+ * facts. The Ramadan screen had six sections built the same way — a heading, a
+ * cream card explaining the thing, then the rows that answer the question
+ * somebody actually opened the screen with. The card is the heavier of the two
+ * and came first, so the eye landed on the explanation and had to get past it
+ * to reach the iftar time, the rota or the booking.
+ *
+ * This is the same words at the weight of a caption, sitting where a caption
+ * sits. Nothing is cut, reworded or hidden: a key owns its translation in
+ * three languages, so moving a string is safe and rewriting one is not. What
+ * changes is which of the two things on the screen looks like the answer.
+ *
+ * HajjLead is this for the dark section. The two stay separate because the
+ * ground differs, not the idea. */
+export function Lead({ children, style }) {
+  const { fs, rtl } = useApp();
+  return <Rich style={[{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),
+                         color: C.muted, marginTop: -3, marginBottom: 2,
+                         textAlign: rtl ? "right" : "left" }, style]}>{children}</Rich>;
 }
 
 export function Sub({ children }) {

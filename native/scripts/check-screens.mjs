@@ -170,3 +170,49 @@ const waived = Object.keys(WONT_NEED).length;
 console.log(`\n${total} strings the website shows that this app has nowhere.`);
 console.log(`${waived} more are deliberately not needed — see WONT_NEED, with a reason each.`);
 if (process.argv.includes("--strict") && total) process.exit(1);
+
+/* ---- ONE STRING, OR COMMAS APPEAR IN THE PROSE -------------------------- *
+ *
+ * P, Lead, Note and Sub all render through Rich, and Rich used to reduce its
+ * children with String(). String(["a", " ", "b"]) is "a, ,b" — JavaScript
+ * joins an array with commas — so a screen written as
+ *
+ *     <Lead>{t("one", "…after Isha.")}{" "}{t("two", "Changes are …")}</Lead>
+ *
+ * rendered "…after Isha., ,Changes are …" on the phone. Nothing warns: it type
+ * checks, it builds, and the commas are only visible to somebody looking at
+ * the running screen in the right language. It shipped into the Ramadan
+ * section's Bayaan and Iʿtikāf leads and was caught by a screenshot.
+ *
+ * Rich now joins arrays, so this is belt and braces — but the call site is
+ * still the clearer place to say it, and a future Rich-like component would
+ * not inherit the fix. Two sentences in one paragraph are concatenated with +,
+ * which is what the writer meant and what the translators' key owns.
+ */
+const RICH_TAGS = ["P", "Lead", "Note", "Sub"];
+const screenFiles = fs.readdirSync(path.join(root, "src/screens"))
+  .filter(f => f.endsWith(".jsx"))
+  .map(f => ["screens/" + f, fs.readFileSync(path.join(root, "src/screens", f), "utf8")]);
+screenFiles.push(["ui.jsx", fs.readFileSync(path.join(root, "src/ui.jsx"), "utf8")]);
+
+const commaRisk = [];
+for (const [file, text] of screenFiles) {
+  for (const tag of RICH_TAGS) {
+    const re = new RegExp(`<${tag}(\\s[^>]*)?>([\\s\\S]*?)</${tag}>`, "g");
+    let m;
+    while ((m = re.exec(text))) {
+      const body = m[2];
+      /* Two adjacent expression children, with or without a spacer between
+         them. One expression, or one run of plain text, is the correct shape. */
+      if (/\}\s*\{/.test(body))
+        commaRisk.push(`${file}  <${tag}> has more than one child — join with + instead`);
+    }
+  }
+}
+if (commaRisk.length) {
+  console.log("\nprose that would render with commas injected:");
+  for (const r of commaRisk) console.log("  " + r);
+} else {
+  console.log(`\nevery <${RICH_TAGS.join(">, <")}> on every screen is given a single string`);
+}
+if (process.argv.includes("--strict") && commaRisk.length) process.exit(1);

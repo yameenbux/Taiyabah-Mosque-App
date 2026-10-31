@@ -26,7 +26,7 @@ import { View, Text, Image, Switch, Share } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
-import { Screen, Hero, Heading, Card, RowGroup, P, Note, PageFoot, Press, Star, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, Lead, RowGroup, P, Note, PageFoot, Press, Star, tap, open } from "../ui";
 import { Field, ErrorBox, Submit, isPhone } from "../form";
 import { rpc, itikafIsOpen } from "../supabase";
 import { useApp } from "../store";
@@ -642,14 +642,19 @@ function Month({ access, now, navigation }) {
       </Hero>
 
       <View style={{ paddingHorizontal: 16 }}>
-        <Card>
-          <P>{t("ramadan.ramadan_is_the_month_the",
-                "Ramadan is the month the Qur’an was sent down — a month of fasting from first "
-                + "light until sunset, of standing in prayer at night, and of giving.")}</P>
-          <P>{t("ramadan.everything_the_masjid_is_running",
-                "Everything the masjid is running this month is here: who is leading taraweeh, "
-                + "who is speaking, and how to book i’tikaf.")}</P>
-        </Card>
+        {/* NO EXPLAINER HERE. Sixty words stood between the hero and Tonight:
+            one paragraph saying what Ramadan is, to people keeping it, and one
+            listing what the screen below contains. On a 393pt phone that card
+            pushed the isha time and the juz off the bottom of the first
+            screen, so the one thing somebody opens this for at five in the
+            afternoon needed a scroll to reach.
+
+            A screen does not need to introduce itself. The hero already says
+            the month, the day and the date, and a table of contents is what
+            the sections underneath ARE. The website's #rmd loses the same card
+            in the same commit, because the two are one screen. Both keys stay
+            in the catalogue with their three translations intact, so putting
+            either back is a line of markup and not a trip to the translators. */}
 
         {/* ---- tonight ---- */}
         {!!st && (
@@ -690,15 +695,17 @@ function Month({ access, now, navigation }) {
 
         <View onLayout={e => { rotaY.current = e.nativeEvent.layout.y; }}>
         <Heading>{t("ramadan.taraweeh", "Taraweeh")}</Heading>
-        <Card>
-          <P>{t("ramadan.twenty_rak_ahs_each_night",
-                "Twenty rak’ahs each night, led by five. Mufti Faiyaz, the Imam of the masjid, "
-                + "leads the first four rak’ahs, and four students of the masjid lead the rest.")}</P>
-          <P>{t("ramadan.the_four_students_are_confirmed",
-                "The four students are confirmed around a month before Ramadan begins. One juz "
-                + "of the Qur’an is read each night, so the whole Qur’an is completed in "
-                + "taraweeh by the end of the month.")}</P>
-        </Card>
+        {/* The second line earns its place next to the rota rather than above
+            it: four of the five rows read "To be confirmed" until a month
+            before the month starts, and this is the sentence that says why. */}
+        <Lead>{t("ramadan.twenty_rak_ahs_each_night",
+                 "Twenty rak’ahs each night, led by five. Mufti Faiyaz, the Imam of the masjid, "
+                 + "leads the first four rak’ahs, and four students of the masjid lead the rest.")}</Lead>
+        <Lead style={{ marginTop: 7 }}>
+          {t("ramadan.the_four_students_are_confirmed",
+             "The four students are confirmed around a month before Ramadan begins. One juz "
+             + "of the Qur’an is read each night, so the whole Qur’an is completed in "
+             + "taraweeh by the end of the month.")}</Lead>
         <RowGroup>
           <View style={{ paddingHorizontal: 16, paddingTop: 13, paddingBottom: 2 }}>
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.9,
@@ -713,22 +720,18 @@ function Month({ access, now, navigation }) {
         {!!st && <Nights st={st} onRead={read} />}
 
         <Heading>{t("ramadan.bayaan", "Bayaan")}</Heading>
-        <Card>
-          <P>{t("ramadan.two_talks_a_day_one", "Two talks a day, one after Asr and one after Isha.")}</P>
-          <P>{t("ramadan.changes_are_announced_in_the", "Changes are announced in the app.")}</P>
-        </Card>
+        <Lead>{t("ramadan.two_talks_a_day_one", "Two talks a day, one after Asr and one after Isha.")
+               + " " + t("ramadan.changes_are_announced_in_the", "Changes are announced in the app.")}</Lead>
         <RowGroup>
           {RAMADAN.bayaan.slots.map(b => (
             <RmRow key={b.when} k={b.when} v={b.speaker || tbc} sub={b.subject} first />))}
         </RowGroup>
 
         <Heading>{t("ramadan.i_tikaf", "I’tikaf")}</Heading>
-        <Card>
-          <P>{t("ramadan.staying_in_the_masjid_for",
-                "Staying in the masjid for the last ten nights of Ramadan, brothers only.")}</P>
-          <P>{t("ramadan.places_are_limited_so_booking",
-                "Places are limited, so booking is asked for — book your place in the app.")}</P>
-        </Card>
+        <Lead>{t("ramadan.staying_in_the_masjid_for",
+                 "Staying in the masjid for the last ten nights of Ramadan, brothers only.")
+               + " " + t("ramadan.places_are_limited_so_booking",
+                         "Places are limited, so booking is asked for — book your place in the app.")}</Lead>
         <RowGroup>
           <RmRow first k={t("ramadan.begins", "Begins")} v={it.begins} />
           <RmRow first k={t("ramadan.who", "Who")} v={it.who} />
@@ -741,10 +744,8 @@ function Month({ access, now, navigation }) {
         <Booking st={st} open={booking} />
 
         <Heading>{t("ramadan.zakat_al_fitr", "Zakat al-Fitr")}</Heading>
-        <Card>
-          <P>{t("ramadan.due_per_person_in_the",
-                "Due per person in the household, before the Eid prayer.")}</P>
-        </Card>
+        <Lead>{t("ramadan.due_per_person_in_the",
+                 "Due per person in the household, before the Eid prayer.")}</Lead>
         <RowGroup>
           <RmRow first k={t("ramadan.amount", "Amount")} v={RAMADAN.fitrana.amount || tbc} />
           <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>

@@ -146,8 +146,8 @@ export default function Bukhari({ navigation }) {
           </View>
           {!!err && <Note>{err}</Note>}
           {!!hits?.length && (
-            <Note>{t("bukhari.n_matching", "{n} hadith matching").replace("{n}", String(hits.length))}
-              {hits.length >= 200 ? t("bukhari.first_200", " — showing the first 200") : ""}</Note>)}
+            <Note>{t("bukhari.n_matching", "{n} hadith matching").replace("{n}", String(hits.length))
+                 + (hits.length >= 200 ? t("bukhari.first_200", " — showing the first 200") : "")}</Note>)}
         </View>}
       ListFooterComponent={
         <View style={{ paddingHorizontal: 16, paddingTop: 4 }}>
