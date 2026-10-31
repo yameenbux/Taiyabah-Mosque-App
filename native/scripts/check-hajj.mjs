@@ -165,12 +165,21 @@ for (const b of (shipped.branches || []).filter(b => b.kind === "fiqh"))
 for (const b of branches.filter(b => b.kind === "fiqh")) {
   const all = b.sections.flatMap(s => s.items || []);
   const live = all.filter(approved);
-  /* Not "there must be none approved" — the ʿulamā will approve them one at a
-     time and this check must not stand in their way. The rule is that an
-     approved entry is finished: named AND sourced. */
+  /* THE SOURCE RULE IS GONE, BY DECISION RATHER THAN BY ROT. It used to read
+     "an approved entry is finished: named AND sourced", and it was there to
+     stop a ruling reaching a congregation with nothing behind the name. The
+     trustee has since asked that only Taiyabah Masjid be named anywhere a
+     reader can see, so there is no second name left for the rule to require
+     and keeping it would only fail the build.
+
+     What it was protecting has not gone away. content.js's header records
+     which published guides each branch was drafted from and that the
+     permission question is unsettled; this is the check that used to make
+     that visible on screen, and nothing replaces it. If sources ever come
+     back, so should this. */
   for (const item of live)
-    ok(typeof item.source === "string" && item.source.trim().length > 0,
-       `${b.id}/${item.id} carries an approver but no source — a ruling in front of a ` +
+    ok(typeof item.by === "string" && item.by.trim().length > 0,
+       `${b.id}/${item.id} is live with no name against it — a ruling in front of a ` +
        `congregation needs something after the name`);
   if (!live.length)
     ok(!branchOpen(b), `${b.id} has ${all.length} draft(s) and no approval, so it must stay shut`);
@@ -365,11 +374,14 @@ is(progress("tasbih", 99), 0, "the tasbīḥ ring comes round on its mark");
     ok(sec("umrah").includes(id) && sec("hajj").includes(id),
        `${id} is shared, so it shows on both journeys`);
 
-  /* The five days are still unwritten, so the Hajj journey has no rites of
-     its own yet. When they are written this assertion is the one that fails,
-     and that is the intended signal to flip it. */
-  ok(!sec("hajj").includes("rites-hajj"),
-     "the days of Hajj are still empty, so Hajj shows no rites section of its own");
+  /* THIS ASSERTION HAS FLIPPED, which is what it was written to do. It used
+     to say the days of Hajj were empty; they are written and approved now, so
+     the Hajj journey has rites of its own and the ʿUmrah journey must still
+     not show them. */
+  ok(sec("hajj").includes("rites-hajj"),
+     "the days of Hajj are on the Hajj journey");
+  ok(!sec("umrah").includes("rites-hajj"),
+     "and are not shown to somebody planning ʿUmrah");
 
   /* A practical branch is the same on both trips and must not be narrowed by
      accident — the paperwork is where Nusuk and the certificate live. */

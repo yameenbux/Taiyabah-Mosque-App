@@ -112,8 +112,12 @@ export default function HajjJourney({ navigation, route }) {
       {access.branches.some(b => b.kind === "fiqh" && branchOpen(b, journey)) && (
         <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18.5),
                        color: HJ.inkFaint, marginTop: 30, textAlign: "center" }}>
-          {t("hajj.published_by_the_masjid",
-             "Published by Taiyabah Masjid, following the Islāmic Daʿwah Academy’s How to Perform ʿUmrah. For your own case, ask the ʿulamā.")}
+          {/* A NEW KEY, not a reworded one. hajj.published_by_the_masjid owns
+              an Urdu, a Gujarati and an Arabic translation that all name the
+              Academy; editing the English under it would leave three
+              languages making a claim the English no longer makes. */}
+          {t("hajj.published_by_taiyabah",
+             "Published by Taiyabah Masjid. For your own case, ask the ʿulamā.")}
         </Text>)}
     </HajjScreen>
   );
