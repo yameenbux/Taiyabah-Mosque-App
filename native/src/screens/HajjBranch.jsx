@@ -28,7 +28,8 @@ import Svg, { Path } from "react-native-svg";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
 import { Press } from "../ui";
-import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip } from "../hajj-ui";
+import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar }
+  from "../hajj-ui";
 import HajjArt from "../hajj-art";
 import { visibleSections } from "../hajj";
 import { branchById } from "../hajj-data";
@@ -120,8 +121,17 @@ export default function HajjBranch({ route }) {
   const total = all.filter(i => i.pack).length;
   const done = all.filter(i => i.pack && packed[i.id]).length;
 
+  /* Where each section starts in the scroll, measured as it lays out rather
+     than guessed from line counts — a translation, a longer photograph
+     caption or a bigger text size moves all of them. */
+  const scroller = useRef(null);
+  const tops = useRef({});
+  const jump = i => scroller.current?.scrollTo({ y: Math.max(0, (tops.current[i] || 0) - 10),
+                                                 animated: true });
+
   return (
-    <HajjScreen top={16}>
+    <HajjScreen top={16} scrollRef={scroller}
+                bar={<HajjJumpBar labels={sections.map(s => s.title)} onJump={jump} />}>
       {!!branch.lead && <HajjLead>{branch.lead}</HajjLead>}
 
       {/* A count, not a progress bar: it is a case being packed, not a task
@@ -140,7 +150,8 @@ export default function HajjBranch({ route }) {
         </Panel>)}
 
       {sections.map((s, si) => (
-        <View key={s.id} style={{ marginTop: si === 0 ? 22 : 28 }}>
+        <View key={s.id} style={{ marginTop: si === 0 ? 22 : 28 }}
+              onLayout={e => { tops.current[si] = e.nativeEvent.layout.y; }}>
           <HajjKicker>{s.title}</HajjKicker>
           {!!s.lead && (
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(20.5),

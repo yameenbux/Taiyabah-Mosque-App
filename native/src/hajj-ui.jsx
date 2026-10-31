@@ -17,7 +17,8 @@
  * HJ in theme.js holds the values and the measurement behind each one.
  */
 import React from "react";
-import { View, Text, Image, Pressable, Platform } from "react-native";
+import { View, Text, Image, Pressable, Platform, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, RadialGradient, LinearGradient, Stop, Rect, Path } from "react-native-svg";
 import { F, R, HJ } from "./theme";
 import { useApp } from "./store";
@@ -56,16 +57,69 @@ function Lamp({ at }) {
  *  `lamp` moves the source: at the top for a screen that is read, behind the
  *  dial for the counter, where the dial is the composition.
  *  `foot` turns off the mark, for the same reason. */
-export function HajjScreen({ children, foot = true, top = 18, lamp = "2%" }) {
+export function HajjScreen({ children, foot = true, top = 18, lamp = "2%",
+                            scrollRef, bar }) {
   return (
     <View style={{ flex: 1, backgroundColor: HJ.ground }}>
       <Lamp at={lamp} />
       {/* bg transparent so the ground shows through the column; Screen still
           supplies the 520px cap, the 16px gutter and the offline-bar room. */}
-      <Screen bg="transparent" top={top}>
+      <Screen ref={scrollRef} bg="transparent" top={top}>
         {children}
         {foot ? <HajjFoot /> : null}
+        {/* room for the bar to sit over, so it never covers the last item */}
+        {bar ? <View style={{ height: 58 }} /> : null}
       </Screen>
+      {bar}
+    </View>
+  );
+}
+
+/** THE JUMP BAR — the section names, fixed at the bottom of the screen.
+ *
+ *  A branch is one scroll of everything it holds, which is right at home and
+ *  wrong in the Ḥaram: during ṭawāf you want "Ṭawāf, point by point", and
+ *  reaching it means scrolling past thirteen entries you are not doing right
+ *  now, one-handed, in a crowd. These are the sections, and a tap goes
+ *  straight there.
+ *
+ *  AT THE BOTTOM, not the top, because that is where the thumb already is.
+ *  A bar at the top would be the same list and a reach away. */
+/* "Ṭawāf, point by point" is a good heading and a bad chip: four of them
+   filled the bar twice over and the last was off the edge. A section's name
+   is the part before its comma — "Ṭawāf", "Saʿī", "For women" — which is
+   what somebody is looking for anyway. The Arabic comma counts too. */
+const chipOf = title => String(title || "").split(/[,،—]/)[0].trim() || title;
+
+export function HajjJumpBar({ labels, onJump }) {
+  const { fs, rtl } = useApp();
+  const insets = useSafeAreaInsets();
+  if (!labels || labels.length < 2) return null;
+  return (
+    <View style={{ position: "absolute", left: 0, right: 0, bottom: 0,
+                   paddingBottom: insets.bottom + 8, paddingTop: 8,
+                   backgroundColor: HJ.barGround, borderTopWidth: 1,
+                   borderTopColor: HJ.panelLine }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: 12, gap: 8,
+                                           flexDirection: rtl ? "row-reverse" : "row" }}>
+        {labels.map((label, i) => (
+          <Pressable key={i} onPress={() => onJump(i)} accessibilityRole="button"
+                     accessibilityLabel={label}
+                     /* 42px tall, which is the smallest a chip can be and
+                        still be hit without looking at it */
+                     style={({ pressed }) => ({
+                       minHeight: 42, justifyContent: "center", paddingHorizontal: 14,
+                       borderRadius: R.pill, borderWidth: 1,
+                       borderColor: pressed ? HJ.goldLine : HJ.panelLine,
+                       backgroundColor: pressed ? HJ.panelHi : HJ.panel })}>
+            <Text numberOfLines={1}
+                  style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: HJ.inkSoft }}>
+              {chipOf(label)}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -205,6 +259,70 @@ export function HajjRow({ icon, label, detail, trail, tone, onPress }) {
       {!!trail && (
         <Text style={{ fontFamily: F.display, fontSize: fs(17), color: HJ.gold }}>{trail}</Text>)}
     </Panel>
+  );
+}
+
+/** A branch as a TILE rather than a row.
+ *
+ *  WHY THE SECTION FRONT IS A GRID. A full-width row is 88px of screen to
+ *  carry a glyph and two short lines, and seven of them under three headings
+ *  do not fit a phone — so the one screen a pilgrim opens in the Ḥaram asked
+ *  them to scroll to find the counters. Two columns put every branch above
+ *  the fold and inside the thumb's arc, which is the whole requirement: one
+ *  hand, the other holding the izār, in a crowd, in the sun.
+ *
+ *  The tile keeps the row's skin so the section still looks like itself, and
+ *  `lit` still marks the counters — the one thing here that is a tool rather
+ *  than a text, and the one most likely to be opened mid-ṭawāf. */
+export function HajjTile({ icon, label, detail, tone, wide, onPress }) {
+  const { fs, rtl } = useApp();
+  const lit = tone === "gold";
+  return (
+    <Panel tone={tone} onPress={onPress} accessibilityLabel={label}
+           style={wide
+             ? { flex: 1, minHeight: 68, padding: 11, gap: 11, alignItems: "center",
+                 flexDirection: rtl ? "row-reverse" : "row" }
+             : { flex: 1, minHeight: 98, padding: 11, justifyContent: "space-between" }}>
+      <View style={[{ width: 30, height: 30, alignItems: "center", justifyContent: "center" },
+                    lit && { borderRadius: 10, backgroundColor: HJ.goldFill }]}>
+        {icon}
+      </View>
+      <View style={wide ? { flex: 1 } : null}>
+        <Text numberOfLines={2}
+              style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(19),
+                       color: HJ.ink, textAlign: rtl ? "right" : "left" }}>{label}</Text>
+        {!!detail && (
+          <Text numberOfLines={2}
+                style={{ fontFamily: F.sans, fontSize: fs(11.5), lineHeight: fs(15.5),
+                         color: HJ.inkFaint, marginTop: 2,
+                         textAlign: rtl ? "right" : "left" }}>{detail}</Text>)}
+      </View>
+    </Panel>
+  );
+}
+
+/** Tiles laid two to a row, with an odd one left at its own width rather than
+ *  stretched across — a half-width tile beside a gap reads as a grid; a
+ *  full-width one reads as a row that lost its friends. */
+export function HajjTileGrid({ children }) {
+  const { rtl } = useApp();
+  const items = React.Children.toArray(children);
+  const rows = [];
+  for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
+  return (
+    <View style={{ marginTop: 9 }}>
+      {rows.map((row, i) => (
+        <View key={i} style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 10,
+                               marginTop: i === 0 ? 0 : 10 }}>
+          {/* An odd branch count left half the row empty on three of the four
+              stages — a third of the screen carrying nothing, on the screen
+              that most needs the room. A lone tile takes the whole width and
+              lays itself out sideways instead, which is a different shape
+              rather than a stretched one. */}
+          {row.length === 1 ? React.cloneElement(row[0], { wide: true }) : row}
+        </View>
+      ))}
+    </View>
   );
 }
 
