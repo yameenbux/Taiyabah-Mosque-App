@@ -107,8 +107,11 @@ export function MaTafPlan({ full = true }) {
   /* The dial crops in to the building. The full box is framed for the maṭāf
      ring, and reusing it there would leave a cube the size of a thumbnail in
      the middle of a 276pt dial. */
+  /* The dial's crop had to open up when the Ḥaṭīm grew. Its apex is now at
+     y=49 where the old arc topped out at 57, so the old "56 54 88 88" would
+     have sliced the top off the wall on the counter screen. */
   return (
-    <Svg viewBox={full ? "8 8 184 184" : "56 54 88 88"} width="100%" height="100%">
+    <Svg viewBox={full ? "8 8 184 184" : "52 42 96 96"} width="100%" height="100%">
       {full && (
         <G>
           {/* the maṭāf — the floor walked on, not a line drawn round it */}
@@ -118,18 +121,52 @@ export function MaTafPlan({ full = true }) {
           {[0, 90, 180, 270].map(d => <Arrow key={d} deg={d} r={r} />)}
         </G>)}
       {/* the line every circuit starts and ends on, out through the stone */}
-      <Path d={`M127 128 L${full ? "157 157" : "148 149"}`} stroke={GOLD} strokeWidth={1.2}
+      <Path d={`M124 129 L${full ? "156 159" : "150 152"}`} stroke={GOLD} strokeWidth={1.2}
             strokeDasharray={[2.5, 4]} opacity={0.75} />
-      <Path d="M84 73 A16 16 0 0 1 116 73 L116 77 L84 77 Z" fill="rgba(220,187,99,.13)" />
-      <Path d="M84 73 a16 16 0 0 1 32 0" fill="none" stroke={GOLD}
-            strokeWidth={1.6} strokeLinecap="round" />
-      <Rect x="73" y="76" width="54" height="52" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
-      <Path d="M73 90 H127" stroke={GOLD} strokeWidth={2.4} opacity={0.45} />
-      <Path d="M127 101 L127 114" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
-      {full && <Rect x="152" y="92" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
-      {[[73, 76], [127, 76], [73, 128], [127, 128]].map(([x, y]) =>
+      {/* THE BUILDING IS NOT SQUARE, and which wall is the long one matters.
+          It was drawn 54 across by 52 down, which put the LONG side on the
+          Ḥaṭīm wall and the short side on the door wall. That is the wrong way
+          round: the door side, al-Multazam, is about 12.84m and the Ḥijr side
+          about 11.28m. Anyone who has stood there knows the door wall is the
+          long one, and a plan that says otherwise is wrong in the one way a
+          plan cannot afford. Now 48 across by 55 down — the same 1.14 — with
+          the corners at Shāmī (76,74), ʿIrāqī (124,74), Yamānī (76,129) and
+          the Black Stone (124,129). At that scale one unit is about 0.235m.
+
+          THE ḤAṬĪM IS A WALL, AND IT STANDS APART. Two mistakes, made one
+          after the other. It was first a thin arc against the middle of the
+          wall, far too short. Taking it corner to corner fixed the span and
+          welded it to the building, which is worse: it is opposite the
+          north-west face and joined to it at neither end, and the two openings
+          are how people walk in.
+
+          It is also not a line. A wall seen from above is a band with two
+          faces, and this one is about 0.9m of marble — drawn as a single
+          stroke it read as a boundary somebody had marked on the floor rather
+          than as masonry you cannot step through. So: an arc band struck from
+          the midpoint of the north-west wall, outer face at 22 and inner at
+          18.5, running from 18° to 162° so each end stops about 1.75m short of
+          its corner. Filled, because in plan a wall is solid. */}
+      {/* the ground the wall encloses, which is walked around and not through */}
+      <Path d="M76 74 L124 74 L117.59 68.28 A18.5 18.5 0 0 0 82.41 68.28 Z"
+            fill="rgba(220,187,99,.10)" />
+      {/* the masonry itself */}
+      <Path d="M79.08 67.20 A22 22 0 0 1 120.92 67.20 L117.59 68.28 A18.5 18.5 0 0 0 82.41 68.28 Z"
+            fill={GOLD} opacity={0.85} />
+      <Rect x="76" y="74" width="48" height="55" fill="#190511" stroke={GOLD} strokeWidth={2.6} />
+      {/* NO LINE ACROSS THE BUILDING. A band ran the full width at y=90, which
+          is a thing you would see on an elevation — the kiswah's belt, seen
+          from the side. This picture is a plan, looked down on from above, and
+          from above that band is the top of a wall you cannot see. Drawn
+          anyway it split the roof in two and made the square read as two
+          rooms. The caption says "from above"; the drawing now agrees. */}
+      {/* The door, on the long wall and nearer the Black Stone corner than the
+          ʿIrāqī one, which is where it actually sits. */}
+      <Path d="M124 103 L124 116" stroke={GOLD} strokeWidth={4.6} strokeLinecap="round" />
+      {full && <Rect x="150" y="89" width="13" height="13" fill="none" stroke={GOLD} strokeWidth={1.8} />}
+      {[[76, 74], [124, 74], [76, 129], [124, 129]].map(([x, y]) =>
         <Circle key={`${x}-${y}`} cx={x} cy={y} r={2.4} fill={GOLD} opacity={0.55} />)}
-      <Circle cx="127" cy="128" r={7} fill={GOLD} />
+      <Circle cx="124" cy="129" r={7} fill={GOLD} />
     </Svg>
   );
 }

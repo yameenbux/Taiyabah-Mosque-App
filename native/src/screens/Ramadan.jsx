@@ -26,7 +26,7 @@ import { View, Text, Image, Switch, Share } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R } from "../theme";
-import { Screen, Hero, Heading, Card, Lead, RowGroup, P, Note, PageFoot, Press, Star, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, Lead, RowGroup, P, Note, PageFoot, Press, StarField, tap, open } from "../ui";
 import { Field, ErrorBox, Submit, isPhone } from "../form";
 import { rpc, itikafIsOpen } from "../supabase";
 import { useApp } from "../store";
@@ -909,8 +909,9 @@ export default function Ramadan({ navigation }) {
             watermark behind it — the first render had a solid plum star
             swallowing the words. Drawn here instead, hairline and unfilled,
             the way the App Store frames and the widget draw it. */}
-        <Star size={560} color={C.gold} opacity={0.3} width={0.35} />
-        <Star size={330} color={C.goldBright} opacity={0.22} width={0.5} />
+        {/* Sized to the phone and centred on the whole poster — ui.jsx
+            says why the fixed 560 was wider than the screen. */}
+        <StarField gold={C.gold} bright={C.goldBright} />
 
         {/* 1. the words */}
         <View style={{ alignItems: "center" }}>

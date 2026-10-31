@@ -135,9 +135,22 @@ export async function call(fn, args = {}) {
  * A failure to reach the server is SHUT, as on the website. Drawing the form
  * and failing at the end, after somebody has written out something difficult,
  * is much the worse of the two failures. */
+/* IT TAKES THE SLUG NOW, like every other call. The database became
+ * multi-masjid and advice_is_open() stopped guessing which masjid is asking —
+ * it raises rather than guess, because guessing wrong would answer for
+ * somebody else's imams. readList() and rpc() were both moved over; this one
+ * was not, because it is the only call that bypasses them, and nothing failed
+ * loudly enough to notice: the empty body came back 400, `!res.ok` returned
+ * false, and false is indistinguishable from "no imam is on duty".
+ *
+ * So the screen said the masjid was not taking written questions while the
+ * masjid was taking them — the one failure mode this function's own failsafe
+ * is designed to produce, firing for the wrong reason. The real answer for
+ * "taiyabah" is true. */
 export async function adviceIsOpen() {
   try {
-    const res = await go("rpc/advice_is_open", { method: "POST", body: "{}" });
+    const res = await go("rpc/advice_is_open",
+                         { method: "POST", body: JSON.stringify({ p_masjid: MASJID }) });
     if (!res.ok) return false;
     return (await res.text()).trim() === "true";
   } catch { return false; }
