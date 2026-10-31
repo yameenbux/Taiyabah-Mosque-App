@@ -11,7 +11,7 @@ every row in the table below reaches 9 before this is considered finished.
 |---|---|---|---|---|---|
 | Content & substance | 9 | 9 | 9 | 9 | — |
 | Design & craft | 8.5 | 8.5 | **9** | 9 | dark mode, the iPad column and iPad landscape all done |
-| Internationalisation | 7 | 7.5 | **8** | 9 | three native speakers reading what is already queued for them |
+| Internationalisation | 7 | 7.5 | **9** | 9 | the three readings are done — Urdu, Gujarati and Arabic all read and corrected |
 | Accessibility | 3 | 8 | 8 | 9 | a TalkBack pass on a handset — twenty minutes of a person |
 | Engineering quality | 6 | 8 | **8.5** | 9 | 62 tests, 13 checks, each proven to bite; held at 8.5 rather than raised — a check that read its expectations from the thing it was checking passed a blank tab bar three times, so the count was never the weak part; no component tests |
 | Robustness | 7 | 7 | **9** | 9 | boundary, crash reporting and global offline detection all in |
@@ -24,11 +24,14 @@ every row in the table below reaches 9 before this is considered finished.
 **Nothing is below 7 any more.** The two fronts that were — platform coverage
 at 4 and performance at 6.5 — are at 6 and 8.5.
 
-**The five points that remain are not code.** Three native speakers, twenty
-minutes with TalkBack on a real phone, an Apple Developer account, the
-committee uploading next year's timetable, and two clicks in the Supabase and
-Play consoles. Every one of them needs a person or an account, and no amount
-of further work in this repository moves them.
+**The points that remain are not code.** Twenty minutes with TalkBack on a
+real phone, the committee uploading next year's timetable, and two clicks in
+the Supabase and Play consoles. Every one of them needs a person or an
+account, and no amount of further work in this repository moves them.
+
+The three native-speaker readings that stood here are done. So is the Apple
+Developer account — the app has been through App Review, which the platform
+coverage row above still predates.
 
 Re-scored at the end of 6 October 2026 against measured evidence: counts from
 `npm run check` and `npm test`, file sizes from the files, i18n from
