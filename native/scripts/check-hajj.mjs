@@ -24,6 +24,7 @@
  * with the ṭawāf cap removed 1, with saʿī's alternation removed 1.
  */
 import fs from "node:fs";
+import vm from "node:vm";
 import path from "node:path";
 import {
   hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches,
@@ -81,11 +82,45 @@ is(hajjAccess([draftBranch], true), { open: false, reason: "incomplete", missing
    "released with nothing but drafts stays SHUT");
 is(hajjAccess(null, true).open, false, "no branches at all is not a crash");
 
-/* ---- and now on the real shipped content ------------------------------ */
+/* ---- and now on the real content --------------------------------------
+ *
+ * TWO SOURCES, ON PURPOSE, because they answer different questions.
+ *
+ *   `data` is hajj/content.js — EVERYTHING, drafts included. The content
+ *   rules live here: a caption that reads like a ruling, a mark off the edge
+ *   of its picture, a drawing nobody shipped. Those have to be caught in the
+ *   draft, which is the only time anybody can still fix them cheaply.
+ *
+ *   `shipped` is src/data/hajj.json — what the importer actually put in the
+ *   binary. The rule there is narrower and newer: nothing unapproved may be
+ *   in it at all.
+ *
+ * Reading only the bundle, as this did, quietly stopped checking the drafts
+ * the moment the importer started holding them back — 40 assertions that
+ * vanished without a word rather than failing. */
 const here = path.resolve(import.meta.dirname, "..");
-const data = JSON.parse(fs.readFileSync(path.join(here, "src/data/hajj.json"), "utf8"));
+const src = fs.readFileSync(path.join(here, "../hajj/content.js"), "utf8");
+const box = { window: {} };
+vm.createContext(box);
+vm.runInContext(src, box, { filename: "hajj/content.js" });
+const data = box.window.HAJJ;
+ok(!!data, "hajj/content.js did not set window.HAJJ");
 const branches = data.branches || [];
-ok(branches.length > 0, "src/data/hajj.json has no branches — run npm run content");
+ok(branches.length > 0, "hajj/content.js has no branches");
+
+const shipped = JSON.parse(fs.readFileSync(path.join(here, "src/data/hajj.json"), "utf8"));
+ok((shipped.branches || []).length > 0,
+   "src/data/hajj.json has no branches — run npm run content");
+
+/* NOTHING UNAPPROVED REACHES THE BINARY. A draft is invisible to readers by
+   hajj.js's rule, which governed what was drawn; this governs what is
+   carried. Unreachable is not absent, and the drafts quote a booklet the
+   masjid has no written permission for. */
+for (const b of (shipped.branches || []).filter(b => b.kind === "fiqh"))
+  for (const it of b.sections.flatMap(s => s.items || []))
+    ok(approved(it),
+       `src/data/hajj.json ships ${b.id}/${it.id}, which no scholar has approved — ` +
+       `the importer is meant to hold it back`);
 
 for (const b of branches.filter(b => b.kind === "fiqh")) {
   const all = b.sections.flatMap(s => s.items || []);
