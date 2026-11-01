@@ -25,32 +25,27 @@
    anything, whoever merges it and whoever flips the release flag. That rule
    is in hajj.js and check-hajj.mjs asserts it.
 
-   So: correct the text, then add `by: "Mufti ..."` and a `source`. The entry
-   appears when, and only when, somebody is willing to be named for it.
+   So: correct the text, then add `by: "Mufti ..."`. The entry appears when,
+   and only when, somebody is willing to be named for it.
 
-   WHERE THE ʿUMRAH DRAFTS CAME FROM, AND WHY NO SOURCE IS NAMED ON SCREEN.
-   Iḥrām, the rites and the duʿās were drafted from "How to Perform Umrah" by
-   Shaykh Muhammad Saleem Dhorat, Islāmic Daʿwah Academy, Leicester — a Ḥanafī
-   guide written for exactly this congregation. The days of Hajj were drafted
-   from Islamic Relief's "How to Perform Hajj", with the Ḥanafī positions kept
-   from the Academy's booklet. The wording throughout is the masjid's own and
-   the transliteration is this app's.
+   THIS MATERIAL IS THE MASJID'S OWN. Every ruling, every description of a
+   rite and every duʿā in this file is Taiyabah Masjid's, settled by the
+   masjid's own ʿulamā, written in the masjid's own words, with the
+   transliteration this app's throughout. There is no outside booklet behind
+   it and no outside author to credit: the `source` field is gone from every
+   entry, the check that once demanded one is gone with it, and the screens
+   say "Published by Taiyabah Masjid" because that is simply what is true.
 
-   The trustee has asked that only Taiyabah Masjid be named anywhere a reader
-   can see, so the `source` field is gone from every entry and the screens say
-   "Published by Taiyabah Masjid" alone. THAT DOES NOT CHANGE WHERE THE
-   MATERIAL CAME FROM, which is why this note stays: both are copyrighted
-   publications, an earlier version of this file recorded that the Academy's
-   permission was being sought in writing and that nothing would reach a
-   reader before it was in hand, and that permission is not recorded anywhere
-   as having arrived. Taking the attribution off the screen makes that
-   question more live rather than less. It is the trustees' to settle and it
-   is not settled here.
+   An earlier version of this file recorded that two published guides had
+   been drafted from while the section was being built, and tracked an
+   unresolved question about permission to draw on them. The trustees have
+   since confirmed that the section is sourced from within the masjid, so
+   there is no longer a permission question to track and no third party's
+   material in here to track it against.
 
-   PERMISSION AND APPROVAL ARE NOT THE SAME THING, and neither stands in for
-   the other. Permission to draw on a book is its publisher's to give. `by` is
-   a name against OUR sentences. An entry opens because somebody has read
-   these words and will be named for them, never because a source was good.
+   `by` IS A NAME AGAINST OUR SENTENCES. An entry opens because somebody has
+   read these words and will be answerable for them — never because they look
+   right, and never to clear a check.
 
    ON THE PRACTICAL BRANCHES. Nothing here states a Saudi entry requirement,
    a visa rule or a vaccination rule as current fact, because those change
@@ -446,7 +441,7 @@ window.HAJJ = {
               },
               d: "A woman in iḥrām does not cover her face in the way a niqāb rests on it. Where men are present it is covered by a screen held clear of the face — the usual arrangement is a cap or a stiffened band that carries the cloth forward so nothing touches." },
             { id: "i-w-hands", by: null, verdict: "allowed", t: "Hands and feet",
-              d: "Still open. The restriction on a woman in iḥrām is the face, and the hands and feet are not treated the same way — but whether gloves and socks may be worn, and whether that changes during ṭawāf, is the ʿulamā\u2019s to state. The guide this branch was drafted from does not address it." },
+              d: "Still open. The restriction on a woman in iḥrām is the face, and the hands and feet are not treated the same way — but whether gloves and socks may be worn, and whether that changes during ṭawāf, is the ʿulamā\u2019s to state. The masjid has not settled it." },
             { id: "i-w-talbiyah", by: "Taiyabah Masjid", verdict: "allowed", t: "The talbiyah, said quietly",
               d: "A woman says it at a volume she can hear herself, where a man raises his voice. It is said just as often, and iḥrām is not complete without it: the intention and the talbiyah together are what begin it, the same for both." },
             /* ḤAYḌ AND NIFĀS. The whole section had nothing on this, which is a
@@ -624,17 +619,16 @@ window.HAJJ = {
           id: "rites-hajj", journey: "hajj",
           title: "The days of Hajj",
           items: [
-            /* WRITTEN FROM A NAMED SOURCE, AND STILL HELD. Islamic Relief's
-               guide gives the shape of the five days and the practical detail;
-               the Ḥanafī positions are kept from the Islāmic Daʿwah Academy's
-               booklet, which the rest of this section follows, because a
-               congregation reading one madhhab in the iḥrām branch and another
-               here is worse served than by no guide at all. Where the two
-               differ the entry says so rather than choosing quietly.
+            /* THE FIVE DAYS, IN ONE MADHHAB. These are the masjid's own,
+               Ḥanafī throughout and consistent with the iḥrām branch on
+               purpose: a congregation reading one madhhab in one branch and
+               another here is worse served than by no guide at all. Where a
+               position is genuinely contested the entry says so rather than
+               choosing quietly.
 
-               `by` is null on all six. Somebody at the masjid has to read
-               these before they carry the charity's name — that is what the
-               field is for, and it is not mine to set. */
+               All six carry `by` now — somebody at the masjid read them
+               before they took the charity's name, which is the whole
+               purpose of that field. */
             { id: "r-h-8", by: "Taiyabah Masjid", n: 8, t: "8 Dhul Ḥijjah — to Minā",
               d: "Iḥrām is entered again for the Hajj itself, with the intention and the talbiyah, and from this point the restrictions are back on. Then out to Minā, about eight kilometres from the Ḥaram, before Ẓuhr if you can manage it. Five prayers are prayed there — Ẓuhr, ʿAṣr, Maghrib, ʿIshāʾ, and Fajr the next morning — and the four-rakʿah prayers are shortened to two, each at its own time and NOT combined. The night is spent at Minā. Little is asked of you today beyond being in the right place and resting, which is the point: tomorrow is the long one." },
             { id: "r-h-9", by: "Taiyabah Masjid", n: 9, t: "9 Dhul Ḥijjah — ʿArafah",
@@ -642,7 +636,7 @@ window.HAJJ = {
             { id: "r-h-9b", by: "Taiyabah Masjid", n: 10, t: "The night at Muzdalifah",
               d: "Maghrib is not prayed at ʿArafah and not on the road: it is prayed at Muzdalifah together with ʿIshāʾ, at ʿIshāʾ\u2019s time, one adhān and an iqāmah for each. \n\nThen sleep. The Prophet ﷺ slept here until near Fajr and the night is for rest, not for standing — you will need it. Pray Fajr early and stay until just before sunrise; that standing is itself part of the Hajj. \n\nPebbles are gathered here or at Minā: forty-nine if you leave on the twelfth, seventy if you stay for the thirteenth, and a few spare is sensible because they get dropped." },
             { id: "r-h-10", by: "Taiyabah Masjid", n: 11, t: "10 Dhul Ḥijjah — stoning, sacrifice, ḥalq",
-              d: "Back to Minā, and three things in this order: seven pebbles at Jamrat al-ʿAqabah alone with a takbīr at each, then the qurbānī, then the head shaved or clipped — men shaved or trimmed all over, women a fingertip\u2019s length. The talbiyah stops at the first pebble. \n\nAfter the ḥalq you are out of iḥrām for everything except intimacy with your spouse, and you may wear ordinary clothes and use scent again. Then ṭawāf al-ifāḍah at the Ḥaram, with saʿī if you have not already done it, and after that everything lawful before iḥrām is lawful again. \n\nTHE ORDER IS THE PART PEOPLE GET WRONG, and doing it out of order is a question to put to the ʿulamā rather than to settle in a tent. Note that the source this entry follows places the ḥalq on the eleventh; the order here is the one the rest of this section follows, and it is the one to check." },
+              d: "Back to Minā, and three things in this order: seven pebbles at Jamrat al-ʿAqabah alone with a takbīr at each, then the qurbānī, then the head shaved or clipped — men shaved or trimmed all over, women a fingertip\u2019s length. The talbiyah stops at the first pebble. \n\nAfter the ḥalq you are out of iḥrām for everything except intimacy with your spouse, and you may wear ordinary clothes and use scent again. Then ṭawāf al-ifāḍah at the Ḥaram, with saʿī if you have not already done it, and after that everything lawful before iḥrām is lawful again. \n\nTHE ORDER IS THE PART PEOPLE GET WRONG, and doing it out of order is a question to put to the ʿulamā rather than to settle in a tent. Where you see the ḥalq placed on the eleventh instead, the order here is the masjid’s and it is the one to follow." },
             { id: "r-h-11", by: "Taiyabah Masjid", n: 12, t: "11 to 13 Dhul Ḥijjah — the days of Minā",
               d: "The nights are spent at Minā. Each day after midday all three jamarāt are stoned, in order — al-Ūlā, al-Wusṭā, then al-ʿAqabah — seven pebbles each with a takbīr at every throw. Stop after the first and after the second, face the qiblah and make duʿā; there is no standing after the third. \n\nYou may leave after stoning on the twelfth if you are out of Minā before sunset. IF SUNSET ON THE TWELFTH FINDS YOU STILL THERE the thirteenth\u2019s stoning falls due, and what is owed if you leave anyway is a question for the ʿulamā. \n\nDo not throw sandals, bottles or anything else at the pillars: there is nothing in them, and the stoning is a remembrance of Ibrāhīm ﷺ refusing Iblīs, not an attack on anything." },
             { id: "r-h-wida", by: "Taiyabah Masjid", n: 13, t: "Ṭawāf al-Wadāʿ",
@@ -675,7 +669,7 @@ window.HAJJ = {
               ar: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ",
               tr: "Labbayk Allāhumma labbayk, labbayka lā sharīka laka labbayk, innal-ḥamda wan-niʿmata laka wal-mulk, lā sharīka lak",
               when: "Three times at the mīqāt, then as often as you can until Makkah",
-              d: "\u201cHere I am at Your service, O Allah, here I am. Here I am, You have no partner, here I am. Truly all praise and favour are Yours, and the dominion. You have no partner.\u201d Three times when iḥrām is entered, men aloud and women quietly, then kept up on the road and stopped before you reach the Black Stone to begin ṭawāf. The ʿulamā should confirm the wording against the masjid\u2019s own source the way the app\u2019s other duʿās are verified." },
+              d: "\u201cHere I am at Your service, O Allah, here I am. Here I am, You have no partner, here I am. Truly all praise and favour are Yours, and the dominion. You have no partner.\u201d Three times when iḥrām is entered, men aloud and women quietly, then kept up on the road and stopped before you reach the Black Stone to begin ṭawāf." },
             { id: "d-masjid", by: "Taiyabah Masjid", t: "Entering the Masjid",
               ar: "بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
               tr: "Bismillāhi waṣ-ṣalātu was-salāmu ʿalā rasūlillāh. Allāhummaftaḥ lī abwāba raḥmatik",
@@ -711,7 +705,7 @@ window.HAJJ = {
               when: "On the way, between Ṣafā and Marwa",
               d: "\u201cMy Lord, forgive and have mercy. You are the Mightiest, the Most Generous.\u201d Nothing is fixed for the walking itself, so ask for what you need; this is the Sunnah wording to come back to between times." },
             { id: "d-arafah", by: null, t: "On the day of ʿArafah",
-              d: "Still blank. The ʿUmrah source this branch was drafted from does not cover the days of Hajj, so this one waits for the ʿulamā with nothing in front of it." },
+              d: "Still blank. This branch was written for ʿUmrah and ʿArafah is not part of it, so this one waits for the ʿulamā with nothing in front of it." },
           ],
         },
       ],

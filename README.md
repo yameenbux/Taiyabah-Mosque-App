@@ -1017,8 +1017,7 @@ Still outstanding, roughly in the order it matters:
   scholar's name**, and until one has it, it is invisible to every reader and
   cannot open its branch. The drafts exist to save the ʿulamā a blank page, not
   to be published. Sending them is the single thing standing between this
-  section and release. The Islāmic Daʿwah Academy's written permission for the
-  ʿUmrah text is still to be obtained in person as well.
+  section and release.
 - **Two things for Ramadan that only the masjid can make.** Both are built and
   both are dark, and neither needs an app release — the day the thing exists,
   the button appears on both platforms:

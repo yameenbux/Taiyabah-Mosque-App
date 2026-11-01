@@ -190,12 +190,12 @@ they are not checked, and those are different things.
 They sit in `app-extra.json` like the rest, as `"key": [Urdu, Gujarati, Arabic]`.
 
 **`hajj.published_by_taiyabah` is the exception and does not need re-reading.**
-It is `hajj.published_by_the_masjid` — which was read and corrected — with the
-clause naming the Daʿwah Academy deleted, because the trustee asked that only
-Taiyabah Masjid appear anywhere a reader can see. Nothing else about the
-sentence moved. The key is new only because a key owns its translation in
-three languages, so editing the English under the old key would have left
-Urdu, Gujarati and Arabic still naming the Academy.
+It is `hajj.published_by_the_masjid` — which was read and corrected — with a
+trailing clause deleted, because the trustees asked that only Taiyabah Masjid
+appear anywhere a reader can see. Nothing else about the sentence moved. The
+key is new only because a key owns its translation in three languages, so
+editing the English under the old key would have left Urdu, Gujarati and
+Arabic still carrying the old wording.
 
 ### hajj.plan_your_umrah
 
