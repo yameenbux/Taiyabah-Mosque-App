@@ -611,7 +611,7 @@ else {
   const ROWS = ["Full prayer timetable", "Videos & bayaans", "Hajj / Umrah", "Ramadan",
                 "Zakat calculator", "Admissions & Fees", "Holiday Planner", "Madrasah Portal",
                 "About us", "Membership", "Find us", "Contact us", "Birth, Marriage & Death",
-                "Imams' Advice", "Education", "Tours & Visits", "Notifications",
+                "Imams' Advice", "Education", "Notifications",
                 "Privacy notice", "System Preferences",
                 /* The one row that is not on the website. It is listed here so
                  * the run opens it: a screen nothing taps is a screen that can
@@ -629,8 +629,17 @@ else {
   /* Ramadan was in here while it was a dead "coming soon" row. It opens the
    * countdown now, so it is followed like any other live row — which is the
    * only thing that would catch that screen crashing on a phone. */
-  const SKIP = new Set(["Hajj / Umrah", "Tours & Visits",                   // deliberately inert
-                        "Madrasah Portal", "Find us", "Privacy notice"]);   // leave the app
+  /* "Tours & Visits" was removed from the menu — it was a dead row and went
+   * with the other placeholder content scrubbed for guideline 2.1. It stayed
+   * in the list above and in this set, so every run since has failed looking
+   * for a row that no longer exists.
+   *
+   * AND HAJJ / UMRAH IS NO LONGER INERT, for the same reason Ramadan stopped
+   * being: the section is released and the row opens the journey chooser. It
+   * is followed like any other live row now. That screen and the two it leads
+   * to are the newest in the app and were the only ones this run never opened
+   * — which is precisely the gap that let a crash reach a phone last time. */
+  const SKIP = new Set(["Madrasah Portal", "Find us", "Privacy notice"]);   // leave the app
   for (const label of ROWS) {
     const n = seek(label);
     if (!n) { fail(`menu row "${label}" is missing, even after scrolling`); continue; }
