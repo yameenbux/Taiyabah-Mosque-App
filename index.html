@@ -1330,7 +1330,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hj-ch-cards{display:flex;flex-direction:column;gap:13px;margin-top:16px}
   .hj-jcard{position:relative;display:block;width:100%;padding:0;background:none;
     border:1px solid rgba(220,187,99,.34);border-radius:18px;overflow:hidden;
-    cursor:pointer;aspect-ratio:1.72;color:inherit;font:inherit;text-align:left}
+    cursor:pointer;aspect-ratio:1.72;color:inherit;font:inherit;
+    /* start, not left: a button resets text-align, and `left` would hold the
+       Arabic and Urdu titles against the wrong edge of their own card. */
+    text-align:start}
   .hj-jcard img{display:block;width:100%;height:100%;object-fit:cover}
   .hj-jscrim{position:absolute;inset:0;display:flex;flex-direction:column;
     justify-content:flex-end;padding:15px;
