@@ -76,7 +76,11 @@ passes — `scripts/check-hajj.mjs` enforces all of this, and
 
 ## Before pushing
 
-`cd native && npm run check` — the full gate, and it must be green.
+`cd native && npm run check` — the full gate, and it must be green. It now
+starts with the unit tests, which it did not: `npm test` was a separate script
+nobody ran locally, while CI's smoke run ran it and went red. A gate this file
+calls "the full gate" has to be the thing CI actually checks, or a branch sails
+through it and fails the moment it is pushed.
 `node scripts/check-everything.mjs` and `node scripts/check-back-button.mjs`
 need `python3 -m http.server 8111` running from the repository root.
 
