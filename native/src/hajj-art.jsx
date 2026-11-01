@@ -190,7 +190,8 @@ export function MaTafPlan({ full = true }) {
  * follow a string out of content.js.
  */
 const LOGOS = {
-  nusuk: require("../assets/nusuk.png"),
+  nusuk:   require("../assets/nusuk.png"),
+  ksavisa: require("../assets/ksavisa.png"),
 };
 
 export function HajjLogo({ id, size = 34 }) {

@@ -288,6 +288,25 @@ window.HAJJ = {
           items: [
             { id: "d-visa", t: "Your visa and permit",
               d: "Hajj and ʿUmrah are issued differently and through official channels. Use the Saudi government's own route and your tour operator; do not rely on what somebody was told two years ago." },
+            /* THE TWO VISAS ARE NOT ONE THING, and this is the entry where
+               conflating them costs somebody money. The shared sentence above
+               stays shared; each journey then carries its own next step, which
+               hajj.js filters on the journey tag.
+
+               NEITHER NAMES A CURRENT RULE. Eligibility, cost and what a visa
+               permits are Saudi Arabia's to set and are revised between
+               seasons. This branch's whole posture is to point at the official
+               source rather than be confidently wrong a season later, and the
+               ETA page is rendered in the browser rather than served as text,
+               so its terms were not read here and are not restated here. */
+            { id: "d-visa-umrah", journey: "umrah", t: "The ʿUmrah visa",
+              logo: "ksavisa",
+              link: { t: "Apply on Saudi Arabia’s visa service",
+                      url: "https://ksavisa.sa/visa/electronic-travel-authorization/details" },
+              d: "ʿUmrah is travelled on an ordinary visitor visa rather than on anything pilgrimage-specific, and for British passport holders that now means the Electronic Travel Authorization — the ETA — applied for online in advance.\n\nWho is eligible, what it costs, how long it lasts and what it lets you do are Saudi Arabia’s to set and they are revised, so read them on the service itself rather than taking a figure off a forum or out of this app. The link below is the government’s own." },
+            { id: "d-visa-hajj", journey: "hajj", t: "The Hajj visa is not applied for the same way",
+              logo: "nusuk",
+              d: "A Hajj visa is not something you apply for yourself the way an ʿUmrah one is. It comes with a package, and packages for pilgrims travelling from outside the Kingdom are released through Nusuk Hajj on the Saudi ministry’s own schedule — you choose a package there, and the visa follows from it.\n\nSo the thing to watch is when packages open, not when a visa form appears. Follow the rules and the package information published with them, because they set the dates, the price and what is included, and they change between seasons." },
             /* NUSUK IS NOT OPTIONAL AND IT IS NOT A TRAVEL APP. The permits
                are issued through it, so somebody who has not set it up has
                not finished booking — whatever the operator has told them.

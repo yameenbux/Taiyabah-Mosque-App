@@ -386,9 +386,25 @@ is(progress("tasbih", 99), 0, "the tasbīḥ ring comes round on its mark");
   /* A practical branch is the same on both trips and must not be narrowed by
      accident — the paperwork is where Nusuk and the certificate live. */
   const papers = shipped.branches.find(b => b.id === "papers");
-  is(visibleItems(papers, "umrah").length, visibleItems(papers, "hajj").length,
-     "the paperwork branch is the same on both journeys");
   const ids = visibleItems(papers).map(i => i.id);
+  /* THE TWO VISAS MUST NOT CROSS. Showing a Hajj pilgrim the ETA page, or an
+     ʿUmrah pilgrim a note saying to wait for Nusuk Hajj packages, is the kind
+     of mistake that is only discovered at an airport. */
+  const idsU = visibleItems(papers, "umrah").map(i => i.id);
+  const idsH = visibleItems(papers, "hajj").map(i => i.id);
+  ok(idsU.includes("d-visa-umrah") && !idsH.includes("d-visa-umrah"),
+     "the ʿUmrah visa is on the ʿUmrah journey and only there");
+  ok(idsH.includes("d-visa-hajj") && !idsU.includes("d-visa-hajj"),
+     "the Hajj visa note is on the Hajj journey and only there");
+  ok(idsU.includes("d-visa") && idsH.includes("d-visa"),
+     "and the sentence that says they differ is on both");
+
+  /* It used to assert the paperwork was identical on both journeys. It is not
+     any more, and must not be: the visas differ. What still has to hold is
+     that each journey gets exactly one of the two, so the counts still match. */
+  is(idsU.length, idsH.length,
+     "each journey carries the same NUMBER of paperwork entries — one visa each");
+
   ok(ids.includes("d-nusuk"), "Nusuk ships: the permits are issued through it");
   ok(ids.includes("d-mening"), "the meningitis certificate ships");
   ok(branchOpen(papers, "hajj") && branchOpen(papers, "umrah"),
