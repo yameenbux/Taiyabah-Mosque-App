@@ -314,8 +314,14 @@ window.HAJJ = {
                approver: it states no ruling, only what has to be arranged. */
             { id: "d-nusuk", t: "Set up Nusuk before you fly",
               logo: "nusuk",
+              /* BOTH STORES. Nusuk is published on Google Play as well, by the
+                 same ministry (com.moh.nusukapp), and an Android pilgrim shown
+                 only an App Store link reasonably concludes the app is not for
+                 their phone. hajj.js picks the row; this just carries both. */
               link: { t: "Get Nusuk on the App Store",
-                      url: "https://apps.apple.com/gb/app/nusuk-%D9%86%D8%B3%D9%83/id6469515422" },
+                      url: "https://apps.apple.com/gb/app/nusuk-%D9%86%D8%B3%D9%83/id6469515422",
+                      android: { t: "Get Nusuk on Google Play",
+                                 url: "https://play.google.com/store/apps/details?id=com.moh.nusukapp" } },
               d: "Nusuk is the Saudi ministry\u2019s own app and the permits are issued through it, so install it and get the account working at home rather than in a queue at the other end. The \u02bfUmrah permit is booked in it. So is the permit for the Raw\u1e0dah at the Prophet\u2019s Masjid in Mad\u012bnah \uFDFA, which is released in timed slots and goes quickly \u2014 people who leave that one until they arrive often do not get it." },
             /* ONE ENTRY, NOT THREE AND THEN A FOURTH. The certificate, the
                clinic, the surgery and the general note about vaccinations

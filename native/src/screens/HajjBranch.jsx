@@ -21,7 +21,7 @@
  * went plum would vanish.
  */
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Svg, { Path } from "react-native-svg";
@@ -32,7 +32,7 @@ import { Press, open, tap } from "../ui";
 import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar,
          HajjStep, Reveal } from "../hajj-ui";
 import HajjArt, { HajjLogo } from "../hajj-art";
-import { visibleSections, leadOf } from "../hajj";
+import { visibleSections, leadOf, linkRows } from "../hajj";
 import { branchById } from "../hajj-data";
 
 const KEY = "taiyabah.hajj.packed";
@@ -238,25 +238,29 @@ export default function HajjBranch({ route }) {
                     URL lives in content.js so check-links tests it with every
                     other link the app carries rather than it being the one
                     nobody watches. */}
-                {!!(item.link && item.link.url) && (
-                  <Press onPress={() => { tap(); open(item.link.url); }}
+                {/* linkRows() decides how many rows and which: one on a
+                    phone, chosen by platform, both on a desktop browser where
+                    the browser says nothing about the phone. */}
+                {linkRows(item.link, Platform.OS).map((lk, li) => (
+                  <Press key={lk.url} onPress={() => { tap(); open(lk.url); }}
                          accessibilityRole="link"
-                         accessibilityLabel={item.link.t}
+                         accessibilityLabel={lk.t}
                          style={{ flexDirection: rtl ? "row-reverse" : "row",
-                                  alignItems: "center", gap: 9, marginTop: 12,
+                                  alignItems: "center", gap: 9,
+                                  marginTop: li === 0 ? 12 : 8,
                                   paddingVertical: 11, paddingHorizontal: 13,
                                   backgroundColor: HJ.goldPanel, borderRadius: R.card,
                                   borderWidth: 1, borderColor: HJ.goldLine }}>
                     <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5),
-                                   color: HJ.gold, textAlign: align }}>{item.link.t}</Text>
+                                   color: HJ.gold, textAlign: align }}>{lk.t}</Text>
                     {/* The glyph follows the scheme: a number is rung, a page
                         is opened, and an arrow on a phone number is a small
                         lie about what the tap will do. */}
-                    <Ionicons name={item.link.url.startsWith("tel:") ? "call-outline"
-                                  : item.link.url.startsWith("mailto:") ? "mail-outline"
+                    <Ionicons name={lk.url.startsWith("tel:") ? "call-outline"
+                                  : lk.url.startsWith("mailto:") ? "mail-outline"
                                   : "open-outline"}
                               size={16} color={HJ.gold} />
-                  </Press>)}
+                  </Press>))}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
                                  color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}

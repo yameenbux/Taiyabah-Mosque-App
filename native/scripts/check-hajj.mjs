@@ -28,7 +28,7 @@ import vm from "node:vm";
 import path from "node:path";
 import {
   hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches, leadOf,
-  forJourney,
+  forJourney, linkRows,
   tick, untick, isComplete, saiFrom, progress, RELEASED,
 } from "../src/hajj.js";
 
@@ -406,6 +406,38 @@ is(progress("tasbih", 99), 0, "the tasbīḥ ring comes round on its mark");
      "each journey carries the same NUMBER of paperwork entries — one visa each");
 
   ok(ids.includes("d-nusuk"), "Nusuk ships: the permits are issued through it");
+
+  /* BOTH STORES, AND THE RIGHT ONE EACH. Nusuk is the one entry whose whole
+     job is getting an app onto the phone in the reader's hand, so a link that
+     is right on one platform and wrong on the other fails that job for half
+     the readers. These assert the data carries both and that the rule hands
+     each platform its own — a mutation that drops the android twin, or that
+     stops switching on the platform, has to fail here. */
+  const nusuk = branches.flatMap(b => (b.sections || []).flatMap(x => x.items || [])).find(i => i.id === "d-nusuk");
+  ok(nusuk && nusuk.link && /apps\.apple\.com/.test(nusuk.link.url),
+     "Nusuk carries the App Store link");
+  ok(nusuk && nusuk.link && nusuk.link.android &&
+     /play\.google\.com/.test(nusuk.link.android.url),
+     "Nusuk carries the Google Play link too");
+
+  is(linkRows(nusuk.link, "ios").length, 1, "an iPhone is shown one store row");
+  ok(/apps\.apple\.com/.test(linkRows(nusuk.link, "ios")[0].url),
+     "and it is the App Store one");
+  is(linkRows(nusuk.link, "android").length, 1, "an Android phone is shown one store row");
+  ok(/play\.google\.com/.test(linkRows(nusuk.link, "android")[0].url),
+     "and it is the Google Play one");
+  is(linkRows(nusuk.link, "web").length, 2,
+     "a desktop browser is shown both, because it says nothing about the phone");
+
+  /* A link with no twin is unaffected on every platform — the common case,
+     and the one a careless generalisation would break. */
+  const tel = branches.flatMap(b => (b.sections || []).flatMap(x => x.items || [])).find(i => i.link && i.link.url.startsWith("tel:"));
+  if (tel) {
+    is(linkRows(tel.link, "ios").length, 1, "a plain link is one row on iOS");
+    is(linkRows(tel.link, "android").length, 1, "a plain link is one row on Android");
+    is(linkRows(tel.link, "web").length, 1, "a plain link is one row on the web");
+  }
+  is(linkRows(null, "ios").length, 0, "no link, no rows");
   ok(ids.includes("d-mening"), "the meningitis certificate ships");
   ok(branchOpen(papers, "hajj") && branchOpen(papers, "umrah"),
      "and the branch opens on both");

@@ -238,3 +238,30 @@ export function leadOf(text) {
   }
   return { lead: d, rest: "" };
 }
+
+/* WHICH STORE LINK A PERSON IS SHOWN.
+ *
+ * Nusuk is published on both stores, and an entry that says "Get Nusuk on the
+ * App Store" is wrong half the time — worse than wrong, because the one thing
+ * that entry exists to do is get the app onto the phone in the reader's hand.
+ * An Android pilgrim reading an iOS instruction concludes the app is not for
+ * them.
+ *
+ * So a link may carry an `android` twin. The rule lives here rather than in
+ * either renderer because the app and the website both need it and they must
+ * not drift: this is the same reason forJourney() lives here.
+ *
+ * ON A PHONE, ONE ROW — the right one, chosen from the platform, because the
+ * other row is noise the reader has to step over. ON A DESKTOP BROWSER, BOTH,
+ * because the platform of the browser says nothing about the platform of the
+ * phone the person is going to install it on. Somebody planning their trip on
+ * a laptop is exactly the person who needs to see that both exist.
+ */
+export function linkRows(link, platform) {
+  if (!link || !link.url) return [];
+  const alt = link.android;
+  if (!alt || !alt.url) return [link];
+  if (platform === "android") return [alt];
+  if (platform === "ios") return [link];
+  return [link, alt];
+}
