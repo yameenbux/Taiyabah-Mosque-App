@@ -319,6 +319,22 @@ window.HAJJ = {
               d: "Nusuk is the Saudi ministry\u2019s own app and the permits are issued through it, so install it and get the account working at home rather than in a queue at the other end. The \u02bfUmrah permit is booked in it. So is the permit for the Raw\u1e0dah at the Prophet\u2019s Masjid in Mad\u012bnah \uFDFA, which is released in timed slots and goes quickly \u2014 people who leave that one until they arrive often do not get it." },
             { id: "d-mening", t: "The meningitis certificate",
               d: "Proof of meningococcal vaccination is asked for at the border, not at the airport here, and a certificate that has expired counts the same as none at all. Book it with your GP or a travel clinic well ahead, because it has to be given a set time before you travel to be accepted and the surgery may not have it in stock. For Hajj treat this as an entry requirement rather than as advice: it is checked, and it is checked harder than for \u02bfUmrah." },
+            /* TWO ROUTES, BECAUSE "GET VACCINATED" IS NOT AN INSTRUCTION
+               ANYBODY CAN ACT ON. One is the service this community already
+               uses and the other is the surgery somebody is already
+               registered with; between them there is no reason to arrive
+               without a certificate.
+
+               NO NHS MARK ON THE SURGERY ENTRY, deliberately. The NHS logo is
+               a protected identity and putting it on a row in a masjid's app
+               reads as endorsement nobody has given. The sentence says what
+               to do without borrowing anybody's badge. */
+            { id: "d-mening-bcom", t: "Bolton Council of Mosques run a clinic for it",
+              logo: "bcom",
+              link: { t: "Ring the BCoM office", url: "tel:01204363680" },
+              d: "BCoM's Health Forum has run a meningitis vaccination service for Hajj and ʿUmrah pilgrims for over twenty years, with the certificate included and qualified doctors and healthcare staff doing it. They vaccinate all ages, children and young people included. It is not-for-profit.\n\nIt has to be BOOKED AND PAID FOR IN ADVANCE at the BCoM office, 1 Vicarage Street, Bolton BL3 5LE — they run it on set dates each season rather than on demand, so ring and ask which dates are open before you plan around it. The poster for the current round puts it at £30 a person; confirm that when you book. admin@thebcom.org reaches them as well." },
+            { id: "d-mening-gp", t: "Or your own surgery can do it",
+              d: "Your GP practice can give the vaccination and issue the certificate, and if you are registered there it may be the simpler route. Ring the surgery rather than waiting for an appointment to come round: some keep the vaccine in stock and some have to order it, and that is the difference between a week and a month.\n\nAsk them to confirm the certificate will say what Saudi Arabia asks it to say, because a vaccination recorded in your notes and a certificate you can show at a border are not the same thing." },
             { id: "d-vacc", t: "Vaccinations",
               d: "Saudi Arabia sets vaccination requirements for pilgrims and they are revised. Ask your GP or practice nurse well ahead, and check the UK's own travel health service, because some need more than one dose or time to take effect." },
             { id: "d-fcdo", t: "The UK's travel advice for Saudi Arabia",

@@ -12585,8 +12585,10 @@ function hjItemHtml(x){
     /* One tap to the store. The URL lives in content.js so check-links tests
        it with every other link rather than it being the one nobody watches. */
     + (x.link && x.link.url
-        ? `<a class="hl-link" href="${esc(x.link.url)}" target="_blank" rel="noopener noreferrer">`
-          + `${esc(x.link.t)}<span class="hl-link-ic" aria-hidden="true">\u2197</span></a>`
+        ? `<a class="hl-link" href="${esc(x.link.url)}"${/^https?:/.test(x.link.url) ? ' target="_blank" rel="noopener noreferrer"' : ""}>`
+          + `${esc(x.link.t)}<span class="hl-link-ic" aria-hidden="true">`
+          + `${x.link.url.startsWith("tel:") ? "\u2706" : x.link.url.startsWith("mailto:") ? "\u2709" : "\u2197"}`
+          + `</span></a>`
         : "")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)

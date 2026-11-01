@@ -192,6 +192,9 @@ export function MaTafPlan({ full = true }) {
 const LOGOS = {
   nusuk:   require("../assets/nusuk.png"),
   ksavisa: require("../assets/ksavisa.png"),
+  /* Bolton Council of Mosques, whose number and funeral service this app
+     already carries elsewhere — the same organisation, the same mark. */
+  bcom:    require("../assets/bcom.png"),
 };
 
 export function HajjLogo({ id, size = 34 }) {

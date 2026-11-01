@@ -249,7 +249,13 @@ export default function HajjBranch({ route }) {
                                   borderWidth: 1, borderColor: HJ.goldLine }}>
                     <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5),
                                    color: HJ.gold, textAlign: align }}>{item.link.t}</Text>
-                    <Ionicons name="open-outline" size={16} color={HJ.gold} />
+                    {/* The glyph follows the scheme: a number is rung, a page
+                        is opened, and an arrow on a phone number is a small
+                        lie about what the tap will do. */}
+                    <Ionicons name={item.link.url.startsWith("tel:") ? "call-outline"
+                                  : item.link.url.startsWith("mailto:") ? "mail-outline"
+                                  : "open-outline"}
+                              size={16} color={HJ.gold} />
                   </Press>)}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
