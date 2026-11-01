@@ -1,5 +1,11 @@
 # The strings that were drafted, and who read them
 
+> **SIX STRINGS ADDED SINCE THE READING ARE NOT COVERED BY IT.** They are
+> listed at the foot of this file under *Drafted after the reading*. They are
+> the Hajj/ʿUmrah chooser's wording, and they went in with the journey split.
+> Five were drafted; the sixth was cut down from a string that *was* read.
+> Everything above that section is still as described below.
+
 > **DONE — the reading has happened.** Every string listed here, the 97 in
 > `lang/src/28-ramadan.json`, the Hajj strings in `lang/src/29-hajj.json` and
 > the handful added since have been read and corrected by native speakers of
@@ -171,3 +177,90 @@ tells somebody their choice actually took effect.
 | **Urdu** | مسجد کے پاس آپ کی پسند محفوظ ہے۔ آپ کو یہ بھیجا جائے گا: |
 | **Gujarati** | મસ્જિદ પાસે તમારી પસંદગી સચવાયેલી છે. તમને આ મોકલવામાં આવશે: |
 | **Arabic** | المسجد لديه اختياراتك وسيُرسل إليك: |
+
+---
+
+## Drafted after the reading
+
+The reading recorded above happened before the Hajj section split into two
+journeys. These six strings came with that split, so **no native speaker has
+read five of them.** They are not wrong as far as the drafter could tell, and
+they are not checked, and those are different things.
+
+They sit in `app-extra.json` like the rest, as `"key": [Urdu, Gujarati, Arabic]`.
+
+**`hajj.published_by_taiyabah` is the exception and does not need re-reading.**
+It is `hajj.published_by_the_masjid` — which was read and corrected — with the
+clause naming the Daʿwah Academy deleted, because the trustee asked that only
+Taiyabah Masjid appear anywhere a reader can see. Nothing else about the
+sentence moved. The key is new only because a key owns its translation in
+three languages, so editing the English under the old key would have left
+Urdu, Gujarati and Arabic still naming the Academy.
+
+### hajj.plan_your_umrah
+
+*Where it appears:* Hajj & ʿUmrah → the chooser, the ʿUmrah card
+
+| | |
+|---|---|
+| **English** | Plan your journey: ʿUmrah |
+| **Urdu** | اپنے سفر کی تیاری: عمرہ |
+| **Gujarati** | તમારી મુસાફરીની તૈયારી: ઉમરાહ |
+| **Arabic** | خَطِّطْ لِرِحْلَتِك: الْعُمْرَة |
+
+### hajj.plan_your_hajj
+
+*Where it appears:* Hajj & ʿUmrah → the chooser, the Hajj card
+
+| | |
+|---|---|
+| **English** | Plan your journey: Hajj |
+| **Urdu** | اپنے سفر کی تیاری: حج |
+| **Gujarati** | તમારી મુસાફરીની તૈયારી: હજ |
+| **Arabic** | خَطِّطْ لِرِحْلَتِك: الْحَجّ |
+
+### hajj.choose_the_journey
+
+*Where it appears:* Hajj & ʿUmrah → the chooser, the line above the two cards
+
+| | |
+|---|---|
+| **English** | Choose the journey you are making. The packing, the heat and the paperwork are the same for both. |
+| **Urdu** | منتخب کیجیے کہ آپ کون سا سفر کر رہے ہیں۔ سامان، گرمی اور کاغذات دونوں کے لیے ایک جیسے ہیں۔ |
+| **Gujarati** | તમે કઈ મુસાફરી કરી રહ્યા છો તે પસંદ કરો. સામાન, ગરમી અને કાગળકામ બંને માટે સરખાં છે. |
+| **Arabic** | اخْتَرِ الرِّحْلَةَ الَّتِي تُؤَدِّيهَا. أَمَّا الْحَقِيبَةُ وَالْحَرُّ وَالْأَوْرَاقُ فَهِيَ نَفْسُهَا فِي كِلْتَيْهِمَا. |
+
+### hajj.the_rites_in_order
+
+*Where it appears:* Hajj & ʿUmrah → the chooser, under the ʿUmrah card's title
+
+| | |
+|---|---|
+| **English** | The rites in order, iḥrām, and the duʿās |
+| **Urdu** | مناسک بالترتیب، احرام، اور دعائیں |
+| **Gujarati** | મનાસિક ક્રમ પ્રમાણે, ઇહરામ, અને દુઆઓ |
+| **Arabic** | الْمَنَاسِكُ بِتَرْتِيبِهَا، وَالْإِحْرَام، وَالْأَدْعِيَة |
+
+### hajj.the_case_the_heat
+
+*Where it appears:* Hajj & ʿUmrah → the chooser, under the Hajj card's title
+
+| | |
+|---|---|
+| **English** | The case, the heat, the paperwork and coming home |
+| **Urdu** | سامان، گرمی، کاغذات اور واپسی |
+| **Gujarati** | સામાન, ગરમી, કાગળકામ અને ઘરે પાછા ફરવું |
+| **Arabic** | الْحَقِيبَة، وَالْحَرّ، وَالْأَوْرَاق، وَالْعَوْدَة |
+
+### hajj.published_by_taiyabah
+
+*Where it appears:* Hajj & ʿUmrah → the foot of each journey's branch list
+
+*This is the cut-down one. It was read as `hajj.published_by_the_masjid`.*
+
+| | |
+|---|---|
+| **English** | Published by Taiyabah Masjid. For your own case, ask the ʿulamā. |
+| **Urdu** | طیبہ مسجد کی جانب سے شائع کردہ۔ اپنے مخصوص مسئلے کے لیے علماء سے رجوع کیجیے۔ |
+| **Gujarati** | તૈયબા મસ્જિદ દ્વારા પ્રકાશિત. તમારા પોતાના પ્રશ્ન માટે ઉલમાને પૂછો. |
+| **Arabic** | تَنْشُرُهُ مَسْجِدُ طَيِّبَة. وَلِمَسْأَلَتِكَ الْخَاصَّةِ اسْأَلِ الْعُلَمَاء. |
