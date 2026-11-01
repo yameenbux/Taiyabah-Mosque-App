@@ -55,6 +55,11 @@ meant for a scholar in front of a pilgrim. **Read the body before naming an
 approver on it** — the field is easy to set and a check failure is not a
 formality. That mistake has been made on this file already.
 
+`docs/hajj-held-entries-for-the-ulama.md` is the sheet to hand the ʿulamā:
+each of the seven, the question it is waiting on, and what is needed back.
+Only one of them has proposed wording, and that is the one asserting no
+ruling at all.
+
 Everything else is live, including the five days of Hajj, which are drafted
 from Islamic Relief's guide with the Ḥanafī positions kept from the Academy's
 booklet, and which name three things inside their own text as the ʿulamā's to
