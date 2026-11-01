@@ -38,13 +38,17 @@ whatever the release switch says.
 authority. An entry opens because somebody has read those words and will be
 named for them — never because the material came from a good source.
 
-**No source is named on screen.** The trustee has asked that only Taiyabah
-Masjid appear anywhere a reader can see, so the `source` field is gone from
-every entry and the check that used to require one has been removed. The
-header of `hajj/content.js` still records which published guides each branch
-was drafted from, and that the permission question those raise has never been
-recorded as settled. Do not delete that note: taking the attribution off the
-screen did not change where the words came from.
+**The material is the masjid's own, and no source is named anywhere.** The
+trustees have confirmed that this section is sourced from within the masjid:
+settled by its own ʿulamā, written in its own words. The `source` field is
+gone from every entry, the check that used to demand one is gone, and the
+header of `hajj/content.js` no longer tracks outside publications or any
+question of permission to draw on them, because there is none to track.
+
+An earlier version of this file said the opposite and told you not to delete
+that record. The trustees have since instructed otherwise. If you are adding
+material that did come from somewhere else, that is a different situation
+and it needs saying before it is written, not after.
 
 Seven entries are still held, and all seven are the same kind of thing: their
 bodies describe what the entry *ought to contain* rather than saying it —
@@ -60,10 +64,9 @@ each of the seven, the question it is waiting on, and what is needed back.
 Only one of them has proposed wording, and that is the one asserting no
 ruling at all.
 
-Everything else is live, including the five days of Hajj, which are drafted
-from Islamic Relief's guide with the Ḥanafī positions kept from the Academy's
-booklet, and which name three things inside their own text as the ʿulamā's to
-settle.
+Everything else is live, including the five days of Hajj, which are Ḥanafī
+throughout and consistent with the iḥrām branch on purpose, and which name
+three things inside their own text as the ʿulamā's to settle.
 
 A journey tag splits the two trips: anything may carry `journey: "hajj"` or
 `journey: "umrah"`, and anything carrying neither belongs to both, which is

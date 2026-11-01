@@ -62,8 +62,7 @@ for (const [file, global_, out] of files) {
  * hajj.js has always hidden an unapproved fiqh entry from every reader: a
  * ruling counts only once a scholar's name is on it. That rule governed what
  * was DRAWN, and the drafts were shipped inside the binary anyway — 59 of
- * them, 46 carrying the Islāmic Daʿwah Academy's booklet as their source,
- * which the masjid has no written permission for.
+ * them, unread and unapproved, inside an app somebody could unzip.
  *
  * Unreachable is not the same as absent. App Review asks an applicant to
  * declare the protected third-party material it is authorised to include;
