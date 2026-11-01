@@ -1274,17 +1274,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     line-height:1.22;color:var(--hj-ink);margin:14px 0 0}
   .hj-lede{font-size:calc(14.5px * var(--ts));line-height:1.6;color:var(--hj-ink-soft);margin:10px 0 0}
   .hj-sheet .soon-tag{color:var(--hj-gold);border-color:var(--hj-gold-line);background:var(--hj-gold-panel)}
-  .hj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
-  /* A <button> even while held, and disabled: a disabled control is not in
-     the tab order and is not announced as pressable, so it reads as the
-     picture of a thing that is coming. Once the gate opens the same element
-     is the way in. */
-  .hj-tile{min-height:154px;display:flex;flex-direction:column;justify-content:space-between;
-    padding:15px 14px 16px}
-  .hj-t{font-size:calc(14.5px * var(--ts));font-weight:600;color:var(--hj-ink)}
-  .hj-d{font-size:calc(12px * var(--ts));line-height:1.5;color:var(--hj-ink-faint);margin-top:3px}
-  .hj-ar{font-family:"Amiri",Georgia,serif;font-size:calc(20px * var(--ts));line-height:1.7;
-    color:var(--hj-gold);text-align:right;direction:rtl}
+  /* .hj-grid, .hj-tile at 154px, .hj-t, .hj-d and .hj-ar stood here: the four
+     preview tiles on the held screen, removed when that screen was rebuilt for
+     guideline 2.1. Nothing has referenced them since, and the second .hj-tile
+     further down — the branch grid's, at 98px — silently won every time. */
   .hj-count{display:flex;align-items:baseline;gap:5px}
   .hj-count b{font-family:"Fraunces",Georgia,serif;font-weight:400;
     font-size:calc(40px * var(--ts));line-height:1;color:var(--hj-ink)}
