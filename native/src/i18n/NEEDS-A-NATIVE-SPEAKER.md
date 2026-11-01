@@ -1,10 +1,10 @@
 # The strings that were drafted, and who read them
 
-> **SIX STRINGS ADDED SINCE THE READING ARE NOT COVERED BY IT.** They are
+> **NINE STRINGS ADDED SINCE THE READING ARE NOT COVERED BY IT.** They are
 > listed at the foot of this file under *Drafted after the reading*. They are
 > the Hajj/ʿUmrah chooser's wording, and they went in with the journey split.
-> Five were drafted; the sixth was cut down from a string that *was* read.
-> Everything above that section is still as described below.
+> Five were drafted; the other four were each built from strings that *were*
+> read. Everything above that section is still as described below.
 
 > **DONE — the reading has happened.** Every string listed here, the 97 in
 > `lang/src/28-ramadan.json`, the Hajj strings in `lang/src/29-hajj.json` and
@@ -183,7 +183,7 @@ tells somebody their choice actually took effect.
 ## Drafted after the reading
 
 The reading recorded above happened before the Hajj section split into two
-journeys. These six strings came with that split, so **no native speaker has
+journeys. These nine strings came with that split, so **no native speaker has
 read five of them.** They are not wrong as far as the drafter could tell, and
 they are not checked, and those are different things.
 
@@ -264,3 +264,19 @@ Urdu, Gujarati and Arabic still naming the Academy.
 | **Urdu** | طیبہ مسجد کی جانب سے شائع کردہ۔ اپنے مخصوص مسئلے کے لیے علماء سے رجوع کیجیے۔ |
 | **Gujarati** | તૈયબા મસ્જિદ દ્વારા પ્રકાશિત. તમારા પોતાના પ્રશ્ન માટે ઉલમાને પૂછો. |
 | **Arabic** | تَنْشُرُهُ مَسْجِدُ طَيِّبَة. وَلِمَسْأَلَتِكَ الْخَاصَّةِ اسْأَلِ الْعُلَمَاء. |
+
+### hajj.back_to_hajj_umrah, hajj.umrah_short, hajj.hajj_short
+
+*Where they appear:* Hajj & ʿUmrah → the sheet header, once a journey is
+chosen — the back control, and the title that names the journey.
+
+*Derived, not drafted, and listed here only so the count is honest.* The back
+label is an arrow plus `marriage.hajj_umrah`, which was read. The two journey
+names are the nouns already standing inside `hajj.plan_your_umrah` and
+`hajj.plan_your_hajj` above, lifted out unchanged.
+
+| | Urdu | Gujarati | Arabic |
+|---|---|---|---|
+| **← Hajj / Umrah** | ← حج / عمرہ | ← હજ / ઉમરહ | ← الحج / العمرة |
+| **ʿUmrah** | عمرہ | ઉમરાહ | الْعُمْرَة |
+| **Hajj** | حج | હજ | الْحَجّ |

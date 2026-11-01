@@ -33,10 +33,6 @@ import { HajjRow, HajjChevron } from "../hajj-ui";
 import { hajjAccess } from "../hajj";
 import { BRANCHES } from "../hajj-data";
 
-
-
-
-
 /* ONE JOURNEY, AS A CARD. The picture carries the place and the words carry
  * the promise, laid out the way a phone is held: the image on the leading
  * edge where the eye starts, the label beside it, the chevron where the thumb
@@ -78,8 +74,9 @@ export default function Hajj({ navigation }) {
   const { t, fs, rtl } = useApp();
   const access = hajjAccess(BRANCHES);
 
-  /* THREE DESIGNS, SWITCHABLE WHILE THEY ARE BEING CHOSEN BETWEEN.
-     TEMPORARY SCAFFOLDING — the chosen one stays and this switch goes. */
+  /* THE TWO JOURNEYS. Three layouts were built and compared before this one
+     was kept; the switch that let them be flipped between has gone, and so
+     has the comment that described it as temporary. */
   const JOURNEYS = [
     { img: require("../../assets/journey-umrah.png"),
       label: t("hajj.plan_your_umrah", "Plan your journey: ʿUmrah"),

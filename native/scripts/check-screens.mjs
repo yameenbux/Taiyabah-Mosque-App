@@ -66,6 +66,7 @@ const WONT_NEED = {
   "athkar.back_to_athkar":          "a back link; the app has a back arrow in the header",
   "bukhari.all_books":              "a back link; the app has a back arrow in the header",
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
+  "hajj.back_to_hajj_umrah":        "a back link; the website's chooser and branch list are one sheet, so it needs a way back inside it — the app pushes a screen and gets the header's back arrow for free",
   "hallhire.change":                "the website's form is two steps and this is its way back to the first; the app's is one page, so there is nothing to go back to",
   "mushaf.not_installed_yet":        "the website shows this when the licensed pages have not been added; this app is served them",
   "mushaf.the_reader_is_ready":      "part of that same not-installed state",
