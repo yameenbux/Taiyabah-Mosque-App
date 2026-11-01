@@ -124,10 +124,38 @@ const annotate = (level, msg, max = 900) => {
   console.log(`::${level}::` + String(msg).replace(/\s*\n\s*/g, " — ").trim().slice(0, max));
 };
 
+/* ASK THE BUILT APP WHICH DEVICES IT IS FOR, rather than deciding here.
+ *
+ * The comment above was written when supportsTablet was true. It stopped
+ * being true at 8be8dc4 — "iPhone only for the first submission" — and this
+ * list did not follow, so every run since has booted an iPad, installed an
+ * iPhone-only app on it, photographed the compatibility-mode screen and
+ * failed on it: "77% of the screen is #000000". The app was fine. The list
+ * was out of date.
+ *
+ * UIDeviceFamily is the answer straight out of the .app that was just built:
+ * 1 is iPhone, 2 is iPad. Reading it there rather than from app.json means
+ * this follows a change in the config without anybody remembering to edit
+ * it, and it describes what was ACTUALLY built rather than what a file says
+ * should have been — the same reason the Play workflow reads the signing
+ * certificate back out of the finished bundle. Turn supportsTablet on again
+ * and the iPad comes back on its own. */
+const deviceFamily = (() => {
+  try {
+    return sh("/usr/libexec/PlistBuddy", ["-c", "Print :UIDeviceFamily", plist])
+             .split("\n").map(l => l.trim()).filter(l => /^\d+$/.test(l));
+  } catch { return ["1", "2"]; }   // unreadable: check both rather than fewer
+})();
 const DEVICES = [
-  { label: "iphone", match: /^iPhone 16 Pro$/ },
-  { label: "ipad",   match: /^iPad Pro 13-inch/ },
-];
+  { label: "iphone", match: /^iPhone 16 Pro$/,     family: "1" },
+  { label: "ipad",   match: /^iPad Pro 13-inch/,   family: "2" },
+].filter(d => deviceFamily.includes(d.family));
+console.log(`UIDeviceFamily: ${deviceFamily.join(", ")} — checking ` +
+            DEVICES.map(d => d.label).join(" and "));
+if (!DEVICES.length) {
+  console.error("FAIL  the built app declares no device family this script knows");
+  process.exit(1);
+}
 
 const devices = JSON.parse(sh("xcrun", ["simctl", "list", "devices", "available", "--json"])).devices;
 const all = Object.entries(devices).flatMap(([runtime, list]) =>
