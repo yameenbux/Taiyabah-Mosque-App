@@ -63,12 +63,22 @@ should not be runnable from a branch nobody has reviewed.
 
 | | |
 |---|---|
-| Version people see | `2.0.0` |
-| Version code | `2` — must be higher than anything already uploaded |
+| Version people see | match `app.json` and the App Store — `2.1.0` at the time of writing |
+| Version code | higher than anything already uploaded — **at least 8** |
 
-The last TWA production release was version code **1**, so 2 is free. If that
-is ever in doubt, read it off **Release → Production** in the console rather
-than guessing; Play refuses a repeat and only says so after the upload.
+This table used to say code `2`, on the grounds that the TWA's last production
+release was `1`. That has been out of date for a while: **code 7 has shipped**,
+and code 5 was refused outright for targeting API 35. The workflow's floor is
+now 8 and it will refuse anything lower.
+
+**It is still not the authority.** Read the real last code off
+**Release → Production** in the console before running; this file records what
+was true when somebody last wrote in it, and Play refuses a repeat only after
+the upload.
+
+**Keep the version name in step with iOS.** Both stores read `expo.version`
+from `app.json`, and the point of releasing them together is that somebody
+comparing the two listings sees one number.
 
 The run refuses to start unless **this exact commit has already passed the
 smoke run** — the one that boots an emulator, installs the app and taps

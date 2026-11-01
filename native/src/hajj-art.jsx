@@ -176,6 +176,38 @@ export function MaTafPlan({ full = true }) {
    invisible to check-refs.mjs, which reads the source statically and cannot
    follow a variable — it reported an earlier version of this file as a screen
    that would crash. */
+
+/* THE MARK OF AN APP SOMEBODY HAS TO GO AND FIND.
+ *
+ * "Install Nusuk" is an instruction to search a store that will offer several
+ * things with that word in the name, and the one that matters is the ministry's
+ * own. A small picture of the icon is the difference between looking for a word
+ * and recognising a thing.
+ *
+ * It is SMALL and it sits beside the title, not framed like the photographs in
+ * ART: those are the subject of their entry and this is a label on one. A map
+ * rather than a path because Metro resolves require() at build time and cannot
+ * follow a string out of content.js.
+ */
+const LOGOS = {
+  nusuk:   require("../assets/nusuk.png"),
+  ksavisa: require("../assets/ksavisa.png"),
+  /* Bolton Council of Mosques, whose number and funeral service this app
+     already carries elsewhere — the same organisation, the same mark. */
+  bcom:    require("../assets/bcom.png"),
+};
+
+export function HajjLogo({ id, size = 34 }) {
+  const src = LOGOS[id];
+  if (!src) return null;
+  return (
+    <Image source={src}
+           style={{ width: size, height: size, borderRadius: size * 0.22,
+                    resizeMode: "contain" }}
+           accessibilityIgnoresInvertColors />
+  );
+}
+
 const ART = {
   worn:          { el: <Image source={require("../assets/ihram.jpg")} style={fill} />,
                    aspect: 688 / 1008 },

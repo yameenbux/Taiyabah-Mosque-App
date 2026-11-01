@@ -28,6 +28,7 @@ import vm from "node:vm";
 import path from "node:path";
 import {
   hajjAccess, approved, visibleItems, visibleSections, branchOpen, openBranches, leadOf,
+  forJourney, linkRows,
   tick, untick, isComplete, saiFrom, progress, RELEASED,
 } from "../src/hajj.js";
 
@@ -164,12 +165,21 @@ for (const b of (shipped.branches || []).filter(b => b.kind === "fiqh"))
 for (const b of branches.filter(b => b.kind === "fiqh")) {
   const all = b.sections.flatMap(s => s.items || []);
   const live = all.filter(approved);
-  /* Not "there must be none approved" — the ʿulamā will approve them one at a
-     time and this check must not stand in their way. The rule is that an
-     approved entry is finished: named AND sourced. */
+  /* THE SOURCE RULE IS GONE, BY DECISION RATHER THAN BY ROT. It used to read
+     "an approved entry is finished: named AND sourced", and it was there to
+     stop a ruling reaching a congregation with nothing behind the name. The
+     trustee has since asked that only Taiyabah Masjid be named anywhere a
+     reader can see, so there is no second name left for the rule to require
+     and keeping it would only fail the build.
+
+     What it was protecting has not gone away. content.js's header records
+     which published guides each branch was drafted from and that the
+     permission question is unsettled; this is the check that used to make
+     that visible on screen, and nothing replaces it. If sources ever come
+     back, so should this. */
   for (const item of live)
-    ok(typeof item.source === "string" && item.source.trim().length > 0,
-       `${b.id}/${item.id} carries an approver but no source — a ruling in front of a ` +
+    ok(typeof item.by === "string" && item.by.trim().length > 0,
+       `${b.id}/${item.id} is live with no name against it — a ruling in front of a ` +
        `congregation needs something after the name`);
   if (!live.length)
     ok(!branchOpen(b), `${b.id} has ${all.length} draft(s) and no approval, so it must stay shut`);
@@ -327,6 +337,111 @@ is(progress("tawaf", 0), 0, "the ring is empty at zero");
 is(progress("tawaf", 7), 1, "the ring is full at seven");
 is(progress("tawaf", 99), 1, "the ring never over-fills");
 is(progress("tasbih", 99), 0, "the tasbīḥ ring comes round on its mark");
+
+
+/* ---- which trip is this for? ------------------------------------------ *
+ *
+ * Most of the section is the same journey twice over, so the default has to
+ * be "both" and it has to be the thing that happens when nobody said
+ * otherwise. The failure worth testing for is the quiet one: a tag that
+ * silently hides shared material from one of the two trips, or a journey
+ * that leaks the other's rites.
+ */
+{
+  const u = forJourney("umrah"), h = forJourney("hajj"), any = forJourney(undefined);
+
+  is(u({}), true,  "an untagged item belongs to both journeys");
+  is(h({}), true,  "and to the other one as well");
+  is(any({ journey: "hajj" }), true, "asked with no journey, everything matches");
+  is(u({ journey: "umrah" }), true,  "an ʿUmrah item is on the ʿUmrah journey");
+  is(u({ journey: "hajj" }),  false, "a Hajj item is not");
+  is(h({ journey: "hajj" }),  true,  "and the other way round");
+  is(forJourney("nonsense")({ journey: "hajj" }), true,
+     "an unknown journey filters nothing rather than emptying the section");
+
+  const rites = shipped.branches.find(b => b.id === "rites");
+  ok(!!rites, "the rites branch ships");
+  const sec = j => visibleSections(rites, j).map(x => x.id);
+
+  ok(sec("umrah").includes("rites-umrah"), "the ʿUmrah rites are on the ʿUmrah journey");
+  ok(!sec("hajj").includes("rites-umrah"),
+     "and are NOT shown to somebody planning Hajj — the bug this split exists to fix");
+  ok(!sec("umrah").includes("rites-hajj"), "the days of Hajj are not on the ʿUmrah journey");
+
+  /* Shared is the default and the common case, so it is the thing most worth
+     pinning: ṭawāf and saʿī are done on both trips and must appear on both. */
+  for (const id of ["rites-women", "rites-tawaf", "rites-sai"])
+    ok(sec("umrah").includes(id) && sec("hajj").includes(id),
+       `${id} is shared, so it shows on both journeys`);
+
+  /* THIS ASSERTION HAS FLIPPED, which is what it was written to do. It used
+     to say the days of Hajj were empty; they are written and approved now, so
+     the Hajj journey has rites of its own and the ʿUmrah journey must still
+     not show them. */
+  ok(sec("hajj").includes("rites-hajj"),
+     "the days of Hajj are on the Hajj journey");
+  ok(!sec("umrah").includes("rites-hajj"),
+     "and are not shown to somebody planning ʿUmrah");
+
+  /* A practical branch is the same on both trips and must not be narrowed by
+     accident — the paperwork is where Nusuk and the certificate live. */
+  const papers = shipped.branches.find(b => b.id === "papers");
+  const ids = visibleItems(papers).map(i => i.id);
+  /* THE TWO VISAS MUST NOT CROSS. Showing a Hajj pilgrim the ETA page, or an
+     ʿUmrah pilgrim a note saying to wait for Nusuk Hajj packages, is the kind
+     of mistake that is only discovered at an airport. */
+  const idsU = visibleItems(papers, "umrah").map(i => i.id);
+  const idsH = visibleItems(papers, "hajj").map(i => i.id);
+  ok(idsU.includes("d-visa-umrah") && !idsH.includes("d-visa-umrah"),
+     "the ʿUmrah visa is on the ʿUmrah journey and only there");
+  ok(idsH.includes("d-visa-hajj") && !idsU.includes("d-visa-hajj"),
+     "the Hajj visa note is on the Hajj journey and only there");
+  ok(idsU.includes("d-visa") && idsH.includes("d-visa"),
+     "and the sentence that says they differ is on both");
+
+  /* It used to assert the paperwork was identical on both journeys. It is not
+     any more, and must not be: the visas differ. What still has to hold is
+     that each journey gets exactly one of the two, so the counts still match. */
+  is(idsU.length, idsH.length,
+     "each journey carries the same NUMBER of paperwork entries — one visa each");
+
+  ok(ids.includes("d-nusuk"), "Nusuk ships: the permits are issued through it");
+
+  /* BOTH STORES, AND THE RIGHT ONE EACH. Nusuk is the one entry whose whole
+     job is getting an app onto the phone in the reader's hand, so a link that
+     is right on one platform and wrong on the other fails that job for half
+     the readers. These assert the data carries both and that the rule hands
+     each platform its own — a mutation that drops the android twin, or that
+     stops switching on the platform, has to fail here. */
+  const nusuk = branches.flatMap(b => (b.sections || []).flatMap(x => x.items || [])).find(i => i.id === "d-nusuk");
+  ok(nusuk && nusuk.link && /apps\.apple\.com/.test(nusuk.link.url),
+     "Nusuk carries the App Store link");
+  ok(nusuk && nusuk.link && nusuk.link.android &&
+     /play\.google\.com/.test(nusuk.link.android.url),
+     "Nusuk carries the Google Play link too");
+
+  is(linkRows(nusuk.link, "ios").length, 1, "an iPhone is shown one store row");
+  ok(/apps\.apple\.com/.test(linkRows(nusuk.link, "ios")[0].url),
+     "and it is the App Store one");
+  is(linkRows(nusuk.link, "android").length, 1, "an Android phone is shown one store row");
+  ok(/play\.google\.com/.test(linkRows(nusuk.link, "android")[0].url),
+     "and it is the Google Play one");
+  is(linkRows(nusuk.link, "web").length, 2,
+     "a desktop browser is shown both, because it says nothing about the phone");
+
+  /* A link with no twin is unaffected on every platform — the common case,
+     and the one a careless generalisation would break. */
+  const tel = branches.flatMap(b => (b.sections || []).flatMap(x => x.items || [])).find(i => i.link && i.link.url.startsWith("tel:"));
+  if (tel) {
+    is(linkRows(tel.link, "ios").length, 1, "a plain link is one row on iOS");
+    is(linkRows(tel.link, "android").length, 1, "a plain link is one row on Android");
+    is(linkRows(tel.link, "web").length, 1, "a plain link is one row on the web");
+  }
+  is(linkRows(null, "ios").length, 0, "no link, no rows");
+  ok(ids.includes("d-mening"), "the meningitis certificate ships");
+  ok(branchOpen(papers, "hajj") && branchOpen(papers, "umrah"),
+     "and the branch opens on both");
+}
 
 console.log(`\n${pass} passed, ${bad.length} failed`);
 bad.forEach(b => console.log(`  FAIL  ${b}`));

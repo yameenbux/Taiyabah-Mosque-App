@@ -43,6 +43,7 @@ import Hajj from "./screens/Hajj";
 import { branchById } from "./hajj-data";
 import HajjCounter from "./screens/HajjCounter";
 import HajjBranch from "./screens/HajjBranch";
+import HajjJourney from "./screens/HajjJourney";
 import Live from "./screens/Live";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
@@ -204,6 +205,7 @@ const linking = {
       Ramadan:   "ramadan",
       Hajj:      "hajj",
       HajjCounter: "hajj/counter",
+      HajjJourney: "hajj/journey/:journey",
       HajjBranch: "hajj/:branch",
       Quran:     "quran",
       Mushaf:    "mushaf",
@@ -338,6 +340,8 @@ function Root() {
         <Stack.Screen name="Ramadan"   component={Ramadan}   options={{ ...bare, title: t("ramadan.ramadan", "Ramadan") }} />
         <Stack.Screen name="Hajj"      component={Hajj}      options={{ ...hajj, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
         <Stack.Screen name="HajjCounter" component={HajjCounter} options={{ ...hajj, title: t("hajj.the_counters", "The counters") }} />
+        <Stack.Screen name="HajjJourney" component={HajjJourney}
+                      options={{ ...hajj, title: t("marriage.hajj_umrah", "Hajj / Umrah") }} />
         {/* One screen for every branch, so the title comes from the data
             rather than from eight near-identical route registrations. */}
         <Stack.Screen name="HajjBranch" component={HajjBranch}

@@ -33,34 +33,42 @@ stands behind it. An entry without one is invisible, is held out of the app
 bundle and the website's copy by the importer, and cannot open its branch,
 whatever the release switch says.
 
-**`by` records who takes responsibility, not who wrote the source.** The
-entries are the masjid's own restatements of the Islāmic Daʿwah Academy's
-*How to Perform ʿUmrah*; they carry `by: "Taiyabah Masjid"` because the
-trustees publish them on the charity's authority. Do not put a scholar's
-name on wording that scholar has not read — the screen says what the
-guidance follows, and that is the honest claim.
+**`by` records who takes responsibility.** Entries carry
+`by: "Taiyabah Masjid"` because the trustees publish them on the charity's
+authority. An entry opens because somebody has read those words and will be
+named for them — never because the material came from a good source.
 
-Nineteen entries are still held, and they fall into two kinds.
+**No source is named on screen.** The trustee has asked that only Taiyabah
+Masjid appear anywhere a reader can see, so the `source` field is gone from
+every entry and the check that used to require one has been removed. The
+header of `hajj/content.js` still records which published guides each branch
+was drafted from, and that the permission question those raise has never been
+recorded as settled. Do not delete that note: taking the attribution off the
+screen did not change where the words came from.
 
-**Briefs, not guidance.** Some entries' bodies describe what the entry ought
-to contain rather than saying it — "The practical table the ʿulamā should
-supply", "Still blank", "DRAFT FOR REVIEW." Publishing one would put a note
-meant for a scholar in front of a pilgrim. These are the three `dam` entries,
-`i-marry`, `i-intimacy`, `i-w-hands`, `i-w-hayd`, `d-arafah`, and the five
-`o-` entries. **Read the body before naming an approver on it** — the field is
-easy to set and a check failure is not a formality. That mistake has been made
-on this file already.
+Seven entries are still held, and all seven are the same kind of thing: their
+bodies describe what the entry *ought to contain* rather than saying it —
+"The practical table the ʿulamā should supply", "Still open", "Still blank",
+"DRAFT FOR REVIEW." They are the three `dam` entries, `i-marry`,
+`i-intimacy`, `i-w-hands` and `d-arafah`. Publishing one would put a note
+meant for a scholar in front of a pilgrim. **Read the body before naming an
+approver on it** — the field is easy to set and a check failure is not a
+formality. That mistake has been made on this file already.
 
-**The six days of Hajj** (`r-h-*`), which the ʿUmrah booklet never covered and
-four of which were never written. A day-by-day guide missing four of its days
-is worse than no guide.
+`docs/hajj-held-entries-for-the-ulama.md` is the sheet to hand the ʿulamā:
+each of the seven, the question it is waiting on, and what is needed back.
+Only one of them has proposed wording, and that is the one asserting no
+ruling at all.
 
-The iḥrām branch is open. Ten of its entries carry `by: "Taiyabah Masjid"`;
-the seven above stay held, and the two sections left with nothing in them —
-"What is still fine" and dam — are dropped by `visibleSections()` rather than
-drawn as empty headings. Asides addressed to reviewers ("The ʿulamā should say
-plainly which sandals pass…") were removed from the published ten; the rulings
-themselves were not touched.
+Everything else is live, including the five days of Hajj, which are drafted
+from Islamic Relief's guide with the Ḥanafī positions kept from the Academy's
+booklet, and which name three things inside their own text as the ʿulamā's to
+settle.
+
+A journey tag splits the two trips: anything may carry `journey: "hajj"` or
+`journey: "umrah"`, and anything carrying neither belongs to both, which is
+the common case. `native/src/hajj.js` owns that rule and every gate function
+takes the journey, so no screen decides it alone.
 
 Pictures in that section describe what they show and never which option
 passes — `scripts/check-hajj.mjs` enforces all of this, and
@@ -68,7 +76,11 @@ passes — `scripts/check-hajj.mjs` enforces all of this, and
 
 ## Before pushing
 
-`cd native && npm run check` — the full gate, and it must be green.
+`cd native && npm run check` — the full gate, and it must be green. It now
+starts with the unit tests, which it did not: `npm test` was a separate script
+nobody ran locally, while CI's smoke run ran it and went red. A gate this file
+calls "the full gate" has to be the thing CI actually checks, or a branch sails
+through it and fails the moment it is pushed.
 `node scripts/check-everything.mjs` and `node scripts/check-back-button.mjs`
 need `python3 -m http.server 8111` running from the repository root.
 

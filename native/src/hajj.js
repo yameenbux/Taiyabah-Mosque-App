@@ -52,32 +52,61 @@ export function approved(item) {
 }
 
 /** Every item of a branch that a reader may actually see. */
-export function visibleItems(branch) {
+/** WHICH TRIP IS THIS FOR?
+ *
+ * Most of the section is the same journey twice over: a case is packed the
+ * same way, the heat is the same heat, the paperwork is the same paperwork.
+ * A few things are not. The five days belong to Hajj and to nothing else, and
+ * some of what has to be arranged before flying is enforced far harder for
+ * Hajj than for ʿUmrah.
+ *
+ * So anything in content.js may carry `journey: "hajj"` or `journey: "umrah"`,
+ * and anything that carries neither belongs to both — which is the common case
+ * and therefore the default. A branch, a section and an item can each say it,
+ * and the narrowest one that applies wins, because a Hajj-only section inside
+ * a shared branch is a real shape and the opposite is not.
+ *
+ * Asked with no journey at all, everything matches. That is what the check
+ * scripts do, and what a developer navigating straight to a route gets. */
+export function forJourney(journey) {
+  const j = journey === "hajj" || journey === "umrah" ? journey : null;
+  return node => !j || !node || !node.journey || node.journey === j;
+}
+
+export function visibleItems(branch, journey) {
   if (!branch || !Array.isArray(branch.sections)) return [];
-  const all = branch.sections.flatMap(s => (Array.isArray(s.items) ? s.items : []));
+  const fits = forJourney(journey);
+  if (!fits(branch)) return [];
+  const all = branch.sections.filter(fits)
+    .flatMap(s => (Array.isArray(s.items) ? s.items : []))
+    .filter(fits);
   /* Practical branches are travel and safety guidance written in the repo and
      need no scholar. Fiqh branches show only what has been approved. */
   return branch.kind === "fiqh" ? all.filter(approved) : all;
 }
 
 /** The branch's sections, with unapproved entries and emptied sections gone. */
-export function visibleSections(branch) {
+export function visibleSections(branch, journey) {
   if (!branch || !Array.isArray(branch.sections)) return [];
+  const fits = forJourney(journey);
+  if (!fits(branch)) return [];
   const keep = branch.kind === "fiqh" ? approved : () => true;
   return branch.sections
-    .map(s => ({ ...s, items: (Array.isArray(s.items) ? s.items : []).filter(keep) }))
+    .filter(fits)
+    .map(s => ({ ...s, items: (Array.isArray(s.items) ? s.items : []).filter(i => keep(i) && fits(i)) }))
     .filter(s => s.items.length > 0);
 }
 
 /** A tool is always ready. Anything else needs something to show. */
-export function branchOpen(branch) {
+export function branchOpen(branch, journey) {
   if (!branch) return false;
+  if (!forJourney(journey)(branch)) return false;
   if (branch.kind === "tool") return true;
-  return visibleItems(branch).length > 0;
+  return visibleItems(branch, journey).length > 0;
 }
 
-export function openBranches(branches) {
-  return (Array.isArray(branches) ? branches : []).filter(branchOpen);
+export function openBranches(branches, journey) {
+  return (Array.isArray(branches) ? branches : []).filter(b => branchOpen(b, journey));
 }
 
 /**
@@ -208,4 +237,31 @@ export function leadOf(text) {
     return { lead: head, rest: (d).slice(m.index + m[1].length + m[2].length) };
   }
   return { lead: d, rest: "" };
+}
+
+/* WHICH STORE LINK A PERSON IS SHOWN.
+ *
+ * Nusuk is published on both stores, and an entry that says "Get Nusuk on the
+ * App Store" is wrong half the time — worse than wrong, because the one thing
+ * that entry exists to do is get the app onto the phone in the reader's hand.
+ * An Android pilgrim reading an iOS instruction concludes the app is not for
+ * them.
+ *
+ * So a link may carry an `android` twin. The rule lives here rather than in
+ * either renderer because the app and the website both need it and they must
+ * not drift: this is the same reason forJourney() lives here.
+ *
+ * ON A PHONE, ONE ROW — the right one, chosen from the platform, because the
+ * other row is noise the reader has to step over. ON A DESKTOP BROWSER, BOTH,
+ * because the platform of the browser says nothing about the platform of the
+ * phone the person is going to install it on. Somebody planning their trip on
+ * a laptop is exactly the person who needs to see that both exist.
+ */
+export function linkRows(link, platform) {
+  if (!link || !link.url) return [];
+  const alt = link.android;
+  if (!alt || !alt.url) return [link];
+  if (platform === "android") return [alt];
+  if (platform === "ios") return [link];
+  return [link, alt];
 }

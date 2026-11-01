@@ -9,8 +9,20 @@
  * links, the phone numbers and the addresses; a link that was merely TRUNCATED
  * went through it.
  *
- * So: every http(s) link the app holds has to appear verbatim in index.html,
+ * So: every http(s) link the app holds has to appear verbatim in the website,
  * unless it is one of the few that cannot.
+ *
+ * THE WEBSITE IS NOT ONLY index.html. The Hajj section's guidance lives in
+ * hajj/content.public.js, which index.html FETCHES at runtime rather than
+ * inlining — so the moment a Hajj entry started carrying a link, this test
+ * began reporting links that are on the website as missing from it. It read
+ * one of the website's two files and concluded the other one did not exist.
+ *
+ * That is a false alarm, and an expensive one: this test gates the smoke run,
+ * and the smoke run gates the Play bundle, so the Android release was blocked
+ * on the visa and Nusuk links being present and correct. Reading both files
+ * keeps the check exactly as strict — a link the app holds and the website
+ * does not still fails — while letting it see the whole website.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -18,7 +30,13 @@ import fs from "node:fs";
 import path from "node:path";
 
 const NATIVE = path.resolve(import.meta.dirname, "../..");
-const WEB = fs.readFileSync(path.join(NATIVE, "..", "index.html"), "utf8");
+/* Both halves of what the website publishes: the page, and the Hajj content
+   it loads into that page. Concatenated because every use below is a
+   substring test — which file a link is in has never been the question. */
+const WEB = [
+  path.join(NATIVE, "..", "index.html"),
+  path.join(NATIVE, "..", "hajj", "content.public.js"),
+].map(f => fs.readFileSync(f, "utf8")).join("\n");
 
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => {
   const f = path.join(d, e.name);

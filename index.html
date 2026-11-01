@@ -1309,6 +1309,45 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     text-align:center;margin:18px 0 0}
   .hj-sub{font-size:calc(10.5px * var(--ts));font-weight:700;letter-spacing:2.6px;
     text-transform:uppercase;color:var(--hj-gold);margin:26px 0 0}
+  /* ---- the chooser: which journey are you on ----------------------------
+     The app's Hajj.jsx as a step inside the sheet. The picture IS the button:
+     a photograph at full width with the words on a scrim at its foot, which
+     is the app's layout and, at this size, lets the Ḥaram and the tents read
+     as places rather than as stamps.
+
+     THE SCRIM STARTS LATE AND STAYS OFF THE SUBJECT. Run from the top it
+     greys the whole photograph and leaves the Kaʿbah a shape behind the
+     title; it does nothing for the first half of the card and only darkens
+     where the words actually sit. Both pictures are cut at 1.72 with their
+     subject clear of the text, which is why the aspect-ratio is pinned rather
+     than left to the image: a square crop takes the Kaʿbah out of the frame
+     entirely, which is how the first version of this shipped. */
+  .hj-ch-top{text-align:center;padding:4px 0 2px}
+  .hj-ch-head{font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:calc(26px * var(--ts));line-height:1.18;color:#F3EFE3;margin:7px 0 0}
+  .hj-ch-lede{font-size:calc(13px * var(--ts));line-height:1.55;
+    color:rgba(243,239,227,.62);margin:6px auto 0;max-width:34em}
+  .hj-ch-cards{display:flex;flex-direction:column;gap:13px;margin-top:16px}
+  .hj-jcard{position:relative;display:block;width:100%;padding:0;background:none;
+    border:1px solid rgba(220,187,99,.34);border-radius:18px;overflow:hidden;
+    cursor:pointer;aspect-ratio:1.72;color:inherit;font:inherit;
+    /* start, not left: a button resets text-align, and `left` would hold the
+       Arabic and Urdu titles against the wrong edge of their own card. */
+    text-align:start}
+  .hj-jcard img{display:block;width:100%;height:100%;object-fit:cover}
+  .hj-jscrim{position:absolute;inset:0;display:flex;flex-direction:column;
+    justify-content:flex-end;padding:15px;
+    background:linear-gradient(to bottom,rgba(27,6,19,0) 0%,rgba(27,6,19,.08) 50%,rgba(27,6,19,.8) 100%)}
+  .hj-jt{font-size:calc(17px * var(--ts));font-weight:600;color:#F3EFE3}
+  .hj-jd{font-size:calc(12.5px * var(--ts));line-height:1.48;
+    color:rgba(243,239,227,.78);margin-top:3px}
+  .hj-ch-foot{text-align:center;margin-top:14px}
+  .hj-ch-foot img{width:86px;height:62px;object-fit:contain;opacity:.92}
+  /* A tall desktop window would stretch two cards to the height of a door.
+     The app is a phone and these are phone-sized rows; past that width they
+     stop growing and sit in the middle, which is what the sheet does with
+     everything else. */
+  @media (min-width:620px){ .hj-ch-cards{max-width:430px;margin-inline:auto} }
   #hj-branches .hj-sub:first-child{margin-top:20px}
 
   /* A row that goes somewhere: a branch on the front, a link at the foot.
@@ -1473,6 +1512,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hl-q + .hj-chip{margin-top:8px}
   /* The lead sentence in full ink, the remainder beneath it in the faint:
      the eye lands on what to do and the why sits behind it. */
+  .hl-logo{width:34px;height:34px;border-radius:8px;object-fit:contain;
+           float:inline-start;margin-inline-end:11px;margin-bottom:2px}
+  .hl-link{display:flex;align-items:center;gap:9px;margin-top:12px;
+           padding:11px 13px;border-radius:14px;clear:both;
+           background:rgba(220,187,99,.13);border:1px solid rgba(220,187,99,.30);
+           color:#DCBB63;font-weight:600;font-size:calc(13.5px * var(--ts));
+           text-decoration:none}
+  .hl-link-ic{margin-inline-start:auto;font-size:1.05em}
   .hl-lead{font-size:calc(13.5px * var(--ts));font-weight:500;line-height:1.59;
     color:var(--hj-ink);margin-top:6px}
   .hl-a{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--hj-ink-faint);margin-top:7px}
@@ -2513,6 +2560,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   /* ---- qur'an: sūrah list and reader ---- */
   .sh-back{background:none;border:0;font:inherit;font-size:calc(13px * var(--ts));color:var(--brand-600);
     cursor:pointer;padding:4px 8px 4px 0;font-weight:600}
+  /* The mishkāt sheet is the one dark place in the app, and brand-600 on that
+     plum is a whisper — the control was legible in the Qurʼan sheet, which is
+     cream, and all but invisible here. Gold is what every other interactive
+     thing in this section uses. */
+  .hj-sheet .sh-back{color:var(--gold)}
   #qd-search{width:100%;box-sizing:border-box;font:inherit;font-size:calc(14px * var(--ts));padding:11px 13px;
     border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);
     margin-bottom:6px}
@@ -5563,7 +5615,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <div class="scrim" id="hj-scrim"></div>
     <div class="panel">
       <div class="sh-top">
-        <h3 style="text-align:left" data-i18n="marriage.hajj_umrah">Hajj / Umrah</h3>
+        <!-- Back to the chooser, the same in-sheet pattern the Qurʼan's
+             #qd-back uses, and in the same place in the header. It reuses
+             marriage.hajj_umrah rather than introducing a string nobody has
+             translated. -->
+        <button class="sh-back" id="hj-back" hidden data-i18n="hajj.back_to_hajj_umrah">&larr; Hajj / Umrah</button>
+        <!-- The title names the journey once one is picked, which is also what
+             stops it repeating the back button's own label back at the reader.
+             renderHajj sets it; the markup carries the chooser's version. -->
+        <h3 style="text-align:left" id="hj-title">Hajj / Umrah</h3>
         <button class="sh-close" id="hj-close" data-i18n="ramadan.done">Done</button>
       </div>
       <div class="sh-body">
@@ -5604,6 +5664,46 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </div>
         </section>
 
+       <!-- THE CHOOSER. The app's Hajj.jsx, as a step inside this sheet.
+
+            It used to go straight to eight branch tiles, which asks somebody
+            to pick a branch before they have said which journey they are on.
+            The two are not the same trip — ʿUmrah can be done in an afternoon,
+            Hajj is five days in a tent — and the content is tagged for one or
+            the other, so the question has to be asked before the content is
+            drawn or everybody reads both visas.
+
+            THE PICTURE IS THE BUTTON, which is the app's layout too: a
+            photograph at full width, the words on a scrim at its foot, nothing
+            else. Both pictures stop above the crowd and carry no face. -->
+       <section id="hj-choose" hidden>
+         <div class="hj-ch-top">
+           <div class="rmg-kicker" data-i18n="marriage.hajj_umrah">Hajj / Umrah</div>
+           <h2 class="hj-ch-head" data-i18n="hajj.before_you_travel">Before you travel</h2>
+           <p class="hj-ch-lede" data-i18n="hajj.choose_the_journey">Choose the journey you are making. The packing, the heat and the paperwork are the same for both.</p>
+         </div>
+         <div class="hj-ch-cards">
+           <button type="button" class="hj-jcard" data-journey="umrah">
+             <img src="hajj/journey-umrah.jpg" alt="" width="900" height="524" loading="lazy" decoding="async">
+             <span class="hj-jscrim">
+               <span class="hj-jt" data-i18n="hajj.plan_your_umrah">Plan your journey: &#703;Umrah</span>
+               <span class="hj-jd" data-i18n="hajj.the_rites_in_order">The rites in order, i&#7717;r&#257;m, and the du&#703;&#257;s</span>
+             </span>
+           </button>
+           <button type="button" class="hj-jcard" data-journey="hajj">
+             <img src="hajj/journey-hajj.jpg" alt="" width="900" height="525" loading="lazy" decoding="async">
+             <span class="hj-jscrim">
+               <span class="hj-jt" data-i18n="hajj.plan_your_hajj">Plan your journey: Hajj</span>
+               <span class="hj-jd" data-i18n="hajj.the_case_the_heat">The case, the heat, the paperwork and coming home</span>
+             </span>
+           </button>
+         </div>
+         <div class="hj-ch-foot">
+           <img src="logo.svg" alt="Taiyabah Masjid" width="86" height="62"
+                data-i18n-attr="alt:a11y.taiyabah_masjid">
+         </div>
+       </section>
+
        <div class="ab-wrap" id="hj-open-wrap" hidden>
         <!-- One headline and one lede. The held copies went with the four
              preview tiles: this wrap is only ever drawn once the section is
@@ -5620,7 +5720,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         </button>
         <!-- Provenance, so it sits with the mark at the foot rather than as a
              banner between the title and the content. -->
-        <p class="hj-by" id="hj-by-open" hidden data-i18n="hajj.published_by_the_masjid">Published by Taiyabah Masjid, following the Isl&#257;mic Da&#703;wah Academy&rsquo;s How to Perform &#703;Umrah. For your own case, ask the &#703;ulam&#257;.</p>
+        <p class="hj-by" id="hj-by-open" hidden data-i18n="hajj.published_by_taiyabah">Published by Taiyabah Masjid. For your own case, ask the &#703;ulam&#257;.</p>
         <!-- The mark at the foot, the same two lines the Ramadan guard ends
              on and the same two the app draws. -->
         <div class="hj-foot">
@@ -9497,6 +9597,10 @@ function refreshRenderedText(){
        by hand, so a language switch with the sheet open would otherwise leave
        them in whatever language they were drawn in. */
     () => { if(open("ramadan")) renderRamadanGuard(); },
+    /* Same reason again: the Hajj sheet's title is written by hand because it
+       names the journey rather than the section, and no key can carry a value
+       that depends on which card was pressed. */
+    () => { if(open("hajj")) renderHajj(); },
   ];
   /* One screen failing to redraw must not stop the rest from being translated. */
   for(const job of jobs){ try{ job(); }catch(e){ console.warn("re-render after language change:", e); } }
@@ -12278,6 +12382,12 @@ let HAJJ_BRANCHES = [HAJJ_COUNTERS_BRANCH];
    branches. A branch no stage names still appears, at the end, under no
    heading: adding content must never be able to make a branch vanish. */
 let HAJJ_STAGES = [];
+/* WHICH JOURNEY THE READER SAID THEY WERE ON. null means they have not said
+   yet, which is the chooser. The app holds this in a route param; a sheet has
+   no route, so it is held here and reset every time the sheet is opened —
+   somebody coming back to the section is asked again rather than being
+   silently dropped into last week's answer. */
+let HJ_JOURNEY = null;
 function hajjByStage(open){
   const left = new Set(open.map(b => b.id));
   const groups = HAJJ_STAGES.map(st => ({
@@ -12298,18 +12408,43 @@ function hajjAdopt(data){
 }
 
 const hajjApproved = it => !!(it && typeof it.by === "string" && it.by.trim().length);
-function hajjVisibleSections(br){
+
+/* THE JOURNEY TAG — hajj.js's forJourney(), line for line.
+
+   ʿUmrah can be done in an afternoon and Hajj is five days in a tent, and a
+   person planning one is not helped by the furniture of the other. So anything
+   in content.js may carry journey:"hajj" or journey:"umrah", and ANYTHING
+   CARRYING NEITHER BELONGS TO BOTH — which is the common case, because most of
+   this is the same trip twice. A case is packed the same way, the heat is the
+   same heat, the duʿās are the same duʿās.
+
+   The website had none of this. It drew every branch and every entry at once,
+   so a man booking ʿUmrah was reading the five days of Hajj and both visa
+   entries, one of which does not apply to him. The app has filtered since the
+   split; this is the website catching up, and the rule is copied rather than
+   reinvented so the two cannot disagree about who sees what. */
+const hajjForJourney = journey => {
+  const j = journey === "hajj" || journey === "umrah" ? journey : null;
+  return node => !j || !node || !node.journey || node.journey === j;
+};
+function hajjVisibleSections(br, journey){
   if(!br || !Array.isArray(br.sections)) return [];
-  const keep = br.kind === "fiqh" ? hajjApproved : () => true;
-  return br.sections.map(sec => ({ ...sec, items:(sec.items||[]).filter(keep) }))
+  const approvedOk = br.kind === "fiqh" ? hajjApproved : () => true;
+  const journeyOk = hajjForJourney(journey);
+  return br.sections.filter(journeyOk)
+                    .map(sec => ({ ...sec, items:(sec.items||[]).filter(it => approvedOk(it) && journeyOk(it)) }))
                     .filter(sec => sec.items.length);
 }
-const hajjVisibleItems = br => hajjVisibleSections(br).flatMap(sec => sec.items);
-const hajjBranchOpen  = br => !!br && (br.kind === "tool" || hajjVisibleItems(br).length > 0);
-const hajjOpenBranches = bs => (Array.isArray(bs)?bs:[]).filter(hajjBranchOpen);
-function hajjAccess(branches, released){
+const hajjVisibleItems = (br, journey) => hajjVisibleSections(br, journey).flatMap(sec => sec.items);
+/* A tool branch has no entries to filter — the counters are the counters on
+   either journey — so it stays open as long as the journey does not exclude
+   the branch itself. */
+const hajjBranchOpen  = (br, journey) => !!br && hajjForJourney(journey)(br)
+  && (br.kind === "tool" || hajjVisibleItems(br, journey).length > 0);
+const hajjOpenBranches = (bs, journey) => (Array.isArray(bs)?bs:[]).filter(b => hajjBranchOpen(b, journey));
+function hajjAccess(branches, released, journey){
   if(!(released === undefined ? HAJJ_RELEASED : released)) return { open:false, reason:"held" };
-  const open = hajjOpenBranches(branches);
+  const open = hajjOpenBranches(branches, journey);
   if(!open.length) return { open:false, reason:"incomplete" };
   return { open:true, branches:open };
 }
@@ -12531,6 +12666,32 @@ const HJ_VERDICT = {
 /* LEAD FIRST. Mirrors leadOf() in native/src/hajj.js, which carries the
    reasoning and the two traps — a duʿā's own full stops, and a four-word
    sentence that is a perfect lead. Keep the two in step. */
+/* The website's copy of hajj.js's linkRows(). Nusuk is on both stores, and
+   an Android pilgrim shown only an App Store link reasonably concludes the
+   app is not for their phone.
+
+   A PHONE GETS ONE ROW, A DESKTOP GETS BOTH. The browser's platform is the
+   phone's platform when the browser IS the phone; on a laptop it says nothing
+   about which phone the person will install it on, so both are offered.
+   Android is tested before iOS because an Android UA string also carries
+   "Linux", and iPadOS reports itself as a Mac — hence the touch test, which
+   is what separates an iPad from the MacBook it otherwise impersonates. */
+function hjPlatform(){
+  const ua = navigator.userAgent || "";
+  if (/Android/i.test(ua)) return "android";
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return "ios";
+  return "web";
+}
+function hjLinkRows(link){
+  if (!link || !link.url) return [];
+  const alt = link.android;
+  if (!alt || !alt.url) return [link];
+  const p = hjPlatform();
+  if (p === "android") return [alt];
+  if (p === "ios") return [link];
+  return [link, alt];
+}
 function hjLeadOf(d){
   const t = typeof d === "string" ? d : "";
   if(t.startsWith("\u201c")){
@@ -12562,9 +12723,27 @@ function hjItemHtml(x){
     /* The chip used to sit ABOVE the title, so "ALLOWED" was the first word
        read and the least informative one on the card. */
     + (v ? `<span class="hj-chip${v[1]?" "+v[1]:""}">${esc(v[0])}</span>` : "")
+    /* PARAGRAPHS WHERE THE WRITER PUT THEM, the same rule HajjBranch.jsx
+       follows: a blank line in the entry breaks the body, and an entry
+       without one is unchanged. A day of Hajj runs to a hundred and fifty
+       words and as one block it is a wall however soft the ink. */
+    /* The icon sits with the title: a label on the entry, not its subject —
+       a picture of the thing to look for in a store full of near-misses. */
+    + (x.logo ? `<img class="hl-logo" src="hajj/${esc(x.logo)}.png" alt="" width="34" height="34">` : "")
     + (x.d ? (() => { const { lead, rest } = hjLeadOf(x.d);
         return `<div class="hl-lead">${esc(lead)}</div>`
-             + (rest ? `<div class="hl-a">${esc(rest)}</div>` : ""); })() : "")
+             + (rest ? rest.split(/\n\s*\n/).filter(Boolean)
+                           .map(pa => `<div class="hl-a">${esc(pa.trim())}</div>`).join("")
+                     : ""); })() : "")
+    /* One tap to the store. The URL lives in content.js so check-links tests
+       it with every other link rather than it being the one nobody watches.
+       hjLinkRows() is the app's linkRows() — an entry may carry an Android
+       twin, and a phone is shown the one row that fits it. */
+    + hjLinkRows(x.link).map(lk =>
+        `<a class="hl-link" href="${esc(lk.url)}"${/^https?:/.test(lk.url) ? ' target="_blank" rel="noopener noreferrer"' : ""}>`
+        + `${esc(lk.t)}<span class="hl-link-ic" aria-hidden="true">`
+        + `${lk.url.startsWith("tel:") ? "\u2706" : lk.url.startsWith("mailto:") ? "\u2709" : "\u2197"}`
+        + `</span></a>`).join("")
     + (x.when ? `<div class="hl-when">${esc(x.when)}</div>` : "")
     + hjArtHtml(x.art, true)
     + (src ? `<div class="hl-src">${esc(src)}</div>` : "");
@@ -12585,7 +12764,11 @@ function hjItemHtml(x){
 
 function openHajjBranch(id){
   const br = hajjBranchById(id);
-  const secs = br ? hajjVisibleSections(br) : [];
+  /* HJ_JOURNEY, not nothing: an entry tagged for the other journey must not
+     appear inside a branch either. Filtering only the branch list would have
+     put both visa entries in front of everybody, which is the specific thing
+     the journey tag exists to stop. */
+  const secs = br ? hajjVisibleSections(br, HJ_JOURNEY) : [];
   document.getElementById("hb-title").textContent = br ? br.title : "";
   const items = secs.flatMap(sec => sec.items);
   const total = items.filter(x => x.pack).length;
@@ -12649,14 +12832,34 @@ const HJ_ICON = {
   home:'<path d="M3 14.5l18-6.5-3.5 9-4-2.5-3 3.5-1-4Z"/><path d="M4 20h16"/>',
 };
 function renderHajj(){
-  const access = hajjAccess(HAJJ_BRANCHES);
+  /* The chooser must be drawn from the UNFILTERED access check: whether the
+     section is open at all is a question about the section, not about a
+     journey nobody has picked yet. */
+  const access = hajjAccess(HAJJ_BRANCHES, undefined, HJ_JOURNEY);
   const open = access.open;
-  /* ONE SWITCH, TWO SCREENS. Held draws the poster and nothing else; open
-     draws the section and nothing else. There is no longer a third state
-     where part of the open markup shows a held version of itself, which is
-     what the per-element -held/-open pairs were. */
+  const choosing = open && !HJ_JOURNEY;
+  /* ONE SWITCH, THREE SCREENS NOW. Held draws the poster and nothing else;
+     open draws either the chooser or one journey's branches, never both.
+     There is still no state where part of the open markup shows a held
+     version of itself, which is what the per-element -held/-open pairs were.
+
+     The back button only exists once a journey has been picked, which is the
+     only moment there is anything to go back to. */
   document.getElementById("hjg").hidden = open;
-  document.getElementById("hj-open-wrap").hidden = !open;
+  document.getElementById("hj-choose").hidden = !choosing;
+  document.getElementById("hj-back").hidden = !open || choosing;
+  document.getElementById("hj-open-wrap").hidden = !open || choosing;
+  /* The title names the journey once there is one, so the header is not the
+     back button's label printed twice. Held and choosing both keep the
+     section's own name, because neither is on a journey yet. */
+  document.getElementById("hj-title").textContent =
+    HJ_JOURNEY === "umrah" ? t("hajj.umrah_short", "\u02bfUmrah")
+  : HJ_JOURNEY === "hajj"  ? t("hajj.hajj_short", "Hajj")
+  : t("marriage.hajj_umrah", "Hajj / Umrah");
+  if(choosing){
+    document.getElementById("hj-branches").innerHTML = "";
+    return;
+  }
   /* The by-line claims every ruling here was approved. That is only true
      when a ruling is actually showing: with every fiqh branch still shut it
      would be a boast about content nobody can see. */
@@ -12672,7 +12875,7 @@ function renderHajj(){
      everything else says what it is for, in its own words. */
   const detailFor = b => {
     if(b.id === "pack"){
-      const all = hajjVisibleItems(b).filter(x => x.pack);
+      const all = hajjVisibleItems(b, HJ_JOURNEY).filter(x => x.pack);
       if(all.length) return t("hajj.packed_count","{a} of {b} packed")
         .replace("{a}", num(all.filter(x => hjPacked[x.id]).length))
         .replace("{b}", num(all.length));
@@ -12709,6 +12912,10 @@ function renderHajj(){
    sheets close on Back without knowing anything about it. */
 async function openHajj(){
   hjPackLoad();
+  /* Ask again. Somebody who did ʿUmrah last month and is now looking at Hajj
+     should not be dropped into last month's answer by a variable that
+     outlived the visit. */
+  HJ_JOURNEY = null;
   /* 20KB of guidance, fetched the first time somebody opens the section
      rather than carried by every visitor who never will — and NOT fetched at
      all while the section is held.
@@ -12733,6 +12940,24 @@ function closeHajj(){
 function initHajj(){
   document.getElementById('hj-close').addEventListener('click',closeHajj);
   document.getElementById('hj-scrim').addEventListener('click',closeHajj);
+
+  /* THE CHOOSER. Picking a journey re-renders in place rather than opening a
+     second sheet — the app pushes a screen, but a sheet that opens a sheet to
+     show the same section's own list would be a thirteenth sheet-to-sheet
+     journey for check-back-button.mjs to keep alive, for no gain. The scroll
+     goes back to the top because the reader is looking at a different screen
+     now, not further down the same one. */
+  [...document.querySelectorAll('#hj-choose [data-journey]')].forEach(btn =>
+    btn.addEventListener('click', () => {
+      HJ_JOURNEY = btn.dataset.journey === 'hajj' ? 'hajj' : 'umrah';
+      renderHajj();
+      document.querySelector('#hajj .sh-body').scrollTop = 0;
+    }));
+  document.getElementById('hj-back').addEventListener('click', () => {
+    HJ_JOURNEY = null;
+    renderHajj();
+    document.querySelector('#hajj .sh-body').scrollTop = 0;
+  });
   /* Both of these already exist and already work offline, which is the whole
      reason they are what is offered while the section is locked. */
   document.getElementById('hjg-duas').addEventListener('click',()=>{ closeHajj(); setTimeout(openDuas,120); });

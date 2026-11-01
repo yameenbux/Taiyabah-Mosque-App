@@ -37,13 +37,13 @@ on:
   workflow_dispatch:
     inputs:
       versionName:
-        description: 'Version people see, e.g. 2.0.0'
+        description: 'Version people see — match app.json and the App Store, e.g. 2.1.0'
         required: true
-        default: '2.0.0'
+        default: '2.1.0'
       versionCode:
-        description: 'Play version code — a whole number, HIGHER than the last upload (the TWA ended at 1)'
+        description: 'Play version code — HIGHER than the last upload. Code 7 has shipped; CONFIRM in Play Console > Release > Production before running.'
         required: true
-        default: '2'
+        default: '8'
 
 jobs:
   bundle:
@@ -153,8 +153,16 @@ jobs:
             const fs = require("fs");
             const c = JSON.parse(fs.readFileSync("app.json", "utf8"));
             const code = Number(process.env.VCODE);
-            if (!Number.isInteger(code) || code < 2) {
-              console.error("::error::versionCode must be a whole number above 1 — the TWA shipped code 1.");
+            /* The floor was 1, written when the TWA was the only thing that
+               had ever been uploaded. Code 7 has shipped since (see the key
+               note above) and code 5 was refused for targeting API 35, so a
+               build offered 2 would be rejected AFTER the upload, which is
+               the slowest possible way to find out. This floor is what this
+               repository knows has shipped; Play knows better, so read the
+               real number off Release > Production rather than trusting it. */
+            if (!Number.isInteger(code) || code < 8) {
+              console.error("::error::versionCode must be a whole number of at least 8 — code 7 has already shipped to Play.");
+              console.error("::error::Check Play Console > Release > Production for the real last code; Play refuses a repeat only after the upload.");
               process.exit(1);
             }
             c.expo.version = process.env.VNAME;

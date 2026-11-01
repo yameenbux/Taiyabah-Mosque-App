@@ -21,17 +21,18 @@
  * went plum would vanish.
  */
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import Svg, { Path } from "react-native-svg";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { F, R, HJ } from "../theme";
 import { useApp } from "../store";
-import { Press } from "../ui";
-import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar }
-  from "../hajj-ui";
-import HajjArt from "../hajj-art";
-import { visibleSections, leadOf } from "../hajj";
+import { Press, open, tap } from "../ui";
+import { HajjScreen, Panel, HajjTitle, HajjLead, HajjKicker, HajjChip, HajjJumpBar,
+         HajjStep, Reveal } from "../hajj-ui";
+import HajjArt, { HajjLogo } from "../hajj-art";
+import { visibleSections, leadOf, linkRows } from "../hajj";
 import { branchById } from "../hajj-data";
 
 const KEY = "taiyabah.hajj.packed";
@@ -67,8 +68,9 @@ function Tick({ on }) {
 export default function HajjBranch({ route }) {
   const { t, fs, rtl } = useApp();
   const id = route?.params?.branch;
+  const journey = route?.params?.journey;
   const branch = branchById(id);
-  const sections = visibleSections(branch);
+  const sections = visibleSections(branch, journey);
   const align = rtl ? "right" : "left";
 
   const [packed, setPacked] = useState({});
@@ -161,7 +163,15 @@ export default function HajjBranch({ route }) {
               its own frame — a panel for a drawing, none for a photograph. */}
           {!!s.art && <HajjArt art={s.art} style={{ marginTop: 13 }} />}
 
-          {s.items.map((item, ii) => {
+          {/* AN ORDERED SECTION IS DRAWN AS ONE. Every item carrying an `n`
+              means the section is a sequence — the rites in order, the days of
+              Hajj — and hajj-ui's rail says so better than a number glued to
+              the front of each title. A section where only some items are
+              numbered is not a sequence and keeps the plain stack. */}
+          {(() => {
+            const stepped = s.items.length > 1
+              && s.items.every(i => typeof i.n === "number");
+            return s.items.map((item, ii) => {
             const v = VERDICT[item.verdict];
             const src = [item.by, item.source].filter(Boolean).join(" · ");
             const on = !!packed[item.id];
@@ -179,11 +189,19 @@ export default function HajjBranch({ route }) {
                 {/* The chip used to sit ABOVE the title, so "ALLOWED" was the
                     first word read on the card and the least informative one
                     there. It belongs with the thing it qualifies. */}
-                <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), lineHeight: fs(21.5),
-                               color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
-                               textDecorationLine: on ? "line-through" : "none" }}>
-                  {item.n ? `${item.n}. ` : ""}{item.t}
-                </Text>
+                {/* THE ICON SITS WITH THE TITLE, because it is a label on the
+                    entry rather than its subject — a picture of the thing to
+                    look for in a store that will offer several near-misses. */}
+                <View style={{ flexDirection: rtl ? "row-reverse" : "row",
+                               alignItems: "center", gap: item.logo ? 11 : 0 }}>
+                  {!!item.logo && <HajjLogo id={item.logo} />}
+                  <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(14.5),
+                                 lineHeight: fs(21.5),
+                                 color: on ? HJ.inkFaint : HJ.ink, textAlign: align,
+                                 textDecorationLine: on ? "line-through" : "none" }}>
+                    {item.n && !stepped ? `${item.n}. ` : ""}{item.t}
+                  </Text>
+                </View>
                 {!!v && (
                   <View style={{ alignSelf: rtl ? "flex-end" : "flex-start", marginTop: 8 }}>
                     <HajjChip tone={v.tone}>{t(v.k, v.en)}</HajjChip>
@@ -202,13 +220,47 @@ export default function HajjBranch({ route }) {
                       <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13.5),
                                      lineHeight: fs(21.5), color: HJ.ink, marginTop: 6,
                                      textAlign: align }}>{lead}</Text>
-                      {!!rest && (
-                        <Text style={{ fontFamily: F.sans, fontSize: fs(12.5),
-                                       lineHeight: fs(20), color: HJ.inkFaint, marginTop: 7,
-                                       textAlign: align }}>{rest}</Text>)}
+                      {/* PARAGRAPHS WHERE THE WRITER PUT THEM. A day of Hajj
+                          runs to a hundred and fifty words and as one block it
+                          is a wall, however soft the ink. A blank line in the
+                          entry breaks it; an entry without one is unchanged,
+                          so nothing already written moves. */}
+                      {rest.split(/\n\s*\n/).filter(Boolean).map((para, pi) => (
+                        <Text key={pi}
+                              style={{ fontFamily: F.sans, fontSize: fs(12.5),
+                                       lineHeight: fs(20), color: HJ.inkFaint,
+                                       marginTop: 7, textAlign: align }}>{para.trim()}</Text>))}
                     </>
                   );
                 })()}
+                {/* ONE TAP TO THE STORE. An instruction to go and find an app
+                    is a worse instruction than a way of getting there, and the
+                    URL lives in content.js so check-links tests it with every
+                    other link the app carries rather than it being the one
+                    nobody watches. */}
+                {/* linkRows() decides how many rows and which: one on a
+                    phone, chosen by platform, both on a desktop browser where
+                    the browser says nothing about the phone. */}
+                {linkRows(item.link, Platform.OS).map((lk, li) => (
+                  <Press key={lk.url} onPress={() => { tap(); open(lk.url); }}
+                         accessibilityRole="link"
+                         accessibilityLabel={lk.t}
+                         style={{ flexDirection: rtl ? "row-reverse" : "row",
+                                  alignItems: "center", gap: 9,
+                                  marginTop: li === 0 ? 12 : 8,
+                                  paddingVertical: 11, paddingHorizontal: 13,
+                                  backgroundColor: HJ.goldPanel, borderRadius: R.card,
+                                  borderWidth: 1, borderColor: HJ.goldLine }}>
+                    <Text style={{ flex: 1, fontFamily: F.sansSemi, fontSize: fs(13.5),
+                                   color: HJ.gold, textAlign: align }}>{lk.t}</Text>
+                    {/* The glyph follows the scheme: a number is rung, a page
+                        is opened, and an arrow on a phone number is a small
+                        lie about what the tap will do. */}
+                    <Ionicons name={lk.url.startsWith("tel:") ? "call-outline"
+                                  : lk.url.startsWith("mailto:") ? "mail-outline"
+                                  : "open-outline"}
+                              size={16} color={HJ.gold} />
+                  </Press>))}
                 {!!item.when && (
                   <Text style={{ fontFamily: F.sansMedium, fontSize: fs(12.5), lineHeight: fs(19),
                                  color: HJ.gold, marginTop: 8, textAlign: align }}>{item.when}</Text>)}
@@ -224,8 +276,18 @@ export default function HajjBranch({ route }) {
             const tone = v && v.tone === "warn" ? "warn" : "plain";
             const gap = { marginTop: ii === 0 ? 13 : 10 };
 
-            if (!item.pack)
-              return <Panel key={item.id} tone={tone} style={gap}>{body}</Panel>;
+            if (!item.pack) {
+              const panel = <Panel tone={tone} style={stepped ? null : gap}>{body}</Panel>;
+              if (!stepped)
+                return <Reveal key={item.id} index={ii}>{panel}</Reveal>;
+              return (
+                <Reveal key={item.id} index={ii} style={{ marginTop: ii === 0 ? 13 : 0 }}>
+                  <HajjStep n={item.n} first={ii === 0} last={ii === s.items.length - 1}>
+                    {panel}
+                  </HajjStep>
+                </Reveal>
+              );
+            }
 
             /* A PACKING LIST IS A LIST. Thirty-five full cards was a wall
                three screens tall; a row with a hairline above it is half the
@@ -244,7 +306,8 @@ export default function HajjBranch({ route }) {
                 <View style={{ flex: 1 }}>{body}</View>
               </Press>
             );
-          })}
+            });
+          })()}
         </View>
       ))}
     </HajjScreen>
