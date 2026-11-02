@@ -19,7 +19,7 @@
  * what is already there.
  */
 import BUNDLED from "./data/timetable-2026.json";
-import { call } from "./supabase";
+import { call, MASJID } from "./supabase";
 
 /* Required where it is used rather than at the top, so that importing this
  * module — and so prayer.js, and so anything that needs the prayer arithmetic
@@ -159,7 +159,13 @@ export async function fetchYear(year, { force = false } = {}) {
   }
 
   try {
-    const rows = await call("prayer_year", { p_year: year });
+    /* The slug is not optional. prayer_year() used to work out the masjid on
+       its own; since the database took on more than one it answers 400 to a
+       call that does not name one, and call() turns any non-200 into null —
+       so a missing slug here reads exactly like an unpublished year. The app
+       then sits on the bundled timetable for ever, looking healthy, and the
+       first anyone knows is the morning it has no times to show. */
+    const rows = await call("prayer_year", { p_masjid: MASJID, p_year: year });
     if (!Array.isArray(rows) || rows.length === 0) {
       /* Remember the ASK, not the answer. Without this an unpublished year is
          requested on every launch for as long as it stays unpublished, which

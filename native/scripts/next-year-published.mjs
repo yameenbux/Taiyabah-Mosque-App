@@ -74,7 +74,7 @@ export function verdict({ today, counts, nagFrom = 11 }) {
       const days = Math.ceil((due - today) / 86400000);
       lines.push({ level: "notice", text: `${next}: not published yet. Not due to worry until 1 ${due.toLocaleString("en-GB", { month: "long", timeZone: "UTC" })} — ${days} day${days === 1 ? "" : "s"} away.` });
     } else {
-      lines.push({ level: "error", text: `${next}: STILL NOT PUBLISHED, and it is past 1 ${due.toLocaleString("en-GB", { month: "long", timeZone: "UTC" })}. On 1 January every phone will show ${now}'s times as though they were ${next}'s. The committee needs to publish the ${next} timetable in the admin page.` });
+      lines.push({ level: "error", text: `${next}: STILL NOT PUBLISHED, and it is past 1 ${due.toLocaleString("en-GB", { month: "long", timeZone: "UTC" })}. On 1 January every phone and the website will show NO prayer times at all: both key a day by its full date, so a day in ${next} simply is not there. The committee needs to publish the ${next} timetable in the admin page.` });
     }
   }
 
@@ -86,7 +86,9 @@ export async function daysPublished(year, { url, key }, fetchImpl = fetch) {
   const res = await fetchImpl(`${url}/rest/v1/rpc/prayer_year`, {
     method: "POST",
     headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ p_year: year }),
+    /* Same slug the app sends. Without it this asks a question the database
+       refuses, and a watchdog that cannot ask is worse than none. */
+    body: JSON.stringify({ p_masjid: "taiyabah", p_year: year }),
   });
   const body = await res.text();
   /* PostgREST says WHY in the body — an ambiguous overload is PGRST203, a
