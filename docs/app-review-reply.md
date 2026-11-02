@@ -25,37 +25,40 @@ one reply.** An earlier version of this file said to split the answer across
 two messages. That was wrong — Resolution Center does not offer a second reply
 on a rejected submission, so all six items have to fit one paste.
 
-The block below is that paste: 4039 characters, numbered to match Apple's
+The block below is that paste: 3957 characters, numbered to match Apple's
 own six items so a reviewer can read it against their letter line by line. The
 long-form text further down is the record it was condensed from, not something
 to paste.
+
+The margin is deliberate. 4,000 is the cap, and a field that counts a line
+break as two characters would reject a block that measured 3,993 on this side.
 
 **Attach the screen recording to this reply.** Item 1 claims it.
 
 ---
 
-## Paste block 1 — the reply, all six items (4039 characters)
+## Paste block 1 — the reply, all six items (3957 characters)
 
 ```
 1. SCREEN RECORDING
-Attached: recorded on a physical iPhone on current iOS, from the submitted build 2.1.0 (18), beginning at launch. None of the three listed cases apply. No accounts of any kind - no registration, no login, nothing to delete - so no demo credentials are needed. No user-generated content, so no reporting or blocking mechanism. No paid content: no in-app purchase, nothing digital sold. Donations are charitable giving, on Stripe's hosted pages in the system browser.
+Attached: recorded on a physical iPhone on current iOS from the submitted build 2.1.0 (18), beginning at launch. None of the three listed cases apply. No accounts of any kind - no registration, no login, nothing to delete - so no demo credentials are needed. No user-generated content, so no reporting or blocking mechanism. No paid content: no in-app purchase, nothing digital sold. Donations are charitable giving on Stripe's hosted pages in the system browser.
 
 2. PURPOSE AND TARGET AUDIENCE
-Official app of Taiyabah Masjid, Bolton, UK, operated by Bolton Central Islamic Society, a charity registered in England and Wales (1041569). Third-party prayer apps compute times astronomically and cannot know when this mosque actually holds each congregation. This app publishes the mosque's own timetable, notices and services from one source, and works offline. Audience: the congregation, who read English, Urdu, Gujarati and Arabic - all four are in the app, chosen in Settings.
+Official app of Taiyabah Masjid, Bolton, UK, run by Bolton Central Islamic Society, a charity registered in England and Wales (1041569). Third-party prayer apps compute times astronomically and cannot know when this mosque actually holds each congregation. It publishes the mosque's own timetable, notices and services from one source, and works offline. Audience: the congregation, who read English, Urdu, Gujarati and Arabic - all four in the app, chosen in Settings.
 
 3. SETTING UP AND ACCESSING THE MAIN FEATURES
-Nothing to set up, no sign-in, no paywall; every feature works from a cold first launch. Prayer Times (the mosque's timetable, today and the year); Notices; Recite (the Qur'an, daily adhkar, the Arabic text of Sahih al-Bukhari); Qibla compass; Zakat calculator (live gold and silver prices); Live (the mosque's audio broadcast); Services (hall hire, marriage, imams' advice, charity collection - a form sends a request to the mosque office, creating no account); Madrasah (term dates, admissions, holiday planner); Hajj and Umrah (guidance for pilgrims - the reader picks their journey and sees only what applies: packing, paperwork, ihram, the rites in order, supplications, offline tally counters; nothing sold or submitted).
-Two optional permissions, requested in context, with the app fully usable if both are refused: Notifications, only for prayer reminders; Location when in use, only on Qibla, to compute the bearing to Makkah on the device - those coordinates are neither stored nor transmitted.
+Nothing to set up, no sign-in, no paywall; every feature works from a cold first launch. Prayer Times (the mosque's timetable, today and the year); Notices; Recite (the Qur'an, daily adhkar, the Arabic of Sahih al-Bukhari); Qibla compass; Zakat calculator (live gold and silver prices); Live (the mosque's audio broadcast); Services (hall hire, marriage, imams' advice, charity collection - a form sends a request to the office, creating no account); Madrasah (term dates, admissions, holiday planner); Hajj and Umrah (guidance for pilgrims - the reader picks their journey and sees only what applies: packing, paperwork, ihram, the rites in order, supplications, offline tally counters; nothing sold or submitted).
+Two optional permissions, requested in context, the app fully usable if both are refused: Notifications, only for prayer reminders; Location when in use, only on Qibla, to compute the bearing to Makkah on the device; the coordinates are neither stored nor transmitted.
 
 4. EXTERNAL SERVICES
-Supabase (Postgres): the mosque's database - timetable, notices, service requests. OneSignal: push notifications. Stripe: hosted pages in the system browser for donations, hall-hire deposits and marriage fees - real-world services at the mosque, not digital content. Cloudflare Workers: relays form submissions. YouTube: the mosque's recorded talks. radioca.st: streaming host. gold-api.com, goldprice.org, frankfurter.dev, open.er-api.com: metal prices and currency rates for Zakat. Apple Maps: directions. ksavisa.sa (Saudi Ministry of Foreign Affairs) and the App Store/Google Play listings for Nusuk, the Saudi ministry's pilgrimage app: linked, not integrated - outbound links in the system browser; nothing is sent or read back. No analytics, advertising, tracking or AI services.
+Supabase (Postgres): the mosque's database - timetable, notices, service requests. OneSignal: push notifications. Stripe: hosted pages in the system browser for donations, hall-hire deposits and marriage fees - real-world services, not digital content. Cloudflare Workers: relays form submissions. YouTube: the mosque's recorded talks. radioca.st: streaming host. gold-api.com, goldprice.org, frankfurter.dev, open.er-api.com: metal and currency rates for Zakat. Apple Maps: directions. ksavisa.sa (Saudi Ministry of Foreign Affairs) and the App Store/Google Play listings for Nusuk, the ministry's own pilgrimage app: linked, not integrated - outbound links in the system browser; nothing is sent or read back. No analytics, advertising, tracking or AI services.
 
 5. REGIONAL DIFFERENCES
-None. Identical in every region and storefront; nothing unlocked, hidden or substituted by country. Language is chosen by the reader, not by region. The timetable is this mosque's own, in Bolton, and does not vary with location.
+None. Identical in every region and storefront; nothing unlocked, hidden or substituted by country. Language is chosen by the reader, not by region. The timetable is this mosque's own in Bolton and does not vary with location.
 
 6. REGULATED INDUSTRY AND THIRD-PARTY MATERIAL
-Not a regulated industry, no regulated service, no medical, legal or financial advice. Where an official rule applies - a visa condition, a vaccination requirement - the app says it is set by the Saudi authorities or the UK health service and links to the official source rather than restating it.
-Timetable, notices, madrasah information, service details, live broadcast: the mosque's own. Qur'an: Arabic text with the English translation of Abdullah Yusuf Ali (d. 1953), out of copyright in the UK where the app is published. Sahih al-Bukhari: Arabic only, public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is reproduced. Hajj and Umrah guidance: the mosque's own, settled by its scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed. Name, logo and wordmark: the charity's property.
+Not a regulated industry, no regulated service, no medical, legal or financial advice. Where an official rule applies - a visa condition, a vaccination requirement - the app says it is set by the Saudi authorities or UK health service and links to the source rather than restating it.
+Timetable, notices, madrasah information, service details, live broadcast: the mosque's own. Qur'an: Arabic with the English translation of Abdullah Yusuf Ali (d. 1953), out of copyright in the UK where the app is published. Sahih al-Bukhari: Arabic only, public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is included. Hajj and Umrah guidance: the mosque's own, settled by its scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed. Name, logo and wordmark: the charity's property.
 ```
 
 ## Paste block 2 — App Review Information → Notes (3963 characters)
