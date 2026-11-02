@@ -1,7 +1,8 @@
 # App Review reply — Taiyabah Masjid 2.1.0
 
-**Keep this file up to date, and on every submission paste the two blocks under
-Part 1 into Reply to App Review and into App Review Information → Notes.** It was first written for build 15 and has been
+**Keep this file up to date. On every submission, paste block 1 into Reply to
+App Review with the recording attached, and block 2 into App Review
+Information → Notes.** It was first written for build 15 and has been
 revised since; the Hajj & ʿUmrah section in particular did not exist when the
 first version was sent, and item 6 asks directly about third-party material,
 so a reply that omits a whole section invites a second rejection.
@@ -9,7 +10,7 @@ so a reply that omits a whole section invites a second rejection.
 Two separate things arrived in Apple's letter.
 
 **The questionnaire** (items 1–6) is Apple's standard "Information Needed"
-template. Part 1 below answers it, and holds the blocks to paste.
+template. Part 1 below answers it, and holds the two blocks to paste.
 
 **The rejection reason** was the line under Review Status: *2.1.0 Performance:
 App Completeness*. Answering the questionnaire does not clear that on its own
@@ -19,81 +20,45 @@ App Completeness*. Answering the questionnaire does not clear that on its own
 
 # Part 1 — the reply to paste into App Store Connect
 
-**The Reply to App Review box takes 4,000 characters.** The full text below is
-6,550, so it does not go in as one paste — and neither does a version trimmed
-far enough to fit without losing the two items a reviewer checks against the
-binary: the external services list (item 4) and the rights breakdown (item 6).
+**The Reply to App Review box takes 4,000 characters, and it allows exactly
+one reply.** An earlier version of this file said to split the answer across
+two messages. That was wrong — Resolution Center does not offer a second reply
+on a rejected submission, so all six items have to fit one paste.
 
-So it goes in as **two replies**. Resolution Center accepts more than one and
-threads them. The two blocks are reproduced verbatim below under *Paste block
-1* and *Paste block 2*; the long-form text that follows them is the record, not
-the paste.
+The block below is that paste: 4039 characters, numbered to match Apple's
+own six items so a reviewer can read it against their letter line by line. The
+long-form text further down is the record it was condensed from, not something
+to paste.
 
-**App Review Information → Notes is capped at 4,000 too**, and it takes one
-field, not a thread — so the two blocks cannot simply be run together there.
-It has its own condensed version below, all six items in 3963 characters.
-It is denser than the reply on purpose: Notes is a standing reference a
-reviewer scans, not an argument, so it leads with the line they look for
-first — no sign-in required.
+**Attach the screen recording to this reply.** Item 1 claims it.
 
 ---
 
-## Paste block 1 — items 1 to 3 (2547 characters)
+## Paste block 1 — the reply, all six items (4039 characters)
 
 ```
-Replying in two parts because of the 4000-character limit. This is part 1 of 2, covering items 1 to 3.
-
 1. SCREEN RECORDING
-Attached: captured on a physical iPhone on the latest iOS, from the build submitted here, beginning with the app launching. None of the three cases listed apply. The app has no accounts of any kind - no registration, no login, nothing to delete. It has no user-generated content, so no reporting or blocking mechanism is required. It has no paid content: there is no in-app purchase and nothing digital is sold. Donations are charitable giving to a registered charity, on Stripe's hosted pages in the system browser.
+Attached: recorded on a physical iPhone on current iOS, from the submitted build 2.1.0 (18), beginning at launch. None of the three listed cases apply. No accounts of any kind - no registration, no login, nothing to delete - so no demo credentials are needed. No user-generated content, so no reporting or blocking mechanism. No paid content: no in-app purchase, nothing digital sold. Donations are charitable giving, on Stripe's hosted pages in the system browser.
 
-2. PURPOSE AND AUDIENCE
-The official app of Taiyabah Masjid, Bolton, United Kingdom, operated by Bolton Central Islamic Society, a charity registered in England and Wales, no. 1041569. Free; no advertising, nothing sold, no analytics, no account.
-Third-party prayer apps calculate prayer times astronomically and cannot know what time this mosque has chosen to hold each congregation. This app publishes the mosque's own timetable, notices and services from one authoritative source, and works with no network connection. Its audience is the congregation, who read English, Urdu, Gujarati and Arabic; all four are in the app and the reader chooses in Settings.
+2. PURPOSE AND TARGET AUDIENCE
+Official app of Taiyabah Masjid, Bolton, UK, operated by Bolton Central Islamic Society, a charity registered in England and Wales (1041569). Third-party prayer apps compute times astronomically and cannot know when this mosque actually holds each congregation. This app publishes the mosque's own timetable, notices and services from one source, and works offline. Audience: the congregation, who read English, Urdu, Gujarati and Arabic - all four are in the app, chosen in Settings.
 
-3. SETUP AND MAIN FEATURES
-Nothing to set up. No sign-in and no paywall, so no demo credentials are needed. Every feature works from a cold first launch.
-- Prayer Times: the mosque's own timetable, today and the year, including Friday prayer
-- Notices: announcements published by the mosque
-- Recite: the Qur'an, daily adhkar, and the Arabic text of Sahih al-Bukhari
-- Qibla: compass showing the direction of prayer
-- Zakat calculator: threshold from live gold and silver prices
-- Live: the mosque's own audio broadcast
-- Services: hall hire, marriage, imams' advice, charity collection. A form sends a request to the mosque office; it creates no account
-- Madrasah: term dates, admissions, holiday planner
-- Hajj and Umrah: guidance for pilgrims. The reader picks their journey and sees only what applies - packing, paperwork, the state of ihram, the rites in order, supplications, and offline tally counters for tawaf and sa'i. Nothing is sold or submitted
-Two optional permissions are requested in context, and the app is fully usable if both are refused: Notifications, only for prayer reminders; and Location when in use, only on Qibla, to compute the bearing to Makkah on the device. Those coordinates are neither stored nor transmitted.
-```
-
-## Paste block 2 — items 4 to 6 (2499 characters)
-
-```
-Part 2 of 2, covering items 4 to 6.
+3. SETTING UP AND ACCESSING THE MAIN FEATURES
+Nothing to set up, no sign-in, no paywall; every feature works from a cold first launch. Prayer Times (the mosque's timetable, today and the year); Notices; Recite (the Qur'an, daily adhkar, the Arabic text of Sahih al-Bukhari); Qibla compass; Zakat calculator (live gold and silver prices); Live (the mosque's audio broadcast); Services (hall hire, marriage, imams' advice, charity collection - a form sends a request to the mosque office, creating no account); Madrasah (term dates, admissions, holiday planner); Hajj and Umrah (guidance for pilgrims - the reader picks their journey and sees only what applies: packing, paperwork, ihram, the rites in order, supplications, offline tally counters; nothing sold or submitted).
+Two optional permissions, requested in context, with the app fully usable if both are refused: Notifications, only for prayer reminders; Location when in use, only on Qibla, to compute the bearing to Makkah on the device - those coordinates are neither stored nor transmitted.
 
 4. EXTERNAL SERVICES
-- Supabase (Postgres): the mosque's own database - timetable, notices, service requests
-- OneSignal: push notifications
-- Stripe: hosted payment pages in the system browser, for donations, hall-hire deposits and marriage fees
-- Cloudflare Workers: an endpoint operated for the mosque, relaying form submissions
-- YouTube: the mosque's recorded talks, which the app links to
-- radioca.st: streaming host for the live broadcast
-- gold-api.com, goldprice.org, frankfurter.dev, open.er-api.com: metal prices and currency rates for the Zakat calculator
-- Apple Maps: directions to the mosque
-- ksavisa.sa (Saudi Ministry of Foreign Affairs) and the App Store and Google Play listings for Nusuk, the Saudi ministry's own pilgrimage app: linked, not integrated - outbound links opened in the system browser. The app sends them nothing and reads nothing back
-No analytics, advertising, tracking or AI services, and no in-app purchase. The Stripe pages cover donations and services delivered at the mosque premises, which are not digital content.
+Supabase (Postgres): the mosque's database - timetable, notices, service requests. OneSignal: push notifications. Stripe: hosted pages in the system browser for donations, hall-hire deposits and marriage fees - real-world services at the mosque, not digital content. Cloudflare Workers: relays form submissions. YouTube: the mosque's recorded talks. radioca.st: streaming host. gold-api.com, goldprice.org, frankfurter.dev, open.er-api.com: metal prices and currency rates for Zakat. Apple Maps: directions. ksavisa.sa (Saudi Ministry of Foreign Affairs) and the App Store/Google Play listings for Nusuk, the Saudi ministry's pilgrimage app: linked, not integrated - outbound links in the system browser; nothing is sent or read back. No analytics, advertising, tracking or AI services.
 
 5. REGIONAL DIFFERENCES
-None. The app behaves identically in every region and storefront; nothing is unlocked, hidden or substituted by country. Language is chosen by the reader, not by region. The timetable is this one mosque's timetable in Bolton and does not vary with location. The only use of location is the Qibla compass above.
+None. Identical in every region and storefront; nothing unlocked, hidden or substituted by country. Language is chosen by the reader, not by region. The timetable is this mosque's own, in Bolton, and does not vary with location.
 
 6. REGULATED INDUSTRY AND THIRD-PARTY MATERIAL
-Not a regulated industry, and no regulated service. The app gives no medical, legal or financial advice: where an official rule applies, such as a visa condition or vaccination requirement, it states that this is set by the Saudi authorities or the UK health service and links to the official source rather than restating it.
-- Timetable, notices, madrasah information, service details and the live broadcast: the mosque's own
-- Qur'an: Arabic text with the English translation of Abdullah Yusuf Ali, who died in 1953 and is out of copyright in the United Kingdom, where the app is published
-- Sahih al-Bukhari: Arabic text only, from a public domain edition under The Unlicense. English links out to sunnah.com, so no modern translation is reproduced
-- Hajj and Umrah guidance: the mosque's own, settled by this mosque's scholars and written by the mosque. No third party's text is reproduced
-- Photographs and diagrams: the mosque's own or licensed for this use. The name, logo and wordmark are the charity's property
+Not a regulated industry, no regulated service, no medical, legal or financial advice. Where an official rule applies - a visa condition, a vaccination requirement - the app says it is set by the Saudi authorities or the UK health service and links to the official source rather than restating it.
+Timetable, notices, madrasah information, service details, live broadcast: the mosque's own. Qur'an: Arabic text with the English translation of Abdullah Yusuf Ali (d. 1953), out of copyright in the UK where the app is published. Sahih al-Bukhari: Arabic only, public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is reproduced. Hajj and Umrah guidance: the mosque's own, settled by its scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed. Name, logo and wordmark: the charity's property.
 ```
 
-## Paste block 3 — App Review Information → Notes (3963 characters)
+## Paste block 2 — App Review Information → Notes (3963 characters)
 
 Not part of the Resolution Center reply. This one goes in the version page's
 **App Review Information → Notes** field, and stays there for every future
