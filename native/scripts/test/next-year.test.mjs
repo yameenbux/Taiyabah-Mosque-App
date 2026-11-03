@@ -31,7 +31,13 @@ test("on 1 November, a missing next year fails", () => {
   assert.equal(v.exit, 1);
   assert.equal(errs(v).length, 1);
   assert.match(errs(v)[0], /STILL NOT PUBLISHED/);
-  assert.match(errs(v)[0], /2026's times as though they were 2027's/);
+  /* The warning has to say what actually happens, not something worse. Both
+     the app and the website key a day by its full date, so an unpublished
+     year shows NO times rather than the wrong year's — this assertion is
+     here because the message used to claim the latter. */
+  assert.match(errs(v)[0], /NO prayer times at all/);
+  assert.doesNotMatch(errs(v)[0], /as though they were/);
+  assert.match(errs(v)[0], /2027 timetable/);
 });
 
 test("the last day of October still does not fail", () => {

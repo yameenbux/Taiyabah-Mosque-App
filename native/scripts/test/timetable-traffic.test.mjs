@@ -91,3 +91,27 @@ test("the committee publishing next year still reaches a phone", async () => {
   assert.equal(await fetchYear(2027, { force: true }), true,
     "a published year did not land");
 });
+
+test("the request names which masjid it is asking about", async () => {
+  /* prayer_year() resolved the masjid on its own until the database took on
+     more than one. It now answers 400 to a call that does not name one, and
+     call() turns any non-200 into null — which fetchYear() cannot tell apart
+     from a year the committee has not published yet.
+     
+     So the app sat on its bundled 2026 timetable, reported nothing wrong, and
+     would have shown no times at all from 1 January. Every assertion above
+     this one passed throughout, because a stub answers whatever it is asked.
+     This is the one that would have caught it. */
+  let sent = null;
+  globalThis.fetch = async (url, opts) => {
+    sent = JSON.parse(opts?.body || "{}");
+    return { ok: true, status: 200, text: async () => "[]", json: async () => [] };
+  };
+  await fetchYear(2027, { force: true });
+
+  assert.ok(sent, "no request was made at all");
+  assert.equal(sent.p_year, 2027);
+  assert.equal(sent.p_masjid, "taiyabah",
+    "prayer_year was called without a masjid slug, so the database will " +
+    "answer 400 and the app will read that as 'not published yet'");
+});
