@@ -20,6 +20,46 @@ content. File it wherever the D‑U‑N‑S paperwork lives.
 
 ---
 
+## First: the open-licence question, already asked and answered
+
+Before sending either letter, somebody will reasonably ask whether a free,
+openly licensed English Bukhārī exists that could simply be used. It was
+looked for properly. It does not — and the way it does not is consistent
+enough to be worth writing down, so the search is not repeated every year.
+
+**Every "open" hadith dataset licenses its own packaging, not the
+translation.** A repository can license the code it wrote, the database it
+assembled and the API it serves. It cannot license an English translation it
+never held rights in, and none of them claims in writing to have been granted
+any. Five were checked:
+
+| Source | Licence it claims | What it actually is |
+| --- | --- | --- |
+| `fawazahmed0/hadith-api`, edition `eng-bukhari` | The Unlicense — public domain | Its own editions metadata names the author: **Muhsin Khan**. Source field blank. This is the same repository the app's **Arabic** comes from, and for the Arabic the licence is sound, because that text is 9th-century. |
+| `SENODROOM/sahih-al-bukhari` | AGPL-3.0 | Names **no translator at all** — "by reputable Islamic scholars". AGPL is a software licence; it says nothing about the text. 7,277 hadith, so it does not even match the standard numbering the app cites. |
+| `halimbahae/hadith` | ODbL + DBCL | Database licences. The Database Contents Licence exists precisely to say that rights in the individual contents are a separate question — it is an admission, not a grant. |
+| LK Hadith Corpus (Leeds / King Saud) | no licence file | An academic corpus that asks to be cited in a paper. A citation request is not a redistribution grant, and the English provenance is not stated. |
+| Aisha Bewley's own site | no licence published | Genuinely her own work and free to read, but marked **"Revision in progress"**, with no permission statement anywhere on it. |
+
+**Free to read is not free to copy.** That is the whole of it. sunnah.com is
+the same case and says so plainly in its own terms: it does not permit
+scraping, nor mass reproduction of entire books or collections, while
+permitting individual hadith or selections for teaching.
+
+**The unattributed ones are worse, not better.** The committee asked, in the
+same note, for the source and reference to be identified and for the
+authenticity of what is shown to be verifiable. A dataset that will not name
+its translator fails that test before the licensing question is even reached.
+The masjid cannot stand behind words when it cannot say who rendered them.
+
+So there are two honest routes, and only two: ask, or write our own. The
+letters below are the first. If both are declined, the second is the masjid's
+own ʿulamā translating a chosen subset — the hadith actually used in khuṭbahs
+and madrasah — which needs nobody's permission, and which is the same model
+the Hajj section already runs on.
+
+---
+
 ## Letter 1 — Darussalam (the Muhsin Khan translation)
 
 The translation by Dr Muhammad Muhsin Khan is the standard English Bukhārī and
