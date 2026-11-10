@@ -7686,7 +7686,12 @@ function rmBookProbe(){
     method: "POST", signal: ctrl.signal,
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
-    body: "{}",
+    /* The slug, spelled as advice_is_open spells it. This function does not
+       exist in the database yet — the call 404s and the catch below reads
+       that as "booking is closed", which is the state the masjid is in. It is
+       written with the slug now so that the day somebody creates it, this is
+       not the fifth screen to be found calling it without one. */
+    body: JSON.stringify({ p_masjid: SUPA.masjid }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     RM_BOOK.open = res.ok && String(body).trim() === "true";
@@ -11410,6 +11415,7 @@ function bkSubmit(e){
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ payload: {
+      masjid:       SUPA.masjid,
       booking_date: bkIso(BK.date),
       hire_type:    BK.hire.type,
       halls_count:  BK.hire.type === "halls" ? BK.hire.count : null,
@@ -13128,6 +13134,7 @@ function iaSubmit(e){
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
     body: JSON.stringify({ payload: {
+      masjid:   SUPA.masjid,
       name:     v("ia-name"),
       phone:    v("ia-phone"),
       email:    v("ia-email"),
@@ -13514,7 +13521,7 @@ function nkProbe(){
       Authorization: "Bearer " + SUPA.key,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ payload: {} }),
+    body: JSON.stringify({ payload: { masjid: SUPA.masjid } }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     /* 404 with PGRST202 is "no such function" — the migration is not applied.
@@ -13764,6 +13771,7 @@ function nkSubmit(e){
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ payload: {
+      masjid:           SUPA.masjid,
       preferred_date:   nkIso(NK.d1),
       alternative_date: NK.d2 ? nkIso(NK.d2) : null,
       slot:             slot,
@@ -14180,7 +14188,7 @@ function ccProbe(){
     signal: ctrl.signal,
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
-    body: JSON.stringify({ payload: {} }),
+    body: JSON.stringify({ payload: { masjid: SUPA.masjid } }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     CC.open = !(res.status === 404 || /PGRST202/.test(body));
@@ -14347,6 +14355,7 @@ function ccSubmit(e){
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
     body: JSON.stringify({ payload: {
+      masjid:          SUPA.masjid,
       requested_date:  v("cc-date"),
       org_name:        v("cc-org"),
       org_address:     v("cc-addr"),

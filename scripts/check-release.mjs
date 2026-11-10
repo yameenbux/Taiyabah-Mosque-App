@@ -58,7 +58,9 @@ if (workerEntry && existsSync(`worker/${workerEntry}`)) {
   const called = new Set();
   for (const f of ["index.html", "admin.html"]) {
     if (!existsSync(f)) continue;
-    for (const m of R(f).matchAll(/["'`](\/api\/[a-z0-9-]+)/gi)) called.add(m[1]);
+    /* Slashes belong in the class: /api/donate/friday is one route, and
+       stopping at "donate" made this check look for a path nothing serves. */
+    for (const m of R(f).matchAll(/["'`](\/api\/[a-z0-9/-]+)/gi)) called.add(m[1]);
   }
   for (const path of [...called].sort()) {
     if (!worker.includes(`"${path}"`)) fail(`the app calls ${path}, but ${workerEntry} does not serve it`);
@@ -133,6 +135,28 @@ if (existsSync("scripts/check-i18n.mjs")) {
     const out = String(e.stdout || "") + String(e.stderr || "");
     for (const line of out.split("\n").filter(l => l.includes("FAIL")))
       fail("i18n — " + line.replace(/^\s*FAIL\s+/, "").trim());
+  }
+}
+
+/* ---- 3e2. every database call names a masjid ----
+ * The database runs more than one masjid now and its functions refuse to
+ * guess which is asking. The app is safe because one wrapper adds the slug
+ * for every call; the website writes each fetch by hand, and has been caught
+ * without it four times — the imams' form, the prayer timetable, the nikah
+ * form and charity collections, each reported as its own separate bug.
+ *
+ * None of them failed loudly. A 400 reads to the screen above it as a closed
+ * form or an unpublished year, so the only symptom is a feature quietly not
+ * working. That is precisely the kind of thing a person stops noticing and a
+ * check does not. */
+if (existsSync("scripts/check-masjid-slug.mjs")) {
+  try {
+    const out = execSync("node scripts/check-masjid-slug.mjs", { encoding: "utf8" });
+    ok(out.trim() || "every database call names a masjid");
+  } catch (e) {
+    const out = String(e.stdout || "") + String(e.stderr || "");
+    for (const line of out.split("\n").filter(l => /do not name a masjid|rpc|\.html:/.test(l)))
+      fail("masjid slug — " + line.trim());
   }
 }
 
