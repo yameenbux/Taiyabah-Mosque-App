@@ -77,6 +77,20 @@ Pictures in that section describe what they show and never which option
 passes — `scripts/check-hajj.mjs` enforces all of this, and
 `native/src/hajj-art.jsx` explains why.
 
+## Both stores, every time
+
+**A change ships to Google Play and the App Store together.** One React Native
+codebase means a change reaches both platforms the moment it is written — but
+reaching a phone needs a build and a submission on each, and the two are easy
+to let drift. They have drifted twice: iOS build 18 went to Apple without the
+timetable fix, and Play spent weeks serving fiqh entries that credited a source
+the trustees had already removed.
+
+So a piece of work is not done when `main` is green. It is done when both
+stores carry it, at the same `expo.version`. If only one can go — Apple is
+reviewing, Play has refused the bundle — say so plainly and say what is on
+each, rather than calling the work finished.
+
 ## Before pushing
 
 `cd native && npm run check` — the full gate, and it must be green. It now
