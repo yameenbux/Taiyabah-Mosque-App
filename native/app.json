@@ -112,6 +112,8 @@
           ]
         }
       ],
+      "expo-asset",
+      "expo-web-browser",
       "./plugins/with-api-36",
       "./plugins/with-fmt-consteval",
       "@bacons/apple-targets",
