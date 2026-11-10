@@ -970,6 +970,18 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .wl-adv-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
     color:var(--ink-rose);margin-bottom:7px}
   .wl-advisory p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink-rose)}
+  /* Where the hadith text comes from, at the TOP of the page — the
+     committee asked for the source and the reference to be the first thing
+     read, not a footnote. Deliberately NOT .wl-advisory: that panel is rose
+     and reads as a warning, and the provenance of a sound collection is not
+     a warning. A plain card in the page's own colours. */
+  .hd-source{margin:0 0 14px;border-radius:14px;padding:13px 15px;
+    background:var(--card);border:1px solid var(--line)}
+  .hd-source .hd-src-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;
+    text-transform:uppercase;font-weight:700;color:var(--brand-600);margin-bottom:7px}
+  .hd-source p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink)}
+  .hd-source p+p{margin-top:7px}
+  .hd-source .hd-src-meta{color:var(--muted)}
   .wl-call{display:flex;align-items:center;gap:13px;text-decoration:none;margin-top:14px;
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -5178,6 +5190,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       </div>
       <div class="sh-body" id="hd-body">
         <div class="ab-wrap">
+          <!-- Point 1 of the committee's note: the original source and the
+               reference, at the top of the page. The two lines that depend on
+               the pack are filled from its own metadata in hdRenderSource(),
+               so the page cannot claim a provenance the data does not carry. -->
+          <div class="hd-source">
+            <div class="hd-src-h" data-i18n="bukhari.where_this_comes_from">Where this text comes from</div>
+            <p data-i18n="bukhari.compiled_by">Ṣaḥīḥ al-Bukhārī, compiled by Imām Muḥammad ibn Ismāʿīl al-Bukhārī (d. 256 AH / 870 CE).</p>
+            <p class="hd-src-meta" id="hd-src-structure"></p>
+            <p class="hd-src-meta" id="hd-src-edition"></p>
+          </div>
           <div class="hd-bar">
             <input id="hd-search" type="search" placeholder="Search the Arabic…"
                    autocapitalize="off" autocorrect="off" aria-label="Search the Arabic text"
@@ -5192,8 +5214,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <p class="hd-sub" id="hd-sub" hidden></p>
           <div id="hd-list"><p class="qd-empty" data-i18n="bukhari.loading">Loading…</p></div>
           <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="bukhari.arabic_only">Arabic here, English on sunnah.com</div>
-            <p data-i18n="bukhari.no_translation_note">The Arabic is 9th-century and free to reproduce. Every complete English translation in circulation is a modern work still in copyright, so rather than copy one, each hadith links out to its English on sunnah.com. That needs a connection; the Arabic does not.</p>
+            <div class="wl-adv-h" data-i18n="bukhari.what_is_here">What is in the app, and what is a link</div>
+            <p data-i18n="bukhari.arabic_is_carried">The Arabic above is carried inside the app in full, from the public-domain edition named at the top of this page. It reads with no connection and nothing is fetched to show it.</p>
+            <p data-i18n="bukhari.english_is_not_copied">No English translation is reproduced here. Every complete English Ṣaḥīḥ al-Bukhārī in circulation is a modern work still in copyright — the standard one is Dr Muhammad Muhsin Khan's, published by Darussalam, and it is the translation sunnah.com serves. The masjid has not been given permission to copy it, so it does not.</p>
+            <p data-i18n="bukhari.link_not_reproduce">Each hadith instead carries a link that opens sunnah.com in your browser at the matching number. Nothing from sunnah.com is stored in the app or shipped with it, and sunnah.com's own terms do not permit reproducing a collection in full.</p>
           </div>
           <p class="wl-foot" id="hd-attr"></p>
         </div>
@@ -12115,6 +12139,23 @@ function hdSearchable(s){
     .trim();
 }
 
+/* The source card at the top of the page. Its two factual lines are read off
+   the pack's own metadata rather than typed into the markup: the counts, the
+   numbering and the licence are properties of the text that shipped, and a
+   page that states them from memory will state them wrongly the first time
+   the pack is rebuilt. The third line of the card, the compiler, IS in the
+   markup — that fact belongs to the ninth century, not to the pack. */
+function hdRenderSource(m){
+  const structure = document.getElementById("hd-src-structure");
+  const edition = document.getElementById("hd-src-edition");
+  if(!structure || !edition) return;
+  structure.textContent = t("bukhari.structure",
+      "{books} books · {count} narrations · numbered to {highest}, the numbering used when a hadith is cited.")
+    .replace("{books}", num(m.books)).replace("{count}", num(m.count)).replace("{highest}", num(m.highest));
+  edition.textContent = t("bukhari.edition", "Arabic text: {source}. {licence}.")
+    .replace("{source}", m.source || "").replace("{licence}", m.licence || "");
+}
+
 async function openBukhari(){
   document.getElementById("bukhari").dataset.open = "1";
   document.body.style.overflow = "hidden";
@@ -12122,6 +12163,7 @@ async function openBukhari(){
   if(m){
     document.getElementById("hd-num").max = m.highest;
     document.getElementById("hd-attr").textContent = m.attribution || "";
+    hdRenderSource(m);
   }
   const last = prefStore.get(HD_POS, 0);
   if(last) await hdShowBook(last); else await hdShowBooks();
