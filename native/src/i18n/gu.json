@@ -426,6 +426,7 @@
  "a11y.about_taiyabah_masjid": "તૈયબા મસ્જિદ વિશે",
  "a11y.play_live_stream": "લાઇવ પ્રસારણ ચલાવો",
  "a11y.pause_live_stream": "લાઇવ પ્રસારણ થોભાવો",
+ "a11y.stop_live_stream": "લાઇવ પ્રસારણ બંધ કરો",
  "a11y.volume": "અવાજ",
  "a11y.videos": "વીડિયો",
  "a11y.zakat_calculator": "ઝકાત કેલ્ક્યુલેટર",
@@ -1922,6 +1923,8 @@
  "giving.card_apple_pay_google": "કાર્ડ · Apple Pay · Google Pay",
  "giving.not_available_yet": "હજી ઉપલબ્ધ નથી",
  "giving.choose_another_amount": "બીજી રકમ પસંદ કરો, અથવા નીચેની બેંક વિગતોનો ઉપયોગ કરો",
+ "giving.one_moment": "એક ક્ષણ…",
+ "giving.could_not_start_that_donation": "આ દાન શરૂ થઈ શક્યું નહીં. કૃપા કરીને ફરી પ્રયાસ કરો.",
  "collect.charity_collections": "ચેરિટી કલેક્શન",
  "a11y.charity_collections": "ચેરિટી કલેક્શન",
  "collect.done": "થઈ ગયું",
@@ -2326,7 +2329,5 @@
  "ramadan.it_begins_tonight": "આજે રાત્રે શરૂ થાય છે",
  "ramadan.first_taraweeh_after_isha": "પહેલી તરાવીહ ઈશા પછી",
  "portal.office_answers": "જો તમે વાલી હો અને પોર્ટલ તમને જોઈતું ન દેખાડે, તો ઓફિસ સાંજે ૫ થી ૭ વાગ્યા વચ્ચે ફોન પર જવાબ આપી શકે છે.",
- "sysprefs.lang_fallback": "ઉર્દૂ, ગુજરાતી અને અરબી ભાષાના જાણકારોએ વાંચીને સુધાર્યું છે. જે શબ્દનું ભાષાંતર ન હોય તે ખાલી જગ્યાને બદલે અંગ્રેજીમાં દેખાય છે.",
- "giving.one_moment": "એક ક્ષણ…",
- "giving.could_not_start_that_donation": "આ દાન શરૂ થઈ શક્યું નહીં. કૃપા કરીને ફરી પ્રયાસ કરો."
+ "sysprefs.lang_fallback": "ઉર્દૂ, ગુજરાતી અને અરબી ભાષાના જાણકારોએ વાંચીને સુધાર્યું છે. જે શબ્દનું ભાષાંતર ન હોય તે ખાલી જગ્યાને બદલે અંગ્રેજીમાં દેખાય છે."
 }

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "b946978b37bf",
+ "version": "4f5ef0d3ce53",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.notifications": "સૂચનાઓ",
@@ -452,6 +452,7 @@ window.LANG_PACK = {
   "a11y.about_taiyabah_masjid": "તૈયબા મસ્જિદ વિશે",
   "a11y.play_live_stream": "લાઇવ પ્રસારણ ચલાવો",
   "a11y.pause_live_stream": "લાઇવ પ્રસારણ થોભાવો",
+  "a11y.stop_live_stream": "લાઇવ પ્રસારણ બંધ કરો",
   "a11y.volume": "અવાજ",
   "a11y.videos": "વીડિયો",
   "a11y.zakat_calculator": "ઝકાત કેલ્ક્યુલેટર",

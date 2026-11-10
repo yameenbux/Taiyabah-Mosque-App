@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
+import { PrayerIcon } from "../prayer-icons";
 import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
@@ -290,7 +291,9 @@ export default function Home({ navigation }) {
                                           and makes the strip look like it is marking
                                           something else entirely. */
                                        backgroundColor: isNext ? "rgba(119,33,87,.07)" : "transparent" }}>
-                  <Ionicons name={k === "isha" ? "moon-outline" : "sunny-outline"} size={15} color={C.gold} />
+                  {/* Five glyphs, not one sun and a moon — see src/prayer-icons.jsx,
+                     which the website shares a check with so the two cannot drift. */}
+                  <PrayerIcon k={k} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
                     {t(`prayer.${k}`, NAMES[k].en)}</Text>
                   <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>

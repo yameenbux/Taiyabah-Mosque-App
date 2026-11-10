@@ -1,6 +1,6 @@
 import React from "react";
 import Offline from "./Offline";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
 import * as ExpoLinking from "expo-linking";
 import { BarStyleProvider, useBarStyle } from "./barstyle";
 import KeepReminders from "./keep-reminders";
@@ -23,6 +23,8 @@ import { C, F, HJ } from "./theme";
 import { COLUMN } from "./layout";
 import { tabBarFor, LABEL } from "./chrome";
 import { AppProvider, useApp } from "./store";
+import { LiveAudioProvider } from "./live-audio";
+import OnAirBar from "./on-air";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
 import SHEETS from "./data/sheets.json";
@@ -230,6 +232,26 @@ function AdaptiveStatusBar() {
 function Root() {
   const { t, tx, fs, lang, shotRoute } = useApp();
 
+  /* WHERE THE PERSON IS, for the On air bar and nothing else.
+   *
+   * The bar has to know two things that only the navigator can answer: is the
+   * Live screen the one on top (it stays away if so — the full player is
+   * already there), and is a TAB screen showing (if a pushed screen is, the
+   * tab bar is not on the glass and the bar has nothing to rest on). Both are
+   * read off the container rather than guessed, because getting the second
+   * one wrong leaves the bar floating in the middle of the Qurʼan. */
+  const navRef = useNavigationContainerRef();
+  const [where, setWhere] = React.useState({ onLive: false, onTabs: true });
+  const readWhere = React.useCallback(() => {
+    let onLive = false, onTabs = true;
+    try {
+      onLive = navRef.getCurrentRoute?.()?.name === "Live";
+      const root = navRef.getRootState?.();
+      onTabs = !root || root.routes?.[root.index]?.name === "Tabs";
+    } catch {}
+    setWhere(w => (w.onLive === onLive && w.onTabs === onTabs) ? w : { onLive, onTabs });
+  }, [navRef]);
+
   /* OPENING STRAIGHT ONTO A SCREEN, FOR THE STORE SCREENSHOTS ONLY.
    *
    * The listing needs a picture of the mushaf, the qibla and the zakat
@@ -298,9 +320,14 @@ function Root() {
   const hajj = { ...sheet, contentStyle: { backgroundColor: HJ.ground } };
 
   return (
-    /* Keyed on the language so a switch rebuilds every title, in every stack,
-     * rather than leaving yesterday's words in the headers. */
-    <NavigationContainer key={lang} linking={shotRoute ? undefined : linking} initialState={shotState}>
+    /* The extra View is the On air bar's ground: it is not a screen and must
+     * not be inside the navigator, or it would unmount with whatever screen
+     * happened to be showing — which is the whole bug this exists to fix. */
+    <View style={{ flex: 1 }}>
+    {/* Keyed on the language so a switch rebuilds every title, in every stack,
+      * rather than leaving yesterday's words in the headers. */}
+    <NavigationContainer key={lang} ref={navRef} onReady={readWhere} onStateChange={readWhere}
+                         linking={shotRoute ? undefined : linking} initialState={shotState}>
       {/* layout is the one place react-navigation lets a wrapper sit INSIDE
           each screen, which is what makes a fault recoverable: the header and
           the tab bar survive it, so "Try again" has something to go back to.
@@ -374,6 +401,9 @@ function Root() {
         ))}
       </Stack.Navigator>
     </NavigationContainer>
+    <OnAirBar onLive={where.onLive} onTabs={where.onTabs}
+              onGo={() => { try { navRef.navigate("Live"); } catch {} }} />
+    </View>
   );
 }
 
@@ -442,6 +472,10 @@ export default function App() {
           it can offer is a retry, but a retry beats a white screen. */}
       <Boundary>
         <AppProvider fallback={veil}>
+          {/* The radio lives here, above the navigator, because a stream that
+              is unloaded when a screen unmounts is not a radio. See
+              src/live-audio.jsx. */}
+          <LiveAudioProvider>
           <Root />
           {/* Over the app, under the first-run card, and never over a sheet it
               would be explaining nothing about. */}
@@ -452,6 +486,7 @@ export default function App() {
               says so — see the header of keep-reminders.jsx. */}
           <KeepReminders />
           <KeepActivity />
+          </LiveAudioProvider>
         </AppProvider>
       </Boundary>
       {/* Last, so it sits over the app — and only over it. The app is mounted

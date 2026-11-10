@@ -2879,7 +2879,7 @@
      {
       "type": "note",
       "k": "giving.a_weekly_gift_for_jumuah",
-      "t": "A weekly gift for Jumuʿah. Stripe takes it every seven days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop it any time."
+      "t": "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time."
      },
      {
       "type": "p",

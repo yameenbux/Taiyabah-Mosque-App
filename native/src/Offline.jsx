@@ -34,7 +34,8 @@ import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F, R } from "./theme";
-import { aboveTabBar } from "./chrome";
+import { aboveTabBar, ON_AIR_ROOM } from "./chrome";
+import { useLiveAudio } from "./live-audio";
 import { COLUMN } from "./layout";
 import { useApp } from "./store";
 import { useOffline } from "./reach";
@@ -42,12 +43,18 @@ import { useOffline } from "./reach";
 export default function Offline() {
   const { t, fs, rtl } = useApp();
   const insets = useSafeAreaInsets();
+  /* The On air bar takes the spot directly above the tab bar, so this one
+     steps up over it rather than sharing it. Rare — the stream needs a
+     connection and this says there is none — but the stream can be playing
+     from a buffer at the moment the signal goes, and two notices in one place
+     is the state nobody would ever look for. */
+  const onAir = useLiveAudio().playing;
   if (!useOffline()) return null;
 
   return (
     <View pointerEvents="none"
       style={{ position: "absolute", left: 0, right: 0, alignItems: "center",
-               bottom: aboveTabBar({ rtl, fs, inset: insets.bottom }),
+               bottom: aboveTabBar({ rtl, fs, inset: insets.bottom }) + (onAir ? ON_AIR_ROOM : 0),
                paddingHorizontal: 16 }}>
       <View style={{ width: "100%", maxWidth: COLUMN - 32, flexDirection: "row", alignItems: "center",
                      gap: 9, backgroundColor: C.tintRose, borderWidth: 1, borderColor: C.tintRoseLine,

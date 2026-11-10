@@ -2074,6 +2074,66 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   /* and the last thing on the page is not hidden behind it */
   :root[data-offline="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
+
+  /* ---- the On air bar ----
+     The stream used to stop the moment you left this page, which made
+     "listen to the bayaan while you read Qurʼan" impossible — the thing the
+     radio is most used for. The audio element has always been at module
+     scope here, so the SOUND survived a tab change; what did not survive was
+     any way to stop it once the play button had scrolled out of the person's
+     life. This is that way: a slim bar, only while something is playing, that
+     goes back to the player when tapped and stops the stream on the square.
+
+     IT SITS UNDER THE TAB BAR IN STACKING ORDER, at 37 against the bar's 40,
+     which is what lets it TUCK AWAY on stop rather than slide across the
+     tabs. Over a sheet there is no tab bar to hide behind, so it drops to
+     the floor and goes above everything instead — see [data-oafloor]. */
+  :root{--onair-h:60px}
+  .onair{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom,0));
+    z-index:37;max-width:520px;margin-inline:auto;
+    display:flex;align-items:center;gap:11px;padding:9px 14px;
+    background:var(--brand-900);border-top:1px solid rgba(198,162,76,.45);
+    transform:translateY(0);transition:transform 260ms cubic-bezier(0,0,.2,1)}
+  .onair[hidden]{display:none}
+  /* Leaving. 240ms and ACCELERATING, the opposite curve to arriving: a thing
+     going because you told it to should look decisive, a thing arriving
+     uninvited should not. */
+  .onair[data-state="out"]{transform:translateY(100%);
+    transition:transform 240ms cubic-bezier(.4,0,1,1)}
+  /* A sheet covers the tab bar, so there is nothing to tuck behind and
+     nothing to sit above. */
+  :root[data-oafloor="1"] .onair{bottom:0;z-index:55}
+  .onair .oa-go{flex:1;min-width:0;display:flex;align-items:center;gap:11px;
+    background:none;border:none;padding:0;font:inherit;cursor:pointer;text-align:start}
+  .onair .oa-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--on-air);
+    box-shadow:0 0 0 0 rgba(63,190,115,.75);animation:oa-pulse 2s infinite}
+  @keyframes oa-pulse{70%{box-shadow:0 0 0 7px rgba(63,190,115,0)}
+                     100%{box-shadow:0 0 0 0 rgba(63,190,115,0)}}
+  .onair .oa-txt{flex:1;min-width:0;line-height:1.3}
+  .onair .oa-k{display:block;font-size:calc(9px * var(--ts));letter-spacing:1.6px;
+    text-transform:uppercase;color:var(--gold);font-weight:800}
+  .onair .oa-n{display:block;font-size:calc(13.5px * var(--ts));color:#fff;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .onair .oa-stop{flex:none;width:40px;height:40px;border-radius:50%;cursor:pointer;
+    border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.07);
+    display:grid;place-items:center;padding:0}
+  .onair .oa-stop:active{background:rgba(255,255,255,.22)}
+  .onair .oa-stop svg{width:15px;height:15px;fill:#fff;display:block}
+  /* and the last thing on the page is not hidden behind it, in each of the
+     three combinations rather than one rule that is wrong in two of them */
+  :root[data-onair="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
+  :root[data-onair="1"] .offline-bar{bottom:calc(70px + var(--onair-h) + env(safe-area-inset-bottom,0))}
+  :root[data-offline="1"][data-onair="1"] body{padding-bottom:calc(202px + env(safe-area-inset-bottom,0))}
+  /* A sheet scrolls inside itself, so the page padding above does nothing for
+     the Qurʼan — which is the one place this bar matters most. */
+  :root[data-onair="1"] .sheet[data-open="1"] .sh-body{
+    padding-bottom:calc(var(--onair-h) + 20px)}
+  /* Somebody who has asked for less movement gets none: it fades instead. */
+  @media (prefers-reduced-motion: reduce){
+    .onair,.onair[data-state="out"]{transition:opacity 160ms linear;transform:none}
+    .onair[data-state="out"]{opacity:0}
+    .onair .oa-dot{animation:none}
+  }
   .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
     font:inherit;border:none;background:none;color:var(--muted);padding:9px 4px 8px}
   /* Something has been announced that this phone has not looked at yet. The
@@ -6417,6 +6477,22 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <span class="ob-t" id="offline-text" data-i18n="offline.still_works">No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.</span>
   </div>
 </div>
+<!-- The On air bar. Hidden unless the stream is actually playing and the
+     person has left the Live page — on Live itself the full player is right
+     there and a second stop button under it is clutter. -->
+<div class="onair" id="onair" hidden>
+  <button class="oa-go" id="oa-go" type="button">
+    <span class="oa-dot" aria-hidden="true"></span>
+    <span class="oa-txt">
+      <span class="oa-k" data-i18n="live.on_air">On air</span>
+      <span class="oa-n" data-i18n="app.name">Taiyabah Masjid</span>
+    </span>
+  </button>
+  <button class="oa-stop" id="oa-stop" type="button" aria-label="Stop live stream"
+          data-i18n-attr="aria-label:a11y.stop_live_stream">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
+  </button>
+</div>
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="home" data-on="1" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-9.5Z"/><path d="M9.5 21v-6h5v6"/></svg>
@@ -9326,6 +9402,11 @@ function lvState(s, text){
   document.getElementById('lv-play')
     .setAttribute('aria-label', on ? t("a11y.pause_live_stream","Pause live stream")
                                   : t("a11y.play_live_stream","Play live stream"));
+  /* Every change of state in the player arrives here — playing, paused,
+     stalled, failed — so this is the one place the On air bar has to be told
+     about. Hooking the five audio events separately is how one of them gets
+     forgotten and the bar is left on over a stream that has stopped. */
+  oaSync();
 }
 
 function ensureAudio(){
@@ -9377,6 +9458,75 @@ function initLive(){
     lvVolPaint(e.target);
   });
   document.getElementById('lv-vids').addEventListener('click',openVids);
+}
+
+/* ---------------- the On air bar ----------------
+   What makes the radio usable from the rest of the app. The audio element has
+   always been at module scope, so the stream already survived a tab change —
+   what did not exist was any way to STOP it once you had walked away from the
+   play button, or any sign that it was still going.
+
+   Three things decide what it does, and they are deliberately separate:
+
+     showing   the stream is playing AND you are not on the Live page
+     floored   a sheet is open, so there is no tab bar to sit on
+     leaving   the 240ms it takes to tuck away, during which it is still in
+               the DOM — remove it at the moment of the tap and there is no
+               animation to see.
+------------------------------------------------- */
+let oaLeaving = null;
+
+function oaPlaying(){ return !!(AUDIO && !AUDIO.paused && !AUDIO.ended); }
+
+/* Where it sits: on the tab bar normally, on the floor when a sheet has
+   covered the tab bar. Kept apart from oaSync because a sheet opening over a
+   playing stream changes the position and nothing else. */
+function oaFloor(){
+  const open = document.querySelector('.sheet[data-open="1"], .drawer[data-open="1"]');
+  document.documentElement.dataset.oafloor = open ? "1" : "0";
+}
+
+function oaSync(){
+  const bar = document.getElementById('onair');
+  if(!bar) return;
+  oaFloor();
+  const show = oaPlaying() && navCurrentTab() !== "live";
+  const on = !bar.hidden && bar.dataset.state !== "out";
+  if(show === on) return;
+
+  clearTimeout(oaLeaving);
+  document.documentElement.dataset.onair = show ? "1" : "0";
+  if(show){
+    bar.hidden = false;
+    /* Out first, then in on the next frame: a transition only runs between
+       two painted values, and an element revealed and moved in the same tick
+       has only ever been painted once. */
+    bar.dataset.state = "out";
+    void bar.offsetHeight;
+    requestAnimationFrame(()=>{ bar.dataset.state = "in"; });
+    return;
+  }
+  bar.dataset.state = "out";
+  /* A timer rather than transitionend: reduced motion changes which property
+     is animated, a tab switched twice quickly can cancel the transition
+     entirely, and either way the event may never arrive. */
+  oaLeaving = setTimeout(()=>{ bar.hidden = true; }, 300);
+}
+
+function initOnAir(){
+  document.getElementById('oa-go').addEventListener('click',()=>{ switchTab('live'); });
+  document.getElementById('oa-stop').addEventListener('click',()=>{
+    /* Stop, not pause: on a LIVE stream a held buffer is the wrong audio
+       played late, so the next play reconnects. Paused state is what the
+       player's own button is for. */
+    if(AUDIO){ AUDIO.pause(); try{ AUDIO.removeAttribute("src"); AUDIO.load(); }catch(e){} }
+    lvState("idle", t("live.paused","Paused"));
+  });
+  /* Sheets and the drawer are DOM state and nothing else — data-open="1" —
+     so this is how the bar hears about one opening over it. */
+  new MutationObserver(oaFloor).observe(document.body,
+    { subtree:true, attributes:true, attributeFilter:["data-open"] });
+  oaSync();
 }
 
 /* ---------------- 40 rabbanā ----------------
@@ -13271,13 +13421,56 @@ function initMarriageDeath(){
    day is above the fold. Built from the record rather than read back out of
    the table, so it is right on a day the table is not showing. On a Friday
    the Zuhr column is announced as Jumuʿah, matching everywhere else. -------*/
+/* The five glyphs. They were four near-identical suns and a moon — at this
+   size Fajr, Zuhr, Asr and Maghrib were one picture repeated, which is the
+   drift the committee asked to be fixed. The horizon carries it now: Fajr is
+   the disc under the line with the arrow rising, Maghrib the same line with
+   the arrow falling, Zuhr the sun at its height, Asr that sun pushed low and
+   leaning, Isha a crescent and a star.
+
+   A FLAT LIST OF `d` STRINGS, and circles written as paths, because
+   native/src/prayer-icons.jsx holds the same five for the app and
+   scripts/check-prayer-icons.mjs fails the build when one of them differs.
+   Two files can only be compared if they say the same thing the same way, so
+   redraw one of these and you will be told to redraw the other. */
 const STRIP_ICONS = {
-  fajr:    '<circle cx="12" cy="14" r="3.4"/><path d="M12 6.6V4.4M6.9 8.9 5.4 7.4M17.1 8.9l1.5-1.5M3.6 14h2.2M18.2 14h2.2"/>',
-  zuhr:    '<circle cx="12" cy="12" r="4"/><path d="M12 3.6v2M12 18.4v2M5.6 5.6 7 7M17 17l1.4 1.4M3.6 12h2M18.4 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/>',
-  asr:     '<circle cx="12" cy="13.5" r="3.6"/><path d="M12 6.2v2M4.4 13.5h2M17.6 13.5h2M6.6 8.1 8 9.5M17.4 8.1 16 9.5"/>',
-  maghrib: '<path d="M4 17.5h16"/><circle cx="12" cy="13" r="3.4"/><path d="M12 5.6v2.2M6.4 9.4 7.9 10.9M17.6 9.4 16.1 10.9"/>',
-  isha:    '<path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.7 7.7 0 1 0 10.1 10.1Z"/>',
+  fajr: [
+    "M3 18h18",
+    "M7.5 18a4.5 4.5 0 0 1 9 0",
+    "M12 3.2v3.4",
+    "M9.6 5.9 12 3.3l2.4 2.6",
+    "M5 9.6 6.4 11",
+    "M19 9.6 17.6 11",
+  ],
+  zuhr: [
+    "M16 12a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
+    "M12 3.6v2M12 18.4v2M5.6 5.6 7 7M17 17l1.4 1.4M3.6 12h2M18.4 12h2M5.6 18.4 7 17M17 7l1.4-1.4",
+  ],
+  asr: [
+    "M16.7 13.2a3.5 3.5 0 1 1-7 0 3.5 3.5 0 1 1 7 0",
+    "M13.2 4.8v2.1",
+    "M4.6 13.2h2.1",
+    "M7.1 7.1 8.6 8.6",
+    "M7.1 19.3 8.6 17.8",
+    "M19.3 7.1 17.8 8.6",
+    "M19.6 13.2h2",
+  ],
+  maghrib: [
+    "M3 18h18",
+    "M7.5 18a4.5 4.5 0 0 1 9 0",
+    "M12 9.6V3.2",
+    "M9.6 7 12 9.7 14.4 7",
+    "M5 9.6 6.4 11",
+    "M19 9.6 17.6 11",
+  ],
+  isha: [
+    "M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.7 7.7 0 1 0 10.1 10.1Z",
+    "M18.2 3v2.6",
+    "M16.9 4.3h2.6",
+  ],
 };
+
+const stripIcon = k => (STRIP_ICONS[k] || []).map(d => `<path d="${d}"/>`).join("");
 
 /* The strip has a fifth of the screen per prayer, so the meridiem is dropped:
    Fajr is not going to be mistaken for the afternoon. Stripping it off hm12()
@@ -13310,7 +13503,7 @@ function renderStrip(){
     return `<div class="pcol"${k === nextKey ? ' data-next="1"' : ""}>`
          + `<span class="p-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" `
          + `stroke="currentColor" stroke-width="1.6" stroke-linecap="round" `
-         + `stroke-linejoin="round">${STRIP_ICONS[k]}</svg></span>`
+         + `stroke-linejoin="round">${stripIcon(k)}</svg></span>`
          + `<span class="p-n">${esc(label)}</span>`
          + `<span class="p-b tnum">${begin ? esc(hmShort(begin)) : "&mdash;"}</span>`
          + `<span class="p-j tnum">${jam ? esc(hmShort(jam)) : "&mdash;"}</span>`
@@ -14931,6 +15124,8 @@ function switchTab(name){
   });
   window.scrollTo({top:0,behavior:"instant"});
   if(name === "notices") NT.pending = ntEnterTab();
+  /* Arriving on Live takes the bar away; leaving it brings the bar back. */
+  oaSync();
 }
 /* ===========================================================================
    THE ANDROID BACK BUTTON
@@ -15958,6 +16153,7 @@ function boot(){
   initRamadan();
   initHajj();
   initLive();
+  initOnAir();
   initVids();
   initZakat();
   initQibla();

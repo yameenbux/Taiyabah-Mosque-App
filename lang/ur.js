@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "6822fd6962ba",
+ "version": "7a2e5d572b6e",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.notifications": "اطلاعات",
@@ -452,6 +452,7 @@ window.LANG_PACK = {
   "a11y.about_taiyabah_masjid": "طیبہ مسجد کے بارے میں",
   "a11y.play_live_stream": "براہِ راست نشریات چلائیں",
   "a11y.pause_live_stream": "براہِ راست نشریات روکیں",
+  "a11y.stop_live_stream": "براہِ راست نشریات بند کریں",
   "a11y.volume": "آواز",
   "a11y.videos": "ویڈیوز",
   "a11y.zakat_calculator": "زکوٰۃ کیلکولیٹر",

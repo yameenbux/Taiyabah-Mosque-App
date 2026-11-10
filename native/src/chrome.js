@@ -70,6 +70,21 @@ export function tabBarFor({ rtl = false, fs, inset = 0 }) {
 export const GAP = 12;
 
 /**
+ * How much room a screen leaves at its bottom while the On air bar is there.
+ *
+ * Here with the rest of the chrome arithmetic, and not in src/on-air.jsx,
+ * because src/ui.jsx needs it for every Screen in the app — and ui.jsx is
+ * what on-air.jsx gets its own Press behaviour from. A constant that both of
+ * them import from a file that imports nothing is the shape with no cycle in
+ * it.
+ *
+ * Deliberately a shade more than the bar's own height: being wrong here shows
+ * up as a line of someone's Qurʼan sitting behind a bar, and the generous
+ * direction of that mistake is the cheap one.
+ */
+export const ON_AIR_ROOM = 64;
+
+/**
  * How far up from the bottom of the window a floating notice has to sit.
  *
  * The tab bar takes layout space, but the offline notice is positioned against

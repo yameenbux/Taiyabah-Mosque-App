@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "34069877ca17",
+ "version": "1f21f6f09169",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.notifications": "الإشعارات",
@@ -452,6 +452,7 @@ window.LANG_PACK = {
   "a11y.about_taiyabah_masjid": "عن مسجد طيبة",
   "a11y.play_live_stream": "تشغيل البث المباشر",
   "a11y.pause_live_stream": "إيقاف البث المباشر مؤقتًا",
+  "a11y.stop_live_stream": "إيقاف البث المباشر",
   "a11y.volume": "مستوى الصوت",
   "a11y.videos": "مقاطع الفيديو",
   "a11y.zakat_calculator": "حاسبة الزكاة",

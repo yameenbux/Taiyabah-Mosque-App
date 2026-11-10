@@ -426,6 +426,7 @@
  "a11y.about_taiyabah_masjid": "طیبہ مسجد کے بارے میں",
  "a11y.play_live_stream": "براہِ راست نشریات چلائیں",
  "a11y.pause_live_stream": "براہِ راست نشریات روکیں",
+ "a11y.stop_live_stream": "براہِ راست نشریات بند کریں",
  "a11y.volume": "آواز",
  "a11y.videos": "ویڈیوز",
  "a11y.zakat_calculator": "زکوٰۃ کیلکولیٹر",
@@ -1922,6 +1923,8 @@
  "giving.card_apple_pay_google": "کارڈ · Apple Pay · Google Pay",
  "giving.not_available_yet": "ابھی دستیاب نہیں",
  "giving.choose_another_amount": "کوئی اور رقم چنیں، یا نیچے دی گئی بینک تفصیلات استعمال کریں",
+ "giving.one_moment": "ایک لمحہ…",
+ "giving.could_not_start_that_donation": "یہ عطیہ شروع نہیں ہو سکا۔ براہِ کرم دوبارہ کوشش کریں۔",
  "collect.charity_collections": "خیراتی کلیکشن",
  "a11y.charity_collections": "خیراتی کلیکشن",
  "collect.done": "ہو گیا",
@@ -2326,7 +2329,5 @@
  "ramadan.it_begins_tonight": "آج رات شروع ہو رہا ہے",
  "ramadan.first_taraweeh_after_isha": "پہلی تراویح عشاء کے بعد",
  "portal.office_answers": "اگر آپ والد یا والدہ ہیں اور پورٹل وہ نہیں دکھاتا جو آپ کو چاہیے، تو دفتر شام ۵ سے ۷ بجے کے درمیان فون پر اس کا جواب دے سکتا ہے۔",
- "sysprefs.lang_fallback": "اردو، گجراتی اور عربی کو اہلِ زبان نے پڑھا اور درست کیا ہے۔ جس لفظ کا ترجمہ موجود نہ ہو وہ خالی جگہ کے بجائے انگریزی میں دکھایا جاتا ہے۔",
- "giving.one_moment": "ایک لمحہ…",
- "giving.could_not_start_that_donation": "یہ عطیہ شروع نہیں ہو سکا۔ براہِ کرم دوبارہ کوشش کریں۔"
+ "sysprefs.lang_fallback": "اردو، گجراتی اور عربی کو اہلِ زبان نے پڑھا اور درست کیا ہے۔ جس لفظ کا ترجمہ موجود نہ ہو وہ خالی جگہ کے بجائے انگریزی میں دکھایا جاتا ہے۔"
 }

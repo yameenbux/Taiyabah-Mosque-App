@@ -18,6 +18,8 @@ import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
 import { C, F, R, SHADOW, dual } from "./theme";
 import { COLUMN } from "./layout";
+import { ON_AIR_ROOM } from "./chrome";
+import { useLiveAudio } from "./live-audio";
 import { useOffline } from "./reach";
 import { useApp } from "./store";
 
@@ -164,8 +166,13 @@ export const Screen = React.forwardRef(function Screen(
      input on the zakāt calculator. Padding is added only while the bar is
      actually showing, so nothing moves for anybody with a connection. */
   const down = useOffline();
+  /* AND ROOM FOR THE ON AIR BAR, on exactly the same terms: it floats over the
+     scroll too, and only while the radio is actually playing. Without this the
+     last line of whatever you are reading sits behind it — which on the Qurʼan
+     is an āyah, so it is not a small thing. */
+  const onAir = useLiveAudio().playing;
   const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
-                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0),
+                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + (onAir ? ON_AIR_ROOM : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
   if (!scroll)
     return (
