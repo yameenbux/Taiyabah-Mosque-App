@@ -31,6 +31,16 @@
  * tells you WHICH libraries are wrong, which is the difference between bumping
  * one dependency and upgrading the whole SDK.
  *
+ * ONLY THE 64-BIT ABIs ARE CHECKED, and that is not a loophole. 16 KB pages
+ * exist only on 64-bit devices, so a 32-bit library's alignment cannot matter.
+ * React Native ships it that way on purpose: in 0.79.6, every arm64-v8a and
+ * x86_64 library is 16 KB aligned and every armeabi-v7a and x86 one is 4 KB.
+ *
+ * The first version of this check did not know that. It counted every ABI, so
+ * it failed a bundle whose 64-bit halves were perfectly correct and reported
+ * eighteen libraries as broken when none of the ones that count were. A check
+ * that cries wolf gets switched off, which is worse than not having it.
+ *
  * Reads the ELF program headers directly: no NDK, no Python, no download.
  */
 import { execFileSync } from "node:child_process";
@@ -40,6 +50,9 @@ import path from "node:path";
 
 const PT_LOAD = 1;
 const NEEDED = 16384;
+/* The ABIs that can meet a 16 KB page. Anything else is a 32-bit device, which
+ * has 4 KB pages and always will. */
+const SIXTY_FOUR_BIT = new Set(["arm64-v8a", "x86_64", "riscv64"]);
 
 /* The smallest p_align across a library's loadable segments. That is the one
  * that decides it: a library is only as loadable as its worst segment. */
@@ -72,11 +85,17 @@ if (!archive || !fs.existsSync(archive)) {
   process.exit(2);
 }
 
-const list = execFileSync("unzip", ["-Z1", archive], { encoding: "utf8", maxBuffer: 64 << 20 })
+const all = execFileSync("unzip", ["-Z1", archive], { encoding: "utf8", maxBuffer: 64 << 20 })
   .split("\n").map(s => s.trim()).filter(s => s.endsWith(".so"));
+const list = all.filter(p => SIXTY_FOUR_BIT.has(p.split("/").slice(-2)[0]));
+const skipped = all.length - list.length;
 
-if (!list.length) {
+if (!all.length) {
   console.error(`::error::${path.basename(archive)} contains no .so files at all, which cannot be right for a React Native build — this check is not looking where it thinks it is.`);
+  process.exit(1);
+}
+if (!list.length) {
+  console.error(`::error::${path.basename(archive)} has ${all.length} native libraries and not one of them is in a 64-bit ABI directory (${[...SIXTY_FOUR_BIT].join(", ")}). Either this build ships no 64-bit code, which would be its own problem, or the paths are not the shape this check expects.`);
   process.exit(1);
 }
 
@@ -99,11 +118,12 @@ for (const entry of list) {
 fs.rmSync(tmp, { recursive: true, force: true });
 
 if (!bad.size) {
-  console.log(`all ${checked} native libraries are aligned to at least ${NEEDED} bytes, so they load on a 16 KB page device`);
+  console.log(`all ${checked} 64-bit native libraries are aligned to at least ${NEEDED} bytes, so they load on a 16 KB page device`);
+  if (skipped) console.log(`(${skipped} 32-bit libraries not checked: 16 KB pages are a 64-bit feature)`);
   process.exit(0);
 }
 
-console.error(`::error::${bad.size} of ${checked} native libraries are not 16 KB aligned. Play refuses the upload, and the app would fail to load them on a 16 KB device.`);
+console.error(`::error::${bad.size} of ${checked} 64-bit native libraries are not 16 KB aligned. Play refuses the upload, and the app would fail to load them on a 16 KB device.`);
 for (const [name, aligns] of [...bad].sort()) {
   console.error(`  ${name.padEnd(42)} align=${[...aligns].join(", ")}`);
 }
