@@ -317,6 +317,19 @@ jobs:
       # builds perfectly, looks finished, and is rejected on upload — or worse,
       # a future change silently stops applying the patch and nobody notices
       # until the key no longer matches the listing. So: read the certificate
+      # Every check above this point reads the manifest, the applicationId,
+      # the signature or the version code. None of them had ever looked inside
+      # a .so file — which is how a bundle that passed all of them was refused
+      # by Play on 10 November 2026 for not supporting 16 KB memory pages, by a
+      # person pressing Upload twenty-five minutes after the build finished.
+      #
+      # The failure is cheap to detect and expensive to discover: it costs a
+      # build, an upload attempt and a round trip through the console. So it is
+      # checked here, on the finished bundle, in the seconds it takes to read
+      # the ELF headers.
+      - name: Will it load on a 16 KB page device?
+        run: node native/scripts/check-16k.mjs native/android/app/build/outputs/bundle/release/app-release.aab
+
       # back OUT of the finished file and prove it is the keystore's own.
       - name: Prove it is signed with the upload key
         env:

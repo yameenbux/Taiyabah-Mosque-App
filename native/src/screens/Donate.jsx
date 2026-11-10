@@ -195,11 +195,17 @@ const LINKS = {
 };
 const AMOUNTS = ["5", "10", "25", "50", "100", "other"];
 
+/* The same Worker push.js and metals.js talk to. Friday Pay goes through it
+ * rather than opening a Payment Link — see the comment on the CTA below. */
+const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
+
 export function Giving() {
   const { t, fs } = useApp();
   const [fund, setFund] = useState("general");
   const [freq, setFreq] = useState("once");
   const [amt, setAmt]   = useState("25");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const FUNDS = [
     { v: "general",  t: t("giving.the_masjid", "The masjid"), s: t("giving.general", "General"),
@@ -222,9 +228,41 @@ export function Giving() {
   const href = base ? base + (base.includes("?") ? "&" : "?") + "client_reference_id=" + encodeURIComponent(fund) : null;
   const per = freq === "monthly" ? " " + t("giving.a_month", "a month")
             : freq === "friday"  ? " " + t("giving.every_friday", "every Friday") : "";
-  const label = !href ? t("giving.not_available_yet", "Not available yet")
+  const label = busy ? t("giving.one_moment", "One moment…")
+              : !href ? t("giving.not_available_yet", "Not available yet")
               : amt === "other" ? t("giving.choose_your_amount", "Choose your amount") + per
               : `${t("tiles.donate", "Donate")} £${amt}${per}`;
+
+  /* FRIDAY PAY DOES NOT OPEN A LINK, AND CANNOT.
+   *
+   * A Stripe Payment Link charges at checkout and then every seven days from
+   * that moment. A donor who chose Friday Pay on Sunday 8 November 2026 was
+   * charged that Sunday, and would have been every Sunday after, under a
+   * button that read "Donate £10 every Friday".
+   *
+   * The wait to Friday is one day on a Thursday and seven on a Saturday, and a
+   * link's trial_period_days is a fixed integer, so no set of links can say it.
+   * The Worker makes a Checkout Session anchored to the next Friday instead.
+   * One-off and monthly keep their links, which behave correctly.
+   *
+   * On failure the donor is told and the button comes back. It never falls
+   * through to the old link: that takes money today, on the wrong day, which
+   * is the entire complaint. */
+  const giveOnFriday = async () => {
+    if (busy) return;
+    setBusy(true); setFailed(false);
+    try {
+      const res = await fetch(`${SENDER}/api/donate/friday`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: amt, fund }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data && data.url) { open(data.url); return; }
+      setFailed(true);
+    } catch { setFailed(true); }
+    finally { setBusy(false); }
+  };
 
   return (
     <Screen pad={false}>
@@ -271,6 +309,17 @@ export function Giving() {
 
           <GLab>{t("giving.how_often", "How often")}</GLab>
           <Options options={FREQS} value={freq} onChange={setFreq} />
+          {/* The website has shown this note since the screen was built; the
+              app never has. A donor picking Friday Pay in the app saw only the
+              words "Friday Pay · Jumuʿah" and a button promising every Friday,
+              which is how one came to be charged on a Sunday. */}
+          {freq !== "once" && (
+            <Note>{freq === "monthly"
+              ? t("giving.taken_once_a_month_from",
+                  "Taken once a month from the day you set it up, until you stop it. You can cancel any time from the receipt Stripe emails you.")
+              : t("giving.a_weekly_gift_for_jumuah",
+                  "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time.")}</Note>
+          )}
 
           <GLab>{t("giving.amount", "Amount")}</GLab>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -307,8 +356,12 @@ export function Giving() {
             uppercase line. It drew as the app's ordinary plum pill, so the
             one button on the screen that takes money looked like every other
             button in the app. */}
-        <GoldCTA label={label} href={href} disabled={!href}
-             sub={href ? t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")
+        <GoldCTA label={label}
+             href={freq === "friday" ? null : href}
+             onPress={freq === "friday" && href ? giveOnFriday : null}
+             disabled={!href || busy}
+             sub={failed ? t("giving.could_not_start_that_donation", "Could not start that donation. Please try again.")
+                : href ? t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")
                        : t("giving.choose_another_amount", "Choose another amount, or use the bank details below")} />
         </Card>
 

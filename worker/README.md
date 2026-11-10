@@ -168,3 +168,47 @@ Reports carry what the phone could see about itself: subscription and user
 ids, page origin, permission state, service workers, browser user agent. No
 names, no contact details, and nothing the person did not press a button to
 send.
+
+## Jumuʿah donations that land on a Friday
+
+`POST /api/donate/friday  { amount, fund }  ->  { url, firstCharge }`
+
+**Why the Worker is involved at all.** "Friday Pay" used to open a static
+Stripe Payment Link. A Payment Link charges at checkout and then every seven
+days from that moment — so a donor who set one up on Sunday 8 November 2026
+was charged that Sunday, and would have been charged every Sunday after, under
+a button that read *"Donate £10 every Friday"*.
+
+No link can fix it. The wait to Friday is one day on a Thursday and seven on a
+Saturday, and a Payment Link's `trial_period_days` is a fixed integer baked
+into the link. You would need a different link for each day of the week.
+
+A Checkout Session can, because it takes `billing_cycle_anchor`, which Stripe
+documents as setting *"the day of week for `week` intervals"*. Anchor a weekly
+subscription to any Friday and it bills every Friday, for good.
+
+**`proration_behavior` is set to `none`, and must stay that way.** Stripe's
+default with a future anchor is to charge a part amount now for the days in
+between. That is the original complaint wearing a smaller number and a harder
+explanation. `test/friday.test.mjs` fails if the parameter goes missing.
+
+### The secrets it needs
+
+```sh
+npx wrangler secret put STRIPE_SECRET_KEY        # Stripe → Developers → API keys (sk_live_…)
+```
+
+Until that is set the route answers **503** and says so, rather than failing in
+front of a donor.
+
+Two optional ones, both plain configuration rather than secrets, so they can go
+in `wrangler.toml`:
+
+| | |
+|---|---|
+| `STRIPE_DONATION_PRODUCT` | A Stripe product id (`prod_…`). The weekly amounts are created inline, and without this each lands under its own product name. Set it and they all hang off one product, which keeps the reporting readable. |
+| `DONATE_RETURN_URL` | Where Stripe sends the donor afterwards. Defaults to the app site. |
+
+**The live key is a live key.** It can move money. It belongs in
+`wrangler secret put`, never in `wrangler.toml`, never in the repository, and
+never in a screenshot.

@@ -4766,9 +4766,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             </div>
             <p class="gv-note" data-freqnote="monthly" hidden data-i18n="giving.taken_once_a_month_from">Taken once a month from the day you set it up, until you
               stop it. You can cancel any time from the receipt Stripe emails you.</p>
-            <p class="gv-note" data-freqnote="friday" hidden data-i18n="giving.a_weekly_gift_for_jumuah">A weekly gift for Jumu&#703;ah. Stripe takes it every seven
-              days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop
-              it any time.</p>
+            <p class="gv-note" data-freqnote="friday" hidden data-i18n="giving.a_weekly_gift_for_jumuah">A weekly gift for Jumu&#703;ah. The first payment is taken on
+              the next Friday, and every Friday after that. Nothing is taken today. You can stop it any
+              time.</p>
 
             <div class="gv-lab" data-i18n="giving.amount">Amount</div>
             <div class="gv-grid">
@@ -7686,7 +7686,12 @@ function rmBookProbe(){
     method: "POST", signal: ctrl.signal,
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
-    body: "{}",
+    /* The slug, spelled as advice_is_open spells it. This function does not
+       exist in the database yet — the call 404s and the catch below reads
+       that as "booking is closed", which is the state the masjid is in. It is
+       written with the slug now so that the day somebody creates it, this is
+       not the fifth screen to be found calling it without one. */
+    body: JSON.stringify({ p_masjid: SUPA.masjid }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     RM_BOOK.open = res.ok && String(body).trim() === "true";
@@ -11410,6 +11415,7 @@ function bkSubmit(e){
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ payload: {
+      masjid:       SUPA.masjid,
       booking_date: bkIso(BK.date),
       hire_type:    BK.hire.type,
       halls_count:  BK.hire.type === "halls" ? BK.hire.count : null,
@@ -13128,6 +13134,7 @@ function iaSubmit(e){
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
     body: JSON.stringify({ payload: {
+      masjid:   SUPA.masjid,
       name:     v("ia-name"),
       phone:    v("ia-phone"),
       email:    v("ia-email"),
@@ -13514,7 +13521,7 @@ function nkProbe(){
       Authorization: "Bearer " + SUPA.key,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ payload: {} }),
+    body: JSON.stringify({ payload: { masjid: SUPA.masjid } }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     /* 404 with PGRST202 is "no such function" — the migration is not applied.
@@ -13764,6 +13771,7 @@ function nkSubmit(e){
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ payload: {
+      masjid:           SUPA.masjid,
       preferred_date:   nkIso(NK.d1),
       alternative_date: NK.d2 ? nkIso(NK.d2) : null,
       slot:             slot,
@@ -14035,7 +14043,58 @@ function gvRender(){
     sub.textContent = t("giving.choose_another_amount","Choose another amount, or use the bank details below");
   }
 }
+/* FRIDAY PAY DOES NOT OPEN A LINK, AND CANNOT.
+ *
+ * A Stripe Payment Link charges at checkout and then every seven days from
+ * that moment. A donor who chose Friday Pay on Sunday 8 November 2026 was
+ * charged that Sunday, and would have been charged every Sunday after, under
+ * a button reading "Donate £10 every Friday".
+ *
+ * The wait to Friday is one day on a Thursday and seven on a Saturday, and a
+ * link's trial_period_days is a fixed integer, so no set of links can express
+ * it. The Worker makes a Checkout Session anchored to the next Friday
+ * instead — worker/src/friday.js. One-off and monthly still use their links,
+ * which behave correctly.
+ *
+ * If this fails the donor is told and the button comes back. It never falls
+ * through to the old link: that would take money today, on the wrong day,
+ * which is the whole complaint. */
+async function gvFriday(ev){
+  if (GV.freq !== "friday") return;          /* one-off and monthly: leave the link alone */
+  ev.preventDefault();
+  const cta  = document.getElementById("gv-cta");
+  const main = document.getElementById("gv-cta-amt");
+  const sub  = document.getElementById("gv-cta-sub");
+  if (cta.dataset.busy === "1") return;
+  if (!GIVING_AMOUNTS[GV.amt]) return;
+
+  const mainWas = main.textContent, subWas = sub.textContent;
+  cta.dataset.busy = "1";
+  cta.setAttribute("aria-disabled", "true");
+  main.textContent = t("giving.one_moment", "One moment…");
+  sub.textContent  = "";
+  try {
+    const res = await fetch(SENDER_BASE + "/api/donate/friday", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: GV.amt, fund: GV.fund }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data && data.url) { location.href = data.url; return; }
+    throw new Error((data && data.error) || ("Stripe answered " + res.status));
+  } catch (err) {
+    main.textContent = mainWas;
+    sub.textContent  = t("giving.could_not_start_that_donation",
+                         "Could not start that donation. Please try again.");
+    setTimeout(() => { if (sub.textContent !== subWas) sub.textContent = subWas; }, 6000);
+  } finally {
+    cta.dataset.busy = "";
+    cta.removeAttribute("aria-disabled");
+  }
+}
+
 function initGiving(){
+  document.getElementById('gv-cta').addEventListener('click', gvFriday);
   document.getElementById('gv-close').addEventListener('click', closeGiving);
   document.getElementById('gv-scrim').addEventListener('click', closeGiving);
   document.querySelectorAll('#giving .gv-opt').forEach(b=>{
@@ -14129,7 +14188,7 @@ function ccProbe(){
     signal: ctrl.signal,
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
-    body: JSON.stringify({ payload: {} }),
+    body: JSON.stringify({ payload: { masjid: SUPA.masjid } }),
   }).then(res => res.text().then(body => {
     clearTimeout(timer);
     CC.open = !(res.status === 404 || /PGRST202/.test(body));
@@ -14296,6 +14355,7 @@ function ccSubmit(e){
     headers: { apikey: SUPA.key, Authorization: "Bearer " + SUPA.key,
                "Content-Type": "application/json" },
     body: JSON.stringify({ payload: {
+      masjid:          SUPA.masjid,
       requested_date:  v("cc-date"),
       org_name:        v("cc-org"),
       org_address:     v("cc-addr"),

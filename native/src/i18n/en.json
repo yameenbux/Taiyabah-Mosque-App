@@ -623,7 +623,7 @@
  "giving.friday_pay": "Friday Pay",
  "giving.jumuah": "Jumuʿah",
  "giving.taken_once_a_month_from": "Taken once a month from the day you set it up, until you stop it. You can cancel any time from the receipt Stripe emails you.",
- "giving.a_weekly_gift_for_jumuah": "A weekly gift for Jumuʿah. Stripe takes it every seven days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop it any time.",
+ "giving.a_weekly_gift_for_jumuah": "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time.",
  "giving.amount": "Amount",
  "giving.other": "Other",
  "giving.you_choose": "You choose",
@@ -1408,5 +1408,7 @@
  "zakat.nisab_is": "Nisab is",
  "zakat.gsnote": "Enter a price per gram above, or the gold and silver you own cannot be valued.",
  "zakat.below_nisab": "Below the nisab",
- "zakat.no_zakat_due": "No zakat is due on this amount. Ṣadaqah is always welcome."
+ "zakat.no_zakat_due": "No zakat is due on this amount. Ṣadaqah is always welcome.",
+ "giving.one_moment": "One moment…",
+ "giving.could_not_start_that_donation": "Could not start that donation. Please try again."
 }
