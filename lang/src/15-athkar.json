@@ -1,10 +1,5 @@
 {
   "_note": "key: [Urdu, Gujarati, Arabic]. The daily athkār: translations, notes, counts and sources. The Arabic column of a translation is the meaning in Arabic prose, not the dhikr itself — the dhikr is already on the card above it.",
-  "athkar.review_note": [
-    "الفاظ مختلف روایات اور مطبوعات میں مختلف ہو سکتے ہیں۔ اس مجموعے کو حتمی سمجھنے سے پہلے امام صاحب سے تصدیق کر لیں۔",
-    "શબ્દો જુદી જુદી રિવાયતો અને છાપોમાં અલગ હોઈ શકે છે. આ સંગ્રહને આખરી માનતા પહેલાં ઇમામ સાહેબ પાસે ખાતરી કરો.",
-    "قد يختلف اللفظ باختلاف الروايات والمطبوعات. تأكّد من الإمام قبل اعتماد هذه المجموعة نهائيًا."
-  ],
   "athkar.morning-evening.title": [
     "صبح و شام",
     "સવાર અને સાંજ",

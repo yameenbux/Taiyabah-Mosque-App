@@ -141,7 +141,6 @@ const SLEEP = [
 ];
 
 const data = {
-  reviewNote: "Wording varies between narrations and printings. Confirm this set with the imam before treating it as settled.",
   quranNote: "Qur'anic passages here are the same verified IndoPak text used in the Qur'an reader.",
   sections: [
     { id: "morning-evening", title: "Morning & Evening",

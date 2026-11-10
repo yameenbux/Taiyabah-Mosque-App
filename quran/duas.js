@@ -5,12 +5,8 @@
    to read from until the Arabic is fluent, a plain English meaning, and the
    collection it comes from.
 
-   Wording varies between narrations and printings. This set should be
-   confirmed with the imam before it is treated as settled — the page says so.
-
    Loaded only when the Duʿās page is opened. */
 window.DUAS = {
-  reviewNote: "Wording varies between narrations and printings. Confirm with the imam before treating this as settled.",
   categories: [
 
     { id: "day", title: "Through the Day", icon: "sun", items: [

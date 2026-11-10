@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
-import { Screen, Hero, Press, Note, MenuRow } from "../ui";
+import { Screen, Hero, Press, MenuRow } from "../ui";
 import ATHKAR from "../data/athkar.json";
 import DUAS from "../data/duas.json";
 import RABBANAS from "../data/rabbanas.json";
@@ -40,7 +40,7 @@ const GOES = [
 ];
 
 export function Athkar({ navigation }) {
-  const { t, tx } = useApp();
+  const { tx } = useApp();
   const sheet = SHEETS.athkar;
   const hero = sheet?.blocks.find(b => b.type === "hero");
   const rows = (sheet?.blocks || []).filter(b => b.type === "row");
@@ -61,9 +61,6 @@ export function Athkar({ navigation }) {
                           svg={r.svg} ext={r.ext}
                           onPress={() => navigation.navigate(go.to, go.params)} />;
         })}
-        <View style={{ marginTop: 13 }}>
-          <Note>{t("athkar.review_note", ATHKAR.reviewNote)}</Note>
-        </View>
       </View>
     </Screen>
   );
@@ -108,8 +105,8 @@ function Block({ item }) {
   );
 }
 
-function Collection({ groups, note, caution }) {
-  const { fs, t } = useApp();
+function Collection({ groups, note }) {
+  const { fs } = useApp();
   return (
     <SectionList
       style={{ backgroundColor: C.paper }}
@@ -121,7 +118,6 @@ function Collection({ groups, note, caution }) {
         <View style={{ marginTop: 14, gap: 7 }}>
           {!!note && <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted,
                                     lineHeight: fs(19) }}>{note}</Text>}
-          {!!caution && <Note>{caution}</Note>}
         </View>}
       renderSectionHeader={({ section }) => (
         <View style={{ marginTop: 24 }}>
@@ -136,18 +132,13 @@ function Collection({ groups, note, caution }) {
 }
 
 export function AthkarSet({ route }) {
-  const { t } = useApp();
   const s = ATHKAR.sections[route.params.n];
-  return <Collection groups={[{ title: s.title, intro: s.intro, data: s.items }]}
-    caution={`${t("athkar.confirm_the_wording_with_the", "Confirm the wording with the imam")} · ${
-      t("athkar.wording_varies_between_narrations_and", "Wording varies between narrations and printings.")}`} />;
+  return <Collection groups={[{ title: s.title, intro: s.intro, data: s.items }]} />;
 }
 
 export const Duas = () => {
   const { t } = useApp();
   return <Collection note={t("duas.du_as_for_the_day", "Duʿās for the day, with transliteration")}
-    caution={`${t("duas.confirm_the_wording_with_the", "Confirm the wording with the imam")} · ${
-      t("duas.wording_varies_between_narrations_and", "Wording varies between narrations and printings.")}`}
     groups={DUAS.categories.map(c => ({ title: c.title, intro: c.intro, data: c.items }))} />;
 };
 

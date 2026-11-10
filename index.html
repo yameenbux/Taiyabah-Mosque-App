@@ -5156,10 +5156,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <div class="ab-wrap" id="ak-read-view" hidden>
           <div class="ak-tabs" id="ak-tabs"></div>
           <div id="ak-body"><p class="qd-empty" data-i18n="athkar.loading">Loading…</p></div>
-          <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="athkar.confirm_the_wording_with_the">Confirm the wording with the imam</div>
-            <p id="ak-note" data-i18n="athkar.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
-          </div>
           <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
@@ -5225,10 +5221,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <input id="du-search" type="search" placeholder="Search — travel, sleep, forgiveness…"
                    autocapitalize="off" autocorrect="off" aria-label="Search duʿās" data-i18n-attr="placeholder:a11y.search_travel_sleep_forgiveness,aria-label:a11y.search_du_s">
             <div id="du-cats"><p class="qd-empty" data-i18n="duas.loading">Loading…</p></div>
-            <div class="wl-advisory">
-              <div class="wl-adv-h" data-i18n="duas.confirm_the_wording_with_the">Confirm the wording with the imam</div>
-              <p id="du-note" data-i18n="duas.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
-            </div>
             <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
           </div>
         </div>
@@ -12168,7 +12160,6 @@ function renderAthkar(){
   if(!d){ document.getElementById('ak-body').innerHTML =
     `<p class="qd-empty">${esc(t("athkar.load_failed","Couldn't load the athkār. Check your connection and try again."))}</p>`; return; }
 
-  document.getElementById('ak-note').textContent = t("athkar.review_note", d.reviewNote);
   document.getElementById('ak-tabs').innerHTML = d.sections.map((sec,i) =>
     `<button class="ak-tab${i===akSection?' on':''}" data-i="${i}">${
       esc(t("athkar."+sec.id+".title", sec.title))}</button>`).join('');
@@ -12298,7 +12289,6 @@ function renderDuaCategories(filter){
   const d = window.DUAS;
   if(!d){ document.getElementById('du-cats').innerHTML =
     `<p class="qd-empty">${esc(t("duas.load_failed","Couldn't load the duʿās. Check your connection and try again."))}</p>`; return; }
-  document.getElementById('du-note').textContent = t("duas.review_note", d.reviewNote);
 
   const q = (filter || "").trim().toLowerCase();
   if(q){
