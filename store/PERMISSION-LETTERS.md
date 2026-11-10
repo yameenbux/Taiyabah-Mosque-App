@@ -76,6 +76,42 @@ users. That may be arguable, but a masjid app is not the place to find out.
 To re-run the measurement, the script is in the commit that added this
 section.
 
+### The printed edition settles it in its own words
+
+A scan of the Darussalam Arabic–English edition circulates freely online
+(the one watermarked Kalamullah.com). Its availability changes nothing, and
+its own copyright page says so, in English, in a box on page iii:
+
+> ALL RIGHTS RESERVED ©
+> No part of this book may be reproduced or utilized in any form or by any
+> means, electronic or mechanical, including photocopying and recording or
+> by any information storage and retrieval system, without written
+> permission of the publisher or the translator.
+
+"Information storage and retrieval system" is not loose wording. That is an
+app database, named.
+
+The same page gives the details the letter should cite, so a rights
+department can identify the edition without correspondence:
+
+    © Maktaba Dar us Salam, 1997
+    Darussalam Publishers and Distributors, P.O. Box 22743, Riyadh 11416
+    Translated by Dr Muhammad Muhsin Khan
+    Printed July 1997, printing supervised by Abdul Malik Mujahid
+    ISBN 9960-717-31-3 (set), 9960-717-32-1 (v.1)
+
+**AND IT NAMES TWO ROUTES, NOT ONE:** "the publisher **or the translator**".
+Dr Muhsin Khan died in 2021, so the translator route now means his estate —
+harder to reach, but a second door where we assumed there was one.
+
+**Worth asking for specifically.** The front matter carries endorsements of
+this translation's soundness from the Presidency of Islamic Research and
+Iftā (signed ʿAbd al-ʿAzīz ibn Bāz) and from the Islamic University of
+Madinah. That is the committee's authenticity question answered for this
+edition, by authorities they would recognise — which is a reason to want
+this translation in particular, and therefore a reason to ask properly for
+it rather than settle for an unattributed copy of it.
+
 **Free to read is not free to copy.** That is the whole of it. sunnah.com is
 the same case and says so plainly in its own terms: it does not permit
 scraping, nor mass reproduction of entire books or collections, while
@@ -115,9 +151,14 @@ the one sunnah.com serves. Darussalam publishes it.
 >
 > We would like to include Dr Muhammad Muhsin Khan's English translation of
 > Ṣaḥīḥ al-Bukhārī alongside the Arabic, so that members of our community who
-> do not read Arabic can benefit. At present the app links out to the
-> translation online rather than reproducing it, because we did not wish to use
-> your work without asking.
+> do not read Arabic can benefit. The edition we mean is your Arabic–English
+> set translated by Dr Khan, ISBN 9960-717-31-3, © Maktaba Dar us Salam 1997.
+>
+> We note that its copyright page reserves reproduction "in any form or by any
+> means, electronic or mechanical ... or by any information storage and
+> retrieval system, without written permission of the publisher or the
+> translator". That is why we are writing rather than proceeding: at present
+> the app links out to the translation online and reproduces none of it.
 >
 > We would be grateful to know whether Darussalam would grant permission for
 > this use, and on what terms. We are glad to display any credit or copyright
