@@ -20,6 +20,7 @@
    the reasoning are in src/usage.js; the promise it keeps is the privacy
    notice's "no tracking of any kind". */
 import { note, flush, due } from "./src/usage.js";
+import { nextFridayAnchor, describeAnchor, fridayCheckoutForm } from "./src/friday.js";
 
 
 const SESSION_HOURS = 8;
@@ -1339,6 +1340,69 @@ async function handle(request, env) {
       if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
       const result = await runJamaahReminders(env);
       return json(result, 200, ch);
+    }
+
+    /* A JUMUʿAH DONATION THAT ACTUALLY FALLS ON A FRIDAY.
+     *
+     *   POST /api/donate/friday  { amount, fund }  ->  { url, firstCharge }
+     *
+     * The app and the website used to open a static Stripe Payment Link for
+     * this. A Payment Link charges at checkout and then every seven days from
+     * that moment, so a donor who set one up on Sunday 8 November 2026 was
+     * charged that Sunday and would have been charged every Sunday after —
+     * under a button that read "Donate £10 every Friday".
+     *
+     * No link can fix that: the wait to Friday is one day on a Thursday and
+     * seven on a Saturday, and a Payment Link's trial_period_days is a fixed
+     * integer. A Checkout Session can, because it takes billing_cycle_anchor,
+     * which Stripe documents as setting "the day of week for week intervals".
+     *
+     * proration_behavior MUST be "none". Stripe's default with a future anchor
+     * is to charge a part amount for the days in between — which is the very
+     * complaint this route exists to answer, only smaller and harder to
+     * explain. See test/friday.test.mjs.
+     *
+     * The amount is not taken on trust. A caller who posts their own number
+     * would set the masjid's donation amount from the client, so it has to be
+     * one of the amounts the screens actually offer. */
+    if (url.pathname === "/api/donate/friday" && request.method === "POST") {
+      if (!env.STRIPE_SECRET_KEY)
+        return json({ error: "Friday giving is not set up on this server yet." }, 503, ch);
+      if (!limit(`fri:${ip}`, 12, 10 * 60e3))
+        return json({ error: "Too many attempts. Try again in a few minutes." }, 429, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const anchor = nextFridayAnchor(new Date());
+      const built = fridayCheckoutForm({
+        amount: body.amount,
+        fund: body.fund,
+        anchor,
+        product: env.STRIPE_DONATION_PRODUCT || null,
+        returnUrl: env.DONATE_RETURN_URL || null,
+      });
+      if (built.error) return json({ error: built.error }, built.status, ch);
+      const when = describeAnchor(anchor, new Date());
+      const form = new URLSearchParams(built.form);
+
+      const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: form,
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.url) {
+        /* Stripe says why in plain words; pass that on rather than a status
+           code, because the person reading it is the one who set the key up. */
+        const why = out?.error?.message || `Stripe answered ${res.status}`;
+        return json({ error: "Stripe could not start this donation.", detail: why }, 502, ch);
+      }
+
+      return json({ url: out.url, firstCharge: { at: anchor, days: when.days, date: when.date } }, 200, ch);
     }
 
     return json({ error: "Not found", receivedPath: url.pathname, receivedMethod: request.method }, 404, ch);
