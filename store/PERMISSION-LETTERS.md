@@ -123,11 +123,79 @@ authenticity of what is shown to be verifiable. A dataset that will not name
 its translator fails that test before the licensing question is even reached.
 The masjid cannot stand behind words when it cannot say who rendered them.
 
-So there are two honest routes, and only two: ask, or write our own. The
-letters below are the first. If both are declined, the second is the masjid's
+So there are two honest routes: ask, or write our own. **Ask sunnah.com
+first** — see the next section; it is the shortest door and the only one with
+a direct precedent. If every ask is declined, the fallback is the masjid's
 own ʿulamā translating a chosen subset — the hadith actually used in khuṭbahs
 and madrasah — which needs nobody's permission, and which is the same model
 the Hajj section already runs on.
+
+---
+
+## Ask sunnah.com FIRST — their own invited channel
+
+**This is the shortest door, and this file nearly missed it.** An earlier
+version said flatly that sunnah.com forbids reproduction. That is what their
+"Reproduction, Copying, Scraping" section says, and reading only that section
+is how you arrive at the wrong conclusion. Their *Developers* page says the
+other half: they describe themselves as committed to an open platform for
+hadith that includes data and tools, they run an API, they ask you to open a
+GitHub issue to request a key, and they invite requests for an offline dump
+of hadith data.
+
+The prohibition is on **taking**. There is a sanctioned way to **ask**.
+
+**And there is a precedent that matches us almost exactly.** Greentech Apps
+Foundation's "Hadith Collection (All in One)" ships roughly 41,000 hadith in
+Arabic and English — free, ad-free, from a non-profit — and its store listing
+credits "Reference and Courtesy of Sunnah.com". It reads offline, so whatever
+they were granted covers bundling and not merely live API calls. That is the
+same shape as this masjid's request.
+
+**Channel:** a GitHub issue on `sunnah-com/api`, which is what their own page
+asks for, or their contact form. Not a letter — do not post this one.
+
+**What must be asked explicitly.** An API key is permission to *access*. It
+is not automatically permission to *ship the text inside an app, offline*,
+and it does not by itself settle the underlying translators' rights, which
+are not sunnah.com's to waive. So ask all of it plainly, in one message:
+
+> **Subject:** API access request — Taiyabah Masjid (Bolton, UK), a free
+> congregational app
+>
+> As-salāmu ʿalaykum.
+>
+> I write for Bolton Central Islamic Society (registered charity 1041569),
+> which runs Taiyabah Masjid in Bolton, United Kingdom. We publish a free app
+> for our congregation — no advertising, no analytics, not sold — carrying our
+> prayer timetable, the Qurʼan, the daily adhkār and the **Arabic** text of
+> Ṣaḥīḥ al-Bukhārī.
+>
+> We deliberately reproduce no English. Each hadith links out to its English
+> on sunnah.com, because we did not want to copy what we had not been given.
+> We would like to do better by the many in our community who read English
+> rather than Arabic, and your Developers page invites us to ask.
+>
+> Four questions, so that we assume nothing:
+>
+> 1. May we have an API key?
+> 2. Would any grant extend to **including the English text in the app so it
+>    reads offline**, or is it for live API access only? Our building has poor
+>    signal, and offline is the point.
+> 3. Is the offline dump of hadith data available now?
+> 4. Whose permission, besides yours, do we still need? We understand the
+>    English translations are the translators' and publishers' work, and we
+>    would rather write to them as well than assume your grant covers them.
+>
+> We will display whatever credit line you ask for, on every hadith if you
+> wish. We note that Greentech Apps Foundation credit "Reference and Courtesy
+> of Sunnah.com" and would be glad to do the same.
+>
+> Jazākum Allāhu khayran for sunnah.com. It has served our community for
+> years, and the link-out in our app points to you today.
+
+Question 4 is the one not to drop. Answered honestly, it is also what tells
+the masjid whether the two letters below are still needed.
 
 ---
 
