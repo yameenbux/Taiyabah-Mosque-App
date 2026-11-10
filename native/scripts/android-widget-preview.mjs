@@ -159,7 +159,13 @@ const render = (layoutName, w, h, now) => {
     const shape = bg && drawable(bg);
     const alpha = attr(el, "alpha") ? `opacity:${attr(el, "alpha")};` : "";
 
-    if (el.tag === "ImageView") {
+    /* An ImageView carrying only a BACKGROUND and no src is how the rules
+       are drawn — <View> is not a class RemoteViews can inflate, so the
+       seams had to become ImageViews. This branch used to claim every
+       ImageView and paint its src, so those rules rendered as
+       url(undefined) and the preview quietly lost both of them. Only take
+       it when there is actually a src to draw. */
+    if (el.tag === "ImageView" && attr(el, "src")) {
       const src = (attr(el, "src") || "").replace("@drawable/", "");
       const fit = (attr(el, "scaleType") || "fitCenter").toLowerCase();
       const pos = fit === "fitend" ? "right center" : fit === "fitstart" ? "left center" : "center";

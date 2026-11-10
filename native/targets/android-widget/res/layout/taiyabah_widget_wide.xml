@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- THE RULES ARE ImageViews AND THE GAPS ARE FrameLayouts, which looks
+     like somebody reaching for the wrong tag and is not. RemoteViews can
+     inflate only a fixed list of classes — FrameLayout, LinearLayout,
+     RelativeLayout, GridLayout, TextView, ImageView, Button, ImageButton,
+     ProgressBar, Chronometer, AnalogClock, TextClock and the adapter views —
+     and "descendants of these classes are not supported". A bare <View> is
+     not on that list, and <Space> is a descendant of View, so neither can be
+     inflated. A layout containing one does not warn, does not log and does
+     not crash: the launcher simply says "Couldn't add widget" and the widget
+     can never be placed, which is exactly what shipped.
+     scripts/check-android-widget.mjs now holds the real list. -->
 <!-- WIDE — the left column answers "am I about to miss it", the right answers
      "what else is on today". The rule between them carries the weight.
 
@@ -47,12 +58,13 @@
           android:textStyle="bold"
           android:letterSpacing="0.16"
           android:maxLines="1" />
-      <View
+      <ImageView
           android:layout_width="34dp"
           android:layout_height="1dp"
           android:layout_marginTop="7dp"
-          android:background="@drawable/taiyabah_rule" />
-      <Space
+          android:background="@drawable/taiyabah_rule"
+          android:contentDescription="@null" />
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1" />
@@ -84,7 +96,7 @@
           android:textStyle="bold"
           android:letterSpacing="0.14"
           android:maxLines="1" />
-      <Space
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1" />
@@ -97,12 +109,13 @@
           android:contentDescription="@null" />
     </LinearLayout>
 
-    <View
+    <ImageView
         android:layout_width="1dp"
         android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/taiyabah_vrule" />
+        android:background="@drawable/taiyabah_vrule"
+        android:contentDescription="@null" />
 
     <!-- A fixed width, so the rule between the columns sits in the same place
          whatever the launcher gives the widget, and the left column takes the
@@ -124,12 +137,13 @@
           android:letterSpacing="0.12"
           android:maxLines="1"
           android:ellipsize="end" />
-      <View
+      <ImageView
           android:layout_width="match_parent"
           android:layout_height="1dp"
           android:layout_marginTop="6dp"
           android:layout_marginBottom="7dp"
-          android:background="@drawable/taiyabah_rule" />
+          android:background="@drawable/taiyabah_rule"
+          android:contentDescription="@null" />
       <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -274,7 +288,7 @@
             android:textSize="11sp"
             android:maxLines="1" />
       </LinearLayout>
-      <Space
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1" />
