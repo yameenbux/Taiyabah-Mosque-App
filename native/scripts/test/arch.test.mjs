@@ -9,7 +9,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { wants, verdict, nativeSdkOk } from "../check-arch.mjs";
+import { wants, verdict, nativeSdkOk, pinnedNativeSdk } from "../check-arch.mjs";
 
 test("5.4 and above needs the New Architecture", () => {
   for (const v of ["5.4.0", "5.4.3", "^5.4.3", "5.5.1", "5.4.7"])
@@ -32,8 +32,17 @@ test("the two pairings that each broke the app", () => {
   assert.equal(verdict("5.3.6", true).ok, false);
 });
 
-test("the pairing being tried now", () => {
+test("the pairing this project shipped on React Native 0.76", () => {
   assert.equal(verdict("5.3.6", false).ok, true);
+});
+
+/* Expo SDK 53 moved this project to React Native 0.79, which is the version
+   5.4+ needed all along for its iOS module registration. So the pair flipped:
+   5.5.17 with the flag ON is now the supported one, and the old pairing is
+   what would break. */
+test("the pairing being tried now, on React Native 0.79", () => {
+  assert.equal(verdict("5.5.17", true).ok, true);
+  assert.equal(verdict("5.5.17", false).ok, false);
 });
 
 test("a mismatch says which way to move, and that it is both or neither", () => {
@@ -68,4 +77,32 @@ test("and they would be fine if we ever compile with Kotlin 2", () => {
 
 test("the message says which way out", () => {
   assert.match(nativeSdkOk("5.7.3", "1.9.25").message, /5\.7\.7 and later/);
+});
+
+/* --- reading the pinned native SDK ----------------------------------------
+ * The wrapper changed how it spells this between 5.4 and 5.5, and the reader
+ * went on matching the old spelling: it returned undefined, the Kotlin check
+ * treated that as nothing to do, and the guard went quietly blind. These
+ * assertions are here so the next spelling change is a red test rather than a
+ * silent pass. */
+
+test("the native SDK is read from a literal dependency line", () => {
+  assert.equal(pinnedNativeSdk('api("com.onesignal:OneSignal:5.7.7") {'), "5.7.7");
+});
+
+test("and from the variable 5.5.x switched to", () => {
+  const gradle = `def oneSignalVersion = '5.11.0'\n api("com.onesignal:OneSignal:\${oneSignalVersion}") {`;
+  assert.equal(pinnedNativeSdk(gradle), "5.11.0");
+});
+
+test("a spelling it cannot read returns null rather than a guess", () => {
+  assert.equal(pinnedNativeSdk("nothing resembling a version here"), null);
+  assert.equal(pinnedNativeSdk(""), null);
+});
+
+test("the Kotlin window is still enforced on a version read this way", () => {
+  /* 5.7.3 is inside the window; reaching it via the variable form must not
+     be a way around the check. */
+  const gradle = "def oneSignalVersion = '5.7.3'";
+  assert.equal(nativeSdkOk(pinnedNativeSdk(gradle), "1.9.25").ok, false);
 });

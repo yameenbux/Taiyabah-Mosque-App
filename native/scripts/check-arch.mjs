@@ -54,6 +54,24 @@ export function wants(version) {
  */
 const KOTLIN_2_SDKS = new Set(["5.7.1", "5.7.2", "5.7.3"]);
 
+/**
+ * Pure: the native Android SDK version the installed wrapper pins.
+ *
+ * Two spellings, because the wrapper changed one without telling anybody:
+ *
+ *   api("com.onesignal:OneSignal:5.7.7")        up to 5.4.x — a literal
+ *   def oneSignalVersion = '5.11.0'             5.5.x — a variable, used below
+ *
+ * The first regex kept matching nothing against the second form and yielding
+ * undefined, which read as "nothing to check here".
+ */
+export function pinnedNativeSdk(gradleText) {
+  const direct = String(gradleText).match(/com\.onesignal:(?:OneSignal|core|notifications):([0-9]+\.[0-9]+\.[0-9]+)/);
+  if (direct) return direct[1];
+  const viaVar = String(gradleText).match(/\bdef\s+oneSignalVersion\s*=\s*['"]([0-9]+\.[0-9]+\.[0-9]+)['"]/);
+  return viaVar ? viaVar[1] : null;
+}
+
 /** Pure: is the pinned native SDK compilable at this project's Kotlin? */
 export function nativeSdkOk(sdkVersion, kotlinVersion) {
   const kotlinMajor = Number(String(kotlinVersion || "").split(".")[0]);
@@ -92,10 +110,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   /* The native SDK the installed wrapper pins, and the Kotlin we compile with. */
   const gradlePath = path.join(root, "node_modules", "react-native-onesignal", "android", "build.gradle");
   if (fs.existsSync(gradlePath)) {
-    const sdk = (fs.readFileSync(gradlePath, "utf8").match(/com\.onesignal:OneSignal:([0-9.]+)/) || [])[1];
+    const sdk = pinnedNativeSdk(fs.readFileSync(gradlePath, "utf8"));
     const app = JSON.parse(fs.readFileSync(path.join(root, "app.json"), "utf8")).expo;
     const props = (app.plugins || []).find(p => Array.isArray(p) && /build-properties/.test(p[0]));
     const kotlin = props?.[1]?.android?.kotlinVersion;
+    /* A version this cannot read is a check that proves nothing. It used to
+       print "native SDK undefined" and carry on green, which is how the whole
+       Kotlin window below went untested the moment the wrapper switched to a
+       variable. Not being able to look is a failure, not a pass. */
+    if (!sdk) {
+      const why = `Could not read the native Android SDK version out of ${gradlePath}. ` +
+        "The Kotlin check below is the only thing standing between this project and " +
+        "a compile failure nothing in the version numbers predicts, so it does not " +
+        "get to pass by default. Teach pinnedNativeSdk() the new spelling.";
+      console.error("FAIL  " + why);
+      if (process.env.GITHUB_ACTIONS) console.log(`::error::${why}`);
+      process.exit(1);
+    }
     const k = nativeSdkOk(sdk, kotlin);
     console.log(`    native SDK ${sdk}, kotlinVersion ${kotlin}`);
     if (!k.ok) {

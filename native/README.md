@@ -249,35 +249,54 @@ to re-derive are written down here.
 **`newArchEnabled` is paired with the OneSignal version.** They are one
 setting wearing two hats, and each half has broken the app once.
 
-`react-native-onesignal` **5.4.x** declares its Android event listeners as
+**Today the pair is `react-native-onesignal` 5.5.17 with the New Architecture
+ON**, since the Expo SDK 53 upgrade of 10 November 2026. Before it, the pair
+was 5.3.1 with the flag OFF, and that was not a preference — it was the only
+pairing React Native 0.76 could run.
+
+`react-native-onesignal` **5.4+** declares its Android event listeners as
 codegen `EventEmitter` properties (`src/NativeOneSignal.ts`), which exist only
 under the New Architecture. Build without it and nothing complains: the module
 loads, its constructor calls `setupListeners`, and the first line reaches for a
 property that was never generated. Blank screen, `TypeError: undefined is not a
-function`, no stack anyone would connect to a notification library. But 5.4.x
-also registers its **iOS** module through `codegenConfig.ios.modulesProvider`, a
-field React Native added in **0.79** — and Expo SDK 52 ships 0.76. So on iOS the
-app dies with `Invariant Violation: 'OneSignal' could not be found`, and no flag
-fixes that. 5.4.x cannot run on iOS here at all.
+function`, no stack anyone would connect to a notification library.
+
+5.4+ also registers its **iOS** module through `codegenConfig.ios.modulesProvider`,
+a field React Native added in **0.79**. That is what made it impossible here
+under SDK 52's 0.76 — the iOS app died with `Invariant Violation: 'OneSignal'
+could not be found` and no flag fixed it. SDK 53 ships 0.79.6, so that
+objection is gone and the newer wrapper is the supported one.
 
 **5.3.x** is built for the legacy bridge: `NativeModules` on both platforms, no
-codegen. It runs on React Native 0.76, and it wants the New Architecture **off**.
-Pinned exactly, not with a caret — a caret is how a 0.76 project drifted onto a
-release built for 0.79.
+codegen. It runs on React Native 0.76 and wants the New Architecture **off**.
+It is not an option on 0.79.
+
+Either way, **pin it exactly, never with a caret** — a caret is how a 0.76
+project drifted onto a release built for 0.79, and `npm install` writes one
+unless you stop it.
 
 **And the version has to clear a Kotlin window.** The wrapper pins an exact
 native Android SDK, which has to compile at the `kotlinVersion` above. OneSignal
 built native SDK **5.7.1, 5.7.2 and 5.7.3 with Kotlin 2.2.0** and then went back
 to 1.9.25 at 5.7.7 — so `react-native-onesignal` **5.3.6** (which pins 5.7.3)
-will not compile here, while the newer **5.4.3** (which pins 5.7.7) does.
-Nothing in the version numbers says this. **5.3.1** pins 5.6.1, Kotlin 1.9.25,
-which is why it is the one pinned.
+will not compile here, while **5.4.3** (5.7.7) does. Nothing in the version
+numbers says this. The current **5.5.17** pins **5.11.0**, clear of the window.
+
+**How that check went blind, and what now stops it.** The wrapper used to name
+its native SDK on the dependency line, and `check-arch.mjs` read it with a
+regex. At 5.5.x it moved to `def oneSignalVersion = '5.11.0'` and used the
+variable instead. The regex matched nothing, the version read as `undefined`,
+and the Kotlin check treated that as nothing to do — green, and testing
+nothing. `pinnedNativeSdk()` now understands both spellings, and a version it
+cannot read is a **failure** rather than a pass, because a guard that cannot
+look is not a guard.
 
 `scripts/check-arch.mjs` enforces the pair and every workflow runs it after
-prebuild. Moving one without the other is the mistake it exists to catch;
-`scripts/test/arch.test.mjs` pins both ways it has already gone wrong.
-
-The way out is Expo 53+ (React Native 0.79), which is the 2.2 milestone.
+prebuild. Moving one without the other is the mistake it exists to catch; it
+caught exactly that during the SDK 53 upgrade, when the wrapper was moved to
+5.5.17 while the flag was still off. `scripts/test/arch.test.mjs` pins both
+ways it has already gone wrong, both spellings of the SDK line, and the
+pairing in force now.
 
 **`targetSdkVersion: 36`**, under `expo-build-properties`. Play now requires
 API 36 of every update and SDK 52 defaults to 34, so without this the bundle is
