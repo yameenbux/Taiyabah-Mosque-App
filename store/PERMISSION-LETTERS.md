@@ -36,10 +36,45 @@ any. Five were checked:
 | Source | Licence it claims | What it actually is |
 | --- | --- | --- |
 | `fawazahmed0/hadith-api`, edition `eng-bukhari` | The Unlicense — public domain | Its own editions metadata names the author: **Muhsin Khan**. Source field blank. This is the same repository the app's **Arabic** comes from, and for the Arabic the licence is sound, because that text is 9th-century. |
-| `SENODROOM/sahih-al-bukhari` | AGPL-3.0 | Names **no translator at all** — "by reputable Islamic scholars". AGPL is a software licence; it says nothing about the text. 7,277 hadith, so it does not even match the standard numbering the app cites. |
+| `SENODROOM/sahih-al-bukhari` | AGPL-3.0, with `Copyright (C) 2026 Muhammad Saad Amin` | **Measured, not assumed: it is the Muhsin Khan translation.** See below. Its own metadata names no translator — the "English author" field says Imām al-Bukhārī, who did not write English. 7,277 hadith, so it does not match the numbering the app cites either. |
 | `halimbahae/hadith` | ODbL + DBCL | Database licences. The Database Contents Licence exists precisely to say that rights in the individual contents are a separate question — it is an admission, not a grant. |
 | LK Hadith Corpus (Leeds / King Saud) | no licence file | An academic corpus that asks to be cited in a paper. A citation request is not a redistribution grant, and the English provenance is not stated. |
 | Aisha Bewley's own site | no licence published | Genuinely her own work and free to read, but marked **"Revision in progress"**, with no permission statement anywhere on it. |
+
+### The AGPL one, measured
+
+This is the candidate people will keep finding, because its licence file
+genuinely does say that anyone may use it, and it carries a real copyright
+line in the AGPL's own "how to apply" appendix:
+`Copyright (C) 2026  Muhammad Saad Amin @SENODROOM`. The question is not
+whether the licence is real. It is whether the thing being licensed was his
+to license. That is answerable, so it was answered.
+
+The pack's English was compared against the edition that openly declares
+itself as Muhsin Khan's (`fawazahmed0/hadith-api`, `eng-bukhari`). The two
+number differently — 7,277 against 7,589 — so a first pass matching by
+hadith number compared unrelated narrations and returned a meaningless 0.04.
+Aligned instead by their Arabic, on a random sample of 400:
+
+    aligned by Arabic    400 of 400
+    median similarity    0.942
+    above 90% similar    266 of 400
+    above 70% similar    330 of 400
+
+Two translators working independently from the same Arabic do not land at
+94% character-level agreement. That is one translation, lightly edited and
+renumbered. The licence is therefore a licence over somebody else's work,
+and a licence from a party that does not hold the rights conveys nothing to
+the person who relies on it. If it were ever challenged, the masjid is the
+name in the app stores — not the repository.
+
+There is a second problem even setting ownership aside: AGPL-3.0 is strong
+copyleft. Bundling AGPL'd content into the app invites the argument that the
+whole app must be offered under the AGPL with its source made available to
+users. That may be arguable, but a masjid app is not the place to find out.
+
+To re-run the measurement, the script is in the commit that added this
+section.
 
 **Free to read is not free to copy.** That is the whole of it. sunnah.com is
 the same case and says so plainly in its own terms: it does not permit
