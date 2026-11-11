@@ -144,12 +144,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # The icon check counts colours in a slice of a screenshot. Without this it
-      # found no tool, skipped itself, and the run passed — on a build where not
-      # one icon drew. A check that cannot run must not report success, so the
-      # script now fails when the tool is absent, and the tool is installed here.
-      - name: Something to look at pixels with
-        run: sudo apt-get install -y --no-install-recommends imagemagick
+      # NOTHING IS INSTALLED HERE ANY MORE, and that is the point.
+      #
+      # This job used to apt-get ImageMagick so the icon check could count
+      # colours in a screenshot. It was the only step needing the internet
+      # after the APK was built, and on 11 November it took three consecutive
+      # runs down: azure.archive.ubuntu.com, archive.ubuntu.com and
+      # security.ubuntu.com all unresolvable, while GitHub reported every
+      # system operational. Retries and a mirror swap were tried first and
+      # could not have worked — no Ubuntu hostname resolved at all, so there
+      # was no mirror to fall back to.
+      #
+      # scripts/png.mjs decodes a PNG with nothing but Node's own zlib, and
+      # was written for this exact reason. smoke.mjs uses it now, so the check
+      # is stronger than it was: there is no longer a tool that can be
+      # missing, on this runner or on the macOS one.
 
       - name: Boot a phone and use the app
         uses: reactivecircus/android-emulator-runner@v2
