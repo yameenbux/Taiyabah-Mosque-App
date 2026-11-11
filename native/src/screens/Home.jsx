@@ -194,15 +194,31 @@ export default function Home({ navigation }) {
             LINE HEIGHT IS 42 AND MUST STAY THERE. It was cut to 35 on the
             reasoning that 42 was only room for one line's descenders and made
             too big a gap between two. That was wrong, and it shipped: on a
-            phone the ḍamma and shadda above السَّلَامُ were sliced off along
-            the top edge. Android treats lineHeight as the line BOX and clips
-            whatever rises above it, and fully vocalised Arabic carries marks
-            far higher than Latin ascenders — 42 was never slack, it was the
-            headroom those marks need. The web app does not show this because
-            CSS lets text overflow its line box rather than cutting it, so the
-            export this was checked in could not have caught it. If the
-            greeting wraps on a narrow phone the two lines sit further apart
-            than they strictly need to; that is the price, and a clipped
+            phone the ḍamma and shadda above السَّلَامُ came out sliced off
+            along the top edge. Fully vocalised Arabic carries its marks far
+            higher than any Latin ascender, so 42 was never slack — it is the
+            headroom those marks need.
+
+            WHERE IT BITES IS NOT EVERY DEVICE, which is the trap. The smoke
+            run's Android emulator, at the default font scale, drew the marks
+            at 35 with 107 clear rows above them — no clipping at all. The
+            fault appeared on a real handset. So the clipping depends on the
+            platform's text engine and the reader's own font-size setting, and
+            a single clean screenshot proves nothing about the rest.
+
+            42 is not a guess at a safe number: it is the value the SHORT
+            greeting carried, at this same fs(23), through every release the
+            app has shipped — the same shadda, the same ḍamma, the same face —
+            without one report of a clipped mark. 35 is the only value that
+            has ever cut them.
+
+            The react-native-web export cannot answer this question either
+            way, because CSS lets text overflow its line box rather than
+            cutting it. It is the right place to see that a screen builds and
+            renders; it is the wrong place to trust vertical metrics.
+
+            If the greeting wraps on a narrow phone the two lines sit further
+            apart than they strictly need to. That is the price, and a clipped
             greeting is not. */}
         <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
                        color: C.goldBright, writingDirection: "rtl" }}>
