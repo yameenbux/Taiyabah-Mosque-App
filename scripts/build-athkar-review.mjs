@@ -32,6 +32,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { parts, counts } from "./lib/athkar-entries.mjs";
 
 /* createRequire rather than a bare `import ... from "docx"`, because ESM
    resolution ignores NODE_PATH and docx is not a dependency of this
@@ -45,10 +46,8 @@ const {
 } = require("docx");
 
 const root = path.resolve(import.meta.dirname, "..");
-const read = p => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
-const ATHKAR = read("native/src/data/athkar.json");
-const DUAS = read("native/src/data/duas.json");
-const RABBANAS = read("native/src/data/rabbanas.json");
+const PARTS = parts();
+const C = counts();
 
 const OUT = process.argv[2] || path.join(root, "docs/athkar-for-review.docx");
 
@@ -208,13 +207,8 @@ kids.push(p(t("The full text carried in the masjid's app and website,",
 kids.push(p(t("submitted for review and approval by the ʿulamā",
               { size: 24, color: MUTED }), { align: AlignmentType.CENTER, after: 800 }));
 
-const counts = {
-  athkar: ATHKAR.sections.reduce((n, s) => n + s.items.length, 0),
-  duas: DUAS.categories.reduce((n, c) => n + c.items.length, 0),
-  rabbanas: RABBANAS.length,
-};
 kids.push(p(t(`Issued ${today}`, { size: 20, bold: true }), { align: AlignmentType.CENTER, after: 60 }));
-kids.push(p(t(`${counts.athkar + counts.duas + counts.rabbanas} supplications in three parts`,
+kids.push(p(t(`${C.total} supplications in three parts`,
               { size: 20, color: MUTED }), { align: AlignmentType.CENTER, after: 60 }));
 kids.push(p(t("Generated from the app's own data — not transcribed",
               { size: 17, color: MUTED, italics: true }), { align: AlignmentType.CENTER }));
@@ -258,52 +252,23 @@ kids.push(body("2.  The counts — “Once, morning and evening” and the like 
   "carefully as the wording itself."));
 kids.push(new Paragraph({ children: [new PageBreak()] }));
 
-/* Part A — adhkār */
-kids.push(h1("Part A  ·  Daily Adhkār", { before: 0 }));
-kids.push(body(`${counts.athkar} supplications in ${ATHKAR.sections.length} sets, as they appear on ` +
-  "the Daily Adhkār screen.", { color: MUTED }));
-let n = 0;
-for (const s of ATHKAR.sections) {
-  kids.push(h2(`${s.title}  —  ${s.items.length} supplications`));
-  if (s.intro) kids.push(body(s.intro, { color: MUTED }));
-  for (const it of s.items) {
-    kids.push(entry(++n, { title: it.source ? it.source.split("·")[0].trim() : "",
-                           ar: it.ar, en: it.en, times: it.times, source: it.source, note: it.note }));
-    kids.push(blank(160));
+/* Parts A, B and C, from the shared flattening — so this document and the
+   PDF cannot disagree about what is published. */
+for (const part of PARTS) {
+  kids.push(h1(`Part ${part.key}  ·  ${part.title}`, { before: 0 }));
+  kids.push(body(`${C[part.key]} supplications — ${part.blurb}.`, { color: MUTED }));
+  let n = 0;
+  for (const set of part.sets) {
+    kids.push(h2(`${set.title}  —  ${set.entries.length} supplications`));
+    if (set.intro) kids.push(body(set.intro, { color: MUTED }));
+    for (const e of set.entries) {
+      kids.push(entry(++n, e));
+      kids.push(blank(160));
+    }
   }
+  kids.push(...signoff(`Part ${part.key}, ${part.title}`));
+  kids.push(new Paragraph({ children: [new PageBreak()] }));
 }
-kids.push(...signoff("Part A, Daily Adhkār"));
-kids.push(new Paragraph({ children: [new PageBreak()] }));
-
-/* Part B — everyday duʿās */
-kids.push(h1("Part B  ·  Everyday Duʿās", { before: 0 }));
-kids.push(body(`${counts.duas} supplications in ${DUAS.categories.length} categories. Each carries a ` +
-  "transliteration, which should be checked as well as the Arabic.", { color: MUTED }));
-n = 0;
-for (const c of DUAS.categories) {
-  kids.push(h2(`${c.title}  —  ${c.items.length} supplications`));
-  if (c.intro) kids.push(body(c.intro, { color: MUTED }));
-  for (const it of c.items) {
-    kids.push(entry(++n, { title: it.label, ar: it.ar, tr: it.tr, en: it.en, source: it.src }));
-    kids.push(blank(160));
-  }
-}
-kids.push(...signoff("Part B, Everyday Duʿās"));
-kids.push(new Paragraph({ children: [new PageBreak()] }));
-
-/* Part C — the forty Rabbanā */
-kids.push(h1("Part C  ·  Duʿās from the Qurʼan — the forty Rabbanā", { before: 0 }));
-kids.push(body(`${counts.rabbanas} supplications. The Arabic is the verified Qurʼanic text and the ` +
-  "reference is the sūrah and āyah.", { color: MUTED }));
-kids.push(body("These are published with NO English meaning. Please say whether that should stand.",
-  { color: PLUM }));
-n = 0;
-for (const r of RABBANAS) {
-  kids.push(entry(++n, { title: r.ref, ar: r.ar, source: r.ref }));
-  kids.push(blank(160));
-}
-kids.push(...signoff("Part C, the forty Rabbanā"));
-kids.push(new Paragraph({ children: [new PageBreak()] }));
 
 /* what happens next */
 kids.push(h1("After signing", { before: 0 }));
@@ -349,6 +314,5 @@ const doc = new Document({
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const buf = await Packer.toBuffer(doc);
 fs.writeFileSync(OUT, buf);
-console.log(`${path.relative(root, OUT)} — ${counts.athkar} adhkār, ${counts.duas} duʿās, ` +
-            `${counts.rabbanas} rabbanā (${counts.athkar + counts.duas + counts.rabbanas} entries), ` +
-            `${(buf.length / 1024).toFixed(0)}KB`);
+console.log(`${path.relative(root, OUT)} — ${C.total} entries ` +
+            `(A ${C.A}, B ${C.B}, C ${C.C}), ${(buf.length / 1024).toFixed(0)}KB`);

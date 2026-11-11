@@ -32,17 +32,35 @@ will.
 
 ## How it works
 
-**1. Generate the sheet.** Never write it by hand.
+**1. Generate the sheet.** Never write it by hand. There are two, and they
+are the same document in two formats:
 
-    node scripts/build-athkar-review.mjs
+    node scripts/build-athkar-review-pdf.mjs   # docs/athkar-for-review.pdf
+    node scripts/build-athkar-review.mjs       # docs/athkar-for-review.docx
 
-Reads `native/src/data/*.json` — what the app actually ships — and writes
-`docs/athkar-for-review.docx`: every entry with its Arabic, transliteration,
-English, count and reference, a column beside each for the reviewer's mark,
-and a sign-off page per part.
+The **PDF** is the one to send, print and keep. It carries the masjid's
+livery and embeds the masjid's own faces, so it looks and prints the same on
+any machine — and the Arabic is set in Noto Naskh, the face the app and the
+website use for scripture, so the reviewer reads on paper what the
+congregation reads on screen.
+
+The **Word** version is for amending: a reviewer who would rather retype a
+wording than write it in a margin can do it there.
+
+Both read from `scripts/lib/athkar-entries.mjs`, which reads
+`native/src/data/*.json` — what the app actually ships. The entry ids come
+from there too, which is what the approval fingerprints are keyed by, so the
+two documents and the check cannot disagree about what is published.
 
 A document transcribed by hand reviews a copy of the text rather than the
 text, and the two drift the first time either is edited.
+
+**On the fonts, which matters more than it sounds.** The PDF embeds the full
+TTFs from `native/assets/fonts`, not the web subsets. `index.html` already
+records that Google's Arabic subset of Noto Naskh carves a hole in its own
+range at U+08E2 — and five of the adhkār contain that character. A reviewer
+handed a sheet with a missing glyph in Āyat al-Kursī would be right to send
+it back.
 
 **2. Two ʿulamā read it independently.** Independently is the point. Two
 people who agree separately are worth more than two who agree together. Each

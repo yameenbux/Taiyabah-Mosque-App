@@ -30,32 +30,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { flat } from "./lib/athkar-entries.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
-const read = p => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
 const RECORD = path.join(root, "docs/athkar-approved.json");
-
-/** Every published supplication, flattened, with a stable identity. */
-function entries() {
-  const out = [];
-  const A = read("native/src/data/athkar.json");
-  for (const s of A.sections)
-    s.items.forEach((it, i) => out.push({
-      id: `athkar/${s.id}/${i}`, part: "A", set: s.title,
-      ar: it.ar, en: it.en, times: it.times, source: it.source, note: it.note,
-    }));
-  const D = read("native/src/data/duas.json");
-  for (const c of D.categories)
-    c.items.forEach((it, i) => out.push({
-      id: `duas/${c.id}/${i}`, part: "B", set: c.title, label: it.label,
-      ar: it.ar, tr: it.tr, en: it.en, source: it.src,
-    }));
-  read("native/src/data/rabbanas.json").forEach((r, i) => out.push({
-    id: `rabbanas/${i}`, part: "C", set: "The forty Rabbanā",
-    ar: r.ar, source: r.ref,
-  }));
-  return out;
-}
 
 /* Everything a reviewer actually read, and nothing else. The id is left out
    on purpose: moving an entry between sets is not a change to its wording,
@@ -64,7 +42,7 @@ const print = e => crypto.createHash("sha256")
   .update([e.ar, e.tr, e.en, e.times, e.source, e.note].map(x => x ?? "").join("\u0000"))
   .digest("hex").slice(0, 16);
 
-const now = entries();
+const now = flat();
 
 /* ---- recording an approval --------------------------------------------- */
 if (process.argv.includes("--record")) {
