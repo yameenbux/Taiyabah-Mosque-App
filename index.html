@@ -4195,6 +4195,24 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                to every class.</p>
           </div>
 
+          <!-- The sheet, for a wall or a phone. This sits ABOVE the twelve month
+               grids on purpose: a parent who came here to grab the planner should
+               not have to scroll through the whole year to find it, and a parent
+               who came to check one date scrolls past one row. It is a real
+               download attribute on a real file rather than a print stylesheet —
+               the thing people actually do with a planner is put it on the fridge,
+               and a browser's own print dialogue produces a screenshot of a sheet
+               rather than the sheet. planner/ is rebuilt from the same data this
+               page draws from; scripts/check-holiday-planner.mjs fails the build
+               if the file falls behind it. -->
+          <a class="hh-call" href="planner/taiyabah-holiday-planner-2026-27.pdf" download>
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 19.5h15"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="hol.pdf_one_page_a4">PDF &middot; one page &middot; A4</span>
+              <span class="hh-call-v" data-i18n="hol.download_the_holiday_planner">Download the holiday planner</span>
+            </span>
+          </a>
+
           <div class="sec-h"><h2 data-i18n="hol.the_year_at_a_glance">The year at a glance</h2><span class="rule"></span></div>
           <div class="hp-legend">
             <span><i class="hp-key"></i><span data-i18n="hol.madrasah_open">Madrasah open</span></span>

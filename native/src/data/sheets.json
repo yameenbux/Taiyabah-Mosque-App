@@ -2510,6 +2510,19 @@
     ]
    },
    {
+    "type": "call",
+    "k": {
+     "k": "hol.pdf_one_page_a4",
+     "t": "PDF · one page · A4"
+    },
+    "v": {
+     "k": "hol.download_the_holiday_planner",
+     "t": "Download the holiday planner"
+    },
+    "href": "planner/taiyabah-holiday-planner-2026-27.pdf",
+    "icon": "call"
+   },
+   {
     "type": "heading",
     "k": "hol.the_year_at_a_glance",
     "t": "The year at a glance",

@@ -280,3 +280,35 @@ names are the nouns already standing inside `hajj.plan_your_umrah` and
 | **← Hajj / Umrah** | ← حج / عمرہ | ← હજ / ઉમરહ | ← الحج / العمرة |
 | **ʿUmrah** | عمرہ | ઉમરાહ | الْعُمْرَة |
 | **Hajj** | حج | હજ | الْحَجّ |
+
+### hol.download_the_holiday_planner, hol.pdf_one_page_a4
+
+*Where they appear:* Madrasah → Holiday Planner, on the button above the
+twelve month grids — on the website and in the app, which take the same two
+strings.
+
+*Drafted, not read.* Two more than the nine counted at the head of this file.
+They went in with the downloadable planner sheet.
+
+Both are plain interface wording rather than anything that carries a ruling,
+so the risk here is a clumsy phrase and not a wrong one — but *ڈاؤن لوڈ* and
+*ડાઉનલોડ* are transliterations of an English word, and a native speaker may
+well prefer something else. The Arabic **رُزْنَامَة** is the ordinary word for
+a calendar or almanac; **نَزِّلْ** is the imperative "download".
+
+`PDF` and `A4` stay Latin in all three, as the file formats and paper sizes
+elsewhere in the app do — they are read as the labels they are, not words.
+
+| | |
+|---|---|
+| **English** | Download the holiday planner |
+| **Urdu** | چھٹیوں کا منصوبہ ڈاؤن لوڈ کریں |
+| **Gujarati** | રજાઓનું પ્લાનર ડાઉનલોડ કરો |
+| **Arabic** | نَزِّلْ رُزْنَامَةَ الْعُطَلِ |
+
+| | |
+|---|---|
+| **English** | PDF · one page · A4 |
+| **Urdu** | PDF · ایک صفحہ · A4 |
+| **Gujarati** | PDF · એક પાનું · A4 |
+| **Arabic** | PDF · صَفْحَةٌ وَاحِدَةٌ · A4 |
