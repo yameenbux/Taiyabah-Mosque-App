@@ -375,15 +375,18 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      It used to be the short form beside a transliteration, set as a flex row.
      Carrying the whole greeting in that row squeezed both halves into narrow
      columns — six lines where there had been one — so the row is gone and the
-     Arabic has the width to itself, two lines at a smaller size.
+     Arabic has the width to itself, at the size it always had.
+     It runs on and wraps where it wraps. An earlier version broke it by hand
+     after ʿalaykum to balance the two lines; the masjid wants it as one piece
+     of text, so the break is the browser's again.
      The transliteration went with it, which the masjid asked for. It was never
      an English TRANSLATION: nothing here says what the words mean, and in
      Arabic and Urdu the pack turned that line back into Arabic script, so
      those readers were shown the same greeting twice, once vocalised and once
      not. Dropping it ends that as well. */
   .salam{margin-bottom:16px}
-  .salam .ar{display:block;font-size:calc(18px * var(--ts));color:var(--gold-bright);
-    line-height:1.85;letter-spacing:.5px}
+  .salam .ar{display:block;font-size:calc(25px * var(--ts));color:var(--gold-bright);
+    line-height:1.5;letter-spacing:.5px}
 
   .dv-lines{margin-top:12px;display:flex;flex-direction:column;gap:6px}
   .dvl{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
@@ -2740,14 +2743,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   <main id="tab-home">
   <section class="hero">
     <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-    <!-- Broken by hand at the phrase, not left to the browser. Wrapped on its
-         own the greeting drops a two-word orphan onto the second line, which
-         reads as a layout accident; split after ʿalaykum it reads as two
-         halves of a greeting, which is what it is. lang="ar" so a screen
-         reader pronounces it rather than spelling it out. -->
+    <!-- One run of text, wrapping wherever the width puts it. lang="ar" so a
+         screen reader pronounces it rather than spelling it out. -->
     <div class="salam" lang="ar">
-      <span class="ar arabic">السَّلَامُ عَلَيْكُمْ</span>
-      <span class="ar arabic">وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</span>
+      <span class="ar arabic">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</span>
     </div>
     <span class="datechip"><span class="live" id="livedot"></span><span id="dateline">—</span></span>
     <div class="ram" id="ram" hidden>
