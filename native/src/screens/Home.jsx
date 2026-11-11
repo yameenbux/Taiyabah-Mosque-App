@@ -178,15 +178,23 @@ export default function Home({ navigation }) {
 
         <View style={{ paddingHorizontal: 22, alignSelf: "stretch",
                        alignItems: rtl ? "flex-end" : "flex-start" }}>
-        {/* The salām sits on one line, Arabic then transliteration, as the web
-            app sets it. */}
-        <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 11 }}>
-          <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42), color: C.goldBright,
-                         writingDirection: "rtl" }}>السَّلَامُ عَلَيْكُمْ</Text>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.4,
-                         textTransform: "uppercase", color: "rgba(243,239,227,.6)" }}>
-            {t("app.as_salamu_alaykum", "As-salāmu ʿalaykum")}</Text>
-        </View>
+        {/* The FULL salām, Arabic alone, as the web app now sets it.
+            It was the short form on one line beside a transliteration. Two
+            things changed together: the masjid asked for the whole greeting,
+            and the line beside it went. That line was never an English
+            TRANSLATION — nothing told the reader what the words mean — and in
+            Arabic and Urdu the pack rendered it back into Arabic script, so
+            those readers met the same greeting twice, once vocalised and once
+            not.
+            BROKEN BY HAND at the phrase. Left to wrap, the greeting drops a
+            two-word orphan onto the second line and reads as an accident;
+            split after ʿalaykum it reads as two halves of a greeting. Two
+            Texts rather than one with a newline, because a newline inside
+            right-to-left text is laid out by the platform and the two
+            platforms do not agree about where the second line starts. */}
+        {["السَّلَامُ عَلَيْكُمْ", "وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ"].map((line, i) => (
+          <Text key={i} style={{ fontFamily: F.arabic, fontSize: fs(17), lineHeight: fs(31),
+                                 color: C.goldBright, writingDirection: "rtl" }}>{line}</Text>))}
 
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
                        borderWidth: 1, borderColor: "rgba(243,239,227,.18)", borderRadius: R.pill,
