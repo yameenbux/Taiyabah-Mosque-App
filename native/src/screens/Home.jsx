@@ -188,12 +188,23 @@ export default function Home({ navigation }) {
             not.
             ONE RUN OF TEXT, at the size it always had, wrapping wherever the
             width puts it. An earlier version split it after ʿalaykum to
-            balance the two lines, and shrank it to suit; the masjid wants it
-            whole, so the break belongs to the layout again. lineHeight is
-            1.5× the size, matching the web app, rather than the 42 it carried
-            before — that was room for one line's descenders, and as the gap
-            between two lines it is far too loose. */}
-        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(35),
+            balance the two lines; the masjid wants it whole, so the break
+            belongs to the layout again.
+
+            LINE HEIGHT IS 42 AND MUST STAY THERE. It was cut to 35 on the
+            reasoning that 42 was only room for one line's descenders and made
+            too big a gap between two. That was wrong, and it shipped: on a
+            phone the ḍamma and shadda above السَّلَامُ were sliced off along
+            the top edge. Android treats lineHeight as the line BOX and clips
+            whatever rises above it, and fully vocalised Arabic carries marks
+            far higher than Latin ascenders — 42 was never slack, it was the
+            headroom those marks need. The web app does not show this because
+            CSS lets text overflow its line box rather than cutting it, so the
+            export this was checked in could not have caught it. If the
+            greeting wraps on a narrow phone the two lines sit further apart
+            than they strictly need to; that is the price, and a clipped
+            greeting is not. */}
+        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
                        color: C.goldBright, writingDirection: "rtl" }}>
           السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
 
