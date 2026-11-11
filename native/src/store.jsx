@@ -64,6 +64,15 @@ const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favou
                     * settings app or nothing — so the offer is made once, on
                     * purpose, and never nags. */
                    askedPush: false,
+                   /* Notices this phone has been shown, and notices it has
+                    * cleared off its own list. Ids only, never leaving the
+                    * device — see notices-state.js.
+                    *
+                    * ntSeen is NULL rather than [] until the first successful
+                    * load. The difference matters: [] means "has seen none of
+                    * them", which would light the dot for every notice ever
+                    * published the first time somebody opens the app. */
+                   ntSeen: null, ntCleared: [],
                    /* Written only by the store-screenshot harness; see App.jsx. */
                    shotRoute: null };
 
@@ -167,6 +176,21 @@ export function AppProvider({ children, fallback = null }) {
       /* One bookmark, so putting it here is also how you move it: there is
        * nothing to choose between and nothing to tidy up afterwards. */
       setAskedPush: () => save({ ...prefs, askedPush: true }),
+      /* Bounded at 200 the way the website bounds its own list. Ids drop out
+         as notices retire, so this is a ceiling and not a growth rate. */
+      markNoticesSeen: ids => save({ ...prefs, ntSeen: (ids || []).slice(0, 200) }),
+      /* Clearing is reading: a notice the reader has dealt with must not go
+         on lighting the dot. */
+      clearNotice: (id, liveIds) => save({ ...prefs,
+        ntSeen: (liveIds || []).slice(0, 200),
+        ntCleared: (prefs.ntCleared || []).includes(id)
+          ? prefs.ntCleared : (prefs.ntCleared || []).concat(id).slice(0, 200) }),
+      clearAllNotices: liveIds => save({ ...prefs,
+        ntSeen: (liveIds || []).slice(0, 200), ntCleared: (liveIds || []).slice(0, 200) }),
+      restoreNotices: () => save({ ...prefs, ntCleared: [] }),
+      /* Written back only when pruning actually removed something, so this is
+         not a storage write on every render of the Notices screen. */
+      pruneClearedNotices: kept => save({ ...prefs, ntCleared: kept }),
       setAlerts: patch => save({ ...prefs, alerts: { ...prefs.alerts, ...patch } }),
       toggleMushafMark: page => save({ ...prefs, muMark: prefs.muMark === page ? 0 : page }),
       toggleMushafFav: page => save({

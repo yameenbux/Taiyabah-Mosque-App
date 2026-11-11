@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, RefreshControl, ActivityIndicator, Image } from "react-native";
+import { View, Text, FlatList, RefreshControl, ActivityIndicator, Image, Pressable } from "react-native";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW } from "../theme";
@@ -8,6 +9,7 @@ import { useApp } from "../store";
 import { TopBar, Heading } from "../ui";
 import { useTopBar } from "../barstyle";
 import { readList } from "../supabase";
+import { publishNoticeIds, pruneCleared } from "../notices-state";
 
 /* Notices come from `notices_live`, a function that exposes the notice text and
  * nothing else — no author, no draft, no internal state. The table behind it
@@ -16,13 +18,34 @@ import { readList } from "../supabase";
  *
  * It was a view until the app had to say which masjid it is for. A view takes
  * no argument; the function does, and returns the same rows newest first. */
+/* The quiet pill the toolbar is made of — card fill, hairline, muted text.
+   Housekeeping, not an invitation. */
+function Tool({ label, onPress }) {
+  const { fs } = useApp();
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}
+      hitSlop={6}
+      style={({ pressed }) => ({ borderRadius: 999, borderWidth: 1, borderColor: C.line,
+                                 backgroundColor: pressed ? C.paper : C.card,
+                                 paddingHorizontal: 13, paddingVertical: 6 })}>
+      <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted }}>{label}</Text>
+    </Pressable>
+  );
+}
+
 export default function Notices() {
   const bar = useTopBar();
-  const { t, fs, rtl } = useApp();
+  const { t, fs, rtl, ntSeen, ntCleared, markNoticesSeen, clearNotice,
+          clearAllNotices, restoreNotices, pruneClearedNotices } = useApp();
   const top = useSafeAreaInsets().top;
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
+  /* Worked out ONCE, when the screen opens, and not again as the reader
+     scrolls. Marking them read is the next thing that happens, so recomputing
+     would make every pill vanish the moment it was drawn — the website makes
+     the same point in ntEnterTab. */
+  const [newIds, setNewIds] = useState([]);
 
   const load = useCallback(async () => {
     setBusy(true);
@@ -32,6 +55,28 @@ export default function Notices() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const liveIds = (rows || []).map(r => r.id).filter(Boolean);
+
+  /* Opening the screen: show which are new, then mark them read. */
+  useEffect(() => {
+    if (!rows) return;
+    publishNoticeIds(rows);                       // the bell reads the same list
+    const seen = Array.isArray(ntSeen) ? ntSeen : null;
+    /* A phone that has just installed the app has not MISSED what was already
+       there. Baseline silently on the first load. */
+    if (seen === null) { markNoticesSeen(liveIds); setNewIds([]); return; }
+    const fresh = liveIds.filter(id => !seen.includes(id));
+    if (fresh.length) setNewIds(prev => prev.length ? prev : fresh);
+    markNoticesSeen(liveIds);
+    const kept = pruneCleared(ntCleared, liveIds);
+    if (kept !== ntCleared) pruneClearedNotices(kept);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows]);
+
+  const cleared = ntCleared || [];
+  const shown = (rows || []).filter(r => !cleared.includes(r.id));
+  const hiddenCount = (rows || []).length - shown.length;
 
   /* Notices is one of the website's seven PAGES: the app bar, then a section
      heading with its rule. The app drew a bare 26px title at the top of the
@@ -43,6 +88,20 @@ export default function Notices() {
       </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("notices.notices", "Notices")}</Heading>
+        {/* Clearing is LOCAL. A notice belongs to the masjid and every reader
+            sees the same list, so nothing here deletes anything — it hides it
+            on this phone, and Show cleared brings it straight back. That is
+            also why nothing asks "are you sure": there is nothing to lose. */}
+        {!!(rows || []).length && (
+          <View style={{ flexDirection: rtl ? "row-reverse" : "row", justifyContent: "flex-end",
+                         gap: 8, marginBottom: 2 }}>
+            {!!shown.length && (
+              <Tool label={t("notices.clear_all", "Clear all")}
+                    onPress={() => clearAllNotices(liveIds)} />)}
+            {!!hiddenCount && (
+              <Tool label={`${t("notices.show_cleared", "Show cleared")} (${hiddenCount})`}
+                    onPress={restoreNotices} />)}
+          </View>)}
       </View>
     </>
   );
@@ -55,7 +114,7 @@ export default function Notices() {
     <FlatList
       style={{ backgroundColor: C.paper }}
       onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}
-      data={rows || []}
+      data={shown}
       keyExtractor={r => String(r.id)}
       ListHeaderComponent={Header}
       refreshControl={<RefreshControl refreshing={busy} onRefresh={load} tintColor={C.brand600} />}
@@ -68,7 +127,12 @@ export default function Notices() {
          header already pads its own heading, which is why that heading was
          sitting 32px in rather than 16. */
       contentContainerStyle={{ paddingBottom: 28 }}
-      ListEmptyComponent={
+      ListEmptyComponent={hiddenCount ? (
+        <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, textAlign: "center",
+                       lineHeight: fs(21), marginTop: 18, marginHorizontal: 32 }}>
+          {t("notices.all_cleared",
+             "You have cleared every notice on this device. They are still here \u2014 press Show cleared.")}
+        </Text>) :
         /* .nt-empty is a CARD — 16px of radius on the card colour inside a
            hairline with the shared lift, 44/22 of padding, everything centred
            with 12px between. The bell sits in a 56px circle filled plum at 8%
@@ -99,13 +163,52 @@ export default function Notices() {
                  "You can choose which alerts you receive under Notifications in the menu.")}</Text>)}
         </View>}
       renderItem={({ item }) => (
+        /* SWIPE TO CLEAR, which is the gesture both platforms already teach
+           for a list like this, so nothing has to be explained.
+           A swipe is invisible to a screen reader and impossible with a
+           switch control, so the same action is published as an
+           accessibilityAction — VoiceOver and TalkBack offer "Clear" in the
+           rotor. Clear all in the header is the third way in. */
+        <ReanimatedSwipeable
+          friction={2} rightThreshold={44} leftThreshold={44}
+          onSwipeableOpen={() => clearNotice(item.id, liveIds)}
+          renderRightActions={() => <ClearAction label={t("notices.clear", "Clear")} />}
+          renderLeftActions={() => <ClearAction label={t("notices.clear", "Clear")} left />}>
+          <NoticeCard item={item} isNew={newIds.includes(item.id)}
+                      onClear={() => clearNotice(item.id, liveIds)} />
+        </ReanimatedSwipeable>)}
+    />
+  );
+}
+
+/* The red ground that appears behind a swiped card. */
+function ClearAction({ label, left }) {
+  const { fs } = useApp();
+  return (
+    <View style={{ flex: 1, backgroundColor: C.danger, marginTop: 12, marginHorizontal: 16,
+                   borderRadius: 16, alignItems: left ? "flex-start" : "flex-end",
+                   justifyContent: "center", paddingHorizontal: 24 }}>
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), color: "#FFF" }}>{label}</Text>
+    </View>
+  );
+}
+
+function NoticeCard({ item, isNew, onClear }) {
+  const { t, fs, rtl } = useApp();
+  return (
         /* THE POSTER LEADS. On the website the image is the first thing in the
            card, edge to edge, and the words sit under it in .nt-body. Here the
            topic, the title and the body came first and the poster was pushed
            to the bottom — on an event notice, which is the kind that has one,
            that is the whole point of the notice below the fold.
            The date rides in .nt-when WITH the topic, not alone at the foot. */
-        <View style={[{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line,
+        <View
+          /* The swipe published as a real action, so a screen reader or a
+             switch control can reach it. Without this the only way to clear
+             one notice is a gesture those readers cannot make. */
+          accessibilityActions={[{ name: "clear", label: t("notices.clear", "Clear") }]}
+          onAccessibilityAction={e => { if (e.nativeEvent.actionName === "clear") onClear(); }}
+          style={[{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line,
                         marginTop: 12, marginHorizontal: 16, overflow: "hidden" }, SHADOW]}>
           {!!item.image_url && (
             <Image source={{ uri: item.image_url }} resizeMode="contain"
@@ -114,6 +217,15 @@ export default function Notices() {
           <View style={{ paddingTop: 14, paddingHorizontal: 15, paddingBottom: 15 }}>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                            flexWrap: "wrap", gap: 7 }}>
+              {/* .nt-new — danger-filled pill, white text, FIRST in the row,
+                  as the website sets it. It says "since you last looked",
+                  which is the only thing the dot on the bell means either. */}
+              {isNew && (
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 0.77,
+                               textTransform: "uppercase", color: "#FFF", overflow: "hidden",
+                               backgroundColor: C.danger, borderRadius: 999,
+                               paddingHorizontal: 8, paddingVertical: 2 }}>
+                  {t("notices.new", "New")}</Text>)}
               {!!item.topic && (
                 /* .nt-topic — a small 3px-radius chip filled plum at 9% with
                    bold brand-600 text, not gold lettering on nothing. */
@@ -135,7 +247,5 @@ export default function Notices() {
               <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.muted,
                              textAlign: rtl ? "right" : "left" }}>{item.body}</Text>)}
           </View>
-        </View>)}
-    />
-  );
+        </View>);
 }

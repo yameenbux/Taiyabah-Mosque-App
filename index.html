@@ -1786,6 +1786,25 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .nt-card h3{font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
     font-weight:600;line-height:1.25;margin:7px 0 5px}
   .nt-card p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);white-space:pre-wrap}
+  /* The toolbar above the list. Quiet by design: clearing is housekeeping,
+     not a thing to be invited to do. */
+  .nt-tools{display:flex;gap:8px;justify-content:flex-end;margin:0 4px 10px}
+  .nt-tool{font:inherit;font-size:calc(12px * var(--ts));color:var(--muted);cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .nt-tool:active{background:var(--tint-plum-press)}
+  .nt-tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  /* The per-card clear. A button, not only a swipe: a swipe is invisible to a
+     screen reader and to anybody using a mouse. */
+  .nt-card{position:relative}
+  /* The clear sits over the card's top corner, so the line it sits over has
+     to leave room for it. Without this the longest date — a Wednesday in
+     November — runs straight under the glyph. */
+  .nt-card .nt-when{padding-inline-end:30px}
+  .nt-x{position:absolute;top:8px;inset-inline-end:8px;width:30px;height:30px;border-radius:50%;
+    display:grid;place-items:center;cursor:pointer;border:0;background:transparent;color:var(--muted)}
+  .nt-x svg{width:15px;height:15px}
+  .nt-x:hover,.nt-x:focus-visible{background:var(--tint-plum-press);color:var(--ink)}
+  .nt-x:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
   .nt-new{flex:0 0 auto;background:var(--danger-fill);color:#fff;border-radius:999px;
     padding:2px 7px;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:.04em;
     text-transform:uppercase}
@@ -2033,6 +2052,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     border:1px solid rgba(198,162,76,.3);background:rgba(198,162,76,.10);
     display:grid;place-items:center;padding:0;color:var(--gold-bright)}
   .bellbtn svg{width:19px;height:19px}
+  /* The same dot the Notices tab carries, on the bell the committee pointed
+     at. Driven by the same unseen count, so the two can never disagree. */
+  .bellbtn{position:relative}
+  .bellbtn[data-new="1"]::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;
+    border-radius:50%;background:var(--danger-fill);box-shadow:0 0 0 2px var(--brand-900)}
   .bellbtn:active{background:rgba(198,162,76,.2)}
   .bellbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
@@ -2923,6 +2947,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <!-- A notification is delivered and then gone: somebody driving, or who
            swiped it away, or who installed the app the next day, had no way
            back to it. These are the same announcements, kept. -->
+      <!-- Clearing is LOCAL. A notice belongs to the masjid and every reader
+           sees the same list, so nothing here deletes anything — it hides it
+           on this device, and "Show cleared" brings it straight back. That is
+           also why there is no confirmation: nothing is lost to undo. -->
+      <div class="nt-tools" id="nt-tools" hidden>
+        <button type="button" class="nt-tool" id="nt-clear-all"
+                data-i18n="notices.clear_all">Clear all</button>
+        <button type="button" class="nt-tool" id="nt-restore" hidden></button>
+      </div>
       <div class="nt-list" id="nt-list"></div>
 
       <div class="nt-empty" id="nt-empty" hidden>
@@ -11754,9 +11787,48 @@ const NT_CACHE = "notices.cache";
    this device — the masjid is not told who has read what, and there is nothing
    to tell it with. */
 const NT_SEEN  = "notices.seen";
+/* Which notices this reader has cleared off their own list. Hiding, never
+   deleting: the notice stays live for everyone else and comes back here the
+   moment they press Show cleared. Ids only, this device only, same as above. */
+const NT_CLEARED = "notices.cleared";
 const NT = { items: null, stale: false, loaded: false, newIds: [], pending: null };
 
 const ntIds = () => (NT.items || []).map(n => n.id).filter(Boolean);
+
+/* PRUNED ON EVERY READ, against what is actually live. A notice retires on the
+   server and its id would otherwise sit in this list for ever — a store that
+   only grows, holding ids for things nobody can see. */
+function ntCleared(){
+  const kept = prefStore.get(NT_CLEARED, []);
+  if(!Array.isArray(kept) || !kept.length) return [];
+  if(!NT.loaded) return kept;                 // nothing to prune against yet
+  const live = new Set(ntIds());
+  const still = kept.filter(id => live.has(id));
+  if(still.length !== kept.length){ try{ prefStore.set(NT_CLEARED, still); }catch(e){} }
+  return still;
+}
+const ntSetCleared = ids => { try{ prefStore.set(NT_CLEARED, ids.slice(0, 200)); }catch(e){} };
+/* Clearing is reading. Anything else and the dot would still be pointing at a
+   notice the reader has just dealt with. */
+function ntClear(id){
+  const now = ntCleared();
+  if(!now.includes(id)) ntSetCleared(now.concat(id));
+  ntMarkAllSeen();
+  renderNotices();
+}
+function ntClearAll(){
+  ntSetCleared(ntIds());
+  ntMarkAllSeen();
+  renderNotices();
+}
+/* ONE meaning, not three. An earlier version let you peek at the cleared list
+   and then hide it again, which needs the button to say a different thing in
+   each of three states and still leaves no way to un-clear just one. "Show
+   cleared" brings them back; that is the whole of it. */
+function ntRestore(){
+  ntSetCleared([]);
+  renderNotices();
+}
 
 function ntUnseenIds(){
   const seen = prefStore.get(NT_SEEN, null);
@@ -11768,13 +11840,23 @@ function ntUnseenIds(){
    opened this tab. An indicator that cries wolf gets ignored, so it is set
    from the notices actually held, and cleared the moment they are shown. */
 function ntUpdateDot(){
-  const tab = document.querySelector('.tab[data-tab="notices"]');
-  if(!tab) return;
-  const n = ntUnseenIds().length;
-  tab.dataset.new = n ? "1" : "0";
-  /* A dot is invisible to a screen reader. Say it instead. */
+  /* A notice the reader has cleared is a notice they have dealt with, so it
+     must not light the dot — otherwise clearing the list leaves the thing
+     that was nagging you still nagging. */
+  const cleared = ntCleared();
+  const n = ntUnseenIds().filter(id => !cleared.includes(id)).length;
   const label = t("nav.notices", "Notices");
-  tab.setAttribute("aria-label", n ? label + " — " + t("notices.something_new", "something new") : label);
+  /* A dot is invisible to a screen reader. Say it instead. */
+  const say = n ? label + " — " + t("notices.something_new", "something new") : label;
+
+  const tab = document.querySelector('.tab[data-tab="notices"]');
+  if(tab){ tab.dataset.new = n ? "1" : "0"; tab.setAttribute("aria-label", say); }
+
+  /* The bell carries the same dot. It is the control people actually look at
+     on the home screen, and it sat there saying nothing while the tab below
+     it had been marked for months. */
+  const bell = document.getElementById("bellbtn");
+  if(bell){ bell.dataset.new = n ? "1" : "0"; bell.setAttribute("aria-label", say); }
 }
 
 function ntMarkAllSeen(){
@@ -11823,7 +11905,35 @@ function renderNotices(){
   const empty = document.getElementById("nt-empty");
   if(!list) return;
 
-  const items = NT.items || [];
+  const all = NT.items || [];
+  const cleared = ntCleared();
+  const items = all.filter(n => !cleared.includes(n.id));
+  const hiddenCount = all.length - items.length;
+
+  /* The toolbar only exists when there is something for it to do. Offering
+     "Clear all" above an empty list is an invitation to press a button that
+     does nothing. */
+  const tools   = document.getElementById("nt-tools");
+  const restore = document.getElementById("nt-restore");
+  if(tools){
+    tools.hidden = !all.length;
+    const clearAll = document.getElementById("nt-clear-all");
+    if(clearAll) clearAll.hidden = !items.length;
+    if(restore){
+      restore.hidden = !hiddenCount;
+      restore.textContent = t("notices.show_cleared", "Show cleared") + " (" + num(hiddenCount) + ")";
+    }
+  }
+
+  /* EVERYTHING cleared is not the same as nothing announced, and the empty
+     card says "Nothing just now" — which would be a lie. */
+  if(!items.length && hiddenCount){
+    empty.hidden = true;
+    list.innerHTML = `<p class="nt-stale">${esc(t("notices.all_cleared",
+      "You have cleared every notice on this device. They are still here — press Show cleared."))}</p>`;
+    return;
+  }
+
   empty.hidden = items.length > 0;
   if(!items.length){ list.innerHTML = ""; return; }
 
@@ -11838,7 +11948,11 @@ function renderNotices(){
                 ${n.image_w ? `width="${n.image_w}"` : ""} ${n.image_h ? `height="${n.image_h}"` : ""}>
          </button>`
       : "";
-    return `<article class="nt-card">${shot}
+    const x = `<button type="button" class="nt-x" data-clear="${esc(n.id)}"
+         aria-label="${esc(t("notices.clear_this_notice", "Clear this notice"))}">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+       </button>`;
+    return `<article class="nt-card">${x}${shot}
       <div class="nt-body">
         <div class="nt-when">${NT.newIds.includes(n.id)
             ? `<span class="nt-new">${esc(t("notices.new", "New"))}</span>` : ""
@@ -11852,6 +11966,8 @@ function renderNotices(){
 
   list.querySelectorAll(".nt-shot").forEach(b =>
     b.addEventListener("click", () => ntShowPoster(b.dataset.img)));
+  list.querySelectorAll(".nt-x").forEach(b =>
+    b.addEventListener("click", () => ntClear(b.dataset.clear)));
 }
 
 /* Every real poster is a file this masjid uploaded, so it can only ever live on
@@ -11955,6 +12071,10 @@ function initNotices(){
   document.getElementById("nt-v-close").addEventListener("click", ntHidePoster);
   v.addEventListener("click", e => { if(e.target === v) ntHidePoster(); });
   addEventListener("keydown", e => { if(e.key === "Escape" && !v.hidden) ntHidePoster(); });
+  const clearAll = document.getElementById("nt-clear-all");
+  if(clearAll) clearAll.addEventListener("click", ntClearAll);
+  const restore = document.getElementById("nt-restore");
+  if(restore) restore.addEventListener("click", ntRestore);
   renderNotices();
   ntOpenFromHash();
   /* A notification tapped while the app is already open changes the hash
