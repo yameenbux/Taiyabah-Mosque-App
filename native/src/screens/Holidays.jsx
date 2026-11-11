@@ -11,9 +11,20 @@ import { View, Text, ScrollView, useWindowDimensions } from "react-native";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
-import { Screen, Hero, Heading, Card, P } from "../ui";
+import { Screen, Hero, Heading, Card, P, CTA } from "../ui";
 import { nowLondon } from "../prayer";
 import { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS } from "../madrasah-data";
+
+/* The sheet the website serves, built by scripts/build-holiday-planner.mjs
+   from this same data. It opens in the system browser like every other
+   document the app points at, which is where both platforms put their own
+   "save to Files" and "share" — so there is no new native module here, and
+   nothing to go wrong on one platform and not the other.
+
+   THE FILENAME CARRIES THE YEAR, so this constant goes stale the moment the
+   madrasah year rolls over. check-holiday-planner.mjs reads this line and
+   fails if it stops naming the file that was actually built. */
+const PLANNER = "https://taiyabahapp.ysbdesigns.uk/planner/taiyabah-holiday-planner-2026-27.pdf";
 
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const parse = v => { const a = v.split("-"); return new Date(+a[0], +a[1] - 1, +a[2]); };
@@ -227,6 +238,13 @@ export default function Holidays() {
         </View>
 
         <Card><P>{t("hol.the_madrasah_teaches_180_days", "The madrasah teaches 180 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class.")}</P></Card>
+
+        {/* Above the twelve months, as it is on the website: somebody who came
+            for the planner should not have to scroll the whole year to find
+            it, and somebody who came to check one date scrolls past one row. */}
+        <CTA label={t("hol.download_the_holiday_planner", "Download the holiday planner")}
+             sub={t("hol.pdf_one_page_a4", "PDF · one page · A4")}
+             href={PLANNER} />
 
         <Heading>{t("hol.the_year_at_a_glance", "The year at a glance")}</Heading>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14, marginBottom: 11 }}>

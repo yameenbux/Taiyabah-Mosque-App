@@ -1,35 +1,39 @@
 /* The masjid's radio feed.
  *
  * Audio is the one place where native pays off immediately and visibly: the
- * stream keeps playing with the phone locked, and the lock screen gets proper
- * controls. In the browser it stopped the moment Chrome was backgrounded on
+ * stream keeps playing with the phone locked and when the app is in the
+ * background. In the browser it stopped the moment Chrome was backgrounded on
  * some phones, which for a bayaan is the whole point lost.
+ *
+ * THIS SCREEN NO LONGER OWNS THE SOUND. It used to hold the Audio.Sound in a
+ * ref and unload it on unmount, which is correct housekeeping for a screen
+ * and wrong for a radio: leaving this page stopped the bayaan, so listening
+ * while reading Qurʼan — the thing people actually do with it — was
+ * impossible, and the note at the bottom of this very screen promised the
+ * opposite in four languages. The player moved up to src/live-audio.jsx,
+ * above the navigator, where it outlives every screen including this one.
+ *
+ * What is left here is the full player: the state chip, the big button, the
+ * volume. src/on-air.jsx is the other view onto the same sound — the slim bar
+ * that appears once you have walked away from this page.
  */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { View, Text, Pressable, ActivityIndicator, PanResponder } from "react-native";
-import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
+import { useLiveAudio } from "../live-audio";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, TopBar, Girih, Card, Note, Press, tap } from "../ui";
 
-const LIVE_URL = "https://taiyabahmbolton.radioca.st/;";
-
 export default function Live({ navigation }) {
   const { t, fs, rtl } = useApp();
-  const sound = useRef(null);
-  const [state, setState] = useState("idle");   // idle | loading | playing | error
-  const [vol, setVol] = useState(1);
+  const { state, vol, setVolume, toggle: playPause } = useLiveAudio();
   const barW = useRef(1);
   /* A slider drawn here rather than pulled in as a dependency: it is a track,
      a fill and a knob, and the only thing it has to get right is where the
      finger is along the bar. */
-  const setFrom = x => {
-    const v = Math.max(0, Math.min(1, x / (barW.current || 1)));
-    setVol(v);
-    sound.current?.setVolumeAsync?.(v).catch(() => {});
-  };
+  const setFrom = x => setVolume(x / (barW.current || 1));
   const pan = useRef(PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
@@ -37,32 +41,7 @@ export default function Live({ navigation }) {
     onPanResponderMove: (e, g) => setFrom(e.nativeEvent.locationX),
   })).current;
 
-  useEffect(() => {
-    /* Keep playing when the screen locks or the app goes to the background —
-     * the setting that makes this feel like a radio rather than a web page. */
-    Audio.setAudioModeAsync({ staysActiveInBackground: true, playsInSilentModeIOS: true,
-                              shouldDuckAndroid: true }).catch(() => {});
-    return () => { sound.current?.unloadAsync().catch(() => {}); };
-  }, []);
-
-  const toggle = async () => {
-    tap();
-    if (state === "playing") { await sound.current?.pauseAsync().catch(() => {}); setState("idle"); return; }
-    setState("loading");
-    try {
-      if (sound.current) { await sound.current.playAsync(); setState("playing"); return; }
-      /* Opened at whatever the slider is already set to, so a level chosen
-         before pressing play is the level it plays at. */
-      const { sound: s } = await Audio.Sound.createAsync({ uri: LIVE_URL },
-                                                        { shouldPlay: true, volume: vol });
-      sound.current = s;
-      s.setOnPlaybackStatusUpdate(st => {
-        if (st.isPlaying) setState("playing");
-        else if (st.didJustFinish) setState("idle");
-      });
-      setState("playing");
-    } catch { setState("error"); }
-  };
+  const toggle = () => { tap(); playPause(); };
 
   const label = state === "playing" ? t("live.on_air", "On air")
               : state === "loading" ? t("live.connecting", "Connecting…")

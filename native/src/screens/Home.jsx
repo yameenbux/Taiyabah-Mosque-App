@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
+import { PrayerIcon } from "../prayer-icons";
 import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
@@ -177,15 +178,24 @@ export default function Home({ navigation }) {
 
         <View style={{ paddingHorizontal: 22, alignSelf: "stretch",
                        alignItems: rtl ? "flex-end" : "flex-start" }}>
-        {/* The salām sits on one line, Arabic then transliteration, as the web
-            app sets it. */}
-        <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 11 }}>
-          <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42), color: C.goldBright,
-                         writingDirection: "rtl" }}>السَّلَامُ عَلَيْكُمْ</Text>
-          <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), letterSpacing: 1.4,
-                         textTransform: "uppercase", color: "rgba(243,239,227,.6)" }}>
-            {t("app.as_salamu_alaykum", "As-salāmu ʿalaykum")}</Text>
-        </View>
+        {/* The FULL salām, Arabic alone, as the web app sets it.
+            It was the short form on one line beside a transliteration. Two
+            things changed together: the masjid asked for the whole greeting,
+            and the line beside it went. That line was never an English
+            TRANSLATION — nothing told the reader what the words mean — and in
+            Arabic and Urdu the pack rendered it back into Arabic script, so
+            those readers met the same greeting twice, once vocalised and once
+            not.
+            ONE RUN OF TEXT, at the size it always had, wrapping wherever the
+            width puts it. An earlier version split it after ʿalaykum to
+            balance the two lines, and shrank it to suit; the masjid wants it
+            whole, so the break belongs to the layout again. lineHeight is
+            1.5× the size, matching the web app, rather than the 42 it carried
+            before — that was room for one line's descenders, and as the gap
+            between two lines it is far too loose. */}
+        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(35),
+                       color: C.goldBright, writingDirection: "rtl" }}>
+          السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
 
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
                        borderWidth: 1, borderColor: "rgba(243,239,227,.18)", borderRadius: R.pill,
@@ -290,7 +300,9 @@ export default function Home({ navigation }) {
                                           and makes the strip look like it is marking
                                           something else entirely. */
                                        backgroundColor: isNext ? "rgba(119,33,87,.07)" : "transparent" }}>
-                  <Ionicons name={k === "isha" ? "moon-outline" : "sunny-outline"} size={15} color={C.gold} />
+                  {/* Five glyphs, not one sun and a moon — see src/prayer-icons.jsx,
+                     which the website shares a check with so the two cannot drift. */}
+                  <PrayerIcon k={k} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
                     {t(`prayer.${k}`, NAMES[k].en)}</Text>
                   <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>

@@ -371,9 +371,22 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .ram-n{font-size:calc(10px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted-4)}
 
   /* ---- salam greeting ---- */
-  .salam{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
-  .salam .ar{font-size:calc(25px * var(--ts));color:var(--gold-bright);line-height:1.5;letter-spacing:.5px}
-  .salam .tr{font-size:calc(10.5px * var(--ts));letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted-2)}
+  /* The salam is the FULL greeting now, and it is Arabic alone.
+     It used to be the short form beside a transliteration, set as a flex row.
+     Carrying the whole greeting in that row squeezed both halves into narrow
+     columns — six lines where there had been one — so the row is gone and the
+     Arabic has the width to itself, at the size it always had.
+     It runs on and wraps where it wraps. An earlier version broke it by hand
+     after ʿalaykum to balance the two lines; the masjid wants it as one piece
+     of text, so the break is the browser's again.
+     The transliteration went with it, which the masjid asked for. It was never
+     an English TRANSLATION: nothing here says what the words mean, and in
+     Arabic and Urdu the pack turned that line back into Arabic script, so
+     those readers were shown the same greeting twice, once vocalised and once
+     not. Dropping it ends that as well. */
+  .salam{margin-bottom:16px}
+  .salam .ar{display:block;font-size:calc(25px * var(--ts));color:var(--gold-bright);
+    line-height:1.5;letter-spacing:.5px}
 
   .dv-lines{margin-top:12px;display:flex;flex-direction:column;gap:6px}
   .dvl{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
@@ -970,6 +983,18 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .wl-adv-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;text-transform:uppercase;font-weight:700;
     color:var(--ink-rose);margin-bottom:7px}
   .wl-advisory p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink-rose)}
+  /* Where the hadith text comes from, at the TOP of the page — the
+     committee asked for the source and the reference to be the first thing
+     read, not a footnote. Deliberately NOT .wl-advisory: that panel is rose
+     and reads as a warning, and the provenance of a sound collection is not
+     a warning. A plain card in the page's own colours. */
+  .hd-source{margin:0 0 14px;border-radius:14px;padding:13px 15px;
+    background:var(--card);border:1px solid var(--line)}
+  .hd-source .hd-src-h{font-size:calc(11px * var(--ts));letter-spacing:.1em;
+    text-transform:uppercase;font-weight:700;color:var(--brand-600);margin-bottom:7px}
+  .hd-source p{font-size:calc(12.5px * var(--ts));line-height:1.6;color:var(--ink)}
+  .hd-source p+p{margin-top:7px}
+  .hd-source .hd-src-meta{color:var(--muted)}
   .wl-call{display:flex;align-items:center;gap:13px;text-decoration:none;margin-top:14px;
     padding:15px 14px;border-radius:15px;background:var(--card);
     border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -1761,6 +1786,25 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .nt-card h3{font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
     font-weight:600;line-height:1.25;margin:7px 0 5px}
   .nt-card p{font-size:calc(13.5px * var(--ts));line-height:1.65;color:var(--muted);white-space:pre-wrap}
+  /* The toolbar above the list. Quiet by design: clearing is housekeeping,
+     not a thing to be invited to do. */
+  .nt-tools{display:flex;gap:8px;justify-content:flex-end;margin:0 4px 10px}
+  .nt-tool{font:inherit;font-size:calc(12px * var(--ts));color:var(--muted);cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .nt-tool:active{background:var(--tint-plum-press)}
+  .nt-tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  /* The per-card clear. A button, not only a swipe: a swipe is invisible to a
+     screen reader and to anybody using a mouse. */
+  .nt-card{position:relative}
+  /* The clear sits over the card's top corner, so the line it sits over has
+     to leave room for it. Without this the longest date — a Wednesday in
+     November — runs straight under the glyph. */
+  .nt-card .nt-when{padding-inline-end:30px}
+  .nt-x{position:absolute;top:8px;inset-inline-end:8px;width:30px;height:30px;border-radius:50%;
+    display:grid;place-items:center;cursor:pointer;border:0;background:transparent;color:var(--muted)}
+  .nt-x svg{width:15px;height:15px}
+  .nt-x:hover,.nt-x:focus-visible{background:var(--tint-plum-press);color:var(--ink)}
+  .nt-x:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
   .nt-new{flex:0 0 auto;background:var(--danger-fill);color:#fff;border-radius:999px;
     padding:2px 7px;font-size:calc(10px * var(--ts));font-weight:700;letter-spacing:.04em;
     text-transform:uppercase}
@@ -2008,6 +2052,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     border:1px solid rgba(198,162,76,.3);background:rgba(198,162,76,.10);
     display:grid;place-items:center;padding:0;color:var(--gold-bright)}
   .bellbtn svg{width:19px;height:19px}
+  /* The same dot the Notices tab carries, on the bell the committee pointed
+     at. Driven by the same unseen count, so the two can never disagree. */
+  .bellbtn{position:relative}
+  .bellbtn[data-new="1"]::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;
+    border-radius:50%;background:var(--danger-fill);box-shadow:0 0 0 2px var(--brand-900)}
   .bellbtn:active{background:rgba(198,162,76,.2)}
   .bellbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
@@ -2074,6 +2123,66 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   /* and the last thing on the page is not hidden behind it */
   :root[data-offline="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
+
+  /* ---- the On air bar ----
+     The stream used to stop the moment you left this page, which made
+     "listen to the bayaan while you read Qurʼan" impossible — the thing the
+     radio is most used for. The audio element has always been at module
+     scope here, so the SOUND survived a tab change; what did not survive was
+     any way to stop it once the play button had scrolled out of the person's
+     life. This is that way: a slim bar, only while something is playing, that
+     goes back to the player when tapped and stops the stream on the square.
+
+     IT SITS UNDER THE TAB BAR IN STACKING ORDER, at 37 against the bar's 40,
+     which is what lets it TUCK AWAY on stop rather than slide across the
+     tabs. Over a sheet there is no tab bar to hide behind, so it drops to
+     the floor and goes above everything instead — see [data-oafloor]. */
+  :root{--onair-h:60px}
+  .onair{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom,0));
+    z-index:37;max-width:520px;margin-inline:auto;
+    display:flex;align-items:center;gap:11px;padding:9px 14px;
+    background:var(--brand-900);border-top:1px solid rgba(198,162,76,.45);
+    transform:translateY(0);transition:transform 260ms cubic-bezier(0,0,.2,1)}
+  .onair[hidden]{display:none}
+  /* Leaving. 240ms and ACCELERATING, the opposite curve to arriving: a thing
+     going because you told it to should look decisive, a thing arriving
+     uninvited should not. */
+  .onair[data-state="out"]{transform:translateY(100%);
+    transition:transform 240ms cubic-bezier(.4,0,1,1)}
+  /* A sheet covers the tab bar, so there is nothing to tuck behind and
+     nothing to sit above. */
+  :root[data-oafloor="1"] .onair{bottom:0;z-index:55}
+  .onair .oa-go{flex:1;min-width:0;display:flex;align-items:center;gap:11px;
+    background:none;border:none;padding:0;font:inherit;cursor:pointer;text-align:start}
+  .onair .oa-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--on-air);
+    box-shadow:0 0 0 0 rgba(63,190,115,.75);animation:oa-pulse 2s infinite}
+  @keyframes oa-pulse{70%{box-shadow:0 0 0 7px rgba(63,190,115,0)}
+                     100%{box-shadow:0 0 0 0 rgba(63,190,115,0)}}
+  .onair .oa-txt{flex:1;min-width:0;line-height:1.3}
+  .onair .oa-k{display:block;font-size:calc(9px * var(--ts));letter-spacing:1.6px;
+    text-transform:uppercase;color:var(--gold);font-weight:800}
+  .onair .oa-n{display:block;font-size:calc(13.5px * var(--ts));color:#fff;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .onair .oa-stop{flex:none;width:40px;height:40px;border-radius:50%;cursor:pointer;
+    border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.07);
+    display:grid;place-items:center;padding:0}
+  .onair .oa-stop:active{background:rgba(255,255,255,.22)}
+  .onair .oa-stop svg{width:15px;height:15px;fill:#fff;display:block}
+  /* and the last thing on the page is not hidden behind it, in each of the
+     three combinations rather than one rule that is wrong in two of them */
+  :root[data-onair="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
+  :root[data-onair="1"] .offline-bar{bottom:calc(70px + var(--onair-h) + env(safe-area-inset-bottom,0))}
+  :root[data-offline="1"][data-onair="1"] body{padding-bottom:calc(202px + env(safe-area-inset-bottom,0))}
+  /* A sheet scrolls inside itself, so the page padding above does nothing for
+     the Qurʼan — which is the one place this bar matters most. */
+  :root[data-onair="1"] .sheet[data-open="1"] .sh-body{
+    padding-bottom:calc(var(--onair-h) + 20px)}
+  /* Somebody who has asked for less movement gets none: it fades instead. */
+  @media (prefers-reduced-motion: reduce){
+    .onair,.onair[data-state="out"]{transition:opacity 160ms linear;transform:none}
+    .onair[data-state="out"]{opacity:0}
+    .onair .oa-dot{animation:none}
+  }
   .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
     font:inherit;border:none;background:none;color:var(--muted);padding:9px 4px 8px}
   /* Something has been announced that this phone has not looked at yet. The
@@ -2658,9 +2767,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   <main id="tab-home">
   <section class="hero">
     <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-    <div class="salam">
-      <span class="ar arabic">السَّلَامُ عَلَيْكُمْ</span>
-      <span class="tr" data-i18n="app.as_salamu_alaykum">As-salāmu ʿalaykum</span>
+    <!-- One run of text, wrapping wherever the width puts it. lang="ar" so a
+         screen reader pronounces it rather than spelling it out. -->
+    <div class="salam" lang="ar">
+      <span class="ar arabic">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</span>
     </div>
     <span class="datechip"><span class="live" id="livedot"></span><span id="dateline">—</span></span>
     <div class="ram" id="ram" hidden>
@@ -2837,6 +2947,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <!-- A notification is delivered and then gone: somebody driving, or who
            swiped it away, or who installed the app the next day, had no way
            back to it. These are the same announcements, kept. -->
+      <!-- Clearing is LOCAL. A notice belongs to the masjid and every reader
+           sees the same list, so nothing here deletes anything — it hides it
+           on this device, and "Show cleared" brings it straight back. That is
+           also why there is no confirmation: nothing is lost to undo. -->
+      <div class="nt-tools" id="nt-tools" hidden>
+        <button type="button" class="nt-tool" id="nt-clear-all"
+                data-i18n="notices.clear_all">Clear all</button>
+        <button type="button" class="nt-tool" id="nt-restore" hidden></button>
+      </div>
       <div class="nt-list" id="nt-list"></div>
 
       <div class="nt-empty" id="nt-empty" hidden>
@@ -4123,6 +4242,24 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                to every class.</p>
           </div>
 
+          <!-- The sheet, for a wall or a phone. This sits ABOVE the twelve month
+               grids on purpose: a parent who came here to grab the planner should
+               not have to scroll through the whole year to find it, and a parent
+               who came to check one date scrolls past one row. It is a real
+               download attribute on a real file rather than a print stylesheet —
+               the thing people actually do with a planner is put it on the fridge,
+               and a browser's own print dialogue produces a screenshot of a sheet
+               rather than the sheet. planner/ is rebuilt from the same data this
+               page draws from; scripts/check-holiday-planner.mjs fails the build
+               if the file falls behind it. -->
+          <a class="hh-call" href="planner/taiyabah-holiday-planner-2026-27.pdf" download>
+            <span class="hh-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 19.5h15"/></svg></span>
+            <span class="hh-call-t">
+              <span class="hh-call-k" data-i18n="hol.pdf_one_page_a4">PDF &middot; one page &middot; A4</span>
+              <span class="hh-call-v" data-i18n="hol.download_the_holiday_planner">Download the holiday planner</span>
+            </span>
+          </a>
+
           <div class="sec-h"><h2 data-i18n="hol.the_year_at_a_glance">The year at a glance</h2><span class="rule"></span></div>
           <div class="hp-legend">
             <span><i class="hp-key"></i><span data-i18n="hol.madrasah_open">Madrasah open</span></span>
@@ -5096,10 +5233,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <div class="ab-wrap" id="ak-read-view" hidden>
           <div class="ak-tabs" id="ak-tabs"></div>
           <div id="ak-body"><p class="qd-empty" data-i18n="athkar.loading">Loading…</p></div>
-          <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="athkar.confirm_the_wording_with_the">Confirm the wording with the imam</div>
-            <p id="ak-note" data-i18n="athkar.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
-          </div>
           <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
@@ -5122,6 +5255,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       </div>
       <div class="sh-body" id="hd-body">
         <div class="ab-wrap">
+          <!-- Point 1 of the committee's note: the original source and the
+               reference, at the top of the page. The two lines that depend on
+               the pack are filled from its own metadata in hdRenderSource(),
+               so the page cannot claim a provenance the data does not carry. -->
+          <div class="hd-source">
+            <div class="hd-src-h" data-i18n="bukhari.where_this_comes_from">Where this text comes from</div>
+            <p data-i18n="bukhari.compiled_by">Ṣaḥīḥ al-Bukhārī, compiled by Imām Muḥammad ibn Ismāʿīl al-Bukhārī (d. 256 AH / 870 CE).</p>
+            <p class="hd-src-meta" id="hd-src-structure"></p>
+            <p class="hd-src-meta" id="hd-src-edition"></p>
+          </div>
           <div class="hd-bar">
             <input id="hd-search" type="search" placeholder="Search the Arabic…"
                    autocapitalize="off" autocorrect="off" aria-label="Search the Arabic text"
@@ -5136,8 +5279,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <p class="hd-sub" id="hd-sub" hidden></p>
           <div id="hd-list"><p class="qd-empty" data-i18n="bukhari.loading">Loading…</p></div>
           <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="bukhari.arabic_only">Arabic here, English on sunnah.com</div>
-            <p data-i18n="bukhari.no_translation_note">The Arabic is 9th-century and free to reproduce. Every complete English translation in circulation is a modern work still in copyright, so rather than copy one, each hadith links out to its English on sunnah.com. That needs a connection; the Arabic does not.</p>
+            <div class="wl-adv-h" data-i18n="bukhari.what_is_here">What is in the app, and what is a link</div>
+            <p data-i18n="bukhari.arabic_is_carried">The Arabic above is carried inside the app in full, from the public-domain edition named at the top of this page. It reads with no connection and nothing is fetched to show it.</p>
+            <p data-i18n="bukhari.english_is_not_copied">No English translation is reproduced here. Every complete English Ṣaḥīḥ al-Bukhārī in circulation is a modern work still in copyright — the standard one is Dr Muhammad Muhsin Khan's, published by Darussalam, and it is the translation sunnah.com serves. The masjid has not been given permission to copy it, so it does not.</p>
+            <p data-i18n="bukhari.link_not_reproduce">Each hadith instead carries a link that opens sunnah.com in your browser at the matching number. Nothing from sunnah.com is stored in the app or shipped with it, and sunnah.com's own terms do not permit reproducing a collection in full.</p>
           </div>
           <p class="wl-foot" id="hd-attr"></p>
         </div>
@@ -5165,10 +5310,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <input id="du-search" type="search" placeholder="Search — travel, sleep, forgiveness…"
                    autocapitalize="off" autocorrect="off" aria-label="Search duʿās" data-i18n-attr="placeholder:a11y.search_travel_sleep_forgiveness,aria-label:a11y.search_du_s">
             <div id="du-cats"><p class="qd-empty" data-i18n="duas.loading">Loading…</p></div>
-            <div class="wl-advisory">
-              <div class="wl-adv-h" data-i18n="duas.confirm_the_wording_with_the">Confirm the wording with the imam</div>
-              <p id="du-note" data-i18n="duas.wording_varies_between_narrations_and">Wording varies between narrations and printings.</p>
-            </div>
             <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
           </div>
         </div>
@@ -6416,6 +6557,22 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M6.5 18h11a3.5 3.5 0 0 0 .5-6.96A5.5 5.5 0 0 0 8.2 8.6"/><path d="M5.3 9.4A4 4 0 0 0 6.5 18"/></svg>
     <span class="ob-t" id="offline-text" data-i18n="offline.still_works">No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.</span>
   </div>
+</div>
+<!-- The On air bar. Hidden unless the stream is actually playing and the
+     person has left the Live page — on Live itself the full player is right
+     there and a second stop button under it is clutter. -->
+<div class="onair" id="onair" hidden>
+  <button class="oa-go" id="oa-go" type="button">
+    <span class="oa-dot" aria-hidden="true"></span>
+    <span class="oa-txt">
+      <span class="oa-k" data-i18n="live.on_air">On air</span>
+      <span class="oa-n" data-i18n="app.name">Taiyabah Masjid</span>
+    </span>
+  </button>
+  <button class="oa-stop" id="oa-stop" type="button" aria-label="Stop live stream"
+          data-i18n-attr="aria-label:a11y.stop_live_stream">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
+  </button>
 </div>
 <nav class="tabbar" role="tablist">
     <button class="tab" data-tab="home" data-on="1" role="tab">
@@ -9326,6 +9483,11 @@ function lvState(s, text){
   document.getElementById('lv-play')
     .setAttribute('aria-label', on ? t("a11y.pause_live_stream","Pause live stream")
                                   : t("a11y.play_live_stream","Play live stream"));
+  /* Every change of state in the player arrives here — playing, paused,
+     stalled, failed — so this is the one place the On air bar has to be told
+     about. Hooking the five audio events separately is how one of them gets
+     forgotten and the bar is left on over a stream that has stopped. */
+  oaSync();
 }
 
 function ensureAudio(){
@@ -9377,6 +9539,75 @@ function initLive(){
     lvVolPaint(e.target);
   });
   document.getElementById('lv-vids').addEventListener('click',openVids);
+}
+
+/* ---------------- the On air bar ----------------
+   What makes the radio usable from the rest of the app. The audio element has
+   always been at module scope, so the stream already survived a tab change —
+   what did not exist was any way to STOP it once you had walked away from the
+   play button, or any sign that it was still going.
+
+   Three things decide what it does, and they are deliberately separate:
+
+     showing   the stream is playing AND you are not on the Live page
+     floored   a sheet is open, so there is no tab bar to sit on
+     leaving   the 240ms it takes to tuck away, during which it is still in
+               the DOM — remove it at the moment of the tap and there is no
+               animation to see.
+------------------------------------------------- */
+let oaLeaving = null;
+
+function oaPlaying(){ return !!(AUDIO && !AUDIO.paused && !AUDIO.ended); }
+
+/* Where it sits: on the tab bar normally, on the floor when a sheet has
+   covered the tab bar. Kept apart from oaSync because a sheet opening over a
+   playing stream changes the position and nothing else. */
+function oaFloor(){
+  const open = document.querySelector('.sheet[data-open="1"], .drawer[data-open="1"]');
+  document.documentElement.dataset.oafloor = open ? "1" : "0";
+}
+
+function oaSync(){
+  const bar = document.getElementById('onair');
+  if(!bar) return;
+  oaFloor();
+  const show = oaPlaying() && navCurrentTab() !== "live";
+  const on = !bar.hidden && bar.dataset.state !== "out";
+  if(show === on) return;
+
+  clearTimeout(oaLeaving);
+  document.documentElement.dataset.onair = show ? "1" : "0";
+  if(show){
+    bar.hidden = false;
+    /* Out first, then in on the next frame: a transition only runs between
+       two painted values, and an element revealed and moved in the same tick
+       has only ever been painted once. */
+    bar.dataset.state = "out";
+    void bar.offsetHeight;
+    requestAnimationFrame(()=>{ bar.dataset.state = "in"; });
+    return;
+  }
+  bar.dataset.state = "out";
+  /* A timer rather than transitionend: reduced motion changes which property
+     is animated, a tab switched twice quickly can cancel the transition
+     entirely, and either way the event may never arrive. */
+  oaLeaving = setTimeout(()=>{ bar.hidden = true; }, 300);
+}
+
+function initOnAir(){
+  document.getElementById('oa-go').addEventListener('click',()=>{ switchTab('live'); });
+  document.getElementById('oa-stop').addEventListener('click',()=>{
+    /* Stop, not pause: on a LIVE stream a held buffer is the wrong audio
+       played late, so the next play reconnects. Paused state is what the
+       player's own button is for. */
+    if(AUDIO){ AUDIO.pause(); try{ AUDIO.removeAttribute("src"); AUDIO.load(); }catch(e){} }
+    lvState("idle", t("live.paused","Paused"));
+  });
+  /* Sheets and the drawer are DOM state and nothing else — data-open="1" —
+     so this is how the bar hears about one opening over it. */
+  new MutationObserver(oaFloor).observe(document.body,
+    { subtree:true, attributes:true, attributeFilter:["data-open"] });
+  oaSync();
 }
 
 /* ---------------- 40 rabbanā ----------------
@@ -11556,9 +11787,48 @@ const NT_CACHE = "notices.cache";
    this device — the masjid is not told who has read what, and there is nothing
    to tell it with. */
 const NT_SEEN  = "notices.seen";
+/* Which notices this reader has cleared off their own list. Hiding, never
+   deleting: the notice stays live for everyone else and comes back here the
+   moment they press Show cleared. Ids only, this device only, same as above. */
+const NT_CLEARED = "notices.cleared";
 const NT = { items: null, stale: false, loaded: false, newIds: [], pending: null };
 
 const ntIds = () => (NT.items || []).map(n => n.id).filter(Boolean);
+
+/* PRUNED ON EVERY READ, against what is actually live. A notice retires on the
+   server and its id would otherwise sit in this list for ever — a store that
+   only grows, holding ids for things nobody can see. */
+function ntCleared(){
+  const kept = prefStore.get(NT_CLEARED, []);
+  if(!Array.isArray(kept) || !kept.length) return [];
+  if(!NT.loaded) return kept;                 // nothing to prune against yet
+  const live = new Set(ntIds());
+  const still = kept.filter(id => live.has(id));
+  if(still.length !== kept.length){ try{ prefStore.set(NT_CLEARED, still); }catch(e){} }
+  return still;
+}
+const ntSetCleared = ids => { try{ prefStore.set(NT_CLEARED, ids.slice(0, 200)); }catch(e){} };
+/* Clearing is reading. Anything else and the dot would still be pointing at a
+   notice the reader has just dealt with. */
+function ntClear(id){
+  const now = ntCleared();
+  if(!now.includes(id)) ntSetCleared(now.concat(id));
+  ntMarkAllSeen();
+  renderNotices();
+}
+function ntClearAll(){
+  ntSetCleared(ntIds());
+  ntMarkAllSeen();
+  renderNotices();
+}
+/* ONE meaning, not three. An earlier version let you peek at the cleared list
+   and then hide it again, which needs the button to say a different thing in
+   each of three states and still leaves no way to un-clear just one. "Show
+   cleared" brings them back; that is the whole of it. */
+function ntRestore(){
+  ntSetCleared([]);
+  renderNotices();
+}
 
 function ntUnseenIds(){
   const seen = prefStore.get(NT_SEEN, null);
@@ -11570,13 +11840,23 @@ function ntUnseenIds(){
    opened this tab. An indicator that cries wolf gets ignored, so it is set
    from the notices actually held, and cleared the moment they are shown. */
 function ntUpdateDot(){
-  const tab = document.querySelector('.tab[data-tab="notices"]');
-  if(!tab) return;
-  const n = ntUnseenIds().length;
-  tab.dataset.new = n ? "1" : "0";
-  /* A dot is invisible to a screen reader. Say it instead. */
+  /* A notice the reader has cleared is a notice they have dealt with, so it
+     must not light the dot — otherwise clearing the list leaves the thing
+     that was nagging you still nagging. */
+  const cleared = ntCleared();
+  const n = ntUnseenIds().filter(id => !cleared.includes(id)).length;
   const label = t("nav.notices", "Notices");
-  tab.setAttribute("aria-label", n ? label + " — " + t("notices.something_new", "something new") : label);
+  /* A dot is invisible to a screen reader. Say it instead. */
+  const say = n ? label + " — " + t("notices.something_new", "something new") : label;
+
+  const tab = document.querySelector('.tab[data-tab="notices"]');
+  if(tab){ tab.dataset.new = n ? "1" : "0"; tab.setAttribute("aria-label", say); }
+
+  /* The bell carries the same dot. It is the control people actually look at
+     on the home screen, and it sat there saying nothing while the tab below
+     it had been marked for months. */
+  const bell = document.getElementById("bellbtn");
+  if(bell){ bell.dataset.new = n ? "1" : "0"; bell.setAttribute("aria-label", say); }
 }
 
 function ntMarkAllSeen(){
@@ -11625,7 +11905,35 @@ function renderNotices(){
   const empty = document.getElementById("nt-empty");
   if(!list) return;
 
-  const items = NT.items || [];
+  const all = NT.items || [];
+  const cleared = ntCleared();
+  const items = all.filter(n => !cleared.includes(n.id));
+  const hiddenCount = all.length - items.length;
+
+  /* The toolbar only exists when there is something for it to do. Offering
+     "Clear all" above an empty list is an invitation to press a button that
+     does nothing. */
+  const tools   = document.getElementById("nt-tools");
+  const restore = document.getElementById("nt-restore");
+  if(tools){
+    tools.hidden = !all.length;
+    const clearAll = document.getElementById("nt-clear-all");
+    if(clearAll) clearAll.hidden = !items.length;
+    if(restore){
+      restore.hidden = !hiddenCount;
+      restore.textContent = t("notices.show_cleared", "Show cleared") + " (" + num(hiddenCount) + ")";
+    }
+  }
+
+  /* EVERYTHING cleared is not the same as nothing announced, and the empty
+     card says "Nothing just now" — which would be a lie. */
+  if(!items.length && hiddenCount){
+    empty.hidden = true;
+    list.innerHTML = `<p class="nt-stale">${esc(t("notices.all_cleared",
+      "You have cleared every notice on this device. They are still here — press Show cleared."))}</p>`;
+    return;
+  }
+
   empty.hidden = items.length > 0;
   if(!items.length){ list.innerHTML = ""; return; }
 
@@ -11640,7 +11948,11 @@ function renderNotices(){
                 ${n.image_w ? `width="${n.image_w}"` : ""} ${n.image_h ? `height="${n.image_h}"` : ""}>
          </button>`
       : "";
-    return `<article class="nt-card">${shot}
+    const x = `<button type="button" class="nt-x" data-clear="${esc(n.id)}"
+         aria-label="${esc(t("notices.clear_this_notice", "Clear this notice"))}">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+       </button>`;
+    return `<article class="nt-card">${x}${shot}
       <div class="nt-body">
         <div class="nt-when">${NT.newIds.includes(n.id)
             ? `<span class="nt-new">${esc(t("notices.new", "New"))}</span>` : ""
@@ -11654,6 +11966,8 @@ function renderNotices(){
 
   list.querySelectorAll(".nt-shot").forEach(b =>
     b.addEventListener("click", () => ntShowPoster(b.dataset.img)));
+  list.querySelectorAll(".nt-x").forEach(b =>
+    b.addEventListener("click", () => ntClear(b.dataset.clear)));
 }
 
 /* Every real poster is a file this masjid uploaded, so it can only ever live on
@@ -11757,6 +12071,10 @@ function initNotices(){
   document.getElementById("nt-v-close").addEventListener("click", ntHidePoster);
   v.addEventListener("click", e => { if(e.target === v) ntHidePoster(); });
   addEventListener("keydown", e => { if(e.key === "Escape" && !v.hidden) ntHidePoster(); });
+  const clearAll = document.getElementById("nt-clear-all");
+  if(clearAll) clearAll.addEventListener("click", ntClearAll);
+  const restore = document.getElementById("nt-restore");
+  if(restore) restore.addEventListener("click", ntRestore);
   renderNotices();
   ntOpenFromHash();
   /* A notification tapped while the app is already open changes the hash
@@ -11973,6 +12291,23 @@ function hdSearchable(s){
     .trim();
 }
 
+/* The source card at the top of the page. Its two factual lines are read off
+   the pack's own metadata rather than typed into the markup: the counts, the
+   numbering and the licence are properties of the text that shipped, and a
+   page that states them from memory will state them wrongly the first time
+   the pack is rebuilt. The third line of the card, the compiler, IS in the
+   markup — that fact belongs to the ninth century, not to the pack. */
+function hdRenderSource(m){
+  const structure = document.getElementById("hd-src-structure");
+  const edition = document.getElementById("hd-src-edition");
+  if(!structure || !edition) return;
+  structure.textContent = t("bukhari.structure",
+      "{books} books · {count} narrations · numbered to {highest}, the numbering used when a hadith is cited.")
+    .replace("{books}", num(m.books)).replace("{count}", num(m.count)).replace("{highest}", num(m.highest));
+  edition.textContent = t("bukhari.edition", "Arabic text: {source}. {licence}.")
+    .replace("{source}", m.source || "").replace("{licence}", m.licence || "");
+}
+
 async function openBukhari(){
   document.getElementById("bukhari").dataset.open = "1";
   document.body.style.overflow = "hidden";
@@ -11980,6 +12315,7 @@ async function openBukhari(){
   if(m){
     document.getElementById("hd-num").max = m.highest;
     document.getElementById("hd-attr").textContent = m.attribution || "";
+    hdRenderSource(m);
   }
   const last = prefStore.get(HD_POS, 0);
   if(last) await hdShowBook(last); else await hdShowBooks();
@@ -12018,7 +12354,6 @@ function renderAthkar(){
   if(!d){ document.getElementById('ak-body').innerHTML =
     `<p class="qd-empty">${esc(t("athkar.load_failed","Couldn't load the athkār. Check your connection and try again."))}</p>`; return; }
 
-  document.getElementById('ak-note').textContent = t("athkar.review_note", d.reviewNote);
   document.getElementById('ak-tabs').innerHTML = d.sections.map((sec,i) =>
     `<button class="ak-tab${i===akSection?' on':''}" data-i="${i}">${
       esc(t("athkar."+sec.id+".title", sec.title))}</button>`).join('');
@@ -12148,7 +12483,6 @@ function renderDuaCategories(filter){
   const d = window.DUAS;
   if(!d){ document.getElementById('du-cats').innerHTML =
     `<p class="qd-empty">${esc(t("duas.load_failed","Couldn't load the duʿās. Check your connection and try again."))}</p>`; return; }
-  document.getElementById('du-note').textContent = t("duas.review_note", d.reviewNote);
 
   const q = (filter || "").trim().toLowerCase();
   if(q){
@@ -13271,13 +13605,56 @@ function initMarriageDeath(){
    day is above the fold. Built from the record rather than read back out of
    the table, so it is right on a day the table is not showing. On a Friday
    the Zuhr column is announced as Jumuʿah, matching everywhere else. -------*/
+/* The five glyphs. They were four near-identical suns and a moon — at this
+   size Fajr, Zuhr, Asr and Maghrib were one picture repeated, which is the
+   drift the committee asked to be fixed. The horizon carries it now: Fajr is
+   the disc under the line with the arrow rising, Maghrib the same line with
+   the arrow falling, Zuhr the sun at its height, Asr that sun pushed low and
+   leaning, Isha a crescent and a star.
+
+   A FLAT LIST OF `d` STRINGS, and circles written as paths, because
+   native/src/prayer-icons.jsx holds the same five for the app and
+   scripts/check-prayer-icons.mjs fails the build when one of them differs.
+   Two files can only be compared if they say the same thing the same way, so
+   redraw one of these and you will be told to redraw the other. */
 const STRIP_ICONS = {
-  fajr:    '<circle cx="12" cy="14" r="3.4"/><path d="M12 6.6V4.4M6.9 8.9 5.4 7.4M17.1 8.9l1.5-1.5M3.6 14h2.2M18.2 14h2.2"/>',
-  zuhr:    '<circle cx="12" cy="12" r="4"/><path d="M12 3.6v2M12 18.4v2M5.6 5.6 7 7M17 17l1.4 1.4M3.6 12h2M18.4 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/>',
-  asr:     '<circle cx="12" cy="13.5" r="3.6"/><path d="M12 6.2v2M4.4 13.5h2M17.6 13.5h2M6.6 8.1 8 9.5M17.4 8.1 16 9.5"/>',
-  maghrib: '<path d="M4 17.5h16"/><circle cx="12" cy="13" r="3.4"/><path d="M12 5.6v2.2M6.4 9.4 7.9 10.9M17.6 9.4 16.1 10.9"/>',
-  isha:    '<path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.7 7.7 0 1 0 10.1 10.1Z"/>',
+  fajr: [
+    "M3 18h18",
+    "M7.5 18a4.5 4.5 0 0 1 9 0",
+    "M12 3.2v3.4",
+    "M9.6 5.9 12 3.3l2.4 2.6",
+    "M5 9.6 6.4 11",
+    "M19 9.6 17.6 11",
+  ],
+  zuhr: [
+    "M16 12a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
+    "M12 3.6v2M12 18.4v2M5.6 5.6 7 7M17 17l1.4 1.4M3.6 12h2M18.4 12h2M5.6 18.4 7 17M17 7l1.4-1.4",
+  ],
+  asr: [
+    "M16.7 13.2a3.5 3.5 0 1 1-7 0 3.5 3.5 0 1 1 7 0",
+    "M13.2 4.8v2.1",
+    "M4.6 13.2h2.1",
+    "M7.1 7.1 8.6 8.6",
+    "M7.1 19.3 8.6 17.8",
+    "M19.3 7.1 17.8 8.6",
+    "M19.6 13.2h2",
+  ],
+  maghrib: [
+    "M3 18h18",
+    "M7.5 18a4.5 4.5 0 0 1 9 0",
+    "M12 9.6V3.2",
+    "M9.6 7 12 9.7 14.4 7",
+    "M5 9.6 6.4 11",
+    "M19 9.6 17.6 11",
+  ],
+  isha: [
+    "M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.7 7.7 0 1 0 10.1 10.1Z",
+    "M18.2 3v2.6",
+    "M16.9 4.3h2.6",
+  ],
 };
+
+const stripIcon = k => (STRIP_ICONS[k] || []).map(d => `<path d="${d}"/>`).join("");
 
 /* The strip has a fifth of the screen per prayer, so the meridiem is dropped:
    Fajr is not going to be mistaken for the afternoon. Stripping it off hm12()
@@ -13310,7 +13687,7 @@ function renderStrip(){
     return `<div class="pcol"${k === nextKey ? ' data-next="1"' : ""}>`
          + `<span class="p-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" `
          + `stroke="currentColor" stroke-width="1.6" stroke-linecap="round" `
-         + `stroke-linejoin="round">${STRIP_ICONS[k]}</svg></span>`
+         + `stroke-linejoin="round">${stripIcon(k)}</svg></span>`
          + `<span class="p-n">${esc(label)}</span>`
          + `<span class="p-b tnum">${begin ? esc(hmShort(begin)) : "&mdash;"}</span>`
          + `<span class="p-j tnum">${jam ? esc(hmShort(jam)) : "&mdash;"}</span>`
@@ -14931,6 +15308,8 @@ function switchTab(name){
   });
   window.scrollTo({top:0,behavior:"instant"});
   if(name === "notices") NT.pending = ntEnterTab();
+  /* Arriving on Live takes the bar away; leaving it brings the bar back. */
+  oaSync();
 }
 /* ===========================================================================
    THE ANDROID BACK BUTTON
@@ -15958,6 +16337,7 @@ function boot(){
   initRamadan();
   initHajj();
   initLive();
+  initOnAir();
   initVids();
   initZakat();
   initQibla();

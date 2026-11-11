@@ -86,14 +86,39 @@ for (const [, kind, name] of layouts.matchAll(/"@(drawable|layout|xml)\/(\w+)"/g
   if (!have[kind].has(name)) say(`a layout references @${kind}/${name}, which is not in the res tree`);
 }
 
-/* 5. RemoteViews can only inflate a short list of views. Anything else
-      inflates to nothing on the home screen and says so nowhere. */
-const ALLOWED = new Set(["FrameLayout", "LinearLayout", "RelativeLayout", "GridLayout",
-                         "TextView", "ImageView", "Button", "ImageButton", "ProgressBar",
-                         "Chronometer", "AnalogClock", "ViewFlipper", "ListView", "GridView",
-                         "StackView", "AdapterViewFlipper", "View", "Space"]);
+/* 5. RemoteViews can only inflate a short list of views, and the list is
+      SHORTER THAN IT LOOKS. This check used to allow <View> and <Space> as
+      well, on the reasonable-sounding grounds that everything else in the
+      list descends from View — and that is exactly backwards. The
+      RemoteViews documentation is explicit: these classes and
+      "descendants of these classes are not supported". A bare <View> is not
+      among them, and <Space> is a descendant of one.
+
+      Both were in both widget layouts. The widget therefore could never be
+      placed on any Android home screen, on any phone, since the day it was
+      added: the launcher says "Couldn't add widget" and nothing is logged,
+      nothing crashes and no build fails. The check agreed with the bug,
+      which is the only reason it survived three months.
+
+      Taken verbatim from the RemoteViews class reference. Adding to it needs
+      that page, not an inference about inheritance. */
+const ALLOWED = new Set([/* layouts */
+                         "AdapterViewFlipper", "FrameLayout", "GridLayout", "GridView",
+                         "LinearLayout", "ListView", "RelativeLayout", "StackView",
+                         "ViewFlipper",
+                         /* widgets */
+                         "AnalogClock", "Button", "Chronometer", "ImageButton", "ImageView",
+                         "ProgressBar", "TextClock", "TextView",
+                         /* API 31 and up — fine to use, the app's minSdk is well past it */
+                         "CheckBox", "RadioButton", "RadioGroup", "Switch",
+                         /* not a view: an inflation point, and documented as supported */
+                         "ViewStub"]);
 for (const f of fs.readdirSync(path.join(res, "layout"))) {
-  const xml = fs.readFileSync(path.join(res, "layout", f), "utf8");
+  /* Comments out first. These files explain in prose WHY they may not use
+     <View> or <Space>, and a scan that reads the prose reports the warning
+     as the offence. */
+  const xml = fs.readFileSync(path.join(res, "layout", f), "utf8")
+                .replace(/<!--[\s\S]*?-->/g, "");
   for (const [, tag] of xml.matchAll(/<([A-Z][\w.]*)/g)) {
     if (!ALLOWED.has(tag)) say(`${f} uses <${tag}>, which RemoteViews cannot inflate`);
   }

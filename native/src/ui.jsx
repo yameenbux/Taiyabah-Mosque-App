@@ -18,8 +18,11 @@ import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
 import { C, F, R, SHADOW, dual } from "./theme";
 import { COLUMN } from "./layout";
+import { ON_AIR_ROOM } from "./chrome";
+import { useLiveAudio } from "./live-audio";
 import { useOffline } from "./reach";
 import { useApp } from "./store";
+import { useNoticeIds, unseenCount } from "./notices-state";
 
 export const tap = () => { if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); };
 
@@ -164,8 +167,13 @@ export const Screen = React.forwardRef(function Screen(
      input on the zakāt calculator. Padding is added only while the bar is
      actually showing, so nothing moves for anybody with a connection. */
   const down = useOffline();
+  /* AND ROOM FOR THE ON AIR BAR, on exactly the same terms: it floats over the
+     scroll too, and only while the radio is actually playing. Without this the
+     last line of whatever you are reading sits behind it — which on the Qurʼan
+     is an āyah, so it is not a small thing. */
+  const onAir = useLiveAudio().playing;
   const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
-                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0),
+                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + (onAir ? ON_AIR_ROOM : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
   if (!scroll)
     return (
@@ -258,13 +266,16 @@ export function StarField({ gold, bright }) {
  * society's name, and a bell that goes to Notices. It sits on the plum so it
  * runs into the hero below it rather than sitting on top of one. */
 export function TopBar({ navigation, onBell, back }) {
-  const { t, fs, rtl } = useApp();
+  const { t, fs, rtl, ntSeen, ntCleared } = useApp();
   const insets = useSafeAreaInsets();
   const nav = useNavigation();
   /* A pushed screen that wears the website's top bar still has to offer a way
    * out. The website's own pages do not need one — they are tabs — so this is
    * the one addition, and it is the arrow people look for. */
   const canBack = back && nav?.canGoBack?.();
+  /* One fetch per app session, shared by every TopBar on every screen — see
+     notices-state.js for why the bell cannot wait for the Notices screen. */
+  const unseen = unseenCount(useNoticeIds(), ntSeen, ntCleared);
   return (
     /* .topbar: padding 14px 20px, and a 1px gold hairline along the bottom at
        25% — the line that separates it from the hero. Without it the two
@@ -295,7 +306,11 @@ export function TopBar({ navigation, onBell, back }) {
                                    textAlign: rtl ? "right" : "left" }}>{line}</Text>))}
       </View>
       <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
-        accessibilityLabel={t("a11y.notices", "Notices")}
+        /* A DOT IS INVISIBLE TO A SCREEN READER, so the label says it instead
+           — the same sentence the website puts on its own bell. */
+        accessibilityLabel={unseen
+          ? `${t("a11y.notices", "Notices")} — ${t("notices.something_new", "something new")}`
+          : t("a11y.notices", "Notices")}
         accessibilityRole="button"
         /* Drawn 40x40 to match the website; hit as 44x44. Every one of
            these is the website's own size, so the drawing is never changed
@@ -308,6 +323,12 @@ export function TopBar({ navigation, onBell, back }) {
                                    borderColor: "rgba(198,162,76,.3)",
                                    backgroundColor: pressed ? "rgba(198,162,76,.24)" : "rgba(198,162,76,.1)" })}>
         <Ionicons name="notifications-outline" size={19} color={C.goldBright} />
+        {/* Danger red with a plum ring, as the website draws it, so the dot
+            reads as a mark ON the bell rather than a speck behind it. */}
+        {!!unseen && (
+          <View style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8,
+                         borderRadius: 4, backgroundColor: C.danger,
+                         borderWidth: 2, borderColor: C.brand900 }} />)}
       </Pressable>
     </View>
   );

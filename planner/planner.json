@@ -1,0 +1,37 @@
+{
+ "year": "2026/27",
+ "slug": "taiyabah-holiday-planner-2026-27",
+ "issued": "2026-11-11",
+ "built_from": {
+  "all": "248cf725bf61f220",
+  "year": "895f5cd6efce20b8",
+  "closures": {
+   "insert": "960b2b0f7323384e",
+   "autumnht": "1c604daeccf62b98",
+   "christmas": "c0de58386c617bfd",
+   "ramadhan": "d93dd4f2b3cddaa4",
+   "springht": "8bf21c88e87967f6",
+   "eidadha": "0e181c66b1c5eb3c",
+   "summerht": "dbb1722b9b7b2183",
+   "endofyear": "4ecb203c82c4935a"
+  },
+  "events": {
+   "mawlid": "c98f82ec9fa4500f",
+   "miraj": "4d5899a87dbb60b2",
+   "baraah": "739dd6949575b1af",
+   "ramadan1": "c4b261a42b52ee58",
+   "lastten": "b5c6e035dad08c0e",
+   "eidfitr": "7ad95e4216089c88",
+   "arafah": "5a2532bdd842e908",
+   "eidadha": "6b969f25dab26094",
+   "newyear": "5f6b77aab995e3d3",
+   "ashura": "dedc6b38d44ea762"
+  }
+ },
+ "files": [
+  "taiyabah-holiday-planner-2026-27.pdf",
+  "taiyabah-holiday-planner-2026-27.png",
+  "taiyabah-holiday-planner-2026-27-card.png"
+ ],
+ "note": "Written by scripts/build-holiday-planner.mjs. Do not hand-edit — rebuild instead, or scripts/check-holiday-planner.mjs will fail."
+}

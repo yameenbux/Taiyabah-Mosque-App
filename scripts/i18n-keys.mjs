@@ -158,7 +158,6 @@ if (idx) for (const su of idx.surahs) {
 }
 const ath = load("quran/athkar.js", "ATHKAR");
 if (ath) {
-  add("athkar.review_note", ath.reviewNote);
   for (const sec of ath.sections) {
     add(`athkar.${sec.id}.title`, sec.title);
     add(`athkar.${sec.id}.intro`, sec.intro);
@@ -173,7 +172,6 @@ if (ath) {
 }
 const duas = load("quran/duas.js", "DUAS");
 if (duas) {
-  add("duas.review_note", duas.reviewNote);
   for (const c of duas.categories) {
     add(`dua.${c.id}.title`, c.title);
     c.items.forEach((it, j) => {

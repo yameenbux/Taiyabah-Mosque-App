@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- THE RULES ARE ImageViews AND THE GAPS ARE FrameLayouts, which looks
+     like somebody reaching for the wrong tag and is not. RemoteViews can
+     inflate only a fixed list of classes — FrameLayout, LinearLayout,
+     RelativeLayout, GridLayout, TextView, ImageView, Button, ImageButton,
+     ProgressBar, Chronometer, AnalogClock, TextClock and the adapter views —
+     and "descendants of these classes are not supported". A bare <View> is
+     not on that list, and <Space> is a descendant of View, so neither can be
+     inflated. A layout containing one does not warn, does not log and does
+     not crash: the launcher simply says "Couldn't add widget" and the widget
+     can never be placed, which is exactly what shipped.
+     scripts/check-android-widget.mjs now holds the real list. -->
 <!-- SMALL — the mark signs the top right, the type stacks from the bottom
      left, and the space between them is left alone. Only views RemoteViews
      can inflate: FrameLayout, LinearLayout, TextView, ImageView, Chronometer. -->
@@ -49,13 +60,14 @@
           android:contentDescription="@null" />
     </LinearLayout>
 
-    <View
+    <ImageView
         android:layout_width="34dp"
         android:layout_height="1dp"
         android:layout_marginTop="7dp"
-        android:background="@drawable/taiyabah_rule" />
+        android:background="@drawable/taiyabah_rule"
+          android:contentDescription="@null" />
 
-    <Space
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

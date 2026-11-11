@@ -280,3 +280,89 @@ names are the nouns already standing inside `hajj.plan_your_umrah` and
 | **← Hajj / Umrah** | ← حج / عمرہ | ← હજ / ઉમરહ | ← الحج / العمرة |
 | **ʿUmrah** | عمرہ | ઉમરાહ | الْعُمْرَة |
 | **Hajj** | حج | હજ | الْحَجّ |
+
+### hol.download_the_holiday_planner, hol.pdf_one_page_a4
+
+*Where they appear:* Madrasah → Holiday Planner, on the button above the
+twelve month grids — on the website and in the app, which take the same two
+strings.
+
+*Drafted, not read.* Two more than the nine counted at the head of this file.
+They went in with the downloadable planner sheet.
+
+Both are plain interface wording rather than anything that carries a ruling,
+so the risk here is a clumsy phrase and not a wrong one — but *ڈاؤن لوڈ* and
+*ડાઉનલોડ* are transliterations of an English word, and a native speaker may
+well prefer something else. The Arabic **رُزْنَامَة** is the ordinary word for
+a calendar or almanac; **نَزِّلْ** is the imperative "download".
+
+`PDF` and `A4` stay Latin in all three, as the file formats and paper sizes
+elsewhere in the app do — they are read as the labels they are, not words.
+
+| | |
+|---|---|
+| **English** | Download the holiday planner |
+| **Urdu** | چھٹیوں کا منصوبہ ڈاؤن لوڈ کریں |
+| **Gujarati** | રજાઓનું પ્લાનર ડાઉનલોડ કરો |
+| **Arabic** | نَزِّلْ رُزْنَامَةَ الْعُطَلِ |
+
+| | |
+|---|---|
+| **English** | PDF · one page · A4 |
+| **Urdu** | PDF · ایک صفحہ · A4 |
+| **Gujarati** | PDF · એક પાનું · A4 |
+| **Arabic** | PDF · صَفْحَةٌ وَاحِدَةٌ · A4 |
+
+### notices.clear, notices.clear_all, notices.show_cleared, notices.clear_this_notice, notices.all_cleared
+
+*Where they appear:* Notices — the swipe action and the per-card control, the
+two pills above the list, and the line shown once a reader has cleared
+everything. The app and the website take the same five strings.
+
+*Drafted, not read.* They went in with local clearing of notices.
+
+**The verb is the thing to check.** Clearing here does not DELETE: the notice
+stays live for everyone else and comes back the moment the reader presses
+*Show cleared*. English "clear" carries that; a word meaning *delete* or
+*erase* would promise something the feature does not do, and on a janāzah
+notice that is not a small difference.
+
+- Urdu **ہٹانا** and Gujarati **દૂર કરવું** were chosen as "remove / put
+  aside" rather than مٹانا / કાઢી નાખવું, which read as erase.
+- Arabic **إِزَالَة** is "removal". **حَذْف** would be deletion and is wrong
+  here for the same reason.
+
+| | |
+|---|---|
+| **English** | Clear |
+| **Urdu** | ہٹائیں |
+| **Gujarati** | દૂર કરો |
+| **Arabic** | إِزَالَة |
+
+| | |
+|---|---|
+| **English** | Clear all |
+| **Urdu** | سب ہٹائیں |
+| **Gujarati** | બધું દૂર કરો |
+| **Arabic** | إِزَالَةُ الْكُلّ |
+
+| | |
+|---|---|
+| **English** | Show cleared |
+| **Urdu** | ہٹائی گئی اطلاعات دکھائیں |
+| **Gujarati** | દૂર કરેલી સૂચનાઓ બતાવો |
+| **Arabic** | أَظْهِرِ الْمُزَالَة |
+
+| | |
+|---|---|
+| **English** | Clear this notice |
+| **Urdu** | یہ اطلاع ہٹائیں |
+| **Gujarati** | આ સૂચના દૂર કરો |
+| **Arabic** | أَزِلْ هٰذَا الْإِشْعَار |
+
+| | |
+|---|---|
+| **English** | You have cleared every notice on this device. They are still here — press Show cleared. |
+| **Urdu** | آپ نے اس آلے سے ہر اطلاع ہٹا دی ہے۔ وہ اب بھی موجود ہیں — ہٹائی گئی اطلاعات دکھائیں دبائیے۔ |
+| **Gujarati** | તમે આ ઉપકરણ પરથી દરેક સૂચના દૂર કરી છે. તે હજી પણ અહીં છે — દૂર કરેલી સૂચનાઓ બતાવો દબાવો. |
+| **Arabic** | لَقَدْ أَزَلْتَ كُلَّ إِشْعَارٍ مِنْ هٰذَا الْجِهَاز. وَهِيَ مَا زَالَتْ هُنَا — اِضْغَطْ أَظْهِرِ الْمُزَالَة. |

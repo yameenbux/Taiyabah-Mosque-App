@@ -2510,6 +2510,19 @@
     ]
    },
    {
+    "type": "call",
+    "k": {
+     "k": "hol.pdf_one_page_a4",
+     "t": "PDF · one page · A4"
+    },
+    "v": {
+     "k": "hol.download_the_holiday_planner",
+     "t": "Download the holiday planner"
+    },
+    "href": "planner/taiyabah-holiday-planner-2026-27.pdf",
+    "icon": "call"
+   },
+   {
     "type": "heading",
     "k": "hol.the_year_at_a_glance",
     "t": "The year at a glance",
@@ -2879,7 +2892,7 @@
      {
       "type": "note",
       "k": "giving.a_weekly_gift_for_jumuah",
-      "t": "A weekly gift for Jumuʿah. Stripe takes it every seven days from the day you start, so set it up on a Friday if you would like it to land on one. You can stop it any time."
+      "t": "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time."
      },
      {
       "type": "p",
