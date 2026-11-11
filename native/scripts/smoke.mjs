@@ -13,6 +13,7 @@
  */
 import { execSync, execFileSync } from "node:child_process";
 import fs from "node:fs"; import path from "node:path";
+import { decode, colours as pngColours } from "./png.mjs";
 
 const APK = process.argv[2];
 /* NOT a dotted directory: upload-artifact skips hidden files by default, which
@@ -513,15 +514,25 @@ else {
 }
 
 /* Unique colours in a slice of a screenshot. An icon that drew has strokes and
- * antialiasing, so dozens of them; flat background has one or two. */
+ * antialiasing, so dozens of them; flat background has one or two.
+ *
+ * THIS USED TO SHELL OUT TO IMAGEMAGICK, and that made the one check nobody
+ * can replace depend on the one thing a runner cannot guarantee. On
+ * 11 November the apt install of it failed on three consecutive runs — not a
+ * bad mirror but DNS, with azure.archive.ubuntu.com, archive.ubuntu.com AND
+ * security.ubuntu.com all unresolvable while GitHub reported every system
+ * operational. Each run had already compiled the APK and passed every static
+ * check. A masjid's release sat behind a package mirror.
+ *
+ * png.mjs was written for precisely this and says so in its own header: a PNG
+ * is an IHDR, some zlib and a filter byte per row, and Node has zlib. It
+ * exports colours() with these same arguments, so this is a swap and not a
+ * rewrite — and it is strictly stronger, because there is no longer a tool
+ * that can be absent. The null branch below stays for a PNG that will not
+ * decode; it is simply no longer reachable by a missing binary. */
 function colours(png, x, y, w, h) {
-  for (const bin of ["magick", "convert"]) {
-    try {
-      return Number(execFileSync(bin, [png, "-crop", `${w}x${h}+${x}+${y}`, "+repage",
-                                       "-format", "%k", "info:"], { encoding: "utf8" }).trim());
-    } catch { /* try the other name */ }
-  }
-  return null;
+  try { return pngColours(decode(png), x, y, w, h); }
+  catch { return null; }
 }
 
 const tabShot = shot("tabbar");

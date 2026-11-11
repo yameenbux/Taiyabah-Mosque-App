@@ -144,72 +144,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # The icon check counts colours in a slice of a screenshot. Without this it
-      # found no tool, skipped itself, and the run passed — on a build where not
-      # one icon drew. A check that cannot run must not report success, so the
-      # script now fails when the tool is absent, and the tool is installed here.
+      # NOTHING IS INSTALLED HERE ANY MORE, and that is the point.
       #
-      # IT IS ALSO THE ONLY THING IN THIS JOB THAT NEEDS THE INTERNET AFTER THE
-      # APK IS BUILT, which makes it the whole job's weakest point. On
-      # 11 November it took the run down twice in a row:
+      # This job used to apt-get ImageMagick so the icon check could count
+      # colours in a screenshot. It was the only step needing the internet
+      # after the APK was built, and on 11 November it took three consecutive
+      # runs down: azure.archive.ubuntu.com, archive.ubuntu.com and
+      # security.ubuntu.com all unresolvable, while GitHub reported every
+      # system operational. Retries and a mirror swap were tried first and
+      # could not have worked — no Ubuntu hostname resolved at all, so there
+      # was no mirror to fall back to.
       #
-      #   Temporary failure resolving 'azure.archive.ubuntu.com'
-      #   E: Unable to fetch some archives   ->   exit 100
-      #
-      # GitHub reported all systems operational throughout; it was the Azure
-      # mirrors those runners point at, not Actions. The second attempt sat in
-      # apt's own retry loop for over half an hour before anyone stopped it,
-      # having already compiled the APK and run every static check.
-      #
-      # So: try again, move off the Azure mirrors if they stay unreachable, and
-      # give up in minutes rather than hours. What does NOT change is the
-      # ending — if the tool is still missing the job fails, because the
-      # failure this step exists to prevent is a check that quietly skips.
-      - name: Something to look at pixels with
-        timeout-minutes: 8
-        run: |
-          set -u
-          have() { command -v magick >/dev/null 2>&1 || command -v convert >/dev/null 2>&1; }
-
-          # An install that is not needed cannot fail. Runner images have
-          # carried ImageMagick before and may again.
-          if have; then
-            echo "already here: $( (magick --version || convert --version) 2>/dev/null | head -1 )"
-            exit 0
-          fi
-
-          for attempt in 1 2 3 4; do
-            echo "::group::apt attempt $attempt"
-            if sudo apt-get update -qq && \
-               sudo apt-get install -y --no-install-recommends imagemagick; then
-              echo "::endgroup::"
-              break
-            fi
-            echo "::endgroup::"
-            echo "::warning::apt attempt $attempt did not get imagemagick"
-
-            # Ubuntu 25.10 keeps its sources in deb822 format under
-            # sources.list.d; older images use the one-line sources.list. Edit
-            # whichever is there rather than assuming.
-            if [ "$attempt" = "2" ]; then
-              echo "dropping the Azure mirrors for the Ubuntu ones"
-              sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' \
-                /etc/apt/sources.list /etc/apt/sources.list.d/*.sources \
-                /etc/apt/sources.list.d/*.list 2>/dev/null || true
-            fi
-            sleep $(( attempt * 15 ))
-          done
-
-          # THE ENDING IS THE POINT. Everything above is about getting the tool;
-          # this is about never pretending we have it.
-          if ! have; then
-            echo "::error::ImageMagick could not be installed after 4 attempts."
-            echo "::error::The icon check counts colours in a screenshot and cannot"
-            echo "::error::run without it. A check that cannot run must not report"
-            echo "::error::success, so this run fails rather than skipping it."
-            exit 1
-          fi
-          echo "installed: $( (magick --version || convert --version) 2>/dev/null | head -1 )"
+      # scripts/png.mjs decodes a PNG with nothing but Node's own zlib, and
+      # was written for this exact reason. smoke.mjs uses it now, so the check
+      # is stronger than it was: there is no longer a tool that can be
+      # missing, on this runner or on the macOS one.
 
       - name: Boot a phone and use the app
         uses: reactivecircus/android-emulator-runner@v2
