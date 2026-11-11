@@ -7,8 +7,15 @@
  *
  * The hadith athkar below are written out, with the collection named on each.
  * They are the widely known wordings, but wording varies between narrations
- * and printings: the imam should confirm this set before it is treated as
- * settled. The app says as much on the page.
+ * and printings, and settling which wording THIS masjid publishes is a
+ * judgement for its ʿulamā rather than for whoever typed the file.
+ *
+ * The app used to say so on the page, which put a note meant for the masjid
+ * in front of the congregation. That line is gone, and a real process stands
+ * in its place: scripts/build-athkar-review.mjs exports every entry as a
+ * sheet two ʿulamā sign, and scripts/check-athkar-approved.mjs fails the
+ * build if an approved wording is later altered without a fresh signature.
+ * See docs/athkar-approval-record.md.
  *
  *   node scripts/build-athkar.mjs
  */
