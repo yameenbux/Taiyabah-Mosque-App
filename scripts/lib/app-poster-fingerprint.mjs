@@ -27,7 +27,7 @@ export function fingerprint() {
      renamed, JSON.stringify turned the missing value into null, and the
      kicker, tagline, blurb and pills stopped being tracked at all. */
   const words = JSON.stringify({
-    KICKER: C.KICKER, LEAD_1: C.LEAD_1, LEAD_2: C.LEAD_2, TAG: C.TAG,
+    KICKER: C.KICKER, LEAD_1: C.LEAD_1, LEAD_2: C.LEAD_2,
     BLURB: C.BLURB, PILLS: C.PILLS, THINGS: C.THINGS,
     SCAN_HEAD: C.SCAN_HEAD, SCAN_SUB: C.SCAN_SUB,
     WAYS: C.WAYS, MASJID: C.MASJID, CHARITY: C.CHARITY,

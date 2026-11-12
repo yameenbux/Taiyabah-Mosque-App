@@ -1,11 +1,34 @@
 {
  "built": "2026-11-12",
+ "bleedMm": 0,
+ "sizes": [
+  {
+   "name": "A4",
+   "file": "taiyabah-app-poster-a4.pdf"
+  },
+  {
+   "name": "A3",
+   "file": "taiyabah-app-poster-a3.pdf"
+  },
+  {
+   "name": "A2",
+   "file": "taiyabah-app-poster-a2.pdf"
+  },
+  {
+   "name": "A1",
+   "file": "taiyabah-app-poster-a1.pdf"
+  },
+  {
+   "name": "A0",
+   "file": "taiyabah-app-poster-a0.pdf"
+  }
+ ],
  "urls": {
   "appstore": "https://apps.apple.com/gb/app/id6822250468",
   "play": "https://play.google.com/store/apps/details?id=com.taiyabahmasjid.app"
  },
  "fingerprint": {
-  "words": "f47e591a31223ccb",
+  "words": "b0c1b5d7411c0013",
   "urls": "305f5809b8e3783d",
   "codes": "3d5d48c5bb2d0954",
   "shot": "d45923a1976c46b1",

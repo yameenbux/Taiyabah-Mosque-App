@@ -41,12 +41,51 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "poster");
 const SLUG = "taiyabah-app-poster";
 
+/* Where the plum gives way to the cream, in millimetres down a 297mm page.
+   It was written out in three places — the hero's height, the starfield's
+   viewBox and the clearance guard's millimetre conversion — and moving the
+   fold meant remembering all three. The guard quietly measures against the
+   wrong scale if you forget the third. */
+const HERO_MM = 182;
+const PAGE_MM = { w: 210, h: 297 };
+
+/* EVERY SIZE IS THE SAME ARTWORK, SCALED — not a separate layout.
+ *
+ * The design is drawn once at A4 and each larger sheet renders it inside a
+ * 210x297mm box scaled by width/210. That is deliberate and it is the whole
+ * reason the big sizes can be trusted: an A1 is mathematically the A4 that
+ * was checked, four times over, so it cannot reflow, cannot drop a line, and
+ * cannot need re-tuning. Laying out each size separately would mean five
+ * layouts to keep in step and five chances to let one drift.
+ *
+ * Type and the logo are vector and scale without limit. Two things do not —
+ * the home-screen picture and Google's Play badge are bitmaps, and the badge
+ * is the smaller of the two at 646px because that is the only size Google
+ * publishes. The report at the end of a build prints the resolution each
+ * sheet asks of them, so nobody has to guess whether A0 will hold up.
+ */
+const SIZES = {
+  a4: { w: 210, h: 297, look: "a noticeboard, a door, a handout" },
+  a3: { w: 297, h: 420, look: "the main board in the foyer" },
+  a2: { w: 420, h: 594, look: "a corridor or an entrance wall" },
+  a1: { w: 594, h: 841, look: "a hall, read from a few metres" },
+  a0: { w: 841, h: 1189, look: "a large wall, read from across a room" },
+};
+
+/* Trim bleed, in mm, when --bleed is passed. Printers trim to within about a
+   millimetre, so artwork that stops exactly at the edge can leave a white
+   hairline down one side. 3mm is the usual ask. */
+const BLEED = (() => {
+  const i = process.argv.indexOf("--bleed");
+  return i === -1 ? 0 : Number(process.argv[i + 1] ?? 3);
+})();
+
 /* --- what the poster says ------------------------------------------------- */
 
 /* The words live in scripts/lib/app-poster-content.mjs so that editing them
    does not mean reading the layout, and so the gate can tell whether the PDF
    on disk was built from them. */
-const { KICKER, LEAD_1, LEAD_2, TAG, BLURB, PILLS, THINGS,
+const { KICKER, LEAD_1, LEAD_2, BLURB, PILLS, THINGS,
         SCAN_HEAD, SCAN_SUB, MASJID, CHARITY } = C;
 const WAYS = C.WAYS.map(w => ({ ...w, qr: QR[w.key] }));
 
@@ -94,7 +133,7 @@ function star(cx, cy, r, fill, stroke = "none", sw = 0) {
 /* The hero's backdrop. Filled stars in a plum a shade off the ground, plus two
    outlined in gold at a whisper — the same two-weight treatment as the app. */
 const STARFIELD = `
-<svg viewBox="0 0 210 184" preserveAspectRatio="xMidYMid slice" class="stars">
+<svg viewBox="0 0 ${PAGE_MM.w} ${HERO_MM}" preserveAspectRatio="xMidYMid slice" class="stars">
   ${star(168, 44, 46, "rgba(243,239,227,.045)")}
   ${star(196, 118, 30, "rgba(243,239,227,.032)")}
   ${star(150, 148, 22, "rgba(243,239,227,.028)")}
@@ -141,47 +180,52 @@ const HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 ${FONTS}
 :root{${TOKENS}}
 *{margin:0;padding:0;box-sizing:border-box}
-@page{size:A4 portrait;margin:0}
-html,body{width:210mm;height:297mm}
+/* No size here on purpose — each sheet is set by the renderer, and a
+   size pinned in CSS quietly wins over it and tiles the artwork across
+   several A4 pages. An A0 came out as three pages exactly that way. */
+@page{margin:0}
+html,body{width:${PAGE_MM.w}mm;height:${PAGE_MM.h}mm;overflow:hidden}
+.sheet{width:${PAGE_MM.w}mm;height:${PAGE_MM.h}mm;position:relative;overflow:hidden;
+       transform-origin:top left}
 body{font-family:Hanken,sans-serif;color:var(--ink);background:var(--paper);
      -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
 
 /* ---- hero ---- */
-.hero{position:relative;height:184mm;overflow:hidden;color:var(--cream);
+.hero{position:relative;height:${HERO_MM}mm;overflow:hidden;color:var(--cream);
       background:linear-gradient(152deg,#4B1136 0%,#3C0B2A 46%,#330922 100%)}
 .stars{position:absolute;inset:0;width:100%;height:100%}
 .hero>.in{position:relative;height:100%;padding:16mm 16mm 0;display:flex;gap:8mm}
-.col{width:96mm;display:flex;flex-direction:column;padding-bottom:13mm}
+.col{width:100mm;display:flex;flex-direction:column;padding-bottom:13mm}
 
 .brand{display:flex;align-items:center;gap:6mm}
-.brand img{width:40mm;display:block}
+.brand img{width:44mm;display:block}
 .brand .rule{width:.3mm;height:12mm;background:rgba(243,239,227,.3)}
-.brand .soc{font-size:7.4pt;line-height:1.35;letter-spacing:.13em;font-weight:500;
+.brand .soc{font-size:8pt;line-height:1.35;letter-spacing:.13em;font-weight:500;
             text-transform:uppercase;color:rgba(243,239,227,.82)}
 
-.salam{font-family:Amiri,serif;font-size:9.8pt;line-height:1.9;color:rgba(220,187,99,.85);
+.salam{font-family:Amiri,serif;font-size:11pt;line-height:1.9;color:rgba(220,187,99,.85);
        direction:rtl;text-align:left;margin:4.6mm 0 .6mm}
 
 .kick{display:flex;align-items:center;gap:3mm;margin-top:5mm;
-      font-size:7.6pt;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
+      font-size:8.4pt;letter-spacing:.18em;text-transform:uppercase;font-weight:700;
       color:var(--goldbright)}
 .kick s{flex:none;width:9mm;height:.5mm;background:var(--gold);text-decoration:none}
 
-h1{font-size:22pt;line-height:1.12;font-weight:700;letter-spacing:-.016em;margin-top:3.6mm}
-h1 em{display:block;font-style:normal}
+h1{font-size:27pt;line-height:1.1;font-weight:700;letter-spacing:-.018em;margin-top:4mm}
+h1 em{display:block;font-style:normal;color:var(--goldbright)}
 .tag{font-family:Fraunces,serif;font-size:11.6pt;line-height:1.32;color:var(--goldbright);
      margin-top:4.2mm;max-width:84mm}
-.blurb{font-size:8.2pt;line-height:1.48;color:rgba(243,239,227,.78);max-width:85mm;margin-top:4.6mm}
+.blurb{font-size:10.4pt;line-height:1.45;color:rgba(243,239,227,.84);max-width:96mm;margin-top:5mm}
 
 .pills{display:flex;gap:2.4mm;margin-top:4.6mm;margin-bottom:1.4mm}
-.pills b{font-size:7.2pt;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+.pills b{font-size:8.2pt;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
          color:var(--goldbright);border:.28mm solid rgba(220,187,99,.55);
-         border-radius:9mm;padding:1.4mm 3.4mm;background:rgba(220,187,99,.09)}
+         border-radius:9mm;padding:1.9mm 4.2mm;background:rgba(220,187,99,.09)}
 
-ul{list-style:none;margin-top:auto;padding-top:4.5mm;border-top:.25mm solid rgba(243,239,227,.13);display:flex;flex-direction:column;gap:2.9mm}
-li{display:flex;align-items:baseline;gap:3.2mm;font-size:9pt;line-height:1.3;
+ul{list-style:none;margin-top:auto;padding-top:4.5mm;border-top:.25mm solid rgba(243,239,227,.13);display:flex;flex-direction:column;gap:4mm}
+li{display:flex;align-items:baseline;gap:3.6mm;font-size:11pt;line-height:1.28;
    color:rgba(243,239,227,.94)}
-li s{flex:none;width:2.3mm;height:2.3mm;background:var(--gold);text-decoration:none;
+li s{flex:none;width:2.6mm;height:2.6mm;background:var(--gold);text-decoration:none;
      transform:rotate(45deg);border-radius:.25mm;position:relative;top:-.2mm}
 
 /* ---- the phone ---- */
@@ -191,8 +235,8 @@ li s{flex:none;width:2.3mm;height:2.3mm;background:var(--gold);text-decoration:n
    of body text that reads as a mistake. Cut by the layout, it reads as a
    screen that carries on — which is what it is. 32mm down puts the cut just
    above that half line; moving either number moves where it lands. */
-.phone{flex:1;display:flex;align-items:flex-start;justify-content:center;padding-top:39mm}
-.dev{width:68mm;flex:none;padding:1.8mm;border-radius:9.2mm;position:relative;
+.phone{flex:1;display:flex;align-items:flex-start;justify-content:center;padding-top:33mm}
+.dev{width:70mm;flex:none;padding:1.8mm;border-radius:9.2mm;position:relative;
      background:linear-gradient(160deg,#6B5230 0%,#2A1018 34%,#1A0810 70%,#54401F 100%);
      box-shadow:0 2.4mm 7mm rgba(0,0,0,.42)}
 .dev img{display:block;width:100%;border-radius:7.6mm}
@@ -200,13 +244,13 @@ li s{flex:none;width:2.3mm;height:2.3mm;background:var(--gold);text-decoration:n
            border:.22mm solid rgba(220,187,99,.34);pointer-events:none}
 
 /* ---- the fold ---- */
-.fold{height:113mm;background:var(--paper);padding:9.5mm 17mm 0;position:relative}
+.fold{height:${PAGE_MM.h - HERO_MM}mm;background:var(--paper);padding:9.5mm 17mm 0;position:relative}
 .fold:before{content:"";position:absolute;left:0;right:0;top:0;height:.7mm;
              background:linear-gradient(90deg,var(--gold),rgba(198,162,76,.18))}
 .scan{text-align:center}
-.scan b{display:block;font-family:Fraunces,serif;font-weight:400;font-size:18pt;
+.scan b{display:block;font-family:Fraunces,serif;font-weight:400;font-size:20pt;
         color:var(--plum);letter-spacing:-.005em}
-.scan i{display:block;font-style:normal;font-size:8pt;letter-spacing:.16em;
+.scan i{display:block;font-style:normal;font-size:8.6pt;letter-spacing:.15em;
         text-transform:uppercase;color:var(--goldink);font-weight:600;margin-top:2.4mm}
 
 .ways{display:flex;gap:11mm;margin:5mm auto 0;max-width:146mm}
@@ -220,9 +264,10 @@ li s{flex:none;width:2.3mm;height:2.3mm;background:var(--gold);text-decoration:n
 
 footer{position:absolute;left:17mm;right:17mm;bottom:9mm;text-align:center;
         border-top:.25mm solid var(--line);padding-top:4.2mm}
-footer b{display:block;font-size:8pt;font-weight:600;color:var(--ink);line-height:1.45}
-footer span{display:block;font-size:7.2pt;color:var(--muted);margin-top:1.4mm}
+footer b{display:block;font-size:8.8pt;font-weight:600;color:var(--ink);line-height:1.45}
+footer span{display:block;font-size:8pt;color:var(--muted);margin-top:1.4mm}
 </style></head><body>
+<div class="sheet">
 
 <section class="hero">
   ${STARFIELD}
@@ -238,7 +283,6 @@ footer span{display:block;font-size:7.2pt;color:var(--muted);margin-top:1.4mm}
 
       <div class="kick"><s></s>${KICKER}</div>
       <h1>${LEAD_1}<em>${LEAD_2}</em></h1>
-      <p class="tag">${TAG.replace(". ", ".<br>")}</p>
       <p class="blurb">${BLURB}</p>
       <div class="pills">${PILLS.map(x => `<b>${x}</b>`).join("")}</div>
 
@@ -268,6 +312,7 @@ footer span{display:block;font-size:7.2pt;color:var(--muted);margin-top:1.4mm}
   </footer>
 </section>
 
+</div>
 </body></html>`;
 
 /* --- render ---------------------------------------------------------------- */
@@ -290,15 +335,28 @@ await page.setContent(HTML, { waitUntil: "networkidle" });
    can sit 0.7mm off the fold, which looks like a mistake and prints like one,
    while scrollHeight says everything is fine. It did exactly that once. */
 const CLEAR_MM = 7;
-const clearance = await page.evaluate(() => {
+const clearance = await page.evaluate((HERO) => {
   const hero = document.querySelector(".hero").getBoundingClientRect();
   const list = document.querySelector(".hero ul").getBoundingClientRect();
-  const perMm = document.querySelector(".hero").clientHeight / 184;
+  const perMm = document.querySelector(".hero").clientHeight / HERO;
   return Math.round((hero.bottom - list.bottom) / perMm * 10) / 10;
-});
+}, HERO_MM);
 if (clearance < CLEAR_MM) {
   console.error(`The feature list ends ${clearance}mm above the fold; it needs ${CLEAR_MM}mm.`);
   console.error("Shorten the copy or shrink the type. Nothing was written.");
+  await browser.close();
+  process.exit(1);
+}
+
+const kickLines = await page.evaluate(() => {
+  const el = document.querySelector(".kick");
+  const lh = parseFloat(getComputedStyle(el).lineHeight) ||
+             parseFloat(getComputedStyle(el).fontSize) * 1.2;
+  return Math.round(el.getBoundingClientRect().height / lh);
+});
+if (kickLines > 1) {
+  console.error(`The kicker wraps onto ${kickLines} lines and orphans a word.`);
+  console.error("Shorten it, or widen the text column. Nothing was written.");
   await browser.close();
   process.exit(1);
 }
@@ -350,20 +408,110 @@ if (footBottom.bottom > footBottom.page) {
   process.exit(1);
 }
 
-await page.pdf({
-  path: path.join(OUT, `${SLUG}.pdf`),
-  width: "210mm", height: "297mm", printBackground: true,
-  margin: { top: "0", right: "0", bottom: "0", left: "0" },
-});
+/* --- one checked page, every size ------------------------------------------ */
 
+function die(...lines) {
+  for (const l of lines) console.error(l);
+  console.error("Nothing was written.");
+  browser.close().finally(() => process.exit(1));
+  throw new Error(lines[0]);
+}
+
+const PT = 72 / 25.4;                               // points per millimetre
+const sheets = [];
+
+for (const [name, size] of Object.entries(SIZES)) {
+  const k = size.w / PAGE_MM.w;                     // A4 is 1, A0 is 4.005…
+  const pw = size.w + BLEED * 2, ph = size.h + BLEED * 2;
+
+  await page.evaluate(({ k, bleed, W, PH, H }) => {
+    const sheet = document.querySelector(".sheet");
+    sheet.style.transform = `translate(${bleed}mm, ${bleed}mm) scale(${k})`;
+    /* The page behind the artwork, so the bleed is not white. The hero's own
+       gradient runs diagonally, so matching it exactly in a 3mm margin that
+       gets cut off anyway is not worth the complication — the two flat
+       colours either side of the fold are what a trimmer would see. */
+    document.body.style.background = bleed
+      ? `linear-gradient(#3C0B2A 0, #3C0B2A ${(bleed + H * k) }mm, #F5F1E8 ${(bleed + H * k)}mm, #F5F1E8 100%)`
+      : "var(--paper)";
+    for (const el of [document.documentElement, document.body]) {
+      el.style.width = `${W}mm`;
+      el.style.height = `${PH}mm`;
+    }
+  }, { k, bleed: BLEED, W: pw, PH: ph, H: HERO_MM });
+
+  /* THE SCALE MUST ACTUALLY HAVE TAKEN, AND THE SHEET MUST BE ONE PAGE.
+     Both of those failed silently once. An A0 came out as three A4-ish pages
+     with the artwork unscaled in the middle of the first, and every other
+     check passed, because nothing here was looking at the finished sheet —
+     only at the A4 layout it was made from. A poster that is three pages is
+     not a poster. */
+  const fit = await page.evaluate(({ k }) => {
+    const sh = document.querySelector(".sheet").getBoundingClientRect();
+    const m = getComputedStyle(document.querySelector(".sheet")).transform;
+    return {
+      scaled: m === "none" ? 1 : Number(m.slice(7).split(",")[0]),
+      wantK: k,
+      overW: Math.round(sh.width - document.body.clientWidth),
+      overH: Math.round(document.documentElement.scrollHeight - document.body.clientHeight),
+    };
+  }, { k });
+  if (Math.abs(fit.scaled - fit.wantK) > 0.002)
+    die(`${name.toUpperCase()}: the sheet is drawn at ${fit.scaled}x, not ${fit.wantK.toFixed(4)}x.`);
+  if (fit.overW > 2 || fit.overH > 2)
+    die(`${name.toUpperCase()}: the sheet is ${fit.overW}px wider and ${fit.overH}px taller than its page, so it would print across several.`);
+
+  const file = `${SLUG}-${name}${BLEED ? `-bleed${BLEED}` : ""}.pdf`;
+  await page.pdf({
+    path: path.join(OUT, file),
+    width: `${pw}mm`, height: `${ph}mm`, printBackground: true,
+    margin: { top: "0", right: "0", bottom: "0", left: "0" },
+  });
+
+  /* What each sheet asks of the two bitmaps, and how big the headline lands.
+     Stated rather than assumed: "will it look alright at A0" is the question
+     everybody asks about a poster and nobody can answer by eye. */
+  const shotMm = 70 * k, badgeMm = WAYS[1].width * k;
+  sheets.push({
+    name: name.toUpperCase(), size: `${size.w}x${size.h}mm`, file,
+    shotDpi: Math.round(1080 / (shotMm / 25.4)),
+    badgeDpi: Math.round(646 / (badgeMm / 25.4)),
+    capMm: +(27 / PT * 0.72 * k).toFixed(1),         // headline cap height
+    smallMm: +(8 / PT * 0.72 * k).toFixed(1),        // the smallest type on the page
+    look: size.look,
+  });
+}
+
+/* Back to A4 for the picture, which is what gets shared rather than printed. */
+await page.evaluate(() => {
+  const sheet = document.querySelector(".sheet");
+  sheet.style.transform = "none";
+  document.body.style.background = "var(--paper)";
+  for (const el of [document.documentElement, document.body]) {
+    el.style.width = "210mm"; el.style.height = "297mm";
+  }
+});
 await page.screenshot({ path: path.join(OUT, `${SLUG}.png`) });
+
+/* The plain name stays A4, so anything already pointing at it keeps working. */
+fs.copyFileSync(path.join(OUT, `${SLUG}-a4${BLEED ? `-bleed${BLEED}` : ""}.pdf`),
+                path.join(OUT, `${SLUG}.pdf`));
+
 await browser.close();
 
 fs.writeFileSync(path.join(OUT, `${SLUG}.json`),
   JSON.stringify({ built: new Date().toISOString().slice(0, 10),
+                   bleedMm: BLEED,
+                   sizes: sheets.map(s => ({ name: s.name, file: s.file })),
                    urls: Object.fromEntries(WAYS.map(w => [w.key, w.qr.url])),
                    fingerprint: fingerprint() }, null, 1) + "\n");
 
-console.log(`poster/${SLUG}.pdf   A4 portrait, print-ready`);
-console.log(`poster/${SLUG}.png   the same artwork, for a group or a newsletter`);
+console.log(`\nposter/ — ${sheets.length} sheets${BLEED ? `, ${BLEED}mm bleed` : ", trimmed exact (pass --bleed 3 for print)"}\n`);
+console.log("        sheet          headline   smallest   screen   badge   printed for");
+console.log("        ─────────────  ────────   ────────   ──────   ─────   ───────────");
+for (const x of sheets) {
+  console.log(`  ${x.name.padEnd(4)}  ${x.size.padEnd(13)}  ${(x.capMm + "mm").padEnd(10)} ${(x.smallMm + "mm").padEnd(10)} ` +
+              `${(x.shotDpi + "dpi").padEnd(9)}${(x.badgeDpi + "dpi").padEnd(8)}${x.look}`);
+}
+console.log(`\nposter/${SLUG}.png   the same artwork as a picture, for a group or a newsletter`);
 for (const w of WAYS) console.log(`  ${w.name.padEnd(30)} ${w.qr.url}`);

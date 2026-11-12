@@ -26,20 +26,36 @@ const SLUG = "taiyabah-app-poster";
 const OUT = path.join(ROOT, "poster");
 const faults = [];
 
-/* 1. The artwork exists at all. */
+/* 1. The artwork exists at all — every sheet, not just the A4 one. A build
+      that fell over halfway leaves the older sizes on disk looking fine. */
+const SHEETS = ["a4", "a3", "a2", "a1", "a0"];
 for (const ext of ["pdf", "png", "json"]) {
   const f = path.join(OUT, `${SLUG}.${ext}`);
   if (!fs.existsSync(f)) faults.push(`poster/${SLUG}.${ext} is missing — run node scripts/build-app-poster.mjs`);
 }
+for (const n of SHEETS) {
+  const f = path.join(OUT, `${SLUG}-${n}.pdf`);
+  if (!fs.existsSync(f)) faults.push(`poster/${SLUG}-${n}.pdf is missing — run node scripts/build-app-poster.mjs`);
+}
 
-/* 2. The three codes are still QR codes. */
+/* 2. Every sheet was written by the SAME build. Five files with five
+      different timestamps is how one size ends up a version behind, which is
+      worse than one missing: nobody checks a poster that is already there. */
+const stamp = f => fs.statSync(path.join(OUT, f)).mtimeMs;
+if (SHEETS.every(n => fs.existsSync(path.join(OUT, `${SLUG}-${n}.pdf`)))) {
+  const times = SHEETS.map(n => stamp(`${SLUG}-${n}.pdf`));
+  if (Math.max(...times) - Math.min(...times) > 5 * 60 * 1000)
+    faults.push("the sheets were not all written by the same build — rebuild them together");
+}
+
+/* 3. The codes are still QR codes. */
 for (const w of C.WAYS) {
   const code = QR[w.key];
   if (!code) { faults.push(`${w.name} has no QR entry under "${w.key}"`); continue; }
   for (const f of wellFormed(code)) faults.push(`${w.name}: ${f}`);
 }
 
-/* 3. Every URL is one, is https, and is not a placeholder somebody meant to
+/* 4. Every URL is one, is https, and is not a placeholder somebody meant to
       come back to. A QR code pointing at http:// on a printed poster is a
       downgrade nobody can take back. */
 for (const w of C.WAYS) {
@@ -48,7 +64,7 @@ for (const w of C.WAYS) {
   if (/example\.|localhost|TODO|XXX/i.test(url)) faults.push(`${w.name}: "${url}" looks like a placeholder`);
 }
 
-/* 4. The PDF on disk was built from what is in the tree now. */
+/* 5. The PDF on disk was built from what is in the tree now. */
 if (fs.existsSync(path.join(OUT, `${SLUG}.json`))) {
   const was = JSON.parse(fs.readFileSync(path.join(OUT, `${SLUG}.json`), "utf8")).fingerprint ?? {};
   const now = fingerprint();
@@ -57,7 +73,7 @@ if (fs.existsSync(path.join(OUT, `${SLUG}.json`))) {
   }
 }
 
-/* 5. The links the website offers and the ones on the poster are the same
+/* 6. The links the website offers and the ones on the poster are the same
       links. A poster saying one thing while the site says another is how a
       store listing ends up with two different URLs in circulation. */
 const html = path.join(ROOT, "index.html");
@@ -76,4 +92,4 @@ if (faults.length) {
   for (const f of faults) console.error(`  ${f}`);
   process.exit(1);
 }
-console.log(`app poster: ok — ${C.WAYS.length} codes, ${C.THINGS.length} lines, built from the current tree`);
+console.log(`app poster: ok — ${SHEETS.length} sheets A4 to A0, ${C.WAYS.length} codes, built from the current tree`);

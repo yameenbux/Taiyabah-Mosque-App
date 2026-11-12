@@ -15,21 +15,25 @@
  * ships: if a feature is removed, the line goes with it.
  */
 
-/* Small gold line above the headline — the announcement itself. */
-export const KICKER = "New · from your masjid";
+/* Small gold line above the headline — the announcement. It is the KICKER
+   and not the headline on purpose. A poster on a foyer wall gets about three
+   seconds at three metres, and whatever is biggest is the only thing most
+   people read. "Introducing the Taiyabah Masjid app" is a product name; it
+   tells somebody what this is but gives them no reason to reach for their
+   phone. So the name goes up here, small, and the reason goes below, big. */
+export const KICKER = "Introducing the Taiyabah Masjid app";
 
-/* The headline, over two lines. Big, cream, and plainly an introduction. */
-export const LEAD_1 = "Introducing the";
-export const LEAD_2 = "Taiyabah Masjid app.";
-
-/* The line the App Store screenshots already lead with. It earns its place as
-   the supporting line rather than the headline now: the headline announces,
-   this says why it is worth having. */
-export const TAG = "Times from the masjid. Not from an algorithm.";
+/* The headline, over two lines. These are the words the App Store screenshots
+   already lead with, and they are the best line anybody has written for this
+   app: a point of view, not a feature list. They were the secondary line on
+   the first draft of this poster, at a third of the size — which is the wrong
+   way round, and the single change most likely to turn a glance into an
+   install. */
+export const LEAD_1 = "Times from the masjid.";
+export const LEAD_2 = "Not from an algorithm.";
 
 export const BLURB =
-  "Everything that used to mean a phone call or a look at the noticeboard — " +
-  "now in your pocket, and free for everybody.";
+  "The masjid’s own app — free, for iPhone and Android.";
 
 /* Three claims, each of which must stay true. "Works offline" is the cached
    timetable and the local reminders; "no adverts" and "nothing tracked" are
@@ -37,13 +41,15 @@ export const BLURB =
    which docs/app-review-reply.md states to Apple in those words. */
 export const PILLS = ["Free", "No adverts", "Works offline"];
 
+/* FOUR, NOT SIX. Standing in a foyer nobody reads six lines, and every line
+   added is a line everything else has to shrink for. The three that went are
+   not gone from the app — they are the reasons somebody KEEPS it, which is
+   the store listing's job, not a poster's. */
 export const THINGS = [
   "Jamāʿah times, straight from the masjid",
   "A quiet reminder before every adhān",
   "Notices the moment they go up",
-  "The Qur’ān, with English alongside it",
-  "Qibla compass and a Zakat calculator",
-  "Donate, book the hall, pay madrasah fees",
+  "Qur’ān, Qibla, Zakat and giving — in one place",
 ];
 
 export const SCAN_HEAD = "Download it free, today";
