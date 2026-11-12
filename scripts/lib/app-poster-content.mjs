@@ -69,12 +69,18 @@ export const SCAN_SUB = "Open your camera and point it at the square";
    what Apple's guidelines ask for when badges appear together. */
 export const WAYS = [
   { key: "appstore", kicker: "iPhone & iPad", name: "App Store",
-    badge: "docs/store-assets/poster/badges/app-store.svg",   width: 36 },
+    badge: "docs/store-assets/poster/badges/app-store.svg",   width: 44 },
   { key: "play",     kicker: "Android",       name: "Google Play",
-    badge: "docs/store-assets/poster/badges/google-play.png", width: 41.8 },
+    badge: "docs/store-assets/poster/badges/google-play.png", width: 51 },
 ];
 
-/* The masjid's own public details — not a person's. See CLAUDE.md. */
+/* THERE IS NO SALAM ON THIS POSTER. There was one under the logo and it is
+   gone: the logo already carries مسجد طيبة in the same gold, so the greeting
+   repeated the one Arabic note on the page instead of adding to it, and it
+   pushed the announcement a centimetre and a half down the sheet. The app's
+   home screen opens with the full greeting; a poster does not need to.
+
+   The masjid's own public details — not a person's. See CLAUDE.md. */
 export const MASJID = "Taiyabah Masjid · 31a Draycott Street, Bolton BL1 8HD · info@taiyabahmasjid.com";
 export const CHARITY = "Bolton Central Islamic Society · Registered charity 1041569";
 

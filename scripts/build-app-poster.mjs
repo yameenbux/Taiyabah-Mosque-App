@@ -46,7 +46,14 @@ const SLUG = "taiyabah-app-poster";
    viewBox and the clearance guard's millimetre conversion — and moving the
    fold meant remembering all three. The guard quietly measures against the
    wrong scale if you forget the third. */
-const HERO_MM = 182;
+const HERO_MM = 164;
+
+/* ONE MARGIN FOR THE WHOLE SHEET. It used to be 16mm in the hero and 17mm in
+   the lower half, which is the worst kind of wrong: a millimetre is too small
+   to read as a decision and too large to be invisible, so the page just looks
+   slightly off and nobody can say why. An audit of the rendered boxes found
+   five different left edges and five different right ones. */
+const MARGIN_MM = 16;
 const PAGE_MM = { w: 210, h: 297 };
 
 /* EVERY SIZE IS THE SAME ARTWORK, SCALED — not a separate layout.
@@ -154,7 +161,12 @@ function qrSvg(code) {
   code.rows.forEach((row, y) => {
     for (let x = 0; x < n; x++) if (row[x] === "1") d += `M${x} ${y}h1v1h-1z`;
   });
-  return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" class="qr">` +
+  /* FOUR MODULES OF QUIET ZONE, INSIDE THE VIEWBOX. The spec requires it and
+     a reader needs it; it used to be supplied by the card's padding, which
+     meant the margin a scanner depends on was a styling decision somebody
+     could tighten. Carried in the viewBox it is part of the code. */
+  const Q = 4;
+  return `<svg viewBox="${-Q} ${-Q} ${n + Q * 2} ${n + Q * 2}" shape-rendering="crispEdges" class="qr">` +
          `<path d="${d}" fill="#3C0B2A"/></svg>`;
 }
 
@@ -194,20 +206,18 @@ body{font-family:Hanken,sans-serif;color:var(--ink);background:var(--paper);
 .hero{position:relative;height:${HERO_MM}mm;overflow:hidden;color:var(--cream);
       background:linear-gradient(152deg,#4B1136 0%,#3C0B2A 46%,#330922 100%)}
 .stars{position:absolute;inset:0;width:100%;height:100%}
-.hero>.in{position:relative;height:100%;padding:16mm 16mm 0;display:flex;gap:8mm}
+.hero>.in{position:relative;height:100%;padding:${MARGIN_MM}mm ${MARGIN_MM}mm 0;display:flex;gap:8mm}
 .col{width:100mm;display:flex;flex-direction:column;padding-bottom:13mm}
 
 .brand{display:flex;align-items:center;gap:6mm}
 .brand img{width:44mm;display:block}
 .brand .rule{width:.3mm;height:12mm;background:rgba(243,239,227,.3)}
-.brand .soc{font-size:8pt;line-height:1.35;letter-spacing:.13em;font-weight:500;
+.brand .soc{font-size:8.5pt;line-height:1.35;letter-spacing:.13em;font-weight:500;
             text-transform:uppercase;color:rgba(243,239,227,.82)}
 
-.salam{font-family:Amiri,serif;font-size:11pt;line-height:1.9;color:rgba(220,187,99,.85);
-       direction:rtl;text-align:left;margin:4.6mm 0 .6mm}
 
-.kick{display:flex;align-items:center;gap:3mm;margin-top:5mm;
-      font-size:8.4pt;letter-spacing:.18em;text-transform:uppercase;font-weight:700;
+.kick{display:flex;align-items:center;gap:3mm;margin-top:8mm;
+      font-size:8.5pt;letter-spacing:.18em;text-transform:uppercase;font-weight:700;
       color:var(--goldbright)}
 .kick s{flex:none;width:9mm;height:.5mm;background:var(--gold);text-decoration:none}
 
@@ -215,10 +225,10 @@ h1{font-size:27pt;line-height:1.1;font-weight:700;letter-spacing:-.018em;margin-
 h1 em{display:block;font-style:normal;color:var(--goldbright)}
 .tag{font-family:Fraunces,serif;font-size:11.6pt;line-height:1.32;color:var(--goldbright);
      margin-top:4.2mm;max-width:84mm}
-.blurb{font-size:10.4pt;line-height:1.45;color:rgba(243,239,227,.84);max-width:96mm;margin-top:5mm}
+.blurb{font-size:11pt;line-height:1.45;color:rgba(243,239,227,.84);margin-top:6mm}
 
-.pills{display:flex;gap:2.4mm;margin-top:4.6mm;margin-bottom:1.4mm}
-.pills b{font-size:8.2pt;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+.pills{display:flex;gap:2.4mm;margin-top:6mm}
+.pills b{font-size:8.5pt;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
          color:var(--goldbright);border:.28mm solid rgba(220,187,99,.55);
          border-radius:9mm;padding:1.9mm 4.2mm;background:rgba(220,187,99,.09)}
 
@@ -235,7 +245,7 @@ li s{flex:none;width:2.6mm;height:2.6mm;background:var(--gold);text-decoration:n
    of body text that reads as a mistake. Cut by the layout, it reads as a
    screen that carries on — which is what it is. 32mm down puts the cut just
    above that half line; moving either number moves where it lands. */
-.phone{flex:1;display:flex;align-items:flex-start;justify-content:center;padding-top:33mm}
+.phone{flex:1;display:flex;align-items:flex-start;justify-content:center;padding-top:29.5mm}
 .dev{width:70mm;flex:none;padding:1.8mm;border-radius:9.2mm;position:relative;
      background:linear-gradient(160deg,#6B5230 0%,#2A1018 34%,#1A0810 70%,#54401F 100%);
      box-shadow:0 2.4mm 7mm rgba(0,0,0,.42)}
@@ -244,28 +254,38 @@ li s{flex:none;width:2.6mm;height:2.6mm;background:var(--gold);text-decoration:n
            border:.22mm solid rgba(220,187,99,.34);pointer-events:none}
 
 /* ---- the fold ---- */
-.fold{height:${PAGE_MM.h - HERO_MM}mm;background:var(--paper);padding:9.5mm 17mm 0;position:relative}
+.fold{height:${PAGE_MM.h - HERO_MM}mm;background:var(--paper);padding:10mm ${MARGIN_MM}mm 0;position:relative}
 .fold:before{content:"";position:absolute;left:0;right:0;top:0;height:.7mm;
              background:linear-gradient(90deg,var(--gold),rgba(198,162,76,.18))}
 .scan{text-align:center}
 .scan b{display:block;font-family:Fraunces,serif;font-weight:400;font-size:20pt;
         color:var(--plum);letter-spacing:-.005em}
-.scan i{display:block;font-style:normal;font-size:8.6pt;letter-spacing:.15em;
+.scan i{display:block;font-style:normal;font-size:8.5pt;letter-spacing:.15em;
         text-transform:uppercase;color:var(--goldink);font-weight:600;margin-top:2.4mm}
 
-.ways{display:flex;gap:11mm;margin:5mm auto 0;max-width:146mm}
-.way{flex:1;background:var(--card);border:.25mm solid var(--line);border-radius:4mm;
-     padding:4.4mm 5mm 4mm;text-align:center;box-shadow:0 .6mm 2mm rgba(60,11,42,.06)}
-.qr{display:block;width:37mm;height:37mm;margin:0 auto}
+/* NO CARD. There was a bordered, shaded card behind each code, and it was
+   drawing an edge at 32mm and another at 47mm on a page whose margin is
+   16mm — an audit of the rendered boxes found five different left edges. The
+   card was also much wider than its own contents: 67.5mm of card around a
+   37mm code, 15mm of air at the sides against 4.4mm at the top. Taking the
+   chrome away removes both faults at once and lets the code grow by half. */
+.ways{display:flex;gap:10mm;margin:6mm 0 0}
+.way{flex:1;text-align:center}
+.qr{display:block;width:48mm;height:48mm;margin:0 auto}
 /* The badge sits in a fixed-height box so the two cards match to the
    millimetre whatever each company's artwork does inside its own file. */
-.badge{height:12mm;margin-top:4mm;display:flex;align-items:center;justify-content:center}
+/* 20mm, not the 15mm the badges LOOK like they need. Google ships its badge
+   with the required clear space inside the image, so at a width that makes
+   it read the same size as Apple's it is 19.7mm tall — it was overflowing a
+   15mm box by 4.7mm and eating into the gap above the footer, while every
+   measurement of the block reported the box rather than the artwork. */
+.badge{height:20mm;margin-top:5mm;display:flex;align-items:center;justify-content:center}
 .badge img{display:block}
 
-footer{position:absolute;left:17mm;right:17mm;bottom:9mm;text-align:center;
+footer{position:absolute;left:${MARGIN_MM}mm;right:${MARGIN_MM}mm;bottom:10mm;text-align:center;
         border-top:.25mm solid var(--line);padding-top:4.2mm}
-footer b{display:block;font-size:8.8pt;font-weight:600;color:var(--ink);line-height:1.45}
-footer span{display:block;font-size:8pt;color:var(--muted);margin-top:1.4mm}
+footer b{display:block;font-size:8.5pt;font-weight:600;color:var(--ink);line-height:1.45}
+footer span{display:block;font-size:8.5pt;color:var(--muted);margin-top:1.4mm}
 </style></head><body>
 <div class="sheet">
 
@@ -278,8 +298,6 @@ footer span{display:block;font-size:8pt;color:var(--muted);margin-top:1.4mm}
         <div class="rule"></div>
         <div class="soc">Bolton Central<br>Islamic Society</div>
       </div>
-
-      <p class="salam">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</p>
 
       <div class="kick"><s></s>${KICKER}</div>
       <h1>${LEAD_1}<em>${LEAD_2}</em></h1>
@@ -389,15 +407,18 @@ const footBottom = await page.evaluate(() => {
   const r = document.querySelector("footer").getBoundingClientRect();
   return { bottom: Math.round(r.bottom), page: Math.round(document.body.clientHeight) };
 });
-const clash = await page.evaluate(() => {
+/* A GAP, NOT MERELY AN ABSENCE OF OVERLAP. This used to pass at 0.3mm, which
+   is not a gap — it is two blocks touching, and it reads as a mistake. */
+const CARD_GAP_MM = 5;
+const cardGap = await page.evaluate((HERO) => {
+  const perMm = document.querySelector(".hero").clientHeight / HERO;
   const cards = document.querySelector(".ways").getBoundingClientRect();
   const foot = document.querySelector("footer").getBoundingClientRect();
-  return Math.round(cards.bottom - foot.top);
-});
-if (clash > 0) {
-  console.error(`The QR cards run ${clash}px into the footer.`);
-  console.error("They do not overflow — the footer is positioned, so it would simply");
-  console.error("print on top of them. Nothing was written.");
+  return Math.round((foot.top - cards.bottom) / perMm * 10) / 10;
+}, HERO_MM);
+if (cardGap < CARD_GAP_MM) {
+  console.error(`Only ${cardGap}mm between the codes and the footer; it needs ${CARD_GAP_MM}mm.`);
+  console.error("Shrink the codes or move the fold up. Nothing was written.");
   await browser.close();
   process.exit(1);
 }
@@ -406,6 +427,72 @@ if (footBottom.bottom > footBottom.page) {
   console.error(`The footer ends ${footBottom.bottom - footBottom.page}px below the page.`);
   await browser.close();
   process.exit(1);
+}
+
+/* --- --audit: what the page actually measures ------------------------------ */
+
+/* Eyeballing a render tells you whether something looks wrong. It does not
+   tell you that the hero's left margin is 16mm and the footer's is 17mm,
+   which is the kind of fault that reads as "slightly off" forever without
+   anybody being able to say why. This asks the renderer. */
+if (process.argv.includes("--audit")) {
+  const geo = await page.evaluate(() => {
+    const perMm = document.querySelector(".sheet").getBoundingClientRect().width / 210;
+    const mm = v => Math.round(v / perMm * 10) / 10;
+    const box = (sel, label) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { label, l: mm(r.left), r: mm(r.right), t: mm(r.top), b: mm(r.bottom), w: mm(r.width), h: mm(r.height) };
+    };
+    const boxes = [
+      box(".hero .in", "hero content box"),
+      box(".col", "text column"),
+      box(".brand img", "logo"),
+      box(".kick", "kicker"),
+      box("h1", "headline"),
+      box(".blurb", "blurb"),
+      box(".pills", "pills"),
+      box(".hero ul", "feature list"),
+      box(".hero li:last-child", "last bullet"),
+      box(".dev", "device"),
+      box(".fold", "lower half"),
+      box(".scan", "scan heading block"),
+      box(".ways", "the cards"),
+      box(".way", "one card"),
+      box(".way .qr", "one QR code"),
+      box(".way .badge", "one badge box"),
+      box("footer", "footer"),
+    ].filter(Boolean);
+
+    /* every distinct type size on the page, with what uses it */
+    const sizes = new Map();
+    for (const el of document.querySelectorAll("*")) {
+      if (!el.textContent.trim() || el.children.length) continue;
+      if (el.closest("head")) continue;          // <title> and <style> are not type
+      const fs = Math.round(parseFloat(getComputedStyle(el).fontSize) / perMm * 1000) / 1000;
+      const pt = Math.round(fs * 72 / 25.4 * 10) / 10;
+      const who = el.className || el.tagName.toLowerCase();
+      if (!sizes.has(pt)) sizes.set(pt, new Set());
+      sizes.get(pt).add(String(who).split(" ")[0] || el.tagName.toLowerCase());
+    }
+    return { boxes, sizes: [...sizes].sort((a, b) => b[0] - a[0]).map(([pt, who]) => [pt, [...who].join(", ")]) };
+  });
+
+  console.log("\nGEOMETRY (mm)\n");
+  console.log("  block                    left   right    top  bottom   width  height");
+  for (const b of geo.boxes)
+    console.log(`  ${b.label.padEnd(22)} ${String(b.l).padStart(6)}${String(b.r).padStart(8)}` +
+                `${String(b.t).padStart(7)}${String(b.b).padStart(8)}${String(b.w).padStart(8)}${String(b.h).padStart(8)}`);
+
+  const lefts = [...new Set(geo.boxes.filter(b => b.l < 105).map(b => b.l))].sort((a, b) => a - b);
+  const rights = [...new Set(geo.boxes.filter(b => b.r > 105).map(b => b.r))].sort((a, b) => a - b);
+  console.log(`\n  distinct left edges:  ${lefts.join("  ")}`);
+  console.log(`  distinct right edges: ${rights.join("  ")}`);
+
+  console.log("\nTYPE SIZES\n");
+  for (const [pt, who] of geo.sizes) console.log(`  ${(pt + "pt").padStart(7)}   ${who}`);
+  console.log();
 }
 
 /* --- one checked page, every size ------------------------------------------ */

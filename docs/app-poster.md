@@ -60,6 +60,40 @@ device rather than an upscale.
 Nothing is fetched at build time and nothing is linked from the PDF, so it
 renders the same at a print shop that has none of it installed.
 
+## The grid
+
+```
+node scripts/build-app-poster.mjs --audit
+```
+
+Prints the rendered position of every block in millimetres, the distinct left
+and right edges on the page, and every type size in use. It reports what the
+renderer did, not what the stylesheet intended, which is the only way to catch
+this sort of thing:
+
+- **one margin, 16mm.** It used to be 16mm in the hero and 17mm in the lower
+  half. A millimetre is the worst possible error — too small to read as a
+  decision, too large to be invisible — so the page just looked slightly off.
+  The first audit found **five different left edges and five different right
+  ones**.
+- **four type sizes: 27 / 20 / 11 / 8.5pt.** There were nine, five of them
+  within a single point of each other (8, 8.2, 8.4, 8.6, 8.8). That is not a
+  scale, it is noise. Everything below 11pt now separates by weight and colour
+  instead, which is what those are for.
+- **a 4 / 6 / 8mm spacing scale.** The vertical gaps were 5.0, 4.0, 6.0 and
+  4.6mm — four values within 2mm of each other and no relationship between
+  them.
+- **no card behind the QR codes.** There was a bordered, shaded card, and it
+  drew an edge at 32mm and another at 47mm on a page whose margin is 16mm. It
+  was also far wider than its own contents — 67.5mm of card around a 37mm
+  code, 15mm of air at the sides against 4.4mm at the top. Removing the chrome
+  fixed both faults and let the code grow from 37mm to 48mm.
+- **the badge box is 20mm, not 15mm.** Google ships its badge with the
+  required clear space inside the image, so at the width that makes it read
+  the same size as Apple's it is 19.7mm tall. It was overflowing a 15mm box
+  and eating the gap above the footer, while every measurement of the block
+  reported the box rather than the artwork.
+
 ## Changing the wording
 
 Edit `scripts/lib/app-poster-content.mjs` and rebuild. The builder refuses to
@@ -69,7 +103,8 @@ write anything that does not fit. It checks, in order:
 - the text column does not overflow the page;
 - the lower half does not overflow the page;
 - the feature list keeps 7mm of air above the fold;
-- the QR cards do not run into the footer;
+- the codes keep 5mm clear of the footer — a gap, not merely an absence of
+  overlap, which used to pass at 0.3mm;
 - **each sheet is drawn at the scale it is meant to be, and fits one page.**
 
 Each failure names the part and the amount, and nothing is written.
