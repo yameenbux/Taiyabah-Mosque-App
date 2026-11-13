@@ -31,9 +31,37 @@ const note=(s,m)=>{warn++; console.log(`  note  [${s}] ${m}`);};
 const browser = await pw.chromium.launch();
 async function app(opts={}) {
   const p = await browser.newPage({viewport:{width:393,height:851}, ...opts});
-  p._errs=[];
+  p._errs=[]; p._net=[];
   p.on("pageerror", e=>p._errs.push(e.message));
-  p.on("console", m=>{ if(m.type()==="error" && !/net::/.test(m.text())) p._errs.push("console: "+m.text().slice(0,140)); });
+  /* A SCRIPT ERROR AND A REFUSED REQUEST ARE NOT THE SAME THING, and counting
+     them together made this check permanently red — which is precisely how a
+     real script error would have gone unnoticed.
+
+     Chromium logs a failed HTTP response to the console as an error. Three of
+     those happen on every sweep and all three are correct behaviour:
+     itikaf_is_open() 404s BY DESIGN (the function is not in the database and
+     the screen reads that as "booking closed" — see index.html's "DARK UNTIL
+     THE DATABASE HAS IT"), and clicking into the nikāḥ and collection forms
+     with nothing filled in gets a 400 back from Postgres carrying the very
+     sentence the person is meant to read.
+
+     So a failed response from somewhere that is not this server is collected
+     separately and reported as a NOTE: still visible, no longer able to hide
+     a genuine fault behind itself. One from our OWN origin stays a failure —
+     that is a missing file, and a missing file is a broken app. */
+  p.on("console", m=>{
+    if(m.type()!=="error") return;
+    const t=m.text();
+    if(/net::/.test(t)) return;
+    if(/Failed to load resource/i.test(t)){
+      const url=(m.location()&&m.location().url)||"";
+      if(url && url.indexOf(BASE)!==0){
+        p._net.push(t.replace(/^.*status of /i,"")+"  "+url.replace(/^https?:\/\//,"").split("?")[0]);
+        return;
+      }
+    }
+    p._errs.push("console: "+t.slice(0,140));
+  });
   await p.goto(`${BASE}/index.html?t=`+Date.now());
   await p.waitForTimeout(2500);
   return p;
@@ -50,6 +78,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
 {
   const p = await app();
   p._errs.length ? bad("boot","JS errors: "+p._errs.slice(0,2).join(" | ")) : ok("boot","no script errors on load");
+  if(p._net.length) note("boot",`${p._net.length} request(s) to another host were refused and handled: ${[...new Set(p._net)].slice(0,3).join(" · ")}`);
   const veil = await p.evaluate(()=>{const e=document.querySelector(".boot"); if(!e) return "removed";
     const s=getComputedStyle(e);
     return (s.pointerEvents==="none"||s.visibility==="hidden"||s.display==="none") ? "harmless" : "BLOCKING";});
@@ -103,6 +132,7 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
     } catch(e){ bad("menu",`"${r.label}": ${e.message.split("\n")[0]}`); await settle(p); }
   }
   p._errs.length ? bad("menu","JS errors during the sweep: "+p._errs.slice(0,2).join(" | ")) : ok("menu","no script errors across the sweep");
+  if(p._net.length) note("menu",`${p._net.length} request(s) to another host were refused and handled: ${[...new Set(p._net)].slice(0,3).join(" · ")}`);
   await p.close();
 }
 
@@ -111,8 +141,15 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
   // a drill-down tab must come back, a tab-bar tab must still exit
   for (const [name, go] of [
       ["Qibla",         p=>p.locator("button.tile",{hasText:"Qibla"}).first().click()],
-      ["Notifications", async p=>{ await openMore(p);
-                                   return p.locator("#drawer button.dr-row",{hasText:"Notifications"}).first().click(); }],
+      /* The row is "Notification settings" — it was "Notifications" until the
+         bell became a screen of its own and the menu row became the place you
+         change what the bell tells you about. A bare string here matched
+         nothing after that rename and Playwright sat on its default 30-second
+         timeout before saying so, which reads like a hang rather than a stale
+         check. The regex survives the next rewording; the timeout makes a
+         missing row fail in three seconds with the label in the message. */
+      ["Notification settings", async p=>{ await openMore(p);
+                                   return p.locator("#drawer button.dr-row",{hasText:/Notification/i}).first().click({timeout:3500}); }],
       ["Donate",        p=>p.evaluate(()=>switchTab("donate"))],
       ["Live",          p=>p.evaluate(()=>switchTab("live"))]]) {
     const p = await app();
