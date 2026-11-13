@@ -6,12 +6,12 @@
  * colours and three empty cards. Everything below is the website's own
  * renderHolidays(), done natively: same data, same colours, same order.
  */
-import React, { useMemo, useRef, useEffect } from "react";
-import { View, Text, ScrollView, useWindowDimensions } from "react-native";
+import React, { useMemo, useRef, useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable, useWindowDimensions } from "react-native";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
-import { Screen, Hero, Heading, Card, P, CTA } from "../ui";
+import { Screen, Hero, Heading, Card, P, CTA, tap } from "../ui";
 import { nowLondon } from "../prayer";
 import { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS } from "../madrasah-data";
 
@@ -69,7 +69,7 @@ function Key({ colour, label, hollow, fill }) {
     </View>);
 }
 
-function Month({ y, m, shut, evt, todayISO, width }) {
+function Month({ y, m, shut, evt, todayISO, width, picked, onPick, label }) {
   const { fs, t } = useApp();
   const days = new Date(y, m + 1, 0).getDate();
   const lead = (new Date(y, m, 1).getDay() + 6) % 7;        // Monday-first, as the website is
@@ -107,8 +107,32 @@ function Month({ y, m, shut, evt, todayISO, width }) {
           const dw = new Date(y, m, d).getDay();
           const isShut = !!shut[key], isEv = !!evt[key], isToday = key === todayISO;
           const wknd = dw === 0 || dw === 6;
+          const on = picked === key;
           return (
-            <View key={i} style={{ width: box, height: box, alignItems: "center", justifyContent: "center" }}>
+            /* THE RING IS DRAWN ON THE OUTER BOX, NOT THE CELL. Putting the
+               selection on the cell's own border would have to overwrite it,
+               and the cell's border is the legend: gold means an Islamic date
+               and rose means closed. A reader who taps the gold day to find
+               out what it is should not watch the gold disappear. */
+            <Pressable key={i} onPress={() => { tap(); onPick(key); }}
+              accessibilityRole="button"
+              accessibilityState={{ selected: on }}
+              /* A number alone announces as "14" on every cell alike. The
+                 label says the date and what is on it, which is the whole
+                 question this screen exists to answer. */
+              accessibilityLabel={[
+                `${t(`dow.${dw}`, DOW[dw])} ${d} ${label}`,
+                isShut ? `${t("hol.closed", "Closed")} — ${t(`hol.c.${shut[key].id}.n`, shut[key].name)}` : "",
+                isEv ? evt[key].map(e => t(`hol.e.${e.id}.n`, e.name)).join(" · ") : "",
+                isToday ? t("hol.today", "Today") : "",
+              ].filter(Boolean).join(". ")}
+              style={{ width: box, height: box, alignItems: "center", justifyContent: "center" }}>
+              {/* Drawn OVER the cell rather than around it, so selecting a day
+                  moves nothing: the cell keeps its 2px of air whether it is
+                  picked or not. */}
+              {on && <View pointerEvents="none"
+                           style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
+                                    borderRadius: 10, borderWidth: 1.5, borderColor: C.brand600 }} />}
               {/* .hp-d — every cell sits on the PAPER with a transparent
                   hairline; a closed day is a 14% danger fill with a 30% danger
                   border, an Islamic date is marked by a GOLD BORDER on the
@@ -128,7 +152,7 @@ function Month({ y, m, shut, evt, todayISO, width }) {
                                     : isShut ? dual("#8E4126", C.danger)
                                     : wknd ? C.muted : C.ink }}>{d}</Text>
               </View>
-            </View>);
+            </Pressable>);
         })}
         </View>))}
       </View>
@@ -191,6 +215,7 @@ export default function Holidays() {
   const { shut, evt } = useMemo(dayMaps, []);
   const today = nowLondon();
   const todayISO = iso(today);
+  const [picked, setPicked] = useState(null);
 
   const months = useMemo(() => {
     const from = parse(MAD_YEAR.from), to = parse(MAD_YEAR.to);
@@ -210,6 +235,45 @@ export default function Holidays() {
   }, [here, width]);
 
   const pretty = v => { const d = parse(v); return `${d.getDate()} ${t(`month.${d.getMonth()}`, MONTHS[d.getMonth()]).slice(0, 3)} ${d.getFullYear()}`; };
+
+  /* WHAT IS ON THE DAY SOMEBODY TAPPED.
+   *
+   * The legend says a gold cell is an Islamic date and a rose one is a
+   * closure, and then the calendar had no way to say WHICH — the twelve grids
+   * were the only part of this screen a finger could not ask a question of.
+   * The website has the same gap for the same reason: it puts the answer in a
+   * title="" attribute, which is a mouse hover, and nobody reads this on a
+   * mouse.
+   *
+   * The answer is the four states the card at the top of the screen already
+   * gives for today — closed, no classes, hifz only, open — plus whichever
+   * Islamic dates fall on it. Same data, same order, so the two cannot drift.
+   */
+  const answer = useMemo(() => {
+    if (!picked) return null;
+    const d = parse(picked), dw = d.getDay(), c = shut[picked];
+    const state = c
+      /* The closure's own note AND its span. The note says what the break
+         is for — "Christmas and New Year" under "End of Term Break" — and
+         the span says how much of it is left, which is the thing somebody
+         planning a trip came here to find. The span is dropped for a
+         one-day closure, where it would only repeat the date above it. */
+      ? { open: false,
+          line: `${t("hol.closed", "Closed")} — ${t(`hol.c.${c.id}.n`, c.name)}`,
+          note: [c.note ? t(`hol.c.${c.id}.d`, c.note) : "",
+                 c.from === c.to ? "" : `${pretty(c.from)} – ${pretty(c.to)}`]
+                .filter(Boolean).join(" · ") }
+      : dw === 0
+        ? { open: false, line: t("hol.no_classes", "No classes"),
+            note: t("hol.the_madrasah_teaches_monday_to", "The madrasah teaches Monday to Friday. Hifz students also attend on Saturday mornings.") }
+        : dw === 6
+          ? { open: true, line: t("hol.hifz_only", "Hifz only"),
+              note: t("hol.saturday_is_a_hifz_morning", "Saturday is a Hifz morning, 9:00–11:00am. All other classes are Monday to Friday.") }
+          : { open: true, line: t("hol.madrasah_open", "Madrasah open"),
+              note: t("hol.classes_run_5_00_7_00pm", "Classes run 5:00–7:00pm. Hifz runs until 7:30pm.") };
+    return { head: `${t(`dow.${dw}`, DOW[dw])} ${pretty(picked)}`,
+             state, events: evt[picked] || [] };
+  }, [picked, shut, evt, t]);
 
   /* Is the madrasah open today? The website's four answers, in its order. */
   const wd = today.getDay(), why = shut[todayISO];
@@ -280,8 +344,48 @@ export default function Holidays() {
                   decelerationRate="fast" snapToInterval={width - 32 + 12}
                   contentContainerStyle={{ paddingHorizontal: 16 }}>
         {months.map(({ y, m }) => (
-          <Month key={`${y}-${m}`} y={y} m={m} shut={shut} evt={evt} todayISO={todayISO} width={width} />))}
+          <Month key={`${y}-${m}`} y={y} m={m} shut={shut} evt={evt} todayISO={todayISO} width={width}
+                 picked={picked} onPick={setPicked}
+                 label={`${t(`month.${m}`, MONTHS[m])} ${y}`} />))}
       </ScrollView>
+
+      {/* THE ANSWER, under the grid rather than over it. A sheet or an alert
+          would cover the calendar at the moment the reader is comparing days,
+          and this screen is read with a finger moving between dates. It keeps
+          its place in the page so the first tap does not shift the months. */}
+      <View style={{ paddingHorizontal: 16, marginTop: 12 }}>
+        <View style={[{ borderRadius: 15, borderWidth: 1, borderColor: C.line,
+                        backgroundColor: C.card, paddingVertical: 14, paddingHorizontal: 14,
+                        flexDirection: "row", alignItems: "flex-start", gap: 11 }, SHADOW]}>
+          {answer ? (<>
+            <View style={{ width: 10, height: 10, borderRadius: 5, marginTop: 5,
+                           backgroundColor: answer.state.open ? "#3F7D58" : C.danger }} />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), color: C.ink }}>
+                {answer.head}</Text>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
+                {answer.state.line}</Text>
+              {!!answer.state.note && (
+                <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20),
+                               color: C.muted, marginTop: 2 }}>{answer.state.note}</Text>)}
+              {/* The Islamic date is its own line with the gold the cell was
+                  bordered in, so the colour that raised the question is the
+                  colour that answers it. */}
+              {answer.events.map(e => (
+                <View key={e.id} style={{ flexDirection: "row", alignItems: "center", gap: 7, marginTop: 7 }}>
+                  <View style={{ width: 9, height: 9, borderRadius: 2, borderWidth: 1.5,
+                                 borderColor: C.gold }} />
+                  <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12.5), color: C.ink }}>
+                    <Text style={{ fontFamily: F.sansSemi }}>{t(`hol.e.${e.id}.n`, e.name)}</Text>
+                    <Text style={{ color: C.muted }}>{`   ${t(`hol.e.${e.id}.d`, e.sub)}`}</Text></Text>
+                </View>))}
+            </View>
+          </>) : (
+            <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20),
+                           color: C.muted }}>
+              {t("hol.tap_any_date", "Tap any date above to see whether the madrasah is open that day, and which Islamic date falls on it.")}</Text>)}
+        </View>
+      </View>
 
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("hol.when_the_madrasah_is_closed", "When the madrasah is closed")}</Heading>
