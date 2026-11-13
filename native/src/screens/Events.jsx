@@ -27,6 +27,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { C, F, SHADOW } from "../theme";
 import { useApp } from "../store";
 import { TopBar, Heading, Press, tap } from "../ui";
+import { useScrollToTop } from "@react-navigation/native";
 import { useTopBar } from "../barstyle";
 import { readList } from "../supabase";
 import { NoticeCard } from "../notice-card";
@@ -122,6 +123,11 @@ export default function Events() {
   const [picked, setPicked] = useState(null);
   const list = useRef(null);
   const touchedMonth = useRef(false);
+  /* Pressing the Events tab while already on it goes back to the top, as it
+     does on every other tab. This screen does not go through ui.jsx's Screen
+     — it is a FlatList so a day can be scrolled to by index — so it asks for
+     the behaviour itself. */
+  useScrollToTop(list);
 
   const load = useCallback(async () => {
     setBusy(true);
