@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "22e920c2eda9",
+ "version": "6fe86fc9303d",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -1615,6 +1615,9 @@ window.LANG_PACK = {
   "cur.class_times_fees_and_how": "کلاس کے اوقات، فیس اور درخواست کا طریقہ ”داخلہ و فیس“ میں دیا گیا ہے۔",
   "hol.download_the_holiday_planner": "چھٹیوں کا منصوبہ ڈاؤن لوڈ کریں",
   "hol.pdf_one_page_a4": "PDF · ایک صفحہ · A4",
+  "hol.no_classes": "کوئی کلاس نہیں",
+  "hol.hifz_only": "صرف حفظ",
+  "hol.tap_any_date": "اوپر کسی بھی تاریخ پر ٹیپ کریں تاکہ معلوم ہو کہ اس دن مدرسہ کھلا ہے یا نہیں، اور اس دن کون سی اسلامی تاریخ آتی ہے۔",
   "edu.education": "تعلیم",
   "edu.done": "ہو گیا",
   "edu.classes_for_adults": "بالغوں کے لیے کلاسیں",
