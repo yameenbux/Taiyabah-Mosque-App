@@ -55,7 +55,24 @@ const state = p => p.evaluate(() => ({
   armed: !!(history.state && history.state.tLayer),
   onPage: location.pathname.endsWith("index.html"),
 }));
-const back = async p => { await p.evaluate(() => history.back()); await p.waitForTimeout(500); };
+/* history.back() is MEANT to leave the page in scenarios 2, 3f and 4c — that
+   is the whole assertion, because a Back press on the home screen that does
+   NOT leave is the TWA freeze this suite was written for. When it leaves, the
+   execution context is destroyed while this very evaluate() is still running
+   and Playwright throws "Execution context was destroyed". The throw IS the
+   app behaving correctly, so it is swallowed and the caller decides by
+   looking at the URL instead.
+
+   Three scenarios had been reporting that throw as a failure, which left the
+   suite red on its own successes and said nothing about whether the real
+   assertion held. Anything that is NOT a navigation teardown still throws. */
+const back = async p => {
+  await p.evaluate(() => history.back()).catch(e => {
+    const m = String((e && e.message) || e);
+    if (!/Execution context was destroyed|Target (page|closed)|page has been closed|Navigation/i.test(m)) throw e;
+  });
+  await p.waitForTimeout(500);
+};
 const tap  = async (p, sel) => {
   await p.locator(sel).first().waitFor({ state: "visible", timeout: 15000 });
   await p.locator(sel).first().click({ timeout: 15000 });
@@ -239,7 +256,12 @@ await scenario("block", async () => {
   const { ctx, p, errs } = await fresh();
   await tap(p, '[data-tab="times"]');
   const opened = await p.evaluate(() => {
-    const b = document.querySelector('#tab-times [data-act="month"], #tab-times .tt-month, #month-open');
+    /* #chip-month — the "Full month" chip, which is what openMonth() is
+       actually bound to. The three selectors that were here matched nothing
+       at all, so this scenario skipped itself on every run and printed a
+       line saying so. Ten checks that never ran, guarding the one layer
+       whose id is literally "sheet" — the case this scenario exists for. */
+    const b = document.querySelector('#chip-month, #tab-times [data-act="month"], #tab-times .tt-month, #month-open');
     if (b) { b.click(); return true; } return false;
   });
   await p.waitForTimeout(700);
