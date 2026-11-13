@@ -170,7 +170,7 @@ export default function Alerts() {
           A hero here said "Notifications" and then the heading said "Prayer
           alerts" directly underneath, which is the same screen named twice. */}
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
-        <TopBar back onBell={() => nav.navigate("NoticesTab")} />
+        <TopBar back />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("sheet.prayer_alerts", "Prayer alerts")}</Heading>

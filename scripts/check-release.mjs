@@ -485,8 +485,12 @@ for (const f of ["index.html", "admin.html"]) {
     if (sum && len(sum) !== 40) wrong.push(`the summer break is ${len(sum)} days, the screen says 40`);
     if (!say("teaches 180 days this year") || !say("36 weeks"))
       wrong.push("the planner's opening sentence no longer states 180 days over 36 weeks");
-    if (!say("Ramadhan (33 days)") || !say("summer (40 days)"))
-      wrong.push("the two-long-breaks sentence no longer states 33 and 40 days");
+    /*  The two-long-breaks sentence was removed in November 2026 — the
+        masjid called it jargon, and "a family trip costs nothing in
+        attendance" was office shorthand a parent had no way to read. The
+        LENGTHS are still checked against the dates above, because the
+        planner still draws those breaks; it is only the sentence that is
+        gone, so only the sentence is no longer required to exist. */
     if (wrong.length) wrong.forEach(w => fail("holiday planner — " + w));
     else ok(`holiday planner — ${teach} teaching days over ${teach/5} weeks, and the prose agrees with the dates`);
   }
@@ -506,10 +510,17 @@ for (const f of ["index.html", "admin.html"]) {
   const missing = [];
   if (!/function nkProbe\(\)/.test(app) || !/PGRST202/.test(app))
     missing.push("nkProbe is gone — the app no longer asks whether the office can receive a request, so the form's state is a guess");
-  if (!/form\.hidden = !\(NK\.open && NK\.d1 && NK\.slot\)/.test(app))
-    missing.push("nkRenderPicks reveals the form on date+slot alone, without checking NK.open");
-  if (!/f\.hidden = !\(open && !NK\.sent && NK\.d1 && NK\.slot\)/.test(app))
-    missing.push("nkShow reveals the form without checking the server's answer");
+  /*  WHAT IS BEING GUARDED is that the form stays hidden until the server
+      has said it can receive a request AND a date has been picked. It is NOT
+      the shape of the time condition: that was `NK.slot` while the form asked
+      for a prayer and is `(NK.flex || nkTimeOK(NK.time))` now it asks for a
+      clock time, and pinning the whole literal made a correct change look
+      like a removed safety check. Match the part that matters and let the
+      rest move. */
+  if (!/form\.hidden = !\(NK\.open && NK\.d1 && /.test(app))
+    missing.push("nkRenderPicks reveals the form without checking NK.open and a date");
+  if (!/f\.hidden = !\(open && !NK\.sent && NK\.d1 && /.test(app))
+    missing.push("nkShow reveals the form without checking the server's answer and a date");
   /* Treating an unreadable answer as "open" is the dangerous default. */
   if (!/catch\(\(\) => \{ clearTimeout\(timer\); NK\.open = false; return false; \}\)/.test(app))
     missing.push("nkProbe no longer fails closed — an offline phone would be shown a form that cannot send");

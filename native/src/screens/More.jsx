@@ -67,7 +67,12 @@ const GROUPS = [
     { to: "Education",  icon: "ribbon-outline",      k: "marriage.education",   t: "Education" },
   ]},
   { k: "menu.settings", t: "Settings", rows: [
-    { to: "Alerts",     icon: "notifications-outline", k: "menu.notifications", t: "Notifications" },
+    /* "Notification settings", not "Notifications". The bell now opens a
+       Notifications screen — what the masjid has actually sent — and this
+       row opens the switches that decide which of those arrive. Two rows
+       called the same thing, one of them a list and one of them settings,
+       is the kind of thing somebody taps twice and gives up on. */
+    { to: "Alerts",     icon: "notifications-outline", k: "menu.notification_settings", t: "Notification settings" },
     /* The privacy notice is a sheet on the website and a screen here — the
        app has had one all along, and System Preferences already pushed to it.
        This row sent you out to the browser instead, so the same notice was

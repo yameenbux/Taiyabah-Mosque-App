@@ -13,6 +13,8 @@ import { C, F, R, dual } from "./theme";
 import { useApp } from "./store";
 import { Card, Note, Pill, Press, CTA, tap } from "./ui";
 import { monthYear, DOW } from "./dates";
+import { clamp as clampTime, step as stepTime, canStep, pretty as prettyTime,
+         STEP_MINUTES } from "./nikah-time";
 
 /* Keyboards, so nobody types a phone number on a qwerty pad. */
 const KB = {
@@ -113,6 +115,91 @@ export function Choice({ label, options, value, onChange }) {
             </Pressable>);
         })}
       </View>
+    </View>
+  );
+}
+
+/* A TIME CLICKER — two columns of chevrons, hour and minute.
+ *
+ * It replaces the five "After Fajr / Zuhr / Asr / Maghrib / Isha" chips on the
+ * nikāḥ form. Those chips printed a clock time underneath each prayer, and
+ * that time came from the FIRST of the two dates a family may offer, so it was
+ * wrong for anybody whose nikāḥ landed on the alternative. A wall-clock time
+ * is the same on both dates, which is the point.
+ *
+ * No new dependency. @react-native-community/datetimepicker would mean a
+ * config plugin and a fresh build on both stores for one control, and its
+ * Android dialog cannot be held to a quarter-hour step without fighting it.
+ * chevron-up and chevron-down are already in the 33KB Ionicons subset, so
+ * nothing has to be re-cut either.
+ *
+ * The arrows carry their own accessibilityLabel rather than inheriting a name
+ * from the glyph, which has none: a chevron announces as "button" and leaves a
+ * screen-reader user pressing one of four identical buttons to find out what
+ * it does.
+ */
+export function TimePicker({ label, value, onChange, hint }) {
+  const { t, fs, rtl } = useApp();
+  const v = clampTime(value);
+  const h24 = Math.floor(v / 60), mi = v % 60;
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+
+  const arrow = (delta, up, a11y) => {
+    const on = canStep(v, delta);
+    return (
+      <Pressable disabled={!on} onPress={() => { tap(); onChange(stepTime(v, delta)); }}
+        accessibilityRole="button" accessibilityLabel={a11y}
+        accessibilityState={{ disabled: !on }} hitSlop={8}
+        style={({ pressed }) => ({ paddingVertical: 5, paddingHorizontal: 16, borderRadius: 9,
+                                   opacity: !on ? 0.22 : pressed ? 0.55 : 1 })}>
+        <Ionicons name={up ? "chevron-up" : "chevron-down"} size={fs(17)} color={C.brand600} />
+      </Pressable>);
+  };
+
+  /* Each column is its own stack so the two never drift out of line, and the
+     whole row wraps: at the largest text size two columns plus the suffix no
+     longer fit across a phone, and a clipped clock is worse than a tall one. */
+  const column = (text, upDelta, downDelta, upA11y, downA11y, caption) => (
+    <View style={{ alignItems: "center" }}>
+      {arrow(upDelta, true, upA11y)}
+      <Text style={{ fontFamily: F.sansBold, fontSize: fs(27), color: C.ink,
+                     paddingVertical: 1, minWidth: fs(40), textAlign: "center" }}>{text}</Text>
+      {arrow(downDelta, false, downA11y)}
+      <Text style={{ fontFamily: F.sans, fontSize: fs(10), letterSpacing: 0.5,
+                     textTransform: "uppercase", color: C.muted, marginTop: 3 }}>{caption}</Text>
+    </View>);
+
+  return (
+    <View>
+      {!!label && <Text style={{ fontFamily: F.sansBold, fontSize: fs(12), letterSpacing: 0.72,
+                                 textTransform: "uppercase", color: C.muted,
+                                 marginTop: 12, marginBottom: 7,
+                                 textAlign: rtl ? "right" : "left" }}>{label}</Text>}
+      <View style={{ borderWidth: 1, borderColor: C.line, backgroundColor: C.paper,
+                     borderRadius: 11, paddingVertical: 12, paddingHorizontal: 10 }}>
+        <View style={{ flexDirection: rtl ? "row-reverse" : "row", flexWrap: "wrap",
+                       alignItems: "center", justifyContent: "center", gap: 8 }}>
+          {column(String(h12), +60, -60,
+                  t("a11y.an_hour_later", "An hour later"),
+                  t("a11y.an_hour_earlier", "An hour earlier"),
+                  t("form.hour", "Hour"))}
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(27), color: C.muted,
+                         marginBottom: fs(16) }}>:</Text>
+          {column(String(mi).padStart(2, "0"), +STEP_MINUTES, -STEP_MINUTES,
+                  t("a11y.fifteen_minutes_later", "Fifteen minutes later"),
+                  t("a11y.fifteen_minutes_earlier", "Fifteen minutes earlier"),
+                  t("form.minutes", "Minutes"))}
+          <Text style={{ fontFamily: F.sansBold, fontSize: fs(19), color: C.ink,
+                         marginBottom: fs(16) }}>{h24 < 12 ? "am" : "pm"}</Text>
+        </View>
+        {/* The chosen time said once, in full, in a single node — so a screen
+            reader reads "2:30pm" rather than reconstructing it from "2", ":",
+            "30" and "pm" in four separate announcements. */}
+        <Text accessibilityLiveRegion="polite"
+              style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted,
+                       textAlign: "center", marginTop: 9 }}>{prettyTime(v)}</Text>
+      </View>
+      {!!hint && <Note>{hint}</Note>}
     </View>
   );
 }

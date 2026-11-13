@@ -25,7 +25,12 @@ const ROUTE = {
   "ad-to-holidays": "Holidays", "hp-to-admissions": "Admissions",
   "mdr-go-admissions": "Admissions", "mdr-go-curriculum": "Curriculum",
   "mdr-go-holidays": "Holidays", "mdr-go-portal": "Portal",
-  "ab-donate": "Donate", "lv-vids": "Videos",
+  /*  NewBuild, not "Donate". There is no screen called Donate and there never
+      was — the appeal lives in screens/Donate.jsx and is REGISTERED as
+      NewBuild, which is what "Support the new build" at the foot of About us
+      should open. navigate("Donate") matched nothing, so the one button on
+      that page did nothing at all when pressed. */
+  "ab-donate": "NewBuild", "lv-vids": "Videos",
 };
 
 /* An icon for each row, chosen by what the row leads to rather than by
@@ -45,7 +50,7 @@ const ICON = {
   EduArabic: "language-outline", EduGhusl: "water-outline", Birth: "egg-outline",
   Funeral: "flower-outline", Marriage: "heart-outline", Will: "document-text-outline",
   Holidays: "calendar-outline", Admissions: "school-outline", Curriculum: "book-outline",
-  Portal: "log-in-outline", Donate: "gift-outline", Videos: "play-circle-outline",
+  Portal: "log-in-outline", NewBuild: "gift-outline", Videos: "play-circle-outline",
 };
 
 function Block({ b, nav, inCard }) {
@@ -131,8 +136,40 @@ function Block({ b, nav, inCard }) {
     case "facts":
       return <Facts items={b.items} />;
 
-    case "call":
+    /*  A CALL BLOCK IS NOT ALWAYS A CALL. The website uses the same chip,
+        line and chevron for its link from Admissions to the Holiday Planner,
+        and the extractor records what it saw — so the id decides. With a
+        route behind it this is a row to a screen, with the glyph that screen
+        owns; without one it is what it looks like, a number to ring.
+
+        It was neither: a phone handset, on a row that did nothing at all. */
+    case "call": {
+      const route = b.id && ROUTE[b.id];
+      if (route) {
+        const label = tx(b.v) || tx(b.k);
+        const eyebrow = tx(b.k);
+        /*  THE LINE ABOVE THE TITLE IS SOMETIMES WORTH KEEPING AND SOMETIMES
+            THE TITLE AGAIN. On a phone row the website sets the small line to
+            whatever reads best there, so these three are not alike:
+
+              "Wasiyyah — why and how to prepare one"  over "Importance of an
+                 Islamic Will"            — says something the title does not
+              "Fees, uniform, attendance" over "Admissions & guidelines"
+                                          — likewise
+              "Holiday Planner ›"         over "Holiday Planner"
+                                          — the title again, with a chevron
+
+            Dropping all three lost two useful subtitles; keeping all three
+            printed "Holiday Planner" twice, one above the other. So it is
+            kept unless it is the title repeated, and the chevron the website
+            puts on the end does not count as a difference. */
+        const bare = x => String(x || "").replace(/[\s›>]+$/, "").trim().toLowerCase();
+        const sub = eyebrow && bare(eyebrow) !== bare(label) ? eyebrow : null;
+        return <MenuRow label={label} sub={sub} icon={ICON[route]}
+                        onPress={() => nav?.navigate(route)} />;
+      }
       return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+    }
 
     case "row": {
       const route = b.id && ROUTE[b.id];

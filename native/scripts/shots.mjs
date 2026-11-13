@@ -98,7 +98,7 @@ const back = async () => {
 const steps = [
   ["01-home",      async () => {}],
   ["02-times",     async () => tapText("Prayer times")],
-  ["04-notices",   async () => { await back(); await tapText("Notices"); }],
+  ["04-events",    async () => { await back(); await tapText("Events"); }],
   ["05-more",      async () => tapText("More")],
 ];
 

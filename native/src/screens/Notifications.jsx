@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, RefreshControl, ActivityIndicator, Image, Pressable } from "react-native";
+import { View, Text, FlatList, RefreshControl, ActivityIndicator, Pressable } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,14 +10,26 @@ import { TopBar, Heading } from "../ui";
 import { useTopBar } from "../barstyle";
 import { readList } from "../supabase";
 import { publishNoticeIds, pruneCleared } from "../notices-state";
+import { NoticeCard, ClearAction } from "../notice-card";
+import { split } from "../events";
 
-/* Notices come from `notices_live`, a function that exposes the notice text and
- * nothing else — no author, no draft, no internal state. The table behind it
- * is deny-all. That is deliberate and it is why reading it with a public key
- * is safe.
+/* NOTIFICATIONS — what the masjid has SAID, as opposed to what it has ON.
  *
- * It was a view until the app had to say which masjid it is for. A view takes
- * no argument; the function does, and returns the same rows newest first. */
+ * This screen is where the bell goes. Until now the bell opened NoticesTab,
+ * which is the Notices tab, so the app had two doors onto one room: whatever
+ * you pressed, you got the same list. The list has split along `topic`, the
+ * field the masjid already sets and the notification switches already name.
+ * Anything tagged 'events' belongs on the Events tab with the calendar; a
+ * janāzah, an announcement, a Kahf reminder belongs here.
+ *
+ * A JANĀZAH MUST NOT END UP ON A CALENDAR. It is the one notice whose whole
+ * value is being seen today, and burying it behind a month grid would be the
+ * most harmful thing this change could do. events.js keeps it here and
+ * events.test.mjs asserts it.
+ *
+ * Rows come from `notices_live`, which exposes the notice text and nothing
+ * else — no author, no draft, no internal state. The table behind it is
+ * deny-all, which is why reading it with a public key is safe. */
 /* The quiet pill the toolbar is made of — card fill, hairline, muted text.
    Housekeeping, not an invitation. */
 function Tool({ label, onPress }) {
@@ -33,7 +45,7 @@ function Tool({ label, onPress }) {
   );
 }
 
-export default function Notices() {
+export default function Notifications() {
   const bar = useTopBar();
   const { t, fs, rtl, ntSeen, ntCleared, markNoticesSeen, clearNotice,
           clearAllNotices, restoreNotices, pruneClearedNotices } = useApp();
@@ -56,12 +68,14 @@ export default function Notices() {
 
   useEffect(() => { load(); }, [load]);
 
-  const liveIds = (rows || []).map(r => r.id).filter(Boolean);
+  /* Events are the other tab's business. Everything else is this one's. */
+  const mine = split(rows || []).notifications;
+  const liveIds = mine.map(r => r.id).filter(Boolean);
 
   /* Opening the screen: show which are new, then mark them read. */
   useEffect(() => {
     if (!rows) return;
-    publishNoticeIds(rows);                       // the bell reads the same list
+    publishNoticeIds(mine);                       // the bell reads the same list
     const seen = Array.isArray(ntSeen) ? ntSeen : null;
     /* A phone that has just installed the app has not MISSED what was already
        there. Baseline silently on the first load. */
@@ -75,8 +89,8 @@ export default function Notices() {
   }, [rows]);
 
   const cleared = ntCleared || [];
-  const shown = (rows || []).filter(r => !cleared.includes(r.id));
-  const hiddenCount = (rows || []).length - shown.length;
+  const shown = mine.filter(r => !cleared.includes(r.id));
+  const hiddenCount = mine.length - shown.length;
 
   /* Notices is one of the website's seven PAGES: the app bar, then a section
      heading with its rule. The app drew a bare 26px title at the top of the
@@ -87,12 +101,12 @@ export default function Notices() {
         <TopBar />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
-        <Heading>{t("notices.notices", "Notices")}</Heading>
+        <Heading>{t("notices.notifications", "Notifications")}</Heading>
         {/* Clearing is LOCAL. A notice belongs to the masjid and every reader
             sees the same list, so nothing here deletes anything — it hides it
             on this phone, and Show cleared brings it straight back. That is
             also why nothing asks "are you sure": there is nothing to lose. */}
-        {!!(rows || []).length && (
+        {!!mine.length && (
           <View style={{ flexDirection: rtl ? "row-reverse" : "row", justifyContent: "flex-end",
                          gap: 8, marginBottom: 2 }}>
             {!!shown.length && (
@@ -181,71 +195,3 @@ export default function Notices() {
   );
 }
 
-/* The red ground that appears behind a swiped card. */
-function ClearAction({ label, left }) {
-  const { fs } = useApp();
-  return (
-    <View style={{ flex: 1, backgroundColor: C.danger, marginTop: 12, marginHorizontal: 16,
-                   borderRadius: 16, alignItems: left ? "flex-start" : "flex-end",
-                   justifyContent: "center", paddingHorizontal: 24 }}>
-      <Text style={{ fontFamily: F.sansBold, fontSize: fs(13.5), color: "#FFF" }}>{label}</Text>
-    </View>
-  );
-}
-
-function NoticeCard({ item, isNew, onClear }) {
-  const { t, fs, rtl } = useApp();
-  return (
-        /* THE POSTER LEADS. On the website the image is the first thing in the
-           card, edge to edge, and the words sit under it in .nt-body. Here the
-           topic, the title and the body came first and the poster was pushed
-           to the bottom — on an event notice, which is the kind that has one,
-           that is the whole point of the notice below the fold.
-           The date rides in .nt-when WITH the topic, not alone at the foot. */
-        <View
-          /* The swipe published as a real action, so a screen reader or a
-             switch control can reach it. Without this the only way to clear
-             one notice is a gesture those readers cannot make. */
-          accessibilityActions={[{ name: "clear", label: t("notices.clear", "Clear") }]}
-          onAccessibilityAction={e => { if (e.nativeEvent.actionName === "clear") onClear(); }}
-          style={[{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line,
-                        marginTop: 12, marginHorizontal: 16, overflow: "hidden" }, SHADOW]}>
-          {!!item.image_url && (
-            <Image source={{ uri: item.image_url }} resizeMode="contain"
-                   style={{ width: "100%", aspectRatio: (item.image_w && item.image_h) ? item.image_w / item.image_h : 4 / 3,
-                            maxHeight: 420, backgroundColor: "#1B1119" }} />)}
-          <View style={{ paddingTop: 14, paddingHorizontal: 15, paddingBottom: 15 }}>
-            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                           flexWrap: "wrap", gap: 7 }}>
-              {/* .nt-new — danger-filled pill, white text, FIRST in the row,
-                  as the website sets it. It says "since you last looked",
-                  which is the only thing the dot on the bell means either. */}
-              {isNew && (
-                <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 0.77,
-                               textTransform: "uppercase", color: "#FFF", overflow: "hidden",
-                               backgroundColor: C.danger, borderRadius: 999,
-                               paddingHorizontal: 8, paddingVertical: 2 }}>
-                  {t("notices.new", "New")}</Text>)}
-              {!!item.topic && (
-                /* .nt-topic — a small 3px-radius chip filled plum at 9% with
-                   bold brand-600 text, not gold lettering on nothing. */
-                <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 0.77,
-                               textTransform: "uppercase", color: C.brand600, overflow: "hidden",
-                               backgroundColor: "rgba(119,33,87,.09)", borderRadius: 3,
-                               paddingHorizontal: 7, paddingVertical: 2 }}>
-                  {String(item.topic)}</Text>)}
-              <Text style={{ fontFamily: F.sans, fontSize: fs(11), letterSpacing: 0.77,
-                             textTransform: "uppercase", color: C.muted }}>
-                {new Date(item.event_at || item.created_at).toLocaleDateString("en-GB",
-                  { weekday: "short", day: "numeric", month: "long" })}</Text>
-            </View>
-            <Text style={{ fontFamily: F.display, fontSize: fs(17), lineHeight: fs(21), color: C.ink,
-                           marginTop: 7, marginBottom: 5, textAlign: rtl ? "right" : "left" }}>
-              {item.title}</Text>
-            {/* .nt-card p is MUTED, not ink. */}
-            {!!item.body && (
-              <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(22), color: C.muted,
-                             textAlign: rtl ? "right" : "left" }}>{item.body}</Text>)}
-          </View>
-        </View>);
-}

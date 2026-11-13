@@ -37,7 +37,8 @@ import { restoreTimetable, syncTimetable } from "./timetable";
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
 import Timetable from "./screens/Timetable";
-import Notices from "./screens/Notices";
+import Events from "./screens/Events";
+import Notifications from "./screens/Notifications";
 import More from "./screens/More";
 import Qibla from "./screens/Qibla";
 import Ramadan from "./screens/Ramadan";
@@ -62,6 +63,7 @@ import Bukhari, { BukhariBook } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
 import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
+import MembershipScreen from "./screens/Membership";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -71,13 +73,19 @@ const Stack = createNativeStackNavigator();
  * hand would have meant retyping every fee, phone number and funeral step — and
  * the first time the committee changed one, two versions of it. */
 const SHEET = {
-  About: "about", Membership: "membership", Contact: "contact",
+  About: "about", Contact: "contact",
   MarriageDeath: "marriagedeath", Funeral: "funeral", Will: "will", Birth: "birth",
   Education: "education", EduArabic: "eduarabic", EduGhusl: "edughusl",
   Curriculum: "curriculum", Madrasah: "madrasah", Admissions: "madmissions",
   /* Holidays is NOT here any more: the website fills its calendar, its closure
    * list and its Islamic dates with JavaScript, so lifting the markup gave a
-   * legend with no colours and three empty cards. It has a real screen now. */
+   * legend with no colours and three empty cards. It has a real screen now.
+   *
+   * Nor is Membership. Its sheet said "ring the office and they will tell you
+   * whether this year's fee has been received" — true, and still on the
+   * screen, but it was all the app could do. The masjid's register is a real
+   * table now (db/157-160), so the screen looks a member up, shows every year
+   * on their record and takes the fee. */
 };
 
 /* The tab bar is the one piece of chrome a person touches all day, so it is the
@@ -144,8 +152,8 @@ function Tabs() {
                                                                          tabBarLabel: label(t("nav.home", "Home")), tabBarIcon: icon("home") }} />
       <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer Times"),
                                                                          tabBarLabel: label(t("nav.prayer_times", "Prayer Times")), tabBarIcon: icon("time") }} />
-      <Tab.Screen name="NoticesTab" component={Notices}     options={{ title: t("nav.notices", "Notices"),
-                                                                         tabBarLabel: label(t("nav.notices", "Notices")), tabBarIcon: icon("document-text") }} />
+      <Tab.Screen name="EventsTab"  component={Events}      options={{ title: t("nav.events", "Events"),
+                                                                         tabBarLabel: label(t("nav.events", "Events")), tabBarIcon: icon("calendar") }} />
       <Tab.Screen name="MoreTab"    component={More}        options={{ title: t("nav.more", "More"),
                                                                          tabBarLabel: label(t("nav.more", "More")), tabBarIcon: icon("ellipsis-horizontal") }} />
     </Tab.Navigator>
@@ -202,7 +210,12 @@ const linking = {
   config: {
     screens: {
       Tabs: { screens: { HomeTab: "home", TimesTab: "times",
-                         NoticesTab: "notices", MoreTab: "more" } },
+                         EventsTab: "events", MoreTab: "more" } },
+        /* `notices` is kept, pointing at Notifications. Every push already
+           on a phone carries taiyabah://notices and nothing rewrites those,
+           so dropping the path would turn every delivered notification into
+           a tap that opens nothing. links.test.mjs holds this. */
+        Notifications: "notices",
       Qibla:     "qibla",
       Ramadan:   "ramadan",
       Hajj:      "hajj",
@@ -385,10 +398,16 @@ function Root() {
         <Stack.Screen name="Marriage"  component={Marriage}  options={{ ...sheet, title: t("marriage.marriage", "Marriage") }} />
         <Stack.Screen name="HallHire"  component={HallHire}  options={{ ...sheet, title: t("hallhire.hall_room_hire", "Hall / Room Hire") }} />
         <Stack.Screen name="Advice"    component={Advice}    options={{ ...sheet, title: t("advice.imams_advice", "Imams’ Advice") }} />
+        <Stack.Screen name="Membership" component={MembershipScreen}
+                      options={{ ...sheet, title: t("member.membership", "Membership") }} />
         <Stack.Screen name="Collect"   component={Collect}   options={{ ...sheet, title: t("collect.charity_collections", "Charity Collections") }} />
 
         {/* settings */}
         <Stack.Screen name="Alerts"  component={Alerts}  options={page} />
+        {/* Where the bell goes. It used to go to the Notices tab, which was
+            the same screen you reached by pressing the tab — two doors onto
+            one room. Events took the calendar half; this is the other. */}
+        <Stack.Screen name="Notifications" component={Notifications} options={page} />
         <Stack.Screen name="Prefs"   component={Prefs}   options={{ ...sheet, title: t("sysprefs.system_preferences", "System Preferences") }} />
         <Stack.Screen name="Portal"  component={Portal}  options={{ ...sheet, title: t("portals.madrasah_portal", "Madrasah Portal") }} />
         <Stack.Screen name="Privacy" component={Privacy} options={{ ...sheet, title: t("privacy.privacy_notice", "Privacy notice") }} />

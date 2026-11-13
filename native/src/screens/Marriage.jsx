@@ -11,10 +11,10 @@ import { View, Text } from "react-native";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Foot, Press, tap, open } from "../ui";
-import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent, isEmail, isPhone } from "../form";
+import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent, TimePicker, isEmail, isPhone } from "../form";
 import { rpc, isOpen } from "../supabase";
-import { dayFor } from "../prayer";
 import { longDate } from "../dates";
+import { DEFAULT_MINUTES, formatHM, pretty as prettyTime } from "../nikah-time";
 import { SHEETS, Blocks } from "../Blocks";
 
 /* The nikāḥ fee, and NOT a donation link.
@@ -41,14 +41,22 @@ const tidyRef = v => {
 const NOTICE_DAYS = 14;        // the masjid needs a fortnight
 const HORIZON_DAYS = 365;
 
-const SLOTS = [
-  { v: "after_fajr",    k: "nikah.after_fajr",    t: "After Fajr",    prayer: "fajr" },
-  { v: "after_zuhr",    k: "nikah.after_zuhr",    t: "After Zuhr",    prayer: "zuhr" },
-  { v: "after_asr",     k: "nikah.after_asr",     t: "After Asr",     prayer: "asr" },
-  { v: "after_maghrib", k: "nikah.after_maghrib", t: "After Maghrib", prayer: "maghrib" },
-  { v: "after_isha",    k: "nikah.after_isha",    t: "After Isha",    prayer: "isha" },
-];
-const SATURDAY = { v: "saturday_11", k: "nikah.saturday_11am", t: "Saturday, 11:00am", s: "before a wedding meal" };
+/* THE PRAYER SLOTS ARE GONE, and the reason is the alternative date.
+ *
+ * The form takes two dates — a first choice and a fallback — but a jamāʿah
+ * clock time belongs to ONE date. The screen only had d1 to work from, so it
+ * printed the first date's times under every option and they were wrong for
+ * anyone the office ended up booking on the second. The masjid chose the
+ * clock time itself over a label that has to be recomputed per date.
+ *
+ * The website dropped After Fajr in September 2026 — nobody holds a nikāḥ at
+ * first light — and the app never followed, which is why a 7:15am chip was
+ * still on this screen. It goes with the rest of them.
+ *
+ * db/161 keeps every old value legal: requests already recorded as
+ * 'after_zuhr' still display, and the build currently in the two stores goes
+ * on sending them until everybody has updated.
+ */
 const FLEXIBLE = { v: "flexible", k: "nikah.im_flexible", t: "I'm flexible", s: "the office can suggest a time" };
 
 const PEOPLE = [
@@ -66,7 +74,8 @@ export default function Marriage({ navigation }) {
   const [month, setMonth] = useState(null);
   const [d1, setD1] = useState(null);
   const [d2, setD2] = useState(null);
-  const [slot, setSlot] = useState(null);
+  const [timeMode, setTimeMode] = useState(null);   // "specific" | "flexible"
+  const [mins, setMins] = useState(DEFAULT_MINUTES);
   const [who, setWho] = useState({ name: "", role: null, phone: "", email: "", guests: "", notes: "" });
   const [people, setPeople] = useState(Object.fromEntries(PEOPLE.map(p => [p.id, blankPerson()])));
   const [agree, setAgree] = useState(false);
@@ -93,16 +102,11 @@ export default function Marriage({ navigation }) {
     return { before: bs.slice(0, i + 1), after: bs.slice(i + 1) };
   })();
 
-  /* What the family are agreeing to, resolved to the clock time published for
-   * the day they picked. Times move through the year, and the office needs to
-   * know what they were actually looking at. */
-  const jamaatFor = (isoDate, prayer) => {
-    if (!isoDate || !prayer) return null;
-    const day = dayFor(new Date(isoDate + "T12:00:00"));
-    return day?.jamaat?.[prayer] || null;
-  };
-  const chosen = [...SLOTS, SATURDAY, FLEXIBLE].find(s => s.v === slot) || null;
-  const saturdayOnly = d1 && new Date(d1 + "T12:00:00").getDay() === 6;
+  /* What the office will read back. A wall-clock time needs no date to
+   * resolve it, which is the whole reason it replaced the prayer. */
+  const timeLabel = timeMode === "flexible"
+    ? t("nikah.im_flexible", FLEXIBLE.t)
+    : timeMode === "specific" ? prettyTime(mins) : null;
 
   const bad = {
     name: touched && !who.name.trim(),
@@ -110,7 +114,7 @@ export default function Marriage({ navigation }) {
     phone: touched && !isPhone(who.phone),
     email: touched && !isEmail(who.email),
     date: touched && !d1,
-    slot: touched && !slot,
+    slot: touched && !timeMode,
     agree: touched && !agree,
     ...Object.fromEntries(PEOPLE.flatMap(p => {
       const v = people[p.id];
@@ -124,7 +128,7 @@ export default function Marriage({ navigation }) {
     })),
   };
   const valid = !Object.values({ ...bad }).some(Boolean) && who.name.trim() && who.role &&
-                isPhone(who.phone) && isEmail(who.email) && d1 && slot && agree &&
+                isPhone(who.phone) && isEmail(who.email) && d1 && timeMode && agree &&
                 PEOPLE.every(p => {
                   const v = people[p.id];
                   return v.name.trim() && v.age && (!p.adult || Number(v.age) >= 18) &&
@@ -142,9 +146,9 @@ export default function Marriage({ navigation }) {
     const r = await rpc("request_nikah_date", {
       preferred_date: d1,
       alternative_date: d2 || null,
-      slot,
-      preferred_time: chosen?.prayer ? jamaatFor(d1, chosen.prayer) : null,
-      time_flexible: slot === "flexible",
+      slot: timeMode === "flexible" ? "flexible" : "specific",
+      preferred_time: timeMode === "specific" ? formatHM(mins) : null,
+      time_flexible: timeMode === "flexible",
       guests_estimate: who.guests.trim() === "" ? null : Number(who.guests),
       contact_name: who.name.trim(),
       contact_role: who.role,
@@ -205,7 +209,7 @@ export default function Marriage({ navigation }) {
                       sub={t("nikah.opens_your_email_app", "Opens your email app with the details filled in")}
                       href={"mailto:info@taiyabahmasjid.com?subject=" +
                             encodeURIComponent("Nikah request") + "&body=" +
-                            encodeURIComponent(`Preferred date: ${d1 || "—"}\nPrayer: ${chosen ? t(chosen.k, chosen.t) : "—"}\n\n`)} />
+                            encodeURIComponent(`Preferred date: ${d1 || "—"}\nPreferred time: ${timeLabel || "—"}\n\n`)} />
             </RowGroup>
           </>
         ) : (
@@ -244,19 +248,23 @@ export default function Marriage({ navigation }) {
             </View>
             {bad.date && <ErrorBox>{t("nikah.pick_a_date", "Please pick a date.")}</ErrorBox>}
 
-            {/* Which prayer the nikāḥ sits after only means anything once a day
-                is chosen, so the website says so rather than leaving the list
-                looking broken. */}
+            {/* The website says this beside its own mailto fallback, so the
+                app carries it too — the i18n parity check is what noticed it
+                had gone when the prayer list went. It no longer mentions a
+                prayer on either side. */}
             {!d1 && <Note>{t("nikah.pick_a_date_above_so",
-              "Pick a date and a prayer above, and this will carry them across to the office for you.")}</Note>}
+              "Pick a date above, and this will carry it across to the office for you.")}</Note>}
             <Choice label={t("nikah.what_time_would_suit_you", "What time would suit you?")}
-                    value={slot} onChange={setSlot}
+                    value={timeMode} onChange={setTimeMode}
                     options={[
-                      ...SLOTS.map(s => ({ v: s.v, t: t(s.k, s.t),
-                                           s: jamaatFor(d1, s.prayer) ? pretty12(jamaatFor(d1, s.prayer)) : null })),
-                      ...(saturdayOnly ? [{ v: SATURDAY.v, t: t(SATURDAY.k, SATURDAY.t), s: t("nikah.before_a_wedding_meal", SATURDAY.s) }] : []),
-                      { v: FLEXIBLE.v, t: t(FLEXIBLE.k, FLEXIBLE.t), s: t("nikah.the_office_can_suggest", FLEXIBLE.s) },
+                      { v: "specific", t: t("nikah.a_particular_time", "A particular time") },
+                      { v: "flexible", t: t(FLEXIBLE.k, FLEXIBLE.t),
+                        s: t("nikah.the_office_can_suggest", FLEXIBLE.s) },
                     ]} />
+            {timeMode === "specific" &&
+              <TimePicker value={mins} onChange={setMins}
+                          hint={t("nikah.the_office_will_confirm",
+                                  "The office will confirm the time when it replies.")} />}
             {bad.slot && <ErrorBox>{t("nikah.pick_a_time", "Please choose a time.")}</ErrorBox>}
 
             <Heading>{t("nikah.who_are_you", "Who are you?")}</Heading>
@@ -322,12 +330,6 @@ export default function Marriage({ navigation }) {
 
 /* Dates read back to the family in the language they chose. */
 const prettyIn = (t, iso) => longDate(t, new Date(iso + "T12:00:00"));
-const pretty12 = hhmm => {
-  let [h, m] = hhmm.split(":").map(Number);
-  const s = h >= 12 ? "pm" : "am"; h = h % 12 || 12;
-  return `${h}:${String(m).padStart(2, "0")}${s}`;
-};
-
 /* Paying the fee, after the office has agreed a date.
  *
  * This was missing from the app entirely, so the only two Stripe links on the

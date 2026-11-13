@@ -311,9 +311,9 @@
       </div>
 
       <div class="fieldrow" style="margin-bottom:0">
-        <label class="fl" for="eventat">Event date <span class="opt">optional</span></label>
+        <label class="fl" for="eventat">Event date <span class="opt" id="eventat-opt">optional</span></label>
         <input type="datetime-local" id="eventat">
-        <div class="counter">Set this for a bayaan or a class, and the notice retires itself a day after. Leave it blank for an announcement that has no date.</div>
+        <div class="counter" id="eventat-help">Set this for a bayaan or a class, and the notice retires itself a day after. Leave it blank for an announcement that has no date.</div>
       </div>
     </div>
 
@@ -420,6 +420,21 @@ const TEMPLATES = {
 
 const $ = id => document.getElementById(id);
 const titleEl=$("title"), msgEl=$("msg");
+
+/* Events are the one topic the app plots on a calendar, so the date stops
+   being optional the moment Events is chosen — said on the label rather
+   than only when Send is pressed. */
+function syncEventDateRequirement(){
+  var inp = topicInput(), opt = document.getElementById("eventat-opt"),
+      help = document.getElementById("eventat-help"), fld = document.getElementById("eventat");
+  if(!opt || !help || !fld) return;
+  var isEvent = !!inp && inp.value === "events";
+  opt.textContent = isEvent ? "required" : "optional";
+  fld.required = isEvent;
+  help.textContent = isEvent
+    ? "The app shows events on a calendar, so this one needs a date. Without it the post would not appear there at all."
+    : "Set this for a bayaan or a class, and the notice retires itself a day after. Leave it blank for an announcement that has no date.";
+}
 
 function topicInput(){ return document.querySelector('input[name="topic"]:checked'); }
 
@@ -1019,6 +1034,17 @@ $("send").addEventListener("click", async ()=>{
   const inp=topicInput();
   const title=titleEl.value.trim(), msg=msgEl.value.trim();
   if(!title||!msg) return;
+  /* AN EVENT HAS TO SAY WHEN IT IS.
+     The app's Events tab is a calendar keyed on this field, so a post
+     tagged Events with no date would not appear on it — and the office
+     would have no way of knowing. db/162 refuses the row as well; this is
+     the half that says so in words instead of throwing a constraint name
+     at somebody. */
+  if(inp.value === "events" && !$("eventat").value){
+    toast("An event needs a date — the app shows events on a calendar.");
+    $("eventat").focus();
+    return;
+  }
   if(inp.dataset.urgent==="1" && !confirm(`Send this Janāzah alert to everyone now?\n\n${title}\n${msg}`)) return;
 
   const btn=$("send");
@@ -1083,9 +1109,11 @@ $("signout").addEventListener("click", ()=>{ setToken(""); showGate(""); });
 document.querySelectorAll('input[name="topic"]').forEach(r=>{
   r.addEventListener("change",()=>{
     document.querySelectorAll(".topic").forEach(t=>t.dataset.sel = t.contains(topicInput())?"1":"0");
-    renderTemplates(); update();
+    renderTemplates(); update(); syncEventDateRequirement();
   });
 });
+/* And once at load, so the label is right before anything is touched. */
+syncEventDateRequirement();
 /* One handler, and the order inside it matters: typing means a new message,
    so the pin from the last send has to be released BEFORE update() asks for
    the live offer — otherwise the button lags a keystroke behind the words. */

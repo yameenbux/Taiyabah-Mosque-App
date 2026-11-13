@@ -22,6 +22,7 @@
  */
 import { useEffect, useState } from "react";
 import { readList } from "./supabase";
+import { split } from "./events";
 /* The counting rules live apart so a test can load them without React or a
    network client in the way — see notices-unread.js. */
 export { unseenCount, pruneCleared } from "./notices-unread";
@@ -31,9 +32,20 @@ let fetched = false;          // one fetch per app session
 const subs = new Set();
 const emit = () => { for (const set of subs) set(ids); };
 
-/** Called by the Notices screen after its own load — no second request. */
+/** Called by the Notifications screen after its own load — no second request.
+ *
+ * THE FILTER LIVES HERE, not at the call sites, because there are two of them
+ * and they were handed different lists: refreshNoticeIds() fetches everything
+ * notices_live returns, while the Notifications screen had already dropped the
+ * events. The bell's count therefore changed depending on whether that screen
+ * had been opened yet. Filtering in one place makes both callers agree, and
+ * makes passing an already-filtered list a no-op rather than a second rule.
+ *
+ * Events are deliberately not counted: the bell opens Notifications, so a dot
+ * that stands for something only the Events tab can show would send the
+ * reader to a screen that does not have it. */
 export function publishNoticeIds(rows) {
-  ids = (rows || []).map(r => r && r.id).filter(Boolean);
+  ids = split(rows || []).notifications.map(r => r && r.id).filter(Boolean);
   fetched = true;
   emit();
 }

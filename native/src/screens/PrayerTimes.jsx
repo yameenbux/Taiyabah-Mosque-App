@@ -273,7 +273,7 @@ export default function PrayerTimes({ navigation }) {
               another grey row. It is the one row here that offers something
               instead of going somewhere. */}
           <NavRow icon="notifications-outline" tone="gold"
-                  label={t("menu.notifications", "Notifications")}
+                  label={t("menu.notification_settings", "Notification settings")}
                   sub={t("times.remind_sub", "Be reminded before each jamāʿah")}
                   onPress={() => navigation.navigate("Alerts")} />
         </RowGroup>
