@@ -498,10 +498,20 @@ export function Mushaf({ route, navigation }) {
         </Press>)}
 
       {/* The page bar. Tapping the number opens a jump list of juzʼ and surah. */}
-      <View onLayout={e => setBar(h => {
+      {/* READ THE EVENT BEFORE THE UPDATER, NOT INSIDE IT. This used to be
+          `setBar(h => { const next = e.nativeEvent.layout.height; ... })`, and
+          React is free to run that updater after the handler has returned — by
+          which time React Native has recycled the synthetic event and
+          nativeEvent is null. The result was "Cannot read property 'layout' of
+          null", reported seven times from this screen across iOS 27 and
+          Android 11 before anybody read the crash table. It is intermittent by
+          nature, which is why it survived testing.
+
+          measure() above already does it this way round. This was the outlier. */}
+      <View onLayout={e => {
                        const next = e.nativeEvent.layout.height;
-                       return h === next ? h : next;
-                     })}
+                       setBar(h => (h === next ? h : next));
+                     }}
             style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
                      alignItems: "center", justifyContent: "center", gap: 10,
                      paddingVertical: 11, backgroundColor: "rgba(21,6,15,.9)" }}>
