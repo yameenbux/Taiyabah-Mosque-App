@@ -2469,7 +2469,7 @@
     },
     "href": "mailto:admin@taiyabahmasjid.com",
     "id": null,
-    "icon": "call"
+    "icon": "mail"
    },
    {
     "type": "foot",
@@ -2532,7 +2532,7 @@
     },
     "href": "planner/taiyabah-holiday-planner-2026-27.pdf",
     "id": null,
-    "icon": "call"
+    "icon": "document-text"
    },
    {
     "type": "heading",

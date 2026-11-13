@@ -481,7 +481,22 @@ const out = await page.evaluate(ids => {
           /* .hh-addr carries a map pin, not the phone handset every other
              one of these has. Guessing from the href gave it the generic
              "opens elsewhere" box instead. */
-          icon: has(c, "hh-addr") ? "location" : "call",
+          /* THE GLYPH COMES FROM WHERE THE ROW GOES, not from the shape it
+             wears. This was `hh-addr ? location : call`, so every row in the
+             call shape got a telephone handset — including "Email the
+             office", which drew a handset beside an email address, and the
+             holiday planner, which drew one beside a PDF download. .hh-addr
+             keeps an explicit case of its own because a map link is the one
+             thing the href cannot always be trusted to show. */
+          icon: (() => {
+            if (has(c, "hh-addr")) return "location";
+            const h = c.getAttribute("href") || "";
+            if (/^mailto:/i.test(h)) return "mail";
+            if (/^tel:/i.test(h)) return "call";
+            if (/^geo:|maps\./i.test(h)) return "location";
+            if (/\.pdf($|\?)/i.test(h)) return "document-text";
+            return "call";
+          })(),
         }));
         continue;
       }
