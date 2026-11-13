@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "217d5dfe3c82",
+ "version": "81cf9332fb20",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -1615,6 +1615,9 @@ window.LANG_PACK = {
   "cur.class_times_fees_and_how": "ક્લાસના સમય, ફી અને અરજીની રીત ”દાખલા અને ફી“માં આપેલ છે.",
   "hol.download_the_holiday_planner": "રજાઓનું પ્લાનર ડાઉનલોડ કરો",
   "hol.pdf_one_page_a4": "PDF · એક પાનું · A4",
+  "hol.no_classes": "કોઈ વર્ગ નથી",
+  "hol.hifz_only": "ફક્ત હિફ્ઝ",
+  "hol.tap_any_date": "ઉપર કોઈપણ તારીખ પર ટૅપ કરો એ જોવા માટે કે તે દિવસે મદરેસા ખુલ્લું છે કે નહીં, અને તે દિવસે કઈ ઇસ્લામિક તારીખ આવે છે.",
   "edu.education": "શિક્ષણ",
   "edu.done": "થઈ ગયું",
   "edu.classes_for_adults": "પુખ્ત વયના લોકો માટે વર્ગો",

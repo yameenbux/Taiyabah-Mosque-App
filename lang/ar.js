@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "67e17dc2d650",
+ "version": "7d744a93f0a5",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -1615,6 +1615,9 @@ window.LANG_PACK = {
   "cur.class_times_fees_and_how": "أوقات الحصص والرسوم وكيفية التقديم موجودة في «القبول والرسوم».",
   "hol.download_the_holiday_planner": "نَزِّلْ رُزْنَامَةَ الْعُطَلِ",
   "hol.pdf_one_page_a4": "PDF · صَفْحَةٌ وَاحِدَةٌ · A4",
+  "hol.no_classes": "لا دروس",
+  "hol.hifz_only": "الحفظ فقط",
+  "hol.tap_any_date": "اضغط على أي تاريخ أعلاه لمعرفة ما إذا كانت المدرسة مفتوحة في ذلك اليوم، وأي تاريخ إسلامي يوافقه.",
   "edu.education": "التعليم",
   "edu.done": "تم",
   "edu.classes_for_adults": "دروس للكبار",

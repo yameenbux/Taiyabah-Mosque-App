@@ -1697,12 +1697,24 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hp-wd span{text-align:center;font-size:calc(9.5px * var(--ts));letter-spacing:.06em;text-transform:uppercase;
     color:var(--muted);padding-bottom:5px}
   .hp-d{aspect-ratio:1;display:grid;place-items:center;border-radius:8px;font-size:calc(11.5px * var(--ts));
-    color:var(--ink);background:var(--paper);border:1px solid transparent}
-  .hp-d.is-pad{visibility:hidden}
+    color:var(--ink);background:var(--paper);border:1px solid transparent;
+    appearance:none;-webkit-appearance:none;font-family:inherit;padding:0;width:100%;cursor:pointer}
+  .hp-d.is-pad{visibility:hidden;pointer-events:none}
+  /* THE RING IS A SHADOW, NOT THE BORDER. The border IS the legend — gold for
+     an Islamic date, rose for a closure — so selecting a day must not paint
+     over the very colour the reader tapped to ask about. A shadow also costs
+     no layout, so the grid does not shift by a pixel when a day is picked. */
+  .hp-d.is-sel{box-shadow:0 0 0 2px var(--brand-600)}
+  .hp-d:focus-visible{outline:2px solid var(--brand-600);outline-offset:2px}
   .hp-d.is-wknd{color:var(--muted)}
   .hp-d.is-shut{background:rgba(180,83,47,.14);color:var(--ink-rose-2);border-color:rgba(180,83,47,.3)}
   .hp-d.is-ev{border-color:var(--gold);font-weight:700}
   .hp-d.is-today{background:var(--plum-fill);color:#F3EFE3;font-weight:700;border-color:var(--plum-fill)}
+  .hp-pick{margin:11px 0 2px}
+  .hp-today .ev{display:flex;align-items:center;gap:7px;margin-top:7px;
+    font-size:calc(12.5px * var(--ts));color:var(--ink)}
+  .hp-today .ev i{flex:0 0 auto;width:9px;height:9px;border-radius:2px;border:1.5px solid var(--gold)}
+  .hp-today .ev .sub{color:var(--muted)}
   .hp-list{padding:2px 16px}
   .hp-r{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
   .hp-r:first-child{border-top:none}
@@ -4277,6 +4289,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <span><i class="hp-key k-today"></i><span data-i18n="hol.today">Today</span></span>
           </div>
           <div class="hp-months" id="hp-months"></div>
+
+          <!-- What is on the day somebody tapped. Under the grid rather than
+               over it: this screen is read with a finger moving between dates,
+               and a popover would cover the calendar at exactly the moment the
+               reader is comparing one day with another. -->
+          <div class="hp-today hp-pick" id="hp-pick">
+            <span class="dot" aria-hidden="true"></span>
+            <span><span class="t" id="hp-pick-t"></span><span class="d" id="hp-pick-d"></span>
+                  <span id="hp-pick-e"></span></span>
+          </div>
 
           <div class="sec-h"><h2 data-i18n="hol.when_the_madrasah_is_closed">When the madrasah is closed</h2><span class="rule"></span></div>
           <div class="card hp-list" id="hp-closures"></div>
@@ -15071,7 +15093,8 @@ function renderHolidays(){
             '<div class="hp-wd">' +
             [1,2,3,4,5,6,0].map(i => "<span>" + dow(i).slice(0,1) + "</span>").join("") +
             '</div><div class="hp-grid">';
-    for(let i = 0; i < lead; i++) html += '<div class="hp-d is-pad">0</div>';
+    for(let i = 0; i < lead; i++)
+      html += '<button type="button" class="hp-d is-pad" tabindex="-1" aria-hidden="true">0</button>';
     for(let day = 1; day <= days; day++){
       const key = y + "-" + String(m+1).padStart(2,"0") + "-" + String(day).padStart(2,"0");
       const dw = new Date(y, m, day).getDay();
@@ -15080,9 +15103,16 @@ function renderHolidays(){
       if(shut[key]){ cls += " is-shut"; title.push(madName(shut[key])); }
       if(evt[key]){ cls += " is-ev"; title.push(evt[key].map(madEvName).join(" \u00B7 ")); }
       if(key === todayISO){ cls += " is-today"; todayCard = card; }
-      html += '<div class="' + cls + '"' +
+      /* A BUTTON, NOT A DIV. The title attribute below has carried this same
+         sentence since the planner was written, and a title is a mouse hover
+         — so on the device almost everybody reads this on, the answer existed
+         and could not be reached. It stays for a mouse; the tap is what makes
+         it reachable. */
+      html += '<button type="button" class="' + cls + '" data-k="' + key + '"' +
               (title.length ? ' title="' + esc(title.join(" \u00B7 ")) + '"' : "") +
-              ">" + num(day) + "</div>";
+              ' aria-label="' + esc([dow(dw) + " " + madPretty(key)]
+                .concat(title).join(". ")) + '"' +
+              ">" + num(day) + "</button>";
     }
     html += "</div></div>";
     cur.setMonth(cur.getMonth() + 1); card++;
@@ -15093,6 +15123,71 @@ function renderHolidays(){
     const el = host.children[todayCard];
     if(el) host.scrollLeft = el.offsetLeft - host.offsetLeft - 8;
   }
+
+  /* ---- what is on the day somebody tapped ----------------------------- */
+
+  /* The same four answers the card at the top of this sheet gives for today
+     — closed, no classes, hifz only, open — asked about any date, plus the
+     Islamic dates that fall on it. Written once here so the two cannot drift
+     apart: if the madrasah changes its week, both read it from this. */
+  const madAnswer = (key) => {
+    const d = madParse(key), wd = d.getDay(), c = shut[key];
+    if(c) return { open:false,
+      line: t("hol.closed","Closed") + " \u2014 " + madName(c),
+      /* the note says what the break IS, the span says how much is left */
+      note: [c.note ? t("hol.c." + c.id + ".d", c.note) : "",
+             c.from === c.to ? "" : madPretty(c.from) + " \u2013 " + madPretty(c.to)]
+            .filter(Boolean).join(" \u00B7 ") };
+    if(wd === 0) return { open:false, line: t("hol.no_classes","No classes"),
+      note: t("hol.the_madrasah_teaches_monday_to",
+        "The madrasah teaches Monday to Friday. Hifz students also attend on Saturday mornings.") };
+    if(wd === 6) return { open:true, line: t("hol.hifz_only","Hifz only"),
+      note: num(t("hol.saturday_is_a_hifz_morning",
+        "Saturday is a Hifz morning, 9:00\u201311:00am. All other classes are Monday to Friday.")) };
+    return { open:true, line: t("hol.madrasah_open","Madrasah open"),
+      note: num(t("hol.classes_run_5_00_7_00pm",
+        "Classes run 5:00\u20137:00pm. Hifz runs until 7:30pm.")) };
+  };
+
+  const pick = document.getElementById('hp-pick');
+  const showPick = (key) => {
+    if(!pick) return;
+    const pt = document.getElementById('hp-pick-t'),
+          pd = document.getElementById('hp-pick-d'),
+          pe = document.getElementById('hp-pick-e');
+    [...host.querySelectorAll('.hp-d.is-sel')].forEach(el => el.classList.remove('is-sel'));
+    pick.classList.remove("is-open","is-shut");
+    if(!key){
+      pt.textContent = "";
+      pd.textContent = t("hol.tap_any_date",
+        "Tap any date above to see whether the madrasah is open that day, and which Islamic date falls on it.");
+      pe.innerHTML = "";
+      return;
+    }
+    const cell = host.querySelector('.hp-d[data-k="' + key + '"]');
+    if(cell) cell.classList.add('is-sel');
+    const a = madAnswer(key), d = madParse(key);
+    pick.classList.add(a.open ? "is-open" : "is-shut");
+    pt.textContent = dow(d.getDay()) + " " + madPretty(key);
+    pd.textContent = a.line + (a.note ? " \u00B7 " + a.note : "");
+    /* The Islamic date gets the gold it was marked with in the grid, so the
+       colour that raised the question is the colour that answers it. */
+    pe.innerHTML = (evt[key] || []).map(e =>
+      '<span class="ev"><i aria-hidden="true"></i><span><b>' + esc(madEvName(e)) +
+      '</b> <span class="sub">' + esc(t("hol.e." + e.id + ".d", e.sub)) +
+      "</span></span></span>").join("");
+  };
+
+  /* One listener on the host rather than 365 on the cells, and it survives
+     the grid being rebuilt when the language changes. */
+  if(!host.dataset.picks){
+    host.dataset.picks = "1";
+    host.addEventListener("click", (ev) => {
+      const b = ev.target.closest(".hp-d[data-k]");
+      if(b) showPick(b.dataset.k);
+    });
+  }
+  showPick(null);
 
   /* ---- the two lists ---- */
   const row = (name, sub, when, len, past, est) =>
