@@ -162,7 +162,12 @@ export default function Home({ navigation }) {
           stand out, because it was being drawn on a darker ground. */}
       <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ alignSelf: "stretch" }}>
-        <TopBar navigation={navigation} onBell={() => navigation.navigate("NoticesTab")} />
+        {/* No onBell override. Home used to pass its own, pointing at
+            NoticesTab, and when that tab was renamed to EventsTab the
+            override went on calling a route that no longer existed — so the
+            bell on the one screen everybody opens first did nothing at all,
+            silently. TopBar's own default is the single rule now. */}
+        <TopBar navigation={navigation} />
       </LinearGradient>
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         /* The website's own hero box: padding 26px 22px 30px. The top 26 was
