@@ -57,6 +57,13 @@ const NOT_OURS = /\.done$|^a11y\.|_close|^common\.registered_charity$|^sheet\.ap
  * app does BETTER or a thing the platform does instead — never a thing that is
  * merely unfinished. */
 const WONT_NEED = {
+  /* The Notices tab became two screens in November 2026 — Events, which is
+   * the calendar and the posters, and Notifications, which is what the bell
+   * opens. Neither is called "Notices", so the website's page heading has
+   * nowhere to land. The website still shows its notices in the homepage
+   * glance row under this word; when that page is split to match, this
+   * waiver should go with it. */
+  "notices.notices": "the app has no screen called Notices any more — it has Events and Notifications",
   "duas.loading":                   "the duʿās are bundled — there is nothing to wait for",
   "athkar.loading":                 "the athkār are bundled — there is nothing to wait for",
   "bukhari.loading":                "the book list is bundled; only a book's text is fetched",

@@ -263,7 +263,7 @@ export function StarField({ gold, bright }) {
 }
 
 /* The bar the web app carries above every tab: the masjid's own wordmark, the
- * society's name, and a bell that goes to Notices. It sits on the plum so it
+ * society's name, and a bell that goes to Notifications. It sits on the plum so it
  * runs into the hero below it rather than sitting on top of one. */
 export function TopBar({ navigation, onBell, back }) {
   const { t, fs, rtl, ntSeen, ntCleared } = useApp();
@@ -305,12 +305,12 @@ export function TopBar({ navigation, onBell, back }) {
                                    color: C.cream, textTransform: "uppercase",
                                    textAlign: rtl ? "right" : "left" }}>{line}</Text>))}
       </View>
-      <Pressable onPress={() => { tap(); onBell ? onBell() : navigation?.navigate("NoticesTab"); }}
+      <Pressable onPress={() => { tap(); onBell ? onBell() : nav?.navigate("Notifications"); }}
         /* A DOT IS INVISIBLE TO A SCREEN READER, so the label says it instead
            — the same sentence the website puts on its own bell. */
         accessibilityLabel={unseen
-          ? `${t("a11y.notices", "Notices")} — ${t("notices.something_new", "something new")}`
-          : t("a11y.notices", "Notices")}
+          ? `${t("a11y.notifications", "Notifications")} — ${t("notices.something_new", "something new")}`
+          : t("a11y.notifications", "Notifications")}
         accessibilityRole="button"
         /* Drawn 40x40 to match the website; hit as 44x44. Every one of
            these is the website's own size, so the drawing is never changed

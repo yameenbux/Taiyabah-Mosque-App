@@ -602,7 +602,17 @@ const POSTER_CACHE_SECONDS = 30 * 86400;
  * just announced is the one at the top: opening that tab is opening the thing
  * the notification is about. */
 const SITE = "https://taiyabahapp.ysbdesigns.uk";
+/* WHERE A TAPPED NOTIFICATION LANDS.
+   The Notices tab became two screens in November 2026: Events, which is the
+   calendar and the posters, and Notifications, which is what the masjid has
+   said. An event notification should open the calendar; a janāzah should
+   not, because a janāzah is today and a month grid is the wrong thing to
+   put in front of somebody reading one.
+   `notices` STAYS ROUTABLE in the app and still means Notifications, because
+   every notification already delivered to a phone carries this URL and those
+   do not get rewritten. links.test.mjs checks both of these resolve. */
 const APP_NOTICES = "taiyabah://notices";
+const APP_EVENTS  = "taiyabah://events";
 const APP_TIMES   = "taiyabah://times";
 
 async function uploadPoster(env, dataUrl, origin) {
@@ -700,7 +710,7 @@ async function sendNotice(env, { topic, title, body, imageUrl, id }) {
     contents: { en: body },
     filters: anyOfFilter(prefValues(t.idx)),
     web_url: id ? `${SITE}/#notice=${id}` : `${SITE}/#notices`,
-    app_url: APP_NOTICES,
+    app_url: topic === "events" ? APP_EVENTS : APP_NOTICES,
   };
   if (imageUrl) {
     payload.big_picture = imageUrl;                 // Android
@@ -862,7 +872,7 @@ async function handle(request, env) {
           contents: { en: message },
           filters: anyOfFilter(prefValues(t.idx)),
           web_url: `${SITE}/#notices`,
-          app_url: APP_NOTICES,
+          app_url: body.topic === "events" ? APP_EVENTS : APP_NOTICES,
         }),
       });
       const data = await res.json().catch(() => ({}));

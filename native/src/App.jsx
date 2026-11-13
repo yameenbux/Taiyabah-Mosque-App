@@ -37,7 +37,8 @@ import { restoreTimetable, syncTimetable } from "./timetable";
 import Home from "./screens/Home";
 import PrayerTimes from "./screens/PrayerTimes";
 import Timetable from "./screens/Timetable";
-import Notices from "./screens/Notices";
+import Events from "./screens/Events";
+import Notifications from "./screens/Notifications";
 import More from "./screens/More";
 import Qibla from "./screens/Qibla";
 import Ramadan from "./screens/Ramadan";
@@ -151,8 +152,8 @@ function Tabs() {
                                                                          tabBarLabel: label(t("nav.home", "Home")), tabBarIcon: icon("home") }} />
       <Tab.Screen name="TimesTab"   component={PrayerTimes} options={{ title: t("nav.prayer_times", "Prayer Times"),
                                                                          tabBarLabel: label(t("nav.prayer_times", "Prayer Times")), tabBarIcon: icon("time") }} />
-      <Tab.Screen name="NoticesTab" component={Notices}     options={{ title: t("nav.notices", "Notices"),
-                                                                         tabBarLabel: label(t("nav.notices", "Notices")), tabBarIcon: icon("document-text") }} />
+      <Tab.Screen name="EventsTab"  component={Events}      options={{ title: t("nav.events", "Events"),
+                                                                         tabBarLabel: label(t("nav.events", "Events")), tabBarIcon: icon("calendar") }} />
       <Tab.Screen name="MoreTab"    component={More}        options={{ title: t("nav.more", "More"),
                                                                          tabBarLabel: label(t("nav.more", "More")), tabBarIcon: icon("ellipsis-horizontal") }} />
     </Tab.Navigator>
@@ -209,7 +210,12 @@ const linking = {
   config: {
     screens: {
       Tabs: { screens: { HomeTab: "home", TimesTab: "times",
-                         NoticesTab: "notices", MoreTab: "more" } },
+                         EventsTab: "events", MoreTab: "more" } },
+        /* `notices` is kept, pointing at Notifications. Every push already
+           on a phone carries taiyabah://notices and nothing rewrites those,
+           so dropping the path would turn every delivered notification into
+           a tap that opens nothing. links.test.mjs holds this. */
+        Notifications: "notices",
       Qibla:     "qibla",
       Ramadan:   "ramadan",
       Hajj:      "hajj",
@@ -398,6 +404,10 @@ function Root() {
 
         {/* settings */}
         <Stack.Screen name="Alerts"  component={Alerts}  options={page} />
+        {/* Where the bell goes. It used to go to the Notices tab, which was
+            the same screen you reached by pressing the tab — two doors onto
+            one room. Events took the calendar half; this is the other. */}
+        <Stack.Screen name="Notifications" component={Notifications} options={page} />
         <Stack.Screen name="Prefs"   component={Prefs}   options={{ ...sheet, title: t("sysprefs.system_preferences", "System Preferences") }} />
         <Stack.Screen name="Portal"  component={Portal}  options={{ ...sheet, title: t("portals.madrasah_portal", "Madrasah Portal") }} />
         <Stack.Screen name="Privacy" component={Privacy} options={{ ...sheet, title: t("privacy.privacy_notice", "Privacy notice") }} />
