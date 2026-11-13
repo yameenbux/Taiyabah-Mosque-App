@@ -117,10 +117,27 @@ for (const m of html.matchAll(/<(\w+)([^>]*)>([^<]*)</g)) {
 }
 if (!unguarded) ok(`${guarded} identifier(s) keep their Latin digits in every language`);
 
-/* the app's own advisory must not promise less than the packs deliver, or more */
-const advisory = html.match(/data-i18n="sysprefs\.the_urdu_gujarati_and_arabic"[^>]*>([\s\S]*?)<\/p>/);
-if (advisory && /navigation and prayer names\s+only/i.test(advisory[1]))
+/* 5. the Language screen must not promise less than the packs deliver
+ *
+ * It once said the packs covered "the main navigation and prayer names only",
+ * which stopped being true the day they covered the whole app.
+ *
+ * THIS GUARD HAD STOPPED BEING ABLE TO FIRE. It read an element keyed
+ * sysprefs.the_urdu_gujarati_and_arabic, and that key is not in index.html
+ * and has not been for some time — so the match was always null, the test
+ * after it never ran, and the check reported nothing while proving nothing.
+ * A guard that has never been seen to fire is decoration, and this one could
+ * not have fired if the sentence had come back word for word.
+ *
+ * It is pointed at the paragraph that is actually on the screen now. Watched
+ * failing with the old sentence pasted into it, then watched go green again. */
+const advisory = html.match(/data-i18n="sysprefs\.choose_the_language_the_app"[^>]*>([\s\S]*?)<\/p>/);
+if (!advisory)
+  fail("the Language screen's introduction is not where this check looks for it — " +
+       "sysprefs.choose_the_language_the_app is gone from index.html, so the promise it makes is unchecked");
+else if (/navigation and prayer names\s+only/i.test(advisory[1]))
   fail('the Language screen still tells people the packs cover "the main navigation and prayer names only" — that is no longer true');
+else ok("the Language screen does not undersell the packs");
 
 for (const n of notes) console.log("  ok    " + n);
 for (const p of problems) console.error("  FAIL  " + p);
