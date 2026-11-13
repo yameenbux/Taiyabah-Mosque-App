@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp, LANGS } from "../store";
 import { SHEETS } from "../Blocks";
-import { Screen, Hero, Heading, Card, P, Note, Press, tap, open } from "../ui";
+import { Screen, Hero, Heading, Card, P, Press, tap, open } from "../ui";
 import Constants from "expo-constants";
 
 /* TS_STEPS, exactly as the website has them: the same four multipliers and
@@ -135,10 +135,18 @@ export default function Prefs() {
               </Press>);
           })}
         </Card>
-        <View style={{ marginTop: 11 }}>
-          <Note>{t("sysprefs.lang_fallback",
-            "The Urdu, Gujarati and Arabic have been read and corrected by native speakers. A string with no translation shows in English rather than as a blank.")}</Note>
-        </View>
+        {/* A note under the language list used to say the Urdu, Gujarati and
+            Arabic "have been read and corrected by native speakers", and that
+            an untranslated string falls back to English.
+
+            Removed at the masjid's request. It had also stopped being true:
+            strings have gone in since that were composed rather than checked
+            by a speaker — menu.notification_settings and the eight Bukhari
+            provenance lines, both recorded in their own commits as awaiting
+            confirmation — so the screen was making a promise about the packs
+            that the packs no longer kept. The fallback half was describing
+            the mechanism rather than telling the reader anything they could
+            act on. */}
 
         {/* The website ends here, with the charity line under the language
             card. An "About this app" section with Privacy notice and About us
