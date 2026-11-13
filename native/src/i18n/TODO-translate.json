@@ -1,4 +1,12 @@
 {
+ "a11y.an_hour_later": "An hour later",
+ "a11y.an_hour_earlier": "An hour earlier",
+ "form.hour": "Hour",
+ "a11y.fifteen_minutes_later": "Fifteen minutes later",
+ "a11y.fifteen_minutes_earlier": "Fifteen minutes earlier",
+ "form.minutes": "Minutes",
+ "nikah.a_particular_time": "A particular time",
+ "nikah.the_office_will_confirm": "The office will confirm the time when it replies.",
  "member.name_too_short": "Please type the name as the masjid holds it — at least three letters.",
  "member.cannot_reach": "The masjid could not be reached just now. Please try again in a moment, or ring the office on {office}.",
  "member.need_both": "Both boxes, please — the house number and the postcode.",
