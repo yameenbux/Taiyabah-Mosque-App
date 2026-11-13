@@ -469,6 +469,15 @@ const out = await page.evaluate(ids => {
         blocks.push(node("call", {
           k: k ? str(k) : str(c), v: v ? str(v) : null,
           href: c.getAttribute("href") || null,
+          /*  THE ID, WHICH THIS USED TO THROW AWAY. Not every element wearing
+              the call styling is a phone number: the admissions screen
+              dresses its link to the Holiday Planner in it, because on the
+              website that shape — a chip, a line and a chevron — is exactly
+              what the row should look like. Dropping the id left the app with
+              a row it could not route, so it drew the hardcoded handset below
+              and went nowhere when tapped. Blocks.jsx reads this and sends a
+              row to its screen when the id is one the app has a route for. */
+          id: c.id || null,
           /* .hh-addr carries a map pin, not the phone handset every other
              one of these has. Guessing from the href gave it the generic
              "opens elsewhere" box instead. */

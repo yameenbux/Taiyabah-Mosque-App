@@ -131,8 +131,20 @@ function Block({ b, nav, inCard }) {
     case "facts":
       return <Facts items={b.items} />;
 
-    case "call":
+    /*  A CALL BLOCK IS NOT ALWAYS A CALL. The website uses the same chip,
+        line and chevron for its link from Admissions to the Holiday Planner,
+        and the extractor records what it saw — so the id decides. With a
+        route behind it this is a row to a screen, with the glyph that screen
+        owns; without one it is what it looks like, a number to ring.
+
+        It was neither: a phone handset, on a row that did nothing at all. */
+    case "call": {
+      const route = b.id && ROUTE[b.id];
+      if (route)
+        return <MenuRow label={tx(b.v) || tx(b.k)} icon={ICON[route]}
+                        onPress={() => nav?.navigate(route)} />;
       return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
+    }
 
     case "row": {
       const route = b.id && ROUTE[b.id];
