@@ -219,3 +219,60 @@ export async function upload(bucket, file, { ext = "bin", ms = 60000 } = {}) {
    through the same noteReach every other request uses. Eight seconds rather
    than twelve: this one is a poll, not somebody waiting on a screen. */
 setProbe(() => go("", { method: "HEAD" }, 8000));
+
+/* --- membership ----------------------------------------------------------
+ *
+ * THE LOOKUP IS TWO STEPS AND THE FIRST ONE REVEALS A COUNT, NOT A PERSON.
+ * There is no membership number: older members will not have one and the ones
+ * who do will not remember it, so the app asks what the counter asks — a
+ * name. membership_name_matches() answers with HOW MANY records match, never
+ * whose. Only the second step, with the house number and postcode as well,
+ * returns a record.
+ *
+ * Both take the slug like every other function here, and both are callable by
+ * anon because a member paying their fee is not logged in and never will be.
+ * Asking five hundred men to hold an account to pay £100 once a year is how
+ * the Excel sheet wins. */
+export const membershipNameMatches = name =>
+  call("membership_name_matches", { p_masjid: MASJID, p_name: name });
+
+export const membershipClaim = (name, house, postcode) =>
+  call("membership_claim", { p_masjid: MASJID, p_name: name, p_house: house, p_postcode: postcode });
+
+/* Re-reading the same record from the ticket the match handed back, so the
+ * screens after it never hold the name and address again — and so the balance
+ * can be refreshed after paying without asking the member to type anything
+ * twice. */
+export const membershipState = token =>
+  call("membership_state_for_claim", { p_token: token });
+
+/* WHERE THE AMOUNT COMES FROM, AND WHY IT IS NOT HERE.
+ *
+ * A Stripe Payment Link carries a fixed price and cannot be given an amount in
+ * the URL — the website records this at index_template.html, above the donate
+ * links. Membership cannot use one: the figure is different for every member
+ * who is behind. So the amount is built server-side, by a Cloudflare Worker
+ * that holds the Stripe secret key, from a claim token and one of two words.
+ * The app sends "all" or "current" and never a figure. A client that could
+ * name its own amount could settle £460 of arrears for a penny, and no amount
+ * of checking in the app would stop it, because the app is not where the
+ * request would come from.
+ *
+ * UNTIL THE WORKER IS DEPLOYED THIS IS BLANK, and the screen shows the ways to
+ * pay at the masjid instead of a button. The website already holds this line:
+ * a pay button that goes nowhere is worse than no pay button. */
+export const MEMBER_PAY_ENDPOINT = "";
+
+export async function membershipCheckout(token, which) {
+  if (!MEMBER_PAY_ENDPOINT) return { ok: false, unavailable: true };
+  try {
+    const res = await fetch(`${MEMBER_PAY_ENDPOINT}/membership_checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, scope: which }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body.url) return { ok: false, message: body.error || null };
+    return { ok: true, url: body.url };
+  } catch { return { ok: false }; }
+}

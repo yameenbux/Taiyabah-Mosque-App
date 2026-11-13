@@ -62,6 +62,7 @@ import Bukhari, { BukhariBook } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
 import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
+import MembershipScreen from "./screens/Membership";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -71,13 +72,19 @@ const Stack = createNativeStackNavigator();
  * hand would have meant retyping every fee, phone number and funeral step — and
  * the first time the committee changed one, two versions of it. */
 const SHEET = {
-  About: "about", Membership: "membership", Contact: "contact",
+  About: "about", Contact: "contact",
   MarriageDeath: "marriagedeath", Funeral: "funeral", Will: "will", Birth: "birth",
   Education: "education", EduArabic: "eduarabic", EduGhusl: "edughusl",
   Curriculum: "curriculum", Madrasah: "madrasah", Admissions: "madmissions",
   /* Holidays is NOT here any more: the website fills its calendar, its closure
    * list and its Islamic dates with JavaScript, so lifting the markup gave a
-   * legend with no colours and three empty cards. It has a real screen now. */
+   * legend with no colours and three empty cards. It has a real screen now.
+   *
+   * Nor is Membership. Its sheet said "ring the office and they will tell you
+   * whether this year's fee has been received" — true, and still on the
+   * screen, but it was all the app could do. The masjid's register is a real
+   * table now (db/157-160), so the screen looks a member up, shows every year
+   * on their record and takes the fee. */
 };
 
 /* The tab bar is the one piece of chrome a person touches all day, so it is the
@@ -385,6 +392,8 @@ function Root() {
         <Stack.Screen name="Marriage"  component={Marriage}  options={{ ...sheet, title: t("marriage.marriage", "Marriage") }} />
         <Stack.Screen name="HallHire"  component={HallHire}  options={{ ...sheet, title: t("hallhire.hall_room_hire", "Hall / Room Hire") }} />
         <Stack.Screen name="Advice"    component={Advice}    options={{ ...sheet, title: t("advice.imams_advice", "Imams’ Advice") }} />
+        <Stack.Screen name="Membership" component={MembershipScreen}
+                      options={{ ...sheet, title: t("member.membership", "Membership") }} />
         <Stack.Screen name="Collect"   component={Collect}   options={{ ...sheet, title: t("collect.charity_collections", "Charity Collections") }} />
 
         {/* settings */}
