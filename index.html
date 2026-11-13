@@ -13978,7 +13978,7 @@ function nkRenderSlots(){
      and step are advisory in some browsers, so nkTimeOK() checks again. */
   host.innerHTML =
       `<div class="nk-timewrap">`
-    +   `<label class="nk-timelab" for="nk-time">${esc(t("form.time", "Time"))}</label>`
+    +   `<label class="nk-timelab" for="nk-time">${esc(t("edu.time", "Time"))}</label>`
     +   `<input type="time" id="nk-time" class="nk-timein"`
     +     ` min="${NK_TIME_MIN}" max="${NK_TIME_MAX}" step="${NK_TIME_STEP}"`
     +     ` value="${esc(NK.time || "")}"${NK.flex ? " disabled" : ""}>`
