@@ -98,6 +98,12 @@ starts with the unit tests, which it did not: `npm test` was a separate script
 nobody ran locally, while CI's smoke run ran it and went red. A gate this file
 calls "the full gate" has to be the thing CI actually checks, or a branch sails
 through it and fails the moment it is pushed.
+
+It now ENDS with `scripts/check-release.mjs` as well, for the same reason: that
+is the script CI's release-checks job runs, and for a while it was the one part
+of CI the local gate did not cover. It was held out while two i18n faults were
+outstanding — a gate that is red on day one is a gate nobody reads — and went in
+the moment they were fixed.
 `node scripts/check-everything.mjs` and `node scripts/check-back-button.mjs`
 need `python3 -m http.server 8111` running from the repository root.
 

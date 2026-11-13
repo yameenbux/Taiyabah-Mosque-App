@@ -9,7 +9,7 @@
  * So this checks the app against itself instead:
  *   1. every string the app can put on a screen has a key   (scripts/i18n-keys.mjs)
  *   2. every key is translated into all three languages
- *   3. nothing carries a key the app never asks for
+ *   3. nothing carries a key NEITHER the website NOR the native app asks for
  *   4. an identifier — postcode, phone, email, web address — is never rewritten
  *      into another set of digits, because then it stops working
  *
@@ -51,13 +51,48 @@ for (const [k, v] of Object.entries(src)) {
 }
 if (holes.length) fail(`${holes.length} empty translation(s): ${holes.slice(0, 4).join(", ")}`);
 
-/* 3. keys nothing asks for — dead weight that hides real gaps */
-const orphans = Object.keys(src).filter(k => !(k in needed));
+/* 3. keys nothing asks for — dead weight that hides real gaps.
+ *
+ * `needed` comes from index.html, because that is where the strings and their
+ * English live. The native app draws from the same packs through
+ * build-i18n.mjs, and a handful of its strings have no counterpart on the
+ * website — `notices.clear` is the swipe action on a notice card, which the
+ * website renders as "Clear this notice" instead. Those were being reported as
+ * dead keys, which is the opposite of true: deleting one would have put an
+ * English word back on a Gujarati screen.
+ *
+ * So the orphan test asks both. The MISSING test above deliberately does not,
+ * because the app does not take all its words from here: of the 767 keys its
+ * source asks for, 581 are in lang/src, 122 come from
+ * native/src/i18n/app-extra.json, and 81 have no translation anywhere — those
+ * 81 are listed in native/src/i18n/TODO-translate.json by build-i18n.mjs and
+ * show in English meanwhile. That is a real gap with its own place to be
+ * tracked, and folding it in here would bury the two or three keys that are
+ * genuinely dead underneath it. */
+const nativeKeys = new Set();
+for (const dir of ["native/src"]) {
+  const walk = (d) => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      const full = d + "/" + e.name;
+      if (e.isDirectory()) { if (e.name !== "i18n" && e.name !== "data") walk(full); continue; }
+      if (!/\.(jsx?|tsx?)$/.test(e.name)) continue;
+      for (const m of readFileSync(full, "utf8").matchAll(/\bt\(\s*"([^"\\]+)"/g))
+        nativeKeys.add(m[1]);
+    }
+  };
+  if (existsSync(dir)) walk(dir);
+}
+if (nativeKeys.size < 300)
+  fail(`only found ${nativeKeys.size} t() keys in native/src — this reader has drifted, ` +
+       `and a key the app needs could be deleted as dead`);
+
+const orphans = Object.keys(src).filter(k => !(k in needed) && !nativeKeys.has(k));
 if (orphans.length)
   fail(`${orphans.length} key(s) in lang/src that nothing on screen asks for: ${orphans.slice(0, 4).join(", ")}`);
 
 if (!missing.length && !holes.length && !orphans.length)
-  ok(`${Object.keys(needed).length} strings, all three languages, nothing missing and nothing spare`);
+  ok(`${Object.keys(needed).length} strings, all three languages, nothing missing and nothing spare ` +
+     `(${nativeKeys.size} keys the native app asks for were counted as asked-for too)`);
 
 /* 4. an identifier must survive the digit localiser
  * "Bolton BL1 8HD" became "Bolton BL۱ ۸HD" in Urdu. That is not an address
