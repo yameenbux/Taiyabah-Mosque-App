@@ -280,7 +280,15 @@ export default function Holidays() {
                 past={todayISO > c.to} />);
           })}
         </Card>
-        <Card><P>{t("hol.the_two_long_breaks", "The two long breaks — Ramadhan (33 days) and the summer (40 days) — are when a family trip costs nothing in attendance. Everything else is a week or less.")}</P></Card>
+        {/* A card here used to read "the two long breaks ... are when a family
+            trip costs nothing in attendance". It was trying to say that
+            travelling in Ramadhan or the summer will not pull a child's
+            attendance figure down — but "costs nothing in attendance" is the
+            office's own shorthand, and a parent reading it has to work out
+            what is being charged and to whom. The list above already gives
+            every closure and its length, which is the thing somebody planning
+            a trip actually needs. Removed rather than reworded: the screen
+            says it better by saying nothing. */}
 
         <Heading>{t("hol.islamic_dates_this_year", "Islamic dates this year")}</Heading>
         <Card gap={0} pad={0}>

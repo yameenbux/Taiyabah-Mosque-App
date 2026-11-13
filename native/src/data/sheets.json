@@ -2571,16 +2571,6 @@
     "blocks": []
    },
    {
-    "type": "card",
-    "blocks": [
-     {
-      "type": "p",
-      "k": "hol.the_two_long_breaks",
-      "t": "The two long breaks — Ramadhan (33 days) and the summer (40 days) — are when a family trip costs nothing in attendance. Everything else is a week or less."
-     }
-    ]
-   },
-   {
     "type": "heading",
     "k": "hol.islamic_dates_this_year",
     "t": "Islamic dates this year",
