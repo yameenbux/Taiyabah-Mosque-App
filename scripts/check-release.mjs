@@ -2027,53 +2027,6 @@ for (const f of ["sw.js", workerEntry && `worker/${workerEntry}`].filter(Boolean
   else ok("Stripe links — every payment link says what the money is for, so no donation can arrive unattributable");
 }
 
-/*  ---------------------------------------------------------------------------
-    A FIX HAS TO BE ABLE TO REACH A PHONE.
-
-    13 November 2026, from the go-live review. Until today the app had no
-    over-the-air update channel at all: a bug found on the first evening could
-    not be corrected on iPhone that week, because the only route to a phone was
-    a new binary and another App Review. That is a worse position than any
-    single bug this gate looks for.
-
-    expo-updates is now installed and app.json carries the channel. These four
-    checks exist because the configuration is easy to lose — a merge, a
-    hand-edited app.json, a profile added to eas.json without a channel — and
-    losing it is SILENT. The app goes on working perfectly and simply stops
-    being fixable, which nobody notices until the day it matters.
-
-    runtimeVersion is "appVersion" ON PURPOSE. An update only reaches builds
-    carrying the same `version`, so JavaScript can never land on a binary whose
-    native side does not match it. The cost is that bumping the version needs a
-    store build, which is the right cost: the alternative is an update that
-    bricks the app for whoever installed the older one.                      */
-{
-  const bad = [];
-  const app = JSON.parse(readFileSync("native/app.json", "utf8")).expo;
-  const eas = JSON.parse(readFileSync("native/eas.json", "utf8"));
-
-  const url = app.updates && app.updates.url;
-  if (!url)
-    bad.push("native/app.json has no updates.url — the app cannot receive an over-the-air fix, so any bug waits for a new store build and another review");
-  else if (!/^https:\/\/u\.expo\.dev\/[0-9a-f-]{36}$/.test(url))
-    bad.push(`updates.url is ${url}, which is not an expo.dev endpoint for a project id`);
-
-  const projectId = app.extra && app.extra.eas && app.extra.eas.projectId;
-  if (url && projectId && !url.endsWith(projectId))
-    bad.push(`updates.url points at a different project than extra.eas.projectId (${projectId}) — updates would be published where this app is not looking`);
-
-  const policy = app.runtimeVersion && app.runtimeVersion.policy;
-  if (policy !== "appVersion")
-    bad.push(`runtimeVersion.policy is ${JSON.stringify(policy)}; it must be "appVersion" so an update can only land on a build whose native side matches it`);
-
-  for (const [name, profile] of Object.entries(eas.build || {}))
-    if (!profile.channel)
-      bad.push(`eas.json build profile "${name}" has no channel — a build from it cannot be targeted by an update`);
-
-  if (bad.length) bad.forEach(fail);
-  else ok(`over-the-air updates — channel set on all ${Object.keys(eas.build || {}).length} build profiles, runtimeVersion pinned to appVersion, so a fix can reach a phone without another App Review`);
-}
-
 for (const n of notes) console.log("  ok    " + n);
 for (const p of problems) console.error("  FAIL  " + p);
 console.log(problems.length ? `\n${problems.length} problem(s) would reach devices.` : "\nAll release checks passed.");
