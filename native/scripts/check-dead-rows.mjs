@@ -43,6 +43,37 @@ if (ROUTES.size === 0) {
   process.exit(1);
 }
 
+/* AND THE OTHER HALF OF THE QUESTION: does the route go anywhere?
+ *
+ * The first version of this file asked only whether a row's id was in ROUTE.
+ * "Support the new build", the single button at the foot of About us, had
+ * id="ab-donate" and ROUTE had "ab-donate": "Donate" — so it passed, and
+ * pressing it did nothing, because no screen is called Donate. The appeal is
+ * registered as NewBuild. navigate() with a name nothing matches does not
+ * throw anything a person sees; the button simply does not work.
+ *
+ * An id in a table that points at a screen which does not exist is a dead
+ * row with extra steps, so both halves are checked here. */
+const appSrc0 = fs.readFileSync(path.join(root, "src/App.jsx"), "utf8");
+const SCREENS = new Set([
+  ...[...appSrc0.matchAll(/<Stack\.Screen\s+name="([A-Za-z]+)"/g)].map(m => m[1]),
+  ...[...appSrc0.matchAll(/<Tab\.Screen\s+name="([A-Za-z]+)"/g)].map(m => m[1]),
+  ...(() => {
+    const i = appSrc0.indexOf("const SHEET = {");
+    return [...appSrc0.slice(i, appSrc0.indexOf("};", i)).matchAll(/(\w+):\s*"[a-z]+"/g)]
+      .map(m => m[1]);
+  })(),
+]);
+
+const nowhere = [...new Set([...routeBlock.matchAll(/"([^"]+)":\s*"([^"]+)"/g)]
+  .map(m => m[2]))].filter(dest => !SCREENS.has(dest));
+if (nowhere.length) {
+  console.error(`Blocks.jsx ROUTE sends rows to ${nowhere.length} screen(s) that are not registered `
+              + `in App.jsx: ${nowhere.join(", ")}.\nnavigate() with a name nothing matches fails `
+              + `silently — the row is drawn and the press does nothing.`);
+  process.exit(1);
+}
+
 /* WHICH SHEETS THIS APPLIES TO. Only the ones rendered straight out of the
  * block tree, named in App.jsx's SHEET map — read from there rather than
  * listed here, because a list would go stale the first time a sheet gets a

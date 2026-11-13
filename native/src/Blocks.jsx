@@ -25,7 +25,12 @@ const ROUTE = {
   "ad-to-holidays": "Holidays", "hp-to-admissions": "Admissions",
   "mdr-go-admissions": "Admissions", "mdr-go-curriculum": "Curriculum",
   "mdr-go-holidays": "Holidays", "mdr-go-portal": "Portal",
-  "ab-donate": "Donate", "lv-vids": "Videos",
+  /*  NewBuild, not "Donate". There is no screen called Donate and there never
+      was — the appeal lives in screens/Donate.jsx and is REGISTERED as
+      NewBuild, which is what "Support the new build" at the foot of About us
+      should open. navigate("Donate") matched nothing, so the one button on
+      that page did nothing at all when pressed. */
+  "ab-donate": "NewBuild", "lv-vids": "Videos",
 };
 
 /* An icon for each row, chosen by what the row leads to rather than by
@@ -45,7 +50,7 @@ const ICON = {
   EduArabic: "language-outline", EduGhusl: "water-outline", Birth: "egg-outline",
   Funeral: "flower-outline", Marriage: "heart-outline", Will: "document-text-outline",
   Holidays: "calendar-outline", Admissions: "school-outline", Curriculum: "book-outline",
-  Portal: "log-in-outline", Donate: "gift-outline", Videos: "play-circle-outline",
+  Portal: "log-in-outline", NewBuild: "gift-outline", Videos: "play-circle-outline",
 };
 
 function Block({ b, nav, inCard }) {
