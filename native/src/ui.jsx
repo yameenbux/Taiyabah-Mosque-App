@@ -9,7 +9,7 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, Platform, Linking, StyleSheet, Image, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Polygon, SvgXml } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
@@ -155,6 +155,24 @@ export function Arabic({ children, size = 26, center = true }) {
 export const Screen = React.forwardRef(function Screen(
   { children, scroll = true, pad = true, bg = C.paper, top = 0, ...rest }, ref) {
   const insets = useSafeAreaInsets();
+  /* TAPPING THE TAB YOU ARE ALREADY ON TAKES YOU BACK TO THE TOP.
+   *
+   * Every phone does this and the app did not: somebody halfway down Home who
+   * pressed Home got nothing, because the tab was already focused and there
+   * was nowhere to navigate to. react-navigation's own useScrollToTop listens
+   * for tabPress, checks the screen is focused, and scrolls to 0 — so it is
+   * the library's rule rather than ours, and it does the right thing on a
+   * nested stack too (it only fires on the first screen of one).
+   *
+   * It lives HERE, not on the three tab screens, for the same reason the
+   * 520px column does: a tab added later gets it without anybody remembering.
+   * On a pushed screen it finds no tab navigator above it and does nothing.
+   *
+   * The ref is internal because a caller may want its own — Ramadan scrolls
+   * itself to the rota — so the ScrollView is handed to both. */
+  const inner = React.useRef(null);
+  React.useImperativeHandle(ref, () => inner.current);
+  useScrollToTop(inner);
   const style = { backgroundColor: bg };
   /* THE COLUMN. Every screen in the app goes through here, so the website's
      own max-width:520px lands everywhere at once rather than screen by screen
@@ -172,7 +190,7 @@ export const Screen = React.forwardRef(function Screen(
      last line of whatever you are reading sits behind it — which on the Qurʼan
      is an āyah, so it is not a small thing. */
   const onAir = useLiveAudio().playing;
-  const inner = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
+  const pane = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
                   paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + (onAir ? ON_AIR_ROOM : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
   if (!scroll)
@@ -181,7 +199,7 @@ export const Screen = React.forwardRef(function Screen(
         <View style={{ flex: 1, width: "100%", maxWidth: COLUMN }}>{children}</View>
       </View>);
   return (
-    <ScrollView ref={ref} style={[{ flex: 1 }, style]} contentContainerStyle={inner}
+    <ScrollView ref={inner} style={[{ flex: 1 }, style]} contentContainerStyle={pane}
                 /* the platform's own overscroll, which is half of why a list
                    feels native rather than scripted */
                 showsVerticalScrollIndicator={false} {...rest}>
