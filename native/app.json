@@ -3,7 +3,7 @@
     "name": "Taiyabah Masjid",
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -16,7 +16,7 @@
     },
     "android": {
       "package": "com.taiyabahmasjid.app",
-      "versionCode": 2,
+      "versionCode": 23,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#3C0B2A"
@@ -35,7 +35,7 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-      "NSSupportsLiveActivities": true,
+        "NSSupportsLiveActivities": true,
         "UIBackgroundModes": [
           "audio",
           "remote-notification"
