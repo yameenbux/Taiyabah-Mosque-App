@@ -42,6 +42,7 @@
     "expo-sensors": "~14.1.4",
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~0.28.18",
     "expo-web-browser": "~14.2.0",
     "onesignal-expo-plugin": "2.8.0",
     "query-string": "^9.5.1",
