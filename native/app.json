@@ -4,13 +4,6 @@
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
     "version": "2.2.0",
-    "updates": {
-      "url": "https://u.expo.dev/647995fe-86db-4b00-88d5-50a611b14a7b",
-      "fallbackToCacheTimeout": 0
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
