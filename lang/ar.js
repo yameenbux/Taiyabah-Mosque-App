@@ -16,10 +16,9 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "28ce654d55b6",
+ "version": "405a05a2937e",
  "strings": {
   "menu.settings": "الإعدادات",
-  "menu.notifications": "الإشعارات",
   "menu.resources": "الموارد",
   "menu.timetable": "جدول الصلاة الكامل",
   "menu.zakat": "حاسبة الزكاة",

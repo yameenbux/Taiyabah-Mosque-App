@@ -16,10 +16,9 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "6e3269f0d105",
+ "version": "5eaf8bc42e60",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
-  "menu.notifications": "સૂચનાઓ",
   "menu.resources": "સંસાધનો",
   "menu.timetable": "સંપૂર્ણ નમાઝ સમયપત્રક",
   "menu.zakat": "ઝકાત કેલ્ક્યુલેટર",

@@ -16,10 +16,9 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "315cb924634b",
+ "version": "02877546f108",
  "strings": {
   "menu.settings": "ترتیبات",
-  "menu.notifications": "اطلاعات",
   "menu.resources": "وسائل",
   "menu.timetable": "مکمل نماز ٹائم ٹیبل",
   "menu.zakat": "زکٰوۃ کیلکولیٹر",
