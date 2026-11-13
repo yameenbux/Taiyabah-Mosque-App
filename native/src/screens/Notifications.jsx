@@ -98,7 +98,7 @@ export default function Notifications() {
   const Header = (
     <>
       <LinearGradient onLayout={bar.onLayout} colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
-        <TopBar />
+        <TopBar back />
       </LinearGradient>
       <View style={{ paddingHorizontal: 16 }}>
         <Heading>{t("notices.notifications", "Notifications")}</Heading>

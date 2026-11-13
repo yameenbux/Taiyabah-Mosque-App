@@ -61,6 +61,7 @@ const sleep = ms => execSync(`sleep ${ms / 1000}`);
 let step = 0, failures = [], shots = 0;
 /* What the run actually proved, kept so the verdict can say it out loud. */
 const opened = { tiles: [], rows: [] }, inert = [], tabsOk = [];
+let bellOpened = false;
 const log = (mark, msg) => say(`${mark} ${msg}`);
 const fail = msg => { failures.push(msg); log("FAIL", msg); annotate(msg); };
 
@@ -622,7 +623,7 @@ else {
   const ROWS = ["Full prayer timetable", "Videos & bayaans", "Hajj / Umrah", "Ramadan",
                 "Zakat calculator", "Admissions & Fees", "Holiday Planner", "Madrasah Portal",
                 "About us", "Membership", "Find us", "Contact us", "Birth, Marriage & Death",
-                "Imams' Advice", "Education", "Notifications",
+                "Imams' Advice", "Education", "Notification settings",
                 "Privacy notice", "System Preferences",
                 /* The one row that is not on the website. It is listed here so
                  * the run opens it: a screen nothing taps is a screen that can
@@ -681,6 +682,40 @@ for (const tab of ["Prayer Times", "Events", "Home"]) {
   const c = crashes();
   if (c.length) { fail(`the ${tab} tab crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
   else { log("ok", `${tab} tab`); tabsOk.push(tab); }
+}
+
+/* ---------- the bell ------------------------------------------------------ */
+
+/* THE SCREEN NOTHING ELSE OPENS ANY MORE. The More row was renamed
+ * "Notification settings" so that it stops colliding with this screen's own
+ * name — which means the row loop above now opens the switches, as it should,
+ * and no longer opens this list.
+ *
+ * It opened it before only by accident: seek("Notifications") matched the
+ * BELL's accessibility label, not the row, tapped the bell, and landed here.
+ * That accident is the only reason anybody found out that this screen shipped
+ * with a bare <TopBar/> — no back arrow, no Done, nothing but the phone's own
+ * button to get off it. So the tap is deliberate now.
+ *
+ * The label carries "— something new" when there is an unread notice, so the
+ * bell is matched by pattern rather than by the bare word. */
+{
+  const bell = findIn(nodes(dump()), /^Notifications( —|$)/);
+  if (!bell) fail("the bell is nowhere on the home screen");
+  else {
+    tap(bell);
+    const after = nodes(dump());
+    /* Same tell as the tiles: a pushed screen covers the tab bar. */
+    if (findIn(after, "Home") && findIn(after, "More"))
+      fail("tapping the bell did nothing — the tab bar is still there");
+    else { log("ok", "the bell opened the Notifications screen"); bellOpened = true; }
+    shot("bell-notifications");
+    auditDown("Notifications (from the bell)");
+    const c = crashes();
+    if (c.length) { fail(`the Notifications screen crashed:\n    ${c.slice(0, 4).join("\n    ")}`); adb(["logcat", "-c"]); }
+    back();
+    for (let i = 0; i < 2 && !findIn(nodes(dump()), "Home"); i++) back();
+  }
 }
 
 /* ---------- the same app, at the largest text a phone can ask for --------- */
@@ -808,6 +843,7 @@ const tally = [
   `${groupCount}/${groupTotal} menu groups present, ${opened.rows.length + inert.length}/${rowTotal} rows present`,
   `${opened.rows.length} menu rows opened a screen; ${inert.length} present but not followed (${inert.join(", ")})`,
   `tabs working: ${tabsOk.join(", ")}`,
+  `the bell ${bellOpened ? "opened the Notifications screen, which offers a way back" : "did NOT open a screen"}`,
   `tab bar icons drew: ${iconsDrew}/${iconsChecked || "not checked"} (${iconCounts.join(" ") || "—"})`,
   `the first-run reminder offer ${sawOffer ? "appeared and was dismissed" : "did not appear"}`,
   `no crash or fatal JS error in logcat at any point`,

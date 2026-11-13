@@ -22,6 +22,18 @@
  * is a tab, or if it is registered with the `page` options — and a page must
  * render the shared <TopBar>, not a header of its own.
  *
+ * AND A PUSHED PAGE HAS TO OFFER A WAY BACK. A tab does not need one: the tab
+ * bar is its way out. A page the navigator PUSHES has no tab bar, so unless
+ * its TopBar is given `back` there is nothing on the glass to leave by — only
+ * the phone's own button, which an iPhone does not have.
+ *
+ * Notifications shipped exactly like that. `<TopBar />`, no back arrow, on the
+ * screen the bell opens — the first thing anybody taps from the home screen.
+ * It was caught by the emulator sweep, forty minutes into a release run, and
+ * only because the sweep happened to tap the bell by accident. A bare TopBar
+ * on a pushed page is a one-token mistake and it belongs in a check that takes
+ * a second, not in a check that takes an hour.
+ *
  *   node scripts/check-appbar.mjs
  */
 import fs from "node:fs";
@@ -56,6 +68,11 @@ for (const m of app.matchAll(/^import\s+\{([^}]*)\}\s+from\s+"\.\/screens\/([\w-
   for (const n of m[1].split(",").map((x) => x.trim().split(/\s+as\s+/).pop()).filter(Boolean))
     imports.set(n, `src/screens/${m[2]}.jsx`);
 
+/* Which files serve a tab. A tab's TopBar carries no back arrow on purpose. */
+const tabFiles = new Set();
+for (const [component, how] of pages)
+  if (how.startsWith("tab ") && imports.get(component)) tabFiles.add(imports.get(component));
+
 for (const [component, how] of pages) {
   const rel = imports.get(component);
   if (!rel) { say(`${component} is a ${how} but App.jsx does not import it from ./screens`); continue; }
@@ -72,6 +89,16 @@ for (const [component, how] of pages) {
   if (/require\(["'][^"']*logo\.png["']\)/.test(src))
     say(`${rel} loads logo.png itself. The masthead is TopBar's — a second copy ` +
         `is how the bar starts differing between pages.`);
+
+  /* The way out. Only for a PUSHED page: a tab is exempt because the tab bar
+     is its way out, and a file that serves a tab is skipped outright rather
+     than guessed at — Home and More would otherwise be asked for a back arrow
+     to nowhere. */
+  if (how.startsWith("page ") && !tabFiles.has(rel))
+    for (const m of src.matchAll(/<TopBar\b([^>]*)>/g))
+      if (!/\bback\b/.test(m[1]))
+        say(`${rel} is a ${how} and renders <TopBar${m[1].trimEnd()}> without \`back\`. ` +
+            `A pushed page has no tab bar, so there is no way off it — pass \`back\`.`);
 }
 
 if (fail.length) {
@@ -80,4 +107,4 @@ if (fail.length) {
   console.error("");
   process.exit(1);
 }
-console.log(`all ${pages.size} pages wear the same app bar`);
+console.log(`all ${pages.size} pages wear the same app bar, and every pushed one offers a way back`);
