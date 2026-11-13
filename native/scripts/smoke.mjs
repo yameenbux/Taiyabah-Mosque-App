@@ -539,9 +539,9 @@ const tabShot = shot("tabbar");
 const iconCounts = [];
 let iconsDrew = 0, iconsChecked = 0;
 const tabNodes = nodes(dump());
-for (const tab of ["Home", "Prayer Times", "Notices", "More"]) {
+for (const tab of ["Home", "Prayer Times", "Events", "More"]) {
   /* The LOWEST match on the glass, not the first. findIn returns the first
-     node carrying the label, and a word like "Notices" appears on the screen
+     node carrying the label, and a word like "Events" appears on the screen
      above as well as on the tab — so the box being measured was somewhere up
      in the content, and reported the same 10 colours whether the tab's icon
      drew or not. It passed the run where every tab icon was missing.
@@ -598,7 +598,7 @@ for (const label of TILES.filter(t => t !== "Join WhatsApp")) {
   const after = nodes(dump());
   /* The tab bar is the tell: a pushed screen covers it, so if it is still there
    * the tap went nowhere. */
-  const stillHome = findIn(after, "Home") && findIn(after, "Notices") && findIn(after, "More");
+  const stillHome = findIn(after, "Home") && findIn(after, "Events") && findIn(after, "More");
   if (stillHome) fail(`tapping "${label}" did nothing`);
   else { log("ok", `${label} → opened`); opened.tiles.push(label); }
   shot("tile-" + label.replace(/[^A-Za-z]+/g, "-").toLowerCase());
@@ -670,7 +670,7 @@ else {
 
 /* ---------- the other tabs ------------------------------------------------ */
 
-for (const tab of ["Prayer Times", "Notices", "Home"]) {
+for (const tab of ["Prayer Times", "Events", "Home"]) {
   const n = findIn(nodes(dump()), tab);
   if (!n) { fail(`the ${tab} tab is not on screen`); continue; }
   tap(n);
