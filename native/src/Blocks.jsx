@@ -145,9 +145,29 @@ function Block({ b, nav, inCard }) {
         It was neither: a phone handset, on a row that did nothing at all. */
     case "call": {
       const route = b.id && ROUTE[b.id];
-      if (route)
-        return <MenuRow label={tx(b.v) || tx(b.k)} icon={ICON[route]}
+      if (route) {
+        const label = tx(b.v) || tx(b.k);
+        const eyebrow = tx(b.k);
+        /*  THE LINE ABOVE THE TITLE IS SOMETIMES WORTH KEEPING AND SOMETIMES
+            THE TITLE AGAIN. On a phone row the website sets the small line to
+            whatever reads best there, so these three are not alike:
+
+              "Wasiyyah — why and how to prepare one"  over "Importance of an
+                 Islamic Will"            — says something the title does not
+              "Fees, uniform, attendance" over "Admissions & guidelines"
+                                          — likewise
+              "Holiday Planner ›"         over "Holiday Planner"
+                                          — the title again, with a chevron
+
+            Dropping all three lost two useful subtitles; keeping all three
+            printed "Holiday Planner" twice, one above the other. So it is
+            kept unless it is the title repeated, and the chevron the website
+            puts on the end does not count as a difference. */
+        const bare = x => String(x || "").replace(/[\s›>]+$/, "").trim().toLowerCase();
+        const sub = eyebrow && bare(eyebrow) !== bare(label) ? eyebrow : null;
+        return <MenuRow label={label} sub={sub} icon={ICON[route]}
                         onPress={() => nav?.navigate(route)} />;
+      }
       return <Call k={tx(b.k)} v={tx(b.v)} href={b.href} icon={b.icon} />;
     }
 
