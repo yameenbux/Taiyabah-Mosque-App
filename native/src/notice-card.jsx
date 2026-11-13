@@ -8,7 +8,7 @@
  * this lived inside it.
  */
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, useWindowDimensions } from "react-native";
 import { C, F, SHADOW } from "./theme";
 import { useApp } from "./store";
 
@@ -26,6 +26,33 @@ export function ClearAction({ label, left }) {
 
 export function NoticeCard({ item, isNew, onClear }) {
   const { t, fs, rtl } = useApp();
+  /* THE POSTER BOX IS FULL WIDTH AND THE POSTER SITS IN THE MIDDLE OF IT.
+   *
+   * The website says it in one line:
+   *
+   *   .nt-shot img { width:100%; max-height:46vh; object-fit:contain;
+   *                  background:#1B1119 }
+   *
+   * In CSS, max-height caps the BOX and object-fit centres the picture inside
+   * it, so a tall poster shows the dark ground either side. That is what the
+   * #1B1119 is for.
+   *
+   * The first translation of that into React Native was
+   * `width: "100%", aspectRatio: w/h, maxHeight: 420` — which does something
+   * else entirely. Yoga treats aspectRatio as a constraint on the BOX, not on
+   * the picture: when maxHeight bites, it re-derives the WIDTH from the capped
+   * height to keep the ratio. So a portrait poster on a 408dp card came out as
+   * a 300dp-wide box with 108dp of card showing beside it, hard against the
+   * left edge, and the dark ground could never appear because the box was
+   * always exactly the picture's shape. CSS max-height does not do this.
+   *
+   * So the height is worked out here instead and the box keeps its full width.
+   * 46vh rather than a flat 420 because that is the website's own figure and
+   * it is what makes a tablet give the poster more room. */
+  const { width: winW, height: winH } = useWindowDimensions();
+  const ratio = (item.image_w && item.image_h) ? item.image_w / item.image_h : 4 / 3;
+  //  The card is inset 16 each side (marginHorizontal below).
+  const shotHeight = Math.min((winW - 32) / ratio, winH * 0.46);
   return (
         /* THE POSTER LEADS. On the website the image is the first thing in the
            card, edge to edge, and the words sit under it in .nt-body. Here the
@@ -43,8 +70,8 @@ export function NoticeCard({ item, isNew, onClear }) {
                         marginTop: 12, marginHorizontal: 16, overflow: "hidden" }, SHADOW]}>
           {!!item.image_url && (
             <Image source={{ uri: item.image_url }} resizeMode="contain"
-                   style={{ width: "100%", aspectRatio: (item.image_w && item.image_h) ? item.image_w / item.image_h : 4 / 3,
-                            maxHeight: 420, backgroundColor: "#1B1119" }} />)}
+                   style={{ width: "100%", height: shotHeight,
+                            backgroundColor: "#1B1119" }} />)}
           <View style={{ paddingTop: 14, paddingHorizontal: 15, paddingBottom: 15 }}>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
                            flexWrap: "wrap", gap: 7 }}>
