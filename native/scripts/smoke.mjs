@@ -700,7 +700,15 @@ for (const tab of ["Prayer Times", "Events", "Home"]) {
  * The label carries "— something new" when there is an unread notice, so the
  * bell is matched by pattern rather than by the bare word. */
 {
-  const bell = findIn(nodes(dump()), /^Notifications( —|$)/);
+  /* seek(), NOT findIn(dump()) — seek scrolls to the top first, and that is
+   * the whole difference. The tabs loop above finishes with auditDown("tab
+   * Home"), which swipes the home screen down a viewport at a time looking for
+   * clipped text; the bell is in the TopBar at the very top of that scroll
+   * view, so by the time this step runs it is off the glass. Looking once
+   * where the screen happens to be sitting reported "the bell is nowhere on
+   * the home screen" on a run where the bell was perfectly fine — this check
+   * failed on its own first outing (#400) rather than on the app. */
+  const bell = seek(/^Notifications( —|$)/, { swipes: 2 });
   if (!bell) fail("the bell is nowhere on the home screen");
   else {
     tap(bell);
