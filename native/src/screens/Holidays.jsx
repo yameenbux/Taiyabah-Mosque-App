@@ -138,10 +138,24 @@ function Month({ y, m, shut, evt, todayISO, width }) {
 function ListRow({ name, sub, when, len, past, est, first }) {
   const { fs, t } = useApp();
   return (
+    /* WHY THIS ROW CAN WRAP, AND WHY THE NAME HAS A FLOOR.
+     *
+     * minWidth: 0 let the name column be squeezed to nothing. At the "Extra
+     * large" text size the dates and the length took their natural width,
+     * the name got whatever was left, and "Half Term Break" came out as
+     * "Half / Ter / m" — broken mid-word, one or two characters a line. A
+     * column that narrow is not a column, and the screen it happens on is
+     * the one parents read to plan a trip around their child's attendance.
+     *
+     * The floor stops the squeeze before it reaches that point, and
+     * flexWrap gives the row somewhere to put the overflow: at ordinary
+     * sizes all three still sit on one baseline exactly as before, and only
+     * when the name is already at its floor does the length drop below. */
     <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: C.line, flexDirection: "row",
-                   alignItems: "baseline", gap: 10, paddingHorizontal: 15, paddingVertical: 12,
+                   alignItems: "baseline", gap: 10, flexWrap: "wrap",
+                   paddingHorizontal: 15, paddingVertical: 12,
                    opacity: past ? .45 : 1 }}>
-      <View style={{ flex: 1, minWidth: 0 }}>
+      <View style={{ flex: 1, minWidth: 110 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(19.5), color: C.ink,
                          flexShrink: 1 }}>{name}</Text>
@@ -160,9 +174,12 @@ function ListRow({ name, sub, when, len, past, est, first }) {
           the length in a 52px column at the right. Stacking the length under
           the dates put "5 days" where a second date would be, so two rows ran
           together and the eye had to re-find the right-hand edge on each. */}
-      <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, textAlign: "right" }}>{when}</Text>
+      {/* Neither of these may be squeezed: a date range with a digit missing
+          and a length reading "40 day" are both worse than a wrapped row. */}
+      <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, textAlign: "right",
+                     flexShrink: 0 }}>{when}</Text>
       <Text style={{ minWidth: 52, fontFamily: F.sans, fontSize: fs(11), color: C.muted,
-                     textAlign: "right" }}>{len}</Text>
+                     textAlign: "right", flexShrink: 0 }}>{len}</Text>
     </View>);
 }
 

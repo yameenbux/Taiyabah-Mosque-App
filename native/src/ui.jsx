@@ -1008,17 +1008,40 @@ export function Urgent({ lab, h, ps, nums }) {
       {(ps || []).map((x, i) => (
         <Rich key={i} style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21),
                                color: "#E6C8BA", textAlign: align }}>{tx(x)}</Rich>))}
+      {/* THE NUMBER IS THE ONE THING ON THIS PANEL THAT MUST SURVIVE.
+       *
+       * Somebody opening the funeral screen at three in the morning is not
+       * reading it, they are looking for a number to ring — which is why the
+       * panel is solid dark red in the first place. At the "Extra large" text
+       * size the label and the number together stopped fitting the row, and
+       * because the row could not wrap and neither child could give way, the
+       * number ran off the right-hand edge: "01204 363" and then nothing.
+       * Three numbers, all cut, on the screen where being cut matters most.
+       *
+       * So the row now gives way in a fixed order:
+       *   1. the LABEL shrinks and wraps onto a second line — it is the part
+       *      a reader can lose and still dial;
+       *   2. the NUMBER never shrinks and is never clipped (flexShrink: 0);
+       *   3. if even that will not fit, flexWrap drops the number onto its
+       *      own line underneath, whole.
+       *
+       * `justifyContent: space-between` keeps the ordinary case pixel-identical
+       * to what it was: at every size below Extra large these rows are
+       * unchanged. */}
       <View style={{ gap: 8, marginTop: 5 }}>
         {(nums || []).map((n, i) => (
           <Press key={i} onPress={() => { tap(); open(n.href); }}
             style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                     justifyContent: "space-between", gap: 10, paddingVertical: 11,
+                     justifyContent: "space-between", gap: 10, flexWrap: "wrap",
+                     paddingVertical: 11,
                      paddingHorizontal: 13, borderRadius: 12,
                      backgroundColor: "rgba(255,255,255,.1)",
                      borderWidth: 1, borderColor: "rgba(255,255,255,.18)" }}>
             {!!n.who && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.7,
-                                       textTransform: "uppercase", color: "#EFD3C4" }}>{tx(n.who)}</Text>}
-            {!!n.no && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: "#F3EFE3" }}>
+                                       textTransform: "uppercase", color: "#EFD3C4",
+                                       flexShrink: 1 }}>{tx(n.who)}</Text>}
+            {!!n.no && <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16), color: "#F3EFE3",
+                                      flexShrink: 0 }}>
               {tx(n.no)}</Text>}
           </Press>))}
       </View>
