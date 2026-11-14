@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "c00e47eaa1cc",
+ "version": "45af976a6854",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -42,7 +42,7 @@ window.LANG_PACK = {
   "app.the_best_day_on_which": "«خير يوم طلعت عليه الشمس يوم الجمعة.»",
   "app.sahih_muslim_854": "صحيح مسلم 854",
   "app.give_this_jumu_ah": "تبرع هذه الجمعة",
-  "app.support_the_new_taiyabah_masjid": "ادعم مسجد طيبة الجديد",
+  "app.a_weekly_gift_taken_every": "تَبَرُّعٌ أُسْبُوعِيٌّ يُؤْخَذُ كُلَّ جُمُعَة",
   "app.today": "اليوم",
   "app.next_jumu_ah": "الجمعة القادمة",
   "app.full_month": "الشهر كامل",

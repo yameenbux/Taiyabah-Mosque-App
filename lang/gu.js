@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "8102543e5135",
+ "version": "8338acbdd02a",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -42,7 +42,7 @@ window.LANG_PACK = {
   "app.the_best_day_on_which": "“સૂર્ય જે દિવસે ઉગ્યો છે તેમાં શ્રેષ્ઠ દિવસ જુમ્આ છે.”",
   "app.sahih_muslim_854": "સહીહ મુસ્લિમ 854",
   "app.give_this_jumu_ah": "આ જુમ્આએ દાન આપો",
-  "app.support_the_new_taiyabah_masjid": "નવી તૈયબા મસ્જિદને સહયોગ આપો",
+  "app.a_weekly_gift_taken_every": "એક સાપ્તાહિક દાન, દર જુમ્આએ લેવાશે",
   "app.today": "આજે",
   "app.next_jumu_ah": "આગામી જુમ્આ",
   "app.full_month": "સંપૂર્ણ મહિનો",

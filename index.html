@@ -2868,7 +2868,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <div class="jc-en" data-i18n="app.the_best_day_on_which">&ldquo;The best day on which the sun has risen is Friday.&rdquo;</div>
       <div class="jc-src" data-i18n="app.sahih_muslim_854">Ṣaḥīḥ Muslim 854</div>
       <button class="jc-btn" id="jc-btn" data-i18n="app.give_this_jumu_ah">Give this Jumu&#703;ah</button>
-      <div class="jc-note" data-i18n="app.support_the_new_taiyabah_masjid">Support the new Taiyabah Masjid</div>
+      <div class="jc-note" data-i18n="app.a_weekly_gift_taken_every">A weekly gift, taken every Jumu&#703;ah</div>
     </div>
     <script>
       /* The Friday card is revealed by render(), which is the second-to-last
@@ -4947,7 +4947,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <div><dt data-i18n="giving.the_food_bank_and_outreach">The food bank and outreach</dt><dd data-i18n="giving.serving_people_in_bolton_who">Serving people in Bolton who need it, Muslim and non-Muslim alike.</dd></div>
           </dl>
 
-          <div class="sec-h"><h2 data-i18n="giving.give_online">Give online</h2><span class="rule"></span><span class="tag" data-i18n="giving.apple_google_pay">Apple &amp; Google Pay</span></div>
+          <!-- id: the Friday call on the home page lands here with Friday Pay
+               already chosen, rather than at the top of the preamble. -->
+          <div class="sec-h" id="gv-online"><h2 data-i18n="giving.give_online">Give online</h2><span class="rule"></span><span class="tag" data-i18n="giving.apple_google_pay">Apple &amp; Google Pay</span></div>
           <div class="card" style="padding:16px 17px 18px">
 
             <div class="gv-lab" style="margin-top:0" data-i18n="giving.what_it_is_for">What it is for</div>
@@ -8515,9 +8517,34 @@ function rmStep(n){
   renderReminder();
 }
 
+/* THE FRIDAY CALL GOES TO FRIDAY PAY, NOT TO THE NEW BUILD.
+ *
+ * It used to switchTab('donate'), which is the new-build appeal: four fixed
+ * tiers and an open amount, all one-off, all tagged client_reference_id=
+ * newbuild. So a button reading "Give this Jumuʿah" offered a single gift to
+ * a building fund, and the masjid's weekly Jumuʿah giving — the thing the
+ * card is actually for — was three taps away behind the More menu.
+ *
+ * Now it opens the giving sheet with Friday Pay already chosen: a weekly
+ * subscription anchored to the next Friday, set up by the Worker rather than
+ * a Payment Link. See gvFriday() and worker/src/friday.js.
+ *
+ * THE FUND CHANGES AS A RESULT, and that is the masjid's decision, not a
+ * side effect to hide: Friday Pay takes general, sadaqah or lillah — FUNDS in
+ * worker/src/friday.js — and has no newbuild designation, so a gift started
+ * here lands on the general fund unless the donor picks another. The donor
+ * can still reach the new-build appeal from its own tab.
+ *
+ * It lands on the "Give online" card rather than the top of the sheet. The
+ * two screens above it explain where giving goes, which is worth reading but
+ * is not what somebody who has just pressed "Give this Jumuʿah" is after. */
 function initFridayCall(){
   document.getElementById('jc-btn').addEventListener('click',()=>{
-    switchTab('donate');
+    GV.freq = "friday";
+    openGiving();                      /* calls gvRender(), so the choice shows */
+    /* After openGiving(), which sets the body's scrollTop to 0 itself. */
+    const card = document.getElementById('gv-online');
+    if(card) card.scrollIntoView({ block:"start", behavior:"instant" });
   });
 }
 

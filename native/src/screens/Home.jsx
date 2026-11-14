@@ -300,7 +300,16 @@ export default function Home({ navigation }) {
               {t("app.the_best_day_on_which", "“The best day on which the sun has risen is Friday.”")}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)" }}>
               {t("app.sahih_muslim_854", "Ṣaḥīḥ Muslim 854")}</Text>
-            <Pressable onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+            {/* FRIDAY PAY, NOT THE NEW BUILD. This used to push NewBuild — the
+                appeal's four fixed tiers, all one-off — under a button that
+                reads "Give this Jumuʿah". Friday Pay is the weekly Jumuʿah
+                gift, anchored to the next Friday by the Worker, and it is
+                what the card is for. The fund changes with it: Friday Pay
+                takes general, sadaqah or lillah and has no newbuild
+                designation, so this lands on the general fund unless the
+                donor picks another. The new-build appeal keeps its own row
+                in Donate and its button in About. */}
+            <Pressable onPress={() => { tap(); navigation.navigate("Giving", { freq: "friday" }); }}
               accessibilityRole="button"
               style={({ pressed }) => ({ marginTop: 8, borderRadius: R.pill, backgroundColor: C.goldBright,
                                          paddingHorizontal: 20, paddingVertical: 11,
@@ -309,7 +318,7 @@ export default function Home({ navigation }) {
                 {t("app.give_this_jumu_ah", "Give this Jumuʿah")}</Text>
             </Pressable>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: "rgba(243,239,227,.66)", marginTop: 2 }}>
-              {t("app.support_the_new_taiyabah_masjid", "Support the new Taiyabah Masjid")}</Text>
+              {t("app.a_weekly_gift_taken_every", "A weekly gift, taken every Jumuʿah")}</Text>
           </View>)}
         </View>
       </LinearGradient>

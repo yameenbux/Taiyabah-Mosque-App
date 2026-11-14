@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "575d41240aab",
+ "version": "e4cb2c2ea606",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -42,7 +42,7 @@ window.LANG_PACK = {
   "app.the_best_day_on_which": "”بہترین دن جس میں سورج طلوع ہوا وہ جمعہ کا دن ہے۔“",
   "app.sahih_muslim_854": "صحیح مسلم 854",
   "app.give_this_jumu_ah": "اس جمعہ عطیہ دیں",
-  "app.support_the_new_taiyabah_masjid": "نئی طیبہ مسجد کے لیے تعاون کریں",
+  "app.a_weekly_gift_taken_every": "ایک ہفتہ وار عطیہ، ہر جمعہ کو لیا جائے گا",
   "app.today": "آج",
   "app.next_jumu_ah": "اگلا جمعہ",
   "app.full_month": "پورا مہینہ",
