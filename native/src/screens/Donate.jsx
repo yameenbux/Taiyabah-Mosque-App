@@ -182,7 +182,10 @@ function CopyAll() {
 
 /* ---------- ṣadaqah & lillāh --------------------------------------------- */
 
-const LINKS = {
+/* EXPORTED because the home screen's appeal card offers three of these same
+ * one-off amounts, tagged for the new build. One table, so a link cannot be
+ * corrected here and left stale there. */
+export const LINKS = {
   once: { 5: "https://donate.stripe.com/3cI6oH8ry5XO2x84l0f3a09", 10: "https://donate.stripe.com/cNi7sL7nu71S8Vw3gWf3a0a",
           25: "https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b", 50: "https://donate.stripe.com/eVq3cvfU03PG8VwdVAf3a0c",
           100: "https://donate.stripe.com/28EcN5cHOcmc7Rs4l0f3a0d", other: "https://donate.stripe.com/6oU00j7nueuk2x8bNsf3a0o" },

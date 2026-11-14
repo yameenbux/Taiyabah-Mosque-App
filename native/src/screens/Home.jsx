@@ -1,8 +1,9 @@
 /* The home screen, laid out the way the web app lays it out.
  *
  * Same order, same groupings, same words, same twelve tiles in the same
- * sequence: salām, the date, the next jamāʿah, the Friday call, Today, the
- * reminder, Listen, Services, the footer. Somebody who has used the web app
+ * sequence: salām, the date, the next jamāʿah, the Friday call, Today,
+ * Listen, the new build appeal, Services, the footer. Somebody who has used
+ * the web app
  * for a year should find everything where they left it — the only differences
  * should be the ones native makes better.
  */
@@ -16,10 +17,10 @@ import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { PrayerIcon } from "../prayer-icons";
+import { LINKS as GIVING_LINKS } from "./Donate";
 import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, nameFor, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
-import { current as currentReminders, setReminderTranslator } from "../reminder";
 
 /* Ramadan, counted down on the home screen for the month before it.
  *
@@ -64,6 +65,32 @@ const TILES = [
   { href: "https://chat.whatsapp.com/GUU82kvhjNmCXNksk5iRwm", k: "tiles.join_whatsapp", t: "Join WhatsApp", icon: "whatsapp" },
 ];
 
+/* The three amount pills on the home-screen appeal card.
+ *
+ * EACH PILL IS A CHECKOUT PAGE. The masjid asked for a journey of tap, pay,
+ * receipt, so a pill opens Stripe's hosted checkout directly and no screen of
+ * ours sits in between. Only the headline and the gold disc go to the appeal,
+ * for somebody who wants to give more or to pay by bank transfer.
+ *
+ * THE LINKS ARE THE EVERYDAY GIVING ONES, tagged for the new build — the same
+ * GIVING_LINKS.once the Sadaqah & Lillah screen opens, imported rather than
+ * copied. The fund rides on client_reference_id rather than each fund having
+ * links of its own, which is how the rest of the app already works: tagged
+ * newbuild a £5 gift lands on the appeal, tagged general it lands on the
+ * general fund, and untagged the webhook cannot account for it at all.
+ *
+ * SO THE AMOUNTS ARE THE LADDER THOSE LINKS OFFER: 5, 10, 25, 50, 100. The
+ * masjid asked for £5, £10 and £20; £20 has no link, so this is £5, £10 and
+ * £25 until one exists. Never point a £20 pill at the £25 link — the donor
+ * would be charged £25, which is the mistake that costs a donor rather than
+ * a pound. A new link goes in Donate.jsx's LINKS and in index.html, and the
+ * amount below. */
+const NB_TIERS = ["5", "10", "25"].map(k => ({
+  amt: `\u00a3${k}`,
+  a11y: `a11y.donate_${k}_to_the_new_build`,
+  href: `${GIVING_LINKS.once[k]}?client_reference_id=newbuild`,
+}));
+
 /* The web app draws its own tile glyphs rather than using an icon set, and they
  * are part of how it looks — a prayer-bead tasbīḥ, two rings, a collection tin.
  * They are redrawn here from the same paths rather than swapped for the nearest
@@ -104,7 +131,6 @@ export default function Home({ navigation }) {
   const bar = useTopBar();
   const { t, fs, rtl } = useApp();
   const [now, setNow] = useState(nowLondon());
-  const [rmIdx, setRmIdx] = useState(0);
 
   /* Tick on the half minute: the only thing that changes is the countdown, and
    * a per-second timer is a battery cost for nothing. */
@@ -112,11 +138,6 @@ export default function Home({ navigation }) {
     const id = setInterval(() => setNow(nowLondon()), 30000);
     return () => clearInterval(id);
   }, []);
-  /* Set before the reminders are read, not in an effect afterwards: the first
-   * render is the one people see, and an effect would leave the suhūr time in
-   * 24-hour on it. */
-  setReminderTranslator(t, pretty);
-
   const ramadan = ramadanIn(now);
 
   /* Re-read when a downloaded year lands. */
@@ -129,10 +150,6 @@ export default function Home({ navigation }) {
   /* The rule itself lives in prayer.js, because the Dynamic Island has to say
      the same word as this screen does. */
   const friJum = isJumuah(next, now);
-
-  const { list: reminders } = currentReminders(now);
-  const rm = reminders.length ? reminders[rmIdx % reminders.length] : null;
-  const rmCtx = currentReminders(now).c;
 
   const gap = (() => {
     if (!next || next.tomorrow) return 0;
@@ -357,6 +374,24 @@ export default function Home({ navigation }) {
             })}
           </View>)}
 
+        {/* SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
+            no jamāʿah, so a sixth column would promise a beginning and a
+            jamāʿah and leave the second half empty. What a reader wants from
+            sunrise is when Fajr stops, and that is a sentence rather than a
+            column. Drawn from the same `day` the strip was, so the two cannot
+            disagree about which day they are showing. */}
+        {!!day && !!day.begins.sunrise && (
+          <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                         justifyContent: "center", gap: 7, marginTop: 9,
+                         paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10,
+                         backgroundColor: C.tintGold, borderWidth: 1, borderColor: "rgba(198,162,76,.28)" }}>
+            <PrayerIcon k="sunrise" size={14} color={C.gold} />
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.ink }}>
+              {t("prayer.sunrise", "Sunrise")} {pretty(day.begins.sunrise).replace(/ (am|pm)$/, "")}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted }}>
+              — {t("home.fajr_ends", "Fajr ends")}</Text>
+          </View>)}
+
         {/* WHEN THERE ARE NO TIMES FOR TODAY, SAY SO. The timetable runs a
             year at a time, and on the first morning of a year the masjid has
             not published yet this card simply was not drawn — the prayer
@@ -387,55 +422,28 @@ export default function Home({ navigation }) {
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={14} color={C.brand600} />
         </Press>
 
-        {/* ---- the reminder --------------------------------------------- */}
-        {!!rm && (
-          <View style={{ backgroundColor: "rgba(198,162,76,.11)", borderWidth: 1,
-                         borderColor: "rgba(198,162,76,.3)", borderRadius: R.card, padding: 15, marginTop: 6 }}>
-            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10 }}>
-              <Svg width={20} height={20} viewBox="0 0 100 100">
-                <Polygon fill={C.gold} points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26" />
-                <Polygon fill={C.gold} opacity={0.55} points="50,6 94,50 50,94 6,50" />
-              </Svg>
-              <Text style={{ flex: 1, fontFamily: F.arabic, fontSize: fs(18), lineHeight: fs(32),
-                             color: dual("#8A6A18", C.goldInk), textAlign: rtl ? "left" : "right",
-                             writingDirection: "rtl" }}>{rm.ar}</Text>
-            </View>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: dual("#6B5410", C.goldInk), marginTop: 8,
-                           textAlign: rtl ? "right" : "left" }}>
-              {t(`reminder.${rm.id}.t`, rm.t)}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: dual("#7A6838", C.goldInk),
-                           marginTop: 3, textAlign: rtl ? "right" : "left" }}>
-              {typeof rm.d === "function" ? rm.d(rmCtx) : t(`reminder.${rm.id}.d`, rm.d)}</Text>
-            {reminders.length > 1 && (
-              <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                             justifyContent: "space-between", marginTop: 11 }}>
-                <View style={{ flexDirection: "row", gap: 5 }}>
-                  {reminders.map((_, i) => (
-                    <View key={i} style={{ width: 6, height: 6, borderRadius: 3,
-                                           backgroundColor: i === rmIdx % reminders.length
-                                             ? C.goldInk : "rgba(122,104,56,.3)" }} />))}
-                </View>
-                <View style={{ flexDirection: "row", gap: 7 }}>
-                  {[["chevron-back", -1], ["chevron-forward", 1]].map(([icon, step]) => (
-                    <Press key={icon}
-                      accessibilityRole="button"
-                      accessibilityLabel={step < 0 ? t("a11y.previous_reminder", "Previous reminder")
-                                                   : t("a11y.next_reminder", "Next reminder")}
-                      onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
-                      /* Drawn 30x26 because the website draws it 30x26; hit as
-                         44x44, which is what a finger actually needs. */
-                      hitSlop={{ top: 9, bottom: 9, left: 7, right: 7 }}
-                      style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
-                               justifyContent: "center", borderWidth: 1,
-                               borderColor: "rgba(198,162,76,.45)" }}>
-                      <Ionicons name={icon} size={15} color={C.goldInk} />
-                    </Press>))}
-                </View>
-              </View>)}
-          </View>)}
+        {/* ---- Listen, and the appeal under it ---------------------------
+            NO HEADING OVER THESE TWO, A RULE INSTEAD. "Listen" laboured a
+            single banner whose own first line reads LISTEN LIVE, so it spent
+            a line of the home screen repeating the button beneath it; and
+            with the appeal beside it, one heading would have to cover both a
+            radio stream and a building fund, which is vaguer than no heading
+            at all. So the pair gets the heading's hairline without the
+            heading's word, and the Services heading's own rule closes the
+            group underneath.
 
-        {/* ---- Listen ---------------------------------------------------- */}
-        <SecH t={t} fs={fs} rtl={rtl} title={t("home.listen", "Listen")} />
+            The same hairline SecH draws (1px of C.line), inset the same 4, so
+            the breaker and the heading read as one device.
+
+            EQUAL AIR EITHER SIDE, 12 and 12. It first took SecH's own rhythm,
+            which put 26 above the rule and 12 under it, and that reads as a
+            hole above the line rather than as a divider between two things. A
+            rule is not a heading: a heading is a thing with space around it, a
+            rule IS the space, so it wants the same gap on both sides. The
+            website measures the same 12 and 12 — index.html's .brk, where the
+            wrap carries .tight to give up the padding this margin cannot. */}
+        <View style={{ height: 1, backgroundColor: C.line,
+                       marginTop: 12, marginBottom: 12, marginHorizontal: 4 }} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
           accessibilityRole="button"
           style={{ borderRadius: R.card, overflow: "hidden" }}>
@@ -470,6 +478,80 @@ export default function Home({ navigation }) {
           </LinearGradient>
         </Press>
 
+        {/* ---- the new build appeal --------------------------------------
+            The masjid asked for a donate call on the home screen and picked
+            this out of six. The twin of index.html's .nbcta — read that
+            stylesheet comment before changing either, because they are meant
+            to stay the same card.
+
+            THE GRADIENT IS HARDCODED rather than themed: a donate call that
+            goes pale in dark mode stops being a donate call. The gold star
+            and the disc do follow the theme, exactly as the website's do.
+
+            THE THREE AMOUNTS ARE THE THREE STRIPE LINKS THE MASJID HAS —
+            Bronze, Silver and Gold on the appeal screen, the same Payment
+            Links with the same client_reference_id=newbuild, without which
+            the webhook cannot account for the money. There is no £25 or £50
+            pill because no such link exists, and a pill reading £50 that
+            opened a £250 checkout would be a lie. When the masjid creates
+            smaller tiers they go here and in index.html, nowhere else. */}
+        <View style={{ marginTop: 10, borderRadius: 16, overflow: "hidden" }}>
+          <LinearGradient colors={["#2A0C1E", "#3C0B2A", "#1B0613"]} locations={[0, 0.58, 1]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={{ paddingHorizontal: 14, paddingVertical: 13 }}>
+            {/* the same sixteen-point girih the footer and the appeal use,
+                bled off the top-right corner at a tenth of its opacity */}
+            <View style={{ position: "absolute", right: -34, top: -40, width: 140, height: 140,
+                           opacity: 0.1 }} pointerEvents="none">
+              <Svg width={140} height={140} viewBox="0 0 100 100">
+                <Polygon fill={C.gold} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
+              </Svg>
+            </View>
+
+            {/* The headline is tappable as well as the disc. It is the biggest
+                thing on the card and tapping it to no effect would read as
+                broken. */}
+            <Press onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+              accessibilityRole="button"
+              style={{ alignSelf: "stretch" }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(9.5), letterSpacing: 1.3,
+                             textTransform: "uppercase", color: "#E8CC80",
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("home.the_new_masjid_phase", "The new masjid · Phase 3.3")}</Text>
+              <Text style={{ fontFamily: F.display, fontSize: fs(17), lineHeight: fs(21),
+                             color: "#F3EFE3", marginTop: 4,
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("home.build_a_house_in_paradise", "Build a house in Paradise")}</Text>
+            </Press>
+
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                           gap: 7, marginTop: 11 }}>
+              {NB_TIERS.map(x => (
+                <Press key={x.amt} onPress={() => { tap(); open(x.href); }}
+                  /* "link" rather than "button": this leaves the app for
+                     Stripe's own checkout, and a screen reader says so. */
+                  accessibilityRole="link"
+                  accessibilityLabel={t(x.a11y, `Donate ${x.amt} to the new build`)}
+                  style={{ flex: 1, minWidth: 0, paddingVertical: 9, paddingHorizontal: 2,
+                           borderRadius: 10, borderWidth: 1, borderColor: "rgba(220,187,99,.5)",
+                           backgroundColor: "rgba(220,187,99,.1)" }}>
+                  <Text numberOfLines={1} style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
+                                                   color: "#E8CC80", textAlign: "center" }}>
+                    {x.amt}</Text>
+                </Press>))}
+              <Press onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+                accessibilityRole="button"
+                accessibilityLabel={t("a11y.give_another_amount", "Give another amount")}
+                style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
+                <LinearGradient colors={["#E8CC80", C.gold]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                  <Ionicons name={rtl ? "arrow-back" : "arrow-forward"} size={18} color="#3C0B2A" />
+                </LinearGradient>
+              </Press>
+            </View>
+          </LinearGradient>
+        </View>
+
         {/* ---- Services -------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.services", "Services")} />
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -495,7 +577,9 @@ export default function Home({ navigation }) {
             </Pressable>))}
         </View>
 
-        <PageFoot />
+        {/* No credit: the home screen closes on the masjid. "Powered by
+            MasjidOne" moved to the footer of More. */}
+        <PageFoot credit={false} />
 
       </View>
     </Screen>

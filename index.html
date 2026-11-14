@@ -417,28 +417,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .jc-btn:active{transform:translateY(1px)}
   .jc-note{font-size:calc(11px * var(--ts));letter-spacing:.06em;color:#BBA9B4;margin-top:8px}
 
-  /* ---- reminder ribbon ---- */
-  .remind{margin:14px 16px 0;padding:13px 14px;border-radius:15px;
-    background:linear-gradient(180deg,var(--tint-gold),var(--tint-gold-4));border:1px solid var(--tint-gold-line-2);
-    box-shadow:0 1px 2px rgba(60,11,42,.05)}
-  .rm-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}
-  .rm-mark{flex:0 0 auto;width:24px;height:24px;color:var(--gold)}
-  .rm-mark svg{width:100%;height:100%;display:block}
-  .rm-ar{flex:1;min-width:0;font-size:calc(19px * var(--ts));color:var(--ink-gold);line-height:1.7;
-    direction:rtl;text-align:right}
-  .rm-t{font-size:calc(14px * var(--ts));font-weight:700;color:var(--ink-gold-2);line-height:1.3}
-  .rm-d{font-size:calc(12.5px * var(--ts));color:var(--ink-gold-3);line-height:1.5;margin-top:2px}
-  .rm-nav{display:flex;align-items:center;justify-content:space-between;
-    margin-top:11px;padding-top:10px;border-top:1px solid rgba(198,162,76,.28)}
-  .rm-dots{display:flex;gap:5px;align-items:center}
-  .rm-dots i{width:6px;height:6px;border-radius:50%;background:var(--tint-gold-line);display:block}
-  .rm-dots i[data-on="1"]{background:var(--gold);transform:scale(1.15)}
-  .rm-arrows{display:flex;gap:7px}
-  .rm-a{width:32px;height:32px;border-radius:9px;cursor:pointer;font:inherit;font-size:calc(18px * var(--ts));
-    line-height:1;color:var(--ink-gold);background:rgba(198,162,76,.14);
-    border:1px solid rgba(198,162,76,.4);display:grid;place-items:center;padding:0}
-  .rm-a:active{background:rgba(198,162,76,.3)}
-  .rm-a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
   /* ---- full-screen sheets (month view, about) ---- */
   .sheet{position:fixed;inset:0;z-index:50;display:none}
@@ -1789,12 +1767,39 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .pcol .p-b{font-size:calc(13.5px * var(--ts));font-weight:700;color:var(--ink);white-space:nowrap}
   .pcol .p-j{font-size:calc(11px * var(--ts));color:var(--brand-600);font-weight:600;white-space:nowrap;
     background:rgba(119,33,87,.09);border-radius:6px;padding:2px 6px;margin-top:2px}
+  .sunline{display:flex;align-items:center;justify-content:center;gap:7px;
+    margin:9px 0 0;padding:7px 10px;border-radius:10px;
+    background:var(--tint-gold);border:1px solid var(--tint-gold-line)}
+  .sunline svg{width:14px;height:14px;color:var(--gold);flex:0 0 auto}
+  .sunline .sl-t{font-size:calc(12px * var(--ts));color:var(--ink);font-weight:600}
+  .sunline .sl-s{font-size:calc(12px * var(--ts));color:var(--muted)}
   .striplink{display:flex;justify-content:flex-end;margin-top:8px}
   .striplink button{font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;color:var(--brand-600);
     background:none;border:0;cursor:pointer;padding:2px 2px;
     /* 11.5px text in a padding:2px box is a 21px tap target. The width is
        already generous; only the height needed raising to clear 24. */
     min-height:24px;display:inline-flex;align-items:center}
+
+  /* ---- home: a section breaker ----
+     A hairline across the page where a heading would otherwise go. The
+     Listen banner and the new build appeal are a pair with nothing to call
+     them — one heading would have to cover both a radio stream and a
+     building fund — so the rule does the dividing that the word used to.
+
+     It is the SAME hairline .sec-h draws beside a heading (1px of --line),
+     inset the same 4px, so the breaker and the "Services" heading under it
+     read as the same device rather than two different ideas about where a
+     section starts.
+
+     EQUAL AIR EITHER SIDE, 12 and 12. It first took .sec-h's own 6-above
+     rhythm, which lands on 26 once the wrap's 20px of padding is counted,
+     and 26 above a rule with 12 under it reads as a hole above the line
+     rather than as a divider between two things. A rule is not a heading:
+     a heading is a thing with space around it, a rule IS the space, so it
+     wants the same gap on both sides. The wrap carries .tight to make room
+     for that without resorting to a negative margin. */
+  .wrap.tight{padding-top:12px}
+  .brk{height:1px;background:var(--line);margin:0 4px 12px;border:0}
 
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
@@ -1811,6 +1816,83 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .lbanner .wave{position:absolute;right:52px;bottom:0;display:flex;align-items:flex-end;gap:2.5px;
     height:26px;opacity:.4;pointer-events:none}
   .lbanner .wave i{width:2.5px;background:var(--gold-bright);border-radius:2px;display:block}
+
+  /* ---- home: the new build appeal ----
+     The masjid asked for a donate call on the home screen, pointing at the new
+     build. This is the one they picked out of six: a dark plum slab the same
+     width as the Listen banner above it, three amount pills, and a gold disc
+     that opens the full appeal.
+
+     THE GRADIENT IS HARDCODED, not themed. A donate call that goes pale in
+     dark mode stops being a donate call, and the gold against plum is the
+     whole reason it carries on both pages. Everything else on this screen is
+     themed; this is the deliberate exception.
+
+     SMALL AMOUNTS, AND EACH PILL IS A CHECKOUT PAGE. The masjid asked for a
+     journey of tap, pay, receipt: so a pill is an ordinary link straight to
+     Stripe's hosted checkout, never a route into the appeal screen. Only the
+     headline and the gold disc open the appeal, which is where somebody who
+     wants to give more — or by bank transfer — goes.
+
+     THE LINKS ARE THE EVERYDAY GIVING ONES, tagged for the new build. They
+     are GIVING_LINKS.once in this file, the same links the giving sheet
+     opens, and the fund rides on client_reference_id rather than each fund
+     having a link of its own — which is how the whole app already works (see
+     gvRender). Tagged newbuild, a £5 gift lands on the appeal; tagged
+     general it would land on the general fund. Without the tag the webhook
+     cannot account for the money at all.
+
+     WHAT THE DONOR THEN READS. These links' Stripe pages say "Donation - One
+     Off — A gift to Taiyabah Masjid, Bolton. Registered charity 1041569."
+     The appeal's own four tiers say "New Build Appeal" on theirs. The money
+     lands on the appeal either way, because client_reference_id is what the
+     webhook books it against — but somebody who taps £5 under a banner
+     reading "Build a house in Paradise" is not told on the card page that
+     that is where it is going. Three small New Build Appeal links would fix
+     that and give £20 at the same time; they are the masjid's to create.
+
+     SO THE AMOUNTS ARE LIMITED TO THE LADDER THOSE LINKS OFFER: 5, 10, 25, 50
+     and 100. The masjid asked for £5, £10 and £20 — £20 has no link, so this
+     is £5, £10 and £25 until one exists. Do not point a £20 pill at the £25
+     link: the donor would be charged £25, which is the one mistake that
+     costs the masjid a donor rather than a pound. If a £20 Payment Link is
+     created, it goes in GIVING_LINKS.once and then here and in the app's
+     Home.jsx, and nowhere else.
+
+     NO HEADING ABOVE THIS PAIR, and that is a decision rather than an
+     oversight. The Listen heading came off because it labelled one obvious
+     button; a heading wide enough to cover both the stream and an appeal
+     would be vaguer than none at all. The 26px above the Listen banner is
+     what separates the pair from the prayer times. */
+  .nbcta{position:relative;overflow:hidden;margin-top:10px;padding:13px 14px;border-radius:16px;
+    background:linear-gradient(135deg,#2A0C1E 0%,#3C0B2A 58%,#1B0613 100%);
+    box-shadow:var(--shadow)}
+  .nbcta .nb-star{position:absolute;right:-34px;top:-40px;width:140px;height:140px;
+    color:var(--gold);opacity:.1;pointer-events:none}
+  .nbcta .nb-star svg{width:100%;height:100%;display:block}
+  /* The headline is tappable as well as the disc: it is the biggest thing on
+     the card and tapping it and getting nothing would read as broken. It is a
+     button rather than the whole card being one, because the card holds three
+     links and a button already and nesting those inside another button is not
+     valid HTML. */
+  .nb-top{display:block;width:100%;padding:0;border:0;background:none;font:inherit;
+    text-align:left;cursor:pointer;position:relative}
+  .nb-k{display:block;font-size:calc(9.5px * var(--ts));letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;color:#E8CC80}
+  .nb-h{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
+    font-weight:600;color:#F3EFE3;line-height:1.2;letter-spacing:-.2px;margin-top:4px}
+  .nb-row{display:flex;align-items:center;gap:7px;margin-top:11px;position:relative}
+  .nb-amt{flex:1;min-width:0;padding:9px 2px;border-radius:10px;
+    border:1px solid rgba(220,187,99,.5);background:rgba(220,187,99,.1);color:#E8CC80;
+    font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;text-align:center;
+    white-space:nowrap;text-decoration:none;cursor:pointer}
+  .nb-amt:active{background:rgba(220,187,99,.24)}
+  .nb-go{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    border:0;cursor:pointer;color:#3C0B2A;
+    background:linear-gradient(145deg,#E8CC80,var(--gold));
+    box-shadow:0 6px 16px -7px rgba(198,162,76,.85)}
+  .nb-go svg{width:18px;height:18px}
+  .nb-go:active{transform:scale(.95)}
 
   /* ---- home: the services grid ----
      Nine destinations that used to be reachable only from the menu. The label
@@ -2169,6 +2251,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .dr-social a:active{background:var(--tint-plum-press)}
   .dr-social svg{width:21px;height:21px;display:block}
   .dr-foot{font-size:calc(11px * var(--ts));color:var(--muted);text-align:center;line-height:1.7;margin:16px 6px 0}
+  /* The credit moved here from the home footer and brought no styling with
+     it, so it drew as a default browser link — blue and underlined — in the
+     middle of a grey line. Same treatment as it had below: muted, with a
+     hairline rule rather than an underline. */
+  .dr-foot a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(124,110,119,.3)}
 
   /* ---- bottom tab bar ---- */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:520px;margin-inline:auto;
@@ -2358,22 +2445,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     background:transparent;color:#fff;white-space:nowrap}
   .mu-bmrow{margin:10px 0 0;padding:9px 8px 6px;border-radius:11px;
     background:var(--paper);border:1px solid var(--line)}
-  /* however many are saved, the panel stays a panel and the list scrolls */
-  #mu-bm-list{max-height:196px;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .mu-bm-h{font-size:calc(10px * var(--ts));letter-spacing:.06em;text-transform:uppercase;
     color:var(--muted);font-weight:600;margin:0 4px 6px}
-  .mu-bm-item{display:flex;align-items:center;gap:6px}
-  .mu-bm-item + .mu-bm-item{margin-top:4px}
-  .mu-bm-go{flex:1;min-width:0;text-align:left;font:inherit;
-    font-size:calc(12.5px * var(--ts));font-weight:600;cursor:pointer;
-    padding:7px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* the page you are already on is marked, so the list says where you are */
-  .mu-bm-item.is-here .mu-bm-go{border-color:var(--plum-fill);color:var(--brand-600)}
-  .mu-bm-x{flex:0 0 auto;font:inherit;font-size:calc(15px * var(--ts));line-height:1;
-    cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--muted)}
+  /* HOWEVER MANY ARE KEPT, THIS IS ONE LINE. It was a row per favourite in a
+     196px scroller, which at ten sūrahs was most of the panel and pushed the
+     muṣḥaf down behind it. A select holds any number in the height of one. */
+  .mu-fav-pick{width:100%;min-width:0;font:inherit;font-size:calc(12.5px * var(--ts));
+    font-weight:600;color:var(--ink);margin:0 0 7px;padding:7px 8px;border-radius:9px;
+    border:1px solid var(--line);background:var(--card)}
   /* The jump controls and saved pages used to sit in the flow, so opening them
      pushed the mushaf down the screen — and the more pages someone saved, the
      further it went. They hang off the bar now and float over the page, which
@@ -2448,16 +2527,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     color:var(--muted);font-weight:600;margin:0 2px 8px}
   /* The screen is wide this way round, so they sit in columns and a dozen are
      in view at once without scrolling anything. */
-  .ml-fav-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
-  .ml-fav-item{display:flex;align-items:center;gap:4px;min-width:0}
-  .ml-fav-go{flex:1;min-width:0;text-align:left;font:inherit;font-size:calc(12px * var(--ts));
-    font-weight:600;cursor:pointer;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--paper);color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .ml-fav-item.is-here .ml-fav-go{border-color:var(--plum-fill);color:var(--brand-600)}
-  .ml-fav-x{flex:0 0 auto;font:inherit;font-size:calc(14px * var(--ts));line-height:1;cursor:pointer;
-    padding:6px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--muted)}
+
   .ml-fav-none{font-size:calc(12px * var(--ts));color:var(--muted);margin:2px}
   .ml-mark{width:100%;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;cursor:pointer;
     text-align:left;margin:0 0 10px;padding:8px 10px;border-radius:10px;
@@ -2905,30 +2975,24 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   <div class="wrap">
     <div class="sec-h"><h2 data-i18n="home.today">Today</h2><span class="rule"></span><span class="tag" data-i18n="home.beginning_jamaah">Beginning &amp; jam&#257;&#703;ah</span></div>
     <div class="card pstrip" id="pstrip"></div>
+    <!-- SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
+         no jamāʿah, so a sixth column would promise a beginning and a
+         jamāʿah and then leave the second half empty. What a reader wants
+         from sunrise is when Fajr stops, which is a sentence, not a column. -->
+    <p class="sunline" id="sunline" hidden></p>
     <div class="striplink"><button type="button" id="go-timetable" data-i18n="home.full_timetable">Full timetable &rsaquo;</button></div>
   </div>
 
-  <div class="remind" id="remind" hidden>
-    <div class="rm-head">
-      <span class="rm-mark" aria-hidden="true">
-        <svg viewBox="0 0 100 100"><polygon fill="currentColor" points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26"/><polygon fill="currentColor" points="50,6 94,50 50,94 6,50" opacity=".55"/></svg>
-      </span>
-      <span class="rm-ar arabic" id="rm-ar">&mdash;</span>
-    </div>
-    <div class="rm-t" id="rm-t">&mdash;</div>
-    <div class="rm-d" id="rm-d">&mdash;</div>
-    <div class="rm-nav" id="rm-nav">
-      <span class="rm-dots" id="rm-dots"></span>
-      <span class="rm-arrows">
-        <button class="rm-a" id="rm-prev" aria-label="Previous reminder" data-i18n-attr="aria-label:a11y.previous_reminder">&#8249;</button>
-        <button class="rm-a" id="rm-next" aria-label="Next reminder" data-i18n-attr="aria-label:a11y.next_reminder">&#8250;</button>
-      </span>
-    </div>
-  </div>
+  <div class="wrap tight">
 
-  <div class="wrap">
-
-    <div class="sec-h"><h2 data-i18n="home.listen">Listen</h2><span class="rule"></span></div>
+    <!-- NO HEADING OVER THESE TWO, A RULE INSTEAD. "Listen" laboured a single
+         banner whose own first line says LISTEN LIVE, so it spent a line of
+         the home screen repeating the button under it; and with the appeal
+         beside it, one heading would have to cover both a radio stream and a
+         building fund, which is vaguer than no heading at all. So the pair
+         gets the heading's hairline without the heading's word — see .brk.
+         The "Services" rule below closes the group. -->
+    <hr class="brk">
     <button class="lbanner" id="go-listen" type="button">
       <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg></span>
       <span class="lt"><span class="l1" data-i18n="home.listen_live">Listen live</span>
@@ -2936,6 +3000,43 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <span class="ch" aria-hidden="true">&rsaquo;</span>
       <span class="wave" aria-hidden="true"><i style="height:7px"></i><i style="height:13px"></i><i style="height:20px"></i><i style="height:11px"></i><i style="height:25px"></i><i style="height:16px"></i><i style="height:9px"></i><i style="height:22px"></i><i style="height:14px"></i><i style="height:6px"></i><i style="height:18px"></i><i style="height:11px"></i><i style="height:24px"></i><i style="height:8px"></i></span>
     </button>
+
+    <!-- ---- the new build appeal ----
+         Three pills that go STRAIGHT to Stripe's checkout — tap, pay, receipt,
+         with nothing of ours in between — and a disc for anyone who wants to
+         give more, which opens the appeal where the named tiers, the open
+         amount and the bank details are. The amounts are not decorative and
+         £20 is missing on purpose: see .nbcta in the stylesheet before
+         changing one. -->
+    <div class="nbcta">
+      <span class="nb-star"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg></span>
+      <button class="nb-top" type="button" id="nb-top">
+        <span class="nb-k" data-i18n="home.the_new_masjid_phase">The new masjid &middot; Phase 3.3</span>
+        <span class="nb-h" data-i18n="home.build_a_house_in_paradise">Build a house in Paradise</span>
+      </button>
+      <div class="nb-row">
+        <!-- GIVING_LINKS.once["5"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/3cI6oH8ry5XO2x84l0f3a09?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £5 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_5_to_the_new_build"><span data-i18n-num>&pound;5</span></a>
+        <!-- GIVING_LINKS.once["10"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/cNi7sL7nu71S8Vw3gWf3a0a?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £10 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_10_to_the_new_build"><span data-i18n-num>&pound;10</span></a>
+        <!-- GIVING_LINKS.once["25"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £25 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_25_to_the_new_build"><span data-i18n-num>&pound;25</span></a>
+        <button class="nb-go" type="button" id="nb-go" aria-label="Give another amount"
+          data-i18n-attr="aria-label:a11y.give_another_amount"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></svg></button>
+      </div>
+    </div>
 
     <div class="sec-h"><h2 data-i18n="home.services">Services</h2><span class="rule"></span></div>
     <div class="tgrid">
@@ -2957,7 +3058,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <footer>
       <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
       <div class="charity"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></div>
-      <div class="credit"><span data-i18n="sheet.app_built_by">Powered by</span> <a href="https://masjidone.co.uk" target="_blank" rel="noopener" data-i18n="sheet.masjidone">MasjidOne</a></div>
     </footer>
   </div>
   </main>
@@ -4775,10 +4875,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                   <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
               </div>
 
+              <!-- ONE DROPDOWN, NOT A LIST. A list grew a row per favourite and
+                   ten of them took most of the panel; this stays three lines
+                   whether somebody keeps one sūrah or fifty. -->
               <div class="mu-bmrow" id="mu-bmrow">
                 <div class="mu-bm-h" data-i18n="mushaf.favourites">Favourites</div>
+                <select class="mu-fav-pick" id="mu-fav-pick" hidden
+                        data-i18n-attr="aria-label:mushaf.go_to_a_favourite"
+                        aria-label="Go to a favourite"></select>
                 <button class="mu-fav-add" id="mu-fav-add"></button>
-                <div id="mu-bm-list"></div>
               </div>
             </div>
 
@@ -6675,8 +6780,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             </svg>
           </a>
         </div>
-        <p class="dr-foot"><span data-i18n="drawer.radio">Radio</span> <span data-i18n-latin>454.1000</span> <span data-i18n="drawer.mhz">MHz</span><br>
-          <span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        <!-- THE CREDIT LIVES HERE NOW, not under the home screen. It is the
+             masjid's app and the home screen should close on the masjid; the
+             platform it is built on belongs one level down, with the other
+             things a reader looks up rather than reads. The radio frequency
+             came off the same footer at the same time — it is still on the
+             About and Contact screens, which is where somebody goes looking
+             for it. -->
+        <p class="dr-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span><br>
+          <span data-i18n="sheet.app_built_by">Powered by</span> <a href="https://masjidone.co.uk" target="_blank" rel="noopener" data-i18n="sheet.masjidone">MasjidOne</a></p>
       </div>
     </aside>
   </div>
@@ -6708,8 +6820,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <button class="ml-mark" id="ml-mark" hidden></button>
       <div class="ml-fav-h" data-i18n="mushaf.favourites">Favourites</div>
       <button class="ml-fav-add" id="ml-fav-add"></button>
-      <div class="ml-fav-list" id="ml-fav-list"></div>
-      <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_favourites_yet" hidden>Nothing kept yet. The ribbon on the right keeps the page you are on.</p>
+      <select class="mu-fav-pick" id="ml-fav-pick" hidden
+              data-i18n-attr="aria-label:mushaf.go_to_a_favourite"
+              aria-label="Go to a favourite"></select>
+      <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_surahs_kept_yet" hidden>No s&#363;rahs kept yet. The button above keeps the s&#363;rah you are reading.</p>
     </div>
   </div>
 </div>
@@ -7435,8 +7549,6 @@ function render(){
   updateNavUI();
   renderRamadan();
   document.getElementById('jcall').hidden = VIEW.getDay()!==5;
-  RM_IDX=0;
-  renderReminder();
   if(sameDay(VIEW, today0())){ renderTodayHero(); tick(); }
   else { renderDayView(rec); markRows(rec, VIEW, null); }
   renderStrip();
@@ -8318,226 +8430,16 @@ function renderRamadanGuard(){
     : t("ramadan.on_the_sighting_of_the","On the sighting of the moon");
 }
 
-/* ---------------- reminders ----------------
-   Gentle, widely-observed practices — surfaced when they're relevant,
-   not on a random rotation. Wording is deliberately soft ("many read",
-   "a reminder"), and no rulings are given: this is a nudge, not a fatwa.
---------------------------------------------- */
-/* ---------------- Islamic calendar days ----------------
-   Seeded from the days Taiyabah's OWN printed timetable marks, so the
-   app follows the masjid rather than a generic calendar. Their 2026
-   timetable annotates: 27 Rajab (Shab-e-Miʿrāj), the night of 15 Shaʿbān,
-   1 Ramadan, 8–12 Dhul Hijjah (Hajj), 9 Dhul Hijjah (ʿArafah),
-   10 Dhul Hijjah (Eid al-Adha), 1 Muharram (Islamic New Year),
-   10 Muharram (ʿĀshūrāʾ) and 27 Safar (the Hijrah).
-
-   NOT included by default: 12 Rabiʿ al-Awwal. Deobandi and Barelvi
-   communities are both Hanafi and differ on observing it; Taiyabah's
-   own timetable does not mark it. Set MARK_MAWLID = true only if the
-   committee/imam asks for it.
--------------------------------------------------------- */
-const MARK_MAWLID = false;
-
-/* The suhūr sentence is appended to four different reminders, so it is one
-   string rather than four — and the time inside it goes through num() like
-   every other time the app shows. */
-const suhoorNote = c => c.suhoor
-  ? " " + t("reminder.suhoor_ends","Suhūr ends {time}.").replace("{time}", num(hm12(c.suhoor)))
-  : "";
-
-const hIs = (c, day, month) => c.hDay===day && new RegExp(month,"i").test(c.hMonth);
-const tIs = (c, day, month) => c.tDay===day && new RegExp(month,"i").test(c.tMonth);
-
-const CALENDAR_DAYS = [
-  /* --- nights: these begin at Maghrib the evening before --- */
-  { id:"meraj-eve", ar:"شَبِ مِعْرَاج", t:"Shab-e-Miʿrāj tonight",
-    d:"The night of 27 Rajab begins after Maghrib this evening.",
-    when:c => tIs(c,27,"Rajab") },
-  { id:"meraj", ar:"شَبِ مِعْرَاج", t:"Shab-e-Miʿrāj",
-    d:"27 Rajab — the Night Journey and Ascension.",
-    when:c => hIs(c,27,"Rajab") },
-  { id:"baraat-eve", ar:"شَبِ بَرَاءَت", t:"Shab-e-Barāʾat tonight",
-    d:"The night of 15 Shaʿbān begins after Maghrib this evening.",
-    when:c => tIs(c,15,"Sha") },
-  { id:"baraat", ar:"شَبِ بَرَاءَت", t:"Shab-e-Barāʾat",
-    d:"15 Shaʿbān — a night many spend in worship and duʿā.",
-    when:c => hIs(c,15,"Sha") },
-
-  /* --- Eid --- */
-  { id:"fitr-eve", ar:"عِيدُ الْفِطْر", t:"Eid al-Fitr tomorrow",
-    d:"Eid salah times are announced by the masjid. Fitrana should be given before the salah.",
-    when:c => tIs(c,1,"Shawwal") },
-  { id:"fitr", ar:"عِيدُ الْفِطْر", t:"Eid al-Fitr",
-    d:"Eid Mubarak. Eid salah times are announced by the masjid.",
-    when:c => hIs(c,1,"Shawwal") },
-  { id:"adha-eve", ar:"عِيدُ الْأَضْحَىٰ", t:"Eid al-Adha tomorrow",
-    d:"10 Dhul Hijjah falls tomorrow. Eid salah times are announced by the masjid.",
-    when:c => tIs(c,10,"Hijjah") },
-  { id:"adha", ar:"عِيدُ الْأَضْحَىٰ", t:"Eid al-Adha",
-    d:"Eid Mubarak. Qurbani follows the Eid salah.",
-    when:c => hIs(c,10,"Hijjah") },
-
-  /* --- Hajj season --- */
-  { id:"hajj", ar:"أَيَّامُ الْحَجّ", t:"The days of Hajj",
-    d:"8th to 12th Dhul Hijjah.",
-    when:c => /Hijjah/i.test(c.hMonth) && c.hDay>=8 && c.hDay<=12 },
-
-  /* --- Muharram --- */
-  { id:"newyear", ar:"رَأْسُ السَّنَةِ الْهِجْرِيَّة", t:"Islamic New Year",
-    d:"1 Muharram — the start of the Hijri year.",
-    when:c => hIs(c,1,"Muharram") },
-
-  /* --- Ramadan's final third --- */
-  { id:"lastten", ar:"الْعَشْرُ الْأَوَاخِر", t:"The last ten nights",
-    d:"Laylat al-Qadr is sought in the odd nights of the final ten.",
-    when:c => /Ramadan/i.test(c.hMonth) && c.hDay>=21 },
-
-  /* --- 27 Safar --- */
-  { id:"hijrah", ar:"الْهِجْرَة", t:"The Hijrah",
-    d:"27 Safar — the Prophet ﷺ set out for Madinah.",
-    when:c => hIs(c,27,"Safar") },
-
-  /* --- optional, off by default (see MARK_MAWLID above) --- */
-  { id:"mawlid", ar:"رَبِيعُ الْأَوَّل", t:"12 Rabiʿ al-Awwal",
-    d:"A date noted in the Islamic calendar.",
-    when:c => MARK_MAWLID && hIs(c,12,"Rabi al-Awwal") },
-];
-
-const REMINDERS = [
-  ...CALENDAR_DAYS,
-  /* --- heads-up for tomorrow: these need a decision tonight --- */
-  { id:"ramadan-eve", ar:"رَمَضَان", t:"Ramadan begins tomorrow",
-    d:c=>t("reminder.ramadan-eve.d","The first fast is tomorrow.") + suhoorNote(c)
-         + " " + t("reminder.ramadan-eve.d2","Taraweeh follows Isha jamāʿah."),
-    when:c => /Ramadan/i.test(c.tMonth) && c.tDay===1 },
-  { id:"arafah-eve", ar:"يَوْمُ عَرَفَة", t:"Day of ʿArafah is tomorrow",
-    d:c=>t("reminder.arafah-eve.d","The 9th of Dhul Hijjah falls tomorrow — a day of voluntary fasting.") + suhoorNote(c),
-    when:c => /Hijjah/i.test(c.tMonth) && c.tDay===9 },
-  { id:"ashura-eve", ar:"يَوْمُ عَاشُورَاء", t:"ʿĀshūrāʾ fasting tomorrow",
-    d:c=>t("reminder.ashura-eve.d","Many fast the 9th and 10th of Muharram.") + suhoorNote(c),
-    when:c => /Muharram/i.test(c.tMonth) && (c.tDay===9 || c.tDay===10) },
-  { id:"beed-eve", ar:"الْأَيَّامُ الْبِيض", t:"Optional fasting tomorrow",
-    d:c=>t("reminder.beed-eve.d","Tomorrow is one of the white days — the 13th, 14th and 15th of the Islamic month.") + suhoorNote(c),
-    when:c => [13,14,15].includes(c.tDay) },
-  { id:"monthu-eve", ar:"صِيَامُ الِاثْنَيْنِ وَالْخَمِيس", t:"Optional fasting tomorrow",
-    d:c=>t("reminder.monthu-eve.d","Tomorrow is {day} — a day many keep a voluntary fast.")
-         .replace("{day}", fullDow(c.tDow===1?1:4)) + suhoorNote(c),
-    when:c => c.tDow===1 || c.tDow===4 },
-
-  /* --- expiring soon --- */
-  { id:"jumuah-hour", ar:"سَاعَةُ الْإِجَابَة", t:"The last hour of Jumuʿah",
-    d:"The final part of Friday, before Maghrib, is sought for duʿā.",
-    when:c => c.dow===5 && c.live && c.afterAsr && c.beforeMaghrib },
-  { id:"morning", ar:"أَذْكَارُ الصَّبَاح", t:"Morning adhkār",
-    d:"The window after Fajr until sunrise.",
-    when:c => c.live && c.afterFajr && c.beforeSunrise },
-  { id:"evening", ar:"أَذْكَارُ الْمَسَاء", t:"Evening adhkār",
-    d:"From after Asr until Maghrib.",
-    when:c => c.live && c.afterAsr && c.beforeMaghrib },
-
-  /* --- today --- */
-  { id:"ramadan", ar:"رَمَضَان", t:"Ramadan",
-    d:"Suhūr ends 10 minutes before Fajr begins. Taraweeh follows Isha jamāʿah.",
-    when:c => /Ramadan/i.test(c.hMonth) },
-  { id:"arafah", ar:"يَوْمُ عَرَفَة", t:"Day of ʿArafah",
-    d:"The 9th of Dhul Hijjah.",
-    when:c => /Hijjah/i.test(c.hMonth) && c.hDay===9 },
-  { id:"ashura", ar:"يَوْمُ عَاشُورَاء", t:"Day of ʿĀshūrāʾ",
-    d:"The 10th of Muharram — a day of voluntary fasting.",
-    when:c => /Muharram/i.test(c.hMonth) && (c.hDay===9 || c.hDay===10) },
-  { id:"tenhijjah", ar:"عَشْرُ ذِي الْحِجَّة", t:"The first ten days of Dhul Hijjah",
-    d:"A time for extra dhikr, fasting and good deeds.",
-    when:c => /Hijjah/i.test(c.hMonth) && c.hDay<=9 },
-  { id:"beed", ar:"الْأَيَّامُ الْبِيض", t:"The white days",
-    d:"The 13th, 14th and 15th of the Islamic month — days of voluntary fasting.",
-    when:c => [13,14,15].includes(c.hDay) },
-  { id:"monthu", ar:"صِيَامُ الِاثْنَيْنِ وَالْخَمِيس", t:"Monday & Thursday fasting",
-    d:"A voluntary fast many keep through the year.",
-    when:c => c.dow===1 || c.dow===4 },
-
-  /* --- Friday, all day --- */
-  { id:"kahf", ar:"سُورَةُ الْكَهْف", t:"Sūrah al-Kahf",
-    d:"Many read it on Fridays — from Maghrib on Thursday through to Maghrib on Friday.",
-    when:c => c.dow===5 },
-  { id:"salawat", ar:"اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّد", t:"Salawāt upon the Prophet ﷺ",
-    d:"Fridays are a time to send salawāt often.",
-    when:c => c.dow===5 },
-
-  /* --- evergreen --- */
-  { id:"kursi", ar:"آيَةُ الْكُرْسِيّ", t:"Āyat al-Kursī",
-    d:"Recited after each fard salah.",
-    when:c => true },
-  { id:"iqamah", ar:"الدُّعَاءُ بَيْنَ الْأَذَانِ وَالْإِقَامَة", t:"Duʿā before jamāʿah",
-    d:"The time between the adhān and the iqāmah is a time for duʿā.",
-    when:c => true },
-];
-
-let RM_LIST=[], RM_IDX=0;
-
+/* ---------------- small helpers ----------------
+   minusMins used to live under the home reminder ribbon, which has gone. It
+   stayed because the Ramadan screen works sehri back from Fajr with it. */
 function minusMins(hhmm, n){
   const [h,m]=hhmm.split(":").map(Number);
   let v=h*60+m-n; if(v<0) v+=1440;
   return `${String(Math.floor(v/60)).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
 }
 
-function reminderCtx(){
-  const rec=STATE.rec, d=VIEW, now=new Date();   // instants, not wall clock
-  const live=sameDay(d, today0());
-  const hm=(rec.hijri||"").match(/^(\d+)\s+(.+?)\s+\d+/);
-  const c={ dow:d.getDay(), live,
-            hDay: hm?parseInt(hm[1],10):0, hMonth: hm?hm[2]:"" };
-
-  // tomorrow — used for day-before fasting notices
-  const tmr=addDays(d,1), tRec=dayRec(tmr);
-  if(tRec){
-    const thm=(tRec.hijri||"").match(/^(\d+)\s+(.+?)\s+\d+/);
-    c.tDow=tmr.getDay();
-    c.tDay=thm?parseInt(thm[1],10):0;
-    c.tMonth=thm?thm[2]:"";
-    c.suhoor = tRec.begins.fajr ? minusMins(tRec.begins.fajr, 10) : null;
-  }else{
-    c.tDow=-1; c.tDay=0; c.tMonth="";
-  }
-
-  if(live){
-    const at=t=>atToday(d,t);
-    c.afterFajr     = now >= at(rec.begins.fajr);
-    c.beforeSunrise = now <  at(rec.begins.sunrise);
-    c.afterAsr      = now >= at(rec.begins.asr);
-    c.beforeMaghrib = now <  at(rec.begins.maghrib);
-  }
-  return c;
-}
-
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-
-function renderReminder(){
-  const el=document.getElementById('remind');
-  if(!STATE || !STATE.rec){ el.hidden=true; return; }
-  const c=reminderCtx();
-  RM_LIST=REMINDERS.filter(r=>{ try{ return r.when(c); }catch(e){ return false; } });
-  if(!RM_LIST.length){ el.hidden=true; return; }
-  if(RM_IDX>=RM_LIST.length) RM_IDX=0;
-  const r=RM_LIST[RM_IDX];
-  el.hidden=false;
-  document.getElementById('rm-ar').textContent=r.ar;
-  document.getElementById('rm-t').textContent=t("reminder."+r.id+".t", r.t);
-  document.getElementById('rm-d').textContent =
-    typeof r.d==="function" ? r.d(c) : t("reminder."+r.id+".d", r.d);
-  // nav only when there's more than one
-  const nav=document.getElementById('rm-nav');
-  nav.hidden = RM_LIST.length<2;
-  if(RM_LIST.length>1){
-    document.getElementById('rm-dots').innerHTML =
-      RM_LIST.map((_,i)=>`<i data-on="${i===RM_IDX?1:0}"></i>`).join("");
-  }
-}
-
-function rmStep(n){
-  if(RM_LIST.length<2) return;
-  RM_IDX=(RM_IDX+n+RM_LIST.length)%RM_LIST.length;
-  renderReminder();
-}
 
 /* THE FRIDAY CALL GOES TO FRIDAY PAY, NOT TO THE NEW BUILD.
  *
@@ -8607,13 +8509,6 @@ function onSwipe(el, axis, run, min){
     if(Math.abs(along) < Math.abs(across) * DOMINANCE) return;
     run(along);
   }, {passive:true});
-}
-
-function initReminders(){
-  document.getElementById('rm-prev').addEventListener('click',()=>rmStep(-1));
-  document.getElementById('rm-next').addEventListener('click',()=>rmStep(1));
-  // swipe the card as well
-  onSwipe(document.getElementById('remind'), "x", dx => rmStep(dx < 0 ? 1 : -1), 45);
 }
 
 /* ---------------- month view ---------------- */
@@ -8807,9 +8702,6 @@ function tick(){
     pct = span>0 ? Math.min(100, Math.max(0, (realNow-beginsAt)/span*100)) : 0;
   }
   document.getElementById('track').style.width=pct+'%';
-
-  // refresh time-window reminders (morning/evening adhkār) on the minute
-  if(now.getSeconds()===0) renderReminder();
 
   markRows(rec, base, realNow);
 }
@@ -10441,7 +10333,8 @@ const MU_LAST_PAGE = "mushaf.lastPage";
    as many as you like and they do not move. */
 const MU_MARK = "mushaf.mark";
 const MU_BOOKMARK  = "mushaf.bookmark";       // the oldest single value, read once then retired
-const MU_FAVOURITES = "mushaf.bookmarks";    // the key is older than the name; the pages inside are the favourites
+const MU_FAV_PAGES  = "mushaf.bookmarks";    // RETIRED: pages, migrated once into the key below
+const MU_FAVOURITES = "mushaf.fav.surahs";   // sūrah numbers
 
 async function loadMushafMeta(){
   if(MUSHAF.state) return MUSHAF.state;
@@ -10630,18 +10523,51 @@ async function showMushafPage(n){
   }
 }
 
+/* FAVOURITES ARE SŪRAHS NOW, NOT PAGES.
+ *
+ * The list used to read "al-Baqara · Page 247, Yāsīn · Page 611" and what was
+ * stored was the page: keep Yāsīn from page 611 and then again from 612 and
+ * you had two Yāsīns. A page belongs to one printing and names nothing anybody
+ * asks for, and the committee reported favourites as missing rather than as
+ * unhelpful. A sūrah is the thing people mean.
+ *
+ * Anything saved under the old page key is carried across the first time this
+ * runs: each page becomes the sūrah it sat in, duplicates collapse, and the
+ * old key is emptied so it happens once. native/src/mushaf.js does the same
+ * for the app, and scripts/test/mushaf.test.mjs holds it. */
 function mushafFavourites(){
   const v = prefStore.get(MU_FAVOURITES, null);
-  if(Array.isArray(v)) return v.filter(n => Number.isInteger(n) && n >= 1).sort((x, y) => x - y);
-  /* carried over from when only one page could be kept, so nobody who had
-     saved one loses it */
+  if(Array.isArray(v))
+    return v.filter(n => Number.isInteger(n) && n >= 1 && n <= 114).sort((x, y) => x - y);
+
+  const out = [];
+  const take = n => { if(Number.isInteger(n) && n >= 1 && !out.includes(n)) out.push(n); };
+  const pages = prefStore.get(MU_FAV_PAGES, null);
+  if(Array.isArray(pages))
+    for(const p of pages){ const su = mushafAt(MUSHAF.sur, p); if(su) take(su.n); }
+  /* and the oldest single value of all, from before there was a list */
   const one = prefStore.get(MU_BOOKMARK, 0);
-  return (Number.isInteger(one) && one >= 1) ? [one] : [];
+  if(Number.isInteger(one) && one >= 1){ const su = mushafAt(MUSHAF.sur, one); if(su) take(su.n); }
+
+  if(out.length) setMushafFavourites(out);
+  return out.sort((a, b) => a - b);
 }
 
 function setMushafFavourites(list){
   prefStore.set(MU_FAVOURITES, list.slice().sort((a, b) => a - b));
-  prefStore.set(MU_BOOKMARK, 0);          // the old single value is spent
+  prefStore.set(MU_FAV_PAGES, []);        // the page list is spent
+  prefStore.set(MU_BOOKMARK, 0);          // and so is the single value before it
+}
+
+/* The sūrah the reader is in, and its name — the two things every favourite
+   control on this screen has to say. Null where the page carries no sūrah,
+   which in this printing is the frontispiece alone. */
+function mushafHere(){
+  return mushafAt(MUSHAF.sur, MUSHAF.page);
+}
+function mushafSurahName(n){
+  const rec = quranIndex && quranIndex.surahs.find(x => x.n === n);
+  return rec ? (rec.nameEn || rec.name) : t("mushaf.s_rah", "S\u016brah") + " " + num(n);
 }
 
 const MU_RIBBON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
@@ -10668,18 +10594,24 @@ function toggleMushafMark(){
 /* Favourites are added and dropped from the list itself, so that the one button
    on the bar can be the bookmark — the everyday one — and mean only that. */
 function toggleMushafFavourite(){
+  const su = mushafHere();
+  if(!su) return;                      /* the frontispiece belongs to no sūrah */
   const list = mushafFavourites();
-  const i = list.indexOf(MUSHAF.page);
+  const i = list.indexOf(su.n);
   const saving = i < 0;
-  if(saving) list.push(MUSHAF.page); else list.splice(i, 1);
+  if(saving) list.push(su.n); else list.splice(i, 1);
   setMushafFavourites(list);
   renderMushafPlaces();
   if(mushafLandscapeOpen()){ markMushafLandscape(); renderMushafFavs(); return; }
   /* With the list already on screen it says it itself, and a note over the top
      would only be in the way. */
   if(!document.getElementById('mu-jump').hidden) return;
-  mushafToast(saving ? t("mushaf.added_to_favourites", "Added to your favourites")
-                     : t("mushaf.removed_from_favourites", "Removed from your favourites"), saving);
+  /* NAMES THE SŪRAH, which is the whole safeguard on the eight pages that open
+     more than one: the reader is told what was kept, not merely that something
+     was. */
+  mushafToast((saving ? t("mushaf.surah_added", "{s} added to favourites")
+                      : t("mushaf.surah_removed", "{s} removed from favourites"))
+                .replace("{s}", mushafSurahName(su.n)), saving);
 }
 
 /* A ribbon filling in is not an answer to "where did that go?". Saving says so
@@ -10756,10 +10688,16 @@ function renderMushafPlaces(){
   }
 
   const list = mushafFavourites();
-  const here = list.includes(MUSHAF.page);
+  const su = mushafHere();
+  const here = !!su && list.includes(su.n);
   const add = document.getElementById('mu-fav-add');
-  add.textContent = here ? t("mushaf.remove_this_page", "Remove this page from favourites")
-                         : t("mushaf.add_this_page",    "Add this page to favourites");
+  /* The button names the sūrah it is about to keep, so a reader on one of the
+     eight pages that open three of them can see which one they are getting
+     before they press it. */
+  add.hidden = !su;
+  if(su) add.textContent = (here ? t("mushaf.remove_surah", "Remove {s} from favourites")
+                                 : t("mushaf.keep_surah",   "Keep {s} in favourites"))
+                             .replace("{s}", mushafSurahName(su.n));
 
   const hint = document.getElementById('mu-saved');
   hint.hidden = !list.length;
@@ -10771,23 +10709,50 @@ function renderMushafPlaces(){
     : t("mushaf.n_favourites", "{n} favourites")
   ).replace("{n}", num(list.length));
 
-  const host = document.getElementById('mu-bm-list');
-  host.innerHTML = "";
+  fillMushafFavPick('mu-fav-pick', list, su, showMushafPage);
+}
+
+/* FILLING THE FAVOURITES DROPDOWN, for the upright panel and the sideways one
+   alike. One line of screen whatever the count, which a list of rows could
+   never be: ten favourites used to be a 196px scroller inside a panel that
+   already had three fields in it.
+   Choosing an entry goes there and the select snaps back to its prompt, so it
+   never sits claiming to be somewhere the reader has since left. Removing is
+   the button above it, which always acts on the sūrah you are on — the
+   dropdown puts you there in one tap. */
+function fillMushafFavPick(id, list, here, go){
+  const sel = document.getElementById(id);
+  if(!sel) return;
+  sel.hidden = !list.length;
+  sel.innerHTML = "";
+  if(!list.length) return;
+
+  const prompt = document.createElement('option');
+  prompt.value = "";
+  prompt.textContent = t("mushaf.go_to_a_favourite", "Go to a favourite\u2026");
+  sel.appendChild(prompt);
+
   for(const n of list){
-    const row = document.createElement('div');
-    row.className = "mu-bm-item" + (n === MUSHAF.page ? " is-here" : "");
-    const go = document.createElement('button');
-    go.className = "mu-bm-go";
-    go.textContent = mushafPlaceLabel(n);
-    go.addEventListener('click', () => showMushafPage(n));
-    const rm = document.createElement('button');
-    rm.className = "mu-bm-x";
-    rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
-    rm.addEventListener('click', () => removeMushafFavourite(n));
-    row.append(go, rm);
-    host.appendChild(row);
+    const o = document.createElement('option');
+    o.value = String(n);
+    o.textContent = mushafSurahName(n) + " \u00b7 " + t("mushaf.page", "Page") + " " + num(mushafSurahPage(n));
+    sel.appendChild(o);
   }
+  /* The one you are reading shows as the chosen entry, so the dropdown also
+     answers "is this one of mine?" without being opened. */
+  sel.value = (here && list.includes(here.n)) ? String(here.n) : "";
+
+  sel.onchange = () => {
+    const n = Number(sel.value);
+    sel.value = (here && list.includes(here.n)) ? String(here.n) : "";
+    if(n) go(mushafSurahPage(n));
+  };
+}
+
+/* The page a sūrah opens on, from the same table the jump list reads. */
+function mushafSurahPage(n){
+  const row = MUSHAF.sur.find(x => x.n === n);
+  return row ? row.page : 1;
 }
 
 function fillMushafJump(){
@@ -11040,9 +11005,8 @@ function toggleMushafFavs(){
 }
 
 function renderMushafFavs(){
-  const host = document.getElementById('ml-fav-list');
   const none = document.getElementById('ml-fav-none');
-  if(!host) return;
+  if(!none) return;
 
   /* The bookmark rides at the top of the same panel: sideways there is nowhere
      else to put the way back to it, and it belongs with the other places. */
@@ -11053,29 +11017,17 @@ function renderMushafFavs(){
     markBtn.textContent = t("mushaf.bookmark_at", "Bookmark \u00b7 {p}").replace("{p}", mushafPlaceLabel(mark, "flat"));
 
   const list = mushafFavourites();
+  const su = mushafHere();
   const addBtn = document.getElementById('ml-fav-add');
-  addBtn.textContent = list.includes(MUSHAF.page)
-    ? t("mushaf.remove_this_page", "Remove this page from favourites")
-    : t("mushaf.add_this_page",    "Add this page to favourites");
+  addBtn.hidden = !su;
+  if(su) addBtn.textContent = (list.includes(su.n)
+      ? t("mushaf.remove_surah", "Remove {s} from favourites")
+      : t("mushaf.keep_surah",   "Keep {s} in favourites")).replace("{s}", mushafSurahName(su.n));
   none.hidden = !!list.length;
-  host.innerHTML = "";
-  for(const n of list){
-    const row = document.createElement('div');
-    row.className = "ml-fav-item" + (n === MUSHAF.page ? " is-here" : "");
-    const go = document.createElement('button');
-    go.className = "ml-fav-go";
-    go.textContent = mushafPlaceLabel(n, true);
-    go.addEventListener('click', () => { goMushafLandscapePage(n); closeMushafFavs(); });
-    const rm = document.createElement('button');
-    rm.className = "ml-fav-x";
-    rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
-    rm.addEventListener('click', () => {
-      removeMushafFavourite(n); markMushafLandscape(); renderMushafFavs();
-    });
-    row.append(go, rm);
-    host.appendChild(row);
-  }
+  /* The same one-line dropdown as upright. Sideways there is even less room
+     to spend on a column of chips. */
+  fillMushafFavPick('ml-fav-pick', list, su,
+    page => { goMushafLandscapePage(page); closeMushafFavs(); });
 }
 
 /* The bar sits over the page rather than beside it, so it costs no height; it
@@ -14073,6 +14025,17 @@ const STRIP_ICONS = {
     "M18.2 3v2.6",
     "M16.9 4.3h2.6",
   ],
+  /* Sunrise, for the line under the strip. The same horizon the Fajr and
+     Maghrib marks stand on, but a WHOLE sun resting on it and no arrow:
+     Fajr's arrow points up and Maghrib's points down, and sunrise is the
+     moment between them where nothing is moving yet. */
+  sunrise: [
+    "M3 18h18",
+    "M16 13.6a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
+    "M12 5.4v2.2",
+    "M5.6 7.6 7.1 9.1",
+    "M18.4 7.6 16.9 9.1",
+  ],
 };
 
 const stripIcon = k => (STRIP_ICONS[k] || []).map(d => `<path d="${d}"/>`).join("");
@@ -14114,6 +14077,20 @@ function renderStrip(){
          + `<span class="p-j tnum">${jam ? esc(hmShort(jam)) : "&mdash;"}</span>`
          + `</div>`;
   }).join("");
+
+  /* The same record the strip was built from, so the two can never disagree
+     about which day they are showing. Hidden rather than guessed at if a day
+     ever arrives without one. */
+  const sun = document.getElementById("sunline");
+  if(sun){
+    const rise = rec.begins && rec.begins.sunrise;
+    sun.hidden = !rise;
+    if(rise) sun.innerHTML =
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" `
+      + `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${stripIcon("sunrise")}</svg>`
+      + `<span class="sl-t tnum">${esc(t("prayer.sunrise", "Sunrise"))} ${esc(hmShort(rise))}</span>`
+      + `<span class="sl-s">&mdash; ${esc(t("home.fajr_ends", "Fajr ends"))}</span>`;
+  }
 }
 
 /* ---------------- home: the services grid ----------------
@@ -14140,6 +14117,11 @@ const TILE_ACTIONS = {
 function initHome(){
   document.getElementById("go-timetable").addEventListener("click", () => switchTab("times"));
   document.getElementById("go-listen").addEventListener("click", () => switchTab("live"));
+  /* Both the headline and the gold disc open the appeal, which is where the
+     £5,000 tier, the open amount and the bank details are. The three amount
+     pills are ordinary links to Stripe and need no wiring. */
+  for(const id of ["nb-top","nb-go"])
+    document.getElementById(id).addEventListener("click", () => switchTab("donate"));
   document.getElementById("bellbtn").addEventListener("click", () => switchTab("notices"));
 
   const wa = document.querySelector('.tile[data-tile="whatsapp"]');
@@ -16792,7 +16774,6 @@ function boot(){
   if(!rec){ endedState(); return; }
   initNav();
   initMonth();
-  initReminders();
   initFridayCall();
   OneSignalManager.init();
   initTabs();
