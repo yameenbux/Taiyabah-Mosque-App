@@ -428,12 +428,18 @@ export default function Home({ navigation }) {
             heading's word, and the Services heading's own rule closes the
             group underneath.
 
-            The same hairline SecH draws (1px of C.line) on the same rhythm —
-            26 above, 12 below, 4 either side — so the breaker and the heading
-            read as one device. The website draws it the same way and measures
-            the same numbers: index.html's .brk. */}
+            The same hairline SecH draws (1px of C.line), inset the same 4, so
+            the breaker and the heading read as one device.
+
+            EQUAL AIR EITHER SIDE, 12 and 12. It first took SecH's own rhythm,
+            which put 26 above the rule and 12 under it, and that reads as a
+            hole above the line rather than as a divider between two things. A
+            rule is not a heading: a heading is a thing with space around it, a
+            rule IS the space, so it wants the same gap on both sides. The
+            website measures the same 12 and 12 — index.html's .brk, where the
+            wrap carries .tight to give up the padding this margin cannot. */}
         <View style={{ height: 1, backgroundColor: C.line,
-                       marginTop: 26, marginBottom: 12, marginHorizontal: 4 }} />
+                       marginTop: 12, marginBottom: 12, marginHorizontal: 4 }} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
           accessibilityRole="button"
           style={{ borderRadius: R.card, overflow: "hidden" }}>

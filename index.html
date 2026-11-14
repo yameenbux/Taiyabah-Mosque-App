@@ -1786,11 +1786,20 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      them — one heading would have to cover both a radio stream and a
      building fund — so the rule does the dividing that the word used to.
 
-     It is the SAME hairline .sec-h draws beside a heading (1px of --line)
-     and it keeps .sec-h's own rhythm — 6 above, 12 below, 4 either side —
-     so the breaker and the "Services" heading under it read as the same
-     device rather than two different ideas about where a section starts. */
-  .brk{height:1px;background:var(--line);margin:6px 4px 12px;border:0}
+     It is the SAME hairline .sec-h draws beside a heading (1px of --line),
+     inset the same 4px, so the breaker and the "Services" heading under it
+     read as the same device rather than two different ideas about where a
+     section starts.
+
+     EQUAL AIR EITHER SIDE, 12 and 12. It first took .sec-h's own 6-above
+     rhythm, which lands on 26 once the wrap's 20px of padding is counted,
+     and 26 above a rule with 12 under it reads as a hole above the line
+     rather than as a divider between two things. A rule is not a heading:
+     a heading is a thing with space around it, a rule IS the space, so it
+     wants the same gap on both sides. The wrap carries .tight to make room
+     for that without resorting to a negative margin. */
+  .wrap.tight{padding-top:12px}
+  .brk{height:1px;background:var(--line);margin:0 4px 12px;border:0}
 
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
@@ -2952,7 +2961,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <div class="striplink"><button type="button" id="go-timetable" data-i18n="home.full_timetable">Full timetable &rsaquo;</button></div>
   </div>
 
-  <div class="wrap">
+  <div class="wrap tight">
 
     <!-- NO HEADING OVER THESE TWO, A RULE INSTEAD. "Listen" laboured a single
          banner whose own first line says LISTEN LIVE, so it spent a line of
