@@ -105,15 +105,23 @@ const NB_TIERS = ["5", "10", "25"].map(k => ({
  * the mark would stay dark plum on a dark page. */
 const GLYPH = () => ({
   quran:   <><Path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z" /><Path d="M12 6.5v11.8" /></>,
-  book:    <><Path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" /><Path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22" /><Path d="M8.5 8.5h6" /><Path d="M8.5 12h6" /></>,
+  /* A CLOSED VOLUME WITH A RIBBON, not the old shape: that one's corner tail
+     made it read as a speech bubble, and it sat two tiles from the Qur'an's
+     open book. A reference work should not look like a chat. */
+  book:    <><Rect x="6.3" y="3.4" width="12.2" height="17.2" rx="1.7" /><Path d="M9.4 3.4v17.2" /><Path d="M13.6 3.4v6.6l1.9-1.5 1.9 1.5V3.4" /></>,
   compass: <><Circle cx="12" cy="12" r="8.5" /><Path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z" /></>,
   cap:     <><Path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z" /><Path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7" /></>,
   rings:   <><Circle cx="9" cy="14" r="5.4" /><Circle cx="15" cy="14" r="5.4" /></>,
   grave:   <><Path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6" /><Path d="M3.5 20.5h17" /><Path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z" /></>,
   hall:    <><Path d="M4 21V9l8-5 8 5v12" /><Path d="M4 21h16" /><Path d="M10 21v-6h4v6" /></>,
   heart:   <Path d="M11.9 20.2S5 15.9 5 10.7a4.4 4.4 0 0 1 6.9-3.6 4.4 4.4 0 0 1 6.9 3.6c0 5.2-6.9 9.5-6.9 9.5Z" />,
-  box:     <><Circle cx="12" cy="5.6" r="2.7" /><Path d="M4.4 11.4h15.2a1 1 0 0 1 1 1v7.1a1 1 0 0 1-1 1H4.4a1 1 0 0 1-1-1v-7.1a1 1 0 0 1 1-1Z" /><Path d="M9.7 15h4.6" /></>,
-  tin:     <><Path d="M7 8.8h10v10.7a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19.5Z" /><Path d="M9.6 12.2h4.8" /><Path d="M8.2 8.8V7a2 2 0 0 1 2-2h3.6a2 2 0 0 1 2 2v1.8" /></>,
+  box:     <><Path d="M4.3 11.2h15.4a1 1 0 0 1 1 1v7.3a1 1 0 0 1-1 1H4.3a1 1 0 0 1-1-1v-7.3a1 1 0 0 1 1-1Z" /><Path d="M9.5 15h5" /><Circle cx="12" cy="6" r="2.8" /></>,
+  /* AN OPEN HAND AND A FLOATING COIN, the masjid's own idea, replacing a tin
+     that read as a battery. Drawn from the side so the palm is unmistakably a
+     hand: a circle over a symmetrical curve — which is what the front-on and
+     two-handed versions came out as — reads as a face, which is the one thing
+     this app may never draw. */
+  tin:     <><Circle cx="12.6" cy="6.3" r="2.9" /><Path d="M3.4 14.1 6 11.7a2 2 0 0 1 1.4-.6h3.4a1.3 1.3 0 0 1 0 2.6H8.4" /><Path d="M3.4 14.1l2 2.3a2.6 2.6 0 0 0 2.8.7l9.2-3.4a1.4 1.4 0 0 0-1-2.6l-5.1 1.9" /></>,
   /* A tasbīḥ: nine beads around a loop, the thread, and the tassel bead. */
   beads:   <>{[[12,14.8],[15.34,13.58],[17.12,10.5],[16.5,7],[13.78,4.71],[10.22,4.71],[7.5,7],[6.88,10.5],[8.66,13.58]]
     .map(([x,y],i)=><Circle key={i} cx={x} cy={y} r={0.95} />)}
