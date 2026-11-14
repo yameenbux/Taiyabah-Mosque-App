@@ -297,12 +297,15 @@ export default function Alerts() {
         </Press>
         </Card>
 
-        {granted === false
-          ? <Note>{t("alerts.turned_off", "Notifications are turned off for this app. Turn them on in Android settings and they will start straight away.")}</Note>
-          : armed !== null && (
-            <Note>{armed === 0
-              ? t("alerts.none_set", "No reminders set.")
-              : `${armed} ${t("alerts.scheduled", "reminders are scheduled on this phone.")}`}</Note>)}
+        {/* THE WARNING STAYS; THE RUNNING COMMENTARY GOES. "35 reminders are
+            scheduled on this phone" was a true sentence nobody needed: the
+            switches above already say what is on, and a count of queued
+            local notifications is an implementation detail. It is still in
+            the diagnostics behind "Having trouble?", where somebody chasing
+            a reminder that did not arrive will want it.
+            This line is the one that reports a PROBLEM, so it is left. */}
+        {granted === false && (
+          <Note>{t("alerts.turned_off", "Notifications are turned off for this app. Turn them on in Android settings and they will start straight away.")}</Note>)}
 
         {/* The website's diagnostics, opened from the link inside the card
             above. When a reminder does not arrive the answer is almost always
@@ -351,10 +354,26 @@ export default function Alerts() {
                                         lineHeight: fs(18) }}>
                 {`subscription: ${who.sub || "—"}\nuser: ${who.user || "—"}\nsubscribed: ${who.optedIn ? "yes" : "no"}${who.error ? "\n" + who.error : ""}`}
               </Text>)}
+            {/* WHAT THE MASJID'S SERVER ACTUALLY HOLDS, which came down here
+                when the main screen was cleared of its commentary.
+                It is not read from the switches above: a switch says what
+                somebody asked for, and that is not the same as what
+                OneSignal knows, which is the only thing that decides who a
+                send reaches. A write that silently failed would leave the
+                switch on and nothing arriving, with the screen agreeing with
+                the switch. This is the Worker's own read-back, and it is the
+                one line on this screen that cannot be wrong in that
+                direction — which is exactly why it belongs in the panel
+                somebody opens when a notification has not turned up. */}
             <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, lineHeight: fs(19) }}>
               {`${t("alerts.permission", "Permission")}: ${granted ? t("sheet.notifications_on", "Notifications on") : t("alerts.notifications_off", "Notifications off")}\n` +
                `${t("alerts.scheduled_now", "Scheduled now")}: ${armed ?? "—"}\n` +
-               `${t("sheet.jama_ah_reminders", "Jamāʿah reminders")}: ${alerts.jamaah ? `${alerts.mins} min` : "—"}`}
+               `${t("sheet.jama_ah_reminders", "Jamāʿah reminders")}: ${alerts.jamaah ? `${alerts.mins} min` : "—"}\n` +
+               `${t("alerts.masjid_holds", "Masjid holds")}: ${
+                 !tagState ? "—"
+                 : !tagState.ok ? t("alerts.not_saved", "not saved")
+                 : (SENT_BY_MASJID.filter(c => tagState.prefs?.[c.key] === "1")
+                      .map(c => t(c.id, c.en)).join(" · ") || t("alerts.nothing", "nothing"))}`}
             </Text>
             <Press onPress={async () => { tap(); await rearm({}); }}
               style={{ alignItems: "center", paddingVertical: 11, borderRadius: R.pill,
@@ -386,29 +405,23 @@ export default function Alerts() {
             </Press>
           </Card>)}
 
-        <Note>{t("alerts.what_comes_from_where",
-          "Jamāʿah and Sūrah al-Kahf reminders are set on this phone and arrive with no signal. Janāzah, announcements and events are sent by the masjid, so those need a connection.")}</Note>
+        {/* "Jamāʿah and Sūrah al-Kahf are set on this phone, the rest are sent
+            by the masjid" was three lines of explanation under a screen of
+            switches that already work. It is still said in Help, in full,
+            where somebody has gone looking for it. */}
         {!!tagState && !tagState.ok && (
           <Note>{t("alerts.choices_not_stored",
             "Your choices for the masjid's announcements could not be saved just now. They are kept on this phone and will be sent again next time you press Save.")}</Note>)}
 
-        {/* THE ANSWER TO "did my choice actually take effect".
-          *
-          * Not read from the switches above — a switch says what somebody
-          * asked for, and that is not the same as what the masjid's server
-          * knows, which is the only thing that decides who a send reaches. A
-          * write that silently failed would leave the switch off and the
-          * notifications arriving, with nothing on the phone admitting it.
-          * So this is the Worker's own read-back, taken from OneSignal after
-          * the write, and it is the one claim on this screen that cannot be
-          * wrong in that direction. */}
-        {!!tagState?.ok && !!tagState.prefs && (() => {
-          const on = SENT_BY_MASJID.filter(c => tagState.prefs[c.key] === "1");
-          if (!on.length) return null;
-          return (
-            <Note>{`${t("alerts.masjid_will_send", "The masjid has your choices and will send you:")} ${
-              on.map(c => t(c.id, c.en)).join(" · ")}`}</Note>);
-        })()}
+        {/* The Worker's read-back of what the masjid actually holds used to be
+            listed here — "The masjid has your choices and will send you: …".
+            It only ever appeared when the write had SUCCEEDED, so it told a
+            reader something the switches above had already told them. The
+            case that matters is the opposite one, and that note is still
+            above: a write that failed says so.
+            The read-back itself is not gone, only its restatement: it moved
+            into the diagnostics behind "Having trouble?", on the line
+            reading "Masjid holds". */}
       </View>
     </Screen>
   );

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "c55135ec704c",
+ "version": "636c410cc05e",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -654,6 +654,9 @@ window.LANG_PACK = {
   "quran.translator": "અબ્દુલ્લાહ યુસુફ અલી",
   "zakat.last_known_price": "છેલ્લી જાણીતી {metal} કિંમત · £{p}/ગ્રામ · {at}ની",
   "offline.still_works": "કોઈ કનેક્શન નથી. નમાઝના સમય, કુરઆન, અઝકાર અને કિબલા બધું હજી પણ કામ કરે છે.",
+  "alerts.masjid_holds": "મસ્જિદ પાસે",
+  "alerts.not_saved": "સાચવ્યું નથી",
+  "alerts.nothing": "કશું નહીં",
   "video.gC7H_60vPFU.t": "નવા બાંધકામની અપડેટ ૨૦૨૬",
   "video.gC7H_60vPFU.d": "નવું બાંધકામ",
   "video.N7wFXynmLHM.t": "તૈયબા મસ્જિદ — અમારી કહાણી",

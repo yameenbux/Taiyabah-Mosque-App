@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "032a2af3399f",
+ "version": "17e6cc01fbb8",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -654,6 +654,9 @@ window.LANG_PACK = {
   "quran.translator": "عبداللہ یوسف علی",
   "zakat.last_known_price": "آخری معلوم {metal} قیمت · £{p}/گرام · {at} کی",
   "offline.still_works": "کوئی کنکشن نہیں۔ نماز کے اوقات، قرآن، اذکار اور قبلہ سب پھر بھی کام کرتے ہیں۔",
+  "alerts.masjid_holds": "مسجد کے پاس",
+  "alerts.not_saved": "محفوظ نہیں ہوا",
+  "alerts.nothing": "کچھ نہیں",
   "video.gC7H_60vPFU.t": "نئی تعمیر کی تازہ اطلاع ۲۰۲۶",
   "video.gC7H_60vPFU.d": "نئی تعمیر",
   "video.N7wFXynmLHM.t": "طیبہ مسجد — ہماری کہانی",

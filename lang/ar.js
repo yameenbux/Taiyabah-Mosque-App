@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "57c0ee550fbe",
+ "version": "ca7c9e3f7405",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -654,6 +654,9 @@ window.LANG_PACK = {
   "quran.translator": "عبد الله يوسف علي",
   "zakat.last_known_price": "آخر سعر معروف لـ{metal} · £{p}/غرام · من {at}",
   "offline.still_works": "لا يوجد اتصال. مواقيت الصلاة والقرآن والأذكار والقِبلة كلّها تعمل.",
+  "alerts.masjid_holds": "لَدَى الْمَسْجِد",
+  "alerts.not_saved": "لَمْ يُحْفَظ",
+  "alerts.nothing": "لَا شَيْء",
   "video.gC7H_60vPFU.t": "مستجدات البناء الجديد ٢٠٢٦",
   "video.gC7H_60vPFU.d": "البناء الجديد",
   "video.N7wFXynmLHM.t": "مسجد طيبة — قصتنا",
