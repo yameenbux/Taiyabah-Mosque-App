@@ -1,0 +1,88 @@
+{
+ "_note": [
+  "The tasbīḥ counter in Daily Adhkār (app screen Tasbih.jsx + index.html #ak-tasbih-view). Drafted by Claude from its own language knowledge and NOT YET READ BY A NATIVE SPEAKER.",
+  "Where a string is word for word the same as one the Hajj counter already shows, the translation here is the one from 29-hajj.json, unchanged — the two counters do the same thing and should not say it two different ways in Urdu.",
+  "The four phrases of the tasbīḥ itself are NOT in here and must never be. They are sliced out of athkar.json's 'After Every Ṣalāh' entry at runtime, so that the words a pilgrim counts are the same words the ʿulamā are being asked to sign. See the header of native/src/tasbih.js.",
+  ""
+ ],
+ "tasbih.tasbih_counter": [
+  "تسبیح شمار",
+  "તસ્બીહ ગણતર",
+  "عَدَّادُ التَّسْبِيح"
+ ],
+ "tasbih.the_tasbih_after_salah_or_any": [
+  "نماز کے بعد کی تسبیح، یا کوئی بھی ذکر",
+  "નમાઝ પછીની તસ્બીહ, અથવા કોઈ પણ ઝિક્ર",
+  "تَسْبِيحُ مَا بَعْدَ الصَّلَاة، أَوْ أَيُّ ذِكْر"
+ ],
+ "tasbih.what_to_count": [
+  "کیا شمار کرنا ہے",
+  "શું ગણવું છે",
+  "مَاذَا تَعُدّ"
+ ],
+ "tasbih.after_salah": [
+  "نماز کے بعد",
+  "નમાઝ પછી",
+  "بَعْدَ الصَّلَاة"
+ ],
+ "tasbih.free": [
+  "کھلا",
+  "ખુલ્લું",
+  "مَفْتُوح"
+ ],
+ "tasbih.of_n": [
+  "میں سے {n}",
+  "માંથી {n}",
+  "مِنْ {n}"
+ ],
+ "tasbih.all_hundred": [
+  "پورے سو",
+  "પૂરા સો",
+  "الْمِئَةُ كُلُّهَا"
+ ],
+ "tasbih.complete": [
+  "مکمل",
+  "પૂરું",
+  "تَمَّ"
+ ],
+ "tasbih.keep_going": [
+  "جاری رکھیں",
+  "ચાલુ રાખો",
+  "وَاصِلْ"
+ ],
+ "tasbih.tap_the_circle": [
+  "گننے کے لیے دائرے پر ٹیپ کریں۔ آپ جہاں تھے، یہ وہیں یاد رکھتا ہے۔",
+  "ગણવા માટે વર્તુળ પર ટેપ કરો. તમે જ્યાં હતા તે એને યાદ રહે છે.",
+  "اُنْقُرْ عَلَى الدَّائِرَةِ لِلْعَدّ. وَهُوَ يَحْفَظُ مَوْضِعَكَ."
+ ],
+ "tasbih.undo": [
+  "واپس",
+  "પાછું",
+  "تَرَاجَعْ"
+ ],
+ "tasbih.reset": [
+  "دوبارہ شروع",
+  "ફરી શરૂ",
+  "اِبْدَأْ مِنْ جَدِيد"
+ ],
+ "tasbih.count_one_more": [
+  "ایک اور شمار کریں",
+  "એક વધુ ગણો",
+  "عُدَّ وَاحِدًا آخَر"
+ ],
+ "tasbih.start_again_q": [
+  "دوبارہ شروع کریں؟",
+  "ફરી શરૂ કરીએ?",
+  "تَبْدَأُ مِنْ جَدِيد؟"
+ ],
+ "tasbih.reset_warning": [
+  "شمار صفر پر چلا جائے گا۔ اسے واپس لانے کا کوئی طریقہ نہیں۔",
+  "ગણતરી શૂન્ય પર જતી રહેશે. તેને પાછી લાવવાનો કોઈ રસ્તો નથી.",
+  "سَيَعُودُ الْعَدُّ إِلَى الصِّفْر، وَلَا سَبِيلَ لِاسْتِرْجَاعِه."
+ ],
+ "tasbih.not_now": [
+  "ابھی نہیں",
+  "હમણાં નહીં",
+  "لَيْسَ الْآن"
+ ]
+}

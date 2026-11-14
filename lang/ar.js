@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "7d744a93f0a5",
+ "version": "c00e47eaa1cc",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -2189,6 +2189,22 @@ window.LANG_PACK = {
   "hajj.published_by_taiyabah": "تَنْشُرُهُ مَسْجِدُ طَيِّبَة. وَلِمَسْأَلَتِكَ الْخَاصَّةِ اسْأَلِ الْعُلَمَاء.",
   "hajj.back_to_hajj_umrah": "← الحج / العمرة",
   "hajj.umrah_short": "الْعُمْرَة",
-  "hajj.hajj_short": "الْحَجّ"
+  "hajj.hajj_short": "الْحَجّ",
+  "tasbih.tasbih_counter": "عَدَّادُ التَّسْبِيح",
+  "tasbih.the_tasbih_after_salah_or_any": "تَسْبِيحُ مَا بَعْدَ الصَّلَاة، أَوْ أَيُّ ذِكْر",
+  "tasbih.what_to_count": "مَاذَا تَعُدّ",
+  "tasbih.after_salah": "بَعْدَ الصَّلَاة",
+  "tasbih.free": "مَفْتُوح",
+  "tasbih.of_n": "مِنْ {n}",
+  "tasbih.all_hundred": "الْمِئَةُ كُلُّهَا",
+  "tasbih.complete": "تَمَّ",
+  "tasbih.keep_going": "وَاصِلْ",
+  "tasbih.tap_the_circle": "اُنْقُرْ عَلَى الدَّائِرَةِ لِلْعَدّ. وَهُوَ يَحْفَظُ مَوْضِعَكَ.",
+  "tasbih.undo": "تَرَاجَعْ",
+  "tasbih.reset": "اِبْدَأْ مِنْ جَدِيد",
+  "tasbih.count_one_more": "عُدَّ وَاحِدًا آخَر",
+  "tasbih.start_again_q": "تَبْدَأُ مِنْ جَدِيد؟",
+  "tasbih.reset_warning": "سَيَعُودُ الْعَدُّ إِلَى الصِّفْر، وَلَا سَبِيلَ لِاسْتِرْجَاعِه.",
+  "tasbih.not_now": "لَيْسَ الْآن"
  }
 };

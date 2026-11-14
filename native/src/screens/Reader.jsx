@@ -1,9 +1,9 @@
 /* Adhkār, duʿās and the rabbanās.
  *
  * The web app does not dump all of these into one list: Daily Adhkār is a menu
- * of five — three sets of its own, then the everyday duʿās and the forty
- * rabbanās — and that menu is how most people here know where things are. Same
- * five rows, same wording, same order.
+ * of six — three sets of its own, the tasbīḥ counter, then the everyday duʿās
+ * and the forty rabbanās — and that menu is how most people here know where
+ * things are. Same six rows, same wording, same order.
  *
  * One reader serves all of them, because they are the same thing on the page:
  * Arabic, how to say it, what it means, and where it comes from. The Arabic is
@@ -26,8 +26,8 @@ import RABBANAS from "../data/rabbanas.json";
 /* ---------- the menu the web app opens on -------------------------------
  *
  * The rows come from the website's own markup now — its wording, its order
- * and its five hand-drawn glyphs (a sun, a minaret, a crescent, a page, an
- * open book). They used to be retyped here with the nearest thing in an icon
+ * and its six hand-drawn glyphs (a sun, a minaret, a crescent, beads on a
+ * ring, a page, an open book). They used to be retyped here with the nearest thing in an icon
  * font, which put a repeat arrow on "After Every Ṣalāh", a heart on
  * "Everyday Duʿās" and sparkles on the forty Rabbanā. Only where each row
  * GOES is the app's business, and that is all this table says. */
@@ -35,6 +35,13 @@ const GOES = [
   n => ({ to: "AthkarSet", params: { n: 0 } }),
   n => ({ to: "AthkarSet", params: { n: 1 } }),
   n => ({ to: "AthkarSet", params: { n: 2 } }),
+  /* The tasbīḥ counter sits here, fourth, because the masjid asked for it
+     among the daily adhkār and not at the end after the duʿās: the three sets
+     above it are things to READ and it is the thing you DO while reading the
+     second of them. It is its own counter with its own count — the Hajj
+     section has a tasbīḥ too, and the two deliberately do not share a
+     number. See the header of screens/Tasbih.jsx. */
+  n => ({ to: "Tasbih" }),
   n => ({ to: "Duas" }),
   n => ({ to: "Rabbanas" }),
 ];

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "6fe86fc9303d",
+ "version": "575d41240aab",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -2189,6 +2189,22 @@ window.LANG_PACK = {
   "hajj.published_by_taiyabah": "طیبہ مسجد کی جانب سے شائع کردہ۔ اپنے مخصوص مسئلے کے لیے علماء سے رجوع کیجیے۔",
   "hajj.back_to_hajj_umrah": "← حج / عمرہ",
   "hajj.umrah_short": "عمرہ",
-  "hajj.hajj_short": "حج"
+  "hajj.hajj_short": "حج",
+  "tasbih.tasbih_counter": "تسبیح شمار",
+  "tasbih.the_tasbih_after_salah_or_any": "نماز کے بعد کی تسبیح، یا کوئی بھی ذکر",
+  "tasbih.what_to_count": "کیا شمار کرنا ہے",
+  "tasbih.after_salah": "نماز کے بعد",
+  "tasbih.free": "کھلا",
+  "tasbih.of_n": "میں سے {n}",
+  "tasbih.all_hundred": "پورے سو",
+  "tasbih.complete": "مکمل",
+  "tasbih.keep_going": "جاری رکھیں",
+  "tasbih.tap_the_circle": "گننے کے لیے دائرے پر ٹیپ کریں۔ آپ جہاں تھے، یہ وہیں یاد رکھتا ہے۔",
+  "tasbih.undo": "واپس",
+  "tasbih.reset": "دوبارہ شروع",
+  "tasbih.count_one_more": "ایک اور شمار کریں",
+  "tasbih.start_again_q": "دوبارہ شروع کریں؟",
+  "tasbih.reset_warning": "شمار صفر پر چلا جائے گا۔ اسے واپس لانے کا کوئی طریقہ نہیں۔",
+  "tasbih.not_now": "ابھی نہیں"
  }
 };

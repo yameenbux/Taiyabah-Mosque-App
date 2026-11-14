@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "81cf9332fb20",
+ "version": "8102543e5135",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -2189,6 +2189,22 @@ window.LANG_PACK = {
   "hajj.published_by_taiyabah": "તૈયબા મસ્જિદ દ્વારા પ્રકાશિત. તમારા પોતાના પ્રશ્ન માટે ઉલમાને પૂછો.",
   "hajj.back_to_hajj_umrah": "← હજ / ઉમરહ",
   "hajj.umrah_short": "ઉમરાહ",
-  "hajj.hajj_short": "હજ"
+  "hajj.hajj_short": "હજ",
+  "tasbih.tasbih_counter": "તસ્બીહ ગણતર",
+  "tasbih.the_tasbih_after_salah_or_any": "નમાઝ પછીની તસ્બીહ, અથવા કોઈ પણ ઝિક્ર",
+  "tasbih.what_to_count": "શું ગણવું છે",
+  "tasbih.after_salah": "નમાઝ પછી",
+  "tasbih.free": "ખુલ્લું",
+  "tasbih.of_n": "માંથી {n}",
+  "tasbih.all_hundred": "પૂરા સો",
+  "tasbih.complete": "પૂરું",
+  "tasbih.keep_going": "ચાલુ રાખો",
+  "tasbih.tap_the_circle": "ગણવા માટે વર્તુળ પર ટેપ કરો. તમે જ્યાં હતા તે એને યાદ રહે છે.",
+  "tasbih.undo": "પાછું",
+  "tasbih.reset": "ફરી શરૂ",
+  "tasbih.count_one_more": "એક વધુ ગણો",
+  "tasbih.start_again_q": "ફરી શરૂ કરીએ?",
+  "tasbih.reset_warning": "ગણતરી શૂન્ય પર જતી રહેશે. તેને પાછી લાવવાનો કોઈ રસ્તો નથી.",
+  "tasbih.not_now": "હમણાં નહીં"
  }
 };

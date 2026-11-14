@@ -733,6 +733,43 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .rb-en{font-size:calc(13.5px * var(--ts));line-height:1.62;color:var(--ink-2, var(--ink));
     margin-top:10px}
 
+  /* ---- the tasbīḥ counter -------------------------------------------- */
+  .tb-modes{display:flex;gap:6px;margin:4px 0 14px}
+  .tb-mode{flex:1;min-width:0;padding:9px 6px;border-radius:10px;border:1px solid var(--line);
+    background:transparent;color:var(--muted);font:inherit;font-size:calc(12px * var(--ts));
+    font-weight:600;cursor:pointer}
+  .tb-mode[data-on="1"]{background:var(--brand-600);border-color:var(--brand-600);color:#F3EFE3}
+  /* A FIXED HEIGHT, because the phrases are not the same length. Without it
+     the dial jumps when the one-line Allāhu Akbar follows the three-line
+     tahlīl, and the thumb is already resting where the circle used to be. */
+  .tb-phrase{text-align:center;min-height:116px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:8px}
+  .tb-ar{font-size:calc(26px * var(--ts));line-height:1.95;color:var(--ink);direction:rtl}
+  .tb-en{font-size:calc(13px * var(--ts));line-height:1.55;color:var(--muted);max-width:30em}
+  .tb-dial{position:relative;display:block;width:min(62vw,228px);aspect-ratio:1;
+    margin:16px auto 0;border:0;background:transparent;padding:0;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
+  .tb-ring{position:absolute;inset:0;width:100%;height:100%}
+  .tb-track{stroke:var(--line)}
+  .tb-fill{stroke:var(--gold);transition:stroke-dashoffset .18s ease}
+  .tb-live{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:3px;transition:transform .08s ease}
+  .tb-dial:active .tb-live{transform:scale(.96)}
+  .tb-n{font-size:calc(54px * var(--ts));font-weight:700;color:var(--ink);line-height:1;
+    font-variant-numeric:tabular-nums}
+  .tb-of{font-size:calc(11px * var(--ts));letter-spacing:.11em;text-transform:uppercase;
+    color:var(--muted);max-width:11em;line-height:1.35}
+  .tb-done .tb-n{color:var(--brand-600)}
+  .tb-hint{text-align:center;font-size:calc(12px * var(--ts));color:var(--muted);margin:16px 0 0}
+  .tb-tools{display:flex;gap:10px;justify-content:center;margin-top:14px}
+  .tb-tool{padding:9px 20px;border-radius:999px;border:1px solid var(--line);
+    background:transparent;color:var(--ink);font:inherit;font-size:calc(12.5px * var(--ts));
+    font-weight:600;cursor:pointer}
+  .tb-tool:disabled{opacity:.42;cursor:default}
+  @media (prefers-reduced-motion: reduce){
+    .tb-fill,.tb-live{transition:none}
+  }
+
   /* A row that leaves the app says so: the chevron becomes an outward arrow,
      so nobody taps expecting a sheet and lands in a browser tab. */
   .dr-ext{flex:0 0 auto;font-size:calc(13px * var(--ts));color:var(--gold-bright);opacity:.8}
@@ -5240,6 +5277,24 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <span class="md-t2" data-i18n="athkar.what_to_say_on_going_to_bed">What to say on going to bed</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
+          <!-- ITS OWN COUNTER, ITS OWN COUNT. The Hajj screen has a tasbīḥ mode
+               beside ṭawāf and saʿī; that one belongs to a pilgrimage and keeps
+               its running total under taiyabah.hajj.counts. This is the
+               masjid's everyday counter and stores separately, so finishing a
+               hundred here does not move somebody's ṭawāf count and the two can
+               never disagree about a number neither of them owns.
+
+               Beads on a loop: six filled dots ON the ring so the ring shows
+               between them, which is what reads as a tasbīḥ at 24px. No tassel
+               — see the duʿā icon below for what happens to a metaphor that
+               needs more detail than the size allows. -->
+          <button class="md-row" id="ak-go-tasbih">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="6.5"/><circle cx="12" cy="4.5" r="1.45" fill="currentColor" stroke="none"/><circle cx="17.63" cy="7.75" r="1.45" fill="currentColor" stroke="none"/><circle cx="17.63" cy="14.25" r="1.45" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="1.45" fill="currentColor" stroke="none"/><circle cx="6.37" cy="14.25" r="1.45" fill="currentColor" stroke="none"/><circle cx="6.37" cy="7.75" r="1.45" fill="currentColor" stroke="none"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="tasbih.tasbih_counter">Tasbīḥ Counter</span>
+              <span class="md-t2" data-i18n="tasbih.the_tasbih_after_salah_or_any">The tasbīḥ after ṣalāh, or any dhikr</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
           <button class="md-row" id="ak-go-duas">
             <span class="md-ico" aria-hidden="true"><!-- A leaf of short texts. This was three strokes meant to read as two
      cupped hands; at 34px it read as a raised middle finger instead, on a
@@ -5264,6 +5319,58 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <div class="ab-wrap" id="ak-read-view" hidden>
           <div class="ak-tabs" id="ak-tabs"></div>
           <div id="ak-body"><p class="qd-empty" data-i18n="athkar.loading">Loading…</p></div>
+          <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
+        </div>
+
+        <!-- ================= the tasbīḥ counter =========================
+             A THIRD SUB-VIEW, not a sheet of its own, because the counter is
+             part of Daily Adhkār — it is how you say the dhikr two rows above
+             it. That reuses this sheet's back arrow and the sub-view switching
+             that already works, rather than adding a layer for the Back button
+             to reason about.
+
+             THE PHRASES ARE NOT WRITTEN HERE. They are sliced out of
+             window.ATHKAR's "After Every Ṣalāh" dhikr, which carries its own
+             counts inline as ﴿٣٣﴾ — the same derivation as
+             native/src/tasbih.js, for the same reason: all 142 supplications
+             are published awaiting two ʿulamā signatures and are fingerprinted
+             against edits, and a counter holding its own copy of four of them
+             would sit outside that and be free to drift. -->
+        <div class="ab-wrap" id="ak-tasbih-view" hidden>
+          <div class="tb-modes" role="group" aria-label="What to count" data-i18n-attr="aria-label:tasbih.what_to_count">
+            <button class="tb-mode" data-m="salah" data-on="1" data-i18n="tasbih.after_salah">After ṣalāh</button>
+            <button class="tb-mode" data-m="33"    data-on="0"><span data-i18n-latin>33</span></button>
+            <button class="tb-mode" data-m="100"   data-on="0"><span data-i18n-latin>100</span></button>
+            <button class="tb-mode" data-m="free"  data-on="0" data-i18n="tasbih.free">Free</button>
+          </div>
+
+          <div class="tb-phrase" id="tb-phrase">
+            <div class="tb-ar quranic" id="tb-ar"></div>
+            <div class="tb-en" id="tb-en"></div>
+          </div>
+
+          <!-- The whole circle is the button. A thumb on a phone is not
+               accurate, and nobody saying dhikr should have to look at the
+               screen to keep counting. -->
+          <button class="tb-dial" id="tb-dial" aria-describedby="tb-hint">
+            <svg class="tb-ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="tb-track" id="tb-track" cx="60" cy="60" r="52" fill="none" stroke-width="6"/>
+              <circle class="tb-fill"  id="tb-fill"  cx="60" cy="60" r="52" fill="none" stroke-width="6"
+                      stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <g id="tb-seg"></g>
+            </svg>
+            <span class="tb-live" aria-live="polite" aria-atomic="true">
+              <span class="tb-n" id="tb-n" data-i18n-latin>0</span>
+              <span class="tb-of" id="tb-of"></span>
+            </span>
+          </button>
+
+          <p class="tb-hint" id="tb-hint" data-i18n="tasbih.tap_the_circle">Tap the circle to count. It remembers where you were.</p>
+
+          <div class="tb-tools">
+            <button class="tb-tool" id="tb-undo" data-i18n="tasbih.undo">Undo</button>
+            <button class="tb-tool" id="tb-reset" data-i18n="tasbih.reset">Reset</button>
+          </div>
           <p class="wl-foot"><span data-i18n="common.registered_charity">Bolton Central Islamic Society &middot; Registered charity</span> <span data-i18n-latin>1041569</span></p>
         </div>
       </div>
@@ -9836,6 +9943,7 @@ function refreshRenderedText(){
     () => { if(open("month")) renderMonth(); },
     () => { if(open("vids")) buildVideos(); },
     () => { if(open("athkar") && window.ATHKAR) renderAthkar(); },
+    () => { if(open("athkar") && AK_VIEW === "tasbih"){ tbSeq = null; tbRender(); } },
     () => { if(open("duas") && window.DUAS) renderDuaCategories(document.getElementById('du-search')?.value); },
     () => { if(open("rabbanas") && window.RABBANAS) renderRabbanas(); },
     () => { if(open("hallhire") && BK.month){ bkRenderCal(); if(BK.date) bkRenderDay(); } },
@@ -12417,6 +12525,7 @@ function akShowModes(){
   AK_VIEW = "modes";
   document.getElementById('ak-mode-view').hidden = false;
   document.getElementById('ak-read-view').hidden = true;
+  document.getElementById('ak-tasbih-view').hidden = true;
   document.getElementById('ak-back').hidden = true;
   document.querySelector('#athkar .sh-body').scrollTop = 0;
 }
@@ -12443,6 +12552,203 @@ async function openAthkar(){
 function closeAthkar(){
   document.getElementById('athkar').dataset.open="0";
   document.body.style.overflow="";
+}
+
+/* ================= the tasbīḥ counter ================================
+ *
+ * ITS OWN COUNT. The Hajj screen has a tasbīḥ beside ṭawāf and saʿī which
+ * keeps its running total under taiyabah.hajj.counts; that one belongs to a
+ * pilgrimage. This is the masjid's everyday counter and stores separately, so
+ * a hundred here does not move somebody's ṭawāf and neither can disagree with
+ * the other about a number it does not own.
+ *
+ * THE FOUR PHRASES ARE DERIVED, NOT WRITTEN. window.ATHKAR's "After Every
+ * Ṣalāh" set holds the tasbīḥ as one dhikr carrying its own counts inline:
+ *
+ *   سُبْحَانَ اللَّهِ ﴿٣٣﴾ الْحَمْدُ لِلَّهِ ﴿٣٣﴾ اللَّهُ أَكْبَرُ ﴿٣٣﴾ لَا إِلَهَ إِلَّا اللَّهُ …
+ *
+ * so splitting on those brackets gives the steps and nothing is retyped. All
+ * 142 supplications are published awaiting two ʿulamā signatures and are
+ * fingerprinted so an approved wording cannot change unnoticed; a counter
+ * with its own copy of four of them would sit outside that fingerprint. This
+ * is the same derivation as native/src/tasbih.js, and the two are checked
+ * against each other by scripts/check-tasbih.mjs. */
+const TB_KEY = "taiyabah.athkar.tasbih";
+const TB_MODES = { salah: null, 33: 33, 100: 100, free: 0 };
+let tbMode = "salah";
+let tbN = { salah: 0, 33: 0, 100: 0, free: 0 };
+
+function tbSave(){ try{ localStorage.setItem(TB_KEY, JSON.stringify({ mode: tbMode, n: tbN })); }catch(e){} }
+function tbLoad(){
+  try{
+    const r = JSON.parse(localStorage.getItem(TB_KEY) || "null");
+    if(r && r.n) tbN = { ...tbN, ...r.n };
+    if(r && r.mode && (r.mode in TB_MODES)) tbMode = r.mode;
+  }catch(e){}
+}
+
+/* Cached because it parses Arabic on every call otherwise, and the dial is
+   re-rendered on every tap. Cleared when the language changes only because
+   the English comes from the same entry. */
+let tbSeq = null;
+function tbSequence(){
+  if(tbSeq) return tbSeq;
+  const d = window.ATHKAR;
+  if(!d) return null;
+  const set = (d.sections || []).find(x => x.id === "after-salah");
+  if(!set) return null;
+  /* found by its WORDS, not its index — an entry inserted above it would
+     otherwise send the counter walking a different dhikr */
+  const item = (set.items || []).find(it => /﴿[٠-٩]+﴾/.test(it.ar || ""));
+  if(!item) return null;
+
+  const digits = "٠١٢٣٤٥٦٧٨٩";
+  const toInt = x => Number([...x].map(c => digits.indexOf(c)).join(""));
+  const parts = (item.ar || "").split(/\s*﴿([٠-٩]+)﴾\s*/);
+  const ar = [], counts = [];
+  for(let i = 0; i < parts.length; i += 2){
+    const text = (parts[i] || "").trim();
+    if(!text) continue;
+    ar.push(text);
+    counts.push(parts[i + 1] ? toInt(parts[i + 1]) : 1);
+  }
+  if(ar.length !== 4) return null;
+
+  const [head, tail] = (item.en || "").split(/,\s*then:\s*/);
+  const cap = x => x ? x[0].toUpperCase() + x.slice(1) : x;
+  const en = [...head.split(/\s*\(\d+\)\s*,?\s*/).filter(Boolean), (tail || "")]
+               .map(x => cap(x.trim()));
+
+  tbSeq = ar.map((text, i) => ({ ar: text, en: en[i] || "", count: counts[i] }));
+  return tbSeq;
+}
+
+/* Which step tap n lands in. Landing exactly ON 33 reports the step just
+   FINISHED rather than the next one: somebody who has said the thirty-third
+   is looking at a completed step, and moving the label on before they lift
+   their thumb reads as having skipped one. Mirrors at() in tasbih.js. */
+function tbAt(n){
+  const steps = tbSequence();
+  if(!steps) return null;
+  const whole = steps.reduce((a, x) => a + x.count, 0);
+  const done = Math.max(0, Math.min(n, whole));
+  let left = done;
+  for(let i = 0; i < steps.length; i++){
+    if(left < steps[i].count || (left === steps[i].count && i === steps.length - 1))
+      return { i, step: steps[i], into: left, done, complete: done === whole, whole };
+    if(left === steps[i].count)
+      return { i, step: steps[i], into: left, done, complete: false, whole };
+    left -= steps[i].count;
+  }
+  return { i: 3, step: steps[3], into: 1, done, complete: true, whole };
+}
+
+function tbRender(){
+  const seq = tbSequence();
+  const n = tbN[tbMode] || 0;
+  const view = document.getElementById('ak-tasbih-view');
+  if(!view) return;
+  document.querySelectorAll('#ak-tasbih-view .tb-mode').forEach(b =>
+    b.dataset.on = b.dataset.m === tbMode ? "1" : "0");
+
+  const C = 2 * Math.PI * 52;
+  const fill = document.getElementById('tb-fill');
+  const track = document.getElementById('tb-track');
+  const seg = document.getElementById('tb-seg');
+  const ar = document.getElementById('tb-ar');
+  const en = document.getElementById('tb-en');
+  let shown = n, label = "", done = false;
+
+  if(tbMode === "salah" && seq){
+    const a = tbAt(n);
+    shown = a.into === 0 && a.done > 0 ? a.step.count : a.into;
+    ar.textContent = a.step.ar;
+    en.textContent = a.step.en;
+    label = a.complete
+      ? t("tasbih.all_hundred","All one hundred")
+      : t("tasbih.of_n","of {n}").replace("{n}", num(a.step.count));
+    done = a.complete;
+    /* FOUR SEGMENTS, NOT ONE ARC — the same reasoning the ṭawāf dial gives for
+       seven: "which one am I on" is a counting question that separate marks
+       answer without reading the numeral. Four steps, so four marks; the
+       numeral carries the count inside the step. */
+    /* GAP IS 16°, NOT 6°. A round cap extends each end of a segment by half
+       the stroke width — about 3.3° at this radius — so the caps ate a 6° gap
+       whole and four marks rendered as one continuous arc, which is the exact
+       thing segments were chosen instead of. */
+    const GAP = 16, step = 360 / 4, arc = C * ((step - GAP) / 360);
+    seg.innerHTML = Array.from({ length: 4 }, (_, i) =>
+      `<circle cx="60" cy="60" r="52" fill="none" stroke-width="6" stroke-linecap="round"`
+      + ` stroke-dasharray="${arc} ${C - arc}" transform="rotate(${-90 + i * step + GAP / 2} 60 60)"`
+      + ` stroke="${i < a.i || a.complete || (i === a.i && a.into === a.step.count) ? "var(--gold)" : "var(--line)"}"></circle>`).join("");
+    /* style.stroke, NOT setAttribute("stroke") — a presentation attribute
+       loses to the stylesheet, and .tb-fill{stroke:var(--gold)} therefore won.
+       The ring went on being painted gold underneath the four segments and
+       showed through the gaps as four gold marks on an untouched dial. Inline
+       style beats the rule; the same trap CLAUDE.md records for !important.
+       Hidden outright rather than given a zero-length dash, too: a dash of
+       zero with a round cap still paints the cap. */
+    track.style.stroke = "transparent";
+    fill.style.stroke = "transparent";
+  } else {
+    seg.innerHTML = "";
+    track.style.stroke = "var(--line)";
+    fill.style.stroke = "var(--gold)";
+    const target = TB_MODES[tbMode];
+    ar.textContent = "";
+    en.textContent = "";
+    if(target){
+      done = n >= target;
+      label = done ? t("tasbih.complete","Complete")
+                   : t("tasbih.of_n","of {n}").replace("{n}", num(target));
+      fill.setAttribute("stroke-dasharray", `${C} ${C}`);
+      fill.setAttribute("stroke-dashoffset", String(C * (1 - Math.min(n / target, 1))));
+    } else {
+      /* Free counting has no total, so the ring fills per hundred and starts
+         again — the same choice the Hajj tasbīḥ makes, for the same reason:
+         there is nothing to be "of". */
+      label = t("tasbih.keep_going","Keep going");
+      fill.setAttribute("stroke-dasharray", `${C} ${C}`);
+      fill.setAttribute("stroke-dashoffset", String(C * (1 - (n % 100) / 100)));
+    }
+  }
+
+  document.getElementById('tb-n').textContent = num(shown);
+  document.getElementById('tb-of').textContent = label;
+  view.classList.toggle("tb-done", done);
+  document.getElementById('tb-undo').disabled = n === 0;
+  document.getElementById('tb-reset').disabled = n === 0;
+  document.getElementById('tb-phrase').hidden = !(tbMode === "salah" && seq);
+}
+
+/* Saved on EVERY press, not on a timer and not on close — a phone that dies
+   on the ninetieth comes back on the ninetieth, which is the whole reason a
+   counter beats keeping it in your head. */
+function tbTap(){
+  const cap = tbMode === "salah" ? 100 : (TB_MODES[tbMode] || Infinity);
+  const n = (tbN[tbMode] || 0);
+  if(n >= cap) return;
+  tbN[tbMode] = n + 1;
+  tbSave(); tbRender();
+  const at = tbMode === "salah" ? tbAt(tbN[tbMode]) : null;
+  const edge = tbMode === "salah"
+    ? (at && (at.complete || at.into === at.step.count))
+    : (TB_MODES[tbMode] ? tbN[tbMode] >= TB_MODES[tbMode] : tbN[tbMode] % 100 === 0);
+  try{ if(navigator.vibrate) navigator.vibrate(edge ? [18, 40, 18] : 12); }catch(e){}
+}
+function tbUndo(){ tbN[tbMode] = Math.max(0, (tbN[tbMode] || 0) - 1); tbSave(); tbRender(); }
+function tbReset(){ tbN[tbMode] = 0; tbSave(); tbRender(); }
+
+async function akShowTasbih(){
+  AK_VIEW = "tasbih";
+  document.getElementById('ak-mode-view').hidden = true;
+  document.getElementById('ak-read-view').hidden = true;
+  document.getElementById('ak-tasbih-view').hidden = false;
+  document.getElementById('ak-back').hidden = false;
+  document.querySelector('#athkar .sh-body').scrollTop = 0;
+  await loadOnce('quran/athkar.js', 'ATHKAR_LOADED');
+  tbSeq = null;
+  tbRender();
 }
 
 /* ---- duʿās ---- */
@@ -12590,6 +12896,13 @@ function initRecite(){
   document.getElementById('ak-go-0').addEventListener('click', () => akOpenSection(0));
   document.getElementById('ak-go-1').addEventListener('click', () => akOpenSection(1));
   document.getElementById('ak-go-2').addEventListener('click', () => akOpenSection(2));
+  document.getElementById('ak-go-tasbih').addEventListener('click', akShowTasbih);
+  document.getElementById('tb-dial').addEventListener('click', tbTap);
+  document.getElementById('tb-undo').addEventListener('click', tbUndo);
+  document.getElementById('tb-reset').addEventListener('click', tbReset);
+  document.querySelectorAll('#ak-tasbih-view .tb-mode').forEach(b =>
+    b.addEventListener('click', () => { tbMode = b.dataset.m; tbSave(); tbRender(); }));
+  tbLoad();
   /* These two live in sheets of their own; the athkār sheet steps aside. */
   document.getElementById('ak-go-duas').addEventListener('click', () => {
     closeAthkar(); setTimeout(openDuas, 120);

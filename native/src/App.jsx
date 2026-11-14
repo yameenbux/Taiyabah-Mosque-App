@@ -63,6 +63,7 @@ import Bukhari, { BukhariBook } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
 import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
+import Tasbih from "./screens/Tasbih";
 import MembershipScreen from "./screens/Membership";
 
 const Tab = createBottomTabNavigator();
@@ -361,13 +362,16 @@ function Root() {
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
-        {/* Daily Adhkār draws its own hero over the menu of five, so no header. */}
+        {/* Daily Adhkār draws its own hero over the menu of six, so no header. */}
         <Stack.Screen name="Athkar"    component={Athkar}    options={{ ...sheet, title: t("athkar.daily_athkar", "Daily Athkār") }} />
         <Stack.Screen name="AthkarSet" component={AthkarSet}
           options={({ route }) => ({ ...pushed,
             title: [t("athkar.morning_evening", "Morning & Evening"),
                     t("athkar.after_every_salah", "After Every Ṣalāh"),
                     t("athkar.before_sleep", "Before Sleep")][route.params?.n] || "" })} />
+        {/* Its own screen, not a mode of the Hajj counter: the two keep
+            separate counts on purpose. See screens/Tasbih.jsx. */}
+        <Stack.Screen name="Tasbih"   component={Tasbih}   options={{ ...pushed, title: t("tasbih.tasbih_counter", "Tasbīḥ Counter") }} />
         <Stack.Screen name="Duas"     component={Duas}     options={{ ...pushed, title: t("duas.everyday_du_as", "Everyday Duʿās") }} />
         <Stack.Screen name="Rabbanas" component={Rabbanas} options={{ ...pushed, title: t("rabbanas.40_rabbana", "40 Rabbanā") }} />
 
