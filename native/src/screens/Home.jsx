@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTopBar } from "../barstyle";
-import Svg, { Path, Polygon, Circle } from "react-native-svg";
+import Svg, { Path, Polygon, Circle, Rect } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
@@ -50,11 +50,14 @@ const TILES = [
   { to: "Quran",    k: "tiles.holy_quran",         t: "Holy Qurʼan",          icon: "quran" },
   { to: "Athkar",   k: "tiles.daily_adhkar",       t: "Daily Adhkār",         icon: "beads" },
   { to: "Bukhari",  k: "tiles.hadith",             t: "Ṣaḥīḥ al-Bukhārī",     icon: "book" },
+  { to: "Videos",   k: "marriage.videos_bayaans",  t: "Videos & bayaans",     icon: "vids" },
   { to: "Qibla",    k: "tiles.qibla",              t: "Qibla",                icon: "compass" },
+  { to: "Hajj",     k: "marriage.hajj_umrah",      t: "Hajj / Umrah",         icon: "hajj" },
   { to: "Madrasah", k: "tiles.madrasah",           t: "Madrasah",             icon: "cap" },
   { to: "Marriage", k: "tiles.nikah_services",     t: "Nikāḥ Services",       icon: "rings" },
   { to: "Funeral",  k: "tiles.funeral_services",   t: "Funeral Services",     icon: "grave" },
   { to: "HallHire", k: "tiles.hall_booking",       t: "Hall Booking",         icon: "hall" },
+  { to: "Zakat",    k: "menu.zakat",               t: "Zakat calculator",     icon: "zakat" },
   { to: "NewBuild", k: "tiles.donate",             t: "Donate",               icon: "heart" },
   { to: "Giving",   k: "giving.sadaqah_lillah",    t: "Sadaqah & Lillah",     icon: "box" },
   { to: "Collect",  k: "collect.charity_collections", t: "Charity Collections", icon: "tin" },
@@ -115,6 +118,20 @@ const GLYPH = () => ({
   beads:   <>{[[12,14.8],[15.34,13.58],[17.12,10.5],[16.5,7],[13.78,4.71],[10.22,4.71],[7.5,7],[6.88,10.5],[8.66,13.58]]
     .map(([x,y],i)=><Circle key={i} cx={x} cy={y} r={0.95} />)}
     <Path d="M12 15.9v1.3" /><Circle cx="12" cy="18.7" r="1.5" /></>,
+  /* The three the masjid asked for, drawn from the same paths index.html
+     uses so the tile looks the same on both platforms.
+
+     THE KAʿBAH IS A CUBE IN PERSPECTIVE, not a flat square. A square with a
+     band on it reads as a box or a filing tray at 23px; the top face and the
+     near vertical edge are what make it the Kaʿbah. The masjid picked this
+     one out of six. */
+  hajj:    <><Path d="M12 2.8 19.2 6.4 12 10 4.8 6.4Z" /><Path d="M4.8 6.4v11.2L12 21.2l7.2-3.6V6.4" /><Path d="M12 10v11.2" /><Path d="M4.8 9.2 12 12.8l7.2-3.6" /></>,
+  vids:    <><Rect x="3.5" y="5.5" width="17" height="13" rx="2.5" /><Path d="M10 9.3v5.4l4.5-2.7L10 9.3Z" /></>,
+  /* The keypad is six FILLED dots, as the website draws it. They name the
+     colour because a filled dot cannot inherit the Svg's stroke. */
+  zakat:   <><Rect x="5" y="3.5" width="14" height="17" rx="2" /><Path d="M8 7.5h8" />
+    {[[8.4, 12], [12, 12], [15.6, 12], [8.4, 15.6], [12, 15.6], [15.6, 15.6]].map(([cx, cy]) =>
+      <Circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={0.9} fill={C.brand600} stroke="none" />)}</>,
   whatsapp: <Path fill={C.brand600} stroke="none" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.27-.2-.57-.35M12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.4Z" />,
 });
 
