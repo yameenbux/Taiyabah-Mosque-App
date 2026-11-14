@@ -3447,6 +3447,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <input type="number" id="zk-stock" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
             <label class="zk-f"><span class="zk-l" data-i18n="zakat.shares_crypto_other_investments">Shares, crypto &amp; other investments (£)</span>
               <input type="number" id="zk-invest" inputmode="decimal" step="0.01" min="0" placeholder="0"></label>
+            <!-- THE PENSION NOTE GOES HERE, not at the foot of the page, because
+                 here is where somebody types the number. A pension has no field
+                 of its own — it is entered under investments or cash — so the
+                 caution has to sit beside the field that will carry it, or it is
+                 read after the figure has already been decided. -->
+            <p class="zk-tip" data-i18n-html="zakat.pensions_need_working_out_separately"><b>Pensions need working out separately.</b>
+               Whether zakat is due on a pension, and on how much of it, depends on the scheme,
+               what it is invested in and whether you can draw on it yet. This calculator cannot
+               work any of that out &mdash; it adds up whatever figure you type. Please settle the
+               pension figure with the imam before you enter it.</p>
             <p class="zk-gsnote" id="zk-gsnote" hidden></p>
           </div>
 
@@ -3498,10 +3508,17 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             </div>
           </div>
 
-          <p class="zk-disclaimer" data-i18n-html="zakat.this_is_a_guide_not"><b>This is a guide, not a ruling.</b> It follows the Hanafi
-            position and uses the price you enter. Zakat can depend on your own circumstances,
-            and scholars differ on things like pensions, shares and long-term debt. For anything
-            you are unsure about, please ask the imam at the masjid.</p>
+          <!-- It used to open "This is a guide, not a ruling", which says what it
+               is not and leaves somebody to assume the arithmetic has been done
+               for them. It has not: the calculator adds up what is typed and
+               takes 2.5%, and it cannot tell a wrong figure from a right one.
+               That is the thing to say first. -->
+          <p class="zk-disclaimer" data-i18n-html="zakat.a_basic_calculator_not_a"><b>A basic calculator, not a ruling.</b> It adds up the
+            figures you type and takes 2.5%. It does not know your circumstances and it cannot
+            check a single figure for you, so work each amount out yourself and satisfy yourself
+            it is right before you give. It follows the Hanafi position and uses the price you
+            enter; scholars differ on things like pensions, shares and long-term debt. For
+            anything you are unsure about, please ask the imam at the masjid.</p>
 
         </div>
       </div>
