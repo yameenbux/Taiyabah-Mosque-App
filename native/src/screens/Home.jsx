@@ -419,20 +419,24 @@ export default function Home({ navigation }) {
         </Press>
 
         {/* ---- Listen, and the appeal under it ---------------------------
-            NO HEADING OVER THESE TWO, which is a decision and not an
-            oversight. "Listen" labelled a single banner whose own first line
-            reads LISTEN LIVE, so it spent a line of the home screen repeating
-            the button beneath it. With the appeal banner now beside it, one
-            heading would have to cover both the stream and a building fund,
-            which is vaguer than no heading at all.
+            NO HEADING OVER THESE TWO, A RULE INSTEAD. "Listen" laboured a
+            single banner whose own first line reads LISTEN LIVE, so it spent
+            a line of the home screen repeating the button beneath it; and
+            with the appeal beside it, one heading would have to cover both a
+            radio stream and a building fund, which is vaguer than no heading
+            at all. So the pair gets the heading's hairline without the
+            heading's word, and the Services heading's own rule closes the
+            group underneath.
 
-            What holds the pair apart from the prayer times is the 26 below.
-            The heading's own margins (22 above, 11 below) came to about this
-            much, so the page keeps the rhythm it had while losing the word.
-            The website measures the same 26 — index.html's .lb-first. */}
+            The same hairline SecH draws (1px of C.line) on the same rhythm —
+            26 above, 12 below, 4 either side — so the breaker and the heading
+            read as one device. The website draws it the same way and measures
+            the same numbers: index.html's .brk. */}
+        <View style={{ height: 1, backgroundColor: C.line,
+                       marginTop: 26, marginBottom: 12, marginHorizontal: 4 }} />
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
           accessibilityRole="button"
-          style={{ borderRadius: R.card, overflow: "hidden", marginTop: 26 }}>
+          style={{ borderRadius: R.card, overflow: "hidden" }}>
           {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
               and ending on the BRIGHTER plum. This had it backwards and on the
               wrong two colours. */}

@@ -1780,19 +1780,17 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
        already generous; only the height needed raising to clear 24. */
     min-height:24px;display:inline-flex;align-items:center}
 
-  /* 26px above the banner pair, not the 20px the wrap gives on its own. The
-     "Listen" heading used to sit here and its own margins occupied about this
-     much, so taking the word away without putting the space back left the
-     banners butted up against whatever ends the block above. 6px of margin
-     restores the rhythm the heading had without restoring the heading.
-     Measured, not guessed: 18px reads as cramped and 34px opens a hole the
-     eye stops in.
+  /* ---- home: a section breaker ----
+     A hairline across the page where a heading would otherwise go. The
+     Listen banner and the new build appeal are a pair with nothing to call
+     them — one heading would have to cover both a radio stream and a
+     building fund — so the rule does the dividing that the word used to.
 
-     The thing above used to be the reminder ribbon, which has since come off
-     at the masjid's request; it is now the "Full timetable" link that closes
-     the prayer-times block. The 26px is unchanged because the wrap gives the
-     same 20 either way — re-measured after the ribbon went, not assumed. */
-  .lb-first{margin-top:6px}
+     It is the SAME hairline .sec-h draws beside a heading (1px of --line)
+     and it keeps .sec-h's own rhythm — 6 above, 12 below, 4 either side —
+     so the breaker and the "Services" heading under it read as the same
+     device rather than two different ideas about where a section starts. */
+  .brk{height:1px;background:var(--line);margin:6px 4px 12px;border:0}
 
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
@@ -2956,13 +2954,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
   <div class="wrap">
 
-    <!-- NO HEADING OVER THESE TWO. "Listen" labelled a single banner whose own
-         first line says LISTEN LIVE, so it spent a line of the home screen
-         repeating the button under it. With the appeal banner now beside it,
-         one heading would have to cover both the stream and a building fund,
-         which is vaguer than no heading at all. What holds the pair apart from
-         the prayer times is the 26px below — see .lb-first. -->
-    <button class="lbanner lb-first" id="go-listen" type="button">
+    <!-- NO HEADING OVER THESE TWO, A RULE INSTEAD. "Listen" laboured a single
+         banner whose own first line says LISTEN LIVE, so it spent a line of
+         the home screen repeating the button under it; and with the appeal
+         beside it, one heading would have to cover both a radio stream and a
+         building fund, which is vaguer than no heading at all. So the pair
+         gets the heading's hairline without the heading's word — see .brk.
+         The "Services" rule below closes the group. -->
+    <hr class="brk">
+    <button class="lbanner" id="go-listen" type="button">
       <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg></span>
       <span class="lt"><span class="l1" data-i18n="home.listen_live">Listen live</span>
         <span class="l2" data-i18n="home.tune_in_to_taiyabah">Tune in to Taiyabah Masjid</span></span>
