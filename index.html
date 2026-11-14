@@ -1828,13 +1828,35 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
      whole reason it carries on both pages. Everything else on this screen is
      themed; this is the deliberate exception.
 
-     THE THREE AMOUNTS ARE THE THREE STRIPE LINKS THE MASJID HAS. £250, £500
-     and £1,000 are Bronze, Silver and Gold on the appeal screen, and each pill
-     opens that same Payment Link with the same client_reference_id=newbuild —
-     without which the webhook cannot account for the money (see the appeal
-     screen's own note). There is no £25 or £50 pill because no such link
-     exists: a pill that said £50 and opened a £250 checkout would be a lie.
-     When the masjid creates smaller tiers, the links go here and in the app's
+     SMALL AMOUNTS, AND EACH PILL IS A CHECKOUT PAGE. The masjid asked for a
+     journey of tap, pay, receipt: so a pill is an ordinary link straight to
+     Stripe's hosted checkout, never a route into the appeal screen. Only the
+     headline and the gold disc open the appeal, which is where somebody who
+     wants to give more — or by bank transfer — goes.
+
+     THE LINKS ARE THE EVERYDAY GIVING ONES, tagged for the new build. They
+     are GIVING_LINKS.once in this file, the same links the giving sheet
+     opens, and the fund rides on client_reference_id rather than each fund
+     having a link of its own — which is how the whole app already works (see
+     gvRender). Tagged newbuild, a £5 gift lands on the appeal; tagged
+     general it would land on the general fund. Without the tag the webhook
+     cannot account for the money at all.
+
+     WHAT THE DONOR THEN READS. These links' Stripe pages say "Donation - One
+     Off — A gift to Taiyabah Masjid, Bolton. Registered charity 1041569."
+     The appeal's own four tiers say "New Build Appeal" on theirs. The money
+     lands on the appeal either way, because client_reference_id is what the
+     webhook books it against — but somebody who taps £5 under a banner
+     reading "Build a house in Paradise" is not told on the card page that
+     that is where it is going. Three small New Build Appeal links would fix
+     that and give £20 at the same time; they are the masjid's to create.
+
+     SO THE AMOUNTS ARE LIMITED TO THE LADDER THOSE LINKS OFFER: 5, 10, 25, 50
+     and 100. The masjid asked for £5, £10 and £20 — £20 has no link, so this
+     is £5, £10 and £25 until one exists. Do not point a £20 pill at the £25
+     link: the donor would be charged £25, which is the one mistake that
+     costs the masjid a donor rather than a pound. If a £20 Payment Link is
+     created, it goes in GIVING_LINKS.once and then here and in the app's
      Home.jsx, and nowhere else.
 
      NO HEADING ABOVE THIS PAIR, and that is a decision rather than an
@@ -2980,10 +3002,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     </button>
 
     <!-- ---- the new build appeal ----
-         Three pills, each the Stripe link the appeal screen charges for that
-         amount, and a disc that opens the appeal itself — where the £5,000
-         tier, the open amount and the bank details are. The amounts are not
-         decorative: see .nbcta in the stylesheet before changing one. -->
+         Three pills that go STRAIGHT to Stripe's checkout — tap, pay, receipt,
+         with nothing of ours in between — and a disc for anyone who wants to
+         give more, which opens the appeal where the named tiers, the open
+         amount and the bank details are. The amounts are not decorative and
+         £20 is missing on purpose: see .nbcta in the stylesheet before
+         changing one. -->
     <div class="nbcta">
       <span class="nb-star"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg></span>
       <button class="nb-top" type="button" id="nb-top">
@@ -2991,23 +3015,26 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <span class="nb-h" data-i18n="home.build_a_house_in_paradise">Build a house in Paradise</span>
       </button>
       <div class="nb-row">
-        <!-- £250 is Bronze on the appeal screen; same Payment Link, same purpose tag. -->
-        <a class="nb-amt" href="https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild"
+        <!-- GIVING_LINKS.once["5"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/3cI6oH8ry5XO2x84l0f3a09?client_reference_id=newbuild"
            target="_blank" rel="noopener"
-           aria-label="Donate £250 to the new build"
-           data-i18n-attr="aria-label:a11y.donate_250_to_the_new_build"><span data-i18n-num>&pound;250</span></a>
-        <!-- £500 is Silver on the appeal screen; same Payment Link, same purpose tag. -->
-        <a class="nb-amt" href="https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild"
+           aria-label="Donate £5 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_5_to_the_new_build"><span data-i18n-num>&pound;5</span></a>
+        <!-- GIVING_LINKS.once["10"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/cNi7sL7nu71S8Vw3gWf3a0a?client_reference_id=newbuild"
            target="_blank" rel="noopener"
-           aria-label="Donate £500 to the new build"
-           data-i18n-attr="aria-label:a11y.donate_500_to_the_new_build"><span data-i18n-num>&pound;500</span></a>
-        <!-- £1,000 is Gold on the appeal screen; same Payment Link, same purpose tag. -->
-        <a class="nb-amt" href="https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild"
+           aria-label="Donate £10 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_10_to_the_new_build"><span data-i18n-num>&pound;10</span></a>
+        <!-- GIVING_LINKS.once["25"], tagged for the appeal. Straight to Stripe:
+             no screen of ours sits between this tap and the card page. -->
+        <a class="nb-amt" href="https://donate.stripe.com/aFaeVd37egCs2x8eZEf3a0b?client_reference_id=newbuild"
            target="_blank" rel="noopener"
-           aria-label="Donate £1,000 to the new build"
-           data-i18n-attr="aria-label:a11y.donate_1000_to_the_new_build"><span data-i18n-num>&pound;1,000</span></a>
-        <button class="nb-go" type="button" id="nb-go" aria-label="Open the new build appeal"
-          data-i18n-attr="aria-label:a11y.open_the_new_build_appeal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></svg></button>
+           aria-label="Donate £25 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_25_to_the_new_build"><span data-i18n-num>&pound;25</span></a>
+        <button class="nb-go" type="button" id="nb-go" aria-label="Give another amount"
+          data-i18n-attr="aria-label:a11y.give_another_amount"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></svg></button>
       </div>
     </div>
 

@@ -17,6 +17,7 @@ import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { PrayerIcon } from "../prayer-icons";
+import { LINKS as GIVING_LINKS } from "./Donate";
 import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, nameFor, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
@@ -66,26 +67,29 @@ const TILES = [
 
 /* The three amount pills on the home-screen appeal card.
  *
- * EVERY HREF IS A LINK THE MASJID ALREADY HAS, and the amount shown is the
- * amount that link charges — these are Bronze, Silver and Gold on the appeal
- * screen (src/screens/Donate.jsx, TIERS), with the same Payment Link and the
- * same client_reference_id=newbuild the webhook matches the payment on. The
- * £5,000 tier and the open amount are deliberately not here: three pills and
- * a disc is the card the masjid chose, and the disc opens the appeal where the
- * other two live.
+ * EACH PILL IS A CHECKOUT PAGE. The masjid asked for a journey of tap, pay,
+ * receipt, so a pill opens Stripe's hosted checkout directly and no screen of
+ * ours sits in between. Only the headline and the gold disc go to the appeal,
+ * for somebody who wants to give more or to pay by bank transfer.
  *
- * DO NOT INVENT A SMALLER PILL. There is no £25 or £50 Payment Link, and a
- * pill reading £50 that opened a £250 checkout is the kind of mistake that
- * costs the masjid a donor. If the masjid creates smaller tiers, the links go
- * here and in index.html's .nb-row, and nowhere else. */
-const NB_TIERS = [
-  { amt: "\u00a3250",   a11y: "a11y.donate_250_to_the_new_build",
-    href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
-  { amt: "\u00a3500",   a11y: "a11y.donate_500_to_the_new_build",
-    href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
-  { amt: "\u00a31,000", a11y: "a11y.donate_1000_to_the_new_build",
-    href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
-];
+ * THE LINKS ARE THE EVERYDAY GIVING ONES, tagged for the new build — the same
+ * GIVING_LINKS.once the Sadaqah & Lillah screen opens, imported rather than
+ * copied. The fund rides on client_reference_id rather than each fund having
+ * links of its own, which is how the rest of the app already works: tagged
+ * newbuild a £5 gift lands on the appeal, tagged general it lands on the
+ * general fund, and untagged the webhook cannot account for it at all.
+ *
+ * SO THE AMOUNTS ARE THE LADDER THOSE LINKS OFFER: 5, 10, 25, 50, 100. The
+ * masjid asked for £5, £10 and £20; £20 has no link, so this is £5, £10 and
+ * £25 until one exists. Never point a £20 pill at the £25 link — the donor
+ * would be charged £25, which is the mistake that costs a donor rather than
+ * a pound. A new link goes in Donate.jsx's LINKS and in index.html, and the
+ * amount below. */
+const NB_TIERS = ["5", "10", "25"].map(k => ({
+  amt: `\u00a3${k}`,
+  a11y: `a11y.donate_${k}_to_the_new_build`,
+  href: `${GIVING_LINKS.once[k]}?client_reference_id=newbuild`,
+}));
 
 /* The web app draws its own tile glyphs rather than using an icon set, and they
  * are part of how it looks — a prayer-bead tasbīḥ, two rings, a collection tin.
@@ -537,7 +541,7 @@ export default function Home({ navigation }) {
                 </Press>))}
               <Press onPress={() => { tap(); navigation.navigate("NewBuild"); }}
                 accessibilityRole="button"
-                accessibilityLabel={t("a11y.open_the_new_build_appeal", "Open the new build appeal")}
+                accessibilityLabel={t("a11y.give_another_amount", "Give another amount")}
                 style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
                 <LinearGradient colors={["#E8CC80", C.gold]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                   style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
