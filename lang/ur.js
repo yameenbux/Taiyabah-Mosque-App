@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "363c565f838f",
+ "version": "b750f1ac571c",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -1886,6 +1886,7 @@ window.LANG_PACK = {
   "a11y.remove_this_surah": "اس سورت کو پسندیدہ سے نکالیں",
   "a11y.add_s_to_favourites": "{s} کو پسندیدہ میں شامل کریں",
   "a11y.remove_s_from_favourites": "{s} کو پسندیدہ سے نکالیں",
+  "mushaf.go_to_a_favourite": "محفوظ سورتوں میں جائیں…",
   "sysprefs.text_size": "عبارت کا سائز",
   "sysprefs.pick_the_size_that_reads": "وہ سائز چنیں جو سب سے آسانی سے پڑھا جائے۔ یہ پوری ایپ پر لاگو ہوگا۔",
   "sysprefs.the_quick_brown_sample": "بِسْمِ اللہ — ایپ اس طرح پڑھی جائے گی۔",

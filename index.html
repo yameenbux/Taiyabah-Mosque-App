@@ -2358,22 +2358,14 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     background:transparent;color:#fff;white-space:nowrap}
   .mu-bmrow{margin:10px 0 0;padding:9px 8px 6px;border-radius:11px;
     background:var(--paper);border:1px solid var(--line)}
-  /* however many are saved, the panel stays a panel and the list scrolls */
-  #mu-bm-list{max-height:196px;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .mu-bm-h{font-size:calc(10px * var(--ts));letter-spacing:.06em;text-transform:uppercase;
     color:var(--muted);font-weight:600;margin:0 4px 6px}
-  .mu-bm-item{display:flex;align-items:center;gap:6px}
-  .mu-bm-item + .mu-bm-item{margin-top:4px}
-  .mu-bm-go{flex:1;min-width:0;text-align:left;font:inherit;
-    font-size:calc(12.5px * var(--ts));font-weight:600;cursor:pointer;
-    padding:7px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* the page you are already on is marked, so the list says where you are */
-  .mu-bm-item.is-here .mu-bm-go{border-color:var(--plum-fill);color:var(--brand-600)}
-  .mu-bm-x{flex:0 0 auto;font:inherit;font-size:calc(15px * var(--ts));line-height:1;
-    cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--muted)}
+  /* HOWEVER MANY ARE KEPT, THIS IS ONE LINE. It was a row per favourite in a
+     196px scroller, which at ten sūrahs was most of the panel and pushed the
+     muṣḥaf down behind it. A select holds any number in the height of one. */
+  .mu-fav-pick{width:100%;min-width:0;font:inherit;font-size:calc(12.5px * var(--ts));
+    font-weight:600;color:var(--ink);margin:0 0 7px;padding:7px 8px;border-radius:9px;
+    border:1px solid var(--line);background:var(--card)}
   /* The jump controls and saved pages used to sit in the flow, so opening them
      pushed the mushaf down the screen — and the more pages someone saved, the
      further it went. They hang off the bar now and float over the page, which
@@ -2448,16 +2440,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     color:var(--muted);font-weight:600;margin:0 2px 8px}
   /* The screen is wide this way round, so they sit in columns and a dozen are
      in view at once without scrolling anything. */
-  .ml-fav-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
-  .ml-fav-item{display:flex;align-items:center;gap:4px;min-width:0}
-  .ml-fav-go{flex:1;min-width:0;text-align:left;font:inherit;font-size:calc(12px * var(--ts));
-    font-weight:600;cursor:pointer;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--paper);color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .ml-fav-item.is-here .ml-fav-go{border-color:var(--plum-fill);color:var(--brand-600)}
-  .ml-fav-x{flex:0 0 auto;font:inherit;font-size:calc(14px * var(--ts));line-height:1;cursor:pointer;
-    padding:6px 9px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);color:var(--muted)}
+
   .ml-fav-none{font-size:calc(12px * var(--ts));color:var(--muted);margin:2px}
   .ml-mark{width:100%;font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;cursor:pointer;
     text-align:left;margin:0 0 10px;padding:8px 10px;border-radius:10px;
@@ -4775,10 +4758,15 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                   <input id="mu-j-page" type="number" min="1" inputmode="numeric"></label>
               </div>
 
+              <!-- ONE DROPDOWN, NOT A LIST. A list grew a row per favourite and
+                   ten of them took most of the panel; this stays three lines
+                   whether somebody keeps one sūrah or fifty. -->
               <div class="mu-bmrow" id="mu-bmrow">
                 <div class="mu-bm-h" data-i18n="mushaf.favourites">Favourites</div>
+                <select class="mu-fav-pick" id="mu-fav-pick" hidden
+                        data-i18n-attr="aria-label:mushaf.go_to_a_favourite"
+                        aria-label="Go to a favourite"></select>
                 <button class="mu-fav-add" id="mu-fav-add"></button>
-                <div id="mu-bm-list"></div>
               </div>
             </div>
 
@@ -6708,7 +6696,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <button class="ml-mark" id="ml-mark" hidden></button>
       <div class="ml-fav-h" data-i18n="mushaf.favourites">Favourites</div>
       <button class="ml-fav-add" id="ml-fav-add"></button>
-      <div class="ml-fav-list" id="ml-fav-list"></div>
+      <select class="mu-fav-pick" id="ml-fav-pick" hidden
+              data-i18n-attr="aria-label:mushaf.go_to_a_favourite"
+              aria-label="Go to a favourite"></select>
       <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_surahs_kept_yet" hidden>No s&#363;rahs kept yet. The button above keeps the s&#363;rah you are reading.</p>
     </div>
   </div>
@@ -10817,27 +10807,44 @@ function renderMushafPlaces(){
     : t("mushaf.n_favourites", "{n} favourites")
   ).replace("{n}", num(list.length));
 
-  const host = document.getElementById('mu-bm-list');
-  host.innerHTML = "";
+  fillMushafFavPick('mu-fav-pick', list, su, showMushafPage);
+}
+
+/* FILLING THE FAVOURITES DROPDOWN, for the upright panel and the sideways one
+   alike. One line of screen whatever the count, which a list of rows could
+   never be: ten favourites used to be a 196px scroller inside a panel that
+   already had three fields in it.
+   Choosing an entry goes there and the select snaps back to its prompt, so it
+   never sits claiming to be somewhere the reader has since left. Removing is
+   the button above it, which always acts on the sūrah you are on — the
+   dropdown puts you there in one tap. */
+function fillMushafFavPick(id, list, here, go){
+  const sel = document.getElementById(id);
+  if(!sel) return;
+  sel.hidden = !list.length;
+  sel.innerHTML = "";
+  if(!list.length) return;
+
+  const prompt = document.createElement('option');
+  prompt.value = "";
+  prompt.textContent = t("mushaf.go_to_a_favourite", "Go to a favourite\u2026");
+  sel.appendChild(prompt);
+
   for(const n of list){
-    const page = mushafSurahPage(n);
-    const row = document.createElement('div');
-    row.className = "mu-bm-item" + (su && su.n === n ? " is-here" : "");
-    const go = document.createElement('button');
-    go.className = "mu-bm-go";
-    /* The sūrah's name leads and its page follows as the small part: the name
-       is what somebody is looking for and the page is how they get there. */
-    go.textContent = mushafSurahName(n) + " \u00b7 " + t("mushaf.page", "Page") + " " + num(page);
-    go.addEventListener('click', () => showMushafPage(page));
-    const rm = document.createElement('button');
-    rm.className = "mu-bm-x";
-    rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label",
-      t("a11y.remove_s_from_favourites", "Remove {s} from favourites").replace("{s}", mushafSurahName(n)));
-    rm.addEventListener('click', () => removeMushafFavourite(n));
-    row.append(go, rm);
-    host.appendChild(row);
+    const o = document.createElement('option');
+    o.value = String(n);
+    o.textContent = mushafSurahName(n) + " \u00b7 " + t("mushaf.page", "Page") + " " + num(mushafSurahPage(n));
+    sel.appendChild(o);
   }
+  /* The one you are reading shows as the chosen entry, so the dropdown also
+     answers "is this one of mine?" without being opened. */
+  sel.value = (here && list.includes(here.n)) ? String(here.n) : "";
+
+  sel.onchange = () => {
+    const n = Number(sel.value);
+    sel.value = (here && list.includes(here.n)) ? String(here.n) : "";
+    if(n) go(mushafSurahPage(n));
+  };
 }
 
 /* The page a sūrah opens on, from the same table the jump list reads. */
@@ -11096,9 +11103,8 @@ function toggleMushafFavs(){
 }
 
 function renderMushafFavs(){
-  const host = document.getElementById('ml-fav-list');
   const none = document.getElementById('ml-fav-none');
-  if(!host) return;
+  if(!none) return;
 
   /* The bookmark rides at the top of the same panel: sideways there is nowhere
      else to put the way back to it, and it belongs with the other places. */
@@ -11116,28 +11122,10 @@ function renderMushafFavs(){
       ? t("mushaf.remove_surah", "Remove {s} from favourites")
       : t("mushaf.keep_surah",   "Keep {s} in favourites")).replace("{s}", mushafSurahName(su.n));
   none.hidden = !!list.length;
-  host.innerHTML = "";
-  for(const n of list){
-    const page = mushafSurahPage(n);
-    const row = document.createElement('div');
-    row.className = "ml-fav-item" + (su && su.n === n ? " is-here" : "");
-    const go = document.createElement('button');
-    go.className = "ml-fav-go";
-    /* Sideways these sit in columns, so the name alone — the page number is
-       what used to push it off the end of the chip. */
-    go.textContent = mushafSurahName(n);
-    go.addEventListener('click', () => { goMushafLandscapePage(page); closeMushafFavs(); });
-    const rm = document.createElement('button');
-    rm.className = "ml-fav-x";
-    rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label",
-      t("a11y.remove_s_from_favourites", "Remove {s} from favourites").replace("{s}", mushafSurahName(n)));
-    rm.addEventListener('click', () => {
-      removeMushafFavourite(n); markMushafLandscape(); renderMushafFavs();
-    });
-    row.append(go, rm);
-    host.appendChild(row);
-  }
+  /* The same one-line dropdown as upright. Sideways there is even less room
+     to spend on a column of chips. */
+  fillMushafFavPick('ml-fav-pick', list, su,
+    page => { goMushafLandscapePage(page); closeMushafFavs(); });
 }
 
 /* The bar sits over the page rather than beside it, so it costs no height; it

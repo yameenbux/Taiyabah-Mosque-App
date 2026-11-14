@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "e6369a32a40a",
+ "version": "4238b0cc96ec",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -1886,6 +1886,7 @@ window.LANG_PACK = {
   "a11y.remove_this_surah": "أَزِلْ هَذِهِ السُّورَةَ مِنَ الْمُفَضَّلَة",
   "a11y.add_s_to_favourites": "أَضِفْ {s} إِلَى الْمُفَضَّلَة",
   "a11y.remove_s_from_favourites": "أَزِلْ {s} مِنَ الْمُفَضَّلَة",
+  "mushaf.go_to_a_favourite": "اذْهَبْ إِلَى سُورَةٍ مَحْفُوظَة…",
   "sysprefs.text_size": "حجم النص",
   "sysprefs.pick_the_size_that_reads": "اختر الحجم الأسهل في القراءة. يُطبَّق على التطبيق كلّه.",
   "sysprefs.the_quick_brown_sample": "بِسْمِ الله — هكذا سيبدو التطبيق.",

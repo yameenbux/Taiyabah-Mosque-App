@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "9aea752bd677",
+ "version": "25333cab2148",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -1886,6 +1886,7 @@ window.LANG_PACK = {
   "a11y.remove_this_surah": "આ સૂરહને પસંદગીમાંથી કાઢો",
   "a11y.add_s_to_favourites": "{s} ને પસંદગીમાં ઉમેરો",
   "a11y.remove_s_from_favourites": "{s} ને પસંદગીમાંથી કાઢો",
+  "mushaf.go_to_a_favourite": "સાચવેલી સૂરહ પર જાઓ…",
   "sysprefs.text_size": "લખાણનું કદ",
   "sysprefs.pick_the_size_that_reads": "જે કદ સૌથી સહેલાઈથી વંચાય તે પસંદ કરો. તે આખી ઍપમાં લાગુ થશે.",
   "sysprefs.the_quick_brown_sample": "બિસ્મિલ્લાહ — ઍપ આ રીતે વંચાશે.",
