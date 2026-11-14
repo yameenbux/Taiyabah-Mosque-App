@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "52978e106e4b",
+ "version": "c55135ec704c",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -1847,6 +1847,7 @@ window.LANG_PACK = {
   "notices.show_cleared": "દૂર કરેલી સૂચનાઓ બતાવો",
   "notices.clear_this_notice": "આ સૂચના દૂર કરો",
   "notices.all_cleared": "તમે આ ઉપકરણ પરથી દરેક સૂચના દૂર કરી છે. તે હજી પણ અહીં છે — દૂર કરેલી સૂચનાઓ બતાવો દબાવો.",
+  "home.fajr_ends": "ફજરનો સમય પૂરો",
   "quran.how_would_you_like_to_read": "તમે કઈ રીતે વાંચવા માંગો છો?",
   "quran.english_translation": "અંગ્રેજી અનુવાદ",
   "quran.all_114_s_rahs_with_an_english": "બધી ૧૧૪ સૂરહ, અરબીની સાથે અંગ્રેજી",

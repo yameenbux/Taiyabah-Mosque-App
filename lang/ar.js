@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "08e2f0dc7438",
+ "version": "57c0ee550fbe",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -1847,6 +1847,7 @@ window.LANG_PACK = {
   "notices.show_cleared": "أَظْهِرِ الْمُزَالَة",
   "notices.clear_this_notice": "أَزِلْ هٰذَا الْإِشْعَار",
   "notices.all_cleared": "لَقَدْ أَزَلْتَ كُلَّ إِشْعَارٍ مِنْ هٰذَا الْجِهَاز. وَهِيَ مَا زَالَتْ هُنَا — اِضْغَطْ أَظْهِرِ الْمُزَالَة.",
+  "home.fajr_ends": "يَنْتَهِي وَقْتُ الْفَجْر",
   "quran.how_would_you_like_to_read": "كيف تودّ أن تقرأ؟",
   "quran.english_translation": "الترجمة الإنجليزية",
   "quran.all_114_s_rahs_with_an_english": "جميع السور الـ١١٤، مع الإنجليزية بجانب العربية",

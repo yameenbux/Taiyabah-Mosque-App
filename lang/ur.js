@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "fa8d1cecb7c3",
+ "version": "032a2af3399f",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -1847,6 +1847,7 @@ window.LANG_PACK = {
   "notices.show_cleared": "ہٹائی گئی اطلاعات دکھائیں",
   "notices.clear_this_notice": "یہ اطلاع ہٹائیں",
   "notices.all_cleared": "آپ نے اس آلے سے ہر اطلاع ہٹا دی ہے۔ وہ اب بھی موجود ہیں — ہٹائی گئی اطلاعات دکھائیں دبائیے۔",
+  "home.fajr_ends": "فجر کا وقت ختم",
   "quran.how_would_you_like_to_read": "آپ کس طرح پڑھنا چاہیں گے؟",
   "quran.english_translation": "انگریزی ترجمہ",
   "quran.all_114_s_rahs_with_an_english": "تمام ۱۱۴ سورتیں، عربی کے ساتھ انگریزی ترجمہ",

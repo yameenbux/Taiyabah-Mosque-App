@@ -77,6 +77,17 @@ export const STRIP_ICONS = {
     "M18.2 3v2.6",
     "M16.9 4.3h2.6",
   ],
+  /* Sunrise, for the line under the strip rather than a column in it. The
+     same horizon Fajr and Maghrib stand on, but a WHOLE disc resting on it
+     and no arrow: Fajr's arrow rises and Maghrib's falls, and sunrise is the
+     moment between them where nothing is moving yet. */
+  sunrise: [
+    "M3 18h18",
+    "M16 13.6a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
+    "M12 5.4v2.2",
+    "M5.6 7.6 7.1 9.1",
+    "M18.4 7.6 16.9 9.1",
+  ],
 };
 
 /* 1.6, which is what the website strokes them at. Thinner and the crescent

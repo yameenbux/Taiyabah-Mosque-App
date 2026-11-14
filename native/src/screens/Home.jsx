@@ -357,6 +357,24 @@ export default function Home({ navigation }) {
             })}
           </View>)}
 
+        {/* SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
+            no jamāʿah, so a sixth column would promise a beginning and a
+            jamāʿah and leave the second half empty. What a reader wants from
+            sunrise is when Fajr stops, and that is a sentence rather than a
+            column. Drawn from the same `day` the strip was, so the two cannot
+            disagree about which day they are showing. */}
+        {!!day && !!day.begins.sunrise && (
+          <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                         justifyContent: "center", gap: 7, marginTop: 9,
+                         paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10,
+                         backgroundColor: C.tintGold, borderWidth: 1, borderColor: "rgba(198,162,76,.28)" }}>
+            <PrayerIcon k="sunrise" size={14} color={C.gold} />
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12), color: C.ink }}>
+              {t("prayer.sunrise", "Sunrise")} {pretty(day.begins.sunrise).replace(/ (am|pm)$/, "")}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted }}>
+              — {t("home.fajr_ends", "Fajr ends")}</Text>
+          </View>)}
+
         {/* WHEN THERE ARE NO TIMES FOR TODAY, SAY SO. The timetable runs a
             year at a time, and on the first morning of a year the masjid has
             not published yet this card simply was not drawn — the prayer

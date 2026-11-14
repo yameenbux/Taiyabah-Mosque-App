@@ -54,8 +54,17 @@ const b = table(site, "index.html");
    failure instead of a quietly shorter list that agrees with itself. */
 const ORDER = ["fajr", "zuhr", "asr", "maghrib", "isha"];
 
+/* Glyphs both tables must carry, identically, that are NOT columns in the
+   strip. Sunrise is the only one: it is not a prayer and has no jamāʿah, so
+   it is drawn on the line under the strip rather than in it — but it is the
+   same drawing on both platforms and has exactly the same reason to be kept
+   in step as the five above it. Listed rather than waved through, so a glyph
+   cannot be added to one table alone and excused as "extra". */
+const OFF_STRIP = ["sunrise"];
+const ALL = [...ORDER, ...OFF_STRIP];
+
 const fail = [];
-for (const k of ORDER) {
+for (const k of ALL) {
   const x = a[k], y = b[k];
   if (!x?.length) { fail.push(`${k}: no paths in native/src/prayer-icons.jsx`); continue; }
   if (!y?.length) { fail.push(`${k}: no paths in index.html`); continue; }
@@ -71,8 +80,9 @@ for (const k of ORDER) {
    walks the five it already knows about. */
 for (const [name, tbl] of [["the app", a], ["the website", b]])
   for (const k of Object.keys(tbl))
-    if (!ORDER.includes(k))
-      fail.push(`${name} has a "${k}" glyph the strip never draws — add it to ORDER here or remove it`);
+    if (!ALL.includes(k))
+      fail.push(`${name} has a "${k}" glyph nothing is known to draw — add it to ORDER or ` +
+                `OFF_STRIP here, or remove it`);
 
 if (fail.length) {
   console.error(`\n${fail.length} prayer-icon difference(s) between the app and the website:\n`);
@@ -81,5 +91,6 @@ if (fail.length) {
                 "\n  and the STRIP_ICONS block in index.html.\n");
   process.exit(1);
 }
-const n = ORDER.reduce((s, k) => s + a[k].length, 0);
-console.log(`the app and the website draw the same ${ORDER.length} prayer glyphs (${n} paths)`);
+const n = ALL.reduce((s, k) => s + a[k].length, 0);
+console.log(`the app and the website draw the same ${ORDER.length} prayer glyphs `
+          + `and ${OFF_STRIP.length} off the strip (${n} paths)`);

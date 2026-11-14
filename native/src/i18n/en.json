@@ -1233,6 +1233,8 @@
  "advice.an_imam_will_read_this": "An imam will read this and answer you by email. Nobody else at the masjid can see it. If it is urgent, ring the office as well.",
  "advice.reference": "Reference",
  "advice.please_keep_this_reference_written": "Please keep this reference. If you write again, quote it and the imam will know which question you mean.",
+ "prayer.sunrise": "Sunrise",
+ "home.fajr_ends": "Fajr ends",
  "nikah.email_subject": "Nikah date request",
  "nikah.youve_chosen": "You have chosen {when}, {slot}. Ring or email the office to ask for it.",
  "nikah.check_the_form": "Please fill in your name, number, a valid email, who you are, and tick the box.",

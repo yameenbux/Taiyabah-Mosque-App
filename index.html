@@ -1789,6 +1789,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .pcol .p-b{font-size:calc(13.5px * var(--ts));font-weight:700;color:var(--ink);white-space:nowrap}
   .pcol .p-j{font-size:calc(11px * var(--ts));color:var(--brand-600);font-weight:600;white-space:nowrap;
     background:rgba(119,33,87,.09);border-radius:6px;padding:2px 6px;margin-top:2px}
+  .sunline{display:flex;align-items:center;justify-content:center;gap:7px;
+    margin:9px 0 0;padding:7px 10px;border-radius:10px;
+    background:var(--tint-gold);border:1px solid var(--tint-gold-line)}
+  .sunline svg{width:14px;height:14px;color:var(--gold);flex:0 0 auto}
+  .sunline .sl-t{font-size:calc(12px * var(--ts));color:var(--ink);font-weight:600}
+  .sunline .sl-s{font-size:calc(12px * var(--ts));color:var(--muted)}
   .striplink{display:flex;justify-content:flex-end;margin-top:8px}
   .striplink button{font:inherit;font-size:calc(11.5px * var(--ts));font-weight:700;color:var(--brand-600);
     background:none;border:0;cursor:pointer;padding:2px 2px;
@@ -2893,6 +2899,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   <div class="wrap">
     <div class="sec-h"><h2 data-i18n="home.today">Today</h2><span class="rule"></span><span class="tag" data-i18n="home.beginning_jamaah">Beginning &amp; jam&#257;&#703;ah</span></div>
     <div class="card pstrip" id="pstrip"></div>
+    <!-- SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
+         no jamāʿah, so a sixth column would promise a beginning and a
+         jamāʿah and then leave the second half empty. What a reader wants
+         from sunrise is when Fajr stops, which is a sentence, not a column. -->
+    <p class="sunline" id="sunline" hidden></p>
     <div class="striplink"><button type="button" id="go-timetable" data-i18n="home.full_timetable">Full timetable &rsaquo;</button></div>
   </div>
 
@@ -14134,6 +14145,17 @@ const STRIP_ICONS = {
     "M18.2 3v2.6",
     "M16.9 4.3h2.6",
   ],
+  /* Sunrise, for the line under the strip. The same horizon the Fajr and
+     Maghrib marks stand on, but a WHOLE sun resting on it and no arrow:
+     Fajr's arrow points up and Maghrib's points down, and sunrise is the
+     moment between them where nothing is moving yet. */
+  sunrise: [
+    "M3 18h18",
+    "M16 13.6a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
+    "M12 5.4v2.2",
+    "M5.6 7.6 7.1 9.1",
+    "M18.4 7.6 16.9 9.1",
+  ],
 };
 
 const stripIcon = k => (STRIP_ICONS[k] || []).map(d => `<path d="${d}"/>`).join("");
@@ -14175,6 +14197,20 @@ function renderStrip(){
          + `<span class="p-j tnum">${jam ? esc(hmShort(jam)) : "&mdash;"}</span>`
          + `</div>`;
   }).join("");
+
+  /* The same record the strip was built from, so the two can never disagree
+     about which day they are showing. Hidden rather than guessed at if a day
+     ever arrives without one. */
+  const sun = document.getElementById("sunline");
+  if(sun){
+    const rise = rec.begins && rec.begins.sunrise;
+    sun.hidden = !rise;
+    if(rise) sun.innerHTML =
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" `
+      + `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${stripIcon("sunrise")}</svg>`
+      + `<span class="sl-t tnum">${esc(t("prayer.sunrise", "Sunrise"))} ${esc(hmShort(rise))}</span>`
+      + `<span class="sl-s">&mdash; ${esc(t("home.fajr_ends", "Fajr ends"))}</span>`;
+  }
 }
 
 /* ---------------- home: the services grid ----------------
