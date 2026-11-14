@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "4238b0cc96ec",
+ "version": "08e2f0dc7438",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -432,8 +432,6 @@ window.LANG_PACK = {
   "place.madinah": "المدينة",
   "common.loading": "جارٍ التحميل…",
   "common.registered_charity": "جمعية بولتون الإسلامية المركزية · جمعية خيرية مسجَّلة",
-  "drawer.radio": "راديو",
-  "drawer.mhz": "ميغاهرتز",
   "time.morning": "ص",
   "time.afternoon": "م",
   "time.evening": "م",

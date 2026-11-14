@@ -1338,7 +1338,7 @@ export function Help({ t: label, link }) {
  * something to press. Prayer Times had no footer at all: its "Times from the
  * official 2026 Salah Timetable" sat left-aligned as an ordinary note and the
  * charity line was missing from the screen entirely. */
-export function PageFoot({ note }) {
+export function PageFoot({ note, credit = true }) {
   const { t, fs } = useApp();
   const faint = "#A49AA0";
   return (
@@ -1352,6 +1352,11 @@ export function PageFoot({ note }) {
       <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), lineHeight: fs(18), color: faint,
                      textAlign: "center", marginTop: 12 }}>
         {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
+      {/* `credit={false}` on Home. The masjid asked for the home screen to
+          close on the masjid and nothing else, with the credit moved into
+          More — see the footer there. Prayer Times keeps it, as the website
+          does on the same two pages. */}
+      {credit && (
       <Press onPress={() => { tap(); open("https://masjidone.co.uk"); }}
              /* A 10.5px line of type is a 16pt target, the smallest in the
                 app. It sits under the charity line with nothing beneath it,
@@ -1363,7 +1368,7 @@ export function PageFoot({ note }) {
         <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted,
                        borderBottomWidth: 1, borderBottomColor: "rgba(124,110,119,.3)" }}>
           {t("sheet.masjidone", "MasjidOne")}</Text>
-      </Press>
+      </Press>)}
     </View>
   );
 }

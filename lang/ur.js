@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "b750f1ac571c",
+ "version": "fa8d1cecb7c3",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -432,8 +432,6 @@ window.LANG_PACK = {
   "place.madinah": "مدینہ",
   "common.loading": "لوڈ ہو رہا ہے…",
   "common.registered_charity": "بولٹن سنٹرل اسلامک سوسائٹی · رجسٹرڈ چیریٹی",
-  "drawer.radio": "ریڈیو",
-  "drawer.mhz": "میگاہرٹز",
   "time.morning": "صبح",
   "time.afternoon": "دوپہر",
   "time.evening": "شام",

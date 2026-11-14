@@ -495,7 +495,9 @@ export default function Home({ navigation }) {
             </Pressable>))}
         </View>
 
-        <PageFoot />
+        {/* No credit: the home screen closes on the masjid. "Powered by
+            MasjidOne" moved to the footer of More. */}
+        <PageFoot credit={false} />
 
       </View>
     </Screen>

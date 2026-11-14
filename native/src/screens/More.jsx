@@ -2,7 +2,7 @@
  *
  * This is the web app's drawer, row for row: the same five groups in the same
  * order, the same sixteen rows, every one of which goes somewhere, the same
- * social strip and the same footer with the radio frequency on it. Anything the
+ * social strip, and the footer that now carries the credit. Anything the
  * web app reaches from a tile or a sheet is reached the same way here.
  *
  * ONE ROW IS NOT ON THE WEBSITE: Help. It is here on purpose and it is the only
@@ -136,11 +136,26 @@ export default function More({ navigation }) {
           </Press>))}
       </View>
 
-      <View style={{ marginTop: 18, gap: 3 }}>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, textAlign: "center" }}>
-          {t("drawer.radio", "Radio")} 454.1000 {t("drawer.mhz", "MHz")}</Text>
+      {/* THE CREDIT LIVES HERE NOW, not under the home screen. It is the
+          masjid's app and the home screen should close on the masjid; the
+          platform it is built on belongs one level down, among the things a
+          reader looks up rather than reads. The radio frequency came off the
+          same footer at the same time — it is still on About and Contact,
+          which is where somebody goes looking for it. */}
+      <View style={{ marginTop: 18, gap: 3, alignItems: "center" }}>
         <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, textAlign: "center" }}>
           {t("common.registered_charity", "Bolton Central Islamic Society · Registered charity")} 1041569</Text>
+        {/* 11px of type is a 16pt target, so it is given room to grow
+            downwards — there is nothing under it. */}
+        <Press onPress={() => { tap(); open("https://masjidone.co.uk"); }}
+               hitSlop={{ top: 10, bottom: 16, left: 10, right: 10 }}
+               style={{ flexDirection: "row", gap: 4 }}>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted }}>
+            {t("sheet.app_built_by", "Powered by")}</Text>
+          <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted,
+                         borderBottomWidth: 1, borderBottomColor: "rgba(124,110,119,.3)" }}>
+            {t("sheet.masjidone", "MasjidOne")}</Text>
+        </Press>
       </View>
       </View>
     </Screen>

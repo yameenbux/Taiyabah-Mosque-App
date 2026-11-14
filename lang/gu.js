@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "25333cab2148",
+ "version": "52978e106e4b",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -432,8 +432,6 @@ window.LANG_PACK = {
   "place.madinah": "મદીના",
   "common.loading": "લોડ થઈ રહ્યું છે…",
   "common.registered_charity": "બોલ્ટન સેન્ટ્રલ ઇસ્લામિક સોસાયટી · રજિસ્ટર્ડ ચેરિટી",
-  "drawer.radio": "રેડિયો",
-  "drawer.mhz": "મેગાહર્ટ્ઝ",
   "time.morning": "સવારે",
   "time.afternoon": "બપોરે",
   "time.evening": "સાંજે",
