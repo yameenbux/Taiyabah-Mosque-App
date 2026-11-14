@@ -11,6 +11,7 @@ import { fontSize } from "./scale";
 import { setThemeMode } from "./theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EN from "./i18n/en.json";
+import { surahsFromPages } from "./mushaf";
 
 const PACKS = { ur: () => require("./i18n/ur.json"), gu: () => require("./i18n/gu.json"), ar: () => require("./i18n/ar.json") };
 export const LANGS = [
@@ -25,9 +26,16 @@ const RTL = new Set(["ar", "ur"]);
 
 const KEY = "taiyabah.prefs.v1";
 /* muMark is the one bookmark — the everyday one, moved by putting it somewhere
- * else and taken away by putting it where it already is. muFavs is the list you
- * build up on purpose. The web app keeps exactly these two, separately and for
- * the same reason, so a reader who uses both on the website finds both here. */
+ * else and taken away by putting it where it already is. muFavSurahs is the
+ * list you build up on purpose. The web app keeps exactly these two,
+ * separately and for the same reason, so a reader who uses both on the
+ * website finds both here.
+ *
+ * THE FAVOURITES USED TO BE PAGES and are now SŪRAHS. A list reading "Page
+ * 247, Page 408" told nobody anything — a page number belongs to one printing
+ * and to no sūrah anyone can name — and the committee reported the whole
+ * feature as missing because of it. Anything already saved under the old
+ * `muFavs` is carried across by migrate() below; nothing is dropped. */
 /* What the phone itself asks for. 1 on anything that cannot say — the web
  * export among them, where React Native applies no scale of its own. */
 const osFontScale = () => {
@@ -45,11 +53,31 @@ const osFontScale = () => {
  *
  * `mins` is deliberately absent: it is a number, not a switch, and whatever it
  * was set to is kept. */
+/* MUṢḤAF FAVOURITES MOVED FROM PAGES TO SŪRAHS, and somebody who had already
+ * kept a few pages must not open the app to an empty list. Each saved page
+ * becomes the sūrah it sat in, three pages of al-Baqara collapse to one
+ * al-Baqara, and the old field is cleared so this runs once and never again.
+ *
+ * It reads what is on disk rather than asking the reader to redo anything,
+ * and it cannot lose a favourite it could have kept — surahsFromPages() drops
+ * only a page that belongs to no sūrah at all, which in this printing is the
+ * frontispiece and nothing else. Tested in scripts/test/mushaf.test.mjs. */
+function migrate(p) {
+  if (!Array.isArray(p.muFavs) || !p.muFavs.length) {
+    if ("muFavs" in p) { const { muFavs, ...rest } = p; return rest; }
+    return p;
+  }
+  const { muFavs, ...rest } = p;
+  const already = Array.isArray(rest.muFavSurahs) ? rest.muFavSurahs : [];
+  const moved = surahsFromPages(muFavs);
+  return { ...rest, muFavSurahs: [...new Set([...already, ...moved])].sort((a, b) => a - b) };
+}
+
 export const EVERYTHING_ON = { jamaah: true, janazah: true, announcements: true,
                                events: true, kahf: true };
 
 const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favourites: [], lastRead: null,
-                   muMark: 0, muFavs: [],
+                   muMark: 0, muFavSurahs: [],
                    /* The website's own five switches and its ten-minute default,
                     * so somebody who set this up on the website finds the same
                     * choices here rather than a different set. */
@@ -87,7 +115,7 @@ export function AppProvider({ children, fallback = null }) {
     /* The real answer always wins, even if it arrives late — losing somebody's
      * chosen language would be its own bug. */
     AsyncStorage.getItem(KEY)
-      .then(raw => alive && setPrefs({ ...DEFAULTS, ...(raw ? JSON.parse(raw) : null) }))
+      .then(raw => alive && setPrefs(migrate({ ...DEFAULTS, ...(raw ? JSON.parse(raw) : null) })))
       .catch(() => alive && setPrefs(p => p || DEFAULTS));  // a corrupt store must not brick the app
     /* Nor must a silent one. If the native module is missing, or simply never
      * answers, this provider would render its fallback for ever and the app
@@ -193,11 +221,14 @@ export function AppProvider({ children, fallback = null }) {
       pruneClearedNotices: kept => save({ ...prefs, ntCleared: kept }),
       setAlerts: patch => save({ ...prefs, alerts: { ...prefs.alerts, ...patch } }),
       toggleMushafMark: page => save({ ...prefs, muMark: prefs.muMark === page ? 0 : page }),
-      toggleMushafFav: page => save({
+      /* By sūrah now, not by page. The caller passes a sūrah number; the
+         screen is what works out which sūrah a page belongs to, and it names
+         that sūrah on the control before anybody presses it. */
+      toggleMushafFavSurah: n => save({
         ...prefs,
-        muFavs: prefs.muFavs.includes(page)
-          ? prefs.muFavs.filter(n => n !== page)
-          : [...prefs.muFavs, page].sort((a, b) => a - b),
+        muFavSurahs: (prefs.muFavSurahs || []).includes(n)
+          ? prefs.muFavSurahs.filter(x => x !== n)
+          : [...(prefs.muFavSurahs || []), n].sort((a, b) => a - b),
       }),
       toggleFavourite: id => save({
         ...prefs,

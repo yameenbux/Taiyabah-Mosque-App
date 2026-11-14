@@ -6709,7 +6709,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       <div class="ml-fav-h" data-i18n="mushaf.favourites">Favourites</div>
       <button class="ml-fav-add" id="ml-fav-add"></button>
       <div class="ml-fav-list" id="ml-fav-list"></div>
-      <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_favourites_yet" hidden>Nothing kept yet. The ribbon on the right keeps the page you are on.</p>
+      <p class="ml-fav-none" id="ml-fav-none" data-i18n="mushaf.no_surahs_kept_yet" hidden>No s&#363;rahs kept yet. The button above keeps the s&#363;rah you are reading.</p>
     </div>
   </div>
 </div>
@@ -10441,7 +10441,8 @@ const MU_LAST_PAGE = "mushaf.lastPage";
    as many as you like and they do not move. */
 const MU_MARK = "mushaf.mark";
 const MU_BOOKMARK  = "mushaf.bookmark";       // the oldest single value, read once then retired
-const MU_FAVOURITES = "mushaf.bookmarks";    // the key is older than the name; the pages inside are the favourites
+const MU_FAV_PAGES  = "mushaf.bookmarks";    // RETIRED: pages, migrated once into the key below
+const MU_FAVOURITES = "mushaf.fav.surahs";   // sūrah numbers
 
 async function loadMushafMeta(){
   if(MUSHAF.state) return MUSHAF.state;
@@ -10630,18 +10631,51 @@ async function showMushafPage(n){
   }
 }
 
+/* FAVOURITES ARE SŪRAHS NOW, NOT PAGES.
+ *
+ * The list used to read "al-Baqara · Page 247, Yāsīn · Page 611" and what was
+ * stored was the page: keep Yāsīn from page 611 and then again from 612 and
+ * you had two Yāsīns. A page belongs to one printing and names nothing anybody
+ * asks for, and the committee reported favourites as missing rather than as
+ * unhelpful. A sūrah is the thing people mean.
+ *
+ * Anything saved under the old page key is carried across the first time this
+ * runs: each page becomes the sūrah it sat in, duplicates collapse, and the
+ * old key is emptied so it happens once. native/src/mushaf.js does the same
+ * for the app, and scripts/test/mushaf.test.mjs holds it. */
 function mushafFavourites(){
   const v = prefStore.get(MU_FAVOURITES, null);
-  if(Array.isArray(v)) return v.filter(n => Number.isInteger(n) && n >= 1).sort((x, y) => x - y);
-  /* carried over from when only one page could be kept, so nobody who had
-     saved one loses it */
+  if(Array.isArray(v))
+    return v.filter(n => Number.isInteger(n) && n >= 1 && n <= 114).sort((x, y) => x - y);
+
+  const out = [];
+  const take = n => { if(Number.isInteger(n) && n >= 1 && !out.includes(n)) out.push(n); };
+  const pages = prefStore.get(MU_FAV_PAGES, null);
+  if(Array.isArray(pages))
+    for(const p of pages){ const su = mushafAt(MUSHAF.sur, p); if(su) take(su.n); }
+  /* and the oldest single value of all, from before there was a list */
   const one = prefStore.get(MU_BOOKMARK, 0);
-  return (Number.isInteger(one) && one >= 1) ? [one] : [];
+  if(Number.isInteger(one) && one >= 1){ const su = mushafAt(MUSHAF.sur, one); if(su) take(su.n); }
+
+  if(out.length) setMushafFavourites(out);
+  return out.sort((a, b) => a - b);
 }
 
 function setMushafFavourites(list){
   prefStore.set(MU_FAVOURITES, list.slice().sort((a, b) => a - b));
-  prefStore.set(MU_BOOKMARK, 0);          // the old single value is spent
+  prefStore.set(MU_FAV_PAGES, []);        // the page list is spent
+  prefStore.set(MU_BOOKMARK, 0);          // and so is the single value before it
+}
+
+/* The sūrah the reader is in, and its name — the two things every favourite
+   control on this screen has to say. Null where the page carries no sūrah,
+   which in this printing is the frontispiece alone. */
+function mushafHere(){
+  return mushafAt(MUSHAF.sur, MUSHAF.page);
+}
+function mushafSurahName(n){
+  const rec = quranIndex && quranIndex.surahs.find(x => x.n === n);
+  return rec ? (rec.nameEn || rec.name) : t("mushaf.s_rah", "S\u016brah") + " " + num(n);
 }
 
 const MU_RIBBON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
@@ -10668,18 +10702,24 @@ function toggleMushafMark(){
 /* Favourites are added and dropped from the list itself, so that the one button
    on the bar can be the bookmark — the everyday one — and mean only that. */
 function toggleMushafFavourite(){
+  const su = mushafHere();
+  if(!su) return;                      /* the frontispiece belongs to no sūrah */
   const list = mushafFavourites();
-  const i = list.indexOf(MUSHAF.page);
+  const i = list.indexOf(su.n);
   const saving = i < 0;
-  if(saving) list.push(MUSHAF.page); else list.splice(i, 1);
+  if(saving) list.push(su.n); else list.splice(i, 1);
   setMushafFavourites(list);
   renderMushafPlaces();
   if(mushafLandscapeOpen()){ markMushafLandscape(); renderMushafFavs(); return; }
   /* With the list already on screen it says it itself, and a note over the top
      would only be in the way. */
   if(!document.getElementById('mu-jump').hidden) return;
-  mushafToast(saving ? t("mushaf.added_to_favourites", "Added to your favourites")
-                     : t("mushaf.removed_from_favourites", "Removed from your favourites"), saving);
+  /* NAMES THE SŪRAH, which is the whole safeguard on the eight pages that open
+     more than one: the reader is told what was kept, not merely that something
+     was. */
+  mushafToast((saving ? t("mushaf.surah_added", "{s} added to favourites")
+                      : t("mushaf.surah_removed", "{s} removed from favourites"))
+                .replace("{s}", mushafSurahName(su.n)), saving);
 }
 
 /* A ribbon filling in is not an answer to "where did that go?". Saving says so
@@ -10756,10 +10796,16 @@ function renderMushafPlaces(){
   }
 
   const list = mushafFavourites();
-  const here = list.includes(MUSHAF.page);
+  const su = mushafHere();
+  const here = !!su && list.includes(su.n);
   const add = document.getElementById('mu-fav-add');
-  add.textContent = here ? t("mushaf.remove_this_page", "Remove this page from favourites")
-                         : t("mushaf.add_this_page",    "Add this page to favourites");
+  /* The button names the sūrah it is about to keep, so a reader on one of the
+     eight pages that open three of them can see which one they are getting
+     before they press it. */
+  add.hidden = !su;
+  if(su) add.textContent = (here ? t("mushaf.remove_surah", "Remove {s} from favourites")
+                                 : t("mushaf.keep_surah",   "Keep {s} in favourites"))
+                             .replace("{s}", mushafSurahName(su.n));
 
   const hint = document.getElementById('mu-saved');
   hint.hidden = !list.length;
@@ -10774,20 +10820,30 @@ function renderMushafPlaces(){
   const host = document.getElementById('mu-bm-list');
   host.innerHTML = "";
   for(const n of list){
+    const page = mushafSurahPage(n);
     const row = document.createElement('div');
-    row.className = "mu-bm-item" + (n === MUSHAF.page ? " is-here" : "");
+    row.className = "mu-bm-item" + (su && su.n === n ? " is-here" : "");
     const go = document.createElement('button');
     go.className = "mu-bm-go";
-    go.textContent = mushafPlaceLabel(n);
-    go.addEventListener('click', () => showMushafPage(n));
+    /* The sūrah's name leads and its page follows as the small part: the name
+       is what somebody is looking for and the page is how they get there. */
+    go.textContent = mushafSurahName(n) + " \u00b7 " + t("mushaf.page", "Page") + " " + num(page);
+    go.addEventListener('click', () => showMushafPage(page));
     const rm = document.createElement('button');
     rm.className = "mu-bm-x";
     rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
+    rm.setAttribute("aria-label",
+      t("a11y.remove_s_from_favourites", "Remove {s} from favourites").replace("{s}", mushafSurahName(n)));
     rm.addEventListener('click', () => removeMushafFavourite(n));
     row.append(go, rm);
     host.appendChild(row);
   }
+}
+
+/* The page a sūrah opens on, from the same table the jump list reads. */
+function mushafSurahPage(n){
+  const row = MUSHAF.sur.find(x => x.n === n);
+  return row ? row.page : 1;
 }
 
 function fillMushafJump(){
@@ -11053,23 +11109,29 @@ function renderMushafFavs(){
     markBtn.textContent = t("mushaf.bookmark_at", "Bookmark \u00b7 {p}").replace("{p}", mushafPlaceLabel(mark, "flat"));
 
   const list = mushafFavourites();
+  const su = mushafHere();
   const addBtn = document.getElementById('ml-fav-add');
-  addBtn.textContent = list.includes(MUSHAF.page)
-    ? t("mushaf.remove_this_page", "Remove this page from favourites")
-    : t("mushaf.add_this_page",    "Add this page to favourites");
+  addBtn.hidden = !su;
+  if(su) addBtn.textContent = (list.includes(su.n)
+      ? t("mushaf.remove_surah", "Remove {s} from favourites")
+      : t("mushaf.keep_surah",   "Keep {s} in favourites")).replace("{s}", mushafSurahName(su.n));
   none.hidden = !!list.length;
   host.innerHTML = "";
   for(const n of list){
+    const page = mushafSurahPage(n);
     const row = document.createElement('div');
-    row.className = "ml-fav-item" + (n === MUSHAF.page ? " is-here" : "");
+    row.className = "ml-fav-item" + (su && su.n === n ? " is-here" : "");
     const go = document.createElement('button');
     go.className = "ml-fav-go";
-    go.textContent = mushafPlaceLabel(n, true);
-    go.addEventListener('click', () => { goMushafLandscapePage(n); closeMushafFavs(); });
+    /* Sideways these sit in columns, so the name alone — the page number is
+       what used to push it off the end of the chip. */
+    go.textContent = mushafSurahName(n);
+    go.addEventListener('click', () => { goMushafLandscapePage(page); closeMushafFavs(); });
     const rm = document.createElement('button');
     rm.className = "ml-fav-x";
     rm.textContent = "\u00d7";
-    rm.setAttribute("aria-label", t("a11y.remove_favourite", "Remove favourite"));
+    rm.setAttribute("aria-label",
+      t("a11y.remove_s_from_favourites", "Remove {s} from favourites").replace("{s}", mushafSurahName(n)));
     rm.addEventListener('click', () => {
       removeMushafFavourite(n); markMushafLandscape(); renderMushafFavs();
     });

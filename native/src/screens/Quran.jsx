@@ -24,6 +24,7 @@ import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, MenuRow, Press, Pi
 import { SHEETS } from "../Blocks";
 import IDX from "../data/quran-index.json";
 import MUSHAF from "../data/mushaf.json";
+import { surahAt, pageOf } from "../mushaf";
 
 
 const HOST = "https://taiyabahapp.ysbdesigns.uk";
@@ -328,7 +329,7 @@ function Page({ n, width, height, uri, dim, children, onZoom }) {
 }
 
 export function Mushaf({ route, navigation }) {
-  const { t, fs, setLastRead, muMark, muFavs, toggleMushafMark, toggleMushafFav } = useApp();
+  const { t, fs, setLastRead, muMark, muFavSurahs, toggleMushafMark, toggleMushafFavSurah } = useApp();
   /* Not Dimensions.get(): that is measured once, and this screen is the one
    * place in the app that turns sideways on purpose. The window is only the
    * STARTING guess, though — see `box` below. */
@@ -424,13 +425,36 @@ export function Mushaf({ route, navigation }) {
   }, []);
 
   const marked = muMark === page;
-  const fav = muFavs.includes(page);
+
+  /* THE FAVOURITE IS A SŪRAH, NOT A PAGE. Keeping page numbers gave a list
+     reading "Page 247, Page 408, Page 611" — a page belongs to one printing
+     and names no sūrah anybody could ask for, which is why the committee
+     reported favourites as missing rather than as unhelpful.
+     Eight pages near the end open more than one sūrah, so `here` is the last
+     one to open at or before this page: the sūrah the page runs into. That
+     is a judgement, so it is never acted on silently — the control carries
+     the sūrah's name and so does the note after it. */
+  const here = surahAt(page);
+  const hereName = here ? t(`surah.${here}.name`, IDX.surahs.find(x => x.n === here)?.nameEn || "")
+                        : "";
+  const fav = !!here && muFavSurahs.includes(here);
 
   const bookmark = () => {
     tap();
     toggleMushafMark(page);
     say(marked ? t("mushaf.bookmark_taken_away", "Bookmark taken off this page")
                : t("mushaf.bookmark_put_here", "Bookmark put on this page"));
+  };
+
+  /* The note NAMES THE SŪRAH, which is the whole safeguard on a page that
+     opens more than one: the reader is told what was kept, not merely that
+     something was, and the Sūrah list is one tap away if it was the other. */
+  const favourite = () => {
+    if (!here) return;
+    tap();
+    toggleMushafFavSurah(here);
+    say((fav ? t("mushaf.surah_removed", "{s} removed from favourites")
+             : t("mushaf.surah_added", "{s} added to favourites")).replace("{s}", hereName));
   };
 
   return (
@@ -539,6 +563,16 @@ export function Mushaf({ route, navigation }) {
           <Ionicons name={marked ? "bookmark" : "bookmark-outline"} size={19}
                     color={marked ? C.goldBright : "rgba(243,239,227,.65)"} />
         </Press>
+        {/* THE HEART IS ON THE BAR NOW. Favourites existed before this change
+            but the only way to add one was to open the jump sheet and find a
+            pill inside it, which is why the committee reported the feature as
+            missing: it was there, and unreachable. */}
+        <Press onPress={favourite} disabled={!here} dim={false} style={{ padding: 8, opacity: here ? 1 : 0.35 }}
+          accessibilityLabel={fav ? t("a11y.remove_this_surah", "Remove this sūrah from favourites")
+                                  : t("a11y.favourite_this_surah", "Add this sūrah to favourites")}>
+          <Ionicons name={fav ? "heart" : "heart-outline"} size={19}
+                    color={fav ? C.goldBright : "rgba(243,239,227,.65)"} />
+        </Press>
         <Press onPress={orient} style={{ padding: 8 }}
           accessibilityLabel={t("mushaf.horizontal", "Horizontal")}>
           <Ionicons name={land ? "phone-portrait-outline" : "phone-landscape-outline"} size={19}
@@ -546,28 +580,41 @@ export function Mushaf({ route, navigation }) {
         </Press>
       </View>
 
-      {jump && <Jump page={page} fav={fav} onPick={goto} onClose={() => setJump(false)}
-                     onFav={() => {
-                       tap(); toggleMushafFav(page);
-                       say(fav ? t("mushaf.removed_from_favourites", "Removed from your favourites")
-                               : t("mushaf.added_to_favourites", "Added to your favourites"));
+      {jump && <Jump page={page} here={here} onPick={goto} onClose={() => setJump(false)}
+                     onFav={n => {
+                       tap();
+                       const was = muFavSurahs.includes(n);
+                       toggleMushafFavSurah(n);
+                       const name = t(`surah.${n}.name`, IDX.surahs.find(x => x.n === n)?.nameEn || "");
+                       say((was ? t("mushaf.surah_removed", "{s} removed from favourites")
+                                : t("mushaf.surah_added", "{s} added to favourites")).replace("{s}", name));
                      }} />}
     </View>
   );
 }
 
-function Jump({ page, fav, onPick, onClose, onFav }) {
-  const { t, fs, muFavs, muMark } = useApp();
+function Jump({ page, here, onPick, onClose, onFav }) {
+  const { t, fs, muFavSurahs, muMark } = useApp();
   const [mode, setMode] = useState("juz");
   const [typed, setTyped] = useState("");
+
+  /* A sūrah row carries its number so the heart has something to toggle; a
+     juzʼ row does not, because a juzʼ is not a thing you can favourite. */
+  const surahRow = n => ({
+    n,
+    label: `${n}. ${t(`surah.${n}.name`, IDX.surahs.find(x => x.n === n)?.nameEn || "")}`,
+    sub: `p.${pageOf(n)}`,
+    page: pageOf(n),
+  });
 
   const items = mode === "juz"
     ? Object.entries(MUSHAF.juzPage).map(([j, p]) => ({ label: `${t("quran.juz", "Juzʼ")} ${j}`, sub: `p.${p}`, page: p }))
     : mode === "surah"
-      ? IDX.surahs.map(s => ({ label: `${s.n}. ${t(`surah.${s.n}.name`, s.nameEn)}`,
-                               sub: `p.${MUSHAF.surahPage[s.n]}`, page: MUSHAF.surahPage[s.n] }))
-      : muFavs.map(p => ({ label: `${t("mushaf.page", "Page")} ${p}`,
-                           sub: p === muMark ? t("mushaf.bookmark", "Bookmark") : "", page: p }));
+      ? IDX.surahs.map(x => surahRow(x.n))
+      /* THE FAVOURITES ARE SŪRAHS, in the muṣḥaf's own order rather than the
+         order they happened to be added, which is how somebody looks for
+         one. */
+      : [...muFavSurahs].sort((a, b) => a - b).map(surahRow);
 
   const TABS = [["juz", t("mushaf.juz", "Juz")],
                 ["surah", t("mushaf.s_rah", "Sūrah")],
@@ -612,21 +659,28 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
         </Press>
       </View>
 
-      <Press onPress={onFav}
-        style={{ marginHorizontal: 16, marginBottom: 10, flexDirection: "row", alignItems: "center",
-                 gap: 9, paddingHorizontal: 15, paddingVertical: 11, borderRadius: R.pill,
-                 borderWidth: 1, borderColor: "rgba(243,239,227,.22)" }}>
-        <Ionicons name={fav ? "heart" : "heart-outline"} size={16}
-                  color={fav ? C.goldBright : "rgba(243,239,227,.7)"} />
-        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.cream }}>
-          {fav ? t("mushaf.remove_this_page", "Remove this page from favourites")
-               : t("mushaf.add_this_page", "Add this page to favourites")}</Text>
-      </Press>
+      {/* Keeping the sūrah you are reading, BY NAME. The old pill said "Add
+          this page to favourites" and saved a number; this says which sūrah
+          it is about to keep, which is the only way a reader can tell on one
+          of the eight pages that open more than one. */}
+      {!!here && (
+        <Press onPress={() => onFav(here)}
+          style={{ marginHorizontal: 16, marginBottom: 10, flexDirection: "row", alignItems: "center",
+                   gap: 9, paddingHorizontal: 15, paddingVertical: 11, borderRadius: R.pill,
+                   borderWidth: 1, borderColor: "rgba(243,239,227,.22)" }}>
+          <Ionicons name={muFavSurahs.includes(here) ? "heart" : "heart-outline"} size={16}
+                    color={muFavSurahs.includes(here) ? C.goldBright : "rgba(243,239,227,.7)"} />
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.cream }}>
+            {(muFavSurahs.includes(here) ? t("mushaf.remove_surah", "Remove {s} from favourites")
+                                         : t("mushaf.keep_surah", "Keep {s} in favourites"))
+              .replace("{s}", t(`surah.${here}.name`, IDX.surahs.find(x => x.n === here)?.nameEn || ""))}</Text>
+        </Press>)}
 
-      {mode === "fav" && !muFavs.length
+      {mode === "fav" && !muFavSurahs.length
         ? <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: "rgba(243,239,227,.55)",
                          textAlign: "center", paddingHorizontal: 30, paddingTop: 24 }}>
-            {t("mushaf.no_favourites_yet", "Nothing kept yet. The ribbon on the right keeps the page you are on.")}</Text>
+            {t("mushaf.no_surahs_kept_yet",
+               "No sūrahs kept yet. The button above keeps the sūrah you are reading.")}</Text>
         : <FlatList
             data={items}
             keyExtractor={(x, i) => String(i)}
@@ -639,6 +693,18 @@ function Jump({ page, fav, onPick, onClose, onFav }) {
                 {item.page === muMark && <Ionicons name="bookmark" size={13} color={C.goldBright} />}
                 <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), color: C.cream }}>{item.label}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: "rgba(243,239,227,.5)" }}>{item.sub}</Text>
+                {/* SETTING A FAVOURITE FROM THE LIST is the unambiguous way
+                    to do it: a sūrah row is one sūrah, with no page to share.
+                    Its own hit area, so tapping the row still jumps. */}
+                {!!item.n && (
+                  <Press onPress={() => onFav(item.n)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                    style={{ paddingHorizontal: 4, paddingVertical: 2 }}
+                    accessibilityLabel={(muFavSurahs.includes(item.n)
+                        ? t("a11y.remove_s_from_favourites", "Remove {s} from favourites")
+                        : t("a11y.add_s_to_favourites", "Add {s} to favourites")).replace("{s}", item.label)}>
+                    <Ionicons name={muFavSurahs.includes(item.n) ? "heart" : "heart-outline"} size={16}
+                              color={muFavSurahs.includes(item.n) ? C.goldBright : "rgba(243,239,227,.4)"} />
+                  </Press>)}
               </Press>)} />}
     </View>
   );
