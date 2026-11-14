@@ -16,7 +16,7 @@ import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { PrayerIcon } from "../prayer-icons";
-import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, NAMES, ORDER } from "../prayer";
+import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, nameFor, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
@@ -258,7 +258,7 @@ export default function Home({ navigation }) {
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(29), color: C.cream }}>
-                {friJum ? t("giving.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
+                {friJum ? t("prayer.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
@@ -336,7 +336,7 @@ export default function Home({ navigation }) {
                      which the website shares a check with so the two cannot drift. */}
                   <PrayerIcon k={k} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
-                    {t(`prayer.${k}`, NAMES[k].en)}</Text>
+                    {(n => t(`prayer.${n.k}`, n.en))(nameFor(k, now))}</Text>
                   <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
                     {pretty(day.begins[k]).replace(/ (am|pm)$/, "")}</Text>
                   <View style={{ backgroundColor: "rgba(119,33,87,.09)", borderRadius: R.pill,

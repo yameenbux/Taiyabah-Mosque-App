@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTopBar } from "../barstyle";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, Pill, NavRow, RowGroup, PageFoot, tap, TopBar } from "../ui";
-import { dayFor, pretty, nowLondon, londonInstant, NAMES, ORDER, nextJamaah } from "../prayer";
+import { dayFor, pretty, nowLondon, londonInstant, nameFor, ORDER, nextJamaah } from "../prayer";
 import { dayMonthYear, fullDow, shortDate, hijri } from "../dates";
 
 /* How many days from today to the jumuʿah people mean when they say "next".
@@ -210,7 +210,7 @@ export default function PrayerTimes({ navigation }) {
                       <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 8 }}>
                         <Text style={{ fontFamily: F.sansSemi, fontSize: fs(16),
                                        color: sun ? C.muted : C.ink }}>
-                          {t(`prayer.${k}`, NAMES[k].en)}</Text>
+                          {(n => t(`prayer.${n.k}`, n.en))(nameFor(k, when))}</Text>
                         {(isNow || isNext) && (
                           /* .pill.now is a GOLD fill with near-black text;
                              .pill.next is #EFE6EC with brand-600. */
@@ -222,7 +222,7 @@ export default function PrayerTimes({ navigation }) {
                             {isNow ? t("times.now", "Now") : t("times.next", "Next")}</Text>)}
                       </View>
                       <Text style={{ fontFamily: F.arabic, fontSize: fs(14), color: C.muted,
-                                     textAlign: rtl ? "right" : "left" }}>{NAMES[k].ar}</Text>
+                                     textAlign: rtl ? "right" : "left" }}>{nameFor(k, when).ar}</Text>
                     </View>
                     {/* .row .begins is MUTED at weight 500; .row .jam is ink at
                         600, and only .row.is-next .jam turns plum. Every

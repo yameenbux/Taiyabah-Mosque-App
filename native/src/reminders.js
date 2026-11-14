@@ -12,7 +12,7 @@
  */
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { dayFor, nowLondon, londonInstant, NAMES, ORDER } from "./prayer";
+import { dayFor, nowLondon, londonInstant, ORDER, nameFor } from "./prayer";
 import { isRamadanMonth, hijriOf, sehriEnds, SEHRI_CUSHION_MIN, SEHRI_WARN_MIN } from "./ramadan";
 import { at, weekly, FRIDAY } from "./triggers";
 /* Re-exported so a caller needs one import, not two; it lives in its own file
@@ -76,8 +76,10 @@ export async function arm(reminders, extras = {}) {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: Number(before) === 0
-            ? `${NAMES[key].en} jamāʿah`
-            : `${NAMES[key].en} jamāʿah in ${before} min`,
+            /*  `date` is the day this reminder is FOR, not today, so a
+                Friday queued on a Tuesday still says Jumuʿah. */
+            ? `${nameFor(key, date).en} jamāʿah`
+            : `${nameFor(key, date).en} jamāʿah in ${before} min`,
           body: `${pretty(time)} at Taiyabah Masjid`,
           sound: "default",
         },

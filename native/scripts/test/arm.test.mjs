@@ -102,6 +102,39 @@ test("every prayer in ORDER gets a reminder on at least one day", async () => {
     `fewer distinct prayers than expected: ${titles}`);
 });
 
+/* THE MIDDAY REMINDER MUST SAY JUMUʿAH ON A FRIDAY.
+ *
+ * It said "Zuhr jamāʿah in 10 min", at the exact moment the masjid was
+ * filling for Jumuʿah, on every Friday the app has ever been installed.
+ *
+ * The rule existed. isJumuah() in prayer.js had been right for months, and
+ * the home card and the Dynamic Island both used it. The web push from
+ * worker/worker.js had its own copy and was right too. This path — the local
+ * notification, the one most people actually receive — read NAMES[key].en
+ * straight out of the map, so the same jamāʿah arrived under two different
+ * names depending on which path delivered it.
+ *
+ * Reading the file would not have caught it: NAMES[key].en is correct code
+ * that returns the wrong word on one day in seven. So this runs the real
+ * arm() across the real timetable and reads the titles it actually queued,
+ * which is the only place the day and the word meet. */
+test("the Friday midday reminder is named Jumuʿah, not Zuhr", async () => {
+  const { per } = plan({ jamaah: true, mins: 10, kahf: false });
+  await arm(per, {});
+
+  const friday = stub.log.scheduled.filter(r => {
+    const when = r.trigger?.date ? new Date(r.trigger.date) : null;
+    return when && when.getDay() === 5;
+  });
+  assert.ok(friday.length, "no reminders were queued for a Friday at all, so this proves nothing");
+
+  const titles = friday.map(r => r.content.title);
+  assert.ok(titles.some(t => t.includes("Jumuʿah")),
+    `a Friday was queued but nothing on it says Jumuʿah: ${titles.join(" | ")}`);
+  assert.ok(!titles.some(t => /\bZuhr\b/.test(t)),
+    `a Friday reminder still says Zuhr: ${titles.filter(t => /\bZuhr\b/.test(t)).join(" | ")}`);
+});
+
 /* THE SWITCH THAT IS SAFE TO LEAVE ON.
  *
  * Sehri and iftar are two notifications a night, and the whole reason they can
