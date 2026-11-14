@@ -57,11 +57,18 @@ export function parts() {
     },
     {
       key: "C", title: "Duʿās from the Qurʼan — the forty Rabbanā",
-      blurb: "published with NO English meaning at all; please say whether that should stand",
+      /*  This asked whether having no English at all should stand. It no
+          longer should: the masjid's own plain English rendering is now
+          published against each of the forty, so the question put to the
+          ʿulamā is a different one. `en` MUST be passed through below — a
+          sheet that does not show the English is a sheet nobody can check
+          it on, which is the exact failure this file's header warns about. */
+      blurb: "each carries the masjid's own plain English rendering of the phrase — " +
+             "not a published translation, and not yet approved; please check the meaning",
       sets: [{
         title: "The forty Rabbanā", intro: null,
         entries: R.map((r, i) => ({
-          id: `rabbanas/${i}`, title: r.ref, ar: r.ar, source: r.ref,
+          id: `rabbanas/${i}`, title: r.ref, ar: r.ar, en: r.en, source: r.ref,
         })),
       }],
     },

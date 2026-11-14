@@ -726,6 +726,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .rb-ar{font-size:calc(21px * var(--ts));line-height:2.35;color:var(--ink);direction:rtl;text-align:right}
   .rb-ref{font-size:calc(10.5px * var(--ts));letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
     margin-top:8px;text-align:right;direction:rtl}
+  /* The meaning reads left to right under the Arabic, which reads right to
+     left above it — so this sets its own direction rather than inheriting
+     the card's. Under a language pack it may itself be RTL, which is why
+     the direction comes from the document and not from a literal here. */
+  .rb-en{font-size:calc(13.5px * var(--ts));line-height:1.62;color:var(--ink-2, var(--ink));
+    margin-top:10px}
 
   /* A row that leaves the app says so: the chevron becomes an outward arrow,
      so nobody taps expecting a sheet and lands in a browser tab. */
@@ -9651,6 +9657,7 @@ function renderRabbanas(){
       <span class="rb-n">${num(r.n)}</span>
       <div class="rb-body">
         <div class="rb-ar quranic">${arabicForDisplay(r.ar)}</div>
+        ${r.en ? `<div class="rb-en">${esc(t("rabbana."+r.n+".en", r.en))}</div>` : ``}
         <div class="rb-ref">${esc(t("rabbana."+r.n+".ref", r.ref))}</div>
       </div>
     </div>`).join('');
