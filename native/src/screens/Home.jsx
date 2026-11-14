@@ -64,6 +64,29 @@ const TILES = [
   { href: "https://chat.whatsapp.com/GUU82kvhjNmCXNksk5iRwm", k: "tiles.join_whatsapp", t: "Join WhatsApp", icon: "whatsapp" },
 ];
 
+/* The three amount pills on the home-screen appeal card.
+ *
+ * EVERY HREF IS A LINK THE MASJID ALREADY HAS, and the amount shown is the
+ * amount that link charges — these are Bronze, Silver and Gold on the appeal
+ * screen (src/screens/Donate.jsx, TIERS), with the same Payment Link and the
+ * same client_reference_id=newbuild the webhook matches the payment on. The
+ * £5,000 tier and the open amount are deliberately not here: three pills and
+ * a disc is the card the masjid chose, and the disc opens the appeal where the
+ * other two live.
+ *
+ * DO NOT INVENT A SMALLER PILL. There is no £25 or £50 Payment Link, and a
+ * pill reading £50 that opened a £250 checkout is the kind of mistake that
+ * costs the masjid a donor. If the masjid creates smaller tiers, the links go
+ * here and in index.html's .nb-row, and nowhere else. */
+const NB_TIERS = [
+  { amt: "\u00a3250",   a11y: "a11y.donate_250_to_the_new_build",
+    href: "https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild" },
+  { amt: "\u00a3500",   a11y: "a11y.donate_500_to_the_new_build",
+    href: "https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild" },
+  { amt: "\u00a31,000", a11y: "a11y.donate_1000_to_the_new_build",
+    href: "https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild" },
+];
+
 /* The web app draws its own tile glyphs rather than using an icon set, and they
  * are part of how it looks — a prayer-bead tasbīḥ, two rings, a collection tin.
  * They are redrawn here from the same paths rather than swapped for the nearest
@@ -452,11 +475,21 @@ export default function Home({ navigation }) {
               </View>)}
           </View>)}
 
-        {/* ---- Listen ---------------------------------------------------- */}
-        <SecH t={t} fs={fs} rtl={rtl} title={t("home.listen", "Listen")} />
+        {/* ---- Listen, and the appeal under it ---------------------------
+            NO HEADING OVER THESE TWO, which is a decision and not an
+            oversight. "Listen" labelled a single banner whose own first line
+            reads LISTEN LIVE, so it spent a line of the home screen repeating
+            the button beneath it. With the appeal banner now beside it, one
+            heading would have to cover both the stream and a building fund,
+            which is vaguer than no heading at all.
+
+            What holds the pair apart from the prayer times is the 26 below.
+            The heading's own margins (22 above, 11 below) came to about this
+            much, so the page keeps the rhythm it had while losing the word.
+            The website measures the same 26 — index.html's .lb-first. */}
         <Press onPress={() => { tap(); navigation.navigate("Live"); }}
           accessibilityRole="button"
-          style={{ borderRadius: R.card, overflow: "hidden" }}>
+          style={{ borderRadius: R.card, overflow: "hidden", marginTop: 26 }}>
           {/* .lbanner: linear-gradient(100deg, brand-800, brand-600) — across,
               and ending on the BRIGHTER plum. This had it backwards and on the
               wrong two colours. */}
@@ -487,6 +520,80 @@ export default function Home({ navigation }) {
             <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={18} color={C.goldBright} />
           </LinearGradient>
         </Press>
+
+        {/* ---- the new build appeal --------------------------------------
+            The masjid asked for a donate call on the home screen and picked
+            this out of six. The twin of index.html's .nbcta — read that
+            stylesheet comment before changing either, because they are meant
+            to stay the same card.
+
+            THE GRADIENT IS HARDCODED rather than themed: a donate call that
+            goes pale in dark mode stops being a donate call. The gold star
+            and the disc do follow the theme, exactly as the website's do.
+
+            THE THREE AMOUNTS ARE THE THREE STRIPE LINKS THE MASJID HAS —
+            Bronze, Silver and Gold on the appeal screen, the same Payment
+            Links with the same client_reference_id=newbuild, without which
+            the webhook cannot account for the money. There is no £25 or £50
+            pill because no such link exists, and a pill reading £50 that
+            opened a £250 checkout would be a lie. When the masjid creates
+            smaller tiers they go here and in index.html, nowhere else. */}
+        <View style={{ marginTop: 10, borderRadius: 16, overflow: "hidden" }}>
+          <LinearGradient colors={["#2A0C1E", "#3C0B2A", "#1B0613"]} locations={[0, 0.58, 1]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={{ paddingHorizontal: 14, paddingVertical: 13 }}>
+            {/* the same sixteen-point girih the footer and the appeal use,
+                bled off the top-right corner at a tenth of its opacity */}
+            <View style={{ position: "absolute", right: -34, top: -40, width: 140, height: 140,
+                           opacity: 0.1 }} pointerEvents="none">
+              <Svg width={140} height={140} viewBox="0 0 100 100">
+                <Polygon fill={C.gold} points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4" />
+              </Svg>
+            </View>
+
+            {/* The headline is tappable as well as the disc. It is the biggest
+                thing on the card and tapping it to no effect would read as
+                broken. */}
+            <Press onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+              accessibilityRole="button"
+              style={{ alignSelf: "stretch" }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(9.5), letterSpacing: 1.3,
+                             textTransform: "uppercase", color: "#E8CC80",
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("home.the_new_masjid_phase", "The new masjid · Phase 3.3")}</Text>
+              <Text style={{ fontFamily: F.display, fontSize: fs(17), lineHeight: fs(21),
+                             color: "#F3EFE3", marginTop: 4,
+                             textAlign: rtl ? "right" : "left" }}>
+                {t("home.build_a_house_in_paradise", "Build a house in Paradise")}</Text>
+            </Press>
+
+            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
+                           gap: 7, marginTop: 11 }}>
+              {NB_TIERS.map(x => (
+                <Press key={x.amt} onPress={() => { tap(); open(x.href); }}
+                  /* "link" rather than "button": this leaves the app for
+                     Stripe's own checkout, and a screen reader says so. */
+                  accessibilityRole="link"
+                  accessibilityLabel={t(x.a11y, `Donate ${x.amt} to the new build`)}
+                  style={{ flex: 1, minWidth: 0, paddingVertical: 9, paddingHorizontal: 2,
+                           borderRadius: 10, borderWidth: 1, borderColor: "rgba(220,187,99,.5)",
+                           backgroundColor: "rgba(220,187,99,.1)" }}>
+                  <Text numberOfLines={1} style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
+                                                   color: "#E8CC80", textAlign: "center" }}>
+                    {x.amt}</Text>
+                </Press>))}
+              <Press onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+                accessibilityRole="button"
+                accessibilityLabel={t("a11y.open_the_new_build_appeal", "Open the new build appeal")}
+                style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
+                <LinearGradient colors={["#E8CC80", C.gold]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                  <Ionicons name={rtl ? "arrow-back" : "arrow-forward"} size={18} color="#3C0B2A" />
+                </LinearGradient>
+              </Press>
+            </View>
+          </LinearGradient>
+        </View>
 
         {/* ---- Services -------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.services", "Services")} />

@@ -64,6 +64,16 @@ const ALLOWED = {
   "#F6F2E6": "the gold button's label, on a button that stays gold at night",
   "#FFFFFF": "white on a filled plum control, and a switch's thumb",
   "#fff":    "white on a filled plum control",
+  /* The home screen's new build appeal card is deliberately NOT themed: a
+     donate call that goes pale at night stops being a donate call, so its
+     plum stays plum on both pages (see .nbcta in index.html, and the card in
+     src/screens/Home.jsx). These three are the gradient itself — a surface,
+     never text — and the plum also draws the arrow glyph, which sits on the
+     SOLID GOLD disc and not on the card at all. The text on the card is
+     #E8CC80 and #F3EFE3, both of which this check reads and passes. */
+  "#2A0C1E": "the appeal card's top gradient stop — a surface",
+  "#1B0613": "the same gradient's bottom stop",
+  "#3C0B2A": "that gradient's middle stop, and the arrow ON THE SOLID GOLD disc",
 };
 
 const files = [];

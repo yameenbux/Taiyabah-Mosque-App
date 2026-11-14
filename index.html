@@ -1802,6 +1802,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
        already generous; only the height needed raising to clear 24. */
     min-height:24px;display:inline-flex;align-items:center}
 
+  /* 26px above the banner pair, not the 20px the wrap gives on its own. The
+     "Listen" heading used to sit here and its own margins occupied about this
+     much, so taking the word away without putting the space back left the
+     banners butted up against the reminder ribbon — two bordered edges 20px
+     apart with nothing between them, tighter than any other pair on the page.
+     6px of margin restores the rhythm the heading had without restoring the
+     heading. Measured, not guessed: 18px reads as cramped and 34px opens a
+     hole the eye stops in. */
+  .lb-first{margin-top:6px}
+
   /* ---- home: listen banner ---- */
   .lbanner{display:flex;align-items:center;gap:13px;width:100%;padding:14px 15px;border-radius:16px;
     background:linear-gradient(100deg,var(--brand-800),var(--plum-fill));color:#F3EFE3;
@@ -1817,6 +1827,61 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .lbanner .wave{position:absolute;right:52px;bottom:0;display:flex;align-items:flex-end;gap:2.5px;
     height:26px;opacity:.4;pointer-events:none}
   .lbanner .wave i{width:2.5px;background:var(--gold-bright);border-radius:2px;display:block}
+
+  /* ---- home: the new build appeal ----
+     The masjid asked for a donate call on the home screen, pointing at the new
+     build. This is the one they picked out of six: a dark plum slab the same
+     width as the Listen banner above it, three amount pills, and a gold disc
+     that opens the full appeal.
+
+     THE GRADIENT IS HARDCODED, not themed. A donate call that goes pale in
+     dark mode stops being a donate call, and the gold against plum is the
+     whole reason it carries on both pages. Everything else on this screen is
+     themed; this is the deliberate exception.
+
+     THE THREE AMOUNTS ARE THE THREE STRIPE LINKS THE MASJID HAS. £250, £500
+     and £1,000 are Bronze, Silver and Gold on the appeal screen, and each pill
+     opens that same Payment Link with the same client_reference_id=newbuild —
+     without which the webhook cannot account for the money (see the appeal
+     screen's own note). There is no £25 or £50 pill because no such link
+     exists: a pill that said £50 and opened a £250 checkout would be a lie.
+     When the masjid creates smaller tiers, the links go here and in the app's
+     Home.jsx, and nowhere else.
+
+     NO HEADING ABOVE THIS PAIR, and that is a decision rather than an
+     oversight. The Listen heading came off because it labelled one obvious
+     button; a heading wide enough to cover both the stream and an appeal
+     would be vaguer than none at all. The 26px above the Listen banner is
+     what separates the pair from the prayer times. */
+  .nbcta{position:relative;overflow:hidden;margin-top:10px;padding:13px 14px;border-radius:16px;
+    background:linear-gradient(135deg,#2A0C1E 0%,#3C0B2A 58%,#1B0613 100%);
+    box-shadow:var(--shadow)}
+  .nbcta .nb-star{position:absolute;right:-34px;top:-40px;width:140px;height:140px;
+    color:var(--gold);opacity:.1;pointer-events:none}
+  .nbcta .nb-star svg{width:100%;height:100%;display:block}
+  /* The headline is tappable as well as the disc: it is the biggest thing on
+     the card and tapping it and getting nothing would read as broken. It is a
+     button rather than the whole card being one, because the card holds three
+     links and a button already and nesting those inside another button is not
+     valid HTML. */
+  .nb-top{display:block;width:100%;padding:0;border:0;background:none;font:inherit;
+    text-align:left;cursor:pointer;position:relative}
+  .nb-k{display:block;font-size:calc(9.5px * var(--ts));letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;color:#E8CC80}
+  .nb-h{display:block;font-family:"Fraunces",Georgia,serif;font-size:calc(17px * var(--ts));
+    font-weight:600;color:#F3EFE3;line-height:1.2;letter-spacing:-.2px;margin-top:4px}
+  .nb-row{display:flex;align-items:center;gap:7px;margin-top:11px;position:relative}
+  .nb-amt{flex:1;min-width:0;padding:9px 2px;border-radius:10px;
+    border:1px solid rgba(220,187,99,.5);background:rgba(220,187,99,.1);color:#E8CC80;
+    font:inherit;font-size:calc(12.5px * var(--ts));font-weight:700;text-align:center;
+    white-space:nowrap;text-decoration:none;cursor:pointer}
+  .nb-amt:active{background:rgba(220,187,99,.24)}
+  .nb-go{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    border:0;cursor:pointer;color:#3C0B2A;
+    background:linear-gradient(145deg,#E8CC80,var(--gold));
+    box-shadow:0 6px 16px -7px rgba(198,162,76,.85)}
+  .nb-go svg{width:18px;height:18px}
+  .nb-go:active{transform:scale(.95)}
 
   /* ---- home: the services grid ----
      Nine destinations that used to be reachable only from the menu. The label
@@ -2927,14 +2992,51 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
   <div class="wrap">
 
-    <div class="sec-h"><h2 data-i18n="home.listen">Listen</h2><span class="rule"></span></div>
-    <button class="lbanner" id="go-listen" type="button">
+    <!-- NO HEADING OVER THESE TWO. "Listen" labelled a single banner whose own
+         first line says LISTEN LIVE, so it spent a line of the home screen
+         repeating the button under it. With the appeal banner now beside it,
+         one heading would have to cover both the stream and a building fund,
+         which is vaguer than no heading at all. What holds the pair apart from
+         the prayer times is the 26px below — see .lb-first. -->
+    <button class="lbanner lb-first" id="go-listen" type="button">
       <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7v10"/><path d="M16 7v10"/><path d="M4 10v4"/><path d="M20 10v4"/></svg></span>
       <span class="lt"><span class="l1" data-i18n="home.listen_live">Listen live</span>
         <span class="l2" data-i18n="home.tune_in_to_taiyabah">Tune in to Taiyabah Masjid</span></span>
       <span class="ch" aria-hidden="true">&rsaquo;</span>
       <span class="wave" aria-hidden="true"><i style="height:7px"></i><i style="height:13px"></i><i style="height:20px"></i><i style="height:11px"></i><i style="height:25px"></i><i style="height:16px"></i><i style="height:9px"></i><i style="height:22px"></i><i style="height:14px"></i><i style="height:6px"></i><i style="height:18px"></i><i style="height:11px"></i><i style="height:24px"></i><i style="height:8px"></i></span>
     </button>
+
+    <!-- ---- the new build appeal ----
+         Three pills, each the Stripe link the appeal screen charges for that
+         amount, and a disc that opens the appeal itself — where the £5,000
+         tier, the open amount and the bank details are. The amounts are not
+         decorative: see .nbcta in the stylesheet before changing one. -->
+    <div class="nbcta">
+      <span class="nb-star"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg></span>
+      <button class="nb-top" type="button" id="nb-top">
+        <span class="nb-k" data-i18n="home.the_new_masjid_phase">The new masjid &middot; Phase 3.3</span>
+        <span class="nb-h" data-i18n="home.build_a_house_in_paradise">Build a house in Paradise</span>
+      </button>
+      <div class="nb-row">
+        <!-- £250 is Bronze on the appeal screen; same Payment Link, same purpose tag. -->
+        <a class="nb-amt" href="https://buy.stripe.com/eVqaEX0Z63PGb3E2cSf3a01?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £250 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_250_to_the_new_build"><span data-i18n-num>&pound;250</span></a>
+        <!-- £500 is Silver on the appeal screen; same Payment Link, same purpose tag. -->
+        <a class="nb-amt" href="https://buy.stripe.com/3cI7sLgY4fyo2x8eZEf3a02?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £500 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_500_to_the_new_build"><span data-i18n-num>&pound;500</span></a>
+        <!-- £1,000 is Gold on the appeal screen; same Payment Link, same purpose tag. -->
+        <a class="nb-amt" href="https://buy.stripe.com/fZubJ123a4TK5Jk18Of3a03?client_reference_id=newbuild"
+           target="_blank" rel="noopener"
+           aria-label="Donate £1,000 to the new build"
+           data-i18n-attr="aria-label:a11y.donate_1000_to_the_new_build"><span data-i18n-num>&pound;1,000</span></a>
+        <button class="nb-go" type="button" id="nb-go" aria-label="Open the new build appeal"
+          data-i18n-attr="aria-label:a11y.open_the_new_build_appeal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></svg></button>
+      </div>
+    </div>
 
     <div class="sec-h"><h2 data-i18n="home.services">Services</h2><span class="rule"></span></div>
     <div class="tgrid">
@@ -14237,6 +14339,11 @@ const TILE_ACTIONS = {
 function initHome(){
   document.getElementById("go-timetable").addEventListener("click", () => switchTab("times"));
   document.getElementById("go-listen").addEventListener("click", () => switchTab("live"));
+  /* Both the headline and the gold disc open the appeal, which is where the
+     £5,000 tier, the open amount and the bank details are. The three amount
+     pills are ordinary links to Stripe and need no wiring. */
+  for(const id of ["nb-top","nb-go"])
+    document.getElementById(id).addEventListener("click", () => switchTab("donate"));
   document.getElementById("bellbtn").addEventListener("click", () => switchTab("notices"));
 
   const wa = document.querySelector('.tile[data-tile="whatsapp"]');
