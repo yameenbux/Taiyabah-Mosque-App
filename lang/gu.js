@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "8338acbdd02a",
+ "version": "8ac9537db4eb",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -2199,7 +2199,7 @@ window.LANG_PACK = {
   "tasbih.all_hundred": "પૂરા સો",
   "tasbih.complete": "પૂરું",
   "tasbih.keep_going": "ચાલુ રાખો",
-  "tasbih.tap_the_circle": "ગણવા માટે વર્તુળ પર ટેપ કરો. તમે જ્યાં હતા તે એને યાદ રહે છે.",
+  "tasbih.tap_the_beads": "ગણવા માટે તસ્બીહના દાણા પર ટેપ કરો. તમે જ્યાં હતા તે એને યાદ રહે છે.",
   "tasbih.undo": "પાછું",
   "tasbih.reset": "ફરી શરૂ",
   "tasbih.count_one_more": "એક વધુ ગણો",

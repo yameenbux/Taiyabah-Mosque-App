@@ -45,7 +45,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useIsFocused } from "@react-navigation/native";
-import Svg, { Circle, Path, Defs, LinearGradient, Stop } from "react-native-svg";
+import Svg, { Circle, Path } from "react-native-svg";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Press } from "../ui";
@@ -68,8 +68,6 @@ const MODES = [
   { m: "free",  target: 0 },
 ];
 const EMPTY = { salah: 0, 33: 0, 100: 0, free: 0 };
-
-const STROKE = 11;
 
 /* Drawn rather than taken from Ionicons: arrow-undo-outline is not in the
    app's subset font, and it is the same mark the website and the Hajj counter
@@ -94,60 +92,65 @@ function Refresh({ color }) {
   );
 }
 
-/* The dial.
+/* The dial is a misbaḥa.
  *
- * FOUR SEGMENTS, NOT ONE ARC, for the tasbīḥ — the same reasoning the ṭawāf
- * dial gives for seven. "Which one am I on" is a counting question, and
- * separate marks answer it without reading the numeral; the numeral then
- * carries the count inside the step. The other three modes have a single
- * total to be "of", so they keep the continuous arc.
+ * NOT AN ABSTRACT RING. The first version drew the tasbīḥ as four arc
+ * segments — one per phrase — which told you which phrase you were on and
+ * almost nothing else: at thirty-three counts to a segment, a tap moved the
+ * arc by about a degree, so most taps changed nothing anybody could see. A
+ * counter whose whole job is to answer "how many have I said" has to move
+ * visibly on every single press.
  *
- * GAP IS 16°, NOT 6°. A round cap extends each end of a segment by half the
- * stroke width — a little over 3° at this radius — so a 6° gap was eaten
- * whole and four marks rendered as one continuous arc, which is the exact
- * thing segments were chosen instead of. Found on the web half first; the
- * geometry is identical here.
+ * So it is the object itself: thirty-three beads on a string, one lighting up
+ * per tap, the one under your thumb larger than the rest. Nobody has to be
+ * taught to read it, which matters most for the people least likely to be
+ * taught — the older congregants, and anybody counting with their eyes half
+ * shut. The numeral stays in the middle for the precise answer; the beads
+ * carry the glance.
+ *
+ * THE TAHLĪL GETS ONE BEAD, and it is the big one at the head of the string.
+ * A real misbaḥa has an imām bead marking where the string begins, which is
+ * exactly what a step said once rather than thirty-three times needs. Drawing
+ * a lone small bead in a ring of empty sockets would have read as a fault.
+ *
+ * BEAD SIZE FOLLOWS THE SPACING rather than being fixed. Thirty-three beads
+ * sit 17 points apart on this circle and a hundred sit under six, so one
+ * fixed radius either wastes the string or overlaps it into a solid gold
+ * line. The radius is a fraction of the gap, floored and capped, so the 33,
+ * 100 and Free strings are all legible and none of them collides with itself.
+ *
+ * Units are the web half's: both platforms work in the 220-unit square the
+ * prototype was drawn in, so the two strings are the same string.
  */
-function Ring({ size, steps, place, fraction }) {
-  const r = (size - STROKE) / 2;
-  const c = 2 * Math.PI * r;
+function Misbaha({ size, total, done }) {
+  const U = size / 220;
   const mid = size / 2;
-  const gold = (
-    <Defs>
-      <LinearGradient id="tbDial" x1="0" y1="0" x2="1" y2="1">
-        <Stop offset="0" stopColor="#DCBB63" />
-        <Stop offset="1" stopColor="#C6A24C" />
-      </LinearGradient>
-    </Defs>
-  );
+  const R = 92 * U;
+  const single = total === 1;
+  const gap = (2 * Math.PI * R) / Math.max(total, 1);
+  const base = Math.max(1.8 * U, Math.min(gap * 0.3, 5 * U));
 
-  if (!steps)
-    return (
-      <Svg width={size} height={size} style={{ position: "absolute" }}>
-        {gold}
-        <Circle cx={mid} cy={mid} r={r} fill={C.card} stroke={C.line} strokeWidth={1} />
-        <Circle cx={mid} cy={mid} r={r} fill="none" stroke={C.line} strokeWidth={STROKE} />
-        {fraction > 0 && (
-          <Circle cx={mid} cy={mid} r={r} fill="none" stroke="url(#tbDial)" strokeWidth={STROKE}
-                  strokeDasharray={`${c} ${c}`} strokeDashoffset={c * (1 - fraction)}
-                  strokeLinecap="round" rotation="-90" origin={`${mid}, ${mid}`} />)}
-      </Svg>
-    );
+  const beads = [];
+  if (single) {
+    beads.push({ x: mid, y: mid - R, r: 13 * U, on: done > 0, imam: true });
+  } else {
+    for (let i = 0; i < total; i++) {
+      const a = ((-90 + (360 / total) * i) * Math.PI) / 180;
+      beads.push({ x: mid + R * Math.cos(a), y: mid + R * Math.sin(a),
+                   r: base, on: i < done, cur: i === done - 1 });
+    }
+  }
 
-  const GAP = 16;
-  const step = 360 / steps.length;
-  const arc = c * ((step - GAP) / 360);
-  const lit = i => place.complete || i < place.i
-                   || (i === place.i && place.into === place.step.count);
   return (
     <Svg width={size} height={size} style={{ position: "absolute" }}>
-      {gold}
-      <Circle cx={mid} cy={mid} r={r} fill={C.card} stroke={C.line} strokeWidth={1} />
-      {steps.map((_, i) => (
-        <Circle key={i} cx={mid} cy={mid} r={r} fill="none"
-                stroke={lit(i) ? "url(#tbDial)" : C.line} strokeWidth={STROKE}
-                strokeDasharray={`${arc} ${c - arc}`} strokeLinecap="round"
-                rotation={-90 + i * step + GAP / 2} origin={`${mid}, ${mid}`} />
+      {/* the string they are threaded on */}
+      <Circle cx={mid} cy={mid} r={R} fill="none" stroke={C.line} strokeWidth={1} opacity={0.55} />
+      {beads.map((b, i) => (
+        <Circle key={i} cx={b.x} cy={b.y}
+                r={b.imam ? b.r : b.cur ? b.r * 1.32 : b.on ? b.r : b.r * 0.7}
+                fill={b.on ? C.gold : b.imam ? "none" : C.line}
+                stroke={b.imam ? C.gold : b.cur ? C.goldBright : "none"}
+                strokeWidth={b.imam ? 2.5 * U : b.cur ? 2.4 * U : 0} />
       ))}
     </Svg>
   );
@@ -272,7 +275,15 @@ export default function Tasbih() {
                      : t("tasbih.of_n", "of {n}").replace("{n}", String(target)))
     : t("tasbih.keep_going", "Keep going");
 
-  const fraction = four ? 0 : (target ? Math.min(n / target, 1) : (n % 100) / 100);
+  /* HOW MANY BEADS ARE ON THE STRING, and how many of them are lit.
+     The tasbīḥ draws the step it is on — thirty-three, or the tahlīl's one.
+     33 and 100 draw their whole target, so the string IS the target. Free
+     has no total, so it draws a string of thirty-three and goes round it
+     again, which is what a hand does with a real one; the numeral keeps the
+     running total so nothing is lost by the lap resetting. */
+  const beadTotal = four ? place.step.count : (target || 33);
+  const beadsDone = four ? shown
+                         : (target ? n : (n > 0 && n % 33 === 0 ? 33 : n % 33));
 
   const tool = { flexDirection: rtl ? "row-reverse" : "row", gap: 7, alignItems: "center",
                  justifyContent: "center", paddingVertical: 10, paddingHorizontal: 22,
@@ -322,7 +333,7 @@ export default function Tasbih() {
         </View>
       )}
 
-      {/* The target. The dial IS the button — no card around it, because a
+      {/* The target. The string IS the button — no card around it, because a
           card would only draw a second edge inside the first. */}
       <View style={{ alignItems: "center", marginTop: four ? 6 : 24 }}>
         <Press onPress={press} disabled={!ready || n >= cap} dim={false}
@@ -331,19 +342,37 @@ export default function Tasbih() {
                                      max: four ? place.step.count : (target || undefined) }}
                style={{ width: dial, height: dial, borderRadius: dial / 2,
                         alignItems: "center", justifyContent: "center" }}>
-          <Ring size={dial} steps={four ? steps : null} place={place} fraction={fraction} />
-          <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.3)),
-                         lineHeight: fs(Math.round(dial * 0.34)),
+          <Misbaha size={dial} total={beadTotal} done={beadsDone} />
+          <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.28)),
+                         lineHeight: fs(Math.round(dial * 0.32)),
                          color: done ? C.brand600 : C.ink }}>{shown}</Text>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.8,
-                         textTransform: "uppercase", color: C.gold, marginTop: 5,
-                         textAlign: "center", paddingHorizontal: 22 }}>{under}</Text>
+                         textTransform: "uppercase", color: C.gold, marginTop: 4,
+                         textAlign: "center", paddingHorizontal: 30 }}>{under}</Text>
+          {/* WHICH OF THE FOUR, inside the string. The beads say how far
+              through a phrase you are and cannot also say which phrase, so
+              the four marks the arc segments used to carry move in here —
+              small, under the numeral, where they answer that one question
+              without competing with it. */}
+          {four && (
+            <View style={{ flexDirection: "row", gap: 5, marginTop: 7 }}>
+              {steps.map((_, i) => {
+                const past = place.complete || i < place.i
+                             || (i === place.i && place.into === place.step.count);
+                const now = i === place.i;
+                return <View key={i} style={{ width: 6, height: 6, borderRadius: 3,
+                                              transform: [{ scale: now ? 1.35 : 1 }],
+                                              backgroundColor: now ? C.brand600
+                                                             : past ? C.gold : C.line }} />;
+              })}
+            </View>
+          )}
         </Press>
       </View>
 
       <Text style={{ fontFamily: F.sans, fontSize: fs(12), lineHeight: fs(18),
                      color: C.muted, textAlign: "center", marginTop: 18 }}>
-        {t("tasbih.tap_the_circle", "Tap the circle to count. It remembers where you were.")}
+        {t("tasbih.tap_the_beads", "Tap the beads to count. It remembers where you were.")}
       </Text>
 
       <View style={{ flexDirection: rtl ? "row-reverse" : "row", gap: 10,

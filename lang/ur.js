@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "e4cb2c2ea606",
+ "version": "52d3930db1c9",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -2199,7 +2199,7 @@ window.LANG_PACK = {
   "tasbih.all_hundred": "پورے سو",
   "tasbih.complete": "مکمل",
   "tasbih.keep_going": "جاری رکھیں",
-  "tasbih.tap_the_circle": "گننے کے لیے دائرے پر ٹیپ کریں۔ آپ جہاں تھے، یہ وہیں یاد رکھتا ہے۔",
+  "tasbih.tap_the_beads": "گننے کے لیے تسبیح کے دانوں پر ٹیپ کریں۔ آپ جہاں تھے، یہ وہیں یاد رکھتا ہے۔",
   "tasbih.undo": "واپس",
   "tasbih.reset": "دوبارہ شروع",
   "tasbih.count_one_more": "ایک اور شمار کریں",

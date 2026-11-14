@@ -750,12 +750,16 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     margin:16px auto 0;border:0;background:transparent;padding:0;cursor:pointer;
     -webkit-tap-highlight-color:transparent}
   .tb-ring{position:absolute;inset:0;width:100%;height:100%}
-  .tb-track{stroke:var(--line)}
-  .tb-fill{stroke:var(--gold);transition:stroke-dashoffset .18s ease}
+  /* the string the beads are threaded on */
+  .tb-string{stroke:var(--line);opacity:.55}
+  .tb-steps{display:flex;gap:5px;margin-top:7px}
+  .tb-steps i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+  .tb-steps i[data-on="1"]{background:var(--gold)}
+  .tb-steps i[data-on="2"]{background:var(--brand-600);transform:scale(1.35)}
   .tb-live{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
     justify-content:center;gap:3px;transition:transform .08s ease}
   .tb-dial:active .tb-live{transform:scale(.96)}
-  .tb-n{font-size:calc(54px * var(--ts));font-weight:700;color:var(--ink);line-height:1;
+  .tb-n{font-size:calc(48px * var(--ts));font-weight:700;color:var(--ink);line-height:1;
     font-variant-numeric:tabular-nums}
   .tb-of{font-size:calc(11px * var(--ts));letter-spacing:.11em;text-transform:uppercase;
     color:var(--muted);max-width:11em;line-height:1.35}
@@ -767,7 +771,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     font-weight:600;cursor:pointer}
   .tb-tool:disabled{opacity:.42;cursor:default}
   @media (prefers-reduced-motion: reduce){
-    .tb-fill,.tb-live{transition:none}
+    .tb-live{transition:none}
   }
 
   /* A row that leaves the app says so: the chevron becomes an outward arrow,
@@ -5355,19 +5359,20 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
                accurate, and nobody saying dhikr should have to look at the
                screen to keep counting. -->
           <button class="tb-dial" id="tb-dial" aria-describedby="tb-hint">
-            <svg class="tb-ring" viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="tb-track" id="tb-track" cx="60" cy="60" r="52" fill="none" stroke-width="6"/>
-              <circle class="tb-fill"  id="tb-fill"  cx="60" cy="60" r="52" fill="none" stroke-width="6"
-                      stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            <!-- 220 units, which is the square the design was drawn in; the
+                 app draws the same string from the same numbers. -->
+            <svg class="tb-ring" viewBox="0 0 220 220" aria-hidden="true">
+              <circle class="tb-string" cx="110" cy="110" r="92" fill="none" stroke-width="1"/>
               <g id="tb-seg"></g>
             </svg>
             <span class="tb-live" aria-live="polite" aria-atomic="true">
               <span class="tb-n" id="tb-n" data-i18n-latin>0</span>
               <span class="tb-of" id="tb-of"></span>
+              <span class="tb-steps" id="tb-steps" aria-hidden="true"></span>
             </span>
           </button>
 
-          <p class="tb-hint" id="tb-hint" data-i18n="tasbih.tap_the_circle">Tap the circle to count. It remembers where you were.</p>
+          <p class="tb-hint" id="tb-hint" data-i18n="tasbih.tap_the_beads">Tap the beads to count. It remembers where you were.</p>
 
           <div class="tb-tools">
             <button class="tb-tool" id="tb-undo" data-i18n="tasbih.undo">Undo</button>
@@ -12670,6 +12675,29 @@ function tbAt(n){
   return { i: 3, step: steps[3], into: 1, done, complete: true, whole };
 }
 
+/* THE DIAL IS A MISBAḤA, not an abstract ring.
+ *
+ * It was four arc segments, one per phrase, which told you which phrase you
+ * were on and almost nothing else: at thirty-three counts to a segment a tap
+ * moved the arc about a degree, so most taps changed nothing anybody could
+ * see. A counter whose whole job is to answer "how many have I said" must
+ * move visibly on every press.
+ *
+ * So it is the object: thirty-three beads on a string, one lighting up per
+ * tap, the one under the thumb larger than the rest. Nobody needs teaching
+ * to read it. The numeral keeps the precise answer in the middle; the beads
+ * carry the glance, and the four marks under the numeral carry the one thing
+ * the beads cannot say — which of the four phrases this is.
+ *
+ * THE TAHLĪL GETS ONE BEAD, the big one at the head of the string, the way a
+ * real misbaḥa marks where its string begins. A lone small bead in a ring of
+ * empty sockets would have read as a fault.
+ *
+ * BEAD SIZE FOLLOWS THE SPACING. Thirty-three beads sit 17 units apart on
+ * this circle and a hundred sit under six, so one fixed radius either wastes
+ * the string or overlaps it into a solid gold line. native/src/screens/
+ * Tasbih.jsx works from the same 220-unit square and the same numbers, so
+ * the two platforms draw the same string. */
 function tbRender(){
   const seq = tbSequence();
   const n = tbN[tbMode] || 0;
@@ -12678,16 +12706,14 @@ function tbRender(){
   document.querySelectorAll('#ak-tasbih-view .tb-mode').forEach(b =>
     b.dataset.on = b.dataset.m === tbMode ? "1" : "0");
 
-  const C = 2 * Math.PI * 52;
-  const fill = document.getElementById('tb-fill');
-  const track = document.getElementById('tb-track');
   const seg = document.getElementById('tb-seg');
   const ar = document.getElementById('tb-ar');
   const en = document.getElementById('tb-en');
-  let shown = n, label = "", done = false;
+  const marks = document.getElementById('tb-steps');
+  let shown = n, label = "", done = false, a = null;
 
   if(tbMode === "salah" && seq){
-    const a = tbAt(n);
+    a = tbAt(n);
     shown = a.into === 0 && a.done > 0 ? a.step.count : a.into;
     ar.textContent = a.step.ar;
     en.textContent = a.step.en;
@@ -12695,50 +12721,56 @@ function tbRender(){
       ? t("tasbih.all_hundred","All one hundred")
       : t("tasbih.of_n","of {n}").replace("{n}", num(a.step.count));
     done = a.complete;
-    /* FOUR SEGMENTS, NOT ONE ARC — the same reasoning the ṭawāf dial gives for
-       seven: "which one am I on" is a counting question that separate marks
-       answer without reading the numeral. Four steps, so four marks; the
-       numeral carries the count inside the step. */
-    /* GAP IS 16°, NOT 6°. A round cap extends each end of a segment by half
-       the stroke width — about 3.3° at this radius — so the caps ate a 6° gap
-       whole and four marks rendered as one continuous arc, which is the exact
-       thing segments were chosen instead of. */
-    const GAP = 16, step = 360 / 4, arc = C * ((step - GAP) / 360);
-    seg.innerHTML = Array.from({ length: 4 }, (_, i) =>
-      `<circle cx="60" cy="60" r="52" fill="none" stroke-width="6" stroke-linecap="round"`
-      + ` stroke-dasharray="${arc} ${C - arc}" transform="rotate(${-90 + i * step + GAP / 2} 60 60)"`
-      + ` stroke="${i < a.i || a.complete || (i === a.i && a.into === a.step.count) ? "var(--gold)" : "var(--line)"}"></circle>`).join("");
-    /* style.stroke, NOT setAttribute("stroke") — a presentation attribute
-       loses to the stylesheet, and .tb-fill{stroke:var(--gold)} therefore won.
-       The ring went on being painted gold underneath the four segments and
-       showed through the gaps as four gold marks on an untouched dial. Inline
-       style beats the rule; the same trap CLAUDE.md records for !important.
-       Hidden outright rather than given a zero-length dash, too: a dash of
-       zero with a round cap still paints the cap. */
-    track.style.stroke = "transparent";
-    fill.style.stroke = "transparent";
   } else {
-    seg.innerHTML = "";
-    track.style.stroke = "var(--line)";
-    fill.style.stroke = "var(--gold)";
-    const target = TB_MODES[tbMode];
     ar.textContent = "";
     en.textContent = "";
+    const target = TB_MODES[tbMode];
     if(target){
       done = n >= target;
       label = done ? t("tasbih.complete","Complete")
                    : t("tasbih.of_n","of {n}").replace("{n}", num(target));
-      fill.setAttribute("stroke-dasharray", `${C} ${C}`);
-      fill.setAttribute("stroke-dashoffset", String(C * (1 - Math.min(n / target, 1))));
     } else {
-      /* Free counting has no total, so the ring fills per hundred and starts
-         again — the same choice the Hajj tasbīḥ makes, for the same reason:
-         there is nothing to be "of". */
       label = t("tasbih.keep_going","Keep going");
-      fill.setAttribute("stroke-dasharray", `${C} ${C}`);
-      fill.setAttribute("stroke-dashoffset", String(C * (1 - (n % 100) / 100)));
     }
   }
+
+  /* HOW MANY BEADS, AND HOW MANY LIT. The tasbīḥ draws the step it is on.
+     33 and 100 draw their whole target, so the string IS the target. Free
+     has no total, so it draws thirty-three and goes round again — what a
+     hand does with a real one — while the numeral keeps the running count,
+     so nothing is lost when the lap resets. */
+  const total = (tbMode === "salah" && a) ? a.step.count : (TB_MODES[tbMode] || 33);
+  const lit   = (tbMode === "salah" && a) ? shown
+              : (TB_MODES[tbMode] ? n : (n > 0 && n % 33 === 0 ? 33 : n % 33));
+
+  const R = 92, cx = 110, cy = 110;
+  const gap = (2 * Math.PI * R) / Math.max(total, 1);
+  const base = Math.max(1.8, Math.min(gap * 0.3, 5));
+  let svg = "";
+  if(total === 1){
+    svg = `<circle cx="${cx}" cy="${cy - R}" r="13" fill="${lit ? "var(--gold)" : "none"}"`
+        + ` stroke="var(--gold)" stroke-width="2.5"></circle>`;
+  } else {
+    for(let i = 0; i < total; i++){
+      const ang = (-90 + (360 / total) * i) * Math.PI / 180;
+      const x = (cx + R * Math.cos(ang)).toFixed(2);
+      const y = (cy + R * Math.sin(ang)).toFixed(2);
+      const on = i < lit, cur = i === lit - 1;
+      svg += `<circle cx="${x}" cy="${y}" r="${(cur ? base * 1.32 : on ? base : base * 0.7).toFixed(2)}"`
+           + ` fill="${on ? "var(--gold)" : "var(--line)"}"`
+           + (cur ? ` stroke="var(--gold-bright)" stroke-width="2.4"` : ``)
+           + `></circle>`;
+    }
+  }
+  seg.innerHTML = svg;
+
+  /* Which of the four. Hidden outside the tasbīḥ, where there is no step to
+     be on and four grey dots would only ask a question with no answer. */
+  marks.hidden = !(tbMode === "salah" && seq);
+  marks.innerHTML = !a ? "" : [0,1,2,3].map(i => {
+    const past = a.complete || i < a.i || (i === a.i && a.into === a.step.count);
+    return `<i data-on="${i === a.i ? "2" : past ? "1" : "0"}"></i>`;
+  }).join("");
 
   document.getElementById('tb-n').textContent = num(shown);
   document.getElementById('tb-of').textContent = label;

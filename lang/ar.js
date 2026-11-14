@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "45af976a6854",
+ "version": "92e13e072aa4",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -2199,7 +2199,7 @@ window.LANG_PACK = {
   "tasbih.all_hundred": "الْمِئَةُ كُلُّهَا",
   "tasbih.complete": "تَمَّ",
   "tasbih.keep_going": "وَاصِلْ",
-  "tasbih.tap_the_circle": "اُنْقُرْ عَلَى الدَّائِرَةِ لِلْعَدّ. وَهُوَ يَحْفَظُ مَوْضِعَكَ.",
+  "tasbih.tap_the_beads": "اُنْقُرْ عَلَى حَبَّاتِ التَّسْبِيحِ لِلْعَدّ. وَهُوَ يَحْفَظُ مَوْضِعَكَ.",
   "tasbih.undo": "تَرَاجَعْ",
   "tasbih.reset": "اِبْدَأْ مِنْ جَدِيد",
   "tasbih.count_one_more": "عُدَّ وَاحِدًا آخَر",
