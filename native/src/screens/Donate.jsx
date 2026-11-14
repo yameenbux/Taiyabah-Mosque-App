@@ -199,10 +199,17 @@ const AMOUNTS = ["5", "10", "25", "50", "100", "other"];
  * rather than opening a Payment Link — see the comment on the CTA below. */
 const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
 
-export function Giving() {
+/* `route` carries an opening frequency, and only the Friday call on the home
+   page sends one: "Give this Jumuʿah" has to arrive with Friday Pay already
+   chosen or the button has not done what it said. Anything else opens on
+   one-off as before, and the donor can change it either way — the parameter
+   seeds the screen, it does not lock it. */
+export function Giving({ route }) {
   const { t, fs } = useApp();
+  const want = route?.params?.freq;
   const [fund, setFund] = useState("general");
-  const [freq, setFreq] = useState("once");
+  const [freq, setFreq] = useState(
+    want === "monthly" || want === "friday" ? want : "once");
   const [amt, setAmt]   = useState("25");
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);

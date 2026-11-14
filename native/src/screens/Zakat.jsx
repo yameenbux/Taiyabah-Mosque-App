@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { C, F, R, dual } from "../theme";
 import { useApp } from "../store";
 import { fetchMetalPrices } from "../metals";
-import { Screen, Hero, Heading, Card, P, Note, Rich, Ticks, Warn, Press, Pill, open, tap } from "../ui";
+import { Screen, Hero, Heading, Card, P, Note, Rich, Ticks, Warn, Notice, Press, Pill, open, tap } from "../ui";
 
 const NISAB = { silver: 612.36, gold: 87.48 };
 const RATE = 0.025;
@@ -263,6 +263,12 @@ export default function Zakat() {
         <Field label={t("zakat.business_stock_goods_bought_to", "Business stock — goods bought to sell (£)")} value={v.stock} onChange={x => set("stock", x)} />
         <Field label={t("zakat.shares_crypto_other_investments", "Shares, crypto & other investments (£)")} value={v.invest} onChange={x => set("invest", x)} />
         <Note>{t("zakat.money_in_a_pension_you", "Money in a pension you can access")}</Note>
+        {/* THE PENSION NOTE GOES HERE, beside the field that will carry the
+            figure, not at the foot of the page. A pension has no field of its
+            own — it is entered under investments or cash — so a caution read
+            after the number has been decided is a caution read too late. */}
+        <Notice>{t("zakat.pensions_need_working_out_separately",
+          "*Pensions need working out separately.* Whether zakat is due on a pension, and on how much of it, depends on the scheme, what it is invested in and whether you can draw on it yet. This calculator cannot work any of that out — it adds up whatever figure you type. Please settle the pension figure with the imam before you enter it.")}</Notice>
         {(n("gold") > 0 || n("silver") > 0) && !Number(price) && (
           <Warn>{t("zakat.gsnote",
             "Enter a price per gram above, or the gold and silver you own cannot be valued.")}</Warn>)}
@@ -354,8 +360,13 @@ export default function Zakat() {
                        backgroundColor: C.tintRose, borderWidth: 1, borderColor: C.tintRoseLine }}>
           <Rich style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20.5), color: C.tintRoseInk,
                          textAlign: rtl ? "right" : "left" }}>
-            {t("zakat.this_is_a_guide_not",
-              "*This is a guide, not a ruling.* It follows the Hanafi position and uses the price you enter. Zakat can depend on your own circumstances, and scholars differ on things like pensions, shares and long-term debt. For anything you are unsure about, please ask the imam at the masjid.")}</Rich>
+            {/* It opened "This is a guide, not a ruling", which says what it is
+                not and leaves somebody to assume the arithmetic has been done
+                for them. It has not: this adds up what is typed and takes
+                2.5%, and it cannot tell a wrong figure from a right one. That
+                is the thing to say first. */}
+            {t("zakat.a_basic_calculator_not_a",
+              "*A basic calculator, not a ruling.* It adds up the figures you type and takes 2.5%. It does not know your circumstances and it cannot check a single figure for you, so work each amount out yourself and satisfy yourself it is right before you give. It follows the Hanafi position and uses the price you enter; scholars differ on things like pensions, shares and long-term debt. For anything you are unsure about, please ask the imam at the masjid.")}</Rich>
         </View>
       </View>
     </Screen>

@@ -4015,6 +4015,23 @@
    {
     "type": "row",
     "label": {
+     "k": "tasbih.tasbih_counter",
+     "t": "Tasbīḥ Counter"
+    },
+    "sub": {
+     "k": "tasbih.the_tasbih_after_salah_or_any",
+     "t": "The tasbīḥ after ṣalāh, or any dhikr"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"11\" r=\"6.5\"></circle><circle cx=\"12\" cy=\"4.5\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle><circle cx=\"17.63\" cy=\"7.75\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle><circle cx=\"17.63\" cy=\"14.25\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle><circle cx=\"12\" cy=\"17.5\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle><circle cx=\"6.37\" cy=\"14.25\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle><circle cx=\"6.37\" cy=\"7.75\" r=\"1.45\" fill=\"currentColor\" stroke=\"none\"></circle></svg>",
+    "href": null,
+    "id": "ak-go-tasbih",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
      "k": "athkar.everyday_du_as",
      "t": "Everyday Duʿās"
     },

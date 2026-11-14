@@ -68,6 +68,30 @@ export const NAMES = {
 };
 export const ORDER = ["fajr", "zuhr", "asr", "maghrib", "isha"];
 
+/* THE MIDDAY PRAYER IS NAMED BY THE DAY IT FALLS ON. On a Friday the jamāʿah
+   is Jumuʿah — that is what the board outside says, what the khaṭīb says, and
+   what a message arriving on somebody's phone should say.
+
+   isJumuah() below answers that for the NEXT prayer, which is what the home
+   card and the Dynamic Island need, and they have said Jumuʿah correctly for
+   months. Everything else read NAMES[key] directly and so said "Zuhr" every
+   Friday: the prayer-times list, the strip on the home screen, and — the one
+   that actually reached people — the local reminder, which announced "Zuhr
+   jamāʿah in 10 min" at the exact moment the masjid was filling for Jumuʿah.
+   The web push from worker/worker.js had the rule; the app's own did not, so
+   the same event arrived under two different names depending on which path
+   delivered it.
+
+   This answers it for a prayer on a GIVEN DAY, which is what a list of five
+   and a reminder queued three days ahead both need. `k` is the i18n suffix,
+   so a caller does t(`prayer.${n.k}`, n.en) and gets the Friday name
+   translated like any other. */
+export function nameFor(key, when = nowLondon()) {
+  if (key === "zuhr" && new Date(when).getDay() === 5)
+    return { k: "jumuah", en: "Jumuʿah", ar: "الجمعة" };
+  return { k: key, ...NAMES[key] };
+}
+
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export function dayFor(date = nowLondon()) {

@@ -16,7 +16,7 @@ import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { PrayerIcon } from "../prayer-icons";
-import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, NAMES, ORDER } from "../prayer";
+import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, nameFor, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
 import { current as currentReminders, setReminderTranslator } from "../reminder";
@@ -258,7 +258,7 @@ export default function Home({ navigation }) {
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(29), color: C.cream }}>
-                {friJum ? t("giving.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
+                {friJum ? t("prayer.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
               <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
@@ -300,7 +300,16 @@ export default function Home({ navigation }) {
               {t("app.the_best_day_on_which", "“The best day on which the sun has risen is Friday.”")}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: "rgba(243,239,227,.6)" }}>
               {t("app.sahih_muslim_854", "Ṣaḥīḥ Muslim 854")}</Text>
-            <Pressable onPress={() => { tap(); navigation.navigate("NewBuild"); }}
+            {/* FRIDAY PAY, NOT THE NEW BUILD. This used to push NewBuild — the
+                appeal's four fixed tiers, all one-off — under a button that
+                reads "Give this Jumuʿah". Friday Pay is the weekly Jumuʿah
+                gift, anchored to the next Friday by the Worker, and it is
+                what the card is for. The fund changes with it: Friday Pay
+                takes general, sadaqah or lillah and has no newbuild
+                designation, so this lands on the general fund unless the
+                donor picks another. The new-build appeal keeps its own row
+                in Donate and its button in About. */}
+            <Pressable onPress={() => { tap(); navigation.navigate("Giving", { freq: "friday" }); }}
               accessibilityRole="button"
               style={({ pressed }) => ({ marginTop: 8, borderRadius: R.pill, backgroundColor: C.goldBright,
                                          paddingHorizontal: 20, paddingVertical: 11,
@@ -309,7 +318,7 @@ export default function Home({ navigation }) {
                 {t("app.give_this_jumu_ah", "Give this Jumuʿah")}</Text>
             </Pressable>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: "rgba(243,239,227,.66)", marginTop: 2 }}>
-              {t("app.support_the_new_taiyabah_masjid", "Support the new Taiyabah Masjid")}</Text>
+              {t("app.a_weekly_gift_taken_every", "A weekly gift, taken every Jumuʿah")}</Text>
           </View>)}
         </View>
       </LinearGradient>
@@ -336,7 +345,7 @@ export default function Home({ navigation }) {
                      which the website shares a check with so the two cannot drift. */}
                   <PrayerIcon k={k} size={15} color={C.gold} />
                   <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>
-                    {t(`prayer.${k}`, NAMES[k].en)}</Text>
+                    {(n => t(`prayer.${n.k}`, n.en))(nameFor(k, now))}</Text>
                   <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink, marginTop: 3 }}>
                     {pretty(day.begins[k]).replace(/ (am|pm)$/, "")}</Text>
                   <View style={{ backgroundColor: "rgba(119,33,87,.09)", borderRadius: R.pill,
