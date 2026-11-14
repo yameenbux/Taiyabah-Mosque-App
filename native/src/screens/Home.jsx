@@ -1,8 +1,9 @@
 /* The home screen, laid out the way the web app lays it out.
  *
  * Same order, same groupings, same words, same twelve tiles in the same
- * sequence: salām, the date, the next jamāʿah, the Friday call, Today, the
- * reminder, Listen, Services, the footer. Somebody who has used the web app
+ * sequence: salām, the date, the next jamāʿah, the Friday call, Today,
+ * Listen, the new build appeal, Services, the footer. Somebody who has used
+ * the web app
  * for a year should find everything where they left it — the only differences
  * should be the ones native makes better.
  */
@@ -19,7 +20,6 @@ import { PrayerIcon } from "../prayer-icons";
 import { dayFor, nextJamaah, pretty, nowLondon, isJumuah, nameFor, NAMES, ORDER } from "../prayer";
 import { shortDate, hijri } from "../dates";
 import { dayRecord, allDays, onTimetable } from "../timetable";
-import { current as currentReminders, setReminderTranslator } from "../reminder";
 
 /* Ramadan, counted down on the home screen for the month before it.
  *
@@ -127,7 +127,6 @@ export default function Home({ navigation }) {
   const bar = useTopBar();
   const { t, fs, rtl } = useApp();
   const [now, setNow] = useState(nowLondon());
-  const [rmIdx, setRmIdx] = useState(0);
 
   /* Tick on the half minute: the only thing that changes is the countdown, and
    * a per-second timer is a battery cost for nothing. */
@@ -135,11 +134,6 @@ export default function Home({ navigation }) {
     const id = setInterval(() => setNow(nowLondon()), 30000);
     return () => clearInterval(id);
   }, []);
-  /* Set before the reminders are read, not in an effect afterwards: the first
-   * render is the one people see, and an effect would leave the suhūr time in
-   * 24-hour on it. */
-  setReminderTranslator(t, pretty);
-
   const ramadan = ramadanIn(now);
 
   /* Re-read when a downloaded year lands. */
@@ -152,10 +146,6 @@ export default function Home({ navigation }) {
   /* The rule itself lives in prayer.js, because the Dynamic Island has to say
      the same word as this screen does. */
   const friJum = isJumuah(next, now);
-
-  const { list: reminders } = currentReminders(now);
-  const rm = reminders.length ? reminders[rmIdx % reminders.length] : null;
-  const rmCtx = currentReminders(now).c;
 
   const gap = (() => {
     if (!next || next.tomorrow) return 0;
@@ -427,53 +417,6 @@ export default function Home({ navigation }) {
             {t("home.full_timetable", "Full timetable ›").replace(/\s*›\s*$/, "")}</Text>
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={14} color={C.brand600} />
         </Press>
-
-        {/* ---- the reminder --------------------------------------------- */}
-        {!!rm && (
-          <View style={{ backgroundColor: "rgba(198,162,76,.11)", borderWidth: 1,
-                         borderColor: "rgba(198,162,76,.3)", borderRadius: R.card, padding: 15, marginTop: 6 }}>
-            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10 }}>
-              <Svg width={20} height={20} viewBox="0 0 100 100">
-                <Polygon fill={C.gold} points="50,6 74,26 94,50 74,74 50,94 26,74 6,50 26,26" />
-                <Polygon fill={C.gold} opacity={0.55} points="50,6 94,50 50,94 6,50" />
-              </Svg>
-              <Text style={{ flex: 1, fontFamily: F.arabic, fontSize: fs(18), lineHeight: fs(32),
-                             color: dual("#8A6A18", C.goldInk), textAlign: rtl ? "left" : "right",
-                             writingDirection: "rtl" }}>{rm.ar}</Text>
-            </View>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: dual("#6B5410", C.goldInk), marginTop: 8,
-                           textAlign: rtl ? "right" : "left" }}>
-              {t(`reminder.${rm.id}.t`, rm.t)}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20), color: dual("#7A6838", C.goldInk),
-                           marginTop: 3, textAlign: rtl ? "right" : "left" }}>
-              {typeof rm.d === "function" ? rm.d(rmCtx) : t(`reminder.${rm.id}.d`, rm.d)}</Text>
-            {reminders.length > 1 && (
-              <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center",
-                             justifyContent: "space-between", marginTop: 11 }}>
-                <View style={{ flexDirection: "row", gap: 5 }}>
-                  {reminders.map((_, i) => (
-                    <View key={i} style={{ width: 6, height: 6, borderRadius: 3,
-                                           backgroundColor: i === rmIdx % reminders.length
-                                             ? C.goldInk : "rgba(122,104,56,.3)" }} />))}
-                </View>
-                <View style={{ flexDirection: "row", gap: 7 }}>
-                  {[["chevron-back", -1], ["chevron-forward", 1]].map(([icon, step]) => (
-                    <Press key={icon}
-                      accessibilityRole="button"
-                      accessibilityLabel={step < 0 ? t("a11y.previous_reminder", "Previous reminder")
-                                                   : t("a11y.next_reminder", "Next reminder")}
-                      onPress={() => { tap(); setRmIdx(i => (i + step + reminders.length) % reminders.length); }}
-                      /* Drawn 30x26 because the website draws it 30x26; hit as
-                         44x44, which is what a finger actually needs. */
-                      hitSlop={{ top: 9, bottom: 9, left: 7, right: 7 }}
-                      style={{ width: 30, height: 26, borderRadius: 8, alignItems: "center",
-                               justifyContent: "center", borderWidth: 1,
-                               borderColor: "rgba(198,162,76,.45)" }}>
-                      <Ionicons name={icon} size={15} color={C.goldInk} />
-                    </Press>))}
-                </View>
-              </View>)}
-          </View>)}
 
         {/* ---- Listen, and the appeal under it ---------------------------
             NO HEADING OVER THESE TWO, which is a decision and not an

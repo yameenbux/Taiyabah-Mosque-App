@@ -231,11 +231,16 @@ const reminders = fs.readFileSync(path.join(root, "src/reminders.js"), "utf8");
 eq("SEHRI_CUSHION_MIN / RAM_SEHRI_CUSHION", num(logic, "SEHRI_CUSHION_MIN"), num(html, "RAM_SEHRI_CUSHION"));
 eq("SEHRI_WARN_MIN / RAM_SEHRI_WARN",       num(logic, "SEHRI_WARN_MIN"),    num(html, "RAM_SEHRI_WARN"));
 
-/* The cushion is the masjid's own and the app says it in four places. It is
+/* The cushion is the masjid's own and the app says it in three places. It is
    defined ONCE; a second literal in any of them is how two sehri times get
-   into one app. */
-for (const [what, src] of [["the app's screen", screen], ["the nightly reminder", reminders],
-                           ["the reminder cards", fs.readFileSync(path.join(root, "src/reminder.js"), "utf8")]])
+   into one app.
+
+   It used to be four. The fourth was src/reminder.js, which drew the home
+   screen's reminder ribbon — the masjid asked for that ribbon to come off, so
+   the file went and this list lost a row. Nothing else about the rule
+   changed: the two that remain still have to take the cushion from
+   ramadan.js, and a literal ten in either is still a failure. */
+for (const [what, src] of [["the app's screen", screen], ["the nightly reminder", reminders]])
   ok(`${what} takes the cushion from ramadan.js`, /sehriEnds\(/.test(src) && !/begins\.fajr,\s*10\b/.test(src),
      "it has its own copy of the ten minutes");
 
