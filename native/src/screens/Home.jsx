@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTopBar } from "../barstyle";
-import Svg, { Path, Polygon, Circle } from "react-native-svg";
+import Svg, { Path, Polygon, Circle, Rect } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
@@ -50,11 +50,14 @@ const TILES = [
   { to: "Quran",    k: "tiles.holy_quran",         t: "Holy Qurʼan",          icon: "quran" },
   { to: "Athkar",   k: "tiles.daily_adhkar",       t: "Daily Adhkār",         icon: "beads" },
   { to: "Bukhari",  k: "tiles.hadith",             t: "Ṣaḥīḥ al-Bukhārī",     icon: "book" },
+  { to: "Videos",   k: "marriage.videos_bayaans",  t: "Videos & bayaans",     icon: "vids" },
   { to: "Qibla",    k: "tiles.qibla",              t: "Qibla",                icon: "compass" },
+  { to: "Hajj",     k: "marriage.hajj_umrah",      t: "Hajj / Umrah",         icon: "hajj" },
   { to: "Madrasah", k: "tiles.madrasah",           t: "Madrasah",             icon: "cap" },
   { to: "Marriage", k: "tiles.nikah_services",     t: "Nikāḥ Services",       icon: "rings" },
   { to: "Funeral",  k: "tiles.funeral_services",   t: "Funeral Services",     icon: "grave" },
   { to: "HallHire", k: "tiles.hall_booking",       t: "Hall Booking",         icon: "hall" },
+  { to: "Zakat",    k: "menu.zakat",               t: "Zakat calculator",     icon: "zakat" },
   { to: "NewBuild", k: "tiles.donate",             t: "Donate",               icon: "heart" },
   { to: "Giving",   k: "giving.sadaqah_lillah",    t: "Sadaqah & Lillah",     icon: "box" },
   { to: "Collect",  k: "collect.charity_collections", t: "Charity Collections", icon: "tin" },
@@ -102,19 +105,41 @@ const NB_TIERS = ["5", "10", "25"].map(k => ({
  * the mark would stay dark plum on a dark page. */
 const GLYPH = () => ({
   quran:   <><Path d="M12 6.5c2.4-1.7 5-1.7 7.4 0v11.8c-2.4-1.7-5-1.7-7.4 0-2.4-1.7-5-1.7-7.4 0V6.5c2.4-1.7 5-1.7 7.4 0z" /><Path d="M12 6.5v11.8" /></>,
-  book:    <><Path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" /><Path d="M18 19.5H7.5A2.5 2.5 0 0 0 5 22" /><Path d="M8.5 8.5h6" /><Path d="M8.5 12h6" /></>,
+  /* A CLOSED VOLUME WITH A RIBBON, not the old shape: that one's corner tail
+     made it read as a speech bubble, and it sat two tiles from the Qur'an's
+     open book. A reference work should not look like a chat. */
+  book:    <><Rect x="6.3" y="3.4" width="12.2" height="17.2" rx="1.7" /><Path d="M9.4 3.4v17.2" /><Path d="M13.6 3.4v6.6l1.9-1.5 1.9 1.5V3.4" /></>,
   compass: <><Circle cx="12" cy="12" r="8.5" /><Path d="M15.2 8.8 13.4 13.4 8.8 15.2 10.6 10.6 15.2 8.8Z" /></>,
   cap:     <><Path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z" /><Path d="M6 11.5v4.7c0 1 2.7 2.3 6 2.3s6-1.3 6-2.3v-4.7" /></>,
   rings:   <><Circle cx="9" cy="14" r="5.4" /><Circle cx="15" cy="14" r="5.4" /></>,
   grave:   <><Path d="M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6" /><Path d="M3.5 20.5h17" /><Path d="M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z" /></>,
   hall:    <><Path d="M4 21V9l8-5 8 5v12" /><Path d="M4 21h16" /><Path d="M10 21v-6h4v6" /></>,
   heart:   <Path d="M11.9 20.2S5 15.9 5 10.7a4.4 4.4 0 0 1 6.9-3.6 4.4 4.4 0 0 1 6.9 3.6c0 5.2-6.9 9.5-6.9 9.5Z" />,
-  box:     <><Circle cx="12" cy="5.6" r="2.7" /><Path d="M4.4 11.4h15.2a1 1 0 0 1 1 1v7.1a1 1 0 0 1-1 1H4.4a1 1 0 0 1-1-1v-7.1a1 1 0 0 1 1-1Z" /><Path d="M9.7 15h4.6" /></>,
-  tin:     <><Path d="M7 8.8h10v10.7a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19.5Z" /><Path d="M9.6 12.2h4.8" /><Path d="M8.2 8.8V7a2 2 0 0 1 2-2h3.6a2 2 0 0 1 2 2v1.8" /></>,
+  box:     <><Path d="M4.3 11.2h15.4a1 1 0 0 1 1 1v7.3a1 1 0 0 1-1 1H4.3a1 1 0 0 1-1-1v-7.3a1 1 0 0 1 1-1Z" /><Path d="M9.5 15h5" /><Circle cx="12" cy="6" r="2.8" /></>,
+  /* AN OPEN HAND AND A FLOATING COIN, the masjid's own idea, replacing a tin
+     that read as a battery. Drawn from the side so the palm is unmistakably a
+     hand: a circle over a symmetrical curve — which is what the front-on and
+     two-handed versions came out as — reads as a face, which is the one thing
+     this app may never draw. */
+  tin:     <><Circle cx="12.6" cy="6.3" r="2.9" /><Path d="M3.4 14.1 6 11.7a2 2 0 0 1 1.4-.6h3.4a1.3 1.3 0 0 1 0 2.6H8.4" /><Path d="M3.4 14.1l2 2.3a2.6 2.6 0 0 0 2.8.7l9.2-3.4a1.4 1.4 0 0 0-1-2.6l-5.1 1.9" /></>,
   /* A tasbīḥ: nine beads around a loop, the thread, and the tassel bead. */
   beads:   <>{[[12,14.8],[15.34,13.58],[17.12,10.5],[16.5,7],[13.78,4.71],[10.22,4.71],[7.5,7],[6.88,10.5],[8.66,13.58]]
     .map(([x,y],i)=><Circle key={i} cx={x} cy={y} r={0.95} />)}
     <Path d="M12 15.9v1.3" /><Circle cx="12" cy="18.7" r="1.5" /></>,
+  /* The three the masjid asked for, drawn from the same paths index.html
+     uses so the tile looks the same on both platforms.
+
+     THE KAʿBAH IS A CUBE IN PERSPECTIVE, not a flat square. A square with a
+     band on it reads as a box or a filing tray at 23px; the top face and the
+     near vertical edge are what make it the Kaʿbah. The masjid picked this
+     one out of six. */
+  hajj:    <><Path d="M12 2.8 19.2 6.4 12 10 4.8 6.4Z" /><Path d="M4.8 6.4v11.2L12 21.2l7.2-3.6V6.4" /><Path d="M12 10v11.2" /><Path d="M4.8 9.2 12 12.8l7.2-3.6" /></>,
+  vids:    <><Rect x="3.5" y="5.5" width="17" height="13" rx="2.5" /><Path d="M10 9.3v5.4l4.5-2.7L10 9.3Z" /></>,
+  /* The keypad is six FILLED dots, as the website draws it. They name the
+     colour because a filled dot cannot inherit the Svg's stroke. */
+  zakat:   <><Rect x="5" y="3.5" width="14" height="17" rx="2" /><Path d="M8 7.5h8" />
+    {[[8.4, 12], [12, 12], [15.6, 12], [8.4, 15.6], [12, 15.6], [15.6, 15.6]].map(([cx, cy]) =>
+      <Circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={0.9} fill={C.brand600} stroke="none" />)}</>,
   whatsapp: <Path fill={C.brand600} stroke="none" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.27-.2-.57-.35M12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.4Z" />,
 });
 
