@@ -2279,41 +2279,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   /* and the last thing on the page is not hidden behind it */
   :root[data-offline="1"] body{padding-bottom:calc(142px + env(safe-area-inset-bottom,0))}
 
-  /* ---- the thank-you panel, after a gift ----
-
-     A donor who has just paid comes back to the site with ?gave= on the URL,
-     and until now nothing read it: Stripe redirected them to a home page that
-     behaved as though nothing had happened. So the first job of this panel is
-     simple courtesy — say thank you, and say what will happen next.
-
-     The second job is the ask, and it is deliberately placed HERE and nowhere
-     else. Somebody who has just given is the one person on the site known to
-     be willing; a daily-giving prompt shown to a stranger on the home page is
-     noise, and the same prompt shown thirty seconds after a gift is an
-     invitation. It appears once, it is dismissible, and it never appears to
-     somebody who has just set up daily giving, because asking them again
-     would be asking twice for the same thing. */
-  .gave{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom,0));
-    z-index:41;max-width:520px;margin-inline:auto;padding:0 16px}
-  .gave[hidden]{display:none}
-  .gave .gv-in{background:var(--card);border:1px solid var(--tint-gold-line);
-    border-radius:var(--radius);padding:14px 15px 13px;box-shadow:var(--shadow)}
-  .gave .gv-top{display:flex;align-items:flex-start;gap:10px}
-  .gave svg{flex:none;width:21px;height:21px;stroke:var(--gold);fill:none;
-    stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
-  .gave .gv-hd{font-family:"Fraunces",Georgia,serif;font-size:calc(16px * var(--ts));
-    font-weight:600;line-height:1.3;color:var(--ink)}
-  .gave .gv-bd{margin:5px 0 0;font-size:calc(13px * var(--ts));line-height:1.55;color:var(--muted)}
-  .gave .gv-x{margin-inline-start:auto;flex:none;background:none;border:0;padding:2px 2px 2px 8px;
-    font:inherit;font-size:calc(12px * var(--ts));color:var(--muted);cursor:pointer}
-  .gave .gv-x:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  .gave .gv-ask{display:block;width:100%;margin-top:11px;padding:11px 12px;
-    background:var(--brand-900);border:1px solid var(--brand-900);border-radius:12px;
-    font:inherit;font-weight:700;font-size:calc(14px * var(--ts));color:#F3EFE3;
-    text-align:center;cursor:pointer}
-  .gave .gv-ask:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  :root[data-gave="1"] body{padding-bottom:calc(210px + env(safe-area-inset-bottom,0))}
-
   /* ---- the On air bar ----
      The stream used to stop the moment you left this page, which made
      "listen to the bayaan while you read Qurʼan" impossible — the thing the
@@ -6897,22 +6862,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <span class="ob-t" id="offline-text" data-i18n="offline.still_works">No connection. Prayer times, the Qurʼan, the adhkār and the qibla all still work.</span>
   </div>
 </div>
-<!-- The thank-you panel. Shown only when a donor arrives back with ?gave=
-     on the URL, which Stripe puts there. See initGave(). -->
-<div class="gave" id="gave" hidden role="status" aria-live="polite">
-  <div class="gv-in">
-    <div class="gv-top">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.6s-7.6-4.3-7.6-10a4.3 4.3 0 0 1 7.6-2.7 4.3 4.3 0 0 1 7.6 2.7c0 5.7-7.6 10-7.6 10Z"/></svg>
-      <div>
-        <div class="gv-hd" id="gave-hd" data-i18n="gave.jazakallahu_khayran">Jaz&#257;k All&#257;hu khayran</div>
-        <p class="gv-bd" id="gave-bd"></p>
-      </div>
-      <button class="gv-x" id="gave-x" data-i18n="gave.close">Close</button>
-    </div>
-    <button class="gv-ask" id="gave-ask" hidden>Set up &pound;1 a day</button>
-  </div>
-</div>
-
 <!-- The On air bar. Hidden unless the stream is actually playing and the
      person has left the Live page — on Live itself the full player is right
      there and a second stop button under it is clutter. -->
@@ -15030,90 +14979,6 @@ function closeGiving(){
   document.body.style.overflow = "";
 }
 
-/* ---------------- the thank-you panel, and the one ask ----------------
-
-   STRIPE HAS ALWAYS SENT DONORS BACK WITH ?gave= AND NOTHING READ IT. The
-   Friday Pay route has set success_url to "?gave=friday" since the day it was
-   written; a donor finished paying, landed on the home page, and the site
-   behaved exactly as it would have if they had never given. That is the bug
-   this fixes, and the thank-you is the fix — the ask below is what the moment
-   is additionally worth.
-
-   WHY THE ASK LIVES HERE. Daily giving converts on willingness already shown.
-   Somebody who has this second finished paying has shown it; a stranger
-   scrolling the home page has not, and the same words put in front of them
-   are an advert on a masjid's website. So the prompt exists at exactly one
-   point in the site and it is this one.
-
-   WHO IS NOT ASKED. A donor who has just set up daily giving (gave=daily) is
-   thanked and nothing else: they have already done the thing. Nor is anybody
-   who cancelled — gave=cancelled is somebody who changed their mind at the
-   card page, and a panel acknowledging it would be a reproach. They get
-   silence, which is the correct amount of comment.
-
-   ONE-OFF AND MONTHLY DO NOT ARRIVE HERE YET, and that is not a code
-   problem. They go through Stripe Payment Links, whose after-payment redirect
-   is set per link in the Stripe dashboard, not by us. The moment somebody sets
-   those links to return to the site with ?gave=once and ?gave=monthly, this
-   works for them with no change here — which is why both are listed. Until
-   then the panel only follows Friday Pay and daily giving, the two routes
-   whose return URL our own code controls.
-
-   The marker is stripped from the URL either way. A thank-you that survives a
-   refresh, a back button or a shared link is a thank-you shown to somebody who
-   did not give. */
-/* The bodies are FUNCTIONS, not key/English pairs in an array. A pair read out
-   of an array is invisible to scripts/check-i18n.mjs, which looks for t()
-   calls — the four keys read as orphans nothing asks for and were a step away
-   from being deleted as dead. Calling t() at the moment of use also means the
-   words follow a language change rather than freezing at load. */
-const GAVE_COPY = {
-  once:    { ask: true,  body: () => t("gave.received_one_off",
-    "Your gift has been received, and the receipt is on its way to your email.") },
-  monthly: { ask: true,  body: () => t("gave.received_monthly",
-    "Your monthly gift is set up. You can stop it any time from the receipt Stripe emails you.") },
-  friday:  { ask: true,  body: () => t("gave.received_friday",
-    "Your Jumuʿah gift is set up. Nothing has been taken today — the first payment comes on the next Friday.") },
-  daily:   { ask: false, body: () => t("gave.received_daily",
-    "Your daily gift is set up. It is taken as one payment a month, and you can stop it any time.") },
-};
-function initGave(){
-  const kind = new URLSearchParams(location.search).get("gave");
-  if(kind){
-    /* Strip it before anything else, so even an unrecognised value cannot
-       sit in the URL waiting to be shared. */
-    const u = new URL(location.href);
-    u.searchParams.delete("gave");
-    history.replaceState(null, "", u.pathname + u.search + u.hash);
-  }
-  const copy = kind && GAVE_COPY[kind];
-  if(!copy) return;                      /* no marker, "cancelled", or junk */
-
-  const panel = document.getElementById("gave");
-  const ask   = document.getElementById("gave-ask");
-  document.getElementById("gave-bd").textContent = copy.body();
-  ask.hidden = !copy.ask;
-  ask.textContent = t("gave.set_up_n_a_day","Set up {n} a day").replace("{n}", num("£1"));
-  panel.hidden = false;
-  document.documentElement.dataset.gave = "1";
-
-  const dismiss = ()=>{
-    panel.hidden = true;
-    delete document.documentElement.dataset.gave;
-  };
-  document.getElementById("gave-x").addEventListener("click", dismiss);
-  ask.addEventListener("click", ()=>{
-    dismiss();
-    GV.freq = "daily";
-    GV.per  = "1";
-    openGiving();
-    /* Straight to the card that matters. Somebody who pressed "Set up £1 a
-       day" is not here to read where giving goes. */
-    const card = document.getElementById("gv-online");
-    if(card) card.scrollIntoView({ block:"start", behavior:"instant" });
-  });
-}
-
 /* ---------------- charity collection (chanda) ----------------
 
    The masjid's paper CHARITY DATA FORM. Same request_charity_collection()
@@ -17015,7 +16880,6 @@ function boot(){
   initMadrasah();
   initCurriculum();
   initGiving();
-  initGave();
   initCollect();
   initAdmissions();
   initHolidays();

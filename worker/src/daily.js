@@ -81,8 +81,11 @@ export function dailyCheckoutForm({ perDay, fund, product, returnUrl }) {
   const form = {
     mode: "subscription",
     client_reference_id: FUNDS.includes(String(fund || "")) ? String(fund) : "general",
-    /* ?gave=daily is read by the site on the way back in — it is what turns a
-       finished checkout into a thank you rather than a silent return. */
+    /* ?gave= marks how the donor came back. NOTHING READS IT: a thank-you
+       panel was built on it and taken out again, because it cluttered the
+       home page. The marker stays because Friday Pay has always set one and
+       the two routes should not differ for no reason — but do not assume
+       anything acts on it. */
     success_url: site + "?gave=daily",
     cancel_url: site + "?gave=cancelled",
     "line_items[0][quantity]": "1",
