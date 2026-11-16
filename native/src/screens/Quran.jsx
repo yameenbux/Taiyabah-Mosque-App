@@ -340,6 +340,16 @@ export function Mushaf({ route, navigation }) {
   const [land, setLand] = useState(false);
   const [toast, setToast] = useState(null);
   const [failed, setFailed] = useState(() => new Set());
+  /* WHICH PAGES HAVE ACTUALLY ARRIVED. Without this the reader has exactly two
+     states on screen — the page, or the offline notice — and the whole time in
+     between is a blank black rectangle with nothing on it at all. The notice
+     only appears if expo-image calls onError, so a request that is merely slow,
+     or one that stalls without failing, shows nothing and keeps showing
+     nothing. Paging through a muṣḥaf you have already read never reveals it,
+     because those pages are on disk; JUMPING somewhere new does, which is why
+     it was reported as "a page from favourites comes up blank". */
+  const [ready, setReady] = useState(() => new Set());
+  const arrived = n => setReady(r => (r.has(n) ? r : new Set(r).add(n)));
   /* False while a page is zoomed in, so a sideways drag looks across the page
      instead of turning it. Pages report this up as they are pinched. */
   const [canPage, setCanPage] = useState(true);
@@ -478,7 +488,19 @@ export function Mushaf({ route, navigation }) {
             <Page n={n} width={pageW} height={pageH} dim="#15060F" onZoom={setCanPage}
                   uri={{ source: { uri: pageUrl(n) },
                          onError: () => setFailed(f => new Set(f).add(n)),
-                         onLoad: () => setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; }) }}>
+                         onLoad: () => { arrived(n);
+                           setFailed(f => { if (!f.has(n)) return f; const g = new Set(f); g.delete(n); return g; }); } }}>
+              {/* Fetching. Says which page, because the reader has just jumped
+                  somewhere and the number is the one thing they want confirmed
+                  while they wait. It sits behind the image, so the page itself
+                  covers it the moment it draws. */}
+              {!ready.has(n) && !failed.has(n) && (
+                <View style={{ position: "absolute", left: 0, right: 0, alignItems: "center", gap: 10 }}>
+                  <ActivityIndicator color="rgba(243,239,227,.55)" />
+                  <Text style={{ fontFamily: F.sans, fontSize: fs(12.5),
+                                 color: "rgba(243,239,227,.5)" }}>
+                    {t("mushaf.page", "Page")} {n}</Text>
+                </View>)}
               {/* 848 pages are streamed and then kept, so the first read of any
                   page needs signal. The website never had to say so — it cannot
                   be opened without a connection — and the app used to say it on
