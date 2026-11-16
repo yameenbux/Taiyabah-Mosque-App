@@ -10514,6 +10514,18 @@ function renderMushafImage(n){
 }
 
 async function showMushafPage(n){
+  /* NOT REACHABLE TODAY, AND KEPT ANYWAY. MUSHAF.meta is null until the pack
+     loads, so this read throws on null if the function is ever called before
+     then. Every caller is currently guarded — openMushaf() returns early
+     unless the pack is "ready", mu-reader stays hidden, and the Ramadan link
+     checks that before calling — so a reader cannot get here. A fuzz pass
+     firing events straight at the hidden jump field did, which is how it came
+     to light.
+     The guard stays because this is called from eleven places, two of them
+     gesture handlers, and the next person to show a control before the pack
+     has arrived would turn a null deref into a dead screen. Returning does
+     nothing visible; the "pack missing" notice is already on screen. */
+  if(!MUSHAF.meta) return;
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, Math.round(+n) || 1));
   MUSHAF.page = n;
@@ -10986,6 +10998,7 @@ function mushafGlide(){
 }
 
 function goMushafLandscapePage(n){
+  if(!MUSHAF.meta) return;            /* same reason as showMushafPage above */
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, n));
   stopMushafGlide();
