@@ -46,12 +46,17 @@ function sources() {
   return out;
 }
 
-test("only live-audio.jsx reaches for expo-av's Audio", () => {
+test("only the two audio providers reach for expo-av's Audio", () => {
+  /* There are two things that make sound now: the live stream and the
+     recordings archive. Each owns its player in a provider above the navigator
+     — live-audio.jsx and recordings-audio.jsx — and nothing else opens one, so
+     a screen can never again create a sound it will tidy away on unmount. The
+     two never play at once; src/audio-bus.js keeps one output between them. */
   const owners = sources()
     .filter(([, t]) => /from\s+"expo-av"/.test(t))
-    .map(([f]) => f);
-  assert.deepEqual(owners, ["live-audio.jsx"],
-    "a second file opened its own player — there is one radio, and it lives above the navigator");
+    .map(([f]) => f).sort();
+  assert.deepEqual(owners, ["live-audio.jsx", "recordings-audio.jsx"],
+    "a third file opened its own player — only the stream and the recordings archive own one, both above the navigator");
 });
 
 test("no screen unloads a sound", () => {
@@ -76,6 +81,24 @@ test("the player is mounted above the navigator, not inside it", () => {
     "the navigator must be rendered INSIDE <LiveAudioProvider>");
   assert.ok(!read("App.jsx").match(/<Stack\.Screen[^>]*component=\{?\s*LiveAudioProvider/),
     "the provider is not a screen");
+});
+
+test("the recordings player is mounted above the navigator too", () => {
+  const app = read("App.jsx");
+  /* Same rule as the stream: the provider has to WRAP Root, or leaving the
+     Recordings list would stop a dars somebody meant to keep listening to. */
+  const open = app.indexOf("<RecordingsAudioProvider>");
+  const root = app.indexOf("<Root />");
+  const close = app.indexOf("</RecordingsAudioProvider>");
+  assert.ok(open !== -1 && root !== -1 && close !== -1 && open < root && root < close,
+    "the navigator must be rendered INSIDE <RecordingsAudioProvider>");
+});
+
+test("something draws the recordings bar", () => {
+  const app = read("App.jsx");
+  assert.match(app, /<RecBar\b/,
+    "a recording that survives navigation with no bar is audio nobody can pause from elsewhere");
+  assert.match(app, /onRec=\{/, "the bar is not told whether the Recordings screen is on top");
 });
 
 test("live-audio.jsx does not unload on unmount", () => {

@@ -22,6 +22,8 @@
 import { note, flush, due } from "./src/usage.js";
 import { nextFridayAnchor, describeAnchor, fridayCheckoutForm } from "./src/friday.js";
 import { dailyCheckoutForm, monthlyPence } from "./src/daily.js";
+import { RECORDINGS_BASE, parseRecordings, parseCategories,
+         isCategoryPath, categoryName, DEFAULT_CATEGORIES } from "./src/recordings.js";
 
 
 const SESSION_HOURS = 8;
@@ -1461,6 +1463,49 @@ async function handle(request, env) {
          without working the multiplication out a second time and risking a
          different answer from the one the donor is about to be billed. */
       return json({ url: out.url, monthly: monthlyPence(String(body.perDay).trim()) }, 200, ch);
+    }
+
+    /* THE MASJID'S OWN RECORDINGS, read off eMasjid Live.
+     *
+     *   GET /api/recordings            -> { categories: [{ name, path }] }
+     *   GET /api/recordings?c=<path>   -> { category, path, items: [...] }
+     *
+     * src/recordings.js carries the whole of why this exists: the website is a
+     * different origin and cannot fetch eMasjid itself (CORS), and keeping the
+     * HTML parsing in one server-side place means a change to eMasjid's markup
+     * is a one-file fix here, not a re-release of two apps already on phones.
+     *
+     * Read-only, public, cached at the edge for half an hour. Recordings go up
+     * about weekly, so the cache spares eMasjid a fetch for every listener
+     * without ever holding a new dars back by more than thirty minutes.
+     *
+     * It NEVER fails the screen. The live stream is untouched by any of this —
+     * it stays on the masjid's RadioCast feed — and if eMasjid is unreachable
+     * or its markup has moved, the index falls back to the categories that have
+     * carried the archive for years and a category falls back to an empty list,
+     * so the app says "nothing right now" rather than showing a broken page. */
+    if (url.pathname === "/api/recordings" && request.method === "GET") {
+      const headers = { ...ch, "Cache-Control": "public, max-age=1800" };
+      const c = url.searchParams.get("c");
+      /* The host and path are fixed; only a real category SEGMENT is ever
+         appended, so this cannot be turned into a fetch of another host. */
+      if (c && !isCategoryPath(c)) return json({ error: "Unknown recordings category." }, 400, ch);
+      const ua = { "User-Agent": "TaiyabahMasjidApp" };
+      try {
+        if (c) {
+          const res = await fetch(`${RECORDINGS_BASE}/${c}`,
+            { headers: ua, cf: { cacheTtl: 1800, cacheEverything: true } });
+          const items = res.ok ? parseRecordings(await res.text(), categoryName(c)) : [];
+          return json({ category: categoryName(c), path: c, items }, 200, headers);
+        }
+        const res = await fetch(RECORDINGS_BASE,
+          { headers: ua, cf: { cacheTtl: 1800, cacheEverything: true } });
+        const cats = res.ok ? parseCategories(await res.text()) : [];
+        return json({ categories: cats.length ? cats : DEFAULT_CATEGORIES }, 200, headers);
+      } catch {
+        return c ? json({ category: categoryName(c), path: c, items: [] }, 200, ch)
+                 : json({ categories: DEFAULT_CATEGORIES }, 200, ch);
+      }
     }
 
     return json({ error: "Not found", receivedPath: url.pathname, receivedMethod: request.method }, 404, ch);

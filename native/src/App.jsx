@@ -24,6 +24,8 @@ import { COLUMN } from "./layout";
 import { tabBarFor, LABEL } from "./chrome";
 import { AppProvider, useApp } from "./store";
 import { LiveAudioProvider } from "./live-audio";
+import { RecordingsAudioProvider } from "./recordings-audio";
+import RecBar from "./rec-bar";
 import OnAirBar from "./on-air";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
@@ -48,6 +50,7 @@ import HajjCounter from "./screens/HajjCounter";
 import HajjBranch from "./screens/HajjBranch";
 import HajjJourney from "./screens/HajjJourney";
 import Live from "./screens/Live";
+import Recordings from "./screens/Recordings";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
 import Holidays from "./screens/Holidays";
@@ -255,15 +258,21 @@ function Root() {
    * read off the container rather than guessed, because getting the second
    * one wrong leaves the bar floating in the middle of the Qurʼan. */
   const navRef = useNavigationContainerRef();
-  const [where, setWhere] = React.useState({ onLive: false, onTabs: true });
+  const [where, setWhere] = React.useState({ onLive: false, onRec: false, onTabs: true });
   const readWhere = React.useCallback(() => {
-    let onLive = false, onTabs = true;
+    let onLive = false, onRec = false, onTabs = true;
     try {
-      onLive = navRef.getCurrentRoute?.()?.name === "Live";
+      const name = navRef.getCurrentRoute?.()?.name;
+      onLive = name === "Live";
+      /* The recordings bar, like the On air bar, stays off its own screen —
+         the full player is already there, so a second one in the corner is
+         clutter. */
+      onRec = name === "Recordings";
       const root = navRef.getRootState?.();
       onTabs = !root || root.routes?.[root.index]?.name === "Tabs";
     } catch {}
-    setWhere(w => (w.onLive === onLive && w.onTabs === onTabs) ? w : { onLive, onTabs });
+    setWhere(w => (w.onLive === onLive && w.onRec === onRec && w.onTabs === onTabs)
+      ? w : { onLive, onRec, onTabs });
   }, [navRef]);
 
   /* OPENING STRAIGHT ONTO A SCREEN, FOR THE STORE SCREENSHOTS ONLY.
@@ -378,6 +387,7 @@ function Root() {
         {/* the masjid */}
         <Stack.Screen name="Qibla"     component={Qibla}     options={page} />
         <Stack.Screen name="Live"      component={Live}      options={page} />
+        <Stack.Screen name="Recordings" component={Recordings} options={page} />
         <Stack.Screen name="Videos"    component={Videos}    options={{ ...sheet, title: t("vids.videos_bayaans", "Videos & bayaans") }} />
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
@@ -426,6 +436,11 @@ function Root() {
     </NavigationContainer>
     <OnAirBar onLive={where.onLive} onTabs={where.onTabs}
               onGo={() => { try { navRef.navigate("Live"); } catch {} }} />
+    {/* The recordings player's away-from-screen control, the twin of the On air
+        bar. Only one of the two is ever up: the stream and a recording cannot
+        both be playing (src/audio-bus.js), so they never stack. */}
+    <RecBar onRec={where.onRec} onTabs={where.onTabs}
+            onGo={() => { try { navRef.navigate("Recordings"); } catch {} }} />
     </View>
   );
 }
@@ -499,6 +514,10 @@ export default function App() {
               is unloaded when a screen unmounts is not a radio. See
               src/live-audio.jsx. */}
           <LiveAudioProvider>
+          {/* The recordings player sits under the live one so it inherits the
+              app-wide audio mode the live provider sets. The two never sound at
+              once — src/audio-bus.js keeps one output between them. */}
+          <RecordingsAudioProvider>
           <Root />
           {/* Over the app, under the first-run card, and never over a sheet it
               would be explaining nothing about. */}
@@ -509,6 +528,7 @@ export default function App() {
               says so — see the header of keep-reminders.jsx. */}
           <KeepReminders />
           <KeepActivity />
+          </RecordingsAudioProvider>
           </LiveAudioProvider>
         </AppProvider>
       </Boundary>

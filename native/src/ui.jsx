@@ -20,6 +20,7 @@ import { C, F, R, SHADOW, dual } from "./theme";
 import { COLUMN } from "./layout";
 import { ON_AIR_ROOM } from "./chrome";
 import { useLiveAudio } from "./live-audio";
+import { useRecordings } from "./recordings-audio";
 import { useOffline } from "./reach";
 import { useApp } from "./store";
 import { useNoticeIds, unseenCount } from "./notices-state";
@@ -190,8 +191,13 @@ export const Screen = React.forwardRef(function Screen(
      last line of whatever you are reading sits behind it — which on the Qurʼan
      is an āyah, so it is not a small thing. */
   const onAir = useLiveAudio().playing;
+  /* AND for the recordings bar, on the same terms: it floats over the scroll
+     too, and is up whenever a recording is loaded (playing or paused for a
+     replay), away from the Recordings screen. The two bars never both show —
+     one audio output, one sound at a time — so a single room is right. */
+  const recOn = !!useRecordings().current;
   const pane = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
-                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + (onAir ? ON_AIR_ROOM : 0),
+                  paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + ((onAir || recOn) ? ON_AIR_ROOM : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
   if (!scroll)
     return (

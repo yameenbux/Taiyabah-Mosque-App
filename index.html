@@ -617,6 +617,36 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     font-size:calc(13px * var(--ts));font-weight:600;color:var(--brand-600);
     background:var(--tint-plum);border-radius:12px;padding:13px}
 
+  /* ---- recordings (eMasjid archive) ---- */
+  .rc-hero{position:relative;overflow:hidden;text-align:left;padding:22px 20px 18px;
+    color:#F3EFE3;background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
+  .rc-hero .girih{position:absolute;right:-52px;top:-46px;width:200px;height:200px;
+    color:var(--gold);opacity:.09;pointer-events:none}
+  .rc-h{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(24px * var(--ts));line-height:1.1}
+  .rc-sub{font-size:calc(12.5px * var(--ts));color:#BBA9B4;margin-top:3px}
+  .rc-player{position:sticky;top:0;z-index:3;background:var(--brand-900);
+    padding:10px 14px;border-bottom:1px solid rgba(198,162,76,.35)}
+  .rc-now{font-size:calc(12.5px * var(--ts));font-weight:600;color:#EDE7D8;
+    line-height:1.35;margin-bottom:8px}
+  .rc-chips{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;
+    border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .rc-chips::-webkit-scrollbar{display:none}
+  .rc-chip{flex:0 0 auto;font:inherit;cursor:pointer;white-space:nowrap;
+    font-size:calc(12.5px * var(--ts));font-weight:600;padding:8px 14px;border-radius:999px;
+    background:var(--tint-plum);color:var(--muted);border:1px solid var(--line)}
+  .rc-chip[aria-selected="1"]{background:var(--brand-700);color:#E7D9E2;border-color:var(--brand-700)}
+  .rc-list{display:flex;flex-direction:column}
+  .rc-item{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;
+    cursor:pointer;padding:12px 4px;background:none;border:0;border-bottom:1px solid var(--line)}
+  .rc-ic{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;background:var(--tint-plum);border:1px solid var(--line);color:var(--brand-600)}
+  .rc-item[data-on="1"] .rc-ic{background:var(--tint-gold);border-color:var(--gold);color:var(--gold-ink)}
+  .rc-ic svg{width:17px;height:17px}
+  .rc-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .rc-it-t{font-size:calc(14px * var(--ts));font-weight:600;color:var(--ink);line-height:1.35}
+  .rc-it-m{font-size:calc(11.5px * var(--ts));color:var(--muted)}
+  .rc-note{padding:30px 24px;text-align:center;color:var(--muted);font-size:calc(13px * var(--ts));line-height:1.6}
+
   /* ---- zakat calculator ---- */
   .zk-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 24px;color:#F3EFE3;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
@@ -3458,6 +3488,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <div class="wrap">
       <div class="card lv-info">
         <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n-latin data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
+        <div class="lv-row"><span class="lv-k" data-i18n="rec.previous">Previous recordings</span><button class="lv-v lv-link lv-btn" id="lv-recs" data-i18n="rec.listen_arrow">Listen &rsaquo;</button></div>
         <div class="lv-row"><span class="lv-k" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids" data-i18n="about.watch">Watch &rsaquo;</button></div>
       </div>
       <p class="lv-note" data-i18n="about.audio_keeps_playing_while_you">Audio keeps playing while you use the rest of the app or other apps.
@@ -3482,6 +3513,37 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <a class="vd-all" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos" target="_blank" rel="noopener" data-i18n="vids.see_the_full_channel_on">
             See the full channel on YouTube &rsaquo;
           </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIOUS RECORDINGS — the masjid's own archive on eMasjid Live, read as
+       clean JSON from the Worker (/api/recordings) and played here. The live
+       stream above is untouched; this is the public recordings only. The twin
+       of native/src/screens/Recordings.jsx. -->
+  <div class="sheet" id="recordings" data-open="0" role="dialog" aria-modal="true" aria-label="Recordings" data-i18n-attr="aria-label:a11y.recordings">
+    <div class="scrim" id="rc-scrim"></div>
+    <div class="panel">
+      <div class="sh-top">
+        <h3 style="text-align:left" data-i18n="rec.title">Recordings</h3>
+        <button class="sh-close" id="rc-close" data-i18n="rec.done">Done</button>
+      </div>
+      <div class="sh-body">
+        <section class="rc-hero">
+          <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+          <div class="rc-h" data-i18n="rec.title">Recordings</div>
+          <div class="rc-sub" data-i18n="rec.subtitle">Dars, bayaans and more from the masjid</div>
+        </section>
+
+        <div class="rc-player" id="rc-player" hidden>
+          <div class="rc-now" id="rc-now">&mdash;</div>
+          <audio id="rc-audio" controls preload="none" style="width:100%"></audio>
+        </div>
+
+        <div class="rc-chips" id="rc-chips"></div>
+        <div class="ab-wrap">
+          <div class="rc-list" id="rc-list"></div>
         </div>
       </div>
     </div>
@@ -9559,6 +9621,94 @@ function initVids(){
   document.getElementById('vd-scrim').addEventListener('click',closeVids);
   document.addEventListener('keydown',e=>{
     if(e.key==="Escape" && document.getElementById('vids').dataset.open==="1") closeVids();
+  });
+}
+
+/* ---------------- recordings (eMasjid archive) ----------------
+   The masjid's own dars and bayaans, dated and public on eMasjid Live. The
+   LIST and the play URL come from the Worker (/api/recordings), which reads
+   and parses eMasjid's pages so this file never has to — see
+   worker/src/recordings.js. The live stream below is untouched. This is the
+   twin of native/src/screens/Recordings.jsx; the browser's own <audio>
+   controls stand in for the app's custom player. */
+const REC_API = "https://taiyabah-sender.yameenbux.workers.dev/api/recordings";
+let recCats=null, recActive=null, recLoaded=false;
+
+function recFetch(url){
+  return fetch(url,{headers:{Accept:"application/json"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
+}
+function recNiceDate(iso){
+  const M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||""); if(!m) return iso||"";
+  return (+m[3])+" "+(M[+m[2]-1]||"")+" "+m[1];
+}
+function recNiceLen(sec){
+  const s=+sec||0, h=Math.floor(s/3600), min=Math.round((s%3600)/60);
+  return h>0 ? h+" h"+(min?" "+min+" min":"") : Math.max(1,min)+" min";
+}
+function recErr(){
+  document.getElementById('rc-list').innerHTML =
+    '<div class="rc-note" data-i18n="rec.unavailable">Recordings couldn&rsquo;t be reached right now. Please try again later.</div>';
+  retranslate();
+}
+function recRenderChips(){
+  const el=document.getElementById('rc-chips');
+  el.innerHTML = recCats.map(c=>
+    `<button class="rc-chip" data-path="${esc(c.path)}" aria-selected="${c.path===recActive?1:0}">${esc(c.name)}</button>`
+  ).join("");
+  el.querySelectorAll('.rc-chip').forEach(b=>b.addEventListener('click',()=>recSelect(b.dataset.path)));
+}
+function recRenderList(items){
+  const el=document.getElementById('rc-list');
+  if(!items || !items.length){
+    el.innerHTML='<div class="rc-note" data-i18n="rec.empty">Nothing in this section yet.</div>';
+    retranslate(); return;
+  }
+  el.innerHTML = items.map(it=>
+    `<button class="rc-item" data-mp3="${esc(it.mp3)}" data-title="${esc(it.title)}" data-on="0">`+
+      `<span class="rc-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`+
+      `<span class="rc-meta"><span class="rc-it-t">${esc(it.title)}</span>`+
+      `<span class="rc-it-m">${esc(recNiceDate(it.date))} &middot; ${esc(recNiceLen(it.durationSec))}</span></span>`+
+    `</button>`).join("");
+  el.querySelectorAll('.rc-item').forEach(b=>b.addEventListener('click',()=>recPlay(b)));
+}
+function recSelect(path){
+  recActive=path;
+  document.querySelectorAll('#rc-chips .rc-chip').forEach(b=>b.setAttribute('aria-selected', b.dataset.path===path?"1":"0"));
+  document.getElementById('rc-list').innerHTML='<div class="rc-note">&hellip;</div>';
+  recFetch(REC_API+"?c="+encodeURIComponent(path)).then(d=>recRenderList(d.items||[])).catch(recErr);
+}
+function recPlay(btn){
+  const a=document.getElementById('rc-audio');
+  document.querySelectorAll('.rc-item').forEach(x=>x.dataset.on = x===btn?"1":"0");
+  document.getElementById('rc-player').hidden=false;
+  document.getElementById('rc-now').textContent=btn.dataset.title;
+  a.src=btn.dataset.mp3; a.play().catch(()=>{});
+}
+function openRecs(){
+  document.getElementById('recordings').dataset.open="1";
+  document.body.style.overflow="hidden";
+  if(!recLoaded){
+    recLoaded=true;
+    recFetch(REC_API).then(d=>{
+      recCats=d.categories||[];
+      if(!recCats.length){ recErr(); return; }
+      recRenderChips();
+      recSelect(recCats[0].path);
+    }).catch(()=>{ recLoaded=false; recErr(); });
+  }
+}
+function closeRecs(){
+  try{ document.getElementById('rc-audio').pause(); }catch(e){}
+  document.getElementById('recordings').dataset.open="0";
+  document.body.style.overflow="";
+}
+function initRecs(){
+  document.getElementById('rc-close').addEventListener('click',closeRecs);
+  document.getElementById('rc-scrim').addEventListener('click',closeRecs);
+  document.getElementById('lv-recs').addEventListener('click',openRecs);
+  document.addEventListener('keydown',e=>{
+    if(e.key==="Escape" && document.getElementById('recordings').dataset.open==="1") closeRecs();
   });
 }
 
@@ -16899,6 +17049,7 @@ function boot(){
   initLive();
   initOnAir();
   initVids();
+  initRecs();
   initZakat();
   initQibla();
   initDonate();
