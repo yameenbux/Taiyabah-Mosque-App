@@ -47,12 +47,33 @@ MONTHS = {m: i+1 for i, m in enumerate(
     ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY",
      "AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])}
 DOW = {"MON","TUE","WED","THU","FRI","SAT","SUN"}
+# The board's own abbreviations, and they are NOT stable between years. The
+# 2026 timetable wrote SHBN, ZQDH, RAWAL, JAWL; the 2027 one writes SHB, and
+# puts a full stop in Z.QDH, Z.HAJJ, R.AWAL, R.AKHIR, J.AWL, J.AKHIR. Both
+# spellings of each are listed rather than normalised away, because the raw
+# file is meant to be the PDF's rows as printed.
+#
+# Dots are stripped before lookup, so Z.QDH and ZQDH are the same key — but
+# the variants that differ by more than punctuation still need listing.
 HIJRI = {
-    "RJB":"Rajab","SHBN":"Sha'ban","RMD":"Ramadan","SHWL":"Shawwal","SHW":"Shawwal",
+    "RJB":"Rajab","SHBN":"Sha'ban","SHB":"Sha'ban","RMD":"Ramadan",
+    "SHWL":"Shawwal","SHW":"Shawwal",
     "ZQDH":"Dhul Qa'dah","ZHAJJ":"Dhul Hijjah","MUHRM":"Muharram","SFR":"Safar",
-    "RAWAL":"Rabi al-Awwal","RAKHIR":"Rabi al-Thani",
-    "JAWL":"Jumada al-Awwal","JAWAL":"Jumada al-Awwal","JAKHIR":"Jumada al-Thani",
+    "RAWAL":"Rabi al-Awwal","RAWL":"Rabi al-Awwal",
+    "RAKHIR":"Rabi al-Thani","RAKHR":"Rabi al-Thani",
+    "JAWL":"Jumada al-Awwal","JAWAL":"Jumada al-Awwal",
+    "JAKHIR":"Jumada al-Thani","JAKHR":"Jumada al-Thani",
 }
+def month_num(name, where):
+    """MONTHS[...] directly raised a bare KeyError on a misspelt month, which
+       surfaces as a traceback rather than a sentence. The 2027 PDF spells one
+       of its own dates 'FEBRAURY', so this is not hypothetical."""
+    try:
+        return MONTHS[name.upper()]
+    except KeyError:
+        sys.exit(f"{where}: {name!r} is not a month name. Fix the spelling in "
+                 f"the raw file and note the change, rather than widening this.")
+
 TIME = re.compile(r"^\d{1,2}:\d{2}$")
 BEGIN_KEYS = ["fajr","sunrise","zuhr","asr","isha"]
 BEGIN_AMPM = ["AM","AM","PM","PM","PM"]
@@ -79,13 +100,13 @@ def parse_second_jummah(lines):
     for ln in lines:
         w = win_re.search(ln)
         if w:
-            a = datetime.date(YEAR, MONTHS[w.group(2).upper()], int(w.group(1)))
-            b = datetime.date(YEAR, MONTHS[w.group(4).upper()], int(w.group(3)))
+            a = datetime.date(YEAR, month_num(w.group(2), "WINDOW_330 start"), int(w.group(1)))
+            b = datetime.date(YEAR, month_num(w.group(4), "WINDOW_330 end"), int(w.group(3)))
             window = (a, b)
             continue
         m = date_re.match(ln.strip())
         if m:
-            d = datetime.date(YEAR, MONTHS[m.group(2).upper()], int(m.group(1)))
+            d = datetime.date(YEAR, month_num(m.group(2), f"second Jumuah row {ln.strip()!r}"), int(m.group(1)))
             explicit[d] = to24(m.group(3), m.group(4).upper())
     return explicit, window
 
@@ -132,6 +153,7 @@ def main():
     ah_year = ah_start
     last_jam = {k: None for k in JAM_KEYS}
     warnings = []
+    hard_errs = []        # faults that must stop the build, not just be printed
 
     for ln in lines:
         toks = ln.split()
@@ -159,14 +181,23 @@ def main():
                 seen_hday = True          # first token = hijri day, skip value
                 continue
             if re.search(r"[A-Za-z]", t):  # hijri month code
-                code = t.upper()
+                code = t.upper().replace(".", "")
                 if code in HIJRI:
                     newm = HIJRI[code]
                     if newm == "Muharram" and cur_hijri_month != "Muharram":
                         ah_year += 1
                     cur_hijri_month = newm
                 else:
-                    warnings.append(f"{cur_month}/{gday}: unknown hijri code {code}")
+                    # A WARNING IS NOT ENOUGH HERE. An unrecognised code leaves
+                    # cur_hijri_month on the previous month, so every remaining
+                    # day of that Hijri month is labelled with the wrong name
+                    # and nothing downstream can tell. The 2027 board renamed
+                    # six of its twelve codes; had this stayed a warning, most
+                    # of that year would have shipped mislabelled and still
+                    # passed every other check.
+                    hard_errs.append(
+                        f"{cur_month}/{gday}: unknown hijri month code {t!r}. Add it to "
+                        f"HIJRI with the month it means — do not guess from position.")
             else:
                 cells.append(tok)          # time or ditto
         hday = int(rest[0].replace("*",""))
@@ -213,7 +244,7 @@ def main():
         data[date.isoformat()] = rec
 
     # ---------------- verification ----------------
-    errs = []
+    errs = list(hard_errs)
     keys = sorted(data)
     # 1. day count + per-month completeness
     from calendar import isleap, monthrange
