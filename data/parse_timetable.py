@@ -52,6 +52,10 @@ HIJRI = {
     "ZQDH":"Dhul Qa'dah","ZHAJJ":"Dhul Hijjah","MUHRM":"Muharram","SFR":"Safar",
     "RAWAL":"Rabi al-Awwal","RAKHIR":"Rabi al-Thani",
     "JAWL":"Jumada al-Awwal","JAWAL":"Jumada al-Awwal","JAKHIR":"Jumada al-Thani",
+    # The 2027 board abbreviates differently: SHB, and dotted forms.
+    "SHB":"Sha'ban","Z.QDH":"Dhul Qa'dah","Z.HAJJ":"Dhul Hijjah",
+    "R.AWAL":"Rabi al-Awwal","R.AKHIR":"Rabi al-Thani",
+    "J.AWL":"Jumada al-Awwal","J.AKHIR":"Jumada al-Thani",
 }
 TIME = re.compile(r"^\d{1,2}:\d{2}$")
 BEGIN_KEYS = ["fajr","sunrise","zuhr","asr","isha"]
