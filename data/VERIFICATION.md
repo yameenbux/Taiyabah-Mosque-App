@@ -90,10 +90,16 @@ masjid's official 2027 Salah Timetable PDF (1448–1449 AH) rather than retyped.
 2. The PDF spells 26 February "FEBRAURY" on its 2nd Jumuʿah page. Corrected in
    `raw_timetable_2027.txt` so the month parses; no time was changed.
 
-## Human sign-off (before `published` is set true)
+## Human sign-off — OUTSTANDING, and 2027 is already live
 
-The rows are loaded by `db/155_prayer_times_2027.sql` with **`published = false`**,
-so the app ignores them entirely until the committee has checked:
+`db/155_prayer_times_2027.sql` loads the year with **`published = true`**. It was
+offered unpublished and the masjid chose to publish on load, so these times are
+on people's phones now and this list is a check on something already visible
+rather than a gate in front of it.
+
+It is outstanding, not waived. A wrong time found here can still be corrected in
+the row: phones re-check a published year weekly, so a fix reaches them without
+a release. Still to check:
 
 - [ ] A week of days against the printed board.
 - [ ] The four season edges: a week in Jan, May, Aug, Nov.

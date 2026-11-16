@@ -18,7 +18,21 @@
  * downloaded year is laid OVER it, so this can only ever be an improvement on
  * what is already there.
  */
-import BUNDLED from "./data/timetable-2026.json";
+import BUNDLED_2026 from "./data/timetable-2026.json";
+import BUNDLED_2027 from "./data/timetable-2027.json";
+
+/* BOTH YEARS SHIP. The bundle used to be 2026 alone, which meant a phone that
+ * had never had signal — a new install in a dead spot, a phone with data off —
+ * had prayer times until 31 December 2026 and a blank screen on New Year's
+ * Day. The downloaded year fixes that for everybody who connects, and the
+ * bundle is exactly the floor for everybody who does not.
+ *
+ * Later years are laid over earlier ones, so a year present in both takes the
+ * later file. They do not overlap today; the spread order is what makes that
+ * safe if one ever carries a correction to the other. */
+const BUNDLED = {
+  days: { ...BUNDLED_2026.days, ...BUNDLED_2027.days },
+};
 import { call, MASJID } from "./supabase";
 
 /* Required where it is used rather than at the top, so that importing this

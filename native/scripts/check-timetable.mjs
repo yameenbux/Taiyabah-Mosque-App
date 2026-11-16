@@ -12,14 +12,24 @@
  * does, and compare every single day against the file that has been shipping
  * all along. 365 of 365 or it is wrong.
  *
- *   node scripts/check-timetable.mjs <year.json>
+ *   node scripts/check-timetable.mjs <year.json> <year>
  *
  * where year.json is the raw output of `select public.prayer_year(2026)`.
  * Kept out of CI deliberately: the sandbox cannot reach Supabase, so the
  * figures have to be fetched by somebody who can.
  */
 import fs from "node:fs";
-const BUNDLED = JSON.parse(fs.readFileSync("src/data/timetable-2026.json", "utf8"));
+/* The bundled file is chosen by the year being checked, not fixed at 2026.
+   Hardcoded, this tool could only ever check the one year — so the moment a
+   second year shipped it would have compared 2027's download against 2026's
+   file and reported 365 differences, which reads as a broken database rather
+   than a broken comparison. */
+const bundledFor = year => {
+  const f = `src/data/timetable-${year}.json`;
+  if (!fs.existsSync(f))
+    throw new Error(`no bundled timetable for ${year} — nothing to compare the download against`);
+  return JSON.parse(fs.readFileSync(f, "utf8"));
+};
 
 const pad = n => String(n).padStart(2, "0");
 function fromRows(year, rows) {
@@ -42,8 +52,18 @@ function fromRows(year, rows) {
   return days;
 }
 
+/* The year is an argument with NO DEFAULT, for the reason parse_timetable.py
+   gives: a default silently checks last year's figures and reports success. */
+const year = Number(process.argv[3]);
+if (!process.argv[2] || !Number.isInteger(year)) {
+  console.error("usage: node scripts/check-timetable.mjs <year.json> <year>\n" +
+                "       e.g. node scripts/check-timetable.mjs out.json 2027\n" +
+                "       where out.json is `select public.prayer_year('taiyabah', 2027)`");
+  process.exit(2);
+}
+const BUNDLED = bundledFor(year);
 const rows = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
-const got = fromRows(2026, rows);
+const got = fromRows(year, rows);
 
 let same = 0, diff = [];
 for (const iso of Object.keys(BUNDLED.days)) {
@@ -56,4 +76,4 @@ console.log(`days in the bundled file : ${Object.keys(BUNDLED.days).length}`);
 console.log(`days from the database   : ${Object.keys(got).length}`);
 console.log(`identical                : ${same}`);
 if (diff.length) { console.log(`\nDIFFERENCES (${diff.length}):`); diff.slice(0, 6).forEach(d => console.log("  " + d)); }
-else console.log("\nthe database and the bundled file agree on every day of 2026");
+else console.log(`\nthe database and the bundled file agree on every day of ${year}`);

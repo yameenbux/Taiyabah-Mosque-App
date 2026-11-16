@@ -4,15 +4,35 @@
 -- the masjid's official 2027 Salah Timetable PDF (1448-1449 AH) and refused to
 -- write until every check passed. Not hand-typed.
 --
--- PUBLISHED = FALSE ON PURPOSE. The app only serves a published year, so these
--- rows are inert until the committee has done the sign-off that
--- data/VERIFICATION.md asks for. Publishing is one update, and it is theirs to
--- make, not ours.
+-- PUBLISHED = TRUE, AND THAT WAS THE MASJID'S CALL. The rows were offered
+-- unpublished, so that nothing reached a phone before somebody had held the
+-- generated times against the printed board; the masjid chose to publish on
+-- load. So 2027 is live from the moment this runs.
 --
--- Idempotent: it refuses rather than duplicating if 2027 is already loaded.
+-- The sign-off list in data/VERIFICATION.md is therefore OUTSTANDING, not
+-- waived, and it is now a check on something people can already see. If it
+-- turns up a wrong time, correct the row and the app picks the correction up
+-- within the week — the phones re-check a published year every seven days.
+--
+-- THE MASJID IS NAMED, NOT INFERRED. sole_masjid() used to answer this and now
+-- refuses: the database has grown a second and a third masjid (two audit
+-- throwaways, at the time of writing) and it will not guess between them. A
+-- timetable written to the wrong masjid would be worse than one not written at
+-- all, so the slug is explicit.
+--
+-- This does NOT go through save_prayer_year(), which is the admin screen's
+-- path: that one requires a two-step-verified admin session, takes the masjid
+-- from the session rather than an argument, and deletes the year before
+-- rewriting it. Loading a year that does not exist yet needs none of that. It
+-- does write the admin_audit row that save_prayer_year() would have written,
+-- with a null actor, because a timetable appearing with nothing in the audit
+-- trail to say where it came from is the thing that gets questioned later.
 do $$
-declare m uuid := public.sole_masjid();
+declare m uuid := public.masjid_id_for('taiyabah');
 begin
+  if m is null then
+    raise exception 'no masjid with slug taiyabah - refusing to guess which one this timetable is for';
+  end if;
   if exists (select 1 from public.prayer_times where year = 2027 and masjid_id = m) then
     raise exception '2027 is already loaded for this masjid - delete it deliberately before reloading';
   end if;
@@ -392,7 +412,12 @@ begin
          isha_begins, isha_jamaah, jummah);
 
   insert into public.prayer_years (year, published, note, masjid_id)
-  values (2027, false,
-          'Parsed from the official 2027 PDF via data/parse_timetable.py, 16 November 2026. Awaiting committee sign-off.',
+  values (2027, true,
+          'Parsed from the official 2027 PDF via data/parse_timetable.py, 16 November 2026. Published on load at the masjid''s instruction; VERIFICATION.md sign-off still outstanding.',
           m);
+
+  insert into public.admin_audit (masjid_id, actor, action, detail)
+  values (m, null, 'prayer_times_saved',
+          jsonb_build_object('year', 2027, 'days', 365, 'published', true,
+                             'via', 'db/155_prayer_times_2027.sql'));
 end $$;

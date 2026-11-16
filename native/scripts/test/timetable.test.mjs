@@ -19,8 +19,8 @@ import { dayRecord, yearsHeld, sourceFor, allDays } from "../../src/timetable.js
 test("the bundled year is the floor — a phone with no signal still works", () => {
   /* This is what makes reading from the database safe: it can only ever add
      to what already ships. */
-  assert.deepEqual(yearsHeld(), [2026]);
-  assert.equal(Object.keys(allDays()).length, 365);
+  assert.deepEqual(yearsHeld(), [2026, 2027]);
+  assert.equal(Object.keys(allDays()).length, 730);   /* two non-leap years */
 });
 
 test("a day comes back whole", () => {
@@ -32,7 +32,7 @@ test("a day comes back whole", () => {
 });
 
 test("a day it does not have is null, not an empty object", () => {
-  assert.equal(dayRecord("2027-01-01"), null);
+  assert.equal(dayRecord("2028-01-01"), null);
   assert.equal(dayRecord("nonsense"), null);
 });
 
@@ -43,7 +43,8 @@ test("every Friday carries its Jumuʿah times and no other day does", () => {
     if (d.jummah) { dow === 5 ? fridays++ : strays++; }
   }
   assert.equal(strays, 0, "a non-Friday carried Jumuʿah times");
-  assert.equal(fridays, 52, `expected 52 Fridays with Jumuʿah, got ${fridays}`);
+  /* 52 in 2026 and 53 in 2027 — 2027 opens and closes on a Friday. */
+  assert.equal(fridays, 105, `expected 105 Fridays with Jumuʿah, got ${fridays}`);
 });
 
 test("Maghrib's jamāʿah is the minute it begins, every day of the year", () => {
@@ -59,5 +60,9 @@ test("the source line names the year being shown, not the one that shipped", () 
   const s = sourceFor(2026);
   assert.ok(s.includes("2026"), s);
   assert.ok(/\d{4}.*AH/.test(s), `the hijri span is missing: ${s}`);
-  assert.equal(sourceFor(2027), null, "a year it does not hold has no source");
+  /* 2027 now has its own line, naming its own Hijri span rather than 2026's. */
+  const s27 = sourceFor(2027);
+  assert.ok(s27.includes("2027"), s27);
+  assert.ok(s27.includes("1448") && s27.includes("1449"), s27);
+  assert.equal(sourceFor(2028), null, "a year it does not hold has no source");
 });
