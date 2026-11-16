@@ -1403,7 +1403,33 @@ for (const f of ["index.html", "admin.html"]) {
     if (!funds.length || !freqs.length || !amts.length)
       bad.push("the giving screen's fund, frequency or amount options could not be read");
 
+    /* A FREQUENCY MAY HAVE NO LINKS, PROVIDED IT HAS A ROUTE INSTEAD.
+       Daily giving is the first of these: "£1 a day, charged monthly" is not
+       a thing a Payment Link can say, so the Worker builds the Checkout
+       Session and there are no links to list. (Friday Pay is the same shape
+       but kept its old links, which is why it is not here.)
+
+       This is not an exemption. A frequency in this table still has to prove
+       it goes somewhere — that the route it posts to is named in the page,
+       and that it offers tiers of its own — because the fault being guarded
+       against is a frequency a donor can choose that leads nowhere, and
+       "no links, no route either" is exactly that fault. */
+    const WORKER_ROUTED = { daily: { route: "/api/donate/daily", tiers: "per" } };
+
     for (const q of freqs) {
+      const wr = WORKER_ROUTED[q];
+      if (wr) {
+        if (table[q])
+          bad.push(`"${q}" is routed through the Worker but GIVING_LINKS also lists it — ` +
+                   `one of the two is dead, and nobody can tell which from the screen`);
+        if (!html.includes(`"${wr.route}"`))
+          bad.push(`the giving screen offers "${q}" but nothing calls ${wr.route} — ` +
+                   `the frequency has neither a link nor a route, so the button goes nowhere`);
+        if (!html.includes(`data-gv="${wr.tiers}"`))
+          bad.push(`"${q}" is routed through the Worker but offers no ${wr.tiers} tiers, ` +
+                   `so there is no amount to send it`);
+        continue;
+      }
       if (!table[q]) { bad.push(`the giving screen offers "${q}" but GIVING_LINKS has no such frequency`); continue; }
       if (!Object.keys(table[q]).length)
         bad.push(`no link at all for "${q}" — every amount under it would be dead. ` +

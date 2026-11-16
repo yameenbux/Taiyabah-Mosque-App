@@ -2631,6 +2631,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .gv-lab{font-size:calc(11px * var(--ts));font-weight:700;letter-spacing:.14em;
     text-transform:uppercase;color:var(--muted);margin:18px 2px 9px}
   .gv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .gv-grid2{grid-template-columns:repeat(2,1fr)}
   .gv-opt{background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:11px 7px;font:inherit;color:var(--ink);cursor:pointer;text-align:center;
     display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;
@@ -5095,25 +5096,49 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               please ring the office on <a href="tel:01204535997" dir="ltr" style="color:inherit">01204 535 997</a>.</p>
 
             <div class="gv-lab" data-i18n="giving.how_often">How often</div>
-            <div class="gv-grid">
+            <!-- Two by two, not three and one. A fourth option in a
+                 three-column grid leaves one button sitting alone on a second
+                 row looking like an afterthought. -->
+            <div class="gv-grid gv-grid2">
             <button class="gv-opt" data-gv="freq" data-val="once" aria-pressed="true"><span class="gv-t" data-i18n="giving.one_off">One-off</span><span class="gv-s" data-i18n="giving.a_single_gift">A single gift</span></button>
             <button class="gv-opt" data-gv="freq" data-val="monthly" aria-pressed="false"><span class="gv-t" data-i18n="giving.monthly">Monthly</span><span class="gv-s" data-i18n="giving.until_you_stop">Until you stop</span></button>
             <button class="gv-opt" data-gv="freq" data-val="friday" aria-pressed="false"><span class="gv-t" data-i18n="giving.friday_pay">Friday Pay</span><span class="gv-s" data-i18n="giving.jumuah">Jumu&#703;ah</span></button>
+            <button class="gv-opt" data-gv="freq" data-val="daily" aria-pressed="false"><span class="gv-t" data-i18n="giving.daily">Daily</span><span class="gv-s" data-i18n="giving.from_1_a_day">From &pound;1 a day</span></button>
             </div>
             <p class="gv-note" data-freqnote="monthly" hidden data-i18n="giving.taken_once_a_month_from">Taken once a month from the day you set it up, until you
               stop it. You can cancel any time from the receipt Stripe emails you.</p>
             <p class="gv-note" data-freqnote="friday" hidden data-i18n="giving.a_weekly_gift_for_jumuah">A weekly gift for Jumu&#703;ah. The first payment is taken on
               the next Friday, and every Friday after that. Nothing is taken today. You can stop it any
               time.</p>
+            <!-- The honesty of this note is the point. The donor chooses a
+                 daily figure and is charged monthly, and they are told so
+                 here, on the button, and on Stripe's own page, before any
+                 money moves. worker/src/daily.js says why. -->
+            <p class="gv-note" data-freqnote="daily" hidden data-i18n="giving.a_little_every_day">A little every day, taken as <strong>one payment a month</strong> &mdash; thirty
+              days at a time. One monthly payment instead of thirty daily ones keeps far more of your
+              giving with the masjid, because the card fee is charged per payment. You can stop it any
+              time.</p>
 
-            <div class="gv-lab" data-i18n="giving.amount">Amount</div>
-            <div class="gv-grid">
+            <div class="gv-lab" id="gv-amt-lab" data-i18n="giving.amount">Amount</div>
+            <div class="gv-grid" id="gv-amt-grid">
             <button class="gv-opt" data-gv="amt" data-val="5" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;5</span><span class="gv-s"></span></button>
             <button class="gv-opt" data-gv="amt" data-val="10" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;10</span><span class="gv-s"></span></button>
             <button class="gv-opt" data-gv="amt" data-val="25" aria-pressed="true"><span class="gv-t" data-i18n-num>&pound;25</span><span class="gv-s"></span></button>
             <button class="gv-opt" data-gv="amt" data-val="50" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;50</span><span class="gv-s"></span></button>
             <button class="gv-opt" data-gv="amt" data-val="100" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;100</span><span class="gv-s"></span></button>
             <button class="gv-opt" data-gv="amt" data-val="other" aria-pressed="false"><span class="gv-t" data-i18n="giving.other">Other</span><span class="gv-s" data-i18n="giving.you_choose">You choose</span></button>
+            </div>
+
+            <!-- Daily giving has its own three tiers and swaps places with the
+                 ladder above, because 5/10/25/50/100 are not daily figures and
+                 a grid of five greyed buttons is not a choice. Each one states
+                 the monthly charge under the daily figure: the small print is
+                 the button. -->
+            <div class="gv-lab" id="gv-day-lab" hidden data-i18n="giving.how_much_a_day">How much a day</div>
+            <div class="gv-grid" id="gv-day-grid" hidden>
+            <button class="gv-opt" data-gv="per" data-val="1" aria-pressed="true"><span class="gv-t" data-i18n-num>&pound;1</span><span class="gv-s">&pound;30 a month</span></button>
+            <button class="gv-opt" data-gv="per" data-val="2" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;2</span><span class="gv-s">&pound;60 a month</span></button>
+            <button class="gv-opt" data-gv="per" data-val="3" aria-pressed="false"><span class="gv-t" data-i18n-num>&pound;3</span><span class="gv-s">&pound;90 a month</span></button>
             </div>
 
             <p class="gv-gift" data-i18n-html="giving.gift_aid_if_you_are"><strong>Gift Aid:</strong> if you are a UK taxpayer, tick <strong>Yes</strong> on the
@@ -14783,7 +14808,15 @@ const GIVING_LINKS = {
   },
 };
 const GIVING_AMOUNTS = { "5":"£5", "10":"£10", "25":"£25", "50":"£50", "100":"£100", "other":null };
-const GV = { fund:"general", freq:"once", amt:"25" };
+const GV = { fund:"general", freq:"once", amt:"25", per:"1" };
+/* Daily giving: the tiers, and the multiplier that turns a daily figure into
+   the monthly charge. BOTH MUST MATCH worker/src/daily.js, which is what
+   Stripe is actually told — this copy only decides what the donor is shown,
+   and a donor shown one number and charged another is the one outcome worth
+   any amount of duplication to avoid. The Worker returns the monthly pence it
+   used so the button can state that rather than this multiplication. */
+const GIVING_PER_DAY = ["1","2","3"];
+const GIVING_DAYS_PER_MONTH = 30;
 
 function gvLink(){ return (GIVING_LINKS[GV.freq] || {})[GV.amt] || null; }
 
@@ -14800,11 +14833,39 @@ function gvRender(){
   document.querySelectorAll('#giving [data-freqnote]').forEach(p=>{
     p.hidden = p.dataset.freqnote !== GV.freq;
   });
+  /* The two amount ladders swap places. Daily tiers are £1/£2/£3 and the
+     one-off ladder starts at £5, so neither can stand in for the other. */
+  const daily = GV.freq === "daily";
+  ["gv-amt-lab","gv-amt-grid"].forEach(id=>{ document.getElementById(id).hidden = daily; });
+  ["gv-day-lab","gv-day-grid"].forEach(id=>{ document.getElementById(id).hidden = !daily; });
+
   const amt = GIVING_AMOUNTS[GV.amt];
   const cta = document.getElementById("gv-cta");
   const main = document.getElementById("gv-cta-amt");
   const sub = document.getElementById("gv-cta-sub");
   const href = gvLink();
+
+  /* Daily never opens a link — there is none, and there could not be one that
+     says "£1 a day" and bills monthly. The Worker makes the session. */
+  if(daily){
+    cta.removeAttribute("href");
+    cta.removeAttribute("aria-disabled");
+    /* Placeholders, not concatenation. "Give £1 a day" assembled from three
+       fragments comes out in English word order whatever the language, and
+       in Urdu and Arabic the amount lands in the wrong place. */
+    const month = n => num("£" + (Number(n) * GIVING_DAYS_PER_MONTH));
+    main.textContent = t("giving.give_n_a_day","Give {n} a day")
+                         .replace("{n}", num("£" + GV.per));
+    sub.textContent  = t("giving.one_payment_of_n_a_month","One payment of {n} a month")
+                         .replace("{n}", month(GV.per));
+    /* The monthly charge under each tier, worked out rather than written into
+       the markup, so the three can never disagree with the multiplier. */
+    document.querySelectorAll('#giving [data-gv="per"] .gv-s').forEach(el=>{
+      el.textContent = t("giving.n_a_month","{n} a month")
+                         .replace("{n}", month(el.parentElement.dataset.val));
+    });
+    return;
+  }
   /* What the donor is agreeing to, on the button itself. "Donate £10" and
      "Donate £10 every Friday" are different promises, and the button is the
      last thing read before the card page. */
@@ -14843,13 +14904,28 @@ function gvRender(){
  * through to the old link: that would take money today, on the wrong day,
  * which is the whole complaint. */
 async function gvFriday(ev){
-  if (GV.freq !== "friday") return;          /* one-off and monthly: leave the link alone */
+  /* One-off and monthly: leave the link alone. Friday Pay and daily giving
+     both need a Checkout Session the Worker builds, for the same underlying
+     reason — a Payment Link cannot express either schedule — so they share
+     the one handler and differ only in route and payload. */
+  /* Both paths spelled out in full rather than assembled from a stem and a
+     variable. Assembled, the only path literal in this file is the stem,
+     which is not a route the Worker serves and which hides the two that it
+     does from check-release.mjs — a route could then be renamed on one side
+     only and nothing would notice until a donor pressed the button. (That
+     check reads this file WITHOUT stripping comments, so a path quoted in
+     prose counts as a call. Hence none quoted here.) */
+  const path = GV.freq === "friday" ? "/api/donate/friday"
+             : GV.freq === "daily"  ? "/api/donate/daily" : null;
+  if (!path) return;
+  const route = GV.freq;
   ev.preventDefault();
   const cta  = document.getElementById("gv-cta");
   const main = document.getElementById("gv-cta-amt");
   const sub  = document.getElementById("gv-cta-sub");
   if (cta.dataset.busy === "1") return;
-  if (!GIVING_AMOUNTS[GV.amt]) return;
+  if (route === "friday" && !GIVING_AMOUNTS[GV.amt]) return;
+  if (route === "daily"  && GIVING_PER_DAY.indexOf(GV.per) === -1) return;
 
   const mainWas = main.textContent, subWas = sub.textContent;
   cta.dataset.busy = "1";
@@ -14857,10 +14933,12 @@ async function gvFriday(ev){
   main.textContent = t("giving.one_moment", "One moment…");
   sub.textContent  = "";
   try {
-    const res = await fetch(SENDER_BASE + "/api/donate/friday", {
+    const res = await fetch(SENDER_BASE + path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: GV.amt, fund: GV.fund }),
+      body: JSON.stringify(route === "daily"
+        ? { perDay: GV.per, fund: GV.fund }
+        : { amount: GV.amt, fund: GV.fund }),
     });
     const data = await res.json().catch(() => ({}));
     if (res.ok && data && data.url) { location.href = data.url; return; }
