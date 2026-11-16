@@ -43,10 +43,7 @@ const PORTAL = "https://taiyabahwebsite.ysbdesigns.uk/portal/";
 const GROUPS = [
   { k: "menu.resources", t: "Resources", rows: [
     { to: "Timetable", icon: "calendar-outline",   k: "menu.timetable",        t: "Full prayer timetable" },
-    { to: "Videos",    icon: "play-circle-outline", k: "marriage.videos_bayaans", t: "Videos & bayaans" },
-    { to: "Hajj", icon: "airplane-outline", k: "marriage.hajj_umrah", t: "Hajj / Umrah" },
     { to: "Ramadan",   icon: "moon-outline",        k: "ramadan.ramadan", t: "Ramadan" },
-    { to: "Zakat",     icon: "calculator-outline",  k: "menu.zakat", t: "Zakat calculator" },
   ]},
   { k: "marriage.madrasah", t: "Madrasah", rows: [
     { to: "Admissions", icon: "clipboard-outline",  k: "adm.admissions_fees",  t: "Admissions & Fees" },
