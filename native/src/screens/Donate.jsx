@@ -198,6 +198,16 @@ export const LINKS = {
 };
 const AMOUNTS = ["5", "10", "25", "50", "100", "other"];
 
+/* Daily giving. ASKED FOR AS "£1 A DAY", TAKEN AS ONE CHARGE A MONTH, and
+ * both numbers must match worker/src/daily.js, which is what Stripe is
+ * actually told. That file carries the arithmetic; the short version is that
+ * Stripe's 20p per transaction costs about £78 a year on a pound a day billed
+ * daily against about £8 billed monthly, so the interval is worth more to the
+ * masjid than any other decision in this screen. The donor is shown both
+ * figures — on the tier, on the button and in the note — before they commit. */
+const PER_DAY = ["1", "2", "3"];
+const DAYS_PER_MONTH = 30;
+
 /* The same Worker push.js and metals.js talk to. Friday Pay goes through it
  * rather than opening a Payment Link — see the comment on the CTA below. */
 const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
@@ -212,8 +222,9 @@ export function Giving({ route }) {
   const want = route?.params?.freq;
   const [fund, setFund] = useState("general");
   const [freq, setFreq] = useState(
-    want === "monthly" || want === "friday" ? want : "once");
+    want === "monthly" || want === "friday" || want === "daily" ? want : "once");
   const [amt, setAmt]   = useState("25");
+  const [per, setPer]   = useState("1");          /* pounds a day, daily giving only */
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -229,19 +240,31 @@ export function Giving({ route }) {
     { v: "once",    t: t("giving.one_off", "One-off"), s: t("giving.a_single_gift", "A single gift") },
     { v: "monthly", t: t("giving.monthly", "Monthly"), s: t("giving.until_you_stop", "Until you stop") },
     { v: "friday",  t: t("giving.friday_pay", "Friday Pay"), s: t("giving.jumuah", "Jumuʿah") },
+    { v: "daily",   t: t("giving.daily", "Daily"), s: t("giving.from_1_a_day", "From £1 a day") },
   ];
+  const daily = freq === "daily";
 
   const goes = SHEETS.giving?.blocks.find(b => b.type === "dl");
-  const base = LINKS[freq][amt];
+  /* `|| {}` is not defensive padding: daily giving has NO entry in LINKS at
+     all, because no Payment Link can say "£1 a day, charged monthly". Without
+     it this read threw on undefined the moment Daily was pressed and the whole
+     screen fell through to the error boundary — the static checks all passed,
+     because nothing static can see it. */
+  const base = (LINKS[freq] || {})[amt];
   /* The designation rides on the same link rather than needing its own, exactly
    * as it does on the website, so the masjid's reports do not split in two. */
   const href = base ? base + (base.includes("?") ? "&" : "?") + "client_reference_id=" + encodeURIComponent(fund) : null;
-  const per = freq === "monthly" ? " " + t("giving.a_month", "a month")
-            : freq === "friday"  ? " " + t("giving.every_friday", "every Friday") : "";
+  const every = freq === "monthly" ? " " + t("giving.a_month", "a month")
+              : freq === "friday"  ? " " + t("giving.every_friday", "every Friday") : "";
+  /* Placeholders rather than concatenation for the daily lines. "Give £1 a
+     day" built from three pieces comes out in English word order whatever the
+     language, which puts the amount in the wrong place in Urdu and Arabic. */
+  const monthOf = n => `£${Number(n) * DAYS_PER_MONTH}`;
   const label = busy ? t("giving.one_moment", "One moment…")
+              : daily ? t("giving.give_n_a_day", "Give {n} a day").replace("{n}", `£${per}`)
               : !href ? t("giving.not_available_yet", "Not available yet")
-              : amt === "other" ? t("giving.choose_your_amount", "Choose your amount") + per
-              : `${t("tiles.donate", "Donate")} £${amt}${per}`;
+              : amt === "other" ? t("giving.choose_your_amount", "Choose your amount") + every
+              : `${t("tiles.donate", "Donate")} £${amt}${every}`;
 
   /* FRIDAY PAY DOES NOT OPEN A LINK, AND CANNOT.
    *
@@ -258,14 +281,21 @@ export function Giving({ route }) {
    * On failure the donor is told and the button comes back. It never falls
    * through to the old link: that takes money today, on the wrong day, which
    * is the entire complaint. */
+  /* Daily giving goes the same way and for a related reason: no Payment Link
+   * can say "a pound a day, charged monthly" either. Both routes differ only
+   * in path and payload, so they share this. */
   const giveOnFriday = async () => {
     if (busy) return;
     setBusy(true); setFailed(false);
     try {
-      const res = await fetch(`${SENDER}/api/donate/friday`, {
+      /* Both paths written out, not assembled: an interpolated path leaves
+         "/api/donate/" as the only literal in the file, which is not a route
+         the Worker serves and hides the two that are. */
+      const path = daily ? "/api/donate/daily" : "/api/donate/friday";
+      const res = await fetch(`${SENDER}${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: amt, fund }),
+        body: JSON.stringify(daily ? { perDay: per, fund } : { amount: amt, fund }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data && data.url) { open(data.url); return; }
@@ -318,7 +348,7 @@ export function Giving({ route }) {
           </View>
 
           <GLab>{t("giving.how_often", "How often")}</GLab>
-          <Options options={FREQS} value={freq} onChange={setFreq} />
+          <Options options={FREQS} value={freq} onChange={setFreq} two />
           {/* The website has shown this note since the screen was built; the
               app never has. A donor picking Friday Pay in the app saw only the
               words "Friday Pay · Jumuʿah" and a button promising every Friday,
@@ -327,14 +357,51 @@ export function Giving({ route }) {
             <Note>{freq === "monthly"
               ? t("giving.taken_once_a_month_from",
                   "Taken once a month from the day you set it up, until you stop it. You can cancel any time from the receipt Stripe emails you.")
+              : daily
+              /* The honesty of this note is the point: a daily figure, a
+                 monthly charge, and the donor told so before they pay. */
+              ? t("giving.a_little_every_day",
+                  "A little every day, taken as *one payment a month* — thirty days at a time. One monthly payment instead of thirty daily ones keeps far more of your giving with the masjid, because the card fee is charged per payment. You can stop it any time.")
               : t("giving.a_weekly_gift_for_jumuah",
                   "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time.")}</Note>
           )}
 
-          <GLab>{t("giving.amount", "Amount")}</GLab>
+          <GLab>{daily ? t("giving.how_much_a_day", "How much a day")
+                        : t("giving.amount", "Amount")}</GLab>
+          {/* The two ladders swap places rather than one greying out. Daily
+              tiers are £1/£2/£3 and the one-off ladder starts at £5, so
+              neither can stand in for the other, and five greyed buttons is
+              not a choice. Each daily tier states its monthly charge, worked
+              out from DAYS_PER_MONTH so the three can never disagree with it:
+              the small print is the button. */}
+          {daily ? (
+          <View style={{ flexDirection: "row", gap: 8 }}>
+          {PER_DAY.map(d => {
+            const on = d === per;
+            return (
+              <Pressable key={d} onPress={() => { tap(); setPer(d); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
+                accessibilityLabel={t("giving.give_n_a_day", "Give {n} a day").replace("{n}", `£${d}`)}
+                style={({ pressed }) => ({ flex: 1, minHeight: 62,
+                                           alignItems: "center", justifyContent: "center", gap: 2,
+                                           paddingVertical: 11, paddingHorizontal: 7,
+                                           borderRadius: 14, borderWidth: 1,
+                                           borderColor: on ? dual(C.brand900, C.pick) : C.line,
+                                           backgroundColor: on ? C.brand900 : C.card,
+                                           opacity: pressed ? 0.85 : 1 })}>
+                <Text style={{ fontFamily: F.sansBold, fontSize: fs(14.5), lineHeight: fs(17.5),
+                               color: on ? C.cream : C.ink }}>{`£${d}`}</Text>
+                <Text style={{ fontFamily: F.sans, fontSize: fs(10), letterSpacing: 0.7,
+                               textTransform: "uppercase", lineHeight: fs(12.5), textAlign: "center",
+                               color: on ? C.goldBright : C.muted }}>
+                  {t("giving.n_a_month", "{n} a month").replace("{n}", monthOf(d))}</Text>
+              </Pressable>);
+          })}
+          </View>
+          ) : (
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {AMOUNTS.map(a => {
-            const off = !LINKS[freq][a];
+            const off = !(LINKS[freq] || {})[a];
             const on = a === amt;
             return (
               <Pressable key={a} disabled={off} onPress={() => { tap(); setAmt(a); }}
@@ -356,6 +423,7 @@ export function Giving({ route }) {
               </Pressable>);
           })}
         </View>
+        )}
         {/* Two combinations have no link — a recurring gift of an amount the
             donor types. They grey out rather than vanishing, because a grid that
             changes shape as you switch frequency is a grid people think they
@@ -367,10 +435,12 @@ export function Giving({ route }) {
             one button on the screen that takes money looked like every other
             button in the app. */}
         <GoldCTA label={label}
-             href={freq === "friday" ? null : href}
-             onPress={freq === "friday" && href ? giveOnFriday : null}
-             disabled={!href || busy}
+             href={freq === "friday" || daily ? null : href}
+             onPress={daily ? giveOnFriday : freq === "friday" && href ? giveOnFriday : null}
+             disabled={daily ? busy : !href || busy}
              sub={failed ? t("giving.could_not_start_that_donation", "Could not start that donation. Please try again.")
+                /* What will actually be charged, under the daily figure. */
+                : daily ? t("giving.one_payment_of_n_a_month", "One payment of {n} a month").replace("{n}", monthOf(per))
                 : href ? t("sheet.card_apple_pay_google_pay", "Card · Apple Pay · Google Pay")
                        : t("giving.choose_another_amount", "Choose another amount, or use the bank details below")} />
         </Card>
@@ -394,16 +464,19 @@ export function Giving({ route }) {
  * Here the chosen one was a 7% plum tint with plum text and a grey sub, which
  * on a screen where the choice decides where the money goes is the difference
  * between "this is selected" and "this is slightly highlighted". */
-function Options({ options, value, onChange }) {
+function Options({ options, value, onChange, two = false }) {
   const { fs } = useApp();
+  /* Two by two once there are four. Four across is 80px a column on a small
+     phone, which truncates "Friday Pay" and leaves the sub-labels unreadable;
+     one alone on a second row reads as an afterthought. */
   return (
-    <View style={{ flexDirection: "row", gap: 8 }}>
+    <View style={{ flexDirection: "row", gap: 8, flexWrap: two ? "wrap" : "nowrap" }}>
       {options.map(o => {
         const on = o.v === value;
         return (
           <Pressable key={o.v} onPress={() => { tap(); onChange(o.v); }}
             accessibilityRole="radio" accessibilityState={{ selected: on }}
-            style={({ pressed }) => ({ flex: 1, minHeight: 62, alignItems: "center", justifyContent: "center",
+            style={({ pressed }) => ({ ...(two ? { flexBasis: "47%", flexGrow: 1 } : { flex: 1 }), minHeight: 62, alignItems: "center", justifyContent: "center",
                                        gap: 2, paddingVertical: 11, paddingHorizontal: 7,
                                        borderRadius: 14, borderWidth: 1,
                                        /* The chosen one is a DARK WELL, which is what the

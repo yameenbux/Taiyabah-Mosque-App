@@ -21,6 +21,7 @@
    notice's "no tracking of any kind". */
 import { note, flush, due } from "./src/usage.js";
 import { nextFridayAnchor, describeAnchor, fridayCheckoutForm } from "./src/friday.js";
+import { dailyCheckoutForm, monthlyPence } from "./src/daily.js";
 
 
 const SESSION_HOURS = 8;
@@ -1413,6 +1414,53 @@ async function handle(request, env) {
       }
 
       return json({ url: out.url, firstCharge: { at: anchor, days: when.days, date: when.date } }, 200, ch);
+    }
+
+    /* Daily giving — asked for as "£1 a day", taken as one charge a month.
+     *
+     * The gap between those two is deliberate and src/daily.js explains it at
+     * length: billing a pound a day daily would hand Stripe about £78 a year
+     * per donor in the 20p transaction fee, against about £8 billed monthly.
+     * The donor is told both figures before they commit.
+     *
+     * Everything else follows the Friday route above, including the two rules
+     * that matter: the key has to exist, and the amount is never taken from
+     * the caller. See test/daily.test.mjs. */
+    if (url.pathname === "/api/donate/daily" && request.method === "POST") {
+      if (!env.STRIPE_SECRET_KEY)
+        return json({ error: "Daily giving is not set up on this server yet." }, 503, ch);
+      if (!limit(`day:${ip}`, 12, 10 * 60e3))
+        return json({ error: "Too many attempts. Try again in a few minutes." }, 429, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const built = dailyCheckoutForm({
+        perDay: body.perDay,
+        fund: body.fund,
+        product: env.STRIPE_DONATION_PRODUCT || null,
+        returnUrl: env.DONATE_RETURN_URL || null,
+      });
+      if (built.error) return json({ error: built.error }, built.status, ch);
+
+      const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(built.form),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.url) {
+        const why = out?.error?.message || `Stripe answered ${res.status}`;
+        return json({ error: "Stripe could not start this donation.", detail: why }, 502, ch);
+      }
+
+      /* monthly is sent back so the screen can state what will be charged
+         without working the multiplication out a second time and risking a
+         different answer from the one the donor is about to be billed. */
+      return json({ url: out.url, monthly: monthlyPence(String(body.perDay).trim()) }, 200, ch);
     }
 
     return json({ error: "Not found", receivedPath: url.pathname, receivedMethod: request.method }, 404, ch);
