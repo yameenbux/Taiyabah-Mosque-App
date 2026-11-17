@@ -1,8 +1,7 @@
 {
   "_note": "Zakat calculator — rulings and thresholds. Fiqh content: the imam should review before launch. Weights and percentages are kept as figures so num() can render them in the reader's own numerals.",
 
-  "about.watch": ["دیکھیں ›", "જુઓ ›", "شاهد ›"],
-  "about.audio_keeps_playing_while_you": ["آواز چلتی رہتی ہے جب آپ ایپ کا باقی حصہ یا دوسری ایپس استعمال کریں۔ اگر نشریات شروع نہ ہو تو ممکن ہے مسجد اس وقت نشر نہ کر رہی ہو۔", "તમે ઍપનો બાકીનો ભાગ કે અન્ય ઍપ વાપરો ત્યારે પણ ઑડિયો ચાલુ રહે છે. જો પ્રસારણ શરૂ ન થાય, તો કદાચ મસ્જિદ અત્યારે પ્રસારણ કરતી નથી.", "يستمرّ الصوت أثناء استخدامك بقيّة التطبيق أو تطبيقات أخرى. وإذا لم يبدأ البثّ، فقد لا يكون المسجد يبثّ في هذه اللحظة."],
+  "about.watch": ["دیکھیں", "જુઓ", "شاهد"],
 
   "zakat.zakat_calculator": ["زکٰوۃ کیلکولیٹر", "ઝકાત કેલ્ક્યુલેટર", "حاسبة الزكاة"],
   "zakat.done": ["ہو گیا", "થઈ ગયું", "تم"],
