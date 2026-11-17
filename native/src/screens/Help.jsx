@@ -28,6 +28,7 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, Note, Press, tap, open } from "../ui";
 import { batteryHelp } from "../battery-help";
+import { ReportProblem } from "../report-problem";
 
 /* `device: true` splices in this phone's own battery steps. `settings: true`
  * adds a button into the app's system settings, which is the only place some
@@ -96,6 +97,20 @@ const GROUPS = [
     { k: "help.q_offline", q: "Does it work without internet?",
       a: ["Most of it, yes. Prayer times, the full timetable, duʿās, athkār and the Qurʾān are built into the app and work with no signal at all.",
           "Announcements, videos, the live stream, and any form or payment need a connection."] },
+  ]},
+
+  { k: "help.g_audio", t: "Listen Live & recordings", qs: [
+    { k: "help.q_audio_keeps", q: "The sound keeps playing after I leave the app",
+      a: ["That is on purpose, so a talk or the live stream keeps going while you use another app or lock the phone.",
+          "To pause or stop it, use the controls on your phone’s lock screen or in the notification shade, or open the app and tap the stop square on the bar along the bottom."] },
+
+    { k: "help.q_live_silent", q: "The live stream is silent",
+      a: ["The stream is only live while the masjid is broadcasting — outside those times there is nothing to play.",
+          "It also needs a connection. If it is broadcast time and still silent, leave Listen Live and open it again."] },
+
+    { k: "help.q_rec_play", q: "A recording won’t play, or stopped partway",
+      a: ["Recordings need a connection to load. They remember where you left off, so opening one again carries on from the same place.",
+          "If one will not start, try another — if none of them play, it is the connection rather than the recording."] },
   ]},
 
   { k: "help.g_pay", t: "Payments and forms", qs: [
@@ -206,6 +221,15 @@ export default function Help() {
                 </Card>);
             })}
           </View>))}
+
+        <Heading>{t("help.g_report", "Report a problem")}</Heading>
+        <Card gap={0}>
+          <Text style={[{ fontFamily: F.sans, fontSize: fs(12.5), color: C.muted, lineHeight: fs(20),
+                          marginBottom: 4 }, dir]}>
+            {t("help.report_intro",
+              "If something would not load, or did not work the way it should, tell the masjid here. It sends a short record of what the app was doing — which is usually what makes a problem fixable.")}</Text>
+          <ReportProblem screen="Help" />
+        </Card>
 
         <Heading>{t("help.g_stuck", "Still stuck")}</Heading>
         <Card gap={10}>

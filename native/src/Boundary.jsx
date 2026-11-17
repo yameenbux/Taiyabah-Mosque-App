@@ -20,11 +20,12 @@ import React from "react";
 import { View, Text, Linking } from "react-native";
 import { C, F } from "./theme";
 import { reportCrash } from "./crash";
+import { reportIssue } from "./diagnostics";
 
 const OFFICE = "01204 535 997";
 
 export default class Boundary extends React.Component {
-  state = { failed: false };
+  state = { failed: false, reported: false };
 
   static getDerivedStateFromError() { return { failed: true }; }
 
@@ -32,6 +33,15 @@ export default class Boundary extends React.Component {
     /* Reported, not swallowed. The whole point is that somebody finds out. */
     reportCrash(error, { screen: this.props.screen });
   }
+
+  /* The automatic report above says a fault happened. This one is the person
+     adding what they were doing when it did, with the breadcrumb trail, which
+     is often the difference between a fingerprint and a fix. reportIssue takes
+     no app context, so it is safe to call from this bare fallback. */
+  tellThem = () => {
+    this.setState({ reported: true });
+    reportIssue({ screen: this.props.screen }).catch(() => {});
+  };
 
   render() {
     if (!this.state.failed) return this.props.children;
@@ -69,6 +79,23 @@ export default class Boundary extends React.Component {
                          paddingVertical: 14 }}>
             Try again
           </Text>
+
+          {this.state.reported ? (
+            <Text style={{ marginTop: 10, textAlign: "center",
+                           fontFamily: F.sansSemi, fontSize: 14, color: "#2E8C56",
+                           paddingVertical: 12 }}>
+              Reported — thank you.
+            </Text>
+          ) : (
+            <Text onPress={this.tellThem}
+                  suppressHighlighting
+                  style={{ marginTop: 8, textAlign: "center", overflow: "hidden",
+                           fontFamily: F.sansSemi, fontSize: 14, color: "#261B22",
+                           borderWidth: 1, borderColor: "#E4DECF", borderRadius: 13,
+                           paddingVertical: 13 }}>
+              Report this problem
+            </Text>
+          )}
 
           <Text onPress={() => Linking.openURL(`tel:${OFFICE.replace(/\s/g, "")}`)}
                 suppressHighlighting

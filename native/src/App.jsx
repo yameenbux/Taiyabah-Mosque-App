@@ -27,6 +27,7 @@ import { LiveAudioProvider } from "./live-audio";
 import { RecordingsAudioProvider } from "./recordings-audio";
 import RecBar from "./rec-bar";
 import OnAirBar from "./on-air";
+import { breadcrumb } from "./diagnostics";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
 import SHEETS from "./data/sheets.json";
@@ -260,10 +261,15 @@ function Root() {
    * one wrong leaves the bar floating in the middle of the Qurʼan. */
   const navRef = useNavigationContainerRef();
   const [where, setWhere] = React.useState({ onLive: false, onRec: false, onTabs: true });
+  const lastScreen = React.useRef(null);
   const readWhere = React.useCallback(() => {
     let onLive = false, onRec = false, onTabs = true;
     try {
       const name = navRef.getCurrentRoute?.()?.name;
+      /* A breadcrumb for the problem log, but only when the screen actually
+         changes — onStateChange fires for a great deal more than that, and a
+         trail of the same screen twenty times over says nothing. */
+      if (name && name !== lastScreen.current) { lastScreen.current = name; breadcrumb("opened " + name); }
       onLive = name === "Live";
       /* The recordings bar shows on the browse screen and everywhere else, so
          the dars can be paused from any of them — it stays off only the full

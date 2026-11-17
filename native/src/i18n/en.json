@@ -1523,5 +1523,21 @@
  "zakat.gsnote": "Enter a price per gram above, or the gold and silver you own cannot be valued.",
  "zakat.below_nisab": "Below the nisab",
  "zakat.no_zakat_due": "No zakat is due on this amount. Ṣadaqah is always welcome.",
- "a11y.notifications": "Notifications"
+ "a11y.notifications": "Notifications",
+ "help.g_audio": "Listen Live & recordings",
+ "help.q_audio_keeps": "The sound keeps playing after I leave the app",
+ "help.q_audio_keeps_a": "That is on purpose, so a talk or the live stream keeps going while you use another app or lock the phone.\n\nTo pause or stop it, use the controls on your phone’s lock screen or in the notification shade, or open the app and tap the stop square on the bar along the bottom.",
+ "help.q_live_silent": "The live stream is silent",
+ "help.q_live_silent_a": "The stream is only live while the masjid is broadcasting — outside those times there is nothing to play.\n\nIt also needs a connection. If it is broadcast time and still silent, leave Listen Live and open it again.",
+ "help.q_rec_play": "A recording won’t play, or stopped partway",
+ "help.q_rec_play_a": "Recordings need a connection to load. They remember where you left off, so opening one again carries on from the same place.\n\nIf one will not start, try another — if none of them play, it is the connection rather than the recording.",
+ "help.g_report": "Report a problem",
+ "help.report_intro": "If something would not load, or did not work the way it should, tell the masjid here. It sends a short record of what the app was doing — which is usually what makes a problem fixable.",
+ "report.field_label": "What went wrong?",
+ "report.placeholder": "e.g. the live stream would not play, or a screen stayed blank",
+ "report.failed": "That didn’t send — check your connection and try again, or ring the office on 01204 535 997.",
+ "report.send": "Send report",
+ "report.privacy": "This sends your app version, your phone model, and a short log of the last few screens — so the masjid can see what happened. It does not send your name, your number, or anything you typed into a form.",
+ "report.thanks_title": "Thank you — that’s been sent",
+ "report.thanks_body": "The masjid now has what it needs to look into it. If it is urgent, ring the office on 01204 535 997."
 }
