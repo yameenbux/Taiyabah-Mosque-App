@@ -74,6 +74,20 @@ const ALLOWED = {
   "#2A0C1E": "the appeal card's top gradient stop — a surface",
   "#1B0613": "the same gradient's bottom stop",
   "#3C0B2A": "that gradient's middle stop, and the arrow ON THE SOLID GOLD disc",
+  /* The recordings library's section tiles each sit on a deep jewel ground,
+     with a gold icon and a white label ON them (both of which this check reads
+     and passes). These are those grounds — surfaces, never text — and the two
+     near-blacks are the feet the tile and the player gradients fade into. See
+     JEWELS in src/screens/Recordings.jsx and the player in RecordingPlayer.jsx. */
+  "#5E1844": "a recordings section tile ground — a surface, never text",
+  "#13433A": "a recordings section tile ground — a surface, never text",
+  "#243A6B": "a recordings section tile ground — a surface, never text",
+  "#4A2363": "a recordings section tile ground — a surface, never text",
+  "#6B1E3A": "a recordings section tile ground — a surface, never text",
+  "#1F4A36": "a recordings section tile ground — a surface, never text",
+  "#4B2A12": "a recordings section tile ground — a surface, never text",
+  "#1B0712": "the recordings tile gradient's foot — a near-black surface, never text",
+  "#0E0309": "the recordings player's gradient foot — a near-black surface, never text",
 };
 
 const files = [];

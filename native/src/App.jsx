@@ -51,6 +51,7 @@ import HajjBranch from "./screens/HajjBranch";
 import HajjJourney from "./screens/HajjJourney";
 import Live from "./screens/Live";
 import Recordings from "./screens/Recordings";
+import RecordingPlayer from "./screens/RecordingPlayer";
 import Videos from "./screens/Videos";
 import Zakat from "./screens/Zakat";
 import Holidays from "./screens/Holidays";
@@ -264,10 +265,10 @@ function Root() {
     try {
       const name = navRef.getCurrentRoute?.()?.name;
       onLive = name === "Live";
-      /* The recordings bar, like the On air bar, stays off its own screen —
-         the full player is already there, so a second one in the corner is
-         clutter. */
-      onRec = name === "Recordings";
+      /* The recordings bar shows on the browse screen and everywhere else, so
+         the dars can be paused from any of them — it stays off only the full
+         player, where the controls are already front and centre. */
+      onRec = name === "RecordingPlayer";
       const root = navRef.getRootState?.();
       onTabs = !root || root.routes?.[root.index]?.name === "Tabs";
     } catch {}
@@ -388,6 +389,11 @@ function Root() {
         <Stack.Screen name="Qibla"     component={Qibla}     options={page} />
         <Stack.Screen name="Live"      component={Live}      options={page} />
         <Stack.Screen name="Recordings" component={Recordings} options={page} />
+        {/* The immersive player slides up like a now-playing sheet; its own
+            down-chevron dismisses it. It owns no sound, so dismissing it does
+            not stop the dars — the player lives above this navigator. */}
+        <Stack.Screen name="RecordingPlayer" component={RecordingPlayer}
+                      options={{ ...page, presentation: "fullScreenModal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="Videos"    component={Videos}    options={{ ...sheet, title: t("vids.videos_bayaans", "Videos & bayaans") }} />
         <Stack.Screen name="Timetable" component={Timetable} options={{ ...sheet, title: t("times.monthly_timetable", "Monthly timetable") }} />
         <Stack.Screen name="Zakat"     component={Zakat}     options={{ ...bare, title: t("zakat.zakat_calculator", "Zakat calculator") }} />
@@ -440,7 +446,7 @@ function Root() {
         bar. Only one of the two is ever up: the stream and a recording cannot
         both be playing (src/audio-bus.js), so they never stack. */}
     <RecBar onRec={where.onRec} onTabs={where.onTabs}
-            onGo={() => { try { navRef.navigate("Recordings"); } catch {} }} />
+            onGo={() => { try { navRef.navigate("RecordingPlayer"); } catch {} }} />
     </View>
   );
 }

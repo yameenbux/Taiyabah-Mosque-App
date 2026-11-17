@@ -1,30 +1,37 @@
 /**
- * Taiyabah Masjid — the recordings archive, played in the app.
+ * Taiyabah Masjid — the recordings library: browse, then listen.
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
- * The masjid already keeps every dars and bayaan on eMasjid Live, dated and
- * public. This screen is a native window onto that archive: pick a section,
- * see what is in it newest-first, tap to listen. The LIST and the PLAY URL come
- * from the Worker (/api/recordings), which does the reading and parsing so
- * neither this screen nor the website has to know what eMasjid's HTML looks
- * like — see worker/src/recordings.js. The SOUND is src/recordings-audio.jsx,
- * held above the navigator so a dars keeps going when you walk off to read, the
- * same promise the live stream makes.
+ * The masjid keeps every dars and bayaan on eMasjid Live, dated and public.
+ * This is the native window onto it: the sections as tiles, a "Continue
+ * listening" row that remembers where you left off, and the chosen section's
+ * recordings newest-first. Tap one and it opens the full player (RecordingPlayer).
  *
- * It is laid out as a fixed frame, not a scroll: the section chips and the
- * player stay put while only the list of recordings moves, so the thing you are
- * listening to never scrolls out from under your thumb.
+ * WHERE THE SOUND LIVES. Not here. The player is src/recordings-audio.jsx,
+ * mounted above the whole navigator, so a dars keeps playing while you walk off
+ * to read Qurʼan or lock the phone — and the now-playing bar (src/rec-bar.jsx)
+ * follows you to every other screen. This screen only starts things and lists
+ * them; it owns no sound, which is the rule the gate enforces.
+ *
+ * The LIST and the play URL come from the Worker (/api/recordings), which reads
+ * and parses eMasjid so neither this screen nor the website has to.
  */
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, FlatList, ScrollView, PanResponder } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, TopBar, Girih, tap } from "../ui";
 import { useRecordings } from "../recordings-audio";
+import { IslamicIcon, iconForCategory } from "../islamic-icons";
 
 const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
+
+/* The deep jewel grounds the section tiles sit on, assigned by position so the
+   same section keeps the same colour run to run. All dark enough for the gold
+   icon and white label to read on. */
+const JEWELS = ["#5E1844", "#13433A", "#243A6B", "#4A2363", "#6B1E3A", "#1F4A36", "#4B2A12"];
 
 async function getJSON(url, ms = 9000) {
   const c = new AbortController();
@@ -36,38 +43,41 @@ async function getJSON(url, ms = 9000) {
   } finally { clearTimeout(timer); }
 }
 
-/* "9 Nov 2026" from "2026-11-09", without pulling a date library in. */
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function niceDate(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
-  if (!m) return iso || "";
-  return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] || ""} ${m[1]}`;
+  return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] || ""} ${m[1]}` : (iso || "");
 }
-/* "35 min", or "1 h 20 min" past the hour. */
-function niceLength(sec) {
-  const s = Number(sec) || 0;
-  const h = Math.floor(s / 3600), min = Math.round((s % 3600) / 60);
-  if (h > 0) return `${h} h${min ? ` ${min} min` : ""}`;
-  return `${Math.max(1, min)} min`;
+function niceLen(sec) {
+  const s = Number(sec) || 0, h = Math.floor(s / 3600), min = Math.round((s % 3600) / 60);
+  return h > 0 ? `${h} h${min ? ` ${min} min` : ""}` : `${Math.max(1, min)} min`;
 }
-/* The player clock: m:ss, or h:mm:ss once past an hour. */
-function clock(ms) {
-  const t = Math.max(0, Math.floor((ms || 0) / 1000));
-  const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
-  const mm = h ? String(m).padStart(2, "0") : String(m);
-  return (h ? `${h}:` : "") + `${mm}:${String(s).padStart(2, "0")}`;
+function minsLeft(e) {
+  const left = Math.max(0, (e.dur || (e.durationSec || 0) * 1000) - (e.pos || 0));
+  const m = Math.round(left / 60000);
+  return `${Math.max(1, m)} min left`;
+}
+
+/* A small gold tile carrying a section's icon — the thumbnail used on the
+   continue cards and every list row. */
+function Tile({ cat, size = 54 }) {
+  return (
+    <LinearGradient colors={[C.brand700, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      style={{ width: size, height: size, borderRadius: size * 0.24, alignItems: "center", justifyContent: "center" }}>
+      <IslamicIcon name={iconForCategory(cat)} size={size * 0.52} color={C.goldBright} />
+    </LinearGradient>
+  );
 }
 
 export default function Recordings({ navigation }) {
   const { t, fs, rtl } = useApp();
   const rec = useRecordings();
 
-  const [cats, setCats] = useState(null);     // null = loading, [] = failed/empty
+  const [cats, setCats] = useState(null);     // null = loading, [] = failed
   const [active, setActive] = useState(null); // selected category path
   const [items, setItems] = useState(null);   // null = loading, [] = none
   const [itemsErr, setItemsErr] = useState(false);
 
-  /* Categories, once. */
   useEffect(() => {
     let live = true;
     getJSON(`${SENDER}/api/recordings`)
@@ -80,7 +90,6 @@ export default function Recordings({ navigation }) {
     return () => { live = false; };
   }, []);
 
-  /* The selected category's recordings, whenever it changes. */
   useEffect(() => {
     if (!active) return;
     let live = true;
@@ -91,195 +100,122 @@ export default function Recordings({ navigation }) {
     return () => { live = false; };
   }, [active]);
 
-  const isCurrent = it => rec.current && rec.current.mp3 === it.mp3;
-
-  const onRow = useCallback(it => {
-    tap();
-    if (isCurrent(it)) rec.toggle();
-    else rec.play(it);
-  }, [rec]);
+  const open = useCallback(item => { tap(); rec.play(item); navigation.navigate("RecordingPlayer"); }, [rec, navigation]);
 
   const activeName = (cats || []).find(c => c.path === active)?.name || "";
+  const isCur = it => rec.current && rec.current.mp3 === it.mp3;
 
   return (
-    <Screen scroll={false} pad={false}>
+    <Screen pad={false}>
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar back navigation={navigation} />
       </LinearGradient>
 
-      {/* A band, like the Live hero: title, one line under it, the girih behind. */}
+      {/* The band: the big gold serif title over the girih, like Live's hero. */}
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-        style={{ paddingTop: 22, paddingHorizontal: 20, paddingBottom: 18, overflow: "hidden" }}>
-        <Girih style={{ right: -52, top: -46 }} size={200} opacity={0.09} />
-        <Text style={{ fontFamily: F.display, fontSize: fs(24), color: C.cream,
-                       textAlign: rtl ? "right" : "left" }}>
-          {t("rec.title", "Recordings")}</Text>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: "#BBA9B4", marginTop: 3,
+        style={{ paddingTop: 18, paddingHorizontal: 20, paddingBottom: 22, overflow: "hidden" }}>
+        <Girih style={{ right: -40, top: -36 }} size={200} opacity={0.1} />
+        <Text style={{ fontFamily: F.display, fontSize: fs(40), color: C.gold, letterSpacing: -0.3,
+                       textAlign: rtl ? "right" : "left" }}>{t("rec.listen", "Listen")}</Text>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: "#BBA9B4", marginTop: 6, maxWidth: 300,
                        textAlign: rtl ? "right" : "left" }}>
           {t("rec.subtitle", "Dars, bayaans and more from the masjid")}</Text>
       </LinearGradient>
 
-      {/* The section chips. A horizontal rail so a long list of sections does
-          not push the recordings off the screen. */}
+      {/* Section tiles. */}
       {cats === null
-        ? <View style={{ paddingVertical: 14 }}><ActivityIndicator color={C.gold} /></View>
+        ? <View style={{ paddingVertical: 20 }}><ActivityIndicator color={C.gold} /></View>
         : cats.length === 0
-          ? null
-          : <View style={{ borderBottomWidth: 1, borderBottomColor: C.line }}>
+          ? <Centered fs={fs}>{t("rec.unavailable", "Recordings couldn’t be reached right now. Please try again later.")}</Centered>
+          : <>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 11, gap: 8,
+                contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 4, gap: 12,
                                          flexDirection: rtl ? "row-reverse" : "row" }}>
-                {cats.map(c => {
+                {cats.map((c, i) => {
                   const on = c.path === active;
                   return (
                     <Pressable key={c.path} onPress={() => { tap(); setActive(c.path); }}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: on }}
-                      style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: R.pill,
-                               backgroundColor: on ? C.pick : C.tintPlum,
-                               borderWidth: 1, borderColor: on ? C.pick : C.line }}>
-                      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5),
-                                     color: on ? C.pickInk : C.muted }}>{c.name}</Text>
+                      accessibilityRole="button" accessibilityState={{ selected: on }}
+                      style={{ width: 136, height: 112, borderRadius: 20, overflow: "hidden",
+                               borderWidth: 1, borderColor: on ? "rgba(198,162,76,.55)" : "rgba(198,162,76,.2)" }}>
+                      <LinearGradient colors={[JEWELS[i % JEWELS.length], "#1B0712"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={{ flex: 1, padding: 14, justifyContent: "space-between" }}>
+                        <IslamicIcon name={iconForCategory(c.name)} size={30} color={C.goldBright} />
+                        <Text numberOfLines={2} style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: "#fff" }}>{c.name}</Text>
+                      </LinearGradient>
                     </Pressable>);
                 })}
               </ScrollView>
-            </View>}
 
-      {/* The recordings in the chosen section. */}
-      <View style={{ flex: 1 }}>
-        {cats && cats.length === 0
-          ? <Centered>{t("rec.unavailable", "Recordings couldn’t be reached right now. Please try again later.")}</Centered>
-          : items === null
-            ? <View style={{ paddingTop: 34 }}><ActivityIndicator color={C.gold} /></View>
-            : items.length === 0
-              ? <Centered>{itemsErr
-                  ? t("rec.unavailable", "Recordings couldn’t be reached right now. Please try again later.")
-                  : t("rec.empty", "Nothing in this section yet.")}</Centered>
-              : <FlatList
-                  data={items}
-                  keyExtractor={it => it.mp3}
-                  contentContainerStyle={{ paddingBottom: 14 }}
-                  renderItem={({ item }) => (
-                    <Row item={item} on={isCurrent(item)} playing={isCurrent(item) && rec.playing}
-                         rtl={rtl} fs={fs} onPress={() => onRow(item)}
-                         listenLabel={t("rec.listen", "Listen")} />
-                  )} />}
-      </View>
+              {/* Continue listening — straight from what was remembered locally. */}
+              {rec.continueList.length > 0 && (
+                <>
+                  <SecHead fs={fs} rtl={rtl}>{t("rec.continue", "Continue listening")}</SecHead>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 16, gap: 12, flexDirection: rtl ? "row-reverse" : "row" }}>
+                    {rec.continueList.map(e => {
+                      const frac = e.dur ? Math.max(0.02, Math.min(1, e.pos / e.dur)) : 0.02;
+                      return (
+                        <Pressable key={e.mp3} onPress={() => open(e)}
+                          accessibilityRole="button"
+                          style={{ width: 288, flexDirection: rtl ? "row-reverse" : "row", gap: 12, alignItems: "center",
+                                   backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12 }}>
+                          <Tile cat={e.category} />
+                          <View style={{ flex: 1, minWidth: 0 }}>
+                            <Text numberOfLines={2} style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink }}>{e.title}</Text>
+                            <Text numberOfLines={1} style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 2 }}>{e.category}</Text>
+                            <View style={{ height: 4, borderRadius: 2, backgroundColor: C.line, marginTop: 9, overflow: "hidden" }}>
+                              <View style={{ height: 4, width: `${frac * 100}%`, borderRadius: 2, backgroundColor: C.gold }} />
+                            </View>
+                            <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: C.muted, marginTop: 5 }}>{minsLeft(e)}</Text>
+                          </View>
+                        </Pressable>);
+                    })}
+                  </ScrollView>
+                </>
+              )}
 
-      {/* The player, pinned under the list while something is loaded. */}
-      {rec.current ? <PlayerBar rec={rec} rtl={rtl} fs={fs}
-                       title={rec.current.title} sub={`${niceDate(rec.current.date)} · ${niceLength(rec.current.durationSec)}`} /> : null}
+              {/* The selected section's recordings. */}
+              <SecHead fs={fs} rtl={rtl}>{activeName}</SecHead>
+              {items === null
+                ? <View style={{ paddingTop: 20 }}><ActivityIndicator color={C.gold} /></View>
+                : items.length === 0
+                  ? <Centered fs={fs}>{itemsErr
+                      ? t("rec.unavailable", "Recordings couldn’t be reached right now. Please try again later.")
+                      : t("rec.empty", "Nothing in this section yet.")}</Centered>
+                  : <View style={{ paddingHorizontal: 16 }}>
+                      {items.map(item => (
+                        <Pressable key={item.mp3} onPress={() => open(item)} accessibilityRole="button"
+                          style={({ pressed }) => ({ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
+                                                     paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line,
+                                                     backgroundColor: pressed ? C.tintPlum : "transparent" })}>
+                          <Tile cat={item.category} size={48} />
+                          <View style={{ flex: 1, minWidth: 0 }}>
+                            <Text numberOfLines={2} style={{ fontFamily: F.sansSemi, fontSize: fs(14.5),
+                                   color: isCur(item) ? C.brand600 : C.ink, textAlign: rtl ? "right" : "left" }}>{item.title}</Text>
+                            <Text numberOfLines={1} style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 2,
+                                   textAlign: rtl ? "right" : "left" }}>{niceDate(item.date)} · {niceLen(item.durationSec)}</Text>
+                          </View>
+                          {isCur(item) && <Ionicons name={rec.playing ? "musical-notes" : "pause"} size={17} color={C.gold} />}
+                        </Pressable>))}
+                    </View>}
+              <View style={{ height: 24 }} />
+            </>}
     </Screen>
   );
 }
 
-function Centered({ children }) {
-  const { fs } = useApp();
+function SecHead({ children, fs, rtl }) {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-start", paddingTop: 40, paddingHorizontal: 30 }}>
-      <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: C.muted, textAlign: "center", lineHeight: fs(21) }}>
-        {children}</Text>
-    </View>);
+    <Text style={{ fontFamily: F.sansSemi, fontSize: fs(19), color: C.ink, fontWeight: "600",
+                   paddingHorizontal: 16, marginTop: 24, marginBottom: 12, textAlign: rtl ? "right" : "left" }}>
+      {children}</Text>
+  );
 }
-
-function Row({ item, on, playing, rtl, fs, onPress, listenLabel }) {
+function Centered({ children, fs }) {
   return (
-    <Pressable onPress={onPress}
-      accessibilityRole="button"
-      style={({ pressed }) => ({ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
-                                 paddingVertical: 12, paddingHorizontal: 16,
-                                 borderBottomWidth: 1, borderBottomColor: C.line,
-                                 backgroundColor: pressed ? C.tintPlum : on ? C.tintPlumPill : "transparent" })}>
-      <View style={{ width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center",
-                     borderWidth: 1, borderColor: on ? "rgba(198,162,76,.5)" : C.line,
-                     backgroundColor: on ? "rgba(198,162,76,.16)" : C.tintPlum }}>
-        <Ionicons name={playing ? "pause" : "play"} size={17}
-                  color={on ? C.goldInk : C.brand600}
-                  style={{ marginLeft: playing ? 0 : 2 }} />
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text numberOfLines={2}
-              style={{ fontFamily: F.sansSemi, fontSize: fs(14), color: C.ink,
-                       textAlign: rtl ? "right" : "left" }}>{item.title}</Text>
-        <Text numberOfLines={1}
-              style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted, marginTop: 2,
-                       textAlign: rtl ? "right" : "left" }}>
-          {niceDate(item.date)} · {niceLength(item.durationSec)}
-          {on ? `  ·  ${listenLabel}` : ""}</Text>
-      </View>
-    </Pressable>);
-}
-
-/* The bottom player: title, a scrubber you can drag, the two clocks and the
-   big button, with ±15s either side. */
-function PlayerBar({ rec, title, sub, rtl, fs }) {
-  const { t } = useApp();
-  const barW = useRef(1);
-  const [scrub, setScrub] = useState(null); // a fraction while dragging, else null
-
-  const dur = rec.durationMs || 0;
-  const pos = scrub != null && dur ? scrub * dur : rec.positionMs;
-  const frac = dur ? Math.max(0, Math.min(1, pos / dur)) : 0;
-
-  const setFrom = x => { const f = Math.max(0, Math.min(1, x / (barW.current || 1))); setScrub(f); };
-  const pan = useRef(PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderGrant: e => setFrom(e.nativeEvent.locationX),
-    onPanResponderMove: e => setFrom(e.nativeEvent.locationX),
-    onPanResponderRelease: () => { setScrub(f => { if (f != null && dur) rec.seek(f * dur); return null; }); },
-    onPanResponderTerminate: () => setScrub(null),
-  })).current;
-
-  const loading = rec.state === "loading";
-
-  return (
-    <View style={{ borderTopWidth: 1, borderTopColor: "rgba(198,162,76,.45)", backgroundColor: C.brand900,
-                   paddingHorizontal: 16, paddingTop: 11, paddingBottom: 14 }}>
-      <Text numberOfLines={1}
-            style={{ fontFamily: F.sansSemi, fontSize: fs(13.5), color: "#fff",
-                     textAlign: rtl ? "right" : "left" }}>{title}</Text>
-      <Text numberOfLines={1}
-            style={{ fontFamily: F.sans, fontSize: fs(11), color: "#BBA9B4", marginTop: 1,
-                     textAlign: rtl ? "right" : "left" }}>{sub}</Text>
-
-      {/* scrubber */}
-      <View style={{ height: 26, justifyContent: "center", marginTop: 8 }}
-            onLayout={e => (barW.current = e.nativeEvent.layout.width)}
-            {...pan.panHandlers}>
-        <View style={{ height: 4, borderRadius: 2, backgroundColor: "#4B3542" }}>
-          <View style={{ position: "absolute", left: 0, top: 0, bottom: 0,
-                         width: `${frac * 100}%`, borderRadius: 2, backgroundColor: C.gold }} />
-        </View>
-        <View pointerEvents="none"
-              style={{ position: "absolute", left: `${frac * 100}%`, marginLeft: -8,
-                       width: 16, height: 16, borderRadius: 8, backgroundColor: C.gold }} />
-      </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 2 }}>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "#BBA9B4" }}>{clock(pos)}</Text>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "#BBA9B4" }}>{clock(dur)}</Text>
-      </View>
-
-      {/* transport */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 26, marginTop: 6 }}>
-        <Pressable onPress={() => { tap(); rec.skip(-15); }} hitSlop={10}
-          accessibilityRole="button" accessibilityLabel={t("rec.back15", "Back 15 seconds")}>
-          <Ionicons name="play-back" size={22} color="#D8C6D0" />
-        </Pressable>
-        <Pressable onPress={() => { tap(); rec.toggle(); }}
-          accessibilityRole="button" accessibilityState={{ busy: loading }}
-          style={({ pressed }) => ({ width: 60, height: 60, borderRadius: 30,
-                                     alignItems: "center", justifyContent: "center", borderWidth: 1,
-                                     borderColor: "rgba(198,162,76,.5)",
-                                     backgroundColor: pressed ? "rgba(198,162,76,.3)" : "rgba(198,162,76,.16)" })}>
-          {loading ? <ActivityIndicator color={C.goldBright} />
-                   : <Ionicons name={rec.playing ? "pause" : "play"} size={26} color={C.goldBright}
-                               style={{ marginLeft: rec.playing ? 0 : 3 }} />}
-        </Pressable>
-        <Pressable onPress={() => { tap(); rec.skip(15); }} hitSlop={10}
-          accessibilityRole="button" accessibilityLabel={t("rec.fwd15", "Forward 15 seconds")}>
-          <Ionicons name="play-forward" size={22} color="#D8C6D0" />
-        </Pressable>
-      </View>
-    </View>);
+    <View style={{ alignItems: "center", paddingTop: 34, paddingHorizontal: 30 }}>
+      <Text style={{ fontFamily: F.sans, fontSize: fs(13.5), color: C.muted, textAlign: "center", lineHeight: fs(21) }}>{children}</Text>
+    </View>
+  );
 }
