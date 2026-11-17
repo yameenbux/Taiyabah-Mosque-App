@@ -26,6 +26,11 @@
       "ios": {
         "appleTeamId": "39N949HRK3",
         "ascAppId": "6822250468"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./.pc-api-key.json",
+        "track": "production",
+        "releaseStatus": "completed"
       }
     }
   }

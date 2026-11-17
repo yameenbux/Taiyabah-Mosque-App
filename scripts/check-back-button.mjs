@@ -152,17 +152,25 @@ await scenario("block", async () => {
   check(p.url() !== before, "3f third Back did not leave — Back is being swallowed");
   await ctx.close();
 });
-/* 4 — closed with the X: the sentinel must be given back */
+/* 4 — closed with the close arrow: the sentinel must be given back.
+
+   A home-tile sheet is used, because that is where the close control lives now.
+   The "Done" pill is gone: a sheet opened from the menu steps back with the
+   upback arrow and its own close arrow is folded away behind it, so there is no
+   visible close button to tap there. A sheet opened from a home tile has no
+   upback, so its close arrow is the one on show — the same release-the-sentinel
+   path this scenario has always guarded, on the sheet that still owns it. */
 await scenario("block", async () => {
   const { ctx, p } = await fresh();
-  await tap(p, "#nav-more"); await tap(p, '.dr-row[data-act="advice"]');
-  await tap(p, "#ia-close");
+  await tap(p, '[data-tile="madrasah"]');
+  check((await state(p)).open.length > 0, "4pre madrasah did not open from its tile");
+  await tap(p, "#mdr-close");
   let s = await state(p);
-  check(s.open.length === 0, "4a X did not close the sheet");
-  check(!s.armed,            "4b sentinel still held after closing with X");
+  check(s.open.length === 0, "4a the close arrow did not close the sheet");
+  check(!s.armed,            "4b sentinel still held after closing");
   const before = p.url();
   await back(p);
-  check(p.url() !== before, "4c after an X close, Back did nothing instead of leaving");
+  check(p.url() !== before, "4c after a close, Back did nothing instead of leaving");
   await ctx.close();
 });
 /* 5 — scrim tap */
