@@ -26,11 +26,12 @@
  * going because you told it to should look decisive; a thing arriving
  * uninvited should not. Reduced motion gets neither — it fades.
  *
- * WHAT IT IS NOT. It is not a lock-screen control. expo-av publishes no
- * now-playing metadata of its own, so the phone's own lock screen and
- * Control Centre still show nothing for this stream. That is a separate piece
- * of work with its own library; this bar is how you stop it from inside the
- * app, which is where the complaint came from.
+ * WHAT IT IS. The IN-APP control, the twin of the lock-screen one. Since the
+ * move to expo-audio (src/live-audio.jsx) the stream now publishes now-playing
+ * metadata, so the phone's own lock screen and notification shade carry its
+ * controls too — pause it there without reopening the app, which is where the
+ * complaint came from. This bar is the same control from inside the app, on
+ * every screen the stream outlives.
  */
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, AccessibilityInfo } from "react-native";

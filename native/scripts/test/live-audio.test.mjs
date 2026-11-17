@@ -46,14 +46,17 @@ function sources() {
   return out;
 }
 
-test("only the two audio providers reach for expo-av's Audio", () => {
+test("only the two audio providers reach for expo-audio", () => {
   /* There are two things that make sound now: the live stream and the
      recordings archive. Each owns its player in a provider above the navigator
      — live-audio.jsx and recordings-audio.jsx — and nothing else opens one, so
      a screen can never again create a sound it will tidy away on unmount. The
-     two never play at once; src/audio-bus.js keeps one output between them. */
+     two never play at once; src/audio-bus.js keeps one output between them.
+
+     (This moved from expo-av to expo-audio with the lock-screen controls; the
+     rule is the same, only the library's name changed.) */
   const owners = sources()
-    .filter(([, t]) => /from\s+"expo-av"/.test(t))
+    .filter(([, t]) => /from\s+"expo-audio"/.test(t))
     .map(([f]) => f).sort();
   assert.deepEqual(owners, ["live-audio.jsx", "recordings-audio.jsx"],
     "a third file opened its own player — only the stream and the recordings archive own one, both above the navigator");
@@ -101,15 +104,18 @@ test("something draws the recordings bar", () => {
   assert.match(app, /onRec=\{/, "the bar is not told whether the Recordings screen is on top");
 });
 
-test("live-audio.jsx does not unload on unmount", () => {
+test("live-audio.jsx does not tear the player down on unmount", () => {
   const t = read("live-audio.jsx");
   /* The provider lives as long as the app does. A cleanup function returned
-     from its own effect would be the original bug with a longer reach. */
-  const effect = t.slice(t.indexOf("useEffect("), t.indexOf("const setVolume"));
+     from its MOUNT effect (the one that sets the audio mode) would be the
+     original bug with a longer reach. */
+  const effect = t.slice(t.indexOf("useEffect("), t.indexOf("const teardown"));
   assert.ok(!/return\s*\(\)\s*=>/.test(effect),
     "the provider's mount effect returns a cleanup — nothing it holds should be torn down");
-  assert.match(t, /unloadAsync/,
-    "stop() still has to actually unload, or the square on the bar does nothing");
+  assert.match(t, /\.remove\??\.?\(\)/,
+    "stop() still has to actually tear the player down, or the square on the bar does nothing");
+  assert.match(t, /clearLockScreenControls/,
+    "stop() must also clear the lock-screen controls, or they linger after the stream is gone");
 });
 
 test("something draws the On air bar", () => {

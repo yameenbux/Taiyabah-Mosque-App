@@ -3,7 +3,7 @@
     "name": "Taiyabah Masjid",
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
-    "version": "2.2.2",
+    "version": "2.3.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -98,7 +98,7 @@
         }
       ],
       [
-        "expo-av",
+        "expo-audio",
         {
           "microphonePermission": false
         }
