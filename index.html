@@ -531,28 +531,55 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .dnote{font-size:calc(11.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.6;margin:18px 6px 0}
 
   /* ---- live player ---- */
-  .lv-hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 28px;color:#F3EFE3;
+  /* The live screen's hero: a calm plum band with the mihrab glow (arch + girih)
+     centred BEHIND a solid medallion. The medallion is opaque, so none of the
+     geometry shows through the play button — as clean as the rest of the app. */
+  .lv-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 34px;color:#F3EFE3;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
-  .lv-hero .girih{position:absolute;right:-48px;top:-42px;width:210px;height:210px;
-    color:var(--gold);opacity:.09;pointer-events:none}
-  .lv-state{display:inline-flex;align-items:center;gap:8px;font-size:calc(11px * var(--ts));letter-spacing:.14em;
-    text-transform:uppercase;color:#BBA9B4;border:1px solid rgba(255,255,255,.14);
-    border-radius:999px;padding:5px 12px}
-  .lv-dot{width:7px;height:7px;border-radius:50%;background:#A49AA0;flex:0 0 auto}
-  .lv-state[data-s="playing"]{color:var(--gold-bright);border-color:rgba(198,162,76,.45)}
-  .lv-state[data-s="playing"] .lv-dot{background:var(--on-air);animation:pulse 2s infinite}
+  .lv-state,.lv-sub,.lv-eq,.lv-vol{position:relative;z-index:2}
+  /* The glow is a child of the medallion wrapper, so it is always dead-centre
+     behind the play button whatever the text size does to the layout. */
+  .lv-medwrap{position:relative;z-index:2;width:132px;height:132px;margin:0 auto;display:grid;place-items:center}
+  /* The backdrop is the app's own girih star in its own gold, with a soft gold
+     halo — the exact palette the rest of the app uses, centred on the medallion. */
+  .lv-halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:340px;height:340px;border-radius:50%;
+    pointer-events:none;z-index:0;
+    background:radial-gradient(circle,rgba(198,162,76,.2) 0%,rgba(198,162,76,.07) 42%,transparent 68%)}
+  .lv-girih{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;height:300px;
+    color:var(--gold);opacity:.1;pointer-events:none;z-index:0}
+  /* The status pill is quiet until the stream is actually on air: an outline
+     with a neutral dot for Ready/paused, going solid gold with a pulsing red
+     dot only while playing, so it never reads as "live" when it is not. */
+  .lv-state{position:relative;z-index:3;display:inline-flex;align-items:center;gap:7px;
+    font-size:calc(10px * var(--ts));letter-spacing:.18em;text-transform:uppercase;font-weight:700;
+    border-radius:999px;padding:5px 13px;margin-bottom:12px;
+    color:#E7DBE2;background:rgba(20,3,12,.5);border:1px solid rgba(255,255,255,.18)}
+  .lv-dot{width:6px;height:6px;border-radius:50%;background:#A49AA0;flex:0 0 auto}
+  .lv-state[data-s="loading"]{color:var(--gold-bright);border-color:rgba(198,162,76,.4)}
   .lv-state[data-s="loading"] .lv-dot{background:var(--gold);animation:pulse 1.1s infinite}
   .lv-state[data-s="error"]{color:#E8A88F;border-color:rgba(232,168,143,.4)}
   .lv-state[data-s="error"] .lv-dot{background:#E0483C}
-  .lv-play{width:96px;height:96px;border-radius:50%;margin:22px auto 16px;cursor:pointer;
-    display:grid;place-items:center;border:1px solid rgba(198,162,76,.5);
-    background:rgba(198,162,76,.16);color:var(--gold-bright);padding:0}
-  .lv-play:active{background:rgba(198,162,76,.3)}
-  .lv-play svg{width:40px;height:40px;margin-left:4px}
-  .lv-play svg.ic-pause{margin-left:0}
+  .lv-state[data-s="playing"]{color:#160310;border-color:transparent;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));box-shadow:0 6px 14px -6px rgba(198,162,76,.7)}
+  .lv-state[data-s="playing"] .lv-dot{background:#8a1f1a;animation:pulse 1.8s infinite}
+  .lv-play{position:relative;z-index:1;width:132px;height:132px;border-radius:50%;cursor:pointer;
+    display:grid;place-items:center;border:1.5px solid rgba(198,162,76,.55);
+    background:radial-gradient(circle at 50% 36%,var(--brand-700),var(--brand-900) 72%);
+    color:var(--gold-bright);padding:0;
+    box-shadow:0 0 38px rgba(198,162,76,.22),0 12px 30px -8px rgba(0,0,0,.5)}
+  .lv-play:active{transform:scale(.98)}
+  .lv-play svg{width:42px;height:42px}
   .lv-play:disabled{opacity:.5;cursor:default}
-  .lv-title{font-family:"Fraunces",Georgia,serif;font-size:calc(21px * var(--ts));font-weight:600}
-  .lv-sub{font-size:calc(12.5px * var(--ts));color:#BBA9B4;margin-top:3px}
+  .lv-sub{font-family:"Fraunces",Georgia,serif;font-size:calc(28px * var(--ts));font-weight:600;
+    color:#F3EFE3;margin-top:26px;letter-spacing:.2px}
+  .lv-eq{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:22px;margin-top:16px}
+  .lv-eq i{width:3px;border-radius:2px;background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    height:5px;animation:lveq 1s ease-in-out infinite;animation-play-state:paused}
+  @keyframes lveq{0%,100%{height:5px}50%{height:19px}}
+  /* The bars only move while the stream is actually playing — the honest live
+     signal, in place of a seek bar a live stream cannot have. */
+  #lv-state[data-s="playing"] ~ .lv-eq i{animation-play-state:running}
+  @media (prefers-reduced-motion: reduce){.lv-eq i{animation:none;height:12px}}
   .lv-vol{display:flex;align-items:center;gap:11px;max-width:230px;margin:20px auto 0;color:#BBA9B4}
   .lv-vol svg{width:18px;height:18px;flex:0 0 auto}
   /* This was a 4px-tall band to drag, which on a phone is a miss waiting to
@@ -577,19 +604,41 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .lv-vol input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;
     background:var(--gold);border:0}
   .lv-vol input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-  .card.lv-info{padding:4px 16px;margin-top:4px}
-  /* A bare row button is only as tall as its text, which left this one at 21px
-     — under the 24px minimum target. It grows to 24 rather than taking padding,
-     so the row it sits in keeps its own rhythm. */
-  .lv-btn{background:none;border:none;font:inherit;cursor:pointer;padding:0;
-          min-height:24px;display:inline-flex;align-items:center}
-  .lv-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
-    border-top:1px solid var(--line)}
-  .lv-row:first-child{border-top:none}
-  .lv-k{font-size:calc(11.5px * var(--ts));letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .lv-v{font-size:calc(14.5px * var(--ts));font-weight:600;color:var(--ink)}
-  .lv-link{color:var(--brand-600);text-decoration:none}
-  .lv-note{font-size:calc(12px * var(--ts));color:var(--muted);text-align:center;line-height:1.6;margin:14px 6px 26px}
+  /* The sheet: a themed panel that rises over the plum hero and holds the two
+     destinations as rows, with the frequency as a quiet caption beneath. */
+  .lv-sheet{position:relative;margin-top:-14px;background:var(--paper);
+    border-radius:26px 26px 0 0;padding:20px 16px 12px}
+  .lv-sheet::before{content:"";display:block;width:38px;height:4px;border-radius:2px;
+    background:var(--line);margin:0 auto 16px}
+  .lv-list{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    box-shadow:0 12px 30px -24px rgba(60,11,42,.4)}
+  .lv-r{display:flex;align-items:center;gap:14px;width:100%;padding:16px;background:none;border:0;
+    text-align:left;cursor:pointer;font:inherit;color:inherit}
+  .lv-r + .lv-r{border-top:1px solid var(--line)}
+  .lv-ic{width:46px;height:46px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;
+    color:#7A5C13;background:linear-gradient(180deg,#F3DFA6,#E6C877)}
+  .lv-ic svg{width:23px;height:23px}
+  .lv-rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;text-align:left}
+  .lv-rk{font-size:calc(11.5px * var(--ts));letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);font-weight:600}
+  .lv-rv{font-size:calc(17px * var(--ts));font-weight:700;color:var(--plum-fill)}
+  .lv-chev{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    color:var(--gold);background:rgba(198,162,76,.14)}
+  .lv-chev svg{width:16px;height:16px}
+  :root[dir="rtl"] .lv-r{flex-direction:row-reverse;text-align:right}
+  :root[dir="rtl"] .lv-rt{text-align:right}
+  :root[dir="rtl"] .lv-chev{transform:scaleX(-1)}
+  .lv-freq{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;
+    color:var(--muted);font-size:calc(13px * var(--ts));font-weight:600}
+  .lv-freq svg{width:17px;height:17px;color:var(--gold);flex:0 0 auto}
+  .lv-freq b{color:var(--ink);font-weight:700}
+  .lv-note{font-size:calc(12.5px * var(--ts));color:var(--muted);text-align:center;line-height:1.55;margin:16px 10px 14px}
+  /* Credit: the live stream and recordings are served by eMasjid Live. The logo
+     sits on a light chip so it reads on the sheet in both themes. */
+  .lv-credit{display:flex;justify-content:center;margin:22px 10px 38px}
+  .lv-chip{display:inline-flex;background:#FFFFFF;border:1px solid var(--line);border-radius:13px;
+    padding:9px 15px;box-shadow:0 8px 20px -14px rgba(0,0,0,.4)}
+  .lv-chip img{height:30px;width:auto;display:block}
 
   /* ---- videos ---- */
   .vd-player{background:#000;position:sticky;top:0;z-index:3}
@@ -3501,17 +3550,20 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
   <main id="tab-live" hidden>
     <section class="lv-hero">
-      <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
-
       <div class="lv-state" id="lv-state"><span class="lv-dot"></span><span id="lv-status" data-i18n="about.ready">Ready</span></div>
 
-      <button class="lv-play" id="lv-play" aria-label="Play live stream" data-i18n-attr="aria-label:a11y.play_live_stream">
-        <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
-      </button>
+      <div class="lv-medwrap">
+        <span class="lv-halo"></span>
+        <svg class="lv-girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+        <button class="lv-play" id="lv-play" aria-label="Play live stream" data-i18n-attr="aria-label:a11y.play_live_stream">
+          <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+        </button>
+      </div>
 
-      <div class="lv-title" data-i18n="about.taiyabah_masjid">Taiyabah Masjid</div>
       <div class="lv-sub" data-i18n="about.live_from_the_masjid">Live from the masjid</div>
+
+      <div class="lv-eq" aria-hidden="true"><i style="animation-delay:0s"></i><i style="animation-delay:.11s"></i><i style="animation-delay:.05s"></i><i style="animation-delay:.18s"></i><i style="animation-delay:.09s"></i><i style="animation-delay:.22s"></i><i style="animation-delay:.03s"></i><i style="animation-delay:.16s"></i><i style="animation-delay:.08s"></i><i style="animation-delay:.2s"></i><i style="animation-delay:.06s"></i><i style="animation-delay:.14s"></i></div>
 
       <div class="lv-vol">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
@@ -3519,14 +3571,21 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       </div>
     </section>
 
-    <div class="wrap">
-      <div class="card lv-info">
-        <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n-latin data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
-        <div class="lv-row"><span class="lv-k" data-i18n="rec.previous">Previous recordings</span><button class="lv-v lv-link lv-btn" id="lv-recs" data-i18n="rec.listen_arrow">Listen &rsaquo;</button></div>
-        <div class="lv-row"><span class="lv-k" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids" data-i18n="about.watch">Watch &rsaquo;</button></div>
+    <div class="lv-sheet">
+      <div class="lv-list">
+        <button class="lv-r" id="lv-recs">
+          <span class="lv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg></span>
+          <span class="lv-rt"><span class="lv-rk" data-i18n="rec.previous">Previous recordings</span><span class="lv-rv" data-i18n="rec.listen">Listen</span></span>
+          <span class="lv-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button class="lv-r" id="lv-vids">
+          <span class="lv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg></span>
+          <span class="lv-rt"><span class="lv-rk" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><span class="lv-rv" data-i18n="about.watch">Watch</span></span>
+          <span class="lv-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
       </div>
-      <p class="lv-note" data-i18n="about.audio_keeps_playing_while_you">Audio keeps playing while you use the rest of the app or other apps.
-        If the stream doesn&rsquo;t start, the masjid may not be broadcasting at the moment.</p>
+      <div class="lv-freq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5V21"/><path d="M8.6 21h6.8"/><path d="M12 7.5 7 21M12 7.5 17 21"/><path d="M9.6 14.5h4.8M8.6 17.7h6.8"/><path d="M8.8 6.2a4.5 4.5 0 0 1 6.4 0"/><path d="M6.5 4a7.8 7.8 0 0 1 11 0"/></svg><span data-i18n="about.radio_frequency">Radio frequency</span><b data-i18n-latin data-i18n="about.454_1000_mhz">454.1000 MHz</b></div>
+      <div class="lv-credit"><span class="lv-chip"><img src="emasjid-live.png" alt="Powered by eMasjid Live" data-i18n-attr="alt:about.powered_by_emasjid"></span></div>
     </div>
   </main>
 
