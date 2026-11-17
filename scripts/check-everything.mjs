@@ -173,8 +173,13 @@ const openMore = async p => { if(await p.evaluate(()=>document.getElementById("d
 /* ---- 4. the zakat arithmetic ------------------------------------------- */
 {
   const p = await app();
-  await openMore(p);
-  await p.locator("#drawer button.dr-row",{hasText:"Zakat"}).first().click({timeout:4000});
+  /* THE ZAKAT CALCULATOR IS REACHED FROM THE HOME TILE, not the More drawer.
+     The masjid asked for anything with a home-screen icon to come out of
+     More, so the drawer row this used to click no longer exists. Driving it
+     from the tile is also the truer test: it is the way somebody actually
+     gets there now. */
+  await p.locator('.tgrid [data-go="zakat"], .tgrid button', { hasText: /zakat/i })
+         .first().click({ timeout: 4000 });
   await p.waitForTimeout(800);
   const set = async (id,v)=>{ const el=await p.$("#"+id); await el.fill(String(v)); await el.dispatchEvent("input"); await p.waitForTimeout(320); };
   const due = ()=>p.evaluate(()=>{const m=document.getElementById("zakat").innerText.replace(/\s+/g," ")

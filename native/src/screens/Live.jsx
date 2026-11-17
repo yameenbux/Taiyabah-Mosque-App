@@ -130,6 +130,8 @@ export default function Live({ navigation }) {
             different kinds of thing. */}
         <Card pad={0} style={{ paddingHorizontal: 15 }}>
           {[[t("about.radio_frequency", "Radio frequency"), t("about.454_1000_mhz", "454.1000 MHz"), null],
+            [t("rec.previous", "Previous recordings"), t("rec.listen_arrow", "Listen ›"),
+             () => navigation.navigate("Recordings")],
             [t("about.videos_bayaans", "Videos & bayaans"), t("about.watch", "Watch ›"),
              () => navigation.navigate("Videos")]].map(([k, v, go], i) => (
             /* The radio frequency is a line of information, not a control

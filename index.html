@@ -617,6 +617,70 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     font-size:calc(13px * var(--ts));font-weight:600;color:var(--brand-600);
     background:var(--tint-plum);border-radius:12px;padding:13px}
 
+  /* ---- recordings (eMasjid archive) ---- */
+  #recordings .sh-body{padding:0}
+  #recordings .sh-top{flex-wrap:nowrap;border-bottom:1px solid rgba(198,162,76,.25);padding-left:16px;padding-right:16px}
+  .rc-bk{flex:0 0 auto;background:none;border:0;cursor:pointer;color:#F3EFE3;padding:4px;margin-left:-4px;display:grid;place-items:center}
+  .rc-bk svg{width:24px;height:24px}
+  .rc-hero{position:relative;overflow:hidden;text-align:left;padding:20px 20px 22px;
+    color:#F3EFE3;background:linear-gradient(170deg,var(--brand-800),var(--brand-900))}
+  .rc-hero .girih{position:absolute;right:-40px;top:-36px;width:200px;height:200px;
+    color:var(--gold);opacity:.1;pointer-events:none}
+  .rc-h{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:calc(40px * var(--ts));
+    line-height:1;color:var(--gold);letter-spacing:-.01em}
+  .rc-sub{font-size:calc(13.5px * var(--ts));color:#BBA9B4;margin-top:6px;max-width:300px}
+  .rc-rail{display:flex;gap:12px;overflow-x:auto;padding:16px 16px 4px;scrollbar-width:none}
+  .rc-rail::-webkit-scrollbar{display:none}
+  .rc-cat{flex:0 0 auto;width:136px;height:112px;border-radius:20px;overflow:hidden;cursor:pointer;
+    border:1px solid rgba(198,162,76,.2);padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+  .rc-cat .ic{width:30px;height:30px;color:var(--gold-bright)}
+  .rc-cat .nm{font-size:calc(14.5px * var(--ts));font-weight:600;color:#fff;line-height:1.2}
+  .rc-sec{font-size:calc(19px * var(--ts));font-weight:600;color:var(--ink);padding:0 16px;margin:24px 0 12px}
+  .rc-cont{display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none}
+  .rc-cont::-webkit-scrollbar{display:none}
+  .rc-cc{flex:0 0 auto;width:288px;display:flex;gap:12px;align-items:center;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+  .rc-tile{flex:0 0 auto;width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,var(--brand-700),var(--brand-900))}
+  .rc-tile svg{width:28px;height:28px;color:var(--gold-bright)}
+  .rc-tile.sm{width:48px;height:48px;border-radius:12px}
+  .rc-tile.sm svg{width:25px;height:25px}
+  .rc-cc .m{flex:1;min-width:0;display:flex;flex-direction:column}
+  .rc-cc .t{font-size:calc(14px*var(--ts));font-weight:600;color:var(--ink);line-height:1.25}
+  .rc-cc .c{font-size:calc(11.5px*var(--ts));color:var(--muted);margin-top:2px}
+  .rc-pbar{height:4px;border-radius:2px;background:var(--line);margin-top:9px;overflow:hidden}
+  .rc-pbar i{display:block;height:4px;background:var(--gold);border-radius:2px}
+  .rc-left{font-size:calc(10.5px*var(--ts));color:var(--muted);margin-top:5px}
+  .rc-list{display:flex;flex-direction:column;padding:0 16px}
+  .rc-item{display:flex;gap:13px;align-items:center;width:100%;text-align:left;font:inherit;cursor:pointer;
+    padding:12px 0;background:none;border:0;border-bottom:1px solid var(--line)}
+  .rc-item .m{flex:1;min-width:0;display:flex;flex-direction:column}
+  .rc-it-t{font-size:calc(14.5px*var(--ts));font-weight:600;color:var(--ink);line-height:1.3}
+  .rc-item[data-on="1"] .rc-it-t{color:var(--brand-600)}
+  .rc-it-m{font-size:calc(11.5px*var(--ts));color:var(--muted);margin-top:2px}
+  .rc-note{padding:30px 24px;text-align:center;color:var(--muted);font-size:calc(13px * var(--ts));line-height:1.6}
+  /* immersive player view */
+  .rc-pv{display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:16px 26px 36px;background:linear-gradient(180deg,var(--brand-800),#0E0309);min-height:calc(100vh - 56px)}
+  .rc-pv .back{align-self:flex-start;cursor:pointer;color:var(--gold);background:none;border:0;padding:0}
+  .rc-pv .back svg{width:26px;height:26px}
+  .rc-plogo{width:128px;height:auto;margin:6px auto 0}
+  .rc-plabel{font-size:calc(15.5px*var(--ts));letter-spacing:.2em;color:var(--gold-bright);font-weight:600;margin-top:20px;text-transform:uppercase}
+  .rc-med{width:224px;height:224px;border-radius:50%;margin:28px 0;display:flex;align-items:center;justify-content:center;
+    border:1.5px solid rgba(198,162,76,.5);box-shadow:0 0 50px rgba(198,162,76,.25)}
+  .rc-med svg{width:132px;height:132px;color:var(--gold-bright)}
+  .rc-ptitle{font-family:"Fraunces",Georgia,serif;font-size:calc(24px*var(--ts));line-height:1.2;color:#F3EFE3;margin:0 8px}
+  .rc-wave{display:flex;align-items:center;gap:2px;height:40px;margin:20px 0 4px;justify-content:center;width:100%;cursor:pointer}
+  .rc-wave i{width:3px;border-radius:2px;background:rgba(255,255,255,.22)}
+  .rc-wave i.on{background:var(--gold)}
+  .rc-times{display:flex;justify-content:space-between;width:100%;font-size:calc(11px*var(--ts));color:#BBA9B4}
+  .rc-ctrls{display:flex;align-items:center;justify-content:center;gap:30px;margin-top:20px}
+  .rc-skip{cursor:pointer;color:#D8C6D0;background:none;border:0;padding:0}
+  .rc-skip svg{width:32px;height:32px}
+  .rc-big{width:76px;height:76px;border-radius:50%;cursor:pointer;border:1.5px solid rgba(198,162,76,.5);
+    background:rgba(198,162,76,.16);display:flex;align-items:center;justify-content:center;color:var(--gold-bright)}
+  .rc-big svg{width:32px;height:32px}
+
   /* ---- zakat calculator ---- */
   .zk-hero{position:relative;overflow:hidden;text-align:center;padding:26px 20px 24px;color:#F3EFE3;
     background:linear-gradient(180deg,var(--brand-800),var(--brand-900))}
@@ -3458,6 +3522,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     <div class="wrap">
       <div class="card lv-info">
         <div class="lv-row"><span class="lv-k" data-i18n="about.radio_frequency">Radio frequency</span><span class="lv-v tnum" data-i18n-latin data-i18n="about.454_1000_mhz">454.1000 MHz</span></div>
+        <div class="lv-row"><span class="lv-k" data-i18n="rec.previous">Previous recordings</span><button class="lv-v lv-link lv-btn" id="lv-recs" data-i18n="rec.listen_arrow">Listen &rsaquo;</button></div>
         <div class="lv-row"><span class="lv-k" data-i18n="about.videos_bayaans">Videos &amp; bayaans</span><button class="lv-v lv-link lv-btn" id="lv-vids" data-i18n="about.watch">Watch &rsaquo;</button></div>
       </div>
       <p class="lv-note" data-i18n="about.audio_keeps_playing_while_you">Audio keeps playing while you use the rest of the app or other apps.
@@ -3482,6 +3547,63 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <a class="vd-all" href="https://www.youtube.com/channel/UCIJm0mh5SFn1-esTJpdazSw/videos" target="_blank" rel="noopener" data-i18n="vids.see_the_full_channel_on">
             See the full channel on YouTube &rsaquo;
           </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIOUS RECORDINGS — the masjid's own archive on eMasjid Live, read as
+       clean JSON from the Worker (/api/recordings) and played here. The live
+       stream above is untouched; this is the public recordings only. The twin
+       of native/src/screens/Recordings.jsx. -->
+  <div class="sheet" id="recordings" data-open="0" role="dialog" aria-modal="true" aria-label="Recordings" data-i18n-attr="aria-label:a11y.recordings">
+    <div class="scrim" id="rc-scrim"></div>
+    <div class="panel">
+      <!-- The masjid's app bar, so the website's recordings match the app:
+           wordmark, the society's name, a back arrow that closes the sheet, and
+           the bell. -->
+      <div class="sh-top">
+        <button class="rc-bk" id="rc-close" aria-label="Back" data-i18n-attr="aria-label:rec.back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <img class="brandmark" src="logo.svg" alt="Taiyabah Masjid" width="139" height="100" data-i18n-attr="alt:a11y.taiyabah_masjid">
+        <div class="brand"><p data-i18n="app.bolton_central_islamic_society">Bolton Central Islamic Society</p></div>
+        <button class="bellbtn" id="rc-bell" aria-label="Notices" data-i18n-attr="aria-label:a11y.notices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+      </div>
+      <div class="sh-body">
+        <!-- BROWSE -->
+        <div id="rc-browse">
+          <section class="rc-hero">
+            <svg class="girih" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50,2 57.3,32.4 83.9,16.1 67.6,42.7 98,50 67.6,57.3 83.9,83.9 57.3,67.6 50,98 42.7,67.6 16.1,83.9 32.4,57.3 2,50 32.4,42.7 16.1,16.1 42.7,32.4"/></svg>
+            <div class="rc-h" data-i18n="rec.listen">Listen</div>
+            <div class="rc-sub" data-i18n="rec.subtitle">Dars, bayaans and more from the masjid</div>
+          </section>
+          <div class="rc-rail" id="rc-rail"></div>
+          <div id="rc-cont-sec" hidden>
+            <div class="rc-sec" data-i18n="rec.continue">Continue listening</div>
+            <div class="rc-cont" id="rc-cont"></div>
+          </div>
+          <div class="rc-sec" id="rc-listhead"></div>
+          <div class="rc-list" id="rc-list"></div>
+          <div style="height:24px"></div>
+        </div>
+
+        <!-- IMMERSIVE PLAYER -->
+        <div id="rc-player" class="rc-pv" hidden>
+          <button class="back" id="rc-back" aria-label="Back" data-i18n-attr="aria-label:rec.back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <img class="rc-plogo" src="logo.svg" alt="Taiyabah Masjid">
+          <div class="rc-plabel" id="rc-plabel"></div>
+          <div class="rc-med" id="rc-med"></div>
+          <div class="rc-ptitle" id="rc-ptitle"></div>
+          <div class="rc-wave" id="rc-wave"></div>
+          <div class="rc-times"><span id="rc-pos">0:00</span><span id="rc-dur">0:00</span></div>
+          <div class="rc-ctrls">
+            <button class="rc-skip" id="rc-b15" aria-label="Back 15 seconds" data-i18n-attr="aria-label:rec.back15"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L5 11l6 6"/><path d="M5 11h9a5 5 0 0 1 0 10h-1"/></svg></button>
+            <button class="rc-big" id="rc-pp" aria-label="Play" data-i18n-attr="aria-label:rec.play"></button>
+            <button class="rc-skip" id="rc-f15" aria-label="Forward 15 seconds" data-i18n-attr="aria-label:rec.fwd15"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5l6 6-6 6"/><path d="M19 11h-9a5 5 0 0 0 0 10h1"/></svg></button>
+          </div>
+          <audio id="rc-audio" preload="none" style="display:none"></audio>
         </div>
       </div>
     </div>
@@ -6713,17 +6835,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
         <button class="dr-row" data-act="calendar">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v3"/><path d="M16 3v3"/></svg></span><span class="dr-t" data-i18n="menu.timetable">Full prayer timetable</span><span class="dr-ch">&rsaquo;</span>
         </button>
-        <button class="dr-row" data-act="vids">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M10 9.3v5.4l4.5-2.7L10 9.3Z"/></svg></span><span class="dr-t" data-i18n="marriage.videos_bayaans">Videos &amp; bayaans</span><span class="dr-ch">&rsaquo;</span>
-        </button>
-        <button class="dr-row" data-act="hajj">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 19.2 6.4 12 10 4.8 6.4Z"/><path d="M4.8 6.4v11.2L12 21.2l7.2-3.6V6.4"/><path d="M12 10v11.2"/><path d="M4.8 9.2 12 12.8l7.2-3.6"/></svg></span><span class="dr-t" data-i18n="marriage.hajj_umrah">Hajj / Umrah</span><span class="dr-ch">&rsaquo;</span>
-        </button>
         <button class="dr-row" data-act="ramadan">
           <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span><span class="dr-t" data-i18n="ramadan.ramadan">Ramadan</span><span class="dr-ch">&rsaquo;</span>
-        </button>
-        <button class="dr-row" data-act="zakat">
-          <span class="dr-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8 7.5h8"/><circle cx="8.4" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="8.4" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="15.6" r=".9" fill="currentColor" stroke="none"/><circle cx="15.6" cy="15.6" r=".9" fill="currentColor" stroke="none"/></svg></span><span class="dr-t" data-i18n="menu.zakat">Zakat calculator</span><span class="dr-ch">&rsaquo;</span>
         </button>
         <div class="dr-h" data-i18n="marriage.madrasah">Madrasah</div>
         <!-- The website publishes the fees, the uniform rule and the whole
@@ -9571,6 +9684,137 @@ function initVids(){
   });
 }
 
+/* ---------------- recordings (eMasjid archive) ----------------
+   The twin of native/src/screens/Recordings.jsx + RecordingPlayer.jsx: browse
+   the masjid's sections, then an immersive player. The LIST and play URLs come
+   from the Worker (/api/recordings) — worker/src/recordings.js reads and parses
+   eMasjid so this file never has to. The live stream is untouched. Positions
+   are kept in localStorage so "Continue listening" works and a reopened dars
+   resumes. The icons share their path data with native/src/islamic-icons.jsx. */
+const REC_API = "https://taiyabah-sender.yameenbux.workers.dev/api/recordings";
+const REC_POS = "rec:positions";
+const REC_JEWELS = ["#5E1844","#13433A","#243A6B","#4A2363","#6B1E3A","#1F4A36","#4B2A12"];
+let recCats=null, recActive=null, recLoaded=false, recCur=null, recWave=[], recItems=[];
+
+const RIC=(inner,vb="0 0 24 24")=>`<svg viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+const RECICON={
+  quran:RIC('<path d="M12 7.2C9.8 5.9 6.8 5.9 4.5 7v9.8c2.3-1.1 5.3-1.1 7.5.2 2.2-1.3 5.2-1.3 7.5-.2V7c-2.3-1.1-5.3-1.1-7.5.2z"/><path d="M12 7.2v9.9"/><path d="M8 17.3l-3 3.2M16 17.3l3 3.2"/>'),
+  scroll:RIC('<path d="M8 4.5h9c.9 0 1.5.9 1.5 2v12c0 .9-.6 1.5-1.5 1.5H8"/><path d="M8 4.5c-1.1 0-1.8.9-1.8 2s.7 1.8 1.8 1.8h2.2V6.5c0-1.1-.9-2-2-2z"/><path d="M8 19.9c-1.1 0-1.8-.8-1.8-1.9M10 11h5M10 14h5"/>'),
+  minbar:RIC('<path d="M4 20.5v-2.2h3v-2.4h3v-2.4h3"/><path d="M13 20.5V9.2c0-.6.5-1.1 1.1-1.1H19c.6 0 1 .5 1 1.1v11.3"/><path d="M13 12.2h7"/><path d="M16.5 8V5.8"/>'),
+  mihrab:RIC('<path d="M6.5 21V11.5C6.5 7.9 9 5 12 5s5.5 2.9 5.5 6.5V21"/><path d="M9.3 21v-9.2c0-1.9 1.2-3.6 2.7-3.6s2.7 1.7 2.7 3.6V21"/><path d="M4.5 21h15"/>'),
+  lantern:RIC('<path d="M12 2.5v2"/><path d="M9.3 7.2h5.4l-1 2.1H10.3z"/><path d="M9.6 9.3h4.8v6.4H9.6z"/><path d="M11 15.7v-3.4c0-.6.4-1 1-1s1 .4 1 1v3.4"/><path d="M10.3 17.4h3.4l-1.7 3z"/>'),
+  crescent:RIC('<path d="M16.5 3.7a8.3 8.3 0 1 0 0 16.6 6.6 6.6 0 0 1 0-16.6z"/><path d="M18.7 6.2l.8 1.7 1.8.2-1.3 1.2.3 1.8-1.6-.9-1.6.9.3-1.8-1.3-1.2 1.8-.2z"/>'),
+  mosque:RIC('<path d="M5.5 12.5c0-3.6 2.9-5.5 6.5-5.5s6.5 1.9 6.5 5.5"/><path d="M12 7V4.6"/><path d="M5.5 12.5h13V21h-13z"/><path d="M9.8 21v-3.4c0-1.2 1-2.2 2.2-2.2s2.2 1 2.2 2.2V21"/><path d="M3.5 21V10.5M20.5 21V10.5"/>'),
+  khatim:RIC('<polygon points="50,6 58,30 82,22 70,44 94,50 70,56 82,78 58,70 50,94 42,70 18,78 30,56 6,50 30,44 18,22 42,30" stroke-width="5"/>',"0 0 100 100"),
+};
+function recIconFor(name){const s=String(name||"").toLowerCase();
+  if(/(qur|quran)/.test(s))return"quran"; if(/(hadith|hadeeth)/.test(s))return"scroll";
+  if(/(jumu|bayan|khutb)/.test(s))return"minbar"; if(/(qira|qirat|tajwid|tajweed)/.test(s))return"mihrab";
+  if(/(nazam|naat|nasheed)/.test(s))return"lantern"; if(/(ramadhan|ramadan|taraweeh|tarawih|laylat)/.test(s))return"crescent";
+  if(/(adhan|azan|athan)/.test(s))return"mosque"; return"khatim";}
+function recIcon(cat){return RECICON[recIconFor(cat)]||RECICON.khatim;}
+
+function recFetch(url){return fetch(url,{headers:{Accept:"application/json"}}).then(r=>{if(!r.ok)throw 0;return r.json();});}
+function recNiceDate(iso){const M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||"");return m?(+m[3])+" "+(M[+m[2]-1]||"")+" "+m[1]:(iso||"");}
+function recNiceLen(sec){const s=+sec||0,h=Math.floor(s/3600),min=Math.round((s%3600)/60);return h>0?h+" h"+(min?" "+min+" min":""):Math.max(1,min)+" min";}
+function recClock(t){t=Math.max(0,Math.floor(t||0));const h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=t%60;return (h?h+":":"")+(h?String(m).padStart(2,"0"):m)+":"+String(s).padStart(2,"0");}
+
+let recPosCache={}; try{recPosCache=JSON.parse(localStorage.getItem(REC_POS))||{};}catch(e){}
+function recSavePos(){try{localStorage.setItem(REC_POS,JSON.stringify(recPosCache));}catch(e){}}
+function recUnfinished(e){return e&&e.pos>8&&(!e.dur||(e.pos<e.dur-20&&e.pos/e.dur<0.97));}
+
+function recErr(){document.getElementById('rc-list').innerHTML='<div class="rc-note" data-i18n="rec.unavailable">Recordings couldn&rsquo;t be reached right now. Please try again later.</div>';retranslate();}
+
+function recRenderRail(){
+  document.getElementById('rc-rail').innerHTML=recCats.map((c,i)=>
+    `<div class="rc-cat" data-path="${esc(c.path)}" role="button" tabindex="0" style="background:linear-gradient(160deg,${REC_JEWELS[i%REC_JEWELS.length]},#1b0712)">`+
+    `<span class="ic">${recIcon(c.name)}</span><span class="nm">${esc(c.name)}</span></div>`).join("");
+  document.querySelectorAll('#rc-rail .rc-cat').forEach(b=>b.addEventListener('click',()=>recSelect(b.dataset.path)));
+}
+function recRenderContinue(){
+  const items=Object.values(recPosCache).filter(recUnfinished).sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,12);
+  const sec=document.getElementById('rc-cont-sec');
+  if(!items.length){sec.hidden=true;return;}
+  sec.hidden=false;
+  document.getElementById('rc-cont').innerHTML=items.map(e=>{
+    const frac=e.dur?Math.max(2,Math.min(100,e.pos/e.dur*100)):2;
+    const left=Math.max(1,Math.round(((e.dur||(e.durationSec||0))-(e.pos||0))/60));
+    return `<div class="rc-cc" role="button" tabindex="0" data-mp3="${esc(e.mp3)}">`+
+      `<span class="rc-tile">${recIcon(e.category)}</span>`+
+      `<span class="m"><span class="t">${esc(e.title)}</span><span class="c">${esc(e.category)}</span>`+
+      `<span class="rc-pbar"><i style="width:${frac}%"></i></span><span class="rc-left">${left} min left</span></span></div>`;
+  }).join("");
+  document.querySelectorAll('#rc-cont .rc-cc').forEach(b=>b.addEventListener('click',()=>{const e=recPosCache[b.dataset.mp3];if(e)recOpen(e);}));
+}
+function recRenderList(items){
+  const el=document.getElementById('rc-list');
+  if(!items||!items.length){el.innerHTML='<div class="rc-note" data-i18n="rec.empty">Nothing in this section yet.</div>';retranslate();return;}
+  el.innerHTML=items.map((it,i)=>
+    `<button class="rc-item" data-i="${i}" data-on="${recCur&&recCur.mp3===it.mp3?1:0}">`+
+      `<span class="rc-tile sm">${recIcon(it.category)}</span>`+
+      `<span class="m"><span class="rc-it-t">${esc(it.title)}</span><span class="rc-it-m">${esc(recNiceDate(it.date))} &middot; ${esc(recNiceLen(it.durationSec))}</span></span></button>`).join("");
+  el.querySelectorAll('.rc-item').forEach(b=>b.addEventListener('click',()=>recOpen(items[+b.dataset.i])));
+}
+function recSelect(path){
+  recActive=path;
+  document.getElementById('rc-listhead').textContent=(recCats.find(c=>c.path===path)||{}).name||"";
+  document.getElementById('rc-list').innerHTML='<div class="rc-note">&hellip;</div>';
+  recFetch(REC_API+"?c="+encodeURIComponent(path)).then(d=>{recItems=d.items||[];recRenderList(recItems);}).catch(recErr);
+}
+
+/* ---- the immersive player view, driven by a hidden <audio> ---- */
+function recDrawWave(frac){document.getElementById('rc-wave').innerHTML=recWave.map((h,i)=>`<i class="${i/recWave.length<=frac?'on':''}" style="height:${h}px"></i>`).join("");}
+function recOpen(rec){
+  recCur=rec;
+  document.getElementById('rc-browse').hidden=true;
+  document.getElementById('rc-player').hidden=false;
+  document.querySelector('#recordings .sh-body').scrollTop=0;
+  document.getElementById('rc-plabel').textContent=(rec.category||"").toUpperCase();
+  document.getElementById('rc-med').innerHTML=recIcon(rec.category);
+  document.getElementById('rc-ptitle').textContent=rec.title;
+  const n=44,seed=(rec.title||"").length+7;recWave=[];for(let i=0;i<n;i++)recWave.push(6+Math.abs(Math.sin((i+seed)*0.9))*26+(i%3)*3);
+  recDrawWave(0);
+  const a=document.getElementById('rc-audio'),saved=recPosCache[rec.mp3];
+  a.src=rec.mp3; a.currentTime=recUnfinished(saved)?saved.pos:0; a.play().catch(()=>{});
+}
+function recBack(){document.getElementById('rc-player').hidden=true;document.getElementById('rc-browse').hidden=false;recRenderContinue();if(recItems.length)recRenderList(recItems);}
+function recRemember(){const a=document.getElementById('rc-audio');if(!recCur||!a.duration)return;
+  recPosCache[recCur.mp3]={title:recCur.title,category:recCur.category,date:recCur.date,durationSec:recCur.durationSec,mp3:recCur.mp3,pos:a.currentTime,dur:a.duration,at:Date.now()};recSavePos();}
+
+function openRecs(){
+  document.getElementById('recordings').dataset.open="1";
+  document.body.style.overflow="hidden";
+  recRenderContinue();
+  if(!recLoaded){recLoaded=true;recFetch(REC_API).then(d=>{recCats=d.categories||[];if(!recCats.length){recErr();return;}recRenderRail();recSelect(recCats[0].path);}).catch(()=>{recLoaded=false;recErr();});}
+}
+function closeRecs(){try{document.getElementById('rc-audio').pause();}catch(e){}recRemember();document.getElementById('recordings').dataset.open="0";document.body.style.overflow="";}
+
+function initRecs(){
+  const a=document.getElementById('rc-audio'),pp=document.getElementById('rc-pp');
+  document.getElementById('rc-close').addEventListener('click',closeRecs);
+  document.getElementById('rc-scrim').addEventListener('click',closeRecs);
+  document.getElementById('lv-recs').addEventListener('click',openRecs);
+  document.getElementById('rc-back').addEventListener('click',recBack);
+  /* The bell in the recordings app bar goes where the main one goes — it closes
+     the sheet and opens Notices, so the bell means the same thing everywhere. */
+  document.getElementById('rc-bell').addEventListener('click',()=>{closeRecs();const b=document.getElementById('bellbtn');if(b)b.click();});
+  pp.addEventListener('click',()=>{if(a.paused)a.play().catch(()=>{});else a.pause();});
+  document.getElementById('rc-b15').addEventListener('click',()=>{a.currentTime=Math.max(0,a.currentTime-15);});
+  document.getElementById('rc-f15').addEventListener('click',()=>{a.currentTime=Math.min(a.duration||1e9,a.currentTime+15);});
+  document.getElementById('rc-wave').addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect(),f=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));if(a.duration)a.currentTime=f*a.duration;});
+  const setPP=()=>{pp.innerHTML=a.paused?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';pp.setAttribute('aria-label',a.paused?'Play':'Pause');};
+  a.addEventListener('play',setPP);a.addEventListener('pause',setPP);setPP();
+  let lastSave=0;
+  a.addEventListener('timeupdate',()=>{
+    const d=a.duration||0;recDrawWave(d?a.currentTime/d:0);
+    document.getElementById('rc-pos').textContent=recClock(a.currentTime);
+    document.getElementById('rc-dur').textContent=recClock(d);
+    const now=Date.now();if(now-lastSave>5000){lastSave=now;recRemember();}
+  });
+  a.addEventListener('ended',()=>{if(recCur){delete recPosCache[recCur.mp3];recSavePos();}});
+  document.addEventListener('keydown',e=>{if(e.key==="Escape"&&document.getElementById('recordings').dataset.open==="1"){if(!document.getElementById('rc-player').hidden)recBack();else closeRecs();}});
+}
+
 /* ---------------- live audio ----------------
    Direct Shoutcast/Icecast feed. Playback needs a user gesture (the play
    button), after which iOS keeps audio running when the app is backgrounded.
@@ -10523,6 +10767,18 @@ function renderMushafImage(n){
 }
 
 async function showMushafPage(n){
+  /* NOT REACHABLE TODAY, AND KEPT ANYWAY. MUSHAF.meta is null until the pack
+     loads, so this read throws on null if the function is ever called before
+     then. Every caller is currently guarded — openMushaf() returns early
+     unless the pack is "ready", mu-reader stays hidden, and the Ramadan link
+     checks that before calling — so a reader cannot get here. A fuzz pass
+     firing events straight at the hidden jump field did, which is how it came
+     to light.
+     The guard stays because this is called from eleven places, two of them
+     gesture handlers, and the next person to show a control before the pack
+     has arrived would turn a null deref into a dead screen. Returning does
+     nothing visible; the "pack missing" notice is already on screen. */
+  if(!MUSHAF.meta) return;
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, Math.round(+n) || 1));
   MUSHAF.page = n;
@@ -10995,6 +11251,7 @@ function mushafGlide(){
 }
 
 function goMushafLandscapePage(n){
+  if(!MUSHAF.meta) return;            /* same reason as showMushafPage above */
   const total = MUSHAF.meta.pages;
   n = Math.min(total, Math.max(1, n));
   stopMushafGlide();
@@ -16895,6 +17152,7 @@ function boot(){
   initLive();
   initOnAir();
   initVids();
+  initRecs();
   initZakat();
   initQibla();
   initDonate();

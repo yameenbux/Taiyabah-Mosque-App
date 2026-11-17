@@ -26,7 +26,9 @@ test("a day's record comes back with both columns", () => {
 });
 
 test("a date outside the timetable is null, not a guess", () => {
-  assert.equal(dayFor(new Date(2027, 0, 1, 12, 0, 0)), null);
+  /* The edge moved when 2027 joined the bundle. The rule did not: a day the
+     app does not hold is null, never an invented time. */
+  assert.equal(dayFor(new Date(2028, 0, 1, 12, 0, 0)), null);
   assert.equal(dayFor(new Date(2025, 11, 31, 12, 0, 0)), null);
 });
 
@@ -83,7 +85,7 @@ test("nowLondon returns London's wall clock", () => {
 });
 
 /* ---- the year the timetable runs out ------------------------------------ *
- * The bundled file covers 2026 and the masjid publishes one year at a time,
+ * The bundle covers 2026 and 2027 and the masjid publishes one year at a time,
  * so at midnight on 31 December the app is asked a question it cannot answer.
  * The timetable now comes from the database with this file as the floor, which
  * removes the cliff — but only if somebody uploads next year. These check the
@@ -91,7 +93,7 @@ test("nowLondon returns London's wall clock", () => {
  * sending the congregation to the masjid an hour early.
  */
 test("31 December still answers, including the roll into tomorrow", () => {
-  const nye = new Date(2026, 11, 31, 11, 0, 0);
+  const nye = new Date(2027, 11, 31, 11, 0, 0);   /* the last day the bundle holds */
   const n = nextJamaah(nye);
   assert.ok(n, "the last day of the bundled year must still work");
   assert.equal(n.tomorrow, false);
@@ -103,13 +105,16 @@ test("the last night of the year does not invent 1 January", () => {
      which is what Home and Prayer Times turn into "that date is outside the
      published timetable". Returning a guess here would put a wrong time on
      the busiest screen in the app on New Year's Day. */
-  assert.equal(nextJamaah(new Date(2026, 11, 31, 23, 30, 0)), null);
+  assert.equal(nextJamaah(new Date(2027, 11, 31, 23, 30, 0)), null);
 });
 
-test("1 January 2027 is null, not a crash and not a guess", () => {
+test("1 January 2028 is null, not a crash and not a guess", () => {
+  /* Was 2027, which the bundle now holds. The year in this test is always the
+     first one PAST the bundle: that is the morning the app has to be honest
+     on, and it moves every time a year is added. */
   for (const h of [0, 6, 13, 23]) {
-    assert.equal(nextJamaah(new Date(2027, 0, 1, h, 0, 0)), null,
-      `1 Jan 2027 at ${h}:00 should be null until the year is published`);
-    assert.equal(dayFor(new Date(2027, 0, 1, h, 0, 0)), null);
+    assert.equal(nextJamaah(new Date(2028, 0, 1, h, 0, 0)), null,
+      `1 Jan 2028 at ${h}:00 should be null until the year is published`);
+    assert.equal(dayFor(new Date(2028, 0, 1, h, 0, 0)), null);
   }
 });

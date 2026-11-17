@@ -50,10 +50,16 @@ const books = rd("quran/hadith/bukhari/books.json");
 wr("bukhari.json", { name: bIdx.name, nameAr: bIdx.nameAr, count: bIdx.count, books: bIdx.books,
                      source: bIdx.source, licence: bIdx.licence, list: books });
 
-/* --- the timetable, copied so the two cannot drift ----------------------- */
-fs.copyFileSync(path.join(ROOT, "data/timetable-2026.json"), path.join(OUT, "timetable-2026.json"));
-console.log("timetable-2026.json".padEnd(22),
-  (fs.statSync(path.join(OUT, "timetable-2026.json")).size / 1024).toFixed(0).padStart(6) + " KB");
+/* --- the timetables, copied so the two cannot drift ----------------------- */
+/* Every year in data/, not one named year. The year was hardcoded here, so
+   adding 2027 to data/ copied nothing and the app would have shipped with a
+   2027 file that was never refreshed from the parser's output. */
+for (const f of fs.readdirSync(path.join(ROOT, "data"))
+                  .filter(n => /^timetable-\d{4}\.json$/.test(n)).sort()) {
+  fs.copyFileSync(path.join(ROOT, "data", f), path.join(OUT, f));
+  console.log(f.padEnd(22),
+    (fs.statSync(path.join(OUT, f)).size / 1024).toFixed(0).padStart(6) + " KB");
+}
 
 const total = fs.readdirSync(OUT).reduce((n, f) => n + fs.statSync(path.join(OUT, f)).size, 0);
 console.log("\nbundled data total   " + (total / 1024 / 1024).toFixed(1) + " MB");

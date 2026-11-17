@@ -36,6 +36,7 @@
  */
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Audio } from "expo-av";
+import { claimAudio, releaseAudio } from "./audio-bus";
 
 export const LIVE_URL = "https://taiyabahmbolton.radioca.st/;";
 
@@ -70,8 +71,26 @@ export function LiveAudioProvider({ children }) {
     sound.current?.setVolumeAsync?.(clamped).catch(() => {});
   }, []);
 
+  /* Defined before play() so play() can hand it to the audio bus as "how to
+     stop me". The two are otherwise unchanged from when this screen owned a
+     single sound with no recordings beside it. */
+  const stop = useCallback(async () => {
+    releaseAudio(stop);
+    const s = sound.current;
+    /* Cleared BEFORE the await, so a second tap on a slow unload cannot find
+       the same sound still sitting here and unload it twice. */
+    sound.current = null;
+    setState("idle");
+    try { s?.setOnPlaybackStatusUpdate(null); } catch {}
+    await s?.unloadAsync().catch(() => {});
+  }, []);
+
   const play = useCallback(async () => {
     setState("loading");
+    /* Take the phone's one audio output before opening the stream — this stops
+       a recording that was playing, through src/audio-bus.js, without this file
+       knowing a recordings player exists. */
+    claimAudio(stop);
     try {
       /* Already loaded — paused rather than stopped — so this is a resume. */
       if (sound.current) { await sound.current.playAsync(); setState("playing"); return; }
@@ -89,21 +108,11 @@ export function LiveAudioProvider({ children }) {
       });
       setState("playing");
     } catch { setState("error"); }
-  }, []);
+  }, [stop]);
 
   const pause = useCallback(async () => {
     await sound.current?.pauseAsync().catch(() => {});
     setState("idle");
-  }, []);
-
-  const stop = useCallback(async () => {
-    const s = sound.current;
-    /* Cleared BEFORE the await, so a second tap on a slow unload cannot find
-       the same sound still sitting here and unload it twice. */
-    sound.current = null;
-    setState("idle");
-    try { s?.setOnPlaybackStatusUpdate(null); } catch {}
-    await s?.unloadAsync().catch(() => {});
   }, []);
 
   const toggle = useCallback(() => {

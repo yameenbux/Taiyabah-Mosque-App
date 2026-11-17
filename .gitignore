@@ -42,3 +42,15 @@ smoke-out/
 # comparison, rewritten on every run. The joined side-by-sides that are
 # actually worth keeping are committed under native/final/.
 .compare/
+
+# Google Play service account keys. EAS submits to Play with one of these, and
+# the sane place to keep it is on EAS's servers (eas credentials, or the Expo
+# dashboard) where the repository never sees it at all. But the file arrives as
+# a download with whatever name Google Cloud gave it, often straight into the
+# project folder, and it is a working credential for the masjid's Play listing:
+# anyone holding it can push a release. These patterns are the backstop for the
+# afternoon somebody runs `git add .` without looking.
+*service-account*.json
+*serviceaccount*.json
+google-play-*.json
+play-store-*.json
