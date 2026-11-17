@@ -319,14 +319,17 @@ function Root() {
    *
    * The ← appears only when there is a sheet behind this one, which is what
    * navRenderUpBack() decides on the website and what canGoBack() decides
-   * here. Done leaves the same way the arrow does, because on the website it
-   * closes the sheet and there is nowhere else for it to go. */
+   * here.
+   *
+   * There used to be a gold "Done" pill on the right as well, closing the sheet
+   * the same way the ← does. Two buttons for one action read as clutter on a
+   * phone, so the Done pill is gone and the back arrow is the single way out —
+   * the arrow it duplicated was always right there beside it. */
   const sheet = {
     header: ({ navigation, options }) => (
       <SheetTop title={options.title || ""}
                 canBack={navigation.canGoBack()}
                 onBack={() => navigation.goBack()}
-                onDone={navigation.canGoBack() ? () => navigation.goBack() : null}
                 {...(options.sheetNav || {})} />
     ),
     contentStyle: { backgroundColor: C.paper },

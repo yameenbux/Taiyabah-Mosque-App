@@ -54,3 +54,5 @@ smoke-out/
 *serviceaccount*.json
 google-play-*.json
 play-store-*.json
+.pc-api-key.json
+native/.pc-api-key.json
