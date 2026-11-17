@@ -39,10 +39,22 @@ export default function Timetable() {
      it, otherwise the most recent one it does. It used to be pinned to the
      bundled file's year, so in 2027 it would have opened on January 2026. */
   const years = useMemo(yearsHeld, [tick]);
-  const year = years.includes(today.getFullYear())
+  /* Open on the reader's own year and month when the app holds it, otherwise on
+     January of the most recent year it does. The navigation below is NOT pinned
+     to this year: it steps across the year boundary into any year the app has,
+     so December rolls on to the next January rather than stopping dead — which
+     is what it used to do, leaving next year's timetable unreachable even once
+     it had been downloaded. */
+  const startY = years.includes(today.getFullYear())
     ? today.getFullYear()
     : (years[years.length - 1] ?? today.getFullYear());
-  const [m, setM] = useState(today.getFullYear() === year ? today.getMonth() : 0);
+  const [year, setYear] = useState(startY);
+  const [m, setM] = useState(today.getFullYear() === startY ? today.getMonth() : 0);
+  /* A month is reachable only if the app actually holds it — day 1 stands in for
+     the month, since a held year is complete. This is what disables the arrow at
+     each end of what has been downloaded. */
+  const monthHeld = (yy, mm) => !!dayRecord(`${yy}-${String(mm + 1).padStart(2, "0")}-01`);
+  const canStep = n => { const a = year * 12 + m + n; return monthHeld(Math.floor(a / 12), ((a % 12) + 12) % 12); };
   const [mode, setMode] = useState("jamaat");
   const cols = SETS[mode];
   const list = useRef(null);
@@ -59,9 +71,9 @@ export default function Timetable() {
   }, [m, year, tick]);
 
   const step = n => {
-    const next = Math.min(11, Math.max(0, m + n));
-    if (next === m) return;
-    tap(); setM(next);
+    if (!canStep(n)) return;
+    const a = year * 12 + m + n;
+    tap(); setYear(Math.floor(a / 12)); setM(((a % 12) + 12) % 12);
     list.current?.scrollToOffset({ offset: 0, animated: false });
   };
   const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -75,9 +87,9 @@ export default function Timetable() {
     nav.setOptions({
       title: `${t(`date.fullmon.${m}`, MONTHS[m])} ${year}`,
       sheetNav: { onPrev: () => step(-1), onNext: () => step(1),
-                  prevOff: m === 0, nextOff: m === 11 },
+                  prevOff: !canStep(-1), nextOff: !canStep(1) },
     });
-  }, [nav, m, t]);
+  }, [nav, m, year, t]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.paper }}>
