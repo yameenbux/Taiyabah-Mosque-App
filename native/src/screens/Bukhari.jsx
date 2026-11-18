@@ -12,13 +12,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Screen, Hero, Card, Note, Press, Empty, Arabic, Advisory, tap } from "../ui";
 import B from "../data/bukhari.json";
 
-/* The highest hadith NUMBER, which is not the same as how many there are:
-   the pack carries 7580 narrations numbered to 7563, because the standard
-   numbering gives one number to some narrations that the edition prints
-   separately. Derived from the books rather than hard-coded, so a rebuilt
-   pack moves this with it. */
-const HIGHEST = B.list.reduce((hi, b) => Math.max(hi, b.last), 0);
-
 const HOST = "https://taiyabahapp.ysbdesigns.uk";
 
 /* MUST MATCH scripts/build-bukhari.mjs AND the website's hdSearchable()
@@ -133,52 +126,9 @@ export default function Bukhari({ navigation }) {
       contentContainerStyle={{ paddingBottom: 34 }}
       ListHeaderComponent={
         <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-          {/* WHERE THE TEXT COMES FROM, FIRST. The committee asked for the
-              source and the reference to be at the top of the page rather
-              than a footnote, and they were right to: a reader who cannot
-              see what edition they are reading cannot judge it.
-
-              An earlier version of this screen DID open with a credit card
-              and it was taken out, on the grounds that the licence belongs
-              at the foot of the book. The licence does. The provenance does
-              not — so this names the compiler, the numbering and the edition
-              at the top, and the bare attribution line stays at the foot.
-
-              Not the rose Advisory panel: provenance is not a warning. */}
-          <View style={{ borderRadius: 14, paddingVertical: 13, paddingHorizontal: 15,
-                         backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
-                         marginBottom: 14 }}>
-            <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 1.1,
-                           textTransform: "uppercase", color: C.brand600, marginBottom: 7,
-                           textAlign: rtl ? "right" : "left" }}>
-              {t("bukhari.where_this_comes_from", "Where this text comes from")}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.ink,
-                           textAlign: rtl ? "right" : "left" }}>
-              {t("bukhari.compiled_by", "Ṣaḥīḥ al-Bukhārī, compiled by Imām Muḥammad ibn Ismāʿīl al-Bukhārī (d. 256 AH / 870 CE).")}</Text>
-            {/* Read off the pack, never typed: the counts and the numbering
-                are properties of the data that shipped, and a screen that
-                states them from memory states them wrongly the first time
-                the pack is rebuilt. */}
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.muted,
-                           marginTop: 7, textAlign: rtl ? "right" : "left" }}>
-              {t("bukhari.structure",
-                 "{books} books · {count} narrations · numbered to {highest}, the numbering used when a hadith is cited.")
-                .replace("{books}", String(B.books))
-                .replace("{count}", String(B.count))
-                .replace("{highest}", String(HIGHEST))}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.muted,
-                           marginTop: 7, textAlign: rtl ? "right" : "left" }}>
-              {t("bukhari.edition", "Arabic text: {source}. {licence}.")
-                .replace("{source}", B.source || "").replace("{licence}", B.licence || "")}</Text>
-            {!!B.english && (
-              <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.muted,
-                             marginTop: 7, textAlign: rtl ? "right" : "left" }}>
-                {t("bukhari.edition_en", "English translation: {translation}. {licence}.")
-                  .replace("{translation}", B.english.translation || "")
-                  .replace("{licence}", B.english.licence || "")}</Text>)}
-          </View>
-
-          {/* .hd-bar — the search box over the go-to-hadith row, 9px apart. */}
+          {/* The search box over the go-to-hadith row, 9px apart. The
+              provenance card that used to open this screen was removed; the
+              translation's credit stays in the advisory at the foot. */}
           <TextInput
             value={q} onChangeText={setQ}
             placeholder={t("a11y.search_arabic_or_english", "Search Arabic or English…")} placeholderTextColor={C.muted}

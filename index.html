@@ -5771,17 +5771,6 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
       </div>
       <div class="sh-body" id="hd-body">
         <div class="ab-wrap">
-          <!-- Point 1 of the committee's note: the original source and the
-               reference, at the top of the page. The two lines that depend on
-               the pack are filled from its own metadata in hdRenderSource(),
-               so the page cannot claim a provenance the data does not carry. -->
-          <div class="hd-source">
-            <div class="hd-src-h" data-i18n="bukhari.where_this_comes_from">Where this text comes from</div>
-            <p data-i18n="bukhari.compiled_by">Ṣaḥīḥ al-Bukhārī, compiled by Imām Muḥammad ibn Ismāʿīl al-Bukhārī (d. 256 AH / 870 CE).</p>
-            <p class="hd-src-meta" id="hd-src-structure"></p>
-            <p class="hd-src-meta" id="hd-src-edition"></p>
-            <p class="hd-src-meta" id="hd-src-english" hidden></p>
-          </div>
           <div class="hd-bar">
             <input id="hd-search" type="search" placeholder="Search Arabic or English…"
                    autocapitalize="off" autocorrect="off" aria-label="Search the Arabic or English text"
@@ -13297,32 +13286,6 @@ function hdEnSearchable(s){
     .trim();
 }
 
-/* The source card at the top of the page. Its two factual lines are read off
-   the pack's own metadata rather than typed into the markup: the counts, the
-   numbering and the licence are properties of the text that shipped, and a
-   page that states them from memory will state them wrongly the first time
-   the pack is rebuilt. The third line of the card, the compiler, IS in the
-   markup — that fact belongs to the ninth century, not to the pack. */
-function hdRenderSource(m){
-  const structure = document.getElementById("hd-src-structure");
-  const edition = document.getElementById("hd-src-edition");
-  if(!structure || !edition) return;
-  structure.textContent = t("bukhari.structure",
-      "{books} books · {count} narrations · numbered to {highest}, the numbering used when a hadith is cited.")
-    .replace("{books}", num(m.books)).replace("{count}", num(m.count)).replace("{highest}", num(m.highest));
-  edition.textContent = t("bukhari.edition", "Arabic text: {source}. {licence}.")
-    .replace("{source}", m.source || "").replace("{licence}", m.licence || "");
-  const en = document.getElementById("hd-src-english");
-  if(en){
-    if(m.english){
-      en.hidden = false;
-      en.textContent = t("bukhari.edition_en", "English translation: {translation}. {licence}.")
-        .replace("{translation}", m.english.translation || "")
-        .replace("{licence}", m.english.licence || "");
-    } else en.hidden = true;
-  }
-}
-
 async function openBukhari(){
   document.getElementById("bukhari").dataset.open = "1";
   document.body.style.overflow = "hidden";
@@ -13330,7 +13293,6 @@ async function openBukhari(){
   if(m){
     document.getElementById("hd-num").max = m.highest;
     document.getElementById("hd-attr").textContent = m.attribution || "";
-    hdRenderSource(m);
   }
   const last = prefStore.get(HD_POS, 0);
   if(last) await hdShowBook(last); else await hdShowBooks();
