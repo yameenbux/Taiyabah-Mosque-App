@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "59ad6c007ca6",
+ "version": "d4d0b9655a96",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -102,7 +102,7 @@ window.LANG_PACK = {
   "bukhari.save": "સાચવો",
   "bukhari.copy": "નકલ કરો",
   "bukhari.share": "શેર કરો",
-  "bukhari.copied": "નકલ થયું ✓",
+  "bukhari.copied": "નકલ થયું",
   "bukhari.narrator": "રાવી",
   "bukhari.arabic": "અરબી",
   "bukhari.english": "અંગ્રેજી",

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "2297c7fd3a68",
+ "version": "f0850fe3375c",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -102,7 +102,7 @@ window.LANG_PACK = {
   "bukhari.save": "احفظ",
   "bukhari.copy": "نسخ",
   "bukhari.share": "مشاركة",
-  "bukhari.copied": "تم النسخ ✓",
+  "bukhari.copied": "تم النسخ",
   "bukhari.narrator": "الراوي",
   "bukhari.arabic": "العربية",
   "bukhari.english": "الإنجليزية",

@@ -13108,7 +13108,7 @@ async function hdShowBook(n, focus){
     .replace("{n}", hdNum(n)).replace("{c}", hdNum(list.length));
 
   document.getElementById("hd-list").innerHTML = list.map(h => {
-    const prev = h.en ? hdNarrator(h.en).body : h.ar;
+    const prev = h.en || h.ar;
     return `
     <button class="hd-card" id="hd-h${h.n}" data-n="${h.n}">
       <span class="hd-card-top">
@@ -13172,7 +13172,7 @@ async function hdShowHadith(n, bookN){
   d.querySelector('[data-act="copy"]').addEventListener("click", async e => {
     const lab = e.currentTarget.querySelector(".hd-act-lab"), was = lab.textContent;
     try{ await navigator.clipboard.writeText(hdHadithText(h, n)); }catch(err){}
-    lab.textContent = t("bukhari.copied", "Copied ✓");
+    lab.textContent = t("bukhari.copied", "Copied");
     setTimeout(() => { lab.textContent = was; }, 1400);
   });
   d.querySelector('[data-act="share"]').addEventListener("click", async () => {

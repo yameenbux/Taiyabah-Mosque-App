@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "f18009f8e83c",
+ "version": "3817dc7aa5c1",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -102,7 +102,7 @@ window.LANG_PACK = {
   "bukhari.save": "محفوظ کریں",
   "bukhari.copy": "نقل کریں",
   "bukhari.share": "شیئر کریں",
-  "bukhari.copied": "نقل ہو گیا ✓",
+  "bukhari.copied": "نقل ہو گیا",
   "bukhari.narrator": "راوی",
   "bukhari.arabic": "عربی",
   "bukhari.english": "انگریزی",
