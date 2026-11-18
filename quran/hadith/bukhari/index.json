@@ -3,7 +3,7 @@
  "name": "Ṣaḥīḥ al-Bukhārī",
  "nameAr": "صحيح البخاري",
  "kind": "text",
- "language": "ar",
+ "language": "ar+en",
  "count": 7580,
  "highest": 7563,
  "books": 97,
@@ -13,6 +13,14 @@
  "licence": "The Unlicense — released into the public domain",
  "licenceUrl": "https://unlicense.org/",
  "attribution": "Arabic text and book structure from the public-domain hadith-api project.",
- "prepared": "7580 hadith across 97 books, numbering to 7563, with tashkīl. Hadith the source left unplaced are assigned by book number range, a method checked against every hadith the source did place. No commentary: the Fatḥ al-Bārī available elsewhere is keyed to a different numbering and cannot be matched reliably.",
- "arabicOnly": true
+ "english": {
+  "translation": "Dr Muhammad Muhsin Khan",
+  "publisher": "Darussalam",
+  "source": "hadith-api (fawazahmed0), edition eng-bukhari",
+  "sourceUrl": "https://github.com/fawazahmed0/hadith-api",
+  "licence": "In copyright, included by permission obtained by Taiyabah Masjid",
+  "attribution": "English translation by Dr Muhammad Muhsin Khan (Darussalam), used by permission."
+ },
+ "prepared": "7580 hadith across 97 books, numbering to 7563, with tashkīl and Dr Muhsin Khan's English translation. Hadith the source left unplaced are assigned by book number range, a method checked against every hadith the source did place. No commentary: the Fatḥ al-Bārī available elsewhere is keyed to a different numbering and cannot be matched reliably.",
+ "arabicOnly": false
 }

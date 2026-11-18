@@ -2516,9 +2516,10 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     border-bottom:1px solid var(--line);padding:13px 0;color:var(--ink);display:block;text-align:right}
   .hd-hit .hd-meta{direction:ltr;text-align:left}
   .hd-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
-  .hd-en{display:inline-block;margin-top:9px;font-size:calc(12.5px * var(--ts));font-weight:600;
-    color:var(--brand-600);text-decoration:none}
-  .hd-en:hover{text-decoration:underline}
+  .hd-en-text{margin-top:11px;font-size:calc(14px * var(--ts));line-height:1.6;
+    text-align:left;direction:ltr;color:var(--ink)}
+  .hd-hit .hd-en-snippet{display:block;margin-top:4px;font-size:calc(13px * var(--ts));
+    line-height:1.5;text-align:left;direction:ltr;color:var(--ink)}
   .bk-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
 
   /* ---- 13-line mushaf ----
@@ -5754,11 +5755,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <p data-i18n="bukhari.compiled_by">Ṣaḥīḥ al-Bukhārī, compiled by Imām Muḥammad ibn Ismāʿīl al-Bukhārī (d. 256 AH / 870 CE).</p>
             <p class="hd-src-meta" id="hd-src-structure"></p>
             <p class="hd-src-meta" id="hd-src-edition"></p>
+            <p class="hd-src-meta" id="hd-src-english" hidden></p>
           </div>
           <div class="hd-bar">
-            <input id="hd-search" type="search" placeholder="Search the Arabic…"
-                   autocapitalize="off" autocorrect="off" aria-label="Search the Arabic text"
-                   data-i18n-attr="placeholder:a11y.search_the_arabic,aria-label:a11y.search_the_arabic_text">
+            <input id="hd-search" type="search" placeholder="Search Arabic or English…"
+                   autocapitalize="off" autocorrect="off" aria-label="Search the Arabic or English text"
+                   data-i18n-attr="placeholder:a11y.search_arabic_or_english,aria-label:a11y.search_arabic_or_english_text">
             <div class="hd-jump">
               <label for="hd-num" data-i18n="bukhari.go_to">Go to hadith</label>
               <input id="hd-num" type="number" min="1" inputmode="numeric" aria-label="Hadith number"
@@ -5769,10 +5771,9 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           <p class="hd-sub" id="hd-sub" hidden></p>
           <div id="hd-list"><p class="qd-empty" data-i18n="bukhari.loading">Loading…</p></div>
           <div class="wl-advisory">
-            <div class="wl-adv-h" data-i18n="bukhari.what_is_here">What is in the app, and what is a link</div>
-            <p data-i18n="bukhari.arabic_is_carried">The Arabic above is carried inside the app in full, from the public-domain edition named at the top of this page. It reads with no connection and nothing is fetched to show it.</p>
-            <p data-i18n="bukhari.english_is_not_copied">No English translation is reproduced here. Every complete English Ṣaḥīḥ al-Bukhārī in circulation is a modern work still in copyright — the standard one is Dr Muhammad Muhsin Khan's, published by Darussalam, and it is the translation sunnah.com serves. The masjid has not been given permission to copy it, so it does not.</p>
-            <p data-i18n="bukhari.link_not_reproduce">Each hadith instead carries a link that opens sunnah.com in your browser at the matching number. Nothing from sunnah.com is stored in the app or shipped with it, and sunnah.com's own terms do not permit reproducing a collection in full.</p>
+            <div class="wl-adv-h" data-i18n="bukhari.what_is_here">About this text</div>
+            <p data-i18n="bukhari.arabic_is_carried">The Arabic is carried in full, from the public-domain edition named at the top of this page.</p>
+            <p data-i18n="bukhari.english_by_permission">The English is Dr Muhammad Muhsin Khan's translation, published by Darussalam. It is a modern work still in copyright and is not public domain — it is included here because Taiyabah Masjid has been given permission to use it.</p>
           </div>
           <p class="wl-foot" id="hd-attr"></p>
         </div>
@@ -12966,22 +12967,19 @@ function initNotices(){
    left for the reader to discover. */
 const HD_BASE = "quran/hadith/bukhari";
 
-/* THE ENGLISH IS LINKED, NOT BUNDLED.
+/* THE ENGLISH IS NOW BUNDLED, BY PERMISSION.
 
-   Every complete English Bukhārī in circulation is a modern work still in
-   copyright — the one in every open dataset is Muhsin Khan's, published by
-   Darussalam. Datasets carrying it under a permissive licence do not own it
-   and cannot give it away, so shipping it would put the masjid's name on a
-   copy nobody granted.
+   It was linked, not copied, while the masjid had no right to the text: every
+   complete English Bukhārī in circulation is Dr Muhsin Khan's translation,
+   published by Darussalam, a modern work still in copyright, and the open
+   datasets that carry it do not own it and cannot give it away.
 
-   Linking is not copying. The app knows the hadith number, and the numbering
-   here is the one sunnah.com uses, so a link lands on the right hadith with
-   its English — no licence to hold, nothing to evidence if a store asks.
-
-   If the masjid obtains written permission (see store/PERMISSION-LETTERS.md)
-   the translation can be bundled properly and read offline. Until then this
-   is honest about what it is: a pointer to somebody else's work. */
-const HD_EN_BASE = "https://sunnah.com/bukhari:";
+   The masjid has since obtained permission to use that translation, so it now
+   travels inside the pack beside the Arabic, keyed to the same hadith number,
+   and reads offline. The permission is what makes this lawful; the Arabic's
+   public-domain status does not extend to it. See the pack's LICENCE.txt and
+   scripts/build-bukhari.mjs — rebuilt with --no-english, the pack drops the
+   translation cleanly if that permission ever lapses. */
 const HD_POS  = "bukhari.pos";
 const HD = { meta: null, books: null, book: null, cache: new Map(), index: null };
 
@@ -13074,8 +13072,7 @@ async function hdShowBook(n, focus){
         <span class="hd-i tnum">${esc(t("bukhari.n_in_book", "{i} in this book").replace("{i}", hdNum(h.i)))}</span>
       </div>
       <p class="hd-ar quranic">${esc(h.ar)}</p>
-      <a class="hd-en" href="${HD_EN_BASE}${h.n}" target="_blank" rel="noopener noreferrer"
-         >${esc(t("bukhari.read_english", "Read the English"))} &rsaquo;</a>
+      ${h.en ? `<p class="hd-en-text">${esc(h.en)}</p>` : ""}
     </article>`).join("");
   prefStore.set(HD_POS, n);
   const target = focus && document.getElementById("hd-h" + focus);
@@ -13103,7 +13100,11 @@ async function hdSearchIndex(){
 }
 
 async function hdSearch(q){
-  const term = hdSearchable(q);
+  /* Which language is being searched is decided by what was typed: an Arabic
+     letter means the matn, anything else the English translation. The index
+     carries both as [n, b, arabic, english], so one fetch serves either. */
+  const arabic = /[؀-ۿ]/.test(q);
+  const term = arabic ? hdSearchable(q) : hdEnSearchable(q);
   if(term.length < 2) return HD.book ? hdShowBook(HD.book) : hdShowBooks();
   const m = await hdMeta();
   if(!m) return;
@@ -13117,11 +13118,14 @@ async function hdSearch(q){
 
   const name = {}; books.forEach(b => { name[b.n] = b.name; });
   const hits = [];
-  for(const [n, b, text] of idx){
+  for(const row of idx){
     if(hits.length >= 200) break;
+    const n = row[0], b = row[1];
+    const text = arabic ? row[2] : (row[3] || "");
+    if(!text) continue;
     const at = text.indexOf(term);
     if(at < 0) continue;
-    hits.push({ n, b,
+    hits.push({ n, b, ar: arabic,
       before: text.slice(Math.max(0, at - 38), at),
       hit:    text.slice(at, at + term.length),
       after:  text.slice(at + term.length, at + term.length + 38) });
@@ -13134,7 +13138,9 @@ async function hdSearch(q){
     hits.map(h => `<button class="hd-hit" data-n="${h.n}">
         <span class="hd-meta"><span class="hd-n tnum">${esc(t("bukhari.hadith_n","Hadith {n}").replace("{n}", hdNum(h.n)))}</span>
         <span class="hd-i">${esc(name[h.b] || "")}</span></span>
-        <span class="hd-ar quranic">…${esc(h.before)}<em>${esc(h.hit)}</em>${esc(h.after)}…</span>
+        ${h.ar
+          ? `<span class="hd-ar quranic">…${esc(h.before)}<em>${esc(h.hit)}</em>${esc(h.after)}…</span>`
+          : `<span class="hd-en-snippet">…${esc(h.before)}<em>${esc(h.hit)}</em>${esc(h.after)}…</span>`}
       </button>`).join("");
   document.getElementById("hd-body").scrollTop = 0;
   document.querySelectorAll("#hd-list .hd-hit").forEach(b =>
@@ -13159,6 +13165,17 @@ function hdSearchable(s){
     .trim();
 }
 
+/* English folds the same way the builder folded the fourth element of each
+   search row: the honorific glyph \uFDFA dropped, lower-cased, whitespace
+   collapsed. Must match scripts/build-bukhari.mjs's enSearchable exactly. */
+function hdEnSearchable(s){
+  return String(s)
+    .replace(/\uFDFA/gu, " ")
+    .toLowerCase()
+    .replace(/\s+/gu, " ")
+    .trim();
+}
+
 /* The source card at the top of the page. Its two factual lines are read off
    the pack's own metadata rather than typed into the markup: the counts, the
    numbering and the licence are properties of the text that shipped, and a
@@ -13174,6 +13191,15 @@ function hdRenderSource(m){
     .replace("{books}", num(m.books)).replace("{count}", num(m.count)).replace("{highest}", num(m.highest));
   edition.textContent = t("bukhari.edition", "Arabic text: {source}. {licence}.")
     .replace("{source}", m.source || "").replace("{licence}", m.licence || "");
+  const en = document.getElementById("hd-src-english");
+  if(en){
+    if(m.english){
+      en.hidden = false;
+      en.textContent = t("bukhari.edition_en", "English translation: {translation}. {licence}.")
+        .replace("{translation}", m.english.translation || "")
+        .replace("{licence}", m.english.licence || "");
+    } else en.hidden = true;
+  }
 }
 
 async function openBukhari(){

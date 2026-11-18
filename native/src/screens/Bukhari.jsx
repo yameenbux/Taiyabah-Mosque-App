@@ -33,6 +33,15 @@ const searchable = x => String(x)
   .replace(/\s+/gu, " ")
   .trim();
 
+/* English folds the same way the build folded the index it is matched
+ * against: the honorific glyph \uFDFA dropped, lower-cased, whitespace collapsed.
+ * Kept beside the Arabic normaliser so the two never drift. */
+const enSearchable = x => String(x)
+  .replace(/\uFDFA/gu, " ")
+  .toLowerCase()
+  .replace(/\s+/gu, " ")
+  .trim();
+
 /* The same 5MB index the website fetches, from the same path, held for the
  * life of the screen. It is not bundled: 5MB would be a tenth of the app
  * again for a feature most people never open. */
@@ -65,7 +74,13 @@ export default function Bukhari({ navigation }) {
   const run = useRef(0);
 
   useEffect(() => {
-    const term = searchable(q);
+    /* Which language the reader is searching, decided by what they typed: any
+       Arabic letter means the Arabic matn, otherwise the English translation.
+       The index carries both — [n, b, arabic, english] — so one fetch serves
+       either, and a row with no English (there are none now, but the shape
+       allows it) is simply skipped for an English query. */
+    const arabic = /[؀-ۿ]/.test(q);
+    const term = arabic ? searchable(q) : enSearchable(q);
     if (term.length < 2) { setHits(null); setErr(""); return; }
     const id = ++run.current;
     const timer = setTimeout(async () => {
@@ -75,11 +90,14 @@ export default function Bukhari({ navigation }) {
         if (run.current !== id) return;
         const name = {}; B.list.forEach(b => { name[b.n] = b.name; });
         const out = [];
-        for (const [n, b, text] of idx) {
+        for (const row of idx) {
           if (out.length >= 200) break;
+          const n = row[0], b = row[1];
+          const text = arabic ? row[2] : (row[3] || "");
+          if (!text) continue;
           const at = text.indexOf(term);
           if (at < 0) continue;
-          out.push({ n, book: b, name: name[b] || "",
+          out.push({ n, book: b, name: name[b] || "", ar: arabic,
                      before: text.slice(Math.max(0, at - 38), at),
                      hit: text.slice(at, at + term.length),
                      after: text.slice(at + term.length, at + term.length + 38) });
@@ -152,12 +170,18 @@ export default function Bukhari({ navigation }) {
                            marginTop: 7, textAlign: rtl ? "right" : "left" }}>
               {t("bukhari.edition", "Arabic text: {source}. {licence}.")
                 .replace("{source}", B.source || "").replace("{licence}", B.licence || "")}</Text>
+            {!!B.english && (
+              <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.muted,
+                             marginTop: 7, textAlign: rtl ? "right" : "left" }}>
+                {t("bukhari.edition_en", "English translation: {translation}. {licence}.")
+                  .replace("{translation}", B.english.translation || "")
+                  .replace("{licence}", B.english.licence || "")}</Text>)}
           </View>
 
           {/* .hd-bar — the search box over the go-to-hadith row, 9px apart. */}
           <TextInput
             value={q} onChangeText={setQ}
-            placeholder={t("a11y.search_the_arabic", "Search the Arabic…")} placeholderTextColor={C.muted}
+            placeholder={t("a11y.search_arabic_or_english", "Search Arabic or English…")} placeholderTextColor={C.muted}
             autoCapitalize="none" autoCorrect={false} returnKeyType="search"
             style={{ fontFamily: F.sans, fontSize: fs(14), color: C.ink, borderWidth: 1,
                      borderColor: C.line, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 9,
@@ -196,13 +220,11 @@ export default function Bukhari({ navigation }) {
           {/* .wl-advisory — the same rose panel the nikāḥ screen uses, and it
               comes AFTER the list on the website. Here it was grey prose
               above it, between the controls and the books. */}
-          <Advisory h={{ k: "bukhari.what_is_here", t: "What is in the app, and what is a link" }}
+          <Advisory h={{ k: "bukhari.what_is_here", t: "About this text" }}
                     ps={[{ k: "bukhari.arabic_is_carried",
-                           t: "The Arabic above is carried inside the app in full, from the public-domain edition named at the top of this page. It reads with no connection and nothing is fetched to show it." },
-                         { k: "bukhari.english_is_not_copied",
-                           t: "No English translation is reproduced here. Every complete English Ṣaḥīḥ al-Bukhārī in circulation is a modern work still in copyright — the standard one is Dr Muhammad Muhsin Khan's, published by Darussalam, and it is the translation sunnah.com serves. The masjid has not been given permission to copy it, so it does not." },
-                         { k: "bukhari.link_not_reproduce",
-                           t: "Each hadith instead carries a link that opens sunnah.com in your browser at the matching number. Nothing from sunnah.com is stored in the app or shipped with it, and sunnah.com's own terms do not permit reproducing a collection in full." }]} />
+                           t: "The Arabic is carried in full, from the public-domain edition named at the top of this page." },
+                         { k: "bukhari.english_by_permission",
+                           t: "The English is Dr Muhammad Muhsin Khan's translation, published by Darussalam. It is a modern work still in copyright and is not public domain — it is included here because Taiyabah Masjid has been given permission to use it." }]} />
         </View>}
       renderItem={({ item: b }) => (hits ? (
         /* .hd-hit — a search result: the hadith number in plum over the book
@@ -216,10 +238,13 @@ export default function Bukhari({ navigation }) {
               {t("bukhari.hadith_n", "Hadith {n}").replace("{n}", String(b.n))}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted }}>{b.name}</Text>
           </View>
-          <Text style={{ fontFamily: F.quranic, fontSize: fs(19), lineHeight: fs(41), color: C.ink,
-                         textAlign: "right", writingDirection: "rtl", marginTop: 4 }}>
+          <Text style={b.ar
+              ? { fontFamily: F.quranic, fontSize: fs(19), lineHeight: fs(41), color: C.ink,
+                  textAlign: "right", writingDirection: "rtl", marginTop: 4 }
+              : { fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(22), color: C.ink,
+                  textAlign: "left", writingDirection: "ltr", marginTop: 4 }}>
             {"…" + b.before}
-            <Text style={{ color: C.brand600 }}>{b.hit}</Text>
+            <Text style={{ color: C.brand600, fontFamily: b.ar ? F.quranic : F.sansSemi }}>{b.hit}</Text>
             {b.after + "…"}
           </Text>
         </Press>
@@ -294,6 +319,10 @@ export function BukhariBook({ route }) {
             </View>
           </View>
           <Arabic size={20} center={false}>{h.ar}</Arabic>
+          {!!h.en && (
+            <Text style={{ fontFamily: F.sans, fontSize: fs(14.5), lineHeight: fs(23),
+                           color: C.ink, marginTop: 12, textAlign: "left", writingDirection: "ltr" }}>
+              {h.en}</Text>)}
         </View>)} />
   );
 }
