@@ -66,6 +66,10 @@ export function LiveAudioProvider({ children }) {
     sub.current = null;
     const p = player.current;
     player.current = null;
+    /* Pause before releasing: expo-audio's remove() frees the JS handle but
+       does not reliably stop a player mid-playback, so the square on the bar
+       must pause first or the stream carries on after it. */
+    try { p?.pause?.(); } catch {}
     try { p?.clearLockScreenControls?.(); } catch {}
     try { p?.remove?.(); } catch {}
   }, []);

@@ -100,6 +100,12 @@ export function RecordingsAudioProvider({ children }) {
     const p = player.current;
     player.current = null;
     loaded.current = null;
+    /* Pause BEFORE releasing. expo-audio's remove() frees the JS handle but
+       does not reliably stop a player that is mid-playback, so without this
+       the dars carries on after stop(), and starting a second recording
+       plays it over the first instead of replacing it. Pausing first makes
+       the release actually silence it. */
+    try { p?.pause?.(); } catch {}
     try { p?.clearLockScreenControls?.(); } catch {}
     try { p?.remove?.(); } catch {}
   }, []);
