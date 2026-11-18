@@ -2497,17 +2497,26 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--brand-600)}
   .hd-sub{font-size:calc(12.5px * var(--ts));color:var(--muted);margin:-4px 0 12px}
 
-  .hd-book{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;
-    cursor:pointer;background:none;border:0;border-bottom:1px solid var(--line);padding:13px 2px;color:var(--ink)}
-  .hd-book:last-child{border-bottom:0}
-  .hd-bn{flex:0 0 2.2em;font-size:calc(12px * var(--ts));font-weight:700;color:var(--brand-600);
-    text-align:right;font-variant-numeric:tabular-nums}
+  /* Book list — each book a card: number badge, name over count, chevron. */
+  .hd-book{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:9px;color:var(--ink)}
+  .hd-bn{flex:0 0 auto;width:2em;height:2em;border-radius:9px;background:var(--brand-600);color:var(--paper);
+    display:grid;place-items:center;font-size:calc(13px * var(--ts));font-weight:700;font-variant-numeric:tabular-nums}
   .hd-bt{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;min-width:0}
   .hd-bname{font-size:calc(14.5px * var(--ts));font-weight:600}
   .hd-bcount{font-size:calc(12px * var(--ts));color:var(--muted)}
+  .hd-book .dr-ch{color:var(--muted)}
 
-  .hd-item{border-bottom:1px solid var(--line);padding:15px 0}
-  .hd-item:last-child{border-bottom:0}
+  /* Hadith preview card — label row, two-line preview, chevron. */
+  .hd-card{position:relative;display:block;width:100%;text-align:left;font:inherit;cursor:pointer;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 34px 12px 14px;margin-bottom:9px}
+  .hd-card-top{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+  .hd-card-star{color:var(--gold);font-size:calc(12px * var(--ts))}
+  .hd-card-prev{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    font-size:calc(13.5px * var(--ts));line-height:1.45;color:var(--ink)}
+  .hd-card-prev.quranic{direction:rtl;text-align:right;font-size:calc(16px * var(--ts));line-height:1.9}
+  .hd-card-ch{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:calc(16px * var(--ts))}
+
   .hd-meta{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:7px}
   .hd-n{font-size:calc(11.5px * var(--ts));font-weight:700;letter-spacing:.04em;color:var(--brand-600)}
   .hd-i{font-size:calc(11.5px * var(--ts));color:var(--muted)}
@@ -2520,6 +2529,22 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     text-align:left;direction:ltr;color:var(--ink)}
   .hd-hit .hd-en-snippet{display:block;margin-top:4px;font-size:calc(13px * var(--ts));
     line-height:1.5;text-align:left;direction:ltr;color:var(--ink)}
+
+  /* Single-hadith reader — actions, a number pill, labelled sections. */
+  .hd-detail{padding:2px 0 12px}
+  .hd-acts{display:flex;gap:8px;margin-bottom:12px}
+  .hd-act{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font:inherit;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 0;
+    font-size:calc(11px * var(--ts));font-weight:600;color:var(--muted)}
+  .hd-act-i{font-size:calc(16px * var(--ts));color:var(--brand-600);line-height:1}
+  .hd-act[aria-pressed="true"]{border-color:var(--gold)}
+  .hd-act[aria-pressed="true"] .hd-act-i{color:var(--gold)}
+  .hd-pill{display:inline-block;background:var(--gold);color:#2b1420;font-weight:700;
+    font-size:calc(11.5px * var(--ts));border-radius:999px;padding:4px 12px;margin-bottom:4px}
+  .hd-s{padding:12px 0;border-top:1px solid var(--line)}
+  .hd-s-h{font-size:calc(9.5px * var(--ts));font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold-ink);margin-bottom:6px}
+  .hd-s-narr{font-size:calc(13.5px * var(--ts));font-weight:600;color:var(--ink)}
   .bk-hit em{font-style:normal;background:var(--gold);color:#1d1206;border-radius:3px;padding:0 2px}
 
   /* ---- 13-line mushaf ----
@@ -12981,7 +13006,7 @@ const HD_BASE = "quran/hadith/bukhari";
    scripts/build-bukhari.mjs — rebuilt with --no-english, the pack drops the
    translation cleanly if that permission ever lapses. */
 const HD_POS  = "bukhari.pos";
-const HD = { meta: null, books: null, book: null, cache: new Map(), index: null };
+const HD = { meta: null, books: null, book: null, hadith: null, view: "books", cache: new Map(), index: null };
 
 const hdNum = n => num(String(n));
 
@@ -13023,12 +13048,39 @@ function hdFail(key, fallback){
 }
 
 /* ---- the 97 books ---- */
+/* The source card and the search/jump bar belong over the book list and a
+   book's hadith, not over a single hadith being read. */
+function hdChrome(show){
+  const src = document.querySelector("#bukhari .hd-source");
+  const bar = document.querySelector("#bukhari .hd-bar");
+  if(src) src.hidden = !show;
+  if(bar) bar.hidden = !show;
+}
+
+/* Split the standard "Narrated X:" opening from the body, so the reader can
+   label the narrator the way a printed Bukhārī does. ~2% of the translation
+   has no such opening; those fall back to the whole text with no narrator. */
+function hdNarrator(en){
+  const m = String(en).match(/^(Narrated[^:]*):\s*([\s\S]*)$/);
+  return m ? { narr: m[1].trim(), body: m[2].trim() } : { narr: "", body: String(en).trim() };
+}
+
+const HD_SAVED = "bukhari.saved";
+function hdSavedSet(){ const a = prefStore.get(HD_SAVED, []); return new Set(Array.isArray(a) ? a : []); }
+function hdIsSaved(n){ return hdSavedSet().has(n); }
+function hdToggleSave(n){ const s = hdSavedSet(); s.has(n) ? s.delete(n) : s.add(n); prefStore.set(HD_SAVED, [...s]); return s.has(n); }
+
+function hdHadithText(h, n){
+  return h.ar + "\n\n" + (h.en || "") + "\n\n— " + t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") + " " + n;
+}
+
 async function hdShowBooks(){
-  HD.book = null;
+  HD.book = null; HD.hadith = null; HD.view = "books";
   document.getElementById("hd-back").hidden = true;
   document.getElementById("hd-sub").hidden = true;
   document.getElementById("hd-title").textContent = t("bukhari.title", "Ṣaḥīḥ al-Bukhārī");
   document.getElementById("hd-search").value = "";
+  hdChrome(true);
   const m = await hdMeta();
   if(!m) return hdFail("bukhari.not_installed", "The Ṣaḥīḥ al-Bukhārī text is not installed in this build.");
   let books;
@@ -13048,14 +13100,15 @@ async function hdShowBooks(){
   prefStore.set(HD_POS, 0);
 }
 
-/* ---- one book ---- */
+/* ---- one book: a preview card per hadith, each opening the reader ---- */
 async function hdShowBook(n, focus){
   const books = await hdBooks().catch(() => []);
   const meta = books.find(b => b.n === n);
-  HD.book = n;
+  HD.book = n; HD.hadith = null; HD.view = "book";
   document.getElementById("hd-back").hidden = false;
   document.getElementById("hd-title").textContent = meta ? meta.name : t("bukhari.title", "Ṣaḥīḥ al-Bukhārī");
   document.getElementById("hd-search").value = "";
+  hdChrome(true);
   let list;
   try{ list = await hdBook(n); }
   catch(e){ return hdFail("bukhari.chunk_failed", "Couldn't load that part. Check your connection and try again."); }
@@ -13065,19 +13118,87 @@ async function hdShowBook(n, focus){
   sub.textContent = t("bukhari.book_n_of_m", "Book {n} · {c} hadith")
     .replace("{n}", hdNum(n)).replace("{c}", hdNum(list.length));
 
-  document.getElementById("hd-list").innerHTML = list.map(h => `
-    <article class="hd-item" id="hd-h${h.n}">
-      <div class="hd-meta">
+  document.getElementById("hd-list").innerHTML = list.map(h => {
+    const prev = h.en ? hdNarrator(h.en).body : h.ar;
+    return `
+    <button class="hd-card" id="hd-h${h.n}" data-n="${h.n}">
+      <span class="hd-card-top">
         <span class="hd-n tnum">${esc(t("bukhari.hadith_n", "Hadith {n}").replace("{n}", hdNum(h.n)))}</span>
         <span class="hd-i tnum">${esc(t("bukhari.n_in_book", "{i} in this book").replace("{i}", hdNum(h.i)))}</span>
-      </div>
-      <p class="hd-ar quranic">${esc(h.ar)}</p>
-      ${h.en ? `<p class="hd-en-text">${esc(h.en)}</p>` : ""}
-    </article>`).join("");
+        ${hdIsSaved(h.n) ? `<span class="hd-card-star" aria-hidden="true">★</span>` : ""}
+      </span>
+      <span class="hd-card-prev${h.en ? "" : " quranic"}">${esc(prev)}</span>
+      <span class="dr-ch hd-card-ch" aria-hidden="true">&rsaquo;</span>
+    </button>`;
+  }).join("");
+  document.querySelectorAll("#hd-list .hd-card").forEach(c =>
+    c.addEventListener("click", () => hdShowHadith(Number(c.dataset.n), n)));
   prefStore.set(HD_POS, n);
   const target = focus && document.getElementById("hd-h" + focus);
-  if(target) target.scrollIntoView({ block: "start", behavior: "instant" });
+  if(target) target.scrollIntoView({ block: "center", behavior: "instant" });
   else document.getElementById("hd-body").scrollTop = 0;
+}
+
+/* ---- one hadith: narrator, Arabic, English, and the three actions ---- */
+async function hdShowHadith(n, bookN){
+  const books = await hdBooks().catch(() => []);
+  const meta = books.find(b => b.n === bookN);
+  let list;
+  try{ list = await hdBook(bookN); }
+  catch(e){ return hdFail("bukhari.chunk_failed", "Couldn't load that part. Check your connection and try again."); }
+  const h = list.find(x => x.n === n);
+  if(!h) return hdFail("bukhari.no_such_hadith", "There is no hadith with that number.");
+
+  HD.book = bookN; HD.hadith = n; HD.view = "hadith";
+  document.getElementById("hd-back").hidden = false;
+  document.getElementById("hd-sub").hidden = true;
+  document.getElementById("hd-title").textContent = meta ? meta.name : t("bukhari.title", "Ṣaḥīḥ al-Bukhārī");
+  hdChrome(false);
+
+  const parts = h.en ? hdNarrator(h.en) : { narr: "", body: "" };
+  const act = (a, icon, lab) =>
+    `<button class="hd-act" data-act="${a}"${a === "save" ? ` aria-pressed="${hdIsSaved(n)}"` : ""}>
+       <span class="hd-act-i">${icon}</span><span class="hd-act-lab">${esc(lab)}</span></button>`;
+  document.getElementById("hd-list").innerHTML = `
+    <div class="hd-detail">
+      <div class="hd-acts">
+        ${act("save", hdIsSaved(n) ? "★" : "☆", t("bukhari.save", "Save"))}
+        ${act("copy", "⧉", t("bukhari.copy", "Copy"))}
+        ${act("share", "↗", t("bukhari.share", "Share"))}
+      </div>
+      <div class="hd-pill tnum">${esc(t("bukhari.hadith_n", "Hadith {n}").replace("{n}", hdNum(n)))}</div>
+      ${parts.narr ? `<section class="hd-s"><div class="hd-s-h">${esc(t("bukhari.narrator", "Narrator"))}</div>
+        <p class="hd-s-narr">${esc(parts.narr)}</p></section>` : ""}
+      <section class="hd-s"><div class="hd-s-h">${esc(t("bukhari.arabic", "Arabic"))}</div>
+        <p class="hd-ar quranic">${esc(h.ar)}</p></section>
+      ${h.en ? `<section class="hd-s"><div class="hd-s-h">${esc(t("bukhari.english", "English"))}</div>
+        <p class="hd-en-text">${esc(parts.body)}</p></section>` : ""}
+    </div>`;
+  const d = document.querySelector("#hd-list .hd-detail");
+  d.querySelector('[data-act="save"]').addEventListener("click", e => {
+    const on = hdToggleSave(n), b = e.currentTarget;
+    b.setAttribute("aria-pressed", on);
+    b.querySelector(".hd-act-i").textContent = on ? "★" : "☆";
+  });
+  d.querySelector('[data-act="copy"]').addEventListener("click", async e => {
+    const lab = e.currentTarget.querySelector(".hd-act-lab"), was = lab.textContent;
+    try{ await navigator.clipboard.writeText(hdHadithText(h, n)); }catch(err){}
+    lab.textContent = t("bukhari.copied", "Copied ✓");
+    setTimeout(() => { lab.textContent = was; }, 1400);
+  });
+  d.querySelector('[data-act="share"]').addEventListener("click", async () => {
+    const text = hdHadithText(h, n);
+    if(navigator.share){ try{ await navigator.share({ title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") + " " + n, text }); }catch(err){} }
+    else { try{ await navigator.clipboard.writeText(text); }catch(err){} }
+  });
+  document.getElementById("hd-body").scrollTop = 0;
+}
+
+/* Context-aware back: a single hadith returns to its book, a book to the
+   list of books. */
+function hdBack(){
+  if(HD.view === "hadith") return hdShowBook(HD.book, HD.hadith);
+  return hdShowBooks();
 }
 
 /* ---- jump to a cited number ---- */
@@ -13087,7 +13208,7 @@ async function hdGoTo(n){
   const books = await hdBooks().catch(() => []);
   const b = books.find(x => n >= x.first && n <= x.last);
   if(!b) return hdFail("bukhari.no_such_hadith", "There is no hadith with that number.");
-  await hdShowBook(b.n, n);
+  await hdShowHadith(n, b.n);
 }
 
 /* ---- search ---- */
@@ -13224,7 +13345,7 @@ function initBukhari(){
   if(!sheet) return;
   document.getElementById("hd-close").addEventListener("click", closeBukhari);
   document.getElementById("hd-scrim").addEventListener("click", closeBukhari);
-  document.getElementById("hd-back").addEventListener("click", hdShowBooks);
+  document.getElementById("hd-back").addEventListener("click", hdBack);
   document.getElementById("hd-go").addEventListener("click",
     () => hdGoTo(Number(document.getElementById("hd-num").value)));
   document.getElementById("hd-num").addEventListener("keydown",
