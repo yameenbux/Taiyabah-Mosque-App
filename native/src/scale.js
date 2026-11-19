@@ -9,8 +9,25 @@
  * chosen here drew 16px text at 45px.
  */
 
-/* Past about 1.5 the prayer table stops fitting five columns on a phone and
- * the tab bar's labels start to clip. */
+/* The text does not grow past 1.5×, and that is a decision, not an oversight.
+ *
+ * WCAG 1.4.4 asks that text reach 200% without loss of content; this reaches
+ * 150%, and the gap is deliberate. Rendered at 2.0× (ceiling lifted, on a
+ * 402pt phone), nothing is LOST — every screen still scrolls to all of its
+ * content — but the flagship screens strain in ways that make them harder to
+ * read, not easier: the prayer table's column headings split mid-word
+ * (BEGINNIN/G, JAMĀʿA/H), a filter chip clips off the right edge, the Arabic
+ * beside a prayer name wraps a single word across two lines, and the bottom
+ * tab labels wrap. For an app whose whole job is to show a prayer time at a
+ * glance, a prayer table that has fallen apart at 2.0× serves the person who
+ * needs large text worse than one capped at 1.5× that is still a table.
+ *
+ * So the ceiling holds the text where the layout stays intact. It is NOT a
+ * floor: wantedScale() never returns LESS than the phone asked for up to this
+ * cap, so somebody who has set a large OS font still gets it. Raising this
+ * number is a real change — it needs the prayer table and strip, the tab bar
+ * and the header chips reflowing gracefully first, screen by screen — not a
+ * one-line edit. */
 export const SCALE_CEILING = 1.5;
 
 /* The bigger of the two wins, never the product.
