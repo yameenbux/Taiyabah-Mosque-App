@@ -2962,10 +2962,12 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   #qd-search{width:100%;box-sizing:border-box;font:inherit;font-size:calc(14px * var(--ts));padding:11px 13px;
     border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);
     margin-bottom:6px}
-  .qd-srow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;
-    border:0;border-bottom:1px solid var(--line);padding:13px 2px;cursor:pointer;font:inherit;
-    color:var(--ink)}
-  .qd-srow:last-child{border-bottom:0}
+  /* Index & Card, the same bordered card the Bukhārī book list (.hd-book) uses,
+     rather than flush rows with a divider — the app's sūrah list is carded the
+     same way. */
+  .qd-srow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:11px 13px;margin-bottom:9px;cursor:pointer;font:inherit;color:var(--ink)}
   .qd-num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--plum-fill);color:#fff;
     display:grid;place-items:center;font-size:calc(12px * var(--ts));font-weight:700}
   .qd-srow-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}

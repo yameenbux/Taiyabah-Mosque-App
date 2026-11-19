@@ -12,13 +12,14 @@
  * it sits under the Arabic rather than beside it — you can stop reading it
  * without having to look away.
  */
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, SectionList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
 import { Screen, Hero, Press, MenuRow } from "../ui";
+import { Appear } from "../motion";
 import ATHKAR from "../data/athkar.json";
 import DUAS from "../data/duas.json";
 import RABBANAS from "../data/rabbanas.json";
@@ -64,9 +65,14 @@ export function Athkar({ navigation }) {
       <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
         {rows.map((r, i) => {
           const go = GOES[i]();
-          return <MenuRow key={i} label={tx(r.label)} sub={r.sub ? tx(r.sub) : null}
-                          svg={r.svg} ext={r.ext}
-                          onPress={() => navigation.navigate(go.to, go.params)} />;
+          /* The six rows rise in on arrival, the same list-entrance the Bukhārī
+             index uses — motion on open, and nothing to scroll past here. */
+          return (
+            <Appear key={i} index={i}>
+              <MenuRow label={tx(r.label)} sub={r.sub ? tx(r.sub) : null}
+                       svg={r.svg} ext={r.ext}
+                       onPress={() => navigation.navigate(go.to, go.params)} />
+            </Appear>);
         })}
       </View>
     </Screen>
@@ -114,6 +120,11 @@ function Block({ item }) {
 
 function Collection({ groups, note }) {
   const { fs } = useApp();
+  /* List entrance fires on the first paint only, exactly as the Bukhārī reader
+     does it: the opening screenful of cards rises in, and anything scrolled to
+     afterwards just appears — motion on arrival, never on every scroll. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
   return (
     <SectionList
       style={{ backgroundColor: C.paper }}
@@ -133,7 +144,10 @@ function Collection({ groups, note }) {
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, marginTop: 5,
                            lineHeight: fs(21) }}>{section.intro}</Text>)}
         </View>)}
-      renderItem={({ item }) => <Block item={item} />}
+      renderItem={({ item, index }) => (
+        <Appear index={index} animate={firstPaint.current && index < 12}>
+          <Block item={item} />
+        </Appear>)}
     />
   );
 }

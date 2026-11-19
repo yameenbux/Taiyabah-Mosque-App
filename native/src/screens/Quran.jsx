@@ -21,6 +21,7 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { surah } from "../data/quran-index";
 import { Screen, Hero, Heading, Card, Note, NavRow, RowGroup, MenuRow, Press, Pill, Empty, tap } from "../ui";
+import { Appear } from "../motion";
 import { SHEETS } from "../Blocks";
 import IDX from "../data/quran-index.json";
 import MUSHAF from "../data/mushaf.json";
@@ -133,23 +134,32 @@ export default function Quran({ navigation }) {
 
 export function Surahs({ navigation }) {
   const { t, fs, rtl } = useApp();
+  /* List entrance on the first paint only, the same as the Bukhārī index: the
+     opening screenful of cards rises in, and surahs scrolled to afterwards just
+     appear — motion on arrival, never on every scroll. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
   return (
     <FlatList
       style={{ backgroundColor: C.paper }}
       data={IDX.surahs}
       keyExtractor={s => String(s.n)}
       initialNumToRender={14}
-      contentContainerStyle={{ paddingBottom: 34 }}
-      ListHeaderComponent={<View style={{ height: 8 }} />}
-      renderItem={({ item: s }) => (
+      contentContainerStyle={{ paddingTop: 12, paddingBottom: 34 }}
+      renderItem={({ item: s, index }) => (
+        /* The same "Index & Card" row the Bukhārī book list uses — a bordered
+           card, not a divider between flush rows — but keeping this screen's own
+           muṣḥaf touches: the number in its eight-point frame, and the sūrah's
+           Arabic name set in the right margin. */
+        <Appear index={index} animate={firstPaint.current && index < 14}>
         <Press onPress={() => { tap(); navigation.navigate("Surah", { n: s.n }); }}
-          style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 13,
-                   paddingHorizontal: 16, paddingVertical: 13,
-                   borderBottomWidth: 1, borderBottomColor: "rgba(228,222,207,.7)" }}>
+          style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 12,
+                   marginHorizontal: 16, marginBottom: 9, paddingHorizontal: 13, paddingVertical: 11,
+                   backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 14 }}>
           {/* The number in an eight-point frame, the way a muṣḥaf prints it. */}
-          <View style={{ width: 36, height: 36, alignItems: "center", justifyContent: "center",
+          <View style={{ width: 34, height: 34, alignItems: "center", justifyContent: "center",
                          transform: [{ rotate: "45deg" }], borderWidth: 1, borderColor: C.line,
-                         borderRadius: 7, backgroundColor: C.card }}>
+                         borderRadius: 7, backgroundColor: C.paper }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.brand600,
                            transform: [{ rotate: "-45deg" }] }}>{s.n}</Text>
           </View>
@@ -163,7 +173,7 @@ export function Surahs({ navigation }) {
             </Text>
           </View>
           <Text style={{ fontFamily: F.quranic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
-        </Press>)} />
+        </Press></Appear>)} />
   );
 }
 
@@ -180,6 +190,10 @@ export function Surah({ route, navigation }) {
    * froze the thread while it did. surah() reaches one generated file: 391
    * bytes for al-Fātiḥah, 10KB for the median, 174KB for al-Baqarah. */
   const verses = useMemo(() => surah(n), [n]);
+  /* The opening āyāt rise in on arrival, the same list-entrance the readers
+     elsewhere use; verses scrolled to afterwards just appear. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, [n]);
 
   return (
     <FlatList
@@ -207,7 +221,8 @@ export function Surah({ route, navigation }) {
               name does not: the masjid calls this the 13-Line Qurʼan. */}
           <Note>{`${t("quran.translation_label", "Translation")}: ${IDX.translation}`}</Note>
         </View>}
-      renderItem={({ item: [vn, ar, en] }) => (
+      renderItem={({ item: [vn, ar, en], index }) => (
+        <Appear index={index} animate={firstPaint.current && index < 8}>
         <View style={{ paddingHorizontal: 18, paddingVertical: 16,
                        borderBottomWidth: 1, borderBottomColor: "rgba(228,222,207,.7)" }}>
           <Text style={{ fontFamily: F.quranic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
@@ -220,7 +235,7 @@ export function Surah({ route, navigation }) {
             <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(14), lineHeight: fs(23), color: C.muted }}>
               {en}</Text>
           </View>
-        </View>)} />
+        </View></Appear>)} />
   );
 }
 
