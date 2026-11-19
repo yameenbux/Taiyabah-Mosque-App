@@ -33,16 +33,18 @@ export const LIGHT = {
   paper:    "#F5F1E8",   // light content background
   card:     "#FCFAF3",
   ink:      "#261B22",
-  muted:    "#7C6E77",
+  muted:    "#746670",   // secondary text — darkened from #7C6E77 so it clears
+                         // 4.5:1 on paper (4.81), card (5.19) and tintPlum (4.54)
   line:     "#E4DECF",
   /* A browser's own placeholder is about 54% black — a mid grey you can read.
      The app had been using the HAIRLINE colour for placeholder text, so
      "NK-26-0001" and "e.g. 0.85" — the two placeholders that tell somebody
      what shape of thing to type — were very nearly invisible on the paper.
-     Nudged from #9A8F95 to clear 3:1 against the card rather than miss it by
-     a rounding error. */
-  hint:     "#908490",
-  danger:   "#B4532F",
+     Darkened again, from #908490 to #786A73, to clear the full 4.5:1 for body
+     text against the card (4.89) and paper (4.54) rather than only the 3:1 a
+     placeholder can fall back on — so a hint reads as well as anything else. */
+  hint:     "#786A73",
+  danger:   "#AE4E2B",   // error text — darkened from #B4532F to clear 4.5:1 on paper (4.75)
   onAir:    "#3FBE73",
   /* The interactive plum. These three are brand-700/900 exactly as they were,
      so light renders to the same pixels it always did. */

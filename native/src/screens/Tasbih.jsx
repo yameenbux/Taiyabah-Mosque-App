@@ -364,7 +364,7 @@ export default function Tasbih() {
                            color: done ? C.brand600 : C.ink, textAlign: "center" }}>{shown}</Text>
           </Animated.View>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.8,
-                         textTransform: "uppercase", color: C.gold, marginTop: 4,
+                         textTransform: "uppercase", color: C.goldInk, marginTop: 4,
                          textAlign: "center", paddingHorizontal: 30 }}>{under}</Text>
           {/* WHICH OF THE FOUR, inside the string. The beads say how far
               through a phrase you are and cannot also say which phrase, so

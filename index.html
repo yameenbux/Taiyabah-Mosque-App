@@ -71,10 +71,11 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
     --paper:#F5F1E8;        /* light content bg */
     --card:#FCFAF3;
     --ink:#261B22;
-    --muted:#7C6E77;
+    --muted:#746670;       /* secondary text — darkened from #7C6E77 to clear 4.5:1
+                              on paper (4.81), card (5.19) and tintPlum (4.54) */
     --line:#E4DECF;
-    --danger:#B4532F;      /* danger as TEXT */
-    --danger-fill:#B4532F; /* danger as a SURFACE — same in light, see --plum-fill */
+    --danger:#AE4E2B;      /* danger as TEXT — darkened from #B4532F to clear 4.5:1 on paper (4.75) */
+    --danger-fill:#B4532F; /* danger as a SURFACE — keeps the brighter red; white sits on it */
     /* Surfaces and inks that were written as literals. Tokenised at their
        EXACT current values, so light mode cannot move; dark overrides below.
        Three gold-backed inks (#1D1206, #3A2C07, #3A2A08) are deliberately NOT
