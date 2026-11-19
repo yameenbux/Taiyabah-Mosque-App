@@ -91,7 +91,7 @@ function Block({ item }) {
                    padding: 16, marginTop: 12 }}>
       {!!item.label && (
         <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.2,
-                       color: C.gold, marginBottom: 9 }}>{String(item.label).toUpperCase()}</Text>)}
+                       color: C.goldInk, marginBottom: 9 }}>{String(item.label).toUpperCase()}</Text>)}
       {!!ar && (
         <Text style={{ fontFamily: F.quranic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
                        textAlign: "right", writingDirection: "rtl" }}>{ar}</Text>)}
