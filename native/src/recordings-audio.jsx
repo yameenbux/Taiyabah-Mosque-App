@@ -3,37 +3,38 @@
  * Copyright (c) 2026 Yameen Bux. All rights reserved. See LICENSE.md.
  *
  * This is to the recordings archive what src/live-audio.jsx is to the stream:
- * the one place the sound actually lives, mounted above the whole navigator so
- * a dars keeps playing while somebody walks off to read Qurʼan — the exact
- * thing the live stream was moved up here to allow. A recording is if anything
- * MORE of a sit-and-listen than the stream, so it would be odd for it to stop
- * the moment you left the list to look something up.
+ * the one place the sound lives, mounted above the whole navigator so a dars
+ * keeps playing while somebody walks off to read Qurʼan — a recording is if
+ * anything MORE of a sit-and-listen than the stream.
  *
- * HOW IT DIFFERS FROM THE STREAM, and why it is its own file rather than a flag
- * on that one. The stream is one endless thing with a volume; a recording is a
- * FILE with a start, an end and a place you are up to. So this carries position
- * and duration, it can seek, and it loads a different URL every time you pick a
- * new one. Folding that into live-audio.jsx would make the simple thing (a
- * radio with a play button) carry the weight of the complicated one.
+ * HOW IT DIFFERS FROM THE STREAM. The stream is one endless thing; a recording
+ * is a FILE with a start, an end and a place you are up to. So this carries
+ * position and duration, it can seek, and it resumes where you left off.
  *
- * ONLY ONE SOUND AT A TIME. The stream and a recording must never play over
- * each other. Neither provider knows about the other; both go through
- * src/audio-bus.js, and the rule is simply: claim the output before you start,
- * release it when you stop. Starting a recording stops the stream, and starting
- * the stream stops a recording, without either file importing the other.
+ * NOW ON expo-audio, not expo-av — the same move the stream made, for the same
+ * prize: lock-screen and notification controls, so a dars can be paused or
+ * scrubbed without reopening the app and finding the screen it began on, which
+ * was the exact complaint. setActiveForLockScreen() puts them there, this time
+ * WITH the ±15s seek buttons, because a recording is a thing you scrub. Times
+ * come off expo-audio in seconds; this keeps its own public API in milliseconds
+ * (positionMs/durationMs) so the bar and the player screen did not have to change.
+ *
+ * ONLY ONE SOUND AT A TIME. The stream and a recording must never play over each
+ * other. Neither provider knows about the other; both go through
+ * src/audio-bus.js: claim the output before you start, release it when you stop.
  */
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Audio } from "expo-av";
+import { createAudioPlayer } from "expo-audio";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { claimAudio, releaseAudio } from "./audio-bus";
+import { breadcrumb } from "./diagnostics";
 
 const Ctx = createContext(null);
 
 /* Where we remember how far through each recording somebody got — keyed by the
-   recording's own URL. It does two jobs: a reopened dars resumes instead of
-   restarting, and the browse screen can show a "Continue listening" row. A
-   recording drops off that row once it is within 20s of the end or past 97%,
-   so a dars somebody actually finished does not sit there forever. */
+   recording's own URL. A reopened dars resumes, and the browse screen shows a
+   "Continue listening" row. A recording drops off that row once it is within
+   20s of the end or past 97%, so one somebody finished does not sit there. */
 const POS_KEY = "rec:positions";
 const DONE_TAIL_MS = 20000;
 const loadPositions = async () => {
@@ -43,12 +44,12 @@ const isUnfinished = e =>
   !!e && e.pos > 8000 && (!e.dur || (e.pos < e.dur - DONE_TAIL_MS && e.pos / e.dur < 0.97));
 
 export function RecordingsAudioProvider({ children }) {
-  const sound = useRef(null);
+  const player = useRef(null);
+  const sub = useRef(null);
   /* The recording that is loaded, in full, so the bar and the screen can name
-     it without being handed it again. null when nothing is loaded. */
+     it. null when nothing is loaded. */
   const [current, setCurrent] = useState(null);
-  /* idle (nothing loaded) | loading | playing | paused. "idle" is the only one
-     where `current` is null; the others always have a recording. */
+  /* idle (nothing loaded) | loading | playing | paused. */
   const [state, setState] = useState("idle");
   const [positionMs, setPositionMs] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
@@ -56,13 +57,11 @@ export function RecordingsAudioProvider({ children }) {
      depend on `current` — a stale closure is how "resume" would resume the
      wrong file after you had picked another. */
   const loaded = useRef(null);
-  /* The current recording's full meta, in a ref so the status callback can save
-     a position without depending on `current` (a stale closure would save the
-     spot against the wrong file). */
   const currentRef = useRef(null);
+  /* The spot to jump to once the file reports itself loaded, in seconds. Applied
+     from the status callback because seeking an unloaded player does nothing. */
+  const pendingSeekSec = useRef(0);
 
-  /* Remembered positions: a ref for the callbacks, mirrored into state as the
-     "Continue listening" list the browse screen reads. Loaded once on mount. */
   const positions = useRef({});
   const [continueList, setContinueList] = useState([]);
   const lastSaved = useRef(0);
@@ -93,34 +92,43 @@ export function RecordingsAudioProvider({ children }) {
     return () => { live = false; };
   }, [pushContinue]);
 
-  const unload = useCallback(async () => {
-    const s = sound.current;
-    sound.current = null;
+  /* Drop the player and its lock-screen controls, and detach the listener.
+     Pulled out so stop() and a fresh play() share one teardown. */
+  const teardown = useCallback(() => {
+    try { sub.current?.remove?.(); } catch {}
+    sub.current = null;
+    const p = player.current;
+    player.current = null;
     loaded.current = null;
-    try { s?.setOnPlaybackStatusUpdate(null); } catch {}
-    await s?.unloadAsync().catch(() => {});
+    /* Pause BEFORE releasing. expo-audio's remove() frees the JS handle but
+       does not reliably stop a player that is mid-playback, so without this
+       the dars carries on after stop(), and starting a second recording
+       plays it over the first instead of replacing it. Pausing first makes
+       the release actually silence it. */
+    try { p?.pause?.(); } catch {}
+    try { p?.clearLockScreenControls?.(); } catch {}
+    try { p?.remove?.(); } catch {}
   }, []);
 
-  /* The stop that the audio bus calls when the stream (or anything else) takes
-     the output. Clears everything so the bar goes and nothing lingers loaded. */
+  /* The stop the audio bus calls when the stream (or anything else) takes the
+     output. Clears everything so the bar goes and nothing lingers loaded. */
   const stop = useCallback(async () => {
     releaseAudio(stop);
-    /* Record the spot before letting go, so "stop" on the bar still leaves a
-       place to continue from. */
+    /* Record the spot before letting go, so "stop" still leaves somewhere to
+       continue from. */
     if (currentRef.current) { remember(currentRef.current, positionMs, durationMs); persist(); }
     currentRef.current = null;
     setState("idle");
     setCurrent(null);
     setPositionMs(0);
     setDurationMs(0);
-    await unload();
-  }, [unload, remember, persist, positionMs, durationMs]);
+    teardown();
+  }, [teardown, remember, persist, positionMs, durationMs]);
 
   useEffect(() => {
-    /* The audio mode (play in silent mode, keep going in the background) is set
-       once for the app by the live-audio provider above this one, so a loaded
-       recording already inherits it. Nothing to set here; nothing to tear down
-       either, because this provider lives as long as the app does. */
+    /* The audio mode (silent-mode, background, exclusive focus) is set once for
+       the app by the live provider above this one, so a loaded recording
+       inherits it. Nothing to set here; this provider lives as long as the app. */
     return () => { releaseAudio(stop); };
   }, [stop]);
 
@@ -128,79 +136,89 @@ export function RecordingsAudioProvider({ children }) {
     if (!st) return;
     if (st.didJustFinish) {
       /* Ended: keep it loaded at the start so the bar offers a replay rather
-         than vanishing mid-thought, but hand the output back so the stream is
-         free to take over — and drop it from "Continue listening", since it is
-         done. */
+         than vanishing mid-thought, hand the output back so the stream is free,
+         and drop it from "Continue listening". */
       setState("paused");
       setPositionMs(0);
-      sound.current?.setPositionAsync?.(0).catch(() => {});
-      sound.current?.pauseAsync?.().catch(() => {});
+      try { player.current?.seekTo(0); } catch {}
+      try { player.current?.pause(); } catch {}
       releaseAudio(stop);
       if (currentRef.current) forget(currentRef.current.mp3);
       return;
     }
-    if (typeof st.positionMillis === "number") setPositionMs(st.positionMillis);
-    if (typeof st.durationMillis === "number" && st.durationMillis > 0) setDurationMs(st.durationMillis);
-    if (st.isPlaying) setState("playing");
+    /* Resume: jump to the saved spot the first time the file reports loaded. */
+    if (st.isLoaded && pendingSeekSec.current > 0) {
+      const to = pendingSeekSec.current;
+      pendingSeekSec.current = 0;
+      try { player.current?.seekTo(to); } catch {}
+    }
+    if (typeof st.currentTime === "number") setPositionMs(Math.round(st.currentTime * 1000));
+    if (typeof st.duration === "number" && st.duration > 0) setDurationMs(Math.round(st.duration * 1000));
+    if (st.playing) setState("playing");
     else if (st.isLoaded) setState(s => (s === "loading" ? "loading" : "paused"));
     /* Remember the spot while playing, at most once every five seconds, so a
        backgrounded or killed app still knows where the listener was. */
-    if (st.isPlaying && currentRef.current && typeof st.positionMillis === "number") {
+    if (st.playing && currentRef.current && typeof st.currentTime === "number") {
       const now = Date.now();
       if (now - lastSaved.current > 5000) {
         lastSaved.current = now;
-        remember(currentRef.current, st.positionMillis, st.durationMillis || 0);
+        remember(currentRef.current, st.currentTime * 1000, (st.duration || 0) * 1000);
         persist();
       }
     }
   }, [stop, forget, remember, persist]);
 
   /**
-   * Play a recording. If it is the one already loaded, this is a resume; if it
-   * is a different one, the old sound is unloaded and the new one opened. Either
-   * way the output is claimed first, which stops the live stream.
+   * Play a recording. If it is the one already loaded, resume; otherwise tear
+   * the old one down and open the new one. Either way the output is claimed
+   * first, which stops the live stream.
    */
   const play = useCallback(async rec => {
     if (!rec || !rec.mp3) return;
     claimAudio(stop);
 
-    if (loaded.current === rec.mp3 && sound.current) {
-      try { await sound.current.playAsync(); setState("playing"); } catch { setState("error"); }
+    if (loaded.current === rec.mp3 && player.current) {
+      try { player.current.play(); setState("playing"); } catch { setState("error"); }
       return;
     }
 
-    await unload();
+    teardown();
     setCurrent(rec);
     currentRef.current = rec;
     setState("loading");
     /* Resume where they left off, if we remember and it is not basically done;
        otherwise from the top. */
     const saved = positions.current[rec.mp3];
-    const from = isUnfinished(saved) ? saved.pos : 0;
-    setPositionMs(from);
-    /* A sensible duration to draw the bar with before the file reports its own,
-       taken from the length encoded in the recording's own name. */
+    const fromMs = isUnfinished(saved) ? saved.pos : 0;
+    setPositionMs(fromMs);
     setDurationMs(Number(rec.durationSec) > 0 ? rec.durationSec * 1000 : 0);
+    pendingSeekSec.current = fromMs > 0 ? fromMs / 1000 : 0;
     try {
-      const { sound: s } = await Audio.Sound.createAsync(
-        { uri: rec.mp3 },
-        { shouldPlay: true, progressUpdateIntervalMillis: 500, positionMillis: from },
-      );
-      sound.current = s;
+      const p = createAudioPlayer({ uri: rec.mp3 }, { updateInterval: 500, keepAudioSessionActive: true });
+      player.current = p;
       loaded.current = rec.mp3;
-      s.setOnPlaybackStatusUpdate(onStatus);
+      sub.current = p.addListener("playbackStatusUpdate", onStatus);
+      p.play();
+      /* Lock-screen controls, WITH the seek buttons a recording earns — the
+         title names the dars so a glance at the lock screen says what is on. */
+      try {
+        p.setActiveForLockScreen(true,
+          { title: rec.title || "Recording", artist: "Taiyabah Masjid" },
+          { showSeekForward: true, showSeekBackward: true });
+      } catch {}
+      breadcrumb("recording: " + (rec.title || "?"));
       setState("playing");
     } catch {
       setState("error");
       releaseAudio(stop);
+      breadcrumb("recording failed: " + (rec.title || "?"));
     }
-  }, [onStatus, stop, unload]);
+  }, [onStatus, stop, teardown]);
 
   const pause = useCallback(async () => {
-    await sound.current?.pauseAsync().catch(() => {});
+    try { player.current?.pause(); } catch {}
     setState("paused");
-    /* Pausing is a deliberate "I'll come back" — save the spot at once rather
-       than waiting for the five-second tick. */
+    /* Pausing is a deliberate "I'll come back" — save the spot at once. */
     if (currentRef.current) { remember(currentRef.current, positionMs, durationMs); persist(); }
   }, [positionMs, durationMs, remember, persist]);
 
@@ -215,7 +233,7 @@ export function RecordingsAudioProvider({ children }) {
     const d = durationMs || 0;
     const to = Math.max(0, d ? Math.min(ms, d) : ms);
     setPositionMs(to);
-    await sound.current?.setPositionAsync?.(Math.round(to)).catch(() => {});
+    try { await player.current?.seekTo(to / 1000); } catch {}
   }, [durationMs]);
 
   /* Jump a number of seconds (negative to go back), for the ±15s buttons. */
@@ -226,8 +244,6 @@ export function RecordingsAudioProvider({ children }) {
       current, state, playing: state === "playing",
       positionMs, durationMs,
       play, pause, toggle, stop, seek, skip,
-      /* The "Continue listening" row and a per-recording resume marker for the
-         list, so a row can show a progress sliver. */
       continueList, forget,
       positionOf: mp3 => positions.current[mp3] || null,
     }}>

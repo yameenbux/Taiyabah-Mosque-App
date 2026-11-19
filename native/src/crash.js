@@ -22,6 +22,7 @@ import { Platform } from "react-native";
 import Constants from "expo-constants";
 import { rpc } from "./supabase";
 import { crashPayload, firstTime, shortMessage } from "./crash-report";
+import { breadcrumb } from "./diagnostics";
 
 /* Platform.constants rather than expo-device: React Native already knows the
  * model and the OS version, and this is not worth a native module that would
@@ -36,6 +37,9 @@ export async function reportCrash(error, { screen } = {}) {
   try {
     const message = shortMessage(error);
     if (!message) return;
+    /* Leave it in the trail even if the report itself is a repeat: a person who
+       then taps "Report a problem" should see what fell over. */
+    breadcrumb(`crash on ${screen || "a screen"}: ${message}`);
     if (!firstTime(message, screen)) return;
 
     await rpc("report_app_crash", crashPayload(error, {

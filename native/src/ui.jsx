@@ -16,6 +16,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
+import { useReduceMotion, useRing, SPRING, SPRING_POP } from "./motion";
 import { C, F, R, SHADOW, dual } from "./theme";
 import { COLUMN } from "./layout";
 import { ON_AIR_ROOM } from "./chrome";
@@ -289,6 +291,41 @@ export function StarField({ gold, bright }) {
 /* The bar the web app carries above every tab: the masjid's own wordmark, the
  * society's name, and a bell that goes to Notifications. It sits on the plum so it
  * runs into the hero below it rather than sitting on top of one. */
+/* The unread dot on the bell. A module-level high-water mark means the pulse
+   fires once, when the unseen count actually rises — not on every screen the
+   bell is redrawn on. Clearing every notice resets it, so the next arrival
+   pulses again. Still under Reduce Motion: the dot is simply there. */
+let bellPulsedAt = 0;
+function BellDot({ unseen }) {
+  const reduce = useReduceMotion();
+  const { style: ring, fire } = useRing();
+  const s = useSharedValue(1);
+  const dot = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  React.useEffect(() => {
+    if (!unseen) { bellPulsedAt = 0; return; }
+    if (unseen > bellPulsedAt) {
+      bellPulsedAt = unseen;
+      if (!reduce) {
+        s.value = withSequence(withTiming(0, { duration: 0 }), withSpring(1, SPRING_POP));
+        fire();
+      }
+    }
+  }, [unseen]);
+  /* Mounted even at zero (so the effect above can reset the high-water mark
+     when every notice is read); it just draws nothing then. */
+  if (!unseen) return null;
+  return (
+    <>
+      <Animated.View pointerEvents="none"
+        style={[{ position: "absolute", top: 3, right: 3, width: 14, height: 14, borderRadius: 7,
+                  borderWidth: 2, borderColor: C.danger }, ring]} />
+      <Animated.View pointerEvents="none"
+        style={[{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: 4,
+                  backgroundColor: C.danger, borderWidth: 2, borderColor: C.brand900 }, dot]} />
+    </>
+  );
+}
+
 export function TopBar({ navigation, onBell, back }) {
   const { t, fs, rtl, ntSeen, ntCleared } = useApp();
   const insets = useSafeAreaInsets();
@@ -348,11 +385,9 @@ export function TopBar({ navigation, onBell, back }) {
                                    backgroundColor: pressed ? "rgba(198,162,76,.24)" : "rgba(198,162,76,.1)" })}>
         <Ionicons name="notifications-outline" size={19} color={C.goldBright} />
         {/* Danger red with a plum ring, as the website draws it, so the dot
-            reads as a mark ON the bell rather than a speck behind it. */}
-        {!!unseen && (
-          <View style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8,
-                         borderRadius: 4, backgroundColor: C.danger,
-                         borderWidth: 2, borderColor: C.brand900 }} />)}
+            reads as a mark ON the bell rather than a speck behind it. It
+            pulses once when a new notice arrives — see BellDot. */}
+        {!!unseen && <BellDot unseen={unseen} />}
       </Pressable>
     </View>
   );
@@ -587,12 +622,33 @@ export function RowGroup({ children, style }) {
  * <Press> across the app were thrown away before they reached the Pressable,
  * and the screens that looked like they had been made accessible had not
  * been. Nothing announced a role, because no role ever arrived. */
-export function Press({ children, onPress, disabled, dim = true, style, ...rest }) {
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export function Press({ children, onPress, disabled, dim = true, scale = true, style, ...rest }) {
+  /* PRESS-IN DIP. Every Press scales to 97% while held and springs back — the
+     one touch that tells a finger it has landed on a real surface, decided
+     here so all seventy call sites get it and none can drift. It rides the
+     house SPRING (weighted, barely any overshoot), runs on the UI thread, and
+     is off under Reduce Motion and on a disabled row. `scale={false}` opts a
+     caller out. The haptic stays where it already is — on the call site's
+     onPress — so this does not double-buzz. */
+  const reduce = useReduceMotion();
+  const s = useSharedValue(1);
+  /* Reanimated's animated components take a STATIC style array, not Pressable's
+     ({pressed}) => … render function: a function there is silently dropped,
+     taking the caller's borders and fills with it. So the press-in dip is a
+     shared value here, and the pressed background-tint the plain Pressable used
+     to draw is retired — the spring scale, with android_ripple on Android, is
+     the stronger feedback and does the same job on one surface. */
+  const aStyle = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  const canScale = scale && !reduce && !disabled;
   return (
     /* `dim={false}` for a row that is inert but not greyed — the website fades
        a disabled nav button or an out-of-range day, and never a "coming soon"
        row, whose title and chip go muted on their own. */
-    <Pressable onPress={onPress} disabled={disabled} android_ripple={{ color: "rgba(119,33,87,.10)" }}
+    <AnimatedPressable onPress={onPress} disabled={disabled} android_ripple={{ color: "rgba(119,33,87,.10)" }}
+      onPressIn={() => { if (canScale) s.value = withSpring(0.97, SPRING); }}
+      onPressOut={() => { if (canScale) s.value = withSpring(1, SPRING); }}
       /* A Press is a thing you press, so "button" is the right default and a
          screen that needs otherwise says so — {...rest} is spread AFTER this,
          so a caller passing "link", "radio" or "tab" wins. Defaulting beats
@@ -601,10 +657,9 @@ export function Press({ children, onPress, disabled, dim = true, style, ...rest 
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       {...rest}
-      style={({ pressed }) => [{ backgroundColor: pressed && Platform.OS !== "android" ? "rgba(119,33,87,.07)" : "transparent",
-                                 opacity: disabled && dim ? 0.45 : 1 }, style]}>
+      style={[{ opacity: disabled && dim ? 0.45 : 1 }, style, aStyle]}>
       {children}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

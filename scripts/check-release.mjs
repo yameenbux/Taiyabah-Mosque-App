@@ -1745,10 +1745,20 @@ for (const f of ["index.html", "admin.html"]) {
         bad.push("the Bukhārī LICENCE.txt does not state the public-domain dedication it is shipped under");
       if (!/hadith-api/i.test(lic))
         bad.push("the Bukhārī LICENCE.txt does not record where the text came from");
-      /* The store question is "show me the right to ship this". The answer
-         has to include why no translation is bundled. */
-      if (!/NO ENGLISH TRANSLATION/i.test(lic))
-        bad.push("the Bukhārī LICENCE.txt no longer explains why no translation is bundled — that is the part a store actually asks about");
+      /* The store question is "show me the right to ship this". With the
+         English bundled it must record the permission; Arabic-only, it must
+         say why no translation is there. Which one is read off the pack. */
+      const packMeta = existsSync(`${PACK}/index.json`)
+        ? JSON.parse(readFileSync(`${PACK}/index.json`, "utf8")) : {};
+      if (packMeta.arabicOnly) {
+        if (!/NO ENGLISH TRANSLATION/i.test(lic))
+          bad.push("the Bukhārī LICENCE.txt no longer explains why no translation is bundled — that is the part a store actually asks about");
+      } else {
+        if (!/muhsin khan/i.test(lic) || !/darussalam/i.test(lic))
+          bad.push("the Bukhārī LICENCE.txt ships an English translation but no longer names the translator and publisher it belongs to");
+        if (!/PERMISSION GRANTED/i.test(lic))
+          bad.push("the Bukhārī LICENCE.txt ships an English translation but records no permission for it — that is the one thing a store asks to see");
+      }
     }
   }
 
@@ -1761,23 +1771,28 @@ for (const f of ["index.html", "admin.html"]) {
   if (!/hdShowBooks/.test(app) || !/books\.json/.test(app))
     bad.push("the Bukhārī reader no longer browses by book — a flat list of 7,580 numbered paragraphs is not a readable Bukhārī");
 
-  /* The English is linked, not bundled, and that has to stay true in both
-     directions: the link must be there, and no bundled translation may
-     quietly appear beside the Arabic without the permission to match.
-
-     Every complete English Bukhārī in circulation is in copyright. A dataset
-     claiming otherwise does not own it. If one is ever added, the permission
-     goes in LICENCE.txt first and this check gets updated deliberately. */
-  if (!/https:\/\/sunnah\.com\/bukhari:/.test(app) || !/hd-en/.test(app))
-    bad.push("the Bukhārī reader no longer offers the English — the Arabic is linked to its translation by number, and without that link a non-Arabic reader gets nothing");
+  /* The English must reach a non-Arabic reader, and the HOW is tied to the
+     pack. While the translation was not the masjid's to ship, the reader
+     linked out to it by number; now that permission has been granted it is
+     bundled beside the Arabic and shown in place. Whichever is true, the
+     permission is the gate: a bundled translation with no permission recorded
+     in LICENCE.txt is the one thing that must never ship. */
   {
     const lic = existsSync(`${PACK}/LICENCE.txt`) ? readFileSync(`${PACK}/LICENCE.txt`, "utf8") : "";
     const granted = /PERMISSION GRANTED/i.test(lic);
-    const bundled = existsSync(`${PACK}/en`) ||
-      (existsSync(`${PACK}/b/1.json`) && /"en"\s*:/.test(readFileSync(`${PACK}/b/1.json`, "utf8")));
+    const bundled = existsSync(`${PACK}/b/1.json`) && /"en"\s*:/.test(readFileSync(`${PACK}/b/1.json`, "utf8"));
     if (bundled && !granted)
       bad.push("an English translation has been bundled into the Bukhārī pack, but LICENCE.txt records no permission for it. " +
                "Every complete English Bukhārī is in copyright; see store/PERMISSION-LETTERS.md before shipping one.");
+    if (bundled) {
+      if (!/hd-en-text/.test(app))
+        bad.push("the Bukhārī pack carries an English translation but the reader does not render it — a non-Arabic reader still gets nothing");
+      if (/https:\/\/sunnah\.com\/bukhari:/.test(app))
+        bad.push("the Bukhārī reader still links out to sunnah.com for English although the translation is now bundled — drop the link, it reads offline now");
+    } else {
+      if (!/https:\/\/sunnah\.com\/bukhari:/.test(app) || !/hd-en/.test(app))
+        bad.push("the Bukhārī reader no longer offers the English — the Arabic is linked to its translation by number, and without that link a non-Arabic reader gets nothing");
+    }
   }
   /* The search normaliser destroys Arabic if its ranges are wrong, and the
      failure is silent: every query matches everything, or nothing.

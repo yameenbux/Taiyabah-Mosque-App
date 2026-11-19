@@ -13,8 +13,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTopBar } from "../barstyle";
 import Svg, { Path, Polygon, Circle, Rect } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withDelay } from "react-native-reanimated";
 import { C, F, R, SHADOW, dual } from "../theme";
 import { useApp } from "../store";
+import { useReduceMotion, Appear, GrowBar, SPRING, EASE } from "../motion";
 import { Screen, Girih, Press, Rich, TopBar, PageFoot, open, tap } from "../ui";
 import { PrayerIcon } from "../prayer-icons";
 import { LINKS as GIVING_LINKS } from "./Donate";
@@ -152,6 +154,45 @@ function TileIcon({ name }) {
   );
 }
 
+const TilePressable = Animated.createAnimatedComponent(Pressable);
+
+/* One service tile. It keeps the flex sizing it always had, and adds two
+ * things: it rises and fades into place on first paint, staggered down the
+ * grid, and it dips to 97% on the house spring when pressed. Both are off
+ * under Reduce Motion, where the tile is just there and the press is a plain
+ * tap. A component, not a wrapper, so the flexBasis stays on the pressable
+ * itself and the grid does not reflow. */
+function Tile({ x, i, navigation }) {
+  const { t, fs } = useApp();
+  const reduce = useReduceMotion();
+  const enter = useSharedValue(reduce ? 1 : 0);
+  const press = useSharedValue(1);
+  useEffect(() => {
+    if (reduce) { enter.value = 1; return; }
+    enter.value = withDelay(500 + i * 55, withTiming(1, { duration: 480, easing: EASE }));
+  }, []);
+  const st = useAnimatedStyle(() => ({
+    opacity: enter.value,
+    transform: [{ translateY: (1 - enter.value) * 12 }, { scale: press.value }],
+  }));
+  return (
+    <TilePressable onPress={() => { tap(); x.to ? navigation.navigate(x.to) : open(x.href); }}
+      accessibilityRole={x.to ? "button" : "link"}
+      onPressIn={() => { if (!reduce) press.value = withSpring(0.97, SPRING); }}
+      onPressOut={() => { if (!reduce) press.value = withSpring(1, SPRING); }}
+      style={[{ flexBasis: "30.5%", flexGrow: 1, alignItems: "center", gap: 8, backgroundColor: C.card,
+                borderWidth: 1, borderColor: C.line, borderRadius: 15, paddingTop: 15, paddingBottom: 13,
+                paddingHorizontal: 6, ...SHADOW }, st]}>
+      <View style={{ width: 44, height: 44, borderRadius: 14, alignItems: "center",
+                     justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
+        <TileIcon name={x.icon} />
+      </View>
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
+        {t(x.k, x.t)}</Text>
+    </TilePressable>
+  );
+}
+
 export default function Home({ navigation }) {
   const bar = useTopBar();
   const { t, fs, rtl } = useApp();
@@ -267,9 +308,14 @@ export default function Home({ navigation }) {
             If the greeting wraps on a narrow phone the two lines sit further
             apart than they strictly need to. That is the price, and a clipped
             greeting is not. */}
-        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
-                       color: C.goldBright, writingDirection: "rtl" }}>
-          السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
+        {/* The salām settles in on open — a short fade and rise, ending exactly
+            where it sits now, so the diacritics are never pushed above the
+            clip. Still under Reduce Motion. */}
+        <Appear rise={8} duration={560}>
+          <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
+                         color: C.goldBright, writingDirection: "rtl" }}>
+            السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
+        </Appear>
 
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
                        borderWidth: 1, borderColor: "rgba(243,239,227,.18)", borderRadius: R.pill,
@@ -294,7 +340,7 @@ export default function Home({ navigation }) {
           </View>)}
 
         {next ? (
-          <>
+          <Appear delay={240} rise={10} duration={560} style={{ alignSelf: "stretch", alignItems: rtl ? "flex-end" : "flex-start" }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.5,
                            color: C.goldBright, marginTop: 20, textTransform: "uppercase" }}>
               {t("app.next_jama_ah", "Next Jamāʿah")}</Text>
@@ -319,11 +365,12 @@ export default function Home({ navigation }) {
               </Rich>
             </View>
 
-            <View style={{ alignSelf: "stretch", height: 4, borderRadius: 2,
-                           backgroundColor: "rgba(255,255,255,.14)", marginTop: 16 }}>
-              <View style={{ height: 4, borderRadius: 2, width: `${gap * 100}%`, backgroundColor: C.goldBright }} />
+            {/* The progress toward the next jamāʿah draws itself in from the
+                left as the hero settles. */}
+            <View style={{ alignSelf: "stretch", marginTop: 16 }}>
+              <GrowBar frac={gap} color={C.goldBright} delay={620} />
             </View>
-          </>
+          </Appear>
         ) : (
           <Text style={{ fontFamily: F.sans, fontSize: fs(14), color: "#D0BFCA", marginTop: 20 }}>
             {t("times.no_further_dates", "The loaded timetable has no further dates.")}</Text>
@@ -580,26 +627,10 @@ export default function Home({ navigation }) {
         {/* ---- Services -------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.services", "Services")} />
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-          {TILES.map(x => (
-            <Pressable key={x.k} onPress={() => { tap(); x.to ? navigation.navigate(x.to) : open(x.href); }}
-              /* "link" is not decoration: a screen reader says "link" for
-                 something that leaves the app and "button" for something that
-                 does not, and Join WhatsApp leaving the app is worth being
-                 warned about before you tap it. */
-              accessibilityRole={x.to ? "button" : "link"}
-              style={({ pressed }) => ({ flexBasis: "30.5%", flexGrow: 1, alignItems: "center", gap: 8,
-                                         backgroundColor: C.card, borderWidth: 1, borderColor: C.line,
-                                         borderRadius: 15, paddingTop: 15, paddingBottom: 13, paddingHorizontal: 6,
-                                         ...SHADOW,
-                                         transform: [{ scale: pressed ? 0.97 : 1 }], opacity: pressed ? 0.9 : 1 })}>
-              {/* the tinted chip the web tiles sit their glyph on */}
-              <View style={{ width: 44, height: 44, borderRadius: 14, alignItems: "center",
-                             justifyContent: "center", backgroundColor: "rgba(119,33,87,.07)" }}>
-                <TileIcon name={x.icon} />
-              </View>
-              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.ink, textAlign: "center" }}>
-                {t(x.k, x.t)}</Text>
-            </Pressable>))}
+          {/* "link" vs "button" (inside Tile) is not decoration: a screen reader
+             says "link" for something that leaves the app, which Join WhatsApp
+             does — worth the warning before you tap it. */}
+          {TILES.map((x, i) => <Tile key={x.k} x={x} i={i} navigation={navigation} />)}
         </View>
 
         {/* No credit: the home screen closes on the masjid. "Powered by

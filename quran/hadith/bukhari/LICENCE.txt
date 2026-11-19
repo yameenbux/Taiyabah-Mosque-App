@@ -1,24 +1,32 @@
-Ṣaḥīḥ al-Bukhārī — Arabic text and book structure
-=================================================
+Ṣaḥīḥ al-Bukhārī — Arabic text, book structure, and English translation
+=======================================================================
 
+ARABIC TEXT AND BOOK STRUCTURE
+------------------------------
 Source      hadith-api, edition "ara-bukhari"
             https://github.com/fawazahmed0/hadith-api
 
 Licence     The Unlicense — a dedication of the work to the public domain.
             https://unlicense.org/
 
-            Anyone is free to copy, modify, publish, use, compile, sell or
-            distribute this, for any purpose, commercial or not.
+The Arabic hadith text is a 9th-century work and belongs to nobody. There is
+no condition attached to it and nothing that must be passed on. The credit is
+kept because provenance is worth recording, not because a licence demands it.
 
-There is no condition attached to this text and nothing that must be passed
-on. The credit above is kept because provenance is worth recording, not
-because a licence demands it.
+ENGLISH TRANSLATION
+-------------------
+Translation Dr Muhammad Muhsin Khan
+Publisher   Darussalam
+Source      hadith-api, edition "eng-bukhari"
+            https://github.com/fawazahmed0/hadith-api
 
-The Arabic hadith text is a 9th-century work and belongs to nobody.
+Licence     IN COPYRIGHT. This translation is a modern work and is NOT public
+            domain. PERMISSION GRANTED: Taiyabah Masjid has obtained permission
+            to use it, and that permission is what makes the English here
+            lawful to ship. The Arabic's public-domain status does not, and
+            cannot, extend to it.
 
-NO ENGLISH TRANSLATION IS INCLUDED. The same project publishes English and
-Urdu editions, and its public-domain dedication cannot extend to translations
-it did not own: the widely circulated English Bukhārī is a modern work still
-in copyright. Only the Arabic is shipped.
+            If that permission ever lapses, rebuild the pack with
+            --no-english and the English is removed cleanly, Arabic intact.
 
 NO COMMENTARY IS INCLUDED. See scripts/build-bukhari.mjs for why.

@@ -27,6 +27,7 @@ import { LiveAudioProvider } from "./live-audio";
 import { RecordingsAudioProvider } from "./recordings-audio";
 import RecBar from "./rec-bar";
 import OnAirBar from "./on-air";
+import { breadcrumb } from "./diagnostics";
 import { SheetTop } from "./ui";
 import { sheetScreen } from "./Blocks";
 import SHEETS from "./data/sheets.json";
@@ -63,7 +64,7 @@ import Alerts from "./screens/Alerts";
 import Prefs from "./screens/Prefs";
 import Help from "./screens/Help";
 import Quran, { Surahs, Surah, Mushaf } from "./screens/Quran";
-import Bukhari, { BukhariBook } from "./screens/Bukhari";
+import Bukhari, { BukhariBook, BukhariHadith } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
 import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
@@ -260,10 +261,15 @@ function Root() {
    * one wrong leaves the bar floating in the middle of the Qurʼan. */
   const navRef = useNavigationContainerRef();
   const [where, setWhere] = React.useState({ onLive: false, onRec: false, onTabs: true });
+  const lastScreen = React.useRef(null);
   const readWhere = React.useCallback(() => {
     let onLive = false, onRec = false, onTabs = true;
     try {
       const name = navRef.getCurrentRoute?.()?.name;
+      /* A breadcrumb for the problem log, but only when the screen actually
+         changes — onStateChange fires for a great deal more than that, and a
+         trail of the same screen twenty times over says nothing. */
+      if (name && name !== lastScreen.current) { lastScreen.current = name; breadcrumb("opened " + name); }
       onLive = name === "Live";
       /* The recordings bar shows on the browse screen and everywhere else, so
          the dars can be paused from any of them — it stays off only the full
@@ -375,6 +381,7 @@ function Root() {
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
         <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") }} />
         <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
+        <Stack.Screen name="BukhariHadith" component={BukhariHadith} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of six, so no header. */}
         <Stack.Screen name="Athkar"    component={Athkar}    options={{ ...sheet, title: t("athkar.daily_athkar", "Daily Athkār") }} />
         <Stack.Screen name="AthkarSet" component={AthkarSet}

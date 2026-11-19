@@ -21,7 +21,7 @@
  * look decisive.
  */
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, AccessibilityInfo } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Rect } from "react-native-svg";
@@ -33,29 +33,17 @@ import { useApp } from "./store";
 import { useRecordings } from "./recordings-audio";
 import { reportCrash } from "./crash";
 import { tap } from "./ui";
+import { useReduceMotion, Equaliser } from "./motion";
 
 const IN = { duration: 260, easing: Easing.out(Easing.cubic) };
 const OUT = { duration: 240, easing: Easing.in(Easing.cubic) };
 const FADE = { duration: 160 };
 
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    let live = true;
-    AccessibilityInfo.isReduceMotionEnabled().catch(() => false)
-      .then(v => { if (live) setReduced(!!v); });
-    let sub;
-    try { sub = AccessibilityInfo.addEventListener("reduceMotionChanged", v => setReduced(!!v)); } catch {}
-    return () => { live = false; try { sub?.remove(); } catch {} };
-  }, []);
-  return reduced;
-}
-
 function Bar({ onRec, onTabs, onGo }) {
   const { t, fs, rtl } = useApp();
   const { current, playing, toggle, stop, positionMs, durationMs } = useRecordings();
   const insets = useSafeAreaInsets();
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
 
   const show = !!current && !onRec;
   const [mounted, setMounted] = useState(false);
@@ -105,7 +93,11 @@ function Bar({ onRec, onTabs, onGo }) {
             accessibilityRole="button"
             style={({ pressed }) => ({ flex: 1, minWidth: 0, opacity: pressed ? 0.75 : 1,
                                        flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 10 })}>
-            <Ionicons name="musical-notes" size={16} color={C.gold} />
+            {/* The equaliser breathes while it plays and falls flat the moment
+                it pauses, so a glance says which. Flat under Reduce Motion. */}
+            {playing
+              ? <Equaliser playing color={C.gold} bars={4} size={16} width={18} />
+              : <Ionicons name="musical-notes" size={16} color={C.gold} />}
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text numberOfLines={1}
                     style={{ fontFamily: F.sansSemi, fontSize: fs(9), letterSpacing: 1.6,
