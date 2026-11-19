@@ -1,11 +1,17 @@
 /* The app opening, once, when it is launched from cold.
  *
- * The plum splash holds the gold girih star — the app-icon motif — and then the
- * STAR OPENS: it grows as a hole cut out of the plum, so the app is revealed
- * THROUGH its shape, the way the X app's glyph opens into the feed. The star is
- * a vector, so it needs no font and no bitmap to be sampled — the blur the
- * web version had, and the font-at-startup flash the old logo splash was
- * written to avoid, are both gone because there is no text here at all.
+ * The plum splash holds the gold girih star — the app-icon motif — over the
+ * wordmark, and then the STAR OPENS: the app is revealed THROUGH its shape, the
+ * way the X app's glyph opens into the feed.
+ *
+ * HOW IT OPENS, and why it is built this way. The plum, with a star-shaped hole
+ * cut out of it, is a STATIC react-native-svg mask — nothing animates inside the
+ * SVG. The whole masked plum then SCALES UP as an ordinary view transform, about
+ * the star's centre, until the hole is bigger than the screen and the plum is
+ * gone. Animating the view (which iOS composites on the GPU) rather than the
+ * mask's own geometry is the difference between it working on a device and not:
+ * a Reanimated value driving a prop inside the <Mask> does not re-rasterise the
+ * mask, so the hole never grew — this scales the rendered result instead.
  *
  * THREE RULES, because this app has twice shipped a blank screen caused by
  * something at startup deciding when the app may be used:
@@ -16,26 +22,22 @@
  *      a veil that somehow stayed up could still not stop anybody using the
  *      app behind it.
  *   3. It has a ceiling. If a callback is dropped — a backgrounded app, a
- *      reload mid-animation — a timer takes it away regardless. And the plum
- *      veil fades out at the end on its own opacity, so even if the star mask
- *      never animated on a given device the splash still clears to the app
- *      rather than sticking. The animation is allowed to fail; it is not
- *      allowed to persist.
+ *      reload mid-animation — a timer takes it away regardless. And the veil
+ *      fades out on its own opacity at the end, so even if the scale never ran
+ *      the splash still clears to the app rather than sticking. The animation
+ *      is allowed to fail; it is not allowed to persist.
  *
  * And it asks the phone whether its owner wants movement at all. Somebody who
  * has turned animation off system-wide has usually done it because motion makes
- * them ill, and a masjid app is not the place to overrule that: Reduce Motion
- * gets the plain quick fade this screen has always had, with no zoom.
+ * them ill: Reduce Motion gets the plain quick fade, with no zoom.
  */
 import React, { useEffect, useRef, useState } from "react";
 import { View, Image, AccessibilityInfo, Platform, useWindowDimensions, StyleSheet } from "react-native";
 import Animated, {
-  useSharedValue, useAnimatedStyle, useAnimatedProps, withTiming, withDelay, Easing, runOnJS,
+  useSharedValue, useAnimatedStyle, withTiming, withDelay, Easing, runOnJS,
 } from "react-native-reanimated";
-import Svg, { Defs, Mask, Rect, G, Polygon } from "react-native-svg";
+import Svg, { Defs, Mask, Rect, Polygon } from "react-native-svg";
 import { C } from "./theme";
-
-const AnimatedG = Animated.createAnimatedComponent(G);
 
 /* The sixteen-vertex girih star — the same mark ui.jsx draws — as a points
    string centred on (cx,cy) with outer radius r. Inner radius is 0.43 of the
@@ -52,7 +54,7 @@ function star(cx, cy, r, inner = 0.43) {
 
 /* Short on purpose. This is opened five times a day by people who already know
  * what it is; anything longer stops being a welcome and becomes a toll. */
-const HOLD = 300, GROW = 860, MARK = 520, OUT = 280;
+const HOLD = 300, GROW = 900, MARK = 520, OUT = 300;
 const CEILING = HOLD + GROW + OUT + 1100;
 const OPEN = Easing.bezier(0.5, 0, 0.15, 1);
 
@@ -62,21 +64,26 @@ export default function Opening() {
   /* The star at rest — a crest above the wordmark, about half its width, so it
      reads as part of the mark rather than sat on top of it. */
   const baseR = Math.max(30, Math.round(Math.min(W, H) * 0.092));
-  /* The star and the wordmark are centred AS A GROUP on the screen, so the star
-     sits a little above the middle and the logo below it, the pair balanced on
-     the centre rather than the star alone on it. sy is that star's centre, and
-     the mask hole opens from the same point so the reveal comes out of it. */
+  /* The star and the wordmark are centred AS A GROUP, so the star sits a little
+     above the middle (sy) and the logo below it, the pair balanced on the
+     centre. The hole and the gold star share that centre. */
   const GAP = 16, LOGO_W = 150, LOGO_H = 106;
   const sy = cy - (GAP + LOGO_H) / 2;
-  /* The scale at which the star's INNER points clear the FAR corner from its
-     (slightly raised) centre, so no plum is left in the gaps when it has opened. */
+
+  /* The plum overlay is a square centred on the star, big enough to cover the
+     screen at rest; scaling it up grows the hole about the star's centre. */
+  const half = Math.max(cx, sy, H - sy) + 24;
+  const SIZE = half * 2;
+  const mid = SIZE / 2;
+  /* The scale at which the star's INNER points clear the far corner from the
+     star's centre, so no plum is left in the gaps once it has opened. */
   const corner = Math.sqrt(cx * cx + Math.pow(Math.max(sy, H - sy), 2));
   const cover = (corner / (baseR * 0.43)) * 1.12;
 
   const [gone, setGone] = useState(false);
   const veil = useSharedValue(1);
-  const hole = useSharedValue(0.0001);   // ~0 = no hole, plum covers all
-  const mark = useSharedValue(0);        // 0 = gold star at rest, 1 = lifted and gone
+  const hole = useSharedValue(1);   // 1 = star at rest; grows to `cover`
+  const mark = useSharedValue(0);   // 0 = gold star at rest, 1 = lifted and gone
   const timer = useRef(null);
 
   useEffect(() => {
@@ -98,7 +105,7 @@ export default function Opening() {
         }
         hole.value = withDelay(HOLD, withTiming(cover, { duration: GROW, easing: OPEN }));
         mark.value = withDelay(HOLD - 40, withTiming(1, { duration: MARK, easing: Easing.out(Easing.cubic) }));
-        veil.value = withDelay(HOLD + GROW - 120,
+        veil.value = withDelay(HOLD + GROW - 140,
           withTiming(0, { duration: OUT, easing: Easing.inOut(Easing.quad) },
                      done => done && runOnJS(finish)()));
       });
@@ -107,7 +114,7 @@ export default function Opening() {
   }, [cover]);
 
   const veilStyle = useAnimatedStyle(() => ({ opacity: veil.value }));
-  const holeProps = useAnimatedProps(() => ({ scale: hole.value }));
+  const holeStyle = useAnimatedStyle(() => ({ transform: [{ scale: hole.value }] }));
   const markStyle = useAnimatedStyle(() => ({
     opacity: 1 - mark.value,
     transform: [{ scale: 1 + mark.value * 0.18 }],
@@ -119,23 +126,25 @@ export default function Opening() {
     <Animated.View
       pointerEvents="none"
       style={[StyleSheet.absoluteFill,
-              { zIndex: 50, elevation: Platform.OS === "android" ? 50 : undefined },
+              { overflow: "hidden", zIndex: 50, elevation: Platform.OS === "android" ? 50 : undefined },
               veilStyle]}>
-      {/* The plum, with the star cut out of it — the star is the hole the app is
-          seen through, and the hole grows until the plum is gone. */}
-      <Svg width={W} height={H} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <Mask id="openHole" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
-            <Rect x={0} y={0} width={W} height={H} fill="#fff" />
-            <AnimatedG originX={cx} originY={sy} animatedProps={holeProps}>
-              <Polygon points={star(cx, sy, baseR)} fill="#000" />
-            </AnimatedG>
-          </Mask>
-        </Defs>
-        <Rect x={0} y={0} width={W} height={H} fill={C.brand900} mask="url(#openHole)" />
-      </Svg>
-      {/* On top: the gold star, and the wordmark under it — the mark the app
-          has always opened on, kept. Both lift and fade as the star's own shape
+      {/* The plum, with the star cut out of it, as a STATIC mask. Centred on the
+          star and scaled up as one view (holeStyle) so the hole grows about the
+          star until the plum is pushed off the screen. */}
+      <Animated.View pointerEvents="none"
+        style={[{ position: "absolute", left: cx - mid, top: sy - mid, width: SIZE, height: SIZE }, holeStyle]}>
+        <Svg width={SIZE} height={SIZE}>
+          <Defs>
+            <Mask id="openHole" maskUnits="userSpaceOnUse" x={0} y={0} width={SIZE} height={SIZE}>
+              <Rect x={0} y={0} width={SIZE} height={SIZE} fill="#fff" />
+              <Polygon points={star(mid, mid, baseR)} fill="#000" />
+            </Mask>
+          </Defs>
+          <Rect x={0} y={0} width={SIZE} height={SIZE} fill={C.brand900} mask="url(#openHole)" />
+        </Svg>
+      </Animated.View>
+      {/* On top: the gold star, and the wordmark under it — the mark the app has
+          always opened on, kept. Both lift and fade as the star's own shape
           opens beneath them. The wordmark is the logo bitmap, not live text, so
           nothing waits on a font at cold start. */}
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, markStyle]}>
