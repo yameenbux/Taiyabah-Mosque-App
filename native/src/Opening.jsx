@@ -61,9 +61,15 @@ export default function Opening() {
   const cx = W / 2, cy = H / 2;
   /* The star at rest, about an app-icon's worth of the screen. */
   const baseR = Math.max(44, Math.round(Math.min(W, H) * 0.14));
-  const corner = Math.sqrt(cx * cx + cy * cy);
-  /* The scale at which the star's INNER points clear the far corner, so no plum
-     is left in the gaps between the points when it has finished opening. */
+  /* The star and the wordmark are centred AS A GROUP on the screen, so the star
+     sits a little above the middle and the logo below it, the pair balanced on
+     the centre rather than the star alone on it. sy is that star's centre, and
+     the mask hole opens from the same point so the reveal comes out of it. */
+  const GAP = 22, LOGO_W = 150, LOGO_H = 106;
+  const sy = cy - (GAP + LOGO_H) / 2;
+  /* The scale at which the star's INNER points clear the FAR corner from its
+     (slightly raised) centre, so no plum is left in the gaps when it has opened. */
+  const corner = Math.sqrt(cx * cx + Math.pow(Math.max(sy, H - sy), 2));
   const cover = (corner / (baseR * 0.43)) * 1.12;
 
   const [gone, setGone] = useState(false);
@@ -120,8 +126,8 @@ export default function Opening() {
         <Defs>
           <Mask id="openHole" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
             <Rect x={0} y={0} width={W} height={H} fill="#fff" />
-            <AnimatedG originX={cx} originY={cy} animatedProps={holeProps}>
-              <Polygon points={star(cx, cy, baseR)} fill="#000" />
+            <AnimatedG originX={cx} originY={sy} animatedProps={holeProps}>
+              <Polygon points={star(cx, sy, baseR)} fill="#000" />
             </AnimatedG>
           </Mask>
         </Defs>
@@ -132,14 +138,14 @@ export default function Opening() {
           opens beneath them. The wordmark is the logo bitmap, not live text, so
           nothing waits on a font at cold start. */}
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, markStyle]}>
-        <View style={{ position: "absolute", left: cx - baseR, top: cy - baseR, width: baseR * 2, height: baseR * 2 }}>
+        <View style={{ position: "absolute", left: cx - baseR, top: sy - baseR, width: baseR * 2, height: baseR * 2 }}>
           <Svg width={baseR * 2} height={baseR * 2}>
             <Polygon points={star(baseR, baseR, baseR)} fill={C.gold} />
           </Svg>
         </View>
         <Image source={require("../assets/logo.png")}
-               style={{ position: "absolute", left: cx - 75, top: cy + baseR + 22,
-                        width: 150, height: 106, resizeMode: "contain" }} />
+               style={{ position: "absolute", left: cx - LOGO_W / 2, top: sy + baseR + GAP,
+                        width: LOGO_W, height: LOGO_H, resizeMode: "contain" }} />
       </Animated.View>
     </Animated.View>
   );
