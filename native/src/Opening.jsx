@@ -59,13 +59,14 @@ const OPEN = Easing.bezier(0.5, 0, 0.15, 1);
 export default function Opening() {
   const { width: W, height: H } = useWindowDimensions();
   const cx = W / 2, cy = H / 2;
-  /* The star at rest, about an app-icon's worth of the screen. */
-  const baseR = Math.max(44, Math.round(Math.min(W, H) * 0.14));
+  /* The star at rest — a crest above the wordmark, about half its width, so it
+     reads as part of the mark rather than sat on top of it. */
+  const baseR = Math.max(30, Math.round(Math.min(W, H) * 0.092));
   /* The star and the wordmark are centred AS A GROUP on the screen, so the star
      sits a little above the middle and the logo below it, the pair balanced on
      the centre rather than the star alone on it. sy is that star's centre, and
      the mask hole opens from the same point so the reveal comes out of it. */
-  const GAP = 22, LOGO_W = 150, LOGO_H = 106;
+  const GAP = 16, LOGO_W = 150, LOGO_H = 106;
   const sy = cy - (GAP + LOGO_H) / 2;
   /* The scale at which the star's INNER points clear the FAR corner from its
      (slightly raised) centre, so no plum is left in the gaps when it has opened. */
