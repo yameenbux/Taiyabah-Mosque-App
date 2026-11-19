@@ -208,7 +208,7 @@ export default function Bukhari({ navigation }) {
               {t("bukhari.hadith_n", "Hadith {n}").replace("{n}", String(b.n))}</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted }}>{b.name}</Text>
           </View>
-          <Text numberOfLines={2} style={b.ar
+          <Text numberOfLines={2} accessibilityLanguage={b.ar ? "ar" : undefined} style={b.ar
               ? { fontFamily: F.quranic, fontSize: fs(17), lineHeight: fs(32), color: C.ink,
                   textAlign: "right", writingDirection: "rtl" }
               : { fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21), color: C.ink,
@@ -300,7 +300,7 @@ export function BukhariBook({ route, navigation }) {
           {h.en
             ? <Text numberOfLines={2} style={{ fontFamily: F.sans, fontSize: fs(13.5), lineHeight: fs(21),
                        color: C.ink, textAlign: "left", writingDirection: "ltr" }}>{h.en}</Text>
-            : <Text numberOfLines={2} style={{ fontFamily: F.quranic, fontSize: fs(17), lineHeight: fs(32),
+            : <Text numberOfLines={2} accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(17), lineHeight: fs(32),
                        color: C.ink, textAlign: "right", writingDirection: "rtl" }}>{h.ar}</Text>}
         </Press></Appear>)} />
   );

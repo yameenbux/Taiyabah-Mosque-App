@@ -312,7 +312,7 @@ export default function Home({ navigation }) {
             where it sits now, so the diacritics are never pushed above the
             clip. Still under Reduce Motion. */}
         <Appear rise={8} duration={560}>
-          <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
                          color: C.goldBright, writingDirection: "rtl" }}>
             السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
         </Appear>
@@ -347,7 +347,7 @@ export default function Home({ navigation }) {
             <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "baseline", gap: 10, marginTop: 2 }}>
               <Text style={{ fontFamily: F.display, fontSize: fs(29), color: C.cream }}>
                 {friJum ? t("prayer.jumuah", "Jumuʿah") : t(`prayer.${next.key}`, NAMES[next.key].en)}</Text>
-              <Text style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
+              <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(22), color: C.cream }}>
                 {friJum ? "الجمعة" : NAMES[next.key].ar}</Text>
             </View>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(50), color: "#fff", marginTop: 2 }}>
@@ -381,7 +381,7 @@ export default function Home({ navigation }) {
           <View style={{ alignSelf: "stretch", marginTop: 18, borderRadius: R.card, padding: 15,
                          backgroundColor: "rgba(220,187,99,.12)", borderWidth: 1,
                          borderColor: "rgba(220,187,99,.3)", alignItems: "center", gap: 5 }}>
-            <Text style={{ fontFamily: F.arabic, fontSize: fs(17), lineHeight: fs(32), color: C.goldBright,
+            <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(17), lineHeight: fs(32), color: C.goldBright,
                            textAlign: "center", writingDirection: "rtl" }}>
               خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ</Text>
             <Text style={{ fontFamily: F.sans, fontSize: fs(13), lineHeight: fs(21), color: C.cream,

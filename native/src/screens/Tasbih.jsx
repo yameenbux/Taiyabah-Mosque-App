@@ -331,7 +331,7 @@ export default function Tasbih() {
       {four && (
         <View style={{ minHeight: 112, alignItems: "center", justifyContent: "center",
                        marginBottom: 6 }}>
-          <Text style={{ fontFamily: F.quranic, fontSize: fs(26), lineHeight: fs(50),
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(26), lineHeight: fs(50),
                          color: C.ink, textAlign: "center", writingDirection: "rtl" }}>
             {place.step.ar}
           </Text>

@@ -80,9 +80,9 @@ export function Rich({ children, style, arabic }) {
   const parts = s.split(/(\*[^*]+\*|_[^_]+_)/g).filter(Boolean);
   const base = [{ writingDirection: rtl ? "rtl" : "ltr" }, style];
   if (parts.length === 1 && !/^[*_]/.test(parts[0]))
-    return <Text style={base}>{s}</Text>;
+    return <Text accessibilityLanguage={arabic ? "ar" : undefined} style={base}>{s}</Text>;
   return (
-    <Text style={base}>
+    <Text accessibilityLanguage={arabic ? "ar" : undefined} style={base}>
       {parts.map((p, i) =>
         /* <b> and <strong> are weight 700 in a browser, and that is what every
            one of these was in the website's markup. Setting them in the 500
@@ -145,7 +145,7 @@ export function Note({ children, center }) {
    Amiri, exactly as the website splits .quranic from .arabic. */
 export function Arabic({ children, size = 26, center = true }) {
   const { fs } = useApp();
-  return <Text style={{ fontFamily: F.quranic, fontSize: fs(size), lineHeight: fs(size * 1.75),
+  return <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(size), lineHeight: fs(size * 1.75),
                         color: C.ink, textAlign: center ? "center" : "right", writingDirection: "rtl" }}>{children}</Text>;
 }
 
@@ -540,7 +540,8 @@ export function Hero({ lines = [], children, tall, minHeight, ring, align = "cen
                                   lineHeight: fs(px * 1.3), color: col }
           : { fontFamily: F.sans, fontSize: fs(px), lineHeight: fs(px * 1.55),
               color: col, marginTop: 7 };
-        return <Rich key={i} style={[{ textAlign: align === "left" && !rtl ? "left"
+        return <Rich key={i} arabic={l.w === "arabic"}
+                     style={[{ textAlign: align === "left" && !rtl ? "left"
                                                  : align === "left" ? "right" : "center" }, style]}>{text}</Rich>;
       })}
       {children}

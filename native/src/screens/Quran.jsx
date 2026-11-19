@@ -93,7 +93,7 @@ export default function Quran({ navigation }) {
               <Press key={n} onPress={() => { tap(); navigation.navigate("Surah", { n }); }}
                 style={{ flexBasis: "47%", flexGrow: 1, backgroundColor: C.card, borderWidth: 1,
                          borderColor: C.line, borderRadius: R.tile, paddingVertical: 14, paddingHorizontal: 13 }}>
-                <Text style={{ fontFamily: F.quranic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
+                <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(13), color: C.ink, marginTop: 3 }}>
                   {t(`surah.${n}.name`, s.nameEn)}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 1 }}>
@@ -172,7 +172,7 @@ export function Surahs({ navigation }) {
               {t(`surah.${s.n}.meaning`, s.meaning)} · {s.ayahs} {t("quran.ayahs", "āyāt")} · {s.revealed}
             </Text>
           </View>
-          <Text style={{ fontFamily: F.quranic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(19), color: C.brand600 }}>{s.name}</Text>
         </Press></Appear>)} />
   );
 }
@@ -205,13 +205,13 @@ export function Surah({ route, navigation }) {
       ListHeaderComponent={
         <View style={{ alignItems: "center", paddingVertical: 22, paddingHorizontal: 20,
                        borderBottomWidth: 1, borderBottomColor: C.line, backgroundColor: C.card }}>
-          <Text style={{ fontFamily: F.quranic, fontSize: fs(30), color: C.brand600 }}>{meta.name}</Text>
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(30), color: C.brand600 }}>{meta.name}</Text>
           <Text style={{ fontFamily: F.display, fontSize: fs(17), color: C.ink, marginTop: 5 }}>
             {t(`surah.${n}.name`, meta.nameEn)}</Text>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12), color: C.muted, marginTop: 3 }}>
             {t(`surah.${n}.meaning`, meta.meaning)} · {meta.ayahs} {t("quran.ayahs", "āyāt")} · {meta.revealed}</Text>
           {n !== 1 && n !== 9 && (
-            <Text style={{ fontFamily: F.quranic, fontSize: fs(19), lineHeight: fs(36), color: C.ink,
+            <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(19), lineHeight: fs(36), color: C.ink,
                            marginTop: 16, textAlign: "center" }}>
               بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</Text>)}
         </View>}
@@ -225,7 +225,7 @@ export function Surah({ route, navigation }) {
         <Appear index={index} animate={firstPaint.current && index < 8}>
         <View style={{ paddingHorizontal: 18, paddingVertical: 16,
                        borderBottomWidth: 1, borderBottomColor: "rgba(228,222,207,.7)" }}>
-          <Text style={{ fontFamily: F.quranic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.quranic, fontSize: fs(23), lineHeight: fs(46), color: C.ink,
                          textAlign: "right", writingDirection: "rtl" }}>{ar}</Text>
           <View style={{ flexDirection: "row", gap: 9, marginTop: 11 }}>
             <View style={{ minWidth: 23, height: 23, borderRadius: 12, backgroundColor: "rgba(119,33,87,.09)",
