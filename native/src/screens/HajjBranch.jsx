@@ -179,7 +179,7 @@ export default function HajjBranch({ route }) {
             const body = (
               <>
                 {!!item.ar && (
-                  <Text style={{ fontFamily: F.arabic, fontSize: fs(22), lineHeight: fs(42),
+                  <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(22), lineHeight: fs(42),
                                  color: HJ.ink, textAlign: "right", writingDirection: "rtl" }}>
                     {item.ar}
                   </Text>)}

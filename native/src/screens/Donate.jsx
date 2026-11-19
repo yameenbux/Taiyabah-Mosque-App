@@ -73,7 +73,7 @@ export function NewBuild({ navigation }) {
       <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={{ paddingTop: 26, paddingHorizontal: 22, paddingBottom: 24, overflow: "hidden" }}>
         <Girih style={{ right: -50, top: -44 }} size={220} opacity={0.09} />
-        <Text style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(46), color: C.goldBright,
+        <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(46), color: C.goldBright,
                        textAlign: "right", writingDirection: "rtl", marginBottom: 16 }}>
           مَنْ بَنَى مَسْجِدًا لِلَّهِ بَنَى اللَّهُ لَهُ فِي الْجَنَّةِ مِثْلَهُ</Text>
         <Rich style={{ fontFamily: F.display, fontSize: fs(16.5), lineHeight: fs(25.5), color: "#EDEFE9",

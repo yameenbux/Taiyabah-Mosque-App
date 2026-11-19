@@ -221,7 +221,7 @@ export default function PrayerTimes({ navigation }) {
                                          borderRadius: R.pill, paddingHorizontal: 7, paddingVertical: 3 }}>
                             {isNow ? t("times.now", "Now") : t("times.next", "Next")}</Text>)}
                       </View>
-                      <Text style={{ fontFamily: F.arabic, fontSize: fs(14), color: C.muted,
+                      <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(14), color: C.muted,
                                      textAlign: rtl ? "right" : "left" }}>{nameFor(k, when).ar}</Text>
                     </View>
                     {/* .row .begins is MUTED at weight 500; .row .jam is ink at

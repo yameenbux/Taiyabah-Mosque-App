@@ -96,7 +96,7 @@ function Dua({ ar, tr, en, src }) {
   const { fs, rtl } = useApp();
   return (
     <Card>
-      <Text style={{ fontFamily: F.arabic, fontSize: fs(21), lineHeight: fs(40), color: C.ink,
+      <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(21), lineHeight: fs(40), color: C.ink,
                      textAlign: "right", writingDirection: "rtl" }}>{ar}</Text>
       <Text style={{ fontFamily: F.sansMedium, fontSize: fs(13), lineHeight: fs(21),
                      color: C.goldInk, textAlign: rtl ? "right" : "left" }}>{tr}</Text>
