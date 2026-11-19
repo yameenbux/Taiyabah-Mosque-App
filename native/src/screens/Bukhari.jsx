@@ -315,7 +315,13 @@ function SaveAction({ saved, label, onToggle }) {
   const { fs } = useApp();
   const { style: popStyle, pop } = usePop();
   const { style: ring, fire } = useRing();
-  const run = async () => { const nowSaved = await onToggle(); pop(1.34); if (nowSaved) fire(); };
+  /* Fire the pop and the ring SYNCHRONOUSLY on tap, before the save touches
+     AsyncStorage. A Reanimated value set in the async continuation after an
+     await does not reliably reach the UI thread on device, so the animation
+     was silently dropped on a real phone though it ran on web. The ring shows
+     only when this tap is a SAVE (the bookmark is currently empty); then the
+     storage write happens fire-and-forget. */
+  const run = () => { pop(1.34); if (!saved) fire(); onToggle(); };
   return (
     <Press onPress={run}
       style={{ flex: 1, alignItems: "center", gap: 3, paddingVertical: 9, borderRadius: 12,
