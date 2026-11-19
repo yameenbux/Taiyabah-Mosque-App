@@ -33,6 +33,7 @@ import { readList } from "../supabase";
 import { NoticeCard } from "../notice-card";
 import { monthYear, DOW } from "../dates";
 import { order, groupByDay, daysWithEvents, dayKey, openingMonth } from "../events";
+import { Appear } from "../motion";
 
 /* The month grid. A dot, not a number badge: two events on one day is not a
  * quantity anybody acts on, and a "2" invites the reader to work out which
@@ -123,6 +124,11 @@ export default function Events() {
   const [picked, setPicked] = useState(null);
   const list = useRef(null);
   const touchedMonth = useRef(false);
+  /* List entrance on the first paint only, exactly as the Bukhārī/Adhkār
+     readers do it: the opening screenful rises in, and anything scrolled to
+     afterwards just appears — motion on arrival, never on every scroll. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
   /* Pressing the Events tab while already on it goes back to the top, as it
      does on every other tab. This screen does not go through ui.jsx's Screen
      — it is a FlatList so a day can be scrolled to by index — so it asks for
@@ -233,22 +239,24 @@ export default function Events() {
             {err ? t("events.offline", "Events will appear once you’re back online. Pull down to try again.")
                  : t("events.will_appear", "When the masjid puts something on, the poster and the date will be here.")}</Text>
         </View>}
-      renderItem={({ item }) => {
+      renderItem={({ item, index }) => {
+        let el;
         if (item.kind === "section")
-          return (
+          el = (
             <Text style={{ fontFamily: F.sansBold, fontSize: fs(11), letterSpacing: 0.8,
                            textTransform: "uppercase", color: C.muted, marginTop: 22,
                            marginHorizontal: 16, textAlign: rtl ? "right" : "left" }}>
               {item.label}</Text>);
-        if (item.kind === "day")
-          return (
+        else if (item.kind === "day")
+          el = (
             <Text style={{ fontFamily: F.display, fontSize: fs(15), color: C.ink, marginTop: 14,
                            marginHorizontal: 16, textAlign: rtl ? "right" : "left" }}>
               {item.at
                 ? item.at.toLocaleDateString("en-GB",
                     { weekday: "long", day: "numeric", month: "long" })
                 : t("events.no_date_yet", "Date to be confirmed")}</Text>);
-        return <NoticeCard item={item.item} />;
+        else el = <NoticeCard item={item.item} />;
+        return <Appear index={index} animate={firstPaint.current && index < 12}>{el}</Appear>;
       }}
     />
   );

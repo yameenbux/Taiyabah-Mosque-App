@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, FlatList, RefreshControl, ActivityIndicator, Pressable } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,6 +12,7 @@ import { readList } from "../supabase";
 import { publishNoticeIds, pruneCleared } from "../notices-state";
 import { NoticeCard, ClearAction } from "../notice-card";
 import { split } from "../events";
+import { Appear } from "../motion";
 
 /* NOTIFICATIONS — what the masjid has SAID, as opposed to what it has ON.
  *
@@ -53,6 +54,11 @@ export default function Notifications() {
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
+  /* List entrance on the first paint only, the same as the Bukhārī/Adhkār
+     readers: the opening notices rise in, and anything scrolled to afterwards
+     just appears — motion on arrival, never on every scroll. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
   /* Worked out ONCE, when the screen opens, and not again as the reader
      scrolls. Marking them read is the next thing that happens, so recomputing
      would make every pill vanish the moment it was drawn — the website makes
@@ -178,13 +184,14 @@ export default function Notifications() {
               {t("notices.turn_on_notifications_in_settings",
                  "You can choose which alerts you receive under Notifications in the menu.")}</Text>)}
         </View>}
-      renderItem={({ item }) => (
-        /* SWIPE TO CLEAR, which is the gesture both platforms already teach
+      renderItem={({ item, index }) => (
+       <Appear index={index} animate={firstPaint.current && index < 12}>
+        {/* SWIPE TO CLEAR, which is the gesture both platforms already teach
            for a list like this, so nothing has to be explained.
            A swipe is invisible to a screen reader and impossible with a
            switch control, so the same action is published as an
            accessibilityAction — VoiceOver and TalkBack offer "Clear" in the
-           rotor. Clear all in the header is the third way in. */
+           rotor. Clear all in the header is the third way in. */}
         <ReanimatedSwipeable
           friction={2} rightThreshold={44} leftThreshold={44}
           onSwipeableOpen={() => clearNotice(item.id, liveIds)}
@@ -192,7 +199,8 @@ export default function Notifications() {
           renderLeftActions={() => <ClearAction label={t("notices.clear", "Clear")} left />}>
           <NoticeCard item={item} isNew={newIds.includes(item.id)}
                       onClear={() => clearNotice(item.id, liveIds)} />
-        </ReanimatedSwipeable>)}
+        </ReanimatedSwipeable>
+       </Appear>)}
     />
   );
 }

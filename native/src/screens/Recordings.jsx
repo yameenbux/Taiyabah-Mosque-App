@@ -25,6 +25,7 @@ import { useApp } from "../store";
 import { Screen, TopBar, Girih, tap } from "../ui";
 import { useRecordings } from "../recordings-audio";
 import { IslamicIcon, iconForCategory } from "../islamic-icons";
+import { Appear } from "../motion";
 
 const SENDER = "https://taiyabah-sender.yameenbux.workers.dev";
 
@@ -134,7 +135,11 @@ export default function Recordings({ navigation }) {
                 {cats.map((c, i) => {
                   const on = c.path === active;
                   return (
-                    <Pressable key={c.path} onPress={() => { tap(); setActive(c.path); }}
+                    /* The section tiles rise in on arrival — the browse screen's
+                       own "comes alive" moment, the same staggered entrance Home
+                       gives its tiles. Still under Reduce Motion. */
+                    <Appear key={c.path} index={i}>
+                    <Pressable onPress={() => { tap(); setActive(c.path); }}
                       accessibilityRole="button" accessibilityState={{ selected: on }}
                       style={{ width: 136, height: 112, borderRadius: 20, overflow: "hidden",
                                borderWidth: 1, borderColor: on ? "rgba(198,162,76,.55)" : "rgba(198,162,76,.2)" }}>
@@ -143,7 +148,8 @@ export default function Recordings({ navigation }) {
                         <IslamicIcon name={iconForCategory(c.name)} size={30} color={C.goldBright} />
                         <Text numberOfLines={2} style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: "#fff" }}>{c.name}</Text>
                       </LinearGradient>
-                    </Pressable>);
+                    </Pressable>
+                    </Appear>);
                 })}
               </ScrollView>
 
