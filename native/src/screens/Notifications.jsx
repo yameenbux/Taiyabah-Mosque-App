@@ -126,7 +126,9 @@ export default function Notifications() {
 
   return (
     <FlatList
-      style={{ backgroundColor: C.paper }}
+      /* Plum on the list itself so the overscroll bounce stretches the header;
+         the content container carries the cream paper and grows to fill. */
+      style={{ backgroundColor: C.brand900 }}
       onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}
       data={shown}
       keyExtractor={r => String(r.id)}
@@ -140,7 +142,7 @@ export default function Notifications() {
          page. The padding belongs on the things inside the list, and the
          header already pads its own heading, which is why that heading was
          sitting 32px in rather than 16. */
-      contentContainerStyle={{ paddingBottom: 28 }}
+      contentContainerStyle={{ paddingBottom: 28, backgroundColor: C.paper, flexGrow: 1 }}
       ListEmptyComponent={hiddenCount ? (
         <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted, textAlign: "center",
                        lineHeight: fs(21), marginTop: 18, marginHorizontal: 32 }}>

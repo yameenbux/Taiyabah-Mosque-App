@@ -106,7 +106,7 @@ export default function Recordings({ navigation }) {
   const isCur = it => rec.current && rec.current.mp3 === it.mp3;
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} topColor={C.brand900}>
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar back navigation={navigation} />
       </LinearGradient>

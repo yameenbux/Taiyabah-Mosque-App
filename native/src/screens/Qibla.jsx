@@ -131,7 +131,7 @@ export default function Qibla({ navigation }) {
        gave it a plum hero instead and moved the calibration sentence up into
        it, so the screen announced itself twice and the instruction arrived
        before there was anything to calibrate. */
-    <Screen pad={false} bg={C.paper}>
+    <Screen pad={false} bg={C.paper} topColor={C.brand900}>
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar back navigation={navigation} />
       </LinearGradient>

@@ -198,13 +198,15 @@ export default function Events() {
   return (
     <FlatList
       ref={list}
-      style={{ backgroundColor: C.paper }}
+      /* Plum on the list itself so the overscroll bounce stretches the header;
+         the content container carries the cream paper and grows to fill. */
+      style={{ backgroundColor: C.brand900 }}
       onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}
       data={items}
       keyExtractor={r => r.key}
       ListHeaderComponent={Header}
       refreshControl={<RefreshControl refreshing={busy} onRefresh={load} tintColor={C.brand600} />}
-      contentContainerStyle={{ paddingBottom: 28 }}
+      contentContainerStyle={{ paddingBottom: 28, backgroundColor: C.paper, flexGrow: 1 }}
       /* Posters are images of unknown height, so there is no getItemLayout to
          give. Without this a tap on a day far down the list throws instead of
          scrolling. Measure what is rendered, then try once more. */

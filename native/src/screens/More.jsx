@@ -91,7 +91,7 @@ export default function More({ navigation }) {
   const bar = useTopBar();
 
   return (
-    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
+    <Screen pad={false} topColor={C.brand900} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* THE SAME BAR AS EVERY OTHER PAGE. This drew the wordmark alone, on
           the reasoning that the website's DRAWER opens under a bare wordmark
           — but More is not the website's drawer. It is one of the seven
