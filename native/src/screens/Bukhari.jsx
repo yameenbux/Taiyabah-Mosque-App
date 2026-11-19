@@ -14,6 +14,8 @@ import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Ionicons } from "@expo/vector-icons";
 import { Screen, Note, Press, Empty, Arabic, Advisory, tap } from "../ui";
+import Animated from "react-native-reanimated";
+import { Appear, SkeletonRows, usePop, useRing } from "../motion";
 import B from "../data/bukhari.json";
 
 const HOST = "https://taiyabahapp.ysbdesigns.uk";
@@ -90,6 +92,12 @@ export default function Bukhari({ navigation }) {
   const [hits, setHits] = useState(null);     // null = showing the book list
   const [busy, setBusy] = useState(false);
   const run = useRef(0);
+
+  /* List entrance fires on the first paint only: the opening screenful rises
+     in, and rows scrolled to afterwards (or when searching) just appear —
+     motion on arrival, never on scroll. */
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
 
   useEffect(() => {
     /* Which language is searched is decided by what is typed: any Arabic
@@ -188,7 +196,8 @@ export default function Bukhari({ navigation }) {
                          { k: "bukhari.english_by_permission",
                            t: "The English is Dr Muhammad Muhsin Khan's translation, published by Darussalam. It is a modern work still in copyright and is not public domain — it is included here because Taiyabah Masjid has been given permission to use it." }]} />
         </View>}
-      renderItem={({ item: b }) => (hits ? (
+      renderItem={({ item: b, index }) => (
+        <Appear index={index} animate={firstPaint.current && !hits && index < 14}>{hits ? (
         /* A search result: the hadith number over its book, then the matching
            line with the hit in it. Tapping opens that hadith directly. */
         <Press onPress={() => { tap(); navigation.navigate("BukhariHadith", { bookN: b.book, n: b.n, name: b.name }); }}
@@ -227,7 +236,7 @@ export default function Bukhari({ navigation }) {
               {t("bukhari.n_hadith", "{n} hadith").replace("{n}", String(b.count))}</Text>
           </View>
           <Ionicons name={rtl ? "chevron-back" : "chevron-forward"} size={17} color={C.muted} />
-        </Press>))} />
+        </Press>)}</Appear>)} />
   );
 }
 
@@ -237,6 +246,8 @@ export function BukhariBook({ route, navigation }) {
   const { n, name } = route.params;
   const [state, setState] = useState({ loading: true });
   const [saved, setSaved] = useState(new Set());
+  const firstPaint = useRef(true);
+  useEffect(() => { const id = setTimeout(() => { firstPaint.current = false; }, 900); return () => clearTimeout(id); }, []);
 
   useEffect(() => {
     let live = true;
@@ -250,10 +261,12 @@ export function BukhariBook({ route, navigation }) {
   /* Reflect a save made on the reader when we come back to this list. */
   useEffect(() => navigation.addListener("focus", () => { loadSaved().then(setSaved); }), [navigation]);
 
+  /* While the book's narrations are fetched, branded skeletons the shape of
+     the preview cards shimmer in gold — not a bare spinner on an empty page. */
   if (state.loading)
     return (
-      <View style={{ flex: 1, backgroundColor: C.paper, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator color={C.brand600} />
+      <View style={{ flex: 1, backgroundColor: C.paper }}>
+        <SkeletonRows count={7} height={76} style={{ paddingHorizontal: 16, paddingTop: 12 }} />
       </View>);
 
   if (state.error)
@@ -272,7 +285,8 @@ export function BukhariBook({ route, navigation }) {
       keyExtractor={h => String(h.n)}
       initialNumToRender={10}
       contentContainerStyle={{ paddingTop: 12, paddingBottom: 40 }}
-      renderItem={({ item: h }) => (
+      renderItem={({ item: h, index }) => (
+        <Appear index={index} animate={firstPaint.current && index < 10}>
         <Press onPress={() => { tap(); navigation.navigate("BukhariHadith", { bookN: n, n: h.n, name }); }}
           style={{ marginHorizontal: 16, marginBottom: 9, paddingHorizontal: 14, paddingVertical: 12,
                    backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 14 }}>
@@ -288,8 +302,34 @@ export function BukhariBook({ route, navigation }) {
                        color: C.ink, textAlign: "left", writingDirection: "ltr" }}>{h.en}</Text>
             : <Text numberOfLines={2} style={{ fontFamily: F.quranic, fontSize: fs(17), lineHeight: fs(32),
                        color: C.ink, textAlign: "right", writingDirection: "rtl" }}>{h.ar}</Text>}
-        </Press>)} />
+        </Press></Appear>)} />
   );
+}
+
+/* The Save action, with the one bit of motion the three actions earn: on save
+ * the bookmark pops and a gold ring goes out from it; un-saving just pops. Kept
+ * at module scope, not inline in the reader, so the save that re-renders the
+ * reader does not remount this and cut the animation it just started. Both the
+ * pop and the ring are no-ops under Reduce Motion. */
+function SaveAction({ saved, label, onToggle }) {
+  const { fs } = useApp();
+  const { style: popStyle, pop } = usePop();
+  const { style: ring, fire } = useRing();
+  const run = async () => { const nowSaved = await onToggle(); pop(1.34); if (nowSaved) fire(); };
+  return (
+    <Press onPress={run}
+      style={{ flex: 1, alignItems: "center", gap: 3, paddingVertical: 9, borderRadius: 12,
+               borderWidth: 1, borderColor: saved ? C.gold : C.line, backgroundColor: C.card }}>
+      <View>
+        <Animated.View pointerEvents="none"
+          style={[{ position: "absolute", left: "50%", top: "50%", width: 30, height: 30,
+                    marginLeft: -15, marginTop: -15, borderRadius: 10, borderWidth: 2, borderColor: C.goldBright }, ring]} />
+        <Animated.View style={popStyle}>
+          <Ionicons name={saved ? "bookmark" : "bookmark-outline"} size={17} color={saved ? C.gold : C.brand600} />
+        </Animated.View>
+      </View>
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), color: C.muted }}>{label}</Text>
+    </Press>);
 }
 
 /* ---- one hadith: narrator, Arabic, English, and the three actions ---- */
@@ -314,7 +354,7 @@ export function BukhariHadith({ route }) {
 
   const h = state.h;
   const text = h ? (h.ar + "\n\n" + (h.en || "") + "\n\n— " + t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") + " " + n) : "";
-  const onSave = async () => { tap(); setSaved(await toggleSaved(n)); };
+  const onSave = async () => { tap(); const s = await toggleSaved(n); setSaved(s); return s; };
   const onCopy = async () => { tap(); try { await Clipboard.setStringAsync(text); } catch {} setCopied(true); setTimeout(() => setCopied(false), 1400); };
   const onShare = async () => { tap(); try { await Share.share({ message: text }); } catch {} };
 
@@ -350,7 +390,7 @@ export function BukhariHadith({ route }) {
   return (
     <ScrollView style={{ backgroundColor: C.paper }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16, paddingBottom: 40 }}>
       <View style={{ flexDirection: "row", gap: 8, marginBottom: 14 }}>
-        <Action icon={saved ? "bookmark" : "bookmark-outline"} label={t("bukhari.save", "Save")} onPress={onSave} on={saved} />
+        <SaveAction saved={saved} label={t("bukhari.save", "Save")} onToggle={onSave} />
         <Action icon="copy-outline" label={copied ? t("bukhari.copied", "Copied") : t("bukhari.copy", "Copy")} onPress={onCopy} on={copied} />
         <Action icon="share-outline" label={t("bukhari.share", "Share")} onPress={onShare} />
       </View>

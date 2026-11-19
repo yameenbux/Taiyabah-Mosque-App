@@ -46,6 +46,8 @@ import * as Haptics from "expo-haptics";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useIsFocused } from "@react-navigation/native";
 import Svg, { Circle, Path } from "react-native-svg";
+import Animated from "react-native-reanimated";
+import { usePop, useRing } from "../motion";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Press } from "../ui";
@@ -232,6 +234,12 @@ export default function Tasbih() {
   const cap = four ? whole : (target || Infinity);
   const done = four ? place.complete : (target ? n >= target : false);
 
+  /* The numeral pops on every count; a gold ring goes out from the dial at the
+     end of a step (the thirty-third, the hundredth). Both no-op under Reduce
+     Motion — the count still lands, just without the flourish. */
+  const { style: numStyle, pop: numPop } = usePop();
+  const { style: ringStyle, fire: ringFire } = useRing();
+
   const press = () => {
     if (!ready || n >= cap) return;
     const next = { ...latest.current, [mode]: n + 1 };
@@ -244,6 +252,8 @@ export default function Tasbih() {
                       : (target ? n + 1 >= target : (n + 1) % 100 === 0);
     (edge ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
           : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)).catch(() => {});
+    numPop(edge ? 1.22 : 1.14);
+    if (edge) ringFire();
   };
 
   const back = () => {
@@ -342,10 +352,17 @@ export default function Tasbih() {
                                      max: four ? place.step.count : (target || undefined) }}
                style={{ width: dial, height: dial, borderRadius: dial / 2,
                         alignItems: "center", justifyContent: "center" }}>
+          {/* The milestone ring: invisible at rest, expands and fades when a
+              step completes. */}
+          <Animated.View pointerEvents="none"
+            style={[{ position: "absolute", width: dial * 0.86, height: dial * 0.86,
+                      borderRadius: dial * 0.43, borderWidth: 2, borderColor: C.goldBright }, ringStyle]} />
           <Misbaha size={dial} total={beadTotal} done={beadsDone} />
-          <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.28)),
-                         lineHeight: fs(Math.round(dial * 0.32)),
-                         color: done ? C.brand600 : C.ink }}>{shown}</Text>
+          <Animated.View style={numStyle}>
+            <Text style={{ fontFamily: F.display, fontSize: fs(Math.round(dial * 0.28)),
+                           lineHeight: fs(Math.round(dial * 0.32)),
+                           color: done ? C.brand600 : C.ink, textAlign: "center" }}>{shown}</Text>
+          </Animated.View>
           <Text style={{ fontFamily: F.sansBold, fontSize: fs(10.5), letterSpacing: 1.8,
                          textTransform: "uppercase", color: C.gold, marginTop: 4,
                          textAlign: "center", paddingHorizontal: 30 }}>{under}</Text>

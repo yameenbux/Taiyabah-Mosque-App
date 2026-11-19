@@ -25,6 +25,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Image, Switch, Share } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import Svg, { Path } from "react-native-svg";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing, cancelAnimation } from "react-native-reanimated";
+import { useReduceMotion, EASE } from "../motion";
 import { C, F, R } from "../theme";
 import { Screen, Hero, Heading, Card, Lead, RowGroup, P, Note, PageFoot, Press, StarField, tap, open } from "../ui";
 import { Field, ErrorBox, Submit, isPhone } from "../form";
@@ -106,6 +109,54 @@ function Dua({ ar, tr, en, src }) {
 /* The crescent in the hero's ring, the same path the website draws. */
 const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">'
            + '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>';
+const MOON_PATH = "M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z";
+
+/* The crescent on the countdown poster, breathing — a slow scale, 1 → 1.06
+   over a long beat, so the screen has a pulse of its own while nothing else
+   moves. Still under Reduce Motion. */
+function BreathingCrescent({ size = 62 }) {
+  const reduce = useReduceMotion();
+  const s = useSharedValue(1);
+  useEffect(() => {
+    if (reduce) return;
+    s.value = withRepeat(withTiming(1.06, { duration: 2300, easing: Easing.inOut(Easing.ease) }), -1, true);
+    return () => cancelAnimation(s);
+  }, [reduce]);
+  const st = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  return (
+    <Animated.View style={[{ alignItems: "center", justifyContent: "center" }, st]}>
+      <Svg width={size} height={size} viewBox="0 0 24 24">
+        <Path d={MOON_PATH} fill={C.goldBright} stroke={C.gold} strokeWidth={0.6} />
+      </Svg>
+    </Animated.View>
+  );
+}
+
+/* A count cell's number, which rolls when it changes: the new value slides up
+   from below and fades in, clipped so it reads as a flip. The minutes cell
+   rolls once a minute, hours once an hour — the screen is re-rendered every
+   second but a cell only moves when its own digits change. Static under
+   Reduce Motion. */
+function RollNumber({ value, style, height }) {
+  const reduce = useReduceMotion();
+  const y = useSharedValue(0);
+  const op = useSharedValue(1);
+  const prev = useRef(value);
+  useEffect(() => {
+    if (prev.current === value) return;
+    prev.current = value;
+    if (reduce) return;
+    y.value = height * 0.5; op.value = 0;
+    y.value = withTiming(0, { duration: 440, easing: EASE });
+    op.value = withTiming(1, { duration: 440, easing: EASE });
+  }, [value]);
+  const st = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }], opacity: op.value }));
+  return (
+    <View style={{ height, overflow: "hidden", justifyContent: "center" }}>
+      <Animated.View style={st}><Text style={style}>{value}</Text></Animated.View>
+    </View>
+  );
+}
 
 /* ---- the layer on top of the month ------------------------------------ *
  *
@@ -925,6 +976,11 @@ export default function Ramadan({ navigation }) {
           </Text>
           <View style={{ width: 46, height: 2, backgroundColor: C.gold,
                          opacity: 0.9, marginTop: 20 }} />
+          {/* The crescent, breathing — Ramaḍān's own sign, the one thing on the
+              poster that moves while the rest holds still. */}
+          <View style={{ marginTop: 22 }}>
+            <BreathingCrescent size={60} />
+          </View>
         </View>
 
         {/* 2. the count, holding the middle */}
@@ -936,9 +992,8 @@ export default function Ramadan({ navigation }) {
                       style={{ flex: 1, borderWidth: 1, borderColor: "rgba(220,187,99,0.34)",
                                borderRadius: 18, paddingVertical: 15,
                                backgroundColor: "rgba(243,239,227,0.045)", alignItems: "center" }}>
-                  <Text style={{ fontFamily: F.display, fontSize: fs(36), color: C.cream }}>
-                    {c.n}
-                  </Text>
+                  <RollNumber value={c.n} height={fs(44)}
+                              style={{ fontFamily: F.display, fontSize: fs(36), color: C.cream, textAlign: "center" }} />
                   <Text style={{ fontFamily: F.sansBold, fontSize: fs(9), color: C.gold,
                                  letterSpacing: 1.9, textTransform: "uppercase", marginTop: 9 }}>
                     {c.label}
