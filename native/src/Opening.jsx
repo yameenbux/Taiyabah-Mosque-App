@@ -28,7 +28,7 @@
  * gets the plain quick fade this screen has always had, with no zoom.
  */
 import React, { useEffect, useRef, useState } from "react";
-import { View, AccessibilityInfo, Platform, useWindowDimensions, StyleSheet } from "react-native";
+import { View, Image, AccessibilityInfo, Platform, useWindowDimensions, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue, useAnimatedStyle, useAnimatedProps, withTiming, withDelay, Easing, runOnJS,
 } from "react-native-reanimated";
@@ -103,7 +103,7 @@ export default function Opening() {
   const holeProps = useAnimatedProps(() => ({ scale: hole.value }));
   const markStyle = useAnimatedStyle(() => ({
     opacity: 1 - mark.value,
-    transform: [{ scale: 1 + mark.value * 1.9 }],
+    transform: [{ scale: 1 + mark.value * 0.18 }],
   }));
 
   if (gone) return null;
@@ -127,14 +127,19 @@ export default function Opening() {
         </Defs>
         <Rect x={0} y={0} width={W} height={H} fill={C.brand900} mask="url(#openHole)" />
       </Svg>
-      {/* The gold star on top, at rest the thing you see; it lifts and fades as
-          its own shape opens beneath it. */}
-      <Animated.View
-        style={[{ position: "absolute", left: cx - baseR, top: cy - baseR, width: baseR * 2, height: baseR * 2 },
-                markStyle]}>
-        <Svg width={baseR * 2} height={baseR * 2}>
-          <Polygon points={star(baseR, baseR, baseR)} fill={C.gold} />
-        </Svg>
+      {/* On top: the gold star, and the wordmark under it — the mark the app
+          has always opened on, kept. Both lift and fade as the star's own shape
+          opens beneath them. The wordmark is the logo bitmap, not live text, so
+          nothing waits on a font at cold start. */}
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, markStyle]}>
+        <View style={{ position: "absolute", left: cx - baseR, top: cy - baseR, width: baseR * 2, height: baseR * 2 }}>
+          <Svg width={baseR * 2} height={baseR * 2}>
+            <Polygon points={star(baseR, baseR, baseR)} fill={C.gold} />
+          </Svg>
+        </View>
+        <Image source={require("../assets/logo.png")}
+               style={{ position: "absolute", left: cx - 75, top: cy + baseR + 22,
+                        width: 150, height: 106, resizeMode: "contain" }} />
       </Animated.View>
     </Animated.View>
   );
