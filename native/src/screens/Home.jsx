@@ -234,7 +234,7 @@ export default function Home({ navigation }) {
   })();
 
   return (
-    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
+    <Screen pad={false} topColor={C.brand900} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* ---- hero ------------------------------------------------------- */}
       {/* TWO gradients, as the website has them, not one spread over both.
           .topbar runs brand-900 to brand-800 over its own height; .hero then

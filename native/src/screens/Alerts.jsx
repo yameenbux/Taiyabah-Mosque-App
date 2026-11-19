@@ -163,7 +163,7 @@ export default function Alerts() {
   };
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} topColor={C.brand900}>
       {/* The website has no hero on this page — it is a page under the masjid's
           own top bar, and the sentence that was in the hero's sub belongs
           inside the card, above Enable, which is where the site puts it.

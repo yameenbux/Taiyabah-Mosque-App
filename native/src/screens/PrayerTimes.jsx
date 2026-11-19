@@ -81,7 +81,7 @@ export default function PrayerTimes({ navigation }) {
               : fullDow(t, when);
 
   return (
-    <Screen pad={false} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
+    <Screen pad={false} topColor={C.brand900} onScroll={bar.onScroll} scrollEventThrottle={bar.scrollEventThrottle}>
       {/* Prayer Times is one of the website's seven PAGES: the app bar above
           it, then the day stepper and the three chips ON THE PAPER, as plain
           white controls. The app put all of it inside a plum hero with its

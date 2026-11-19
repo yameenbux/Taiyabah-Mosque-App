@@ -60,7 +60,7 @@ const PHASE = [
 export function NewBuild({ navigation }) {
   const { t, fs, rtl } = useApp();
   return (
-    <Screen pad={false}>
+    <Screen pad={false} topColor={C.brand900}>
       {/* Donate is one of the website's seven PAGES, and its hero is the
           HADITH — the Arabic in gold at 23px, right-aligned, over the English
           in Fraunces and the chain of narration under a gold hairline. The

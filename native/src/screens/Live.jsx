@@ -131,7 +131,7 @@ export default function Live({ navigation }) {
     </Press>);
 
   return (
-    <Screen pad={false}>
+    <Screen pad={false} topColor={C.brand900}>
       <LinearGradient colors={[C.brand900, C.brand800]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
         <TopBar back navigation={navigation} />
       </LinearGradient>

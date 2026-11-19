@@ -156,7 +156,7 @@ export function Arabic({ children, size = 26, center = true }) {
    anchor and here is a scrollTo. Without this the ref lands on a function
    component and is silently dropped. */
 export const Screen = React.forwardRef(function Screen(
-  { children, scroll = true, pad = true, bg = C.paper, top = 0, ...rest }, ref) {
+  { children, scroll = true, pad = true, bg = C.paper, top = 0, topColor, ...rest }, ref) {
   const insets = useSafeAreaInsets();
   /* TAPPING THE TAB YOU ARE ALREADY ON TAKES YOU BACK TO THE TOP.
    *
@@ -176,7 +176,11 @@ export const Screen = React.forwardRef(function Screen(
   const inner = React.useRef(null);
   React.useImperativeHandle(ref, () => inner.current);
   useScrollToTop(inner);
-  const style = { backgroundColor: bg };
+  /* topColor paints the SCROLL VIEW ITSELF — the surface the overscroll bounce
+     reveals at top and bottom — so a screen whose first thing is the plum app
+     bar stretches the header on a pull-down instead of showing the cream paper
+     above it. The body stays cream because the content pane carries bg below. */
+  const style = { backgroundColor: topColor || bg };
   /* THE COLUMN. Every screen in the app goes through here, so the website's
      own max-width:520px lands everywhere at once rather than screen by screen
      — and a screen added later gets it without anybody remembering to. On a
@@ -201,6 +205,10 @@ export const Screen = React.forwardRef(function Screen(
   const pane = { paddingHorizontal: pad ? 16 : 0, paddingTop: top,
                   paddingBottom: insets.bottom + 30 + (down ? 76 : 0) + ((onAir || recOn) ? ON_AIR_ROOM : 0),
                   width: "100%", maxWidth: COLUMN, alignSelf: "center" };
+  /* With a topColor the scroll view is plum, so the content carries the body
+     colour itself and grows to fill the glass — otherwise the plum would show
+     under short content as well as on the bounce. */
+  if (topColor) { pane.backgroundColor = bg; pane.flexGrow = 1; }
   if (!scroll)
     return (
       <View style={[{ flex: 1, alignItems: "center" }, style]} {...rest}>
