@@ -171,6 +171,13 @@ async function hmac(secret, data) {
     { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   return crypto.subtle.sign("HMAC", key, enc.encode(data));
 }
+/* The member's session token, hashed the same way the membership edge function
+   stored it (sha256 hex of the raw token), so the Worker can ask Supabase what
+   this member owes WITHOUT the raw token ever travelling in the database call. */
+async function sha256hex(s) {
+  const buf = await crypto.subtle.digest("SHA-256", enc.encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
 async function issueToken(secret) {
   const payload = b64url(enc.encode(JSON.stringify({ exp: Date.now() + SESSION_HOURS * 3600e3 })));
   return `${payload}.${b64url(await hmac(secret, payload))}`;
@@ -1416,6 +1423,83 @@ async function handle(request, env) {
       }
 
       return json({ url: out.url, firstCharge: { at: anchor, days: when.days, date: when.date } }, 200, ch);
+    }
+
+    /* MEMBERSHIP — pay this year's fee by card, from inside the app.
+     *
+     *   POST /api/membership_checkout  { token, member, scope }  ->  { url }
+     *
+     * The same rule as the donation routes, and it matters more here: the amount
+     * is NEVER taken from the caller. A client that could name its own figure
+     * would settle a £100 membership for a penny. So the app sends only the
+     * member's session token and which member it is paying for; the Worker hashes
+     * the token the way the membership edge function stored it, and asks Supabase
+     * (membership_quote) what that member actually owes. The figure comes back
+     * from the register, is put into the Checkout Session here, and the member
+     * never sees — and cannot change — a number.
+     *
+     * metadata carries kind=membership, the member id and the year, so the Stripe
+     * webhook records the payment against the right member (membership_record_online,
+     * idempotent on the session). One-off (mode=payment), not a subscription —
+     * membership is paid once a year, raised by the office, not a standing charge. */
+    if (url.pathname === "/api/membership_checkout" && request.method === "POST") {
+      if (!env.STRIPE_SECRET_KEY)
+        return json({ error: "Card payment is not set up on this server yet." }, 503, ch);
+      if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY)
+        return json({ error: "Membership payment is not configured on this server." }, 503, ch);
+      if (!limit(`mem:${ip}`, 12, 10 * 60e3))
+        return json({ error: "Too many attempts. Try again in a few minutes." }, 429, ch);
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+      const token  = typeof body.token  === "string" ? body.token  : "";
+      const member = typeof body.member === "string" ? body.member : "";
+      const scope  = body.scope === "all" ? "all" : "current";
+      if (token.length < 20 || !/^[0-9a-f-]{20,40}$/i.test(member))
+        return json({ error: "Please sign in again." }, 400, ch);
+
+      // Ask the register what is owed — the amount is built server-side.
+      const tokenHash = await sha256hex(token);
+      const { data: q, error: qErr } = await supaRpc(env, "membership_quote",
+        { p_token_hash: tokenHash, p_member: member, p_scope: scope });
+      if (qErr) return json({ error: "Could not work out what is owed." }, 502, ch);
+      if (!q || !q.ok) return json({ error: "Please sign in again." }, 401, ch);
+      if (q.nothing_due || !q.amount_p)
+        return json({ error: "Your membership is already paid for this year — there is nothing to pay." }, 400, ch);
+
+      if (!q.reference) return json({ error: "Could not identify your record. Please sign in again." }, 502, ch);
+
+      const ret = env.MEMBER_RETURN_URL || "taiyabah://membership";
+      /* The membership money is recorded by the EXISTING stripe-webhook path: an
+         MF-YY-NNNN client_reference_id names the member (by ref number), and the
+         years list in metadata says what the amount is allocated across. Nothing
+         new is needed on the webhook; this is the convention it already parses. */
+      const form = new URLSearchParams({
+        mode: "payment",
+        client_reference_id: q.reference,
+        "line_items[0][price_data][currency]": "gbp",
+        "line_items[0][price_data][unit_amount]": String(q.amount_p),
+        "line_items[0][price_data][product_data][name]": `Taiyabah Masjid membership ${q.year}`,
+        "line_items[0][quantity]": "1",
+        "metadata[years]": q.years || String(q.year),
+        success_url: `${ret}?paid=1`,
+        cancel_url: `${ret}?paid=0`,
+      });
+
+      const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: form,
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.url) {
+        const why = out?.error?.message || `Stripe answered ${res.status}`;
+        return json({ error: "Stripe could not start this payment.", detail: why }, 502, ch);
+      }
+      return json({ url: out.url, amount_p: q.amount_p, year: q.year }, 200, ch);
     }
 
     /* Daily giving — asked for as "£1 a day", taken as one charge a month.

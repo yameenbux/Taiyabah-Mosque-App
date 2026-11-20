@@ -260,16 +260,24 @@ export const membershipState = token =>
  *
  * UNTIL THE WORKER IS DEPLOYED THIS IS BLANK, and the screen shows the ways to
  * pay at the masjid instead of a button. The website already holds this line:
- * a pay button that goes nowhere is worse than no pay button. */
+ * a pay button that goes nowhere is worse than no pay button.
+ *
+ * TO TURN IT ON: deploy the Worker (it now carries /api/membership_checkout),
+ * then set this to the Worker's /api base and ship an OTA:
+ *   export const MEMBER_PAY_ENDPOINT = "https://taiyabah-sender.yameenbux.workers.dev/api";
+ * The button appears on its own the moment this is non-blank. */
 export const MEMBER_PAY_ENDPOINT = "";
 
-export async function membershipCheckout(token, which) {
+/* The Worker builds the amount from the session token and the member — the app
+   never names a figure (see the Worker route). `member` is the masjid_members
+   id of the record being paid for; `which` is "current" (this year) or "all". */
+export async function membershipCheckout(token, member, which) {
   if (!MEMBER_PAY_ENDPOINT) return { ok: false, unavailable: true };
   try {
     const res = await fetch(`${MEMBER_PAY_ENDPOINT}/membership_checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, scope: which }),
+      body: JSON.stringify({ token, member, scope: which }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok || !body.url) return { ok: false, message: body.error || null };

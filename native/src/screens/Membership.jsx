@@ -41,7 +41,8 @@ import { C, F, dual } from "../theme";
 import { Screen, Hero, Heading, Card, P, Note, GoldCTA, Press,
          Call, KV, RowGroup, Callout } from "../ui";
 import { Field, ErrorBox } from "../form";
-import { memberRequestCode, memberVerifyCode, memberArea, MEMBER_PAY_ENDPOINT } from "../supabase";
+import * as WebBrowser from "expo-web-browser";
+import { memberRequestCode, memberVerifyCode, memberArea, membershipCheckout, MEMBER_PAY_ENDPOINT } from "../supabase";
 import { money } from "../membership";
 
 const OFFICE = "01204 535 997";
@@ -213,7 +214,14 @@ export default function Membership({ navigation }) {
     return <Start nav={navigation} onGo={() => { setErr(null); setInfo(null); setStep(STEP.EMAIL); }} />;
 
   if (step === STEP.AREA && active)
-    return <Area rec={active} many={members.length > 1}
+    return <Area rec={active} many={members.length > 1} token={token}
+                 onPaid={async () => {
+                   /* After a card payment, pull the record again so the screen
+                      flips to the paid ticket without a sign-in. */
+                   if (!token) return;
+                   const a = await memberArea(token);
+                   if (a && a.ok && (a.members || []).length) land(a.members);
+                 }}
                  onSwitch={() => setStep(STEP.PICK)} onLogOut={logOut} />;
 
   /* EMAIL, CODE and PICK share one plum top with a back arrow. */
@@ -370,8 +378,10 @@ function Start({ nav, onGo }) {
 
 /* --- the member's own area --------------------------------------------- */
 
-function Area({ rec, many, onSwitch, onLogOut }) {
+function Area({ rec, many, token, onPaid, onSwitch, onLogOut }) {
   const { t, fs } = useApp();
+  const [paying, setPaying] = useState(false);
+  const [payErr, setPayErr] = useState(null);
   /* THIS YEAR is the one thing a member comes to check. It is answered from the
      year's own line, not the lifetime total — a member who paid and a member who
      was never charged both have nothing "outstanding", and only the year's line
@@ -383,6 +393,34 @@ function Area({ rec, many, onSwitch, onLogOut }) {
   const owedThisYear = Math.max(0, Number(ty.outstanding_p) || 0);
   const totalPaid = Number(rec.paid_p);
   const totalInvoiced = Number(rec.invoiced_p);
+  /* In-app card payment is shown only once the Worker route is live
+     (MEMBER_PAY_ENDPOINT non-blank). Until then the office is the way to pay. */
+  const canPayInApp = !!MEMBER_PAY_ENDPOINT && !paidThisYear;
+
+  async function payNow() {
+    setPayErr(null);
+    setPaying(true);
+    try {
+      /* The amount is built by the Worker from the register — the app never
+         names a figure. We send only the session token and which member. */
+      const r = await membershipCheckout(token, rec.id, "current");
+      if (!r || !r.ok || !r.url) {
+        setPaying(false);
+        setPayErr(r && r.message ? r.message
+          : t("member.pay_failed", "Could not start the payment just now. Please try again, or pay at the office."));
+        return;
+      }
+      await WebBrowser.openBrowserAsync(r.url);
+      setPaying(false);
+      /* We cannot tell from here whether they completed it. Refresh either way:
+         if they paid, the webhook has recorded it and this flips to the ticket;
+         if they did not, nothing changes. */
+      if (onPaid) onPaid();
+    } catch (e) {
+      setPaying(false);
+      setPayErr(t("member.pay_failed", "Could not start the payment just now. Please try again, or pay at the office."));
+    }
+  }
 
   return (
     <Screen pad={false}>
@@ -448,13 +486,33 @@ function Area({ rec, many, onSwitch, onLogOut }) {
           )}
         </Card>
 
-        {!paidThisYear && (
+        {!paidThisYear && (canPayInApp ? (
+          <View style={{ marginTop: 12 }}>
+            <Press onPress={paying ? undefined : payNow} accessibilityRole="button"
+                   accessibilityState={{ disabled: paying }}
+                   accessibilityLabel={t("member.pay_now", "Pay membership by card")}
+                   style={{ backgroundColor: C.gold, borderRadius: 13, paddingVertical: 15,
+                            alignItems: "center", opacity: paying ? 0.6 : 1 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15.5), color: C.brand900 }}>
+                {paying ? t("member.pay_opening", "Opening…")
+                  : (chargedThisYear
+                      ? fill(t("member.pay_amount", "Pay {amount} by card"), { amount: money(owedThisYear) })
+                      : fill(t("member.pay_year", "Pay for {year} by card"), { year }))}
+              </Text>
+            </Press>
+            {!!payErr && (
+              <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.danger, marginTop: 8, textAlign: "center" }}>
+                {payErr}</Text>
+            )}
+            <Note center>{fill(t("member.or_office", "Or pay at the office — {office}, 5pm to 7pm."), { office: OFFICE })}</Note>
+          </View>
+        ) : (
           <Callout tone="plum"
             h={t("member.to_pay_see_office", "How to pay")}
             ps={[{ t: fill(t("member.to_pay_see_office_p",
               "To pay your {year} membership, speak to the office — {office}, 5pm to 7pm. Once it is recorded, this screen will show your membership as paid."),
               { year, office: OFFICE }) }]} />
-        )}
+        ))}
 
         <Call k={t("member.office_5_7", "Masjid office · 5pm–7pm")} v={OFFICE}
               href={`tel:${OFFICE.replace(/\s/g, "")}`} icon="call" />
