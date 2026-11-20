@@ -266,7 +266,7 @@ export const membershipState = token =>
  * then set this to the Worker's /api base and ship an OTA:
  *   export const MEMBER_PAY_ENDPOINT = "https://taiyabah-sender.yameenbux.workers.dev/api";
  * The button appears on its own the moment this is non-blank. */
-export const MEMBER_PAY_ENDPOINT = "";
+export const MEMBER_PAY_ENDPOINT = "https://taiyabah-sender.yameenbux.workers.dev/api";
 
 /* The Worker builds the amount from the session token and the member — the app
    never names a figure (see the Worker route). `member` is the masjid_members
