@@ -53,19 +53,6 @@ const TOKEN_KEY = "member.session.v1";
 const fill = (text, vals) =>
   Object.keys(vals).reduce((a, k) => a.split(`{${k}}`).join(String(vals[k])), text);
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-/* The register's figures are a snapshot of the office's books, dated. Showing a
- * balance with no date, as if it were live, would be a quiet lie — so every
- * figure on the record carries the day it was true. */
-function prettyDate(iso) {
-  if (!iso || typeof iso !== "string") return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  if (!m) return iso;
-  const mo = MONTHS[Number(m[2]) - 1];
-  return mo ? `${Number(m[3])} ${mo} ${m[1]}` : iso;
-}
-
 /* The five places this screen can be. Held as state in one component, not five
  * routes, so the back arrow walks the sign-in rather than dumping somebody out
  * of it halfway. */
@@ -385,9 +372,17 @@ function Start({ nav, onGo }) {
 
 function Area({ rec, many, onSwitch, onLogOut }) {
   const { t, fs } = useApp();
-  const owed = Math.max(0, Number(rec.outstanding_p) || 0);
-  const asOf = prettyDate(rec.as_of);
-  const paidUp = owed === 0;
+  /* THIS YEAR is the one thing a member comes to check. It is answered from the
+     year's own line, not the lifetime total — a member who paid and a member who
+     was never charged both have nothing "outstanding", and only the year's line
+     tells them apart. */
+  const ty = rec.this_year || {};
+  const year = ty.year || new Date().getFullYear();
+  const paidThisYear = !!ty.settled;
+  const chargedThisYear = !!ty.charged;
+  const owedThisYear = Math.max(0, Number(ty.outstanding_p) || 0);
+  const totalPaid = Number(rec.paid_p);
+  const totalInvoiced = Number(rec.invoiced_p);
 
   return (
     <Screen pad={false}>
@@ -398,35 +393,46 @@ function Area({ rec, many, onSwitch, onLogOut }) {
       ]} />
       <View style={{ paddingHorizontal: 16 }}>
 
-        {paidUp ? (
+        {paidThisYear ? (
+          /* THE TICKET. Whoever has paid this year is greeted with this and
+             nothing to do — the answer they came for, said plainly. */
           <View style={{ backgroundColor: C.tintGreen, borderWidth: 1,
-                         borderColor: dual("#CFE3D4", "#2B5B3E"),
-                         borderRadius: 15, padding: 15, marginTop: 12 }}>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(15.5),
+                         borderColor: dual("#CFE3D4", "#2B5B3E"), borderRadius: 18,
+                         paddingVertical: 28, paddingHorizontal: 20, marginTop: 14,
+                         alignItems: "center" }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28,
+                           backgroundColor: dual("#2F5E36", "#8FD6A6"),
+                           alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(30), lineHeight: fs(34),
+                             color: dual("#EAF5EC", "#0E2A17") }}>✓</Text>
+            </View>
+            <Text style={{ fontFamily: F.display, fontSize: fs(21), textAlign: "center",
                            color: dual("#2F5E36", "#8FD6A6") }}>
-              {t("member.youre_paid_up", "You are paid up")}
-            </Text>
-            <P muted>{asOf
-              ? fill(t("member.paid_up_as_of", "Nothing is outstanding on your record as of {date}."), { date: asOf })
-              : t("member.paid_up_plain", "Nothing is outstanding on your record.")}</P>
+              {fill(t("member.paid_this_year", "Your membership is paid for {year}"), { year })}</Text>
+            <P muted center>{t("member.paid_this_year_sub",
+              "Jazāk Allāhu khayran — there is nothing to pay for this year.")}</P>
           </View>
         ) : (
+          /* NOT PAID THIS YEAR — charged and owing, or not yet on this year's
+             record at all. Either way, the way to pay follows below. */
           <Card>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(10), letterSpacing: 1.6,
                            textTransform: "uppercase", color: C.goldInk }}>
-              {t("member.outstanding", "Outstanding")}
+              {fill(t("member.your_year_membership", "Your {year} membership"), { year })}
             </Text>
-            {/* Not red. The masjid asks and cannot compel; a balance in the
-                colour the app keeps for danger reads as a demand. */}
-            <View style={{ flexDirection: "row", alignItems: "baseline", gap: 9, marginTop: 2 }}>
-              <Text style={{ fontFamily: F.display, fontSize: fs(38), color: C.ink,
-                             fontVariant: ["tabular-nums"] }}>{money(owed)}</Text>
-              {!!asOf && (
+            {chargedThisYear ? (
+              /* Not red. The masjid asks and cannot compel; a balance in the
+                 colour the app keeps for danger reads as a demand. */
+              <View style={{ flexDirection: "row", alignItems: "baseline", gap: 9, marginTop: 2 }}>
+                <Text style={{ fontFamily: F.display, fontSize: fs(38), color: C.ink,
+                               fontVariant: ["tabular-nums"] }}>{money(owedThisYear)}</Text>
                 <Text style={{ fontFamily: F.sans, fontSize: fs(13), color: C.muted }}>
-                  {fill(t("member.as_of", "as of {date}"), { date: asOf })}
-                </Text>
-              )}
-            </View>
+                  {fill(t("member.to_pay_for_year", "to pay for {year}"), { year })}</Text>
+              </View>
+            ) : (
+              <P muted>{fill(t("member.not_on_record_year",
+                "We don’t have your {year} membership on record yet."), { year })}</P>
+            )}
           </Card>
         )}
 
@@ -434,19 +440,21 @@ function Area({ rec, many, onSwitch, onLogOut }) {
           {!!rec.status && (
             <KV k={t("member.status", "Status")} v={String(rec.status)} />
           )}
-          {Number.isFinite(Number(rec.total_paid_p)) && (
-            <KV k={t("member.total_paid", "Total paid")} v={money(Number(rec.total_paid_p) || 0)} />
+          {Number.isFinite(totalPaid) && (
+            <KV k={t("member.total_paid", "Total paid")} v={money(totalPaid || 0)} />
           )}
-          {Number.isFinite(Number(rec.total_invoiced_p)) && (
-            <KV k={t("member.total_invoiced", "Total invoiced")} v={money(Number(rec.total_invoiced_p) || 0)} />
+          {Number.isFinite(totalInvoiced) && (
+            <KV k={t("member.total_invoiced", "Total invoiced")} v={money(totalInvoiced || 0)} />
           )}
         </Card>
 
-        <Callout tone="plum"
-          h={t("member.to_pay_see_office", "To pay, or to check this is up to date")}
-          ps={[{ t: fill(t("member.to_pay_see_office_p",
-            "These figures are the office's own record. To pay this year, or if something looks wrong, speak to the office — {office}, 5pm to 7pm. Paying by card in the app is coming."),
-            { office: OFFICE }) }]} />
+        {!paidThisYear && (
+          <Callout tone="plum"
+            h={t("member.to_pay_see_office", "How to pay")}
+            ps={[{ t: fill(t("member.to_pay_see_office_p",
+              "To pay your {year} membership, speak to the office — {office}, 5pm to 7pm. Once it is recorded, this screen will show your membership as paid."),
+              { year, office: OFFICE }) }]} />
+        )}
 
         <Call k={t("member.office_5_7", "Masjid office · 5pm–7pm")} v={OFFICE}
               href={`tel:${OFFICE.replace(/\s/g, "")}`} icon="call" />
