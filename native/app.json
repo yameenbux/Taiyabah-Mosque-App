@@ -3,7 +3,7 @@
     "name": "Taiyabah Masjid",
     "slug": "taiyabah-masjid",
     "scheme": "taiyabah",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "runtimeVersion": {
       "policy": "fingerprint"
     },
