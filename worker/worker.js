@@ -1469,7 +1469,11 @@ async function handle(request, env) {
 
       if (!q.reference) return json({ error: "Could not identify your record. Please sign in again." }, 502, ch);
 
-      const ret = env.MEMBER_RETURN_URL || "taiyabah://membership";
+      // Stripe requires an https success/cancel URL (a custom scheme is refused),
+      // so this is a web page like the donation routes, not a deep link. The app
+      // opened Checkout in an in-app browser and refreshes the record when the
+      // member closes it, so where the page lands matters less than that it loads.
+      const ret = env.MEMBER_RETURN_URL || "https://taiyabahapp.ysbdesigns.uk/";
       /* The membership money is recorded by the EXISTING stripe-webhook path: an
          MF-YY-NNNN client_reference_id names the member (by ref number), and the
          years list in metadata says what the amount is allocated across. Nothing
