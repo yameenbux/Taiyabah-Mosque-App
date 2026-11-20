@@ -276,3 +276,44 @@ export async function membershipCheckout(token, which) {
     return { ok: true, url: body.url };
   } catch { return { ok: false }; }
 }
+
+/* --- membership, LOCKED ---------------------------------------------------
+ *
+ * The lookup above (name, then house number and postcode) authenticated a
+ * HOUSEHOLD, and a household is a thing a neighbour can guess: anyone who knew
+ * a name and an address could confirm that person is a member of this masjid,
+ * which is special-category data. This closes that door.
+ *
+ * A member now proves they can open the EMAIL the register holds against their
+ * record: a six-digit code to that inbox, then a session token the app keeps so
+ * they are not asked again for sixty days. There is still no account and no
+ * password — the masjid's rule that asking 1,490 men to hold an account to pay
+ * once a year is how the Excel sheet wins has not changed.
+ *
+ * The four member_* tables are RLS deny-all, so this publishable key can read
+ * none of them. The ONLY door is the `membership` edge function, which runs as
+ * the service role and does its own rate-limiting, hashing and neutral
+ * answering. request-code says the same thing whether or not the email is on
+ * the register — otherwise the screen becomes a way to confirm membership.
+ *
+ * Returns the function's JSON ({ ok, … }) on an answer, or null when the masjid
+ * could not be reached at all — the screen tells those two apart. */
+const FUNCTIONS = `${URL}/functions/v1`;
+async function memberFn(action, body, ms = 15000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(`${FUNCTIONS}/membership`, {
+      method: "POST", signal: ctrl.signal,
+      headers: { apikey: ANON, Authorization: `Bearer ${ANON}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ masjid: MASJID, action, ...body }),
+    });
+    noteReach(true);
+    return await res.json().catch(() => ({ ok: false }));
+  } catch { noteReach(false); return null; }
+  finally { clearTimeout(timer); }
+}
+
+export const memberRequestCode = email => memberFn("request-code", { email });
+export const memberVerifyCode  = (email, code) => memberFn("verify-code", { email, code });
+export const memberArea        = token => memberFn("area", { token });
