@@ -18,7 +18,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
 import { Screen, Hero, Heading, Card, P, Note, Notice, RowGroup, NavRow, Press, tap, open } from "../ui";
-import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent } from "../form";
+import { Field, Choice, Check, Calendar, ErrorBox, Submit, Sent, isEmail } from "../form";
 import { rpc, upload, isOpen } from "../supabase";
 import { longDate } from "../dates";
 import { nowLondon } from "../prayer";
@@ -80,12 +80,18 @@ export default function Collect({ navigation }) {
   };
 
   const send = async () => {
+    /* Each length mirrors the charity_collections CHECK constraints, so the form
+     * refuses what Postgres would and nobody meets a bare "that didn't send":
+     * names ≥ 2, org address ≥ 5, phones ≥ 6, and the two emails a real address. */
     const need = {
-      date: !date, org: !org.name.trim(), addr: !org.addr.trim(), phone: !org.phone.trim(),
-      email: !org.email.trim(), file: !file, certDate: !/^\d{4}-\d{2}-\d{2}$/.test(certDate),
-      cname: !who.name.trim(), crole: !who.role.trim(), paid: who.paid === null,
-      tname: !trustee.name.trim(), tphone: !trustee.phone.trim(), temail: !trustee.email.trim(),
-      sign: !sign.trim(), agree: !agree, privacy: !privacy,
+      date: !date,
+      org: org.name.trim().length < 2, addr: org.addr.trim().length < 5,
+      phone: org.phone.trim().length < 6, email: !isEmail(org.email),
+      file: !file, certDate: !/^\d{4}-\d{2}-\d{2}$/.test(certDate),
+      cname: who.name.trim().length < 2, crole: who.role.trim().length < 2, paid: who.paid === null,
+      tname: trustee.name.trim().length < 2, tphone: trustee.phone.trim().length < 6,
+      temail: !isEmail(trustee.email),
+      sign: sign.trim().length < 2, agree: !agree, privacy: !privacy,
     };
     /* Refused here as well as in Postgres, so nobody waits for a 5 MB upload
      * only to be told the certificate is too old to be accepted. */
