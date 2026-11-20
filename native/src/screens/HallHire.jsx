@@ -104,18 +104,31 @@ export default function HallHire({ navigation }) {
                                  : t("hallhire.ask", "Ask");
   const blocked = free === false || (free === true && (!agree || !hire || !hireOk));
 
+  /* The office's database holds each field to a length — address 8–300, names
+     2–60, phone 10–13 digits — and refuses anything outside it. The form used
+     to check only that a box was not empty, so a too-short address (a flat
+     number on its own) passed here and was refused by the database as a bare
+     "That didn't send." These mirror the hall_bookings CHECK constraints so the
+     form catches it first and highlights the box, rather than failing silently. */
+  const fTrim = who.first.trim(), lTrim = who.last.trim(), aTrim = who.addr.trim();
+  const phDigits = who.phone.replace(/[^0-9]/g, "");
+  const okFirst = fTrim.length >= 2 && fTrim.length <= 60;
+  const okLast  = lTrim.length >= 2 && lTrim.length <= 60;
+  const okAddr  = aTrim.length >= 8 && aTrim.length <= 300;
+  const okPhone = phDigits.length >= 10 && phDigits.length <= 13;
+
   const bad = {
     hire: touched && !hire, date: touched && !date, agree: touched && !agree,
-    first: touched && !who.first.trim(), last: touched && !who.last.trim(),
-    addr: touched && !who.addr.trim(), phone: touched && !isPhone(who.phone),
+    first: touched && !okFirst, last: touched && !okLast,
+    addr: touched && !okAddr, phone: touched && !okPhone,
   };
   /* THE TERMS OF HIRE WERE NEVER AGREED TO. The website will not send this
      form until "I have read and agree to the terms of hire, including use of
      the venue in accordance with Islamic rulings" is ticked. The app had no
      such box, so it took a £100 deposit for a venue whose conditions the
      hirer had never been asked to accept. */
-  const valid = hire && date && hireOk && who.first.trim() && who.last.trim() &&
-                who.addr.trim() && isPhone(who.phone) && agree;
+  const valid = hire && date && hireOk && okFirst && okLast &&
+                okAddr && okPhone && agree;
 
   async function send() {
     setTouched(true);
