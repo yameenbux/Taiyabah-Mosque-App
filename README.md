@@ -61,18 +61,22 @@ than what this masjid prints on its board.
 
 Four tabs, and a menu that opens in place rather than taking you somewhere else.
 
-<img src="assets/diagrams/02-four-tabs.svg" alt="The app's four tabs — Home, Prayer Times, Notices and More — and what the More menu opens: Recite, Services, Madrasah and Settings" width="100%">
+<img src="assets/diagrams/02-four-tabs.svg" alt="The app's four tabs — Home, Prayer Times, Events and More — and what the More menu opens: Recite, Services, Madrasah and Settings" width="100%">
 
 > [!IMPORTANT]
-> **Two things carry the "in development" tag, and they stay tagged until they
-> are real.** *Membership status* publishes what membership is and when the fee
-> falls due, but is not wired to the committee's members list, so it cannot tell
-> an individual whether **they** have paid. *Recordings* — past bayaans inside
-> the app's own player — waits on written permission from eMasjid Live, whose
-> infrastructure holds the archive. The live stream itself works today.
+> **Nothing now carries the "in development" tag.** The two things that used to —
+> *Membership* and *Recordings* — are both built and shipping. Membership opens a
+> member's own record behind a code emailed to the address the masjid holds, and
+> lets them pay the year's fee by card. Recordings plays past bayaans in the
+> app's own player, streamed from eMasjid Live's archive exactly as the live
+> broadcast is. The `soon` chip the menu can draw is wired to a data field, and
+> every `soon` field in the shipped data is `null`.
 >
-> Nothing else is tagged. Before adding or removing a tag anywhere, check what
-> the code does rather than what this file says.
+> **One section is still held, and it is held differently.** *Hajj & ʿUmrah* is
+> built and locked behind a release switch the masjid owns, and no ruling in it
+> is visible until a scholar's name is on it — see *Hajj & Umrah* below. That is a
+> deliberate lock, not an unfinished feature. Before adding or removing any tag,
+> check what the code does rather than what this file says.
 
 It installs to the home screen, works with no signal, and is also on **Google
 Play** as a Trusted Web Activity over the same URL — one codebase, not two.
@@ -266,7 +270,7 @@ The app's `start_url` is `index.html`, which the service worker serves from its
 own cache. **The code a phone runs is the code cached when that cache was
 written** — not what is on the server. Bump `CACHE` in `sw.js` with every
 user-visible change. It is one line, and it is the difference between shipping
-and appearing to ship. Current: `taiyabah-v164`.
+and appearing to ship. Current: `taiyabah-v295`.
 
 ---
 
@@ -276,7 +280,7 @@ and appearing to ship. Current: `taiyabah-v164`.
 - The app opens on a home screen rather than the timetable: the next jamāʿah and
   its countdown, today's five prayers, the day's reminder, a link to the
   broadcast, and a grid of the services people actually come looking for
-- Four tabs — Home, Prayer Times, Notices and More. "More" opens the full menu
+- Four tabs — Home, Prayer Times, Events and More. "More" opens the full menu
   in place rather than navigating away from where you are
 - The Android Back button closes one layer at a time. In a Trusted Web Activity
   Back is `history.back()`, and until v164 nothing in the app had ever pushed a
@@ -309,7 +313,8 @@ and appearing to ship. Current: `taiyabah-v164`.
   own lead time (5/10/15 min), and **"Jamāʿah Time Now"** at the jamāʿah itself
 - **Sūrah al-Kahf, every Friday at 9am**, on its own switch and on by default
 - **Notices carry a poster**, shown in the notification itself on Android, iOS
-  and desktop, and kept in the Notices tab afterwards
+  and desktop, and kept in the app afterwards — events in the Events tab,
+  announcements under the bell
 - A trustee compose screen (`admin.html`), password-protected, sending through
   the masjid's own Cloudflare Worker
 - Built-in diagnostics ("Having trouble?") so notification problems are
@@ -409,10 +414,16 @@ and appearing to ship. Current: `taiyabah-v164`.
 - Degrades honestly: states the bearing even without a working compass, and
   explains exactly why the compass can't run when it can't
 
-**Listen live**
-- In-app player for the masjid's broadcast, with background playback and
+**Listen live, and the archive**
+- In-app player for the masjid's live broadcast, with background playback and
   lock-screen controls
-- The masjid's videos and bayaans, playing in-app rather than sending people away
+- **Past bayaans in the app's own player** — browse by section, resume where you
+  left off, a draggable scrubber and ±15-second skips — streamed from eMasjid
+  Live's archive, the same source as the live broadcast. The player sits above
+  the navigator and keeps a now-playing bar, so a recording carries on while you
+  move around the app, and only one of the live stream and a recording plays at
+  any time
+- The masjid's videos, playing in-app rather than sending people away
 
 **Zakat calculator**
 - Nisab from a live gold/silver spot price, fetched key-free and sanity-checked,
@@ -427,6 +438,28 @@ and appearing to ship. Current: `taiyabah-v164`.
   platform in between
 - Donor tiers as **pledges**, settled afterwards by transfer or at the office
 - Bank details with tap-to-copy
+
+**Membership**
+- A member opens **their own record, and only their own**, behind a six-digit
+  code emailed to the address the masjid already holds for them. A name and an
+  address no longer open anyone's record — those are things a neighbour knows,
+  and membership is special-category data. The code lasts ten minutes; a session
+  is kept for sixty days, so nobody is asked to hold an account to pay once a year
+- **One inbox can open more than one record** — fathers, sons and brothers share
+  an email on this register, which is normal, not rare — so a verified email
+  offers the household to choose from, and the only names ever shown are the ones
+  already sharing that inbox
+- Whoever has paid the current year is met with a plain **"paid for this year"**
+  ticket and nothing to do — the answer they came for. Whoever has not can **pay
+  the year's fee by card** in the app; the amount is priced by the Worker from the
+  register, so the app never names a figure, and the screen flips to the ticket
+  once the payment is recorded
+- **"Send me a code" says the same thing** whether or not the email is on the
+  register, so the screen can never be used to confirm that a named person is a
+  member. The office runs the register itself — adding and amending members,
+  taking a counter or card-terminal payment, raising the year's charge, exporting
+  a backup — from its own screen in the admin portal on the masjid's website, not
+  here
 
 **The madrasah**
 - **Admissions & Fees** — everything asked of a family before they apply: the
@@ -477,11 +510,17 @@ and appearing to ship. Current: `taiyabah-v164`.
   months the database enforces, and both agreements are read from their
   checkboxes rather than assumed
 
-**Notices**
-- Everything the masjid has announced, newest first, each with its date and the
-  poster if one was attached. Tapping a poster opens it full-screen
-- The list is cached, so it is readable with no signal — the cached copy is shown
-  immediately and quietly replaced when the network answers
+**Events, and notifications**
+- The **Events tab** is a month calendar — a dot on every day that carries
+  something — over the posters in date order, grouped into what is coming up,
+  what has passed, and anything whose date is still to be confirmed. Tapping a
+  poster opens it full-screen
+- The **bell opens Notifications**: the announcements and janāzah notices the
+  masjid has sent, newest first, with events kept to the Events tab so the two do
+  not crowd each other. A red dot marks unread and clears as they are read, and
+  each can be swiped away with an undo
+- Both lists are cached, so they are readable with no signal — the cached copy is
+  shown immediately and quietly replaced when the network answers
 
 **Community information**
 - Masjid history — established 1967, founders, the ulema who have led imaamat
@@ -616,8 +655,15 @@ Anything committed here is reachable by URL.
 │   └── README.md                  deploy, REMINDERS.md for the scheduler.
 │
 ├── db/                          Migrations owned by the app rather than the
-│   └── 001_notices.sql           website. Applied to the shared Supabase
-│                                  project by hand, once.
+│   ├── 001_notices.sql           website — notices, app-crash and app-usage
+│   ├── …                          telemetry, published prayer years, app-issue
+│   └── 158_membership_lockdown.sql  reports, and the membership email lock.
+│                                  Applied to the shared Supabase project by hand.
+│
+├── supabase/functions/         Edge functions owned by the app.
+│   └── membership/               The email-code sign-in behind the Membership
+│                                  screen — sends the six-digit code and checks
+│                                  it on the service role, never from the browser.
 │
 ├── store/                       App-store material — the Play listing copy and
 │   ├── PLAY-LISTING.md            answers, the screenshots and the feature
@@ -975,8 +1021,14 @@ PUPPETEER_EXECUTABLE_PATH=/path/to/chrome node scripts/build-diagrams.mjs
 ## Where things stand
 
 **Live:** the web app at [taiyabahapp.ysbdesigns.uk](https://taiyabahapp.ysbdesigns.uk),
-installable on any phone, and the **Android app on Google Play** —
-`com.taiyabahmasjid.app`, version 2.0.1, version code 8.
+installable on any phone; the **Android app on Google Play** and the **iOS app on
+the App Store** — `com.taiyabahmasjid.app`. Google Play serves **2.4.0 (version
+code 40)**, with **2.4.1 (version code 41)** submitted to production and
+processing; the App Store build predates the membership rework, and a matching
+2.4.1 iOS build is being cut to bring it level. 2.4.1 is the first build to carry
+a fingerprint **runtime version**, so from it onward a JS or content fix reaches
+installed phones over the air — every build before it had none and could receive
+no over-the-air update at all.
 
 That Play app is now the **native React Native build in `native/`**, not the
 Trusted Web Activity it started as; the TWA ended at version code 1. See
@@ -1041,13 +1093,10 @@ Still outstanding, roughly in the order it matters:
 - **Madrasah applications** — the form lives on the website and stays unreachable
   until the DPIA is done. The app publishes the fees, rules and term dates, and
   says applications open soon rather than implying a form.
-- **Live audio archive** — the masjid broadcasts through eMasjid Live, which also
-  keeps past recordings; the app's player streams live audio only. Playing the
-  archive inside our own app needs their agreement in writing, since the stores
-  can ask us to evidence it. Asked, and awaiting an answer.
-- **Two end-to-end tests, by a person** — a real donation through Stripe, and a
-  real hall booking, each confirmed as arriving where the office expects it. Both
-  paths are built and neither has been exercised with real money or a real date.
+- **Three end-to-end tests, by a person** — a real donation through Stripe, a real
+  hall booking, and a real membership card payment, each confirmed as arriving
+  where the office expects it. All three paths are built and none has been
+  exercised with real money or a real date.
 - **Religious content review** — the Islamic Will and Marriage guidance have not
   separately been signed off. The 40 Rabbanā no longer need it: every one is
   checked against the Qur'an text on each build.
@@ -1055,6 +1104,27 @@ Still outstanding, roughly in the order it matters:
 
 ### Done since the first release
 
+- **Membership, end to end.** A member opens their own record behind a code
+  emailed to the address the masjid holds — replacing a lookup that let anyone
+  confirm anyone's membership from a name and an address. Whoever has paid the
+  year is met with a plain "paid" ticket; whoever has not can pay the fee by card
+  in the app, priced by the Worker from the register so the app never names a
+  figure. The office adds, amends, deletes, exports, takes a counter payment and
+  raises the year's charge from its own screen in the admin portal. The register,
+  rates, per-year charges and payments are a canonical schema on the masjid's
+  website — every table deny-all, reached only through `verified_admin`
+  (two-factor) functions, or the service role for the webhook and the card quote
+- **Recordings** — past bayaans in the app's own player, streamed from eMasjid
+  Live's archive like the live broadcast, with background playback, a now-playing
+  bar that survives navigation, and resume-where-you-left-off
+- **The Events tab and a Notifications screen.** The old Notices tab became a
+  month calendar over the posters; the bell opens a separate Notifications list
+  for announcements and janāzah, with an unread dot and swipe-to-clear
+- **Over-the-air updates.** The app carries a fingerprint runtime version and an
+  EAS Update channel, so a JS or content fix reaches installed phones without a
+  store review — on every build cut from 2.4.1 onward. Earlier builds carried no
+  runtime version and could receive none, which is why the first membership
+  lock-down never reached a phone until a fresh build went out
 - **Ramadan, built in full on both platforms, behind a gate that opens by
   itself** a week before the first night and shuts a day after the last. The
   night, the times, the juz and its pages are read from the timetable and the
