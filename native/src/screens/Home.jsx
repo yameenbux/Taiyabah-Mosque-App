@@ -195,7 +195,12 @@ function Tile({ x, i, navigation }) {
 
 export default function Home({ navigation }) {
   const bar = useTopBar();
-  const { t, fs, rtl } = useApp();
+  const { t, fs, rtl, homeLayout } = useApp();
+  /* "times" leads the home screen with today's five prayer times as a list,
+     chosen in System Preferences; "greeting" (the default) opens on the salām
+     and the next jamāʿah. Only the top of the screen changes — everything from
+     Listen down is the same either way. */
+  const timesFirst = homeLayout === "times";
   const [now, setNow] = useState(nowLondon());
 
   /* Tick on the half minute: the only thing that changes is the countdown, and
@@ -311,11 +316,14 @@ export default function Home({ navigation }) {
         {/* The salām settles in on open — a short fade and rise, ending exactly
             where it sits now, so the diacritics are never pushed above the
             clip. Still under Reduce Motion. */}
+        {/* The salām leads the greeting-first home. In the times-first home it
+            steps aside for the prayer list below, which becomes the hero. */}
+        {!timesFirst && (
         <Appear rise={8} duration={560}>
           <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
                          color: C.goldBright, writingDirection: "rtl" }}>
             السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
-        </Appear>
+        </Appear>)}
 
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
                        borderWidth: 1, borderColor: "rgba(243,239,227,.18)", borderRadius: R.pill,
@@ -339,7 +347,10 @@ export default function Home({ navigation }) {
               {ramadan.year ? ` · ${ramadan.year} AH` : ""}</Text>
           </View>)}
 
-        {next ? (
+        {/* The big next-jamāʿah countdown belongs to the greeting-first home.
+            In the times-first home the next prayer is the highlighted row at
+            the top of the list, so this block steps aside there. */}
+        {!timesFirst && (next ? (
           <Appear delay={240} rise={10} duration={560} style={{ alignSelf: "stretch", alignItems: rtl ? "flex-end" : "flex-start" }}>
             <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 1.5,
                            color: C.goldBright, marginTop: 20, textTransform: "uppercase" }}>
@@ -374,7 +385,7 @@ export default function Home({ navigation }) {
         ) : (
           <Text style={{ fontFamily: F.sans, fontSize: fs(14), color: "#D0BFCA", marginTop: 20 }}>
             {t("times.no_further_dates", "The loaded timetable has no further dates.")}</Text>
-        )}
+        ))}
 
         {/* The Friday call, inside the hero exactly as the web app has it. */}
         {friday && (
@@ -416,7 +427,11 @@ export default function Home({ navigation }) {
         {/* ---- Today ---------------------------------------------------- */}
         <SecH t={t} fs={fs} rtl={rtl} title={t("home.today", "Today")}
               tag={t("home.beginning_jamaah", "Beginning & jamāʿah")} />
-        {!!day && (
+        {/* GREETING-FIRST draws today's times as the compact five-column strip
+            the website has. TIMES-FIRST draws them as the vertical agenda just
+            below, built from the same `day`, so the two can never disagree
+            about which day they are showing. */}
+        {!timesFirst && !!day && (
           <View style={{ flexDirection: "row", backgroundColor: C.card, borderRadius: R.card, borderWidth: 1,
                          ...SHADOW,
                          borderColor: C.line, overflow: "hidden" }}>
@@ -445,6 +460,14 @@ export default function Home({ navigation }) {
                 </View>);
             })}
           </View>)}
+
+        {/* TIMES-FIRST: the same five prayers as a vertical agenda, with the
+            next one raised into a highlighted row carrying the countdown the
+            greeting-first hero shows at the top. Style B of the two the
+            committee compared; the website offers the same list. */}
+        {timesFirst && !!day && (
+          <TimesAgenda t={t} fs={fs} rtl={rtl} day={day} next={next}
+                       friJum={friJum} countdown={countdown} now={now} />)}
 
         {/* SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
             no jamāʿah, so a sixth column would promise a beginning and a
@@ -639,6 +662,86 @@ export default function Home({ navigation }) {
 
       </View>
     </Screen>
+  );
+}
+
+/* The times-first home's prayer agenda.
+ *
+ * The same five prayers the greeting-first home shows in its compact strip,
+ * laid out instead as a vertical list so each one is a line of its own — which
+ * is what the members who asked for this layout wanted, and the pattern a
+ * dedicated prayer app uses. The next jamāʿah is raised into a highlighted
+ * plum row that carries the countdown the greeting-first hero shows at the top,
+ * so nothing the other layout tells you is lost. Built from the same `day`, so
+ * the figures cannot disagree with the strip; the website carries the twin. */
+function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown }) {
+  const dir = rtl ? "row-reverse" : "row";
+  const begText = t("home.begins", "Begins {t}").replace("{t}", pretty(begins).replace(/ (am|pm)$/, ""));
+  if (isNext) {
+    return (
+      <View style={{ borderRadius: R.card, overflow: "hidden" }}>
+        <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.4 }}
+          style={{ flexDirection: dir, alignItems: "center", gap: 12, paddingVertical: 14, paddingHorizontal: 14 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center",
+                         backgroundColor: "rgba(220,187,99,.18)" }}>
+            <PrayerIcon k={k} size={17} color={C.goldBright} />
+          </View>
+          <View style={{ flex: 1, minWidth: 0, alignItems: rtl ? "flex-end" : "flex-start" }}>
+            <View style={{ flexDirection: dir, alignItems: "baseline", gap: 7 }}>
+              <Text style={{ fontFamily: F.display, fontSize: fs(16.5), color: C.cream }}>{name}</Text>
+              <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(15), color: C.cream }}>{ar}</Text>
+            </View>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.goldBright, marginTop: 2 }}>
+              {t("app.next_jama_ah", "Next Jamāʿah") + " · " + countdown}</Text>
+          </View>
+          <View style={{ alignItems: rtl ? "flex-start" : "flex-end" }}>
+            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(23), color: "#fff" }}>
+              {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
+            <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.7)", marginTop: 1 }}>
+              {begText}</Text>
+          </View>
+        </LinearGradient>
+      </View>
+    );
+  }
+  return (
+    <View style={{ flexDirection: dir, alignItems: "center", gap: 12, backgroundColor: C.card,
+                   borderRadius: R.card, borderWidth: 1, borderColor: C.line,
+                   paddingVertical: 11, paddingHorizontal: 13, ...SHADOW }}>
+      <View style={{ width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center",
+                     backgroundColor: C.tintPlum }}>
+        <PrayerIcon k={k} size={16} color={C.gold} />
+      </View>
+      <View style={{ flex: 1, minWidth: 0, alignItems: rtl ? "flex-end" : "flex-start" }}>
+        <View style={{ flexDirection: dir, alignItems: "baseline", gap: 7 }}>
+          <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink }}>{name}</Text>
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(13.5), color: C.brand600 }}>{ar}</Text>
+        </View>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 1 }}>{begText}</Text>
+      </View>
+      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(18), color: C.ink }}>
+        {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
+    </View>
+  );
+}
+
+function TimesAgenda({ t, fs, rtl, day, next, friJum, countdown, now }) {
+  return (
+    <Appear rise={8} duration={520}>
+      <View style={{ gap: 8 }}>
+        {ORDER.map(k => {
+          const isNext = !!next && k === next.key && !next.tomorrow;
+          const label = isNext && friJum
+            ? { en: t("prayer.jumuah", "Jumuʿah"), ar: "الجمعة" }
+            : (n => ({ en: t(`prayer.${n.k}`, n.en), ar: NAMES[k].ar }))(nameFor(k, now));
+          return (
+            <AgendaRow key={k} t={t} fs={fs} rtl={rtl} k={k}
+                       name={label.en} ar={label.ar}
+                       begins={day.begins[k]} jamaah={day.jamaat[k]}
+                       isNext={isNext} countdown={countdown} />);
+        })}
+      </View>
+    </Appear>
   );
 }
 
