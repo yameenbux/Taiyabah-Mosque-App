@@ -78,6 +78,13 @@ export const EVERYTHING_ON = { jamaah: true, janazah: true, announcements: true,
 
 const DEFAULTS = { lang: "en", scale: 1.12, theme: "light", reminders: {}, favourites: [], lastRead: null,
                    muMark: 0, muFavSurahs: [],
+                   /* Which home screen the reader has chosen: "greeting" opens
+                    * on the salām and the next jamāʿah, "times" leads with all
+                    * five of today's prayer times as a list. Greeting is the
+                    * default and the masjid's own; the times-first layout was
+                    * asked for by members who open the app only to check the
+                    * next jamāʿah. The website offers the same choice. */
+                   homeLayout: "greeting",
                    /* The website's own five switches and its ten-minute default,
                     * so somebody who set this up on the website finds the same
                     * choices here rather than a different set. */
@@ -197,6 +204,11 @@ export function AppProvider({ children, fallback = null }) {
          the masjid's own screens are light, and somebody who wants the app
          dark says so. */
       setTheme: theme => save({ ...prefs, theme: theme === "dark" ? "dark" : "light" }),
+      /* The home screen's layout, chosen in System Preferences and applied the
+         instant it is tapped, like the theme above it. Anything but "times"
+         falls back to the greeting, so an unknown value from an older build
+         can never leave the home screen blank. */
+      setHomeLayout: v => save({ ...prefs, homeLayout: v === "times" ? "times" : "greeting" }),
       setReminder: (key, on) => save({ ...prefs, reminders: { ...prefs.reminders, [key]: on } }),
       /* Where the reader got to, so the Qur'an screen can offer it back rather
        * than making somebody scroll to page 300 again. */

@@ -36,6 +36,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, BackHandler, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import { useApp } from "../store";
 import { C, F, dual } from "../theme";
 import { Screen, Hero, Heading, Card, P, Note, GoldCTA, Press,
@@ -441,8 +442,10 @@ function Area({ rec, many, token, onPaid, onSwitch, onLogOut }) {
             <View style={{ width: 56, height: 56, borderRadius: 28,
                            backgroundColor: dual("#2F5E36", "#8FD6A6"),
                            alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(30), lineHeight: fs(34),
-                             color: dual("#EAF5EC", "#0E2A17") }}>✓</Text>
+              {/* An Ionicon tick, not the character "✓": on iOS a bare ✓ falls
+                 through to Apple Color Emoji and draws as a blue box that
+                 ignores the colour it is given — see scripts/check-glyphs.mjs. */}
+              <Ionicons name="checkmark" size={fs(34)} color={dual("#EAF5EC", "#0E2A17")} />
             </View>
             <Text style={{ fontFamily: F.display, fontSize: fs(21), textAlign: "center",
                            color: dual("#2F5E36", "#8FD6A6") }}>

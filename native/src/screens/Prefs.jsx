@@ -27,7 +27,7 @@ const SIZES = [
 ];
 
 export default function Prefs() {
-  const { t, fs, lang, setLang, scale, setScale, theme, setTheme } = useApp();
+  const { t, fs, lang, setLang, scale, setScale, theme, setTheme, homeLayout, setHomeLayout } = useApp();
   return (
     <Screen pad={false}>
       {/* .ia-hero's title is "Display & Language". The app used the sheet
@@ -60,6 +60,34 @@ export default function Prefs() {
                          backgroundColor: on ? C.pick : C.card }}>
                 <Ionicons name={m.icon} size={19} color={on ? C.cream : C.muted} />
                 <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.3,
+                               textTransform: "uppercase",
+                               color: on ? C.pickInk : C.muted }}>{t(m.k, m.t)}</Text>
+              </Pressable>);
+          })}
+        </View>
+
+        {/* HOME SCREEN. Whether the home opens on the salām greeting or on all
+            of today's prayer times. The greeting is the default and the
+            masjid's own; the times-first list was asked for by members who open
+            the app only to check the next jamāʿah. Same two buttons as
+            Appearance above, because it is the same kind of choice, and the
+            same choice is offered on the website. */}
+        <Heading>{t("sysprefs.home_layout", "Home screen")}</Heading>
+        <P muted>{t("sysprefs.home_layout_help",
+          "Choose what the home screen shows first: the greeting, or today’s prayer times.")}</P>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+          {[{ v: "greeting", k: "sysprefs.greeting_first", t: "Greeting",      icon: "chatbubbles-outline" },
+            { v: "times",    k: "sysprefs.times_first",    t: "Prayer times",  icon: "time-outline" }].map(m => {
+            const on = (homeLayout || "greeting") === m.v;
+            return (
+              <Pressable key={m.v} onPress={() => { tap(); setHomeLayout(m.v); }}
+                accessibilityRole="radio" accessibilityState={{ selected: on }}
+                style={{ flex: 1, alignItems: "center", gap: 5, paddingVertical: 13, paddingHorizontal: 6,
+                         borderRadius: 12, borderWidth: 1,
+                         borderColor: on ? C.pick : C.line,
+                         backgroundColor: on ? C.pick : C.card }}>
+                <Ionicons name={m.icon} size={19} color={on ? C.cream : C.muted} />
+                <Text numberOfLines={1} style={{ fontFamily: F.sansSemi, fontSize: fs(11), letterSpacing: 0.3,
                                textTransform: "uppercase",
                                color: on ? C.pickInk : C.muted }}>{t(m.k, m.t)}</Text>
               </Pressable>);
