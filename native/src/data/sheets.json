@@ -550,7 +550,7 @@
     },
     "card": true,
     "ext": false,
-    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M4 19c0-3.5 2-6 3-8s.5-4-1-5.5\"></path> <circle cx=\"15\" cy=\"7\" r=\"2.3\"></circle> <path d=\"M6 19h14\"></path><path d=\"M11 19v-4a3 3 0 0 1 6 0v4\"></path> </svg>",
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <path d=\"M12 20v-6.5\"></path> <path d=\"M12 13.5c0-2.7 1.6-4.8 4.8-4.8.2 3.2-1.5 4.8-4.8 4.8Z\"></path> <path d=\"M12 15.5c-1.2 0-3.7-.5-4.4-3.2 2.7-.5 4.1 1 4.4 3.2Z\"></path> <path d=\"M7 20h10\"></path> </svg>",
     "href": null,
     "id": "md-birth",
     "soon": null
@@ -567,7 +567,7 @@
     },
     "card": true,
     "ext": false,
-    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <circle cx=\"8.5\" cy=\"15.5\" r=\"4.5\"></circle><circle cx=\"15.5\" cy=\"15.5\" r=\"4.5\"></circle> <path d=\"M12 4.5c1.4 0 2.5 1 2.5 2.2S13.4 9 12 9s-2.5-1-2.5-2.3S10.6 4.5 12 4.5Z\"></path> </svg>",
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <circle cx=\"9\" cy=\"12\" r=\"5\"></circle><circle cx=\"15\" cy=\"12\" r=\"5\"></circle> </svg>",
     "href": null,
     "id": "md-marriage",
     "soon": null
@@ -584,7 +584,7 @@
     },
     "card": true,
     "ext": false,
-    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z\"></path> <path d=\"M14 3v5h5\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h4\"></path> </svg>",
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <path d=\"M15 12h-5\"></path><path d=\"M15 8h-5\"></path> <path d=\"M19 17V5a2 2 0 0 0-2-2H4\"></path> <path d=\"M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3\"></path> </svg>",
     "href": null,
     "id": "md-will",
     "soon": null
@@ -601,7 +601,7 @@
     },
     "card": true,
     "ext": false,
-    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"> <path d=\"M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7l-8-4Z\"></path> <path d=\"M9 12l2 2 4-4\"></path> </svg>",
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"> <path d=\"M6.5 20.5v-8.6a5.5 5.5 0 0 1 11 0v8.6\"></path> <path d=\"M3.5 20.5h17\"></path> <path d=\"M15 13.64A3.04 3.04 0 0 1 10.96 9.6a3.08 3.08 0 1 0 4.04 4.04Z\"></path> </svg>",
     "href": null,
     "id": "md-funeral",
     "soon": null
@@ -1255,7 +1255,7 @@
     },
     "card": true,
     "ext": false,
-    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z\"></path></svg>",
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3c3.5 4.4 6 7.4 6 10.5a6 6 0 0 1-12 0C6 10.4 8.5 7.4 12 3Z\"></path><path d=\"M9.2 13.8a2.8 2.8 0 0 0 2.8 2.8\"></path></svg>",
     "href": null,
     "id": "ed-ghusl",
     "soon": null
@@ -2516,7 +2516,7 @@
      {
       "type": "p",
       "k": "hol.the_madrasah_teaches_180_days",
-      "t": "The madrasah teaches 180 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class."
+      "t": "The madrasah teaches 179 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class."
      }
     ]
    },
@@ -2561,9 +2561,24 @@
     "t": "Today"
    },
    {
+    "type": "p",
+    "k": "hol.key_date",
+    "t": "Key date"
+   },
+   {
     "type": "heading",
     "k": "hol.when_the_madrasah_is_closed",
     "t": "When the madrasah is closed",
+    "tag": null
+   },
+   {
+    "type": "card",
+    "blocks": []
+   },
+   {
+    "type": "heading",
+    "k": "hol.key_dates_this_year",
+    "t": "Key dates this year",
     "tag": null
    },
    {
@@ -2885,6 +2900,14 @@
          "k": "giving.jumuah",
          "t": "Jumuʿah"
         }
+       },
+       {
+        "k": "giving.daily",
+        "t": "Daily",
+        "sub": {
+         "k": "giving.from_1_a_day",
+         "t": "From £1 a day"
+        }
        }
       ]
      },
@@ -2897,6 +2920,11 @@
       "type": "note",
       "k": "giving.a_weekly_gift_for_jumuah",
       "t": "A weekly gift for Jumuʿah. The first payment is taken on the next Friday, and every Friday after that. Nothing is taken today. You can stop it any time."
+     },
+     {
+      "type": "note",
+      "k": "giving.a_little_every_day",
+      "t": "A little every day, taken as one payment a month — thirty days at a time. One monthly payment instead of thirty daily ones keeps far more of your giving with the masjid, because the card fee is charged per payment. You can stop it any time."
      },
      {
       "type": "p",
@@ -2942,6 +2970,34 @@
         "sub": {
          "k": "giving.you_choose",
          "t": "You choose"
+        }
+       }
+      ]
+     },
+     {
+      "type": "p",
+      "k": "giving.how_much_a_day",
+      "t": "How much a day"
+     },
+     {
+      "type": "chips",
+      "items": [
+       {
+        "t": "£1",
+        "sub": {
+         "t": "£30 a month"
+        }
+       },
+       {
+        "t": "£2",
+        "sub": {
+         "t": "£60 a month"
+        }
+       },
+       {
+        "t": "£3",
+        "sub": {
+         "t": "£90 a month"
         }
        }
       ]
