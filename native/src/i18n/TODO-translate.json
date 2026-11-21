@@ -90,5 +90,9 @@
  "member.to_pay_see_office_p": "To pay your {year} membership, speak to the office — {office}, 5pm to 7pm. Once it is recorded, this screen will show your membership as paid.",
  "member.switch_member": "Switch member",
  "notices.notifications": "Notifications",
+ "sysprefs.home_layout": "Home screen",
+ "sysprefs.home_layout_help": "Choose what the home screen shows first: the greeting, or today’s prayer times.",
+ "sysprefs.greeting_first": "Greeting",
+ "sysprefs.times_first": "Prayer times",
  "a11y.notifications": "Notifications"
 }

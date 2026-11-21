@@ -131,6 +131,13 @@ for (const e of arrayOf("MAD_EVENTS")) {
   add(`hol.e.${e.id}.n`, e.name);
   add(`hol.e.${e.id}.d`, e.sub);
 }
+/* The madrasah's key dates — assessments, parents' evenings, the presentation
+   day — the third list beside the closures and the Islamic ones. Same as those:
+   the name is translated, and a note only where the entry carries one. */
+for (const k of arrayOf("MAD_KEYDATES")) {
+  add(`hol.k.${k.id}.n`, k.name);
+  if (k.note) add(`hol.k.${k.id}.d`, k.note);
+}
 
 for (const [k, en] of [["fajr","Fajr"],["sunrise","Sun"],["zuhr","Zuhr"],["asr","Asr"],
                        ["maghrib","Mag"],["isha","Isha"]]) add(`month.col.${k}`, en);

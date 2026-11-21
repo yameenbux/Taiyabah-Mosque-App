@@ -13,7 +13,7 @@ import { useApp } from "../store";
 import { SHEETS } from "../Blocks";
 import { Screen, Hero, Heading, Card, P, CTA, tap } from "../ui";
 import { nowLondon } from "../prayer";
-import { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS } from "../madrasah-data";
+import { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS, MAD_KEYDATES } from "../madrasah-data";
 
 /* The sheet the website serves, built by scripts/build-holiday-planner.mjs
    from this same data. It opens in the system browser like every other
@@ -34,13 +34,20 @@ const DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "
 
 /* One lookup per day beats scanning the closure list 365 times. */
 function dayMaps() {
-  const shut = {}, evt = {};
+  const shut = {}, evt = {}, kd = {};
   for (const c of MAD_CLOSURES) {
     const d = parse(c.from), end = parse(c.to);
     while (d <= end) { shut[iso(d)] = c; d.setDate(d.getDate() + 1); }
   }
   for (const e of MAD_EVENTS) (evt[e.on] = evt[e.on] || []).push(e);
-  return { shut, evt };
+  /* Key dates — assessments and the like — fall on term-time days, so a day
+     can be both open and a key date. A separate map keeps them off the
+     open/closed/Islamic axes the cell's fill and border already carry. */
+  for (const k of MAD_KEYDATES) {
+    const d = parse(k.from), end = parse(k.to);
+    while (d <= end) { const key = iso(d); (kd[key] = kd[key] || []).push(k); d.setDate(d.getDate() + 1); }
+  }
+  return { shut, evt, kd };
 }
 
 /* Called at render, not read at import — three of these four are theme colours
@@ -56,20 +63,25 @@ function dayMaps() {
  *
  * `today` follows the cell it describes, which is the filled plum — it named
  * brand-600 and so drew a pale pink ring against a saturated plum cell. */
-const KEY = () => ({ open: C.hint, shut: "#C25B5B", ev: "#C6A24C", today: C.plumFill });
+const KEY = () => ({ open: C.hint, shut: "#C25B5B", ev: "#C6A24C", today: C.plumFill, kd: C.brand600 });
 
-function Key({ colour, label, hollow, fill }) {
+function Key({ colour, label, hollow, fill, underline }) {
   const { fs } = useApp();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-      <View style={{ width: 11, height: 11, borderRadius: 3, borderWidth: hollow ? 1.5 : 0,
-                     borderColor: colour,
-                     backgroundColor: fill || (hollow ? "transparent" : colour) }} />
+      {/* `underline` mirrors the grid's key-date mark: a plain cell carrying a
+          thick brand-coloured rule along its bottom edge, not a fill or a
+          full border — those are taken by open/closed and the Islamic date. */}
+      <View style={{ width: 11, height: 11, borderRadius: 3,
+                     borderWidth: hollow || underline ? 1.5 : 0,
+                     borderColor: underline ? C.line : colour,
+                     ...(underline ? { borderBottomWidth: 2.5, borderBottomColor: colour } : null),
+                     backgroundColor: fill || (hollow || underline ? "transparent" : colour) }} />
       <Text style={{ fontFamily: F.sans, fontSize: fs(11.5), color: C.muted }}>{label}</Text>
     </View>);
 }
 
-function Month({ y, m, shut, evt, todayISO, width, picked, onPick, label }) {
+function Month({ y, m, shut, evt, kd, todayISO, width, picked, onPick, label }) {
   const { fs, t } = useApp();
   const days = new Date(y, m + 1, 0).getDate();
   const lead = (new Date(y, m, 1).getDay() + 6) % 7;        // Monday-first, as the website is
@@ -105,7 +117,7 @@ function Month({ y, m, shut, evt, todayISO, width, picked, onPick, label }) {
           if (d === null) return <View key={i} style={{ width: box, height: box }} />;
           const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
           const dw = new Date(y, m, d).getDay();
-          const isShut = !!shut[key], isEv = !!evt[key], isToday = key === todayISO;
+          const isShut = !!shut[key], isEv = !!evt[key], isKd = !!kd[key], isToday = key === todayISO;
           const wknd = dw === 0 || dw === 6;
           const on = picked === key;
           return (
@@ -124,6 +136,7 @@ function Month({ y, m, shut, evt, todayISO, width, picked, onPick, label }) {
                 `${t(`dow.${dw}`, DOW[dw])} ${d} ${label}`,
                 isShut ? `${t("hol.closed", "Closed")} — ${t(`hol.c.${shut[key].id}.n`, shut[key].name)}` : "",
                 isEv ? evt[key].map(e => t(`hol.e.${e.id}.n`, e.name)).join(" · ") : "",
+                isKd ? kd[key].map(k => t(`hol.k.${k.id}.n`, k.name)).join(" · ") : "",
                 isToday ? t("hol.today", "Today") : "",
               ].filter(Boolean).join(". ")}
               style={{ width: box, height: box, alignItems: "center", justifyContent: "center" }}>
@@ -147,7 +160,8 @@ function Month({ y, m, shut, evt, todayISO, width, picked, onPick, label }) {
                              borderColor: isToday ? C.brand600
                                         : isShut ? "rgba(180,83,47,.3)"
                                         : isEv ? C.gold : "transparent" }}>
-                <Text style={{ fontFamily: isToday || isEv ? F.sansBold : F.sans, fontSize: fs(11.5),
+                <Text style={{ fontFamily: isToday || isEv || isKd ? F.sansBold : F.sans, fontSize: fs(11.5),
+                               ...(isKd ? { textDecorationLine: "underline", textDecorationColor: C.brand600 } : null),
                                color: isToday ? C.cream
                                     : isShut ? dual("#8E4126", C.danger)
                                     : wknd ? C.muted : C.ink }}>{d}</Text>
@@ -212,7 +226,7 @@ export default function Holidays() {
   const { width } = useWindowDimensions();
   const strip = useRef(null);
 
-  const { shut, evt } = useMemo(dayMaps, []);
+  const { shut, evt, kd } = useMemo(dayMaps, []);
   const today = nowLondon();
   const todayISO = iso(today);
   const [picked, setPicked] = useState(null);
@@ -272,8 +286,8 @@ export default function Holidays() {
           : { open: true, line: t("hol.madrasah_open", "Madrasah open"),
               note: t("hol.classes_run_5_00_7_00pm", "Classes run 5:00–7:00pm. Hifz runs until 7:30pm.") };
     return { head: `${t(`dow.${dw}`, DOW[dw])} ${pretty(picked)}`,
-             state, events: evt[picked] || [] };
-  }, [picked, shut, evt, t]);
+             state, events: evt[picked] || [], keyd: kd[picked] || [] };
+  }, [picked, shut, evt, kd, t]);
 
   /* Is the madrasah open today? The website's four answers, in its order. */
   const wd = today.getDay(), why = shut[todayISO];
@@ -318,7 +332,7 @@ export default function Holidays() {
           </View>
         </View>
 
-        <Card><P>{t("hol.the_madrasah_teaches_180_days", "The madrasah teaches 180 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class.")}</P></Card>
+        <Card><P>{t("hol.the_madrasah_teaches_180_days", "The madrasah teaches 179 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings. Everything below applies to every class.")}</P></Card>
 
         {/* Above the twelve months, as it is on the website: somebody who came
             for the planner should not have to scroll the whole year to find
@@ -337,6 +351,8 @@ export default function Holidays() {
               set to the same plum, and today's cell in the grid is filled, so
               an outlined swatch described a cell the calendar never draws. */}
           <Key colour={KEY().today} label={t("hol.today", "Today")} />
+          {/* The brand-coloured underline the grid marks a key date with. */}
+          <Key colour={KEY().kd} fill={C.card} underline label={t("hol.key_date", "Key date")} />
         </View>
       </View>
 
@@ -344,7 +360,7 @@ export default function Holidays() {
                   decelerationRate="fast" snapToInterval={width - 32 + 12}
                   contentContainerStyle={{ paddingHorizontal: 16 }}>
         {months.map(({ y, m }) => (
-          <Month key={`${y}-${m}`} y={y} m={m} shut={shut} evt={evt} todayISO={todayISO} width={width}
+          <Month key={`${y}-${m}`} y={y} m={m} shut={shut} evt={evt} kd={kd} todayISO={todayISO} width={width}
                  picked={picked} onPick={setPicked}
                  label={`${t(`month.${m}`, MONTHS[m])} ${y}`} />))}
       </ScrollView>
@@ -379,6 +395,16 @@ export default function Holidays() {
                     <Text style={{ fontFamily: F.sansSemi }}>{t(`hol.e.${e.id}.n`, e.name)}</Text>
                     <Text style={{ color: C.muted }}>{`   ${t(`hol.e.${e.id}.d`, e.sub)}`}</Text></Text>
                 </View>))}
+              {/* A key date carries the brand mark it was underlined with in
+                  the grid, the way an Islamic date carries its gold. */}
+              {answer.keyd.map(k => (
+                <View key={k.id} style={{ flexDirection: "row", alignItems: "center", gap: 7, marginTop: 7 }}>
+                  <View style={{ width: 9, height: 9, borderRadius: 2, borderWidth: 1.5,
+                                 borderColor: C.brand600 }} />
+                  <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12.5), color: C.ink }}>
+                    <Text style={{ fontFamily: F.sansSemi }}>{t(`hol.k.${k.id}.n`, k.name)}</Text>
+                    {!!k.note && <Text style={{ color: C.muted }}>{`   ${t(`hol.k.${k.id}.d`, k.note)}`}</Text>}</Text>
+                </View>))}
             </View>
           </>) : (
             <Text style={{ flex: 1, fontFamily: F.sans, fontSize: fs(12.5), lineHeight: fs(20),
@@ -410,6 +436,26 @@ export default function Holidays() {
             every closure and its length, which is the thing somebody planning
             a trip actually needs. Removed rather than reworded: the screen
             says it better by saying nothing. */}
+
+        {/* Key dates — the assessments, parents' evenings and presentation the
+            madrasah prints alongside its closures. Term-time events, so they
+            sit between the closures and the Islamic dates rather than among
+            either. */}
+        <Heading>{t("hol.key_dates_this_year", "Key dates this year")}</Heading>
+        <Card gap={0} pad={0}>
+          {MAD_KEYDATES.map((k, i) => {
+            const single = k.from === k.to;
+            const n = Math.round((parse(k.to) - parse(k.from)) / 86400000) + 1;
+            return (
+              <ListRow key={k.id} first={i === 0}
+                name={t(`hol.k.${k.id}.n`, k.name)}
+                sub={k.note ? t(`hol.k.${k.id}.d`, k.note) : ""}
+                when={pretty(k.from) + (single ? "" : ` – ${pretty(k.to)}`)}
+                len={single ? t(`dow.${parse(k.from).getDay()}`, DOW[parse(k.from).getDay()])
+                            : `${n} ${n === 1 ? t("hol.day", "day") : t("hol.days", "days")}`}
+                past={todayISO > k.to} />);
+          })}
+        </Card>
 
         <Heading>{t("hol.islamic_dates_this_year", "Islamic dates this year")}</Heading>
         <Card gap={0} pad={0}>

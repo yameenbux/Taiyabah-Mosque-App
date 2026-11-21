@@ -1838,6 +1838,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hp-key.k-shut{background:var(--danger-fill);border-color:var(--danger-fill)}
   .hp-key.k-ev{background:var(--gold);border-color:var(--gold)}
   .hp-key.k-today{background:var(--plum-fill);border-color:var(--plum-fill)}
+  .hp-key.k-kd{background:var(--card);border-color:var(--line);border-bottom:2px solid var(--brand-600)}
   /* Twelve grids down a phone is a lot of scrolling, so they swipe sideways
      one month at a time and snap, the way a calendar is actually read. */
   .hp-months{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
@@ -1863,10 +1864,17 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
   .hp-d.is-shut{background:rgba(180,83,47,.14);color:var(--ink-rose-2);border-color:rgba(180,83,47,.3)}
   .hp-d.is-ev{border-color:var(--gold);font-weight:700}
   .hp-d.is-today{background:var(--plum-fill);color:#F3EFE3;font-weight:700;border-color:var(--plum-fill)}
+  /* Key dates — assessments, parents' evenings, the presentation — fall on days
+     the madrasah is open, so they cannot take the cell's background (that says
+     open/closed) or its border (gold is already an Islamic date). An underline
+     in the brand colour sits under the number without fighting either. */
+  .hp-d.is-kd{text-decoration:underline;text-decoration-color:var(--brand-600);
+    text-decoration-thickness:2px;text-underline-offset:2px;font-weight:700}
   .hp-pick{margin:11px 0 2px}
   .hp-today .ev{display:flex;align-items:center;gap:7px;margin-top:7px;
     font-size:calc(12.5px * var(--ts));color:var(--ink)}
   .hp-today .ev i{flex:0 0 auto;width:9px;height:9px;border-radius:2px;border:1.5px solid var(--gold)}
+  .hp-today .ev.kd i{border-color:var(--brand-600)}
   .hp-today .ev .sub{color:var(--muted)}
   .hp-list{padding:2px 16px}
   .hp-r{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
@@ -4650,7 +4658,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
           </div>
 
           <div class="card hh-card">
-            <p data-i18n="hol.the_madrasah_teaches_180_days">The madrasah teaches 180 days this year &mdash; 36 weeks, Monday to Friday, 5pm
+            <p data-i18n="hol.the_madrasah_teaches_180_days">The madrasah teaches 179 days this year &mdash; 36 weeks, Monday to Friday, 5pm
                to 7pm. Hifz students also attend on Saturday mornings. Everything below applies
                to every class.</p>
           </div>
@@ -4679,6 +4687,7 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
             <span><i class="hp-key k-shut"></i><span data-i18n="hol.closed">Closed</span></span>
             <span><i class="hp-key k-ev"></i><span data-i18n="hol.islamic_date">Islamic date</span></span>
             <span><i class="hp-key k-today"></i><span data-i18n="hol.today">Today</span></span>
+            <span><i class="hp-key k-kd"></i><span data-i18n="hol.key_date">Key date</span></span>
           </div>
           <div class="hp-months" id="hp-months"></div>
 
@@ -4694,6 +4703,8 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
 
           <div class="sec-h"><h2 data-i18n="hol.when_the_madrasah_is_closed">When the madrasah is closed</h2><span class="rule"></span></div>
           <div class="card hp-list" id="hp-closures"></div>
+          <div class="sec-h"><h2 data-i18n="hol.key_dates_this_year">Key dates this year</h2><span class="rule"></span></div>
+          <div class="card hp-list" id="hp-keydates"></div>
           <div class="sec-h"><h2 data-i18n="hol.islamic_dates_this_year">Islamic dates this year</h2><span class="rule"></span></div>
           <div class="card hp-list" id="hp-events"></div>
           <div class="wl-advisory">
@@ -16281,11 +16292,29 @@ const MAD_CLOSURES = [
   { id:"insert",    name:"Insert Day",        note:"Teachers in \u2014 no students", from:"2026-09-01", to:"2026-09-01" },
   { id:"autumnht",  name:"Half Term Break",   note:"",                               from:"2026-10-26", to:"2026-10-30" },
   { id:"christmas", name:"End of Term Break", note:"Christmas and New Year",         from:"2026-12-21", to:"2027-01-01" },
-  { id:"ramadhan",  name:"Ramadhan Holidays", note:"Ramadhan and Eid al-Fitr",       from:"2027-02-08", to:"2027-03-12" },
+  { id:"staffjan",  name:"Staff Training",    note:"Teachers in \u2014 no students", from:"2027-01-04", to:"2027-01-04" },
+  { id:"ramadhan",  name:"Ramadhan Holidays", note:"Ramadhan and Eid al-Fitr",       from:"2027-02-08", to:"2027-03-14" },
   { id:"springht",  name:"End of Term Break", note:"",                               from:"2027-03-26", to:"2027-04-02" },
   { id:"eidadha",   name:"Eid al-Adha",       note:"Eid holidays",                   from:"2027-05-17", to:"2027-05-18" },
   { id:"summerht",  name:"Summer Half Term",  note:"",                               from:"2027-05-31", to:"2027-06-04" },
-  { id:"endofyear", name:"End of Year",       note:"Summer holidays",                from:"2027-07-26", to:"2027-09-03" }
+  { id:"endofyear", name:"End of Year",       note:"Summer holidays",                from:"2027-07-26", to:"2027-09-06" }
+];
+
+/* KEY DATES \u2014 term-time events, when the madrasah is OPEN and these happen:
+   assessments, parents' evenings, the presentation day, and the date the next
+   year starts. A third kind of date beside the closures and the Islamic ones,
+   added so the app's calendar carries the whole of the madrasah's printed
+   "Key Dates" sheet rather than only the closures. Each has an id so its name
+   is translated; a single-day item sets from === to. Edited here once a year
+   alongside the two lists above. */
+const MAD_KEYDATES = [
+  { id:"midyear",  name:"Mid-year assessments",    note:"", from:"2026-12-14", to:"2026-12-18" },
+  { id:"pe1",      name:"Parents\u2019 Evening",    note:"", from:"2026-12-18", to:"2026-12-18" },
+  { id:"endyear",  name:"End-of-year assessments", note:"", from:"2027-07-05", to:"2027-07-15" },
+  { id:"hifzass",  name:"Hifz assessments",        note:"", from:"2027-07-14", to:"2027-07-14" },
+  { id:"pe2",      name:"Parents\u2019 Evening",    note:"", from:"2027-07-16", to:"2027-07-16" },
+  { id:"present",  name:"Presentation Day",        note:"", from:"2027-07-23", to:"2027-07-23" },
+  { id:"newyear28",name:"New year starts",         note:"2027/28", from:"2027-09-07", to:"2027-09-07" }
 ];
 
 const MAD_EVENTS = [
@@ -16308,22 +16337,27 @@ function madParse(v){ const a = v.split("-"); return new Date(+a[0], +a[1]-1, +a
 function madPretty(v){ const d = madParse(v); return num(d.getDate()) + " " + mon(d.getMonth()) + " " + num(d.getFullYear()); }
 function madName(c){ return t("hol.c." + c.id + ".n", c.name); }
 function madEvName(e){ return t("hol.e." + e.id + ".n", e.name); }
+function madKdName(k){ return t("hol.k." + k.id + ".n", k.name); }
 
 /* One lookup per day beats scanning the closure list 365 times. */
 function madDayMaps(){
-  const shut = {}, evt = {};
+  const shut = {}, evt = {}, kd = {};
   MAD_CLOSURES.forEach(c=>{
     const d = madParse(c.from), end = madParse(c.to);
     while(d <= end){ shut[madIso(d)] = c; d.setDate(d.getDate()+1); }
   });
   MAD_EVENTS.forEach(e=>{ (evt[e.on] = evt[e.on] || []).push(e); });
-  return { shut, evt };
+  MAD_KEYDATES.forEach(k=>{
+    const d = madParse(k.from), end = madParse(k.to);
+    while(d <= end){ const key = madIso(d); (kd[key] = kd[key] || []).push(k); d.setDate(d.getDate()+1); }
+  });
+  return { shut, evt, kd };
 }
 
 function renderHolidays(){
   const host = document.getElementById('hp-months');
   if(!host) return;
-  const { shut, evt } = madDayMaps();
+  const { shut, evt, kd } = madDayMaps();
   const todayISO = madIso(nowLondon());
 
   /* ---- is the madrasah open today? ---- */
@@ -16375,6 +16409,7 @@ function renderHolidays(){
       if(dw === 0 || dw === 6) cls += " is-wknd";
       if(shut[key]){ cls += " is-shut"; title.push(madName(shut[key])); }
       if(evt[key]){ cls += " is-ev"; title.push(evt[key].map(madEvName).join(" \u00B7 ")); }
+      if(kd[key]){ cls += " is-kd"; title.push(kd[key].map(madKdName).join(" \u00B7 ")); }
       if(key === todayISO){ cls += " is-today"; todayCard = card; }
       /* A BUTTON, NOT A DIV. The title attribute below has carried this same
          sentence since the planner was written, and a title is a mouse hover
@@ -16448,7 +16483,11 @@ function renderHolidays(){
     pe.innerHTML = (evt[key] || []).map(e =>
       '<span class="ev"><i aria-hidden="true"></i><span><b>' + esc(madEvName(e)) +
       '</b> <span class="sub">' + esc(t("hol.e." + e.id + ".d", e.sub)) +
-      "</span></span></span>").join("");
+      "</span></span></span>").join("") +
+      (kd[key] || []).map(k =>
+      '<span class="ev kd"><i aria-hidden="true"></i><span><b>' + esc(madKdName(k)) + "</b>" +
+      (k.note ? ' <span class="sub">' + esc(t("hol.k." + k.id + ".d", k.note)) + "</span>" : "") +
+      "</span></span>").join("");
   };
 
   /* One listener on the host rather than 365 on the cells, and it survives
@@ -16487,6 +16526,17 @@ function renderHolidays(){
         fullDow(madParse(e.on).getDay()),
         todayISO > e.on, true)
   ).join("");
+
+  document.getElementById('hp-keydates').innerHTML = MAD_KEYDATES.map(k=>{
+    const single = k.from === k.to;
+    const n = Math.round((madParse(k.to) - madParse(k.from)) / 86400000) + 1;
+    return row(madKdName(k),
+               k.note ? t("hol.k." + k.id + ".d", k.note) : "",
+               madPretty(k.from) + (single ? "" : " – " + madPretty(k.to)),
+               single ? fullDow(madParse(k.from).getDay())
+                      : num(n) + " " + (n === 1 ? t("hol.day","day") : t("hol.days","days")),
+               todayISO > k.to, false);
+  }).join("");
 }
 
 function openHolidays(){

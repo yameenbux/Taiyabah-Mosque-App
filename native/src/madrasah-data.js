@@ -9,11 +9,12 @@ export const MAD_CLOSURES = [
   { id:"insert",    name:"Insert Day",        note:"Teachers in \u2014 no students", from:"2026-09-01", to:"2026-09-01" },
   { id:"autumnht",  name:"Half Term Break",   note:"",                               from:"2026-10-26", to:"2026-10-30" },
   { id:"christmas", name:"End of Term Break", note:"Christmas and New Year",         from:"2026-12-21", to:"2027-01-01" },
-  { id:"ramadhan",  name:"Ramadhan Holidays", note:"Ramadhan and Eid al-Fitr",       from:"2027-02-08", to:"2027-03-12" },
+  { id:"staffjan",  name:"Staff Training",    note:"Teachers in \u2014 no students", from:"2027-01-04", to:"2027-01-04" },
+  { id:"ramadhan",  name:"Ramadhan Holidays", note:"Ramadhan and Eid al-Fitr",       from:"2027-02-08", to:"2027-03-14" },
   { id:"springht",  name:"End of Term Break", note:"",                               from:"2027-03-26", to:"2027-04-02" },
   { id:"eidadha",   name:"Eid al-Adha",       note:"Eid holidays",                   from:"2027-05-17", to:"2027-05-18" },
   { id:"summerht",  name:"Summer Half Term",  note:"",                               from:"2027-05-31", to:"2027-06-04" },
-  { id:"endofyear", name:"End of Year",       note:"Summer holidays",                from:"2027-07-26", to:"2027-09-03" }
+  { id:"endofyear", name:"End of Year",       note:"Summer holidays",                from:"2027-07-26", to:"2027-09-06" }
 ];
 
 export const MAD_EVENTS = [
@@ -27,4 +28,14 @@ export const MAD_EVENTS = [
   { id:"eidadha",   name:"Eid al-Adha",           sub:"10 Dhul Hijjah",      on:"2027-05-16" },
   { id:"newyear",   name:"Islamic New Year",      sub:"1 Muharram 1449",     on:"2027-06-06" },
   { id:"ashura",    name:"Day of \u02BFAshura",    sub:"10 Muharram",         on:"2027-06-15" }
+];
+
+export const MAD_KEYDATES = [
+  { id:"midyear",  name:"Mid-year assessments",    note:"", from:"2026-12-14", to:"2026-12-18" },
+  { id:"pe1",      name:"Parents\u2019 Evening",    note:"", from:"2026-12-18", to:"2026-12-18" },
+  { id:"endyear",  name:"End-of-year assessments", note:"", from:"2027-07-05", to:"2027-07-15" },
+  { id:"hifzass",  name:"Hifz assessments",        note:"", from:"2027-07-14", to:"2027-07-14" },
+  { id:"pe2",      name:"Parents\u2019 Evening",    note:"", from:"2027-07-16", to:"2027-07-16" },
+  { id:"present",  name:"Presentation Day",        note:"", from:"2027-07-23", to:"2027-07-23" },
+  { id:"newyear28",name:"New year starts",         note:"2027/28", from:"2027-09-07", to:"2027-09-07" }
 ];

@@ -441,12 +441,17 @@ for (const f of ["index.html", "admin.html"]) {
 
 /* ---- 3k. the holiday planner's prose still matches its dates ----
 
-   The screen tells a parent the madrasah teaches 180 days, 36 weeks, and that
-   the two long breaks are 33 and 40 days. Those are four sentences written by
+   The screen tells a parent the madrasah teaches 179 days, 36 weeks, and that
+   the two long breaks are 35 and 43 days. Those are four sentences written by
    hand next to a list of dates edited by hand, once a year, by different
    people. Nothing makes them agree, and a parent who plans a trip around a
    sentence that no longer matches the calendar beside it loses their child's
-   place over it. So the sentences are checked against the dates. ---- */
+   place over it. So the sentences are checked against the dates.
+
+   36 weeks is the TERM structure, not teaching days ÷ 5: the madrasah runs 36
+   weeks Monday-to-Friday (180 slots) but one of them carries a staff-training
+   inset day on which no students attend, so 179 are actually taught. That is
+   why weeks is no longer derived from the teaching-day count. ---- */
 {
   const html = readFileSync("index.html", "utf8");
   const grab = (name) => {
@@ -478,13 +483,12 @@ for (const f of ["index.html", "admin.html"]) {
     }
     const say = (en) => html.includes(en);
     const wrong = [];
-    if (teach !== 180) wrong.push(`the dates give ${teach} teaching days, the screen says 180`);
-    if (teach % 5 || teach / 5 !== 36) wrong.push(`the dates give ${(teach/5).toFixed(1)} weeks, the screen says 36`);
+    if (teach !== 179) wrong.push(`the dates give ${teach} teaching days, the screen says 179`);
     const ram = closures.find(c => c.id === "ramadhan"), sum = closures.find(c => c.id === "endofyear");
-    if (ram && len(ram) !== 33) wrong.push(`the Ramadhan break is ${len(ram)} days, the screen says 33`);
-    if (sum && len(sum) !== 40) wrong.push(`the summer break is ${len(sum)} days, the screen says 40`);
-    if (!say("teaches 180 days this year") || !say("36 weeks"))
-      wrong.push("the planner's opening sentence no longer states 180 days over 36 weeks");
+    if (ram && len(ram) !== 35) wrong.push(`the Ramadhan break is ${len(ram)} days, the screen says 35`);
+    if (sum && len(sum) !== 43) wrong.push(`the summer break is ${len(sum)} days, the screen says 43`);
+    if (!say("teaches 179 days this year") || !say("36 weeks"))
+      wrong.push("the planner's opening sentence no longer states 179 days over 36 weeks");
     /*  The two-long-breaks sentence was removed in November 2026 — the
         masjid called it jargon, and "a family trip costs nothing in
         attendance" was office shorthand a parent had no way to read. The
@@ -492,7 +496,7 @@ for (const f of ["index.html", "admin.html"]) {
         planner still draws those breaks; it is only the sentence that is
         gone, so only the sentence is no longer required to exist. */
     if (wrong.length) wrong.forEach(w => fail("holiday planner — " + w));
-    else ok(`holiday planner — ${teach} teaching days over ${teach/5} weeks, and the prose agrees with the dates`);
+    else ok(`holiday planner — ${teach} teaching days over 36 weeks, and the prose agrees with the dates`);
   }
 }
 

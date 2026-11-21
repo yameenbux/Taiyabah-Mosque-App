@@ -52,7 +52,7 @@ const { chromium } = require("playwright");
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "planner");
-const { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS } = await import(path.join(ROOT, "native/src/madrasah-data.js"));
+const { MAD_YEAR, MAD_CLOSURES, MAD_EVENTS, MAD_KEYDATES } = await import(path.join(ROOT, "native/src/madrasah-data.js"));
 
 /* --- the year, named the way the masjid names it ------------------------- */
 const parse = v => { const a = v.split("-"); return new Date(+a[0], +a[1] - 1, +a[2]); };
@@ -86,12 +86,16 @@ const span = c => {
 const nights = c => Math.round((parse(c.to) - parse(c.from)) / 86400000) + 1;
 
 /* One lookup per day, as dayMaps() does on the screen. */
-const shut = {}, evt = {};
+const shut = {}, evt = {}, kd = {};
 for (const c of MAD_CLOSURES) {
   const d = parse(c.from), end = parse(c.to);
   while (d <= end) { shut[iso(d)] = c; d.setDate(d.getDate() + 1); }
 }
 for (const e of MAD_EVENTS) (evt[e.on] = evt[e.on] || []).push(e);
+for (const k of MAD_KEYDATES) {
+  const d = parse(k.from), end = parse(k.to);
+  while (d <= end) { kd[iso(d)] = k; d.setDate(d.getDate() + 1); }
+}
 
 const months = [];
 for (let i = 0; i < 12; i++) months.push(new Date(FROM.getFullYear(), FROM.getMonth() + i, 1));
@@ -117,7 +121,7 @@ const TOKENS = `
 
 const CHARITY = "Bolton Central Islamic Society · Registered charity 1041569";
 const MOON = "Islamic dates are calculated and may fall a day either side — the masjid announces each confirmed date beforehand.";
-const TEACHES = `The madrasah teaches 180 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings.`;
+const TEACHES = `The madrasah teaches 179 days this year — 36 weeks, Monday to Friday, 5pm to 7pm. Hifz students also attend on Saturday mornings.`;
 const ISSUED = new Date().toISOString().slice(0, 10);
 
 /* --- one month ------------------------------------------------------------ */
@@ -130,7 +134,7 @@ function grid(m) {
   for (let d = 1; d <= days; d++) {
     const k = iso(new Date(y, mo, d));
     const dw = new Date(y, mo, d).getDay();
-    const cl = [shut[k] && "shut", evt[k] && "ev", (dw === 0 || dw === 6) && "wknd"]
+    const cl = [shut[k] && "shut", evt[k] && "ev", kd[k] && "kd", (dw === 0 || dw === 6) && "wknd"]
       .filter(Boolean).join(" ");
     cells += `<i class="${cl}">${d}</i>`;
   }
@@ -158,6 +162,18 @@ const closureRows = () => MAD_CLOSURES.map(c =>
 const eventRows = () => MAD_EVENTS.map(e =>
   row(e.name, fmt(e.on), e.sub, DOW[parse(e.on).getDay()].slice(0, 3))).join("");
 
+/* Key dates sit on days the madrasah is open, so they carry no "closed" wash —
+   on the wall sheet they go in a tight one-line-each box (most have no note),
+   and on the roomier phone card they take the same four-cell row as the rest. */
+const kdWhen = k => k.from === k.to ? fmt(k.from) : span(k);
+const kdLen  = k => k.from === k.to ? DOW[parse(k.from).getDay()].slice(0, 3) : `${nights(k)} days`;
+const keydateRowsFull = () => MAD_KEYDATES.map(k => row(k.name, kdWhen(k), k.note, kdLen(k))).join("");
+/* On the A4 wall sheet the side panel is full, so the key dates go in a
+   full-width band under the month grids, where the layout has room sideways
+   rather than down: name then date, wrapping across the calendar's width. */
+const keydateBand = () => MAD_KEYDATES.map(k =>
+  `<i><b><bdi>${k.name}</bdi></b><span>${kdWhen(k)}</span></i>`).join("");
+
 /* --- sheet one: A4 landscape, for a wall ---------------------------------- */
 const WALL = `<!doctype html><html lang="en"><meta charset="utf-8"><style>
 ${FONTS}
@@ -180,35 +196,45 @@ header{background:var(--plum);color:var(--cream);padding:5mm 10mm;display:flex;
 main{flex:1;display:flex;gap:5mm;padding:4.5mm 10mm 0;min-height:0}
 .calwrap{flex:1;display:flex;flex-direction:column;min-width:0}
 .cal{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,auto);
-     column-gap:3.4mm;row-gap:4mm;align-content:start}
-.mon h4{font-family:Fraunces,serif;font-size:11.5pt;color:var(--plum);margin-bottom:1.4mm}
+     column-gap:3.4mm;row-gap:3mm;align-content:start}
+.mon h4{font-family:Fraunces,serif;font-size:11.5pt;color:var(--plum);margin-bottom:1mm}
 .mon h4 span{font-family:Hanken;font-size:7.6pt;color:var(--muted);font-weight:400}
 .dow,.cells{display:grid;grid-template-columns:repeat(7,1fr);gap:.55mm}
 .dow b{font-size:6.6pt;color:var(--muted);text-align:center;font-weight:600;letter-spacing:.04em}
 .cells{margin-top:.9mm}
-.cells i{font-style:normal;font-size:7.8pt;text-align:center;line-height:5.9mm;height:5.9mm;
+.cells i{font-style:normal;font-size:7.8pt;text-align:center;line-height:5.5mm;height:5.5mm;
          border-radius:1.3mm;color:var(--ink);border:.3mm solid transparent}
 .cells i.pad{visibility:hidden}
 .cells i.wknd{color:var(--muted)}
 .cells i.shut{background:var(--shut-fill);border-color:var(--shut-line);color:var(--shut-ink)}
 .cells i.ev{border-color:var(--gold);font-weight:700;color:var(--goldink)}
 .cells i.shut.ev{border-color:var(--gold);color:var(--shut-ink)}
+.cells i.kd{text-decoration:underline;text-decoration-color:var(--plum600);
+            text-underline-offset:1px;font-weight:700;color:var(--plum600)}
 aside{width:75mm;flex:none;display:flex;flex-direction:column;gap:2.6mm}
 .box{border:.3mm solid var(--line);border-radius:2mm;padding:2.6mm 3.2mm;background:var(--paper)}
 .box h5{font-size:6.6pt;letter-spacing:.15em;text-transform:uppercase;color:var(--goldink);
         font-weight:700;margin-bottom:1.6mm}
 .r{display:grid;grid-template-columns:1fr auto;column-gap:2.5mm;row-gap:.2mm;
-   padding:.85mm 0;border-top:.2mm solid var(--line)}
+   padding:.6mm 0;border-top:.2mm solid var(--line)}
 .r:nth-of-type(2){border-top:0}
 .r .nm{font-size:7.1pt;font-weight:600;line-height:1.16}
 .r .wh{font-size:6.6pt;color:var(--muted);white-space:nowrap;text-align:right;line-height:1.16}
 .r .sub{font-size:6.2pt;color:var(--muted);line-height:1.16}
 .r .ln{font-size:6.2pt;color:var(--muted);white-space:nowrap;text-align:right;line-height:1.16}
 .key{display:flex;gap:5mm;align-items:center;font-size:6.9pt;color:var(--muted);padding:3mm 0 0 .5mm}
+.kdband{margin-top:2mm;border-top:.25mm solid var(--line);padding-top:1.5mm}
+.kdband h6{font-size:6.6pt;letter-spacing:.15em;text-transform:uppercase;color:var(--goldink);
+           font-weight:700;margin-bottom:1.3mm}
+.kdlist{display:flex;flex-wrap:wrap;gap:1mm 4.5mm;font-size:6.8pt;line-height:1.2}
+.kdlist i{font-style:normal;white-space:nowrap}
+.kdlist i b{font-weight:600;color:var(--ink)}
+.kdlist i span{color:var(--muted);margin-left:1.5mm}
 .key i{font-style:normal;display:inline-flex;align-items:center;gap:1.6mm}
 .sw{width:3.4mm;height:3.4mm;border-radius:.9mm;display:inline-block;border:.3mm solid var(--line)}
 .sw.shut{background:var(--shut-fill);border-color:var(--shut-line)}
 .sw.ev{border-color:var(--gold)}
+.sw.kd{border-bottom:.9mm solid var(--plum600)}
 footer{flex:none;margin:0 10mm;padding:2.4mm 0 3.4mm;border-top:.25mm solid var(--line);
        display:flex;justify-content:space-between;gap:6mm;font-size:6.4pt;color:var(--muted)}
 </style><body>
@@ -227,8 +253,11 @@ footer{flex:none;margin:0 10mm;padding:2.4mm 0 3.4mm;border-top:.25mm solid var(
       <div class="key">
         <i><span class="sw shut"></span>Madrasah closed</i>
         <i><span class="sw ev"></span>Islamic date</i>
+        <i><span class="sw kd"></span>Key date</i>
         <i><span class="sw"></span>Open</i>
       </div>
+      <div class="kdband"><h6>Key dates</h6>
+        <div class="kdlist">${keydateBand()}</div></div>
     </div>
     <aside>
       <div class="box"><h5>Madrasah closed</h5>${closureRows()}</div>
@@ -279,6 +308,7 @@ footer b{display:block;font-weight:400;margin-top:10px;font-size:19px}
   <div class="rule"></div>
   <main>
     <h5>Madrasah closed</h5><div class="box">${closureRows()}</div>
+    <h5>Key dates</h5><div class="box">${keydateRowsFull()}</div>
     <h5>Islamic dates</h5><div class="box">${eventRows()}</div>
   </main>
   <footer>${MOON}<b>${CHARITY} · Issued ${ISSUED}</b></footer>
@@ -328,7 +358,7 @@ await browser.close();
 const { fingerprint } = await import("./lib/holiday-fingerprint.mjs");
 fs.writeFileSync(path.join(OUT, "planner.json"), JSON.stringify({
   year: YEAR, slug: SLUG, issued: ISSUED,
-  built_from: await fingerprint({ MAD_YEAR, MAD_CLOSURES, MAD_EVENTS }),
+  built_from: await fingerprint({ MAD_YEAR, MAD_CLOSURES, MAD_EVENTS, MAD_KEYDATES }),
   files: [`${SLUG}.pdf`, `${SLUG}.png`, `${SLUG}-card.png`],
   note: "Written by scripts/build-holiday-planner.mjs. Do not hand-edit — " +
         "rebuild instead, or scripts/check-holiday-planner.mjs will fail.",
@@ -338,4 +368,4 @@ const kb = f => Math.round(fs.statSync(path.join(OUT, f)).size / 1024);
 console.log(`planner/${SLUG}.pdf        ${kb(SLUG + ".pdf")} KB   A4 landscape, one page`);
 console.log(`planner/${SLUG}.png        ${kb(SLUG + ".png")} KB   wall sheet, 2x`);
 console.log(`planner/${SLUG}-card.png   ${kb(SLUG + "-card.png")} KB   phone card, 1080 wide`);
-console.log(`${MAD_CLOSURES.length} closures · ${MAD_EVENTS.length} Islamic dates · issued ${ISSUED}`);
+console.log(`${MAD_CLOSURES.length} closures · ${MAD_KEYDATES.length} key dates · ${MAD_EVENTS.length} Islamic dates · issued ${ISSUED}`);
