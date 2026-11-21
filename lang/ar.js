@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "b07082fd1271",
+ "version": "fa2bff000133",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -1770,7 +1770,7 @@ window.LANG_PACK = {
   "home.listen": "استمع",
   "home.listen_live": "استمع مباشرة",
   "home.tune_in_to_taiyabah": "استمع إلى مسجد طيبة",
-  "home.services": "الخدمات",
+  "home.services": "روابط سريعة",
   "tiles.holy_quran": "القرآن الكريم",
   "tiles.daily_adhkar": "الأذكار اليومية",
   "tiles.qibla": "القبلة",
