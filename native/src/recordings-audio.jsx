@@ -53,6 +53,19 @@ export function RecordingsAudioProvider({ children }) {
   const [state, setState] = useState("idle");
   const [positionMs, setPositionMs] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
+  /* The live position and duration ALSO as refs. stop() and the status
+     callback need the current spot to remember it, but if they close over the
+     positionMs/durationMs STATE they are rebuilt on every tick — and that
+     breaks src/audio-bus.js, which matches claim to release by function
+     identity: a stop() that changes 500ms after it claimed the output can
+     never release it, the [stop] effect below releases the slot every tick
+     instead of on unmount, and a stale stop lingers to be invoked on the next
+     play. Reading the refs keeps stop() ONE stable function for the app's life,
+     which is exactly what the bus is built on. */
+  const posRef = useRef(0);
+  const durRef = useRef(0);
+  const putPos = useCallback(v => { posRef.current = v; setPositionMs(v); }, []);
+  const putDur = useCallback(v => { durRef.current = v; setDurationMs(v); }, []);
   /* The slug of what is loaded, read inside callbacks without making play()
      depend on `current` — a stale closure is how "resume" would resume the
      wrong file after you had picked another. */
@@ -115,15 +128,15 @@ export function RecordingsAudioProvider({ children }) {
   const stop = useCallback(async () => {
     releaseAudio(stop);
     /* Record the spot before letting go, so "stop" still leaves somewhere to
-       continue from. */
-    if (currentRef.current) { remember(currentRef.current, positionMs, durationMs); persist(); }
+       continue from. From the refs, so this stays one stable function. */
+    if (currentRef.current) { remember(currentRef.current, posRef.current, durRef.current); persist(); }
     currentRef.current = null;
     setState("idle");
     setCurrent(null);
-    setPositionMs(0);
-    setDurationMs(0);
+    putPos(0);
+    putDur(0);
     teardown();
-  }, [teardown, remember, persist, positionMs, durationMs]);
+  }, [teardown, remember, persist, putPos, putDur]);
 
   useEffect(() => {
     /* The audio mode (silent-mode, background, exclusive focus) is set once for
@@ -139,7 +152,7 @@ export function RecordingsAudioProvider({ children }) {
          than vanishing mid-thought, hand the output back so the stream is free,
          and drop it from "Continue listening". */
       setState("paused");
-      setPositionMs(0);
+      putPos(0);
       try { player.current?.seekTo(0); } catch {}
       try { player.current?.pause(); } catch {}
       releaseAudio(stop);
@@ -152,8 +165,8 @@ export function RecordingsAudioProvider({ children }) {
       pendingSeekSec.current = 0;
       try { player.current?.seekTo(to); } catch {}
     }
-    if (typeof st.currentTime === "number") setPositionMs(Math.round(st.currentTime * 1000));
-    if (typeof st.duration === "number" && st.duration > 0) setDurationMs(Math.round(st.duration * 1000));
+    if (typeof st.currentTime === "number") putPos(Math.round(st.currentTime * 1000));
+    if (typeof st.duration === "number" && st.duration > 0) putDur(Math.round(st.duration * 1000));
     if (st.playing) setState("playing");
     else if (st.isLoaded) setState(s => (s === "loading" ? "loading" : "paused"));
     /* Remember the spot while playing, at most once every five seconds, so a
@@ -166,7 +179,7 @@ export function RecordingsAudioProvider({ children }) {
         persist();
       }
     }
-  }, [stop, forget, remember, persist]);
+  }, [stop, forget, remember, persist, putPos, putDur]);
 
   /**
    * Play a recording. If it is the one already loaded, resume; otherwise tear
@@ -190,8 +203,8 @@ export function RecordingsAudioProvider({ children }) {
        otherwise from the top. */
     const saved = positions.current[rec.mp3];
     const fromMs = isUnfinished(saved) ? saved.pos : 0;
-    setPositionMs(fromMs);
-    setDurationMs(Number(rec.durationSec) > 0 ? rec.durationSec * 1000 : 0);
+    putPos(fromMs);
+    putDur(Number(rec.durationSec) > 0 ? rec.durationSec * 1000 : 0);
     pendingSeekSec.current = fromMs > 0 ? fromMs / 1000 : 0;
     try {
       const p = createAudioPlayer({ uri: rec.mp3 }, { updateInterval: 500, keepAudioSessionActive: true });
@@ -213,14 +226,14 @@ export function RecordingsAudioProvider({ children }) {
       releaseAudio(stop);
       breadcrumb("recording failed: " + (rec.title || "?"));
     }
-  }, [onStatus, stop, teardown]);
+  }, [onStatus, stop, teardown, putPos, putDur]);
 
   const pause = useCallback(async () => {
     try { player.current?.pause(); } catch {}
     setState("paused");
     /* Pausing is a deliberate "I'll come back" — save the spot at once. */
-    if (currentRef.current) { remember(currentRef.current, positionMs, durationMs); persist(); }
-  }, [positionMs, durationMs, remember, persist]);
+    if (currentRef.current) { remember(currentRef.current, posRef.current, durRef.current); persist(); }
+  }, [remember, persist]);
 
   const toggle = useCallback(() => {
     if (state === "playing") return pause();
@@ -232,9 +245,9 @@ export function RecordingsAudioProvider({ children }) {
   const seek = useCallback(async ms => {
     const d = durationMs || 0;
     const to = Math.max(0, d ? Math.min(ms, d) : ms);
-    setPositionMs(to);
+    putPos(to);
     try { await player.current?.seekTo(to / 1000); } catch {}
-  }, [durationMs]);
+  }, [durationMs, putPos]);
 
   /* Jump a number of seconds (negative to go back), for the ±15s buttons. */
   const skip = useCallback(secs => seek((positionMs || 0) + secs * 1000), [positionMs, seek]);
