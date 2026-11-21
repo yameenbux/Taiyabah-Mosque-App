@@ -2311,6 +2311,5 @@
  "sysprefs.home_layout": "હોમ સ્ક્રીન",
  "sysprefs.home_layout_help": "પસંદ કરો કે હોમ સ્ક્રીન પર પહેલાં શું દેખાય: સલામ, કે આજના નમાજના સમય.",
  "sysprefs.greeting_first": "સલામ",
- "sysprefs.times_first": "નમાજના સમય",
- "home.begins": "શરૂ {t}"
+ "sysprefs.times_first": "નમાજના સમય"
 }
