@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "a28a52094713",
+ "version": "7391602559d7",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -1770,7 +1770,7 @@ window.LANG_PACK = {
   "home.listen": "સાંભળો",
   "home.listen_live": "લાઇવ સાંભળો",
   "home.tune_in_to_taiyabah": "તૈયબા મસ્જિદ સાથે જોડાઓ",
-  "home.services": "સેવાઓ",
+  "home.services": "ઝડપી લિંક્સ",
   "tiles.holy_quran": "પવિત્ર કુરઆન",
   "tiles.daily_adhkar": "દૈનિક અઝકાર",
   "tiles.qibla": "કિબ્લા",

@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "9a54c80c901e",
+ "version": "1d545284cb25",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -1770,7 +1770,7 @@ window.LANG_PACK = {
   "home.listen": "سنیں",
   "home.listen_live": "براہِ راست سنیں",
   "home.tune_in_to_taiyabah": "طیبہ مسجد سے جُڑیں",
-  "home.services": "خدمات",
+  "home.services": "فوری روابط",
   "tiles.holy_quran": "قرآنِ کریم",
   "tiles.daily_adhkar": "روزانہ اذکار",
   "tiles.qibla": "قبلہ",

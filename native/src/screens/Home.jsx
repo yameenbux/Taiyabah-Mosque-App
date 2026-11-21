@@ -652,7 +652,7 @@ export default function Home({ navigation }) {
         </View>
 
         {/* ---- Services -------------------------------------------------- */}
-        <SecH t={t} fs={fs} rtl={rtl} title={t("home.services", "Services")} />
+        <SecH t={t} fs={fs} rtl={rtl} title={t("home.services", "Quick Links")} />
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {/* "link" vs "button" (inside Tile) is not decoration: a screen reader
              says "link" for something that leaves the app, which Join WhatsApp
