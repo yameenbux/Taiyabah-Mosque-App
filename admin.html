@@ -723,6 +723,33 @@ async function apiGet(path){
   return data;
 }
 
+/* The honest "it reached N people" after a category send.
+   OneSignal delivers a tag-filter send asynchronously and does not report the
+   count in the send response, so the only truthful number comes from its own
+   delivery figure a moment later. This asks the server (which holds the REST
+   key) for that figure a few times and updates the toast, and the history row,
+   once it settles. If the server has no /api/reach yet — an older Worker — it
+   fails quietly and the plain "Sent" stands rather than a wrong number. */
+async function confirmReach(osid, noticeId){
+  for(let i=0;i<4;i++){
+    await new Promise(r=>setTimeout(r, i===0 ? 2500 : 3000));
+    let d;
+    try{ d = await apiGet("/api/reach?id="+encodeURIComponent(osid)); }
+    catch(e){ return; }
+    if(d && typeof d.successful === "number" && (d.completed || d.successful>0 || i===3)){
+      const n = d.successful;
+      toast(n>0 ? `Delivered to ${n} ${n===1?"device":"devices"}`
+                : "Sent, but nobody has it yet — if a category is switched on nowhere, check Alerts in the app.");
+      try{
+        const items = store.get("sent", []);
+        const row = items.find(x => x && x.id === noticeId);
+        if(row){ row.recipients = n; store.set("sent", items.slice(0,20)); renderHistory(); }
+      }catch(e){}
+      return;
+    }
+  }
+}
+
 function diagShow(text){ $("diag-out").textContent = text; }
 
 async function checkDevice(){
@@ -1061,13 +1088,17 @@ $("send").addEventListener("click", async ()=>{
     const r = { ...(res.sent || {}), id: res.notice && res.notice.id };
     if(res.sent && res.sent.sent === false){
       toast("Saved to Notices, but the push failed: " + (res.sent.error || "unknown"));
-    }else if(r.recipients===0){
-      // OneSignal accepted it, but the filter matched nobody
-      toast("Sent, but 0 devices matched — nobody has this category switched on yet.");
+    }else if(r.recipients>0){
+      toast(`Sent to ${r.recipients} ${r.recipients===1?"device":"devices"}`);
     }else{
-      const rec = (r.recipients===null || r.recipients===undefined)
-        ? "" : ` to ${r.recipients} ${r.recipients===1?"device":"devices"}`;
-      toast(`Sent${rec}`);
+      /* A category (tag) send does NOT return a recipient count in OneSignal's
+         send response — it comes back null — so a 0/absent count here never
+         means nobody is subscribed, and we must not say it does: that reads as
+         "the app has no users" when the send in fact reached everyone with the
+         category on. Show "Sent", then confirm the real figure from OneSignal's
+         own delivery count a few seconds later. */
+      toast("Sent — confirming reach…");
+      if(r.osid) confirmReach(r.osid, r.id);
     }
     const items=store.get("sent",[]);
     /* `img` and `topicKey` are kept so the WhatsApp text can be rebuilt from a

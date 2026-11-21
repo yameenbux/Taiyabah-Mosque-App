@@ -736,7 +736,13 @@ async function sendNotice(env, { topic, title, body, imageUrl, id }) {
   if (!res.ok || data.errors) {
     return { sent: false, error: Array.isArray(data.errors) ? data.errors.join(", ") : `OneSignal ${res.status}` };
   }
-  return { sent: true, recipients: data.recipients ?? 0 };
+  /* `recipients` is null, not 0, when OneSignal does not give us a count. A
+     category (tag-filter) send on api.onesignal.com returns NO recipient count
+     in the create response — delivery is computed afterwards — so a 0 here
+     never means "nobody is subscribed", and the admin must not say it does. It
+     reads the true figure from /api/reach once OneSignal has delivered. The
+     notification id is handed back so it can. */
+  return { sent: true, recipients: data.recipients ?? null, osid: data.id || null };
 }
 
 async function runJamaahReminders(env) {
@@ -1353,6 +1359,35 @@ async function handle(request, env) {
         id: row.data && row.data.id,
       });
       return json({ ok: true, notice: row.data, sent }, 200, ch);
+    }
+
+    /* How many phones actually got the last send.
+     *
+     *   GET /api/reach?id=<onesignal notification id>  ->  { successful, ... }
+     *
+     * A category send does not report its audience in the create response, so
+     * the admin cannot know from the send alone whether it reached anyone. This
+     * asks OneSignal, server to server (the REST key never leaves here), for the
+     * notification's own delivery figure a few seconds later. `successful` is
+     * the number of devices that received it — the honest count the admin shows
+     * instead of the create response's missing one. */
+    if (url.pathname === "/api/reach" && request.method === "GET") {
+      const token = (request.headers.get("Authorization") || "").replace(/^Bearer /, "");
+      if (!(await validToken(token, env.SESSION_SECRET))) return json({ error: "Not signed in" }, 401, ch);
+      const osid = url.searchParams.get("id");
+      if (!osid) return json({ error: "no id" }, 400, ch);
+      const r = await fetch(
+        `https://api.onesignal.com/notifications/${encodeURIComponent(osid)}?app_id=${env.ONESIGNAL_APP_ID}`,
+        { headers: { Authorization: `Key ${env.ONESIGNAL_REST_API_KEY}` } });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) return json({ error: `OneSignal ${r.status}` }, 502, ch);
+      const remaining = Number(d.remaining || 0);
+      return json({
+        successful: Number(d.successful || 0),
+        failed: Number(d.failed || 0),
+        remaining,
+        completed: remaining === 0,
+      }, 200, ch);
     }
 
     if (url.pathname === "/api/test-reminders" && request.method === "POST") {
