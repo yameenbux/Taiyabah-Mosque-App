@@ -467,7 +467,7 @@ export default function Home({ navigation }) {
             committee compared; the website offers the same list. */}
         {timesFirst && !!day && (
           <TimesAgenda t={t} fs={fs} rtl={rtl} day={day} next={next}
-                       friJum={friJum} countdown={countdown} now={now} />)}
+                       friJum={friJum} countdown={countdown} now={now} gap={gap} />)}
 
         {/* SUNRISE GOES UNDER THE STRIP, NOT IN IT. It is not a prayer and has
             no jamāʿah, so a sixth column would promise a beginning and a
@@ -674,32 +674,39 @@ export default function Home({ navigation }) {
  * plum row that carries the countdown the greeting-first hero shows at the top,
  * so nothing the other layout tells you is lost. Built from the same `day`, so
  * the figures cannot disagree with the strip; the website carries the twin. */
-function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown }) {
+function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown, gap }) {
   const dir = rtl ? "row-reverse" : "row";
   const begText = t("home.begins", "Begins {t}").replace("{t}", pretty(begins).replace(/ (am|pm)$/, ""));
   if (isNext) {
     return (
       <View style={{ borderRadius: R.card, overflow: "hidden" }}>
         <LinearGradient colors={[C.brand800, C.brand900]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.4 }}
-          style={{ flexDirection: dir, alignItems: "center", gap: 12, paddingVertical: 14, paddingHorizontal: 14 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center",
-                         backgroundColor: "rgba(220,187,99,.18)" }}>
-            <PrayerIcon k={k} size={17} color={C.goldBright} />
-          </View>
-          <View style={{ flex: 1, minWidth: 0, alignItems: rtl ? "flex-end" : "flex-start" }}>
-            <View style={{ flexDirection: dir, alignItems: "baseline", gap: 7 }}>
-              <Text style={{ fontFamily: F.display, fontSize: fs(16.5), color: C.cream }}>{name}</Text>
-              <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(15), color: C.cream }}>{ar}</Text>
+          style={{ gap: 11, paddingVertical: 14, paddingHorizontal: 14 }}>
+          <View style={{ flexDirection: dir, alignItems: "center", gap: 12 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center",
+                           backgroundColor: "rgba(220,187,99,.18)" }}>
+              <PrayerIcon k={k} size={17} color={C.goldBright} />
             </View>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.goldBright, marginTop: 2 }}>
-              {t("app.next_jama_ah", "Next Jamāʿah") + " · " + countdown}</Text>
+            <View style={{ flex: 1, minWidth: 0, alignItems: rtl ? "flex-end" : "flex-start" }}>
+              <View style={{ flexDirection: dir, alignItems: "baseline", gap: 7 }}>
+                <Text style={{ fontFamily: F.display, fontSize: fs(16.5), color: C.cream }}>{name}</Text>
+                <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(15), color: C.cream }}>{ar}</Text>
+              </View>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.goldBright, marginTop: 2 }}>
+                {t("app.next_jama_ah", "Next Jamāʿah") + " · " + countdown}</Text>
+            </View>
+            <View style={{ alignItems: rtl ? "flex-start" : "flex-end" }}>
+              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(23), color: "#fff" }}>
+                {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
+              <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.7)", marginTop: 1 }}>
+                {begText}</Text>
+            </View>
           </View>
-          <View style={{ alignItems: rtl ? "flex-start" : "flex-end" }}>
-            <Text style={{ fontFamily: F.sansSemi, fontSize: fs(23), color: "#fff" }}>
-              {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
-            <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.7)", marginTop: 1 }}>
-              {begText}</Text>
-          </View>
+          {/* The thin time-remaining bar the greeting-first hero carries, the
+              same `gap` fraction, so the agenda's next row fills toward the
+              jamāʿah exactly as the hero does. Only once begins has passed —
+              before that there is no elapsed time to show. */}
+          {gap > 0 && <GrowBar frac={gap} color={C.goldBright} delay={420} />}
         </LinearGradient>
       </View>
     );
@@ -725,7 +732,7 @@ function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown 
   );
 }
 
-function TimesAgenda({ t, fs, rtl, day, next, friJum, countdown, now }) {
+function TimesAgenda({ t, fs, rtl, day, next, friJum, countdown, now, gap }) {
   return (
     <Appear rise={8} duration={520}>
       <View style={{ gap: 8 }}>
@@ -738,7 +745,7 @@ function TimesAgenda({ t, fs, rtl, day, next, friJum, countdown, now }) {
             <AgendaRow key={k} t={t} fs={fs} rtl={rtl} k={k}
                        name={label.en} ar={label.ar}
                        begins={day.begins[k]} jamaah={day.jamaat[k]}
-                       isNext={isNext} countdown={countdown} />);
+                       isNext={isNext} countdown={countdown} gap={gap} />);
         })}
       </View>
     </Appear>
