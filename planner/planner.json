@@ -1,19 +1,20 @@
 {
  "year": "2026/27",
  "slug": "taiyabah-holiday-planner-2026-27",
- "issued": "2026-11-11",
+ "issued": "2026-11-21",
  "built_from": {
-  "all": "248cf725bf61f220",
+  "all": "33fc00c6aa15d334",
   "year": "895f5cd6efce20b8",
   "closures": {
    "insert": "960b2b0f7323384e",
    "autumnht": "1c604daeccf62b98",
    "christmas": "c0de58386c617bfd",
-   "ramadhan": "d93dd4f2b3cddaa4",
+   "staffjan": "dbde0edb1da84946",
+   "ramadhan": "a2dc64d51c2bfb7b",
    "springht": "8bf21c88e87967f6",
    "eidadha": "0e181c66b1c5eb3c",
    "summerht": "dbb1722b9b7b2183",
-   "endofyear": "4ecb203c82c4935a"
+   "endofyear": "254e2be8cf4cb133"
   },
   "events": {
    "mawlid": "c98f82ec9fa4500f",
@@ -26,6 +27,15 @@
    "eidadha": "6b969f25dab26094",
    "newyear": "5f6b77aab995e3d3",
    "ashura": "dedc6b38d44ea762"
+  },
+  "keydates": {
+   "midyear": "91a194015c2d1e3a",
+   "pe1": "ff4147bb4ece7e77",
+   "endyear": "0a1236d2e44cb595",
+   "hifzass": "063ec2bdd7fa326e",
+   "pe2": "1336aad2b4619057",
+   "present": "0ada734a1c9735fd",
+   "newyear28": "881dc2c00a1fd018"
   }
  },
  "files": [

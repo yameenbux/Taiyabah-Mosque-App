@@ -44,7 +44,7 @@ const was = rec.built_from || {};
 
 const bad = [];
 if (was.year !== now.year) bad.push(["CHANGED", "year", "", `${data.MAD_YEAR.from} → ${data.MAD_YEAR.to}`]);
-for (const kind of ["closures", "events"]) {
+for (const kind of ["closures", "events", "keydates"]) {
   const a = was[kind] || {}, b = now[kind] || {};
   for (const id of Object.keys(b)) {
     if (!(id in a)) bad.push(["ADDED", kind.slice(0, -1), id, labelOf(data, kind, id) + " — not on the printed sheet"]);
@@ -90,4 +90,5 @@ if (bad.length || missing.length) {
 }
 
 console.log(`holiday planner matches the madrasah data — ${Object.keys(now.closures).length} closures, ` +
-            `${Object.keys(now.events).length} Islamic dates, issued ${rec.issued}`);
+            `${Object.keys(now.events).length} Islamic dates, ${Object.keys(now.keydates || {}).length} key dates, ` +
+            `issued ${rec.issued}`);

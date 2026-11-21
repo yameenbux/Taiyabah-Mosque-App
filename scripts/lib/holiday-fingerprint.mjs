@@ -40,14 +40,19 @@ export function parts(d) {
     year: h(`${d.MAD_YEAR.from}|${d.MAD_YEAR.to}`),
     closures: Object.fromEntries(d.MAD_CLOSURES.map(c => [c.id, h(closure(c))])),
     events: Object.fromEntries(d.MAD_EVENTS.map(e => [e.id, h(event(e))])),
+    keydates: Object.fromEntries((d.MAD_KEYDATES || []).map(k => [k.id, h(keydate(k))])),
   };
 }
 
 export const labelOf = (d, kind, id) =>
-  (kind === "closures" ? d.MAD_CLOSURES : d.MAD_EVENTS).find(x => x.id === id)?.name || id;
+  (kind === "closures" ? d.MAD_CLOSURES
+   : kind === "events" ? d.MAD_EVENTS
+   : (d.MAD_KEYDATES || [])).find(x => x.id === id)?.name || id;
 
 const h = s => crypto.createHash("sha256").update(s).digest("hex").slice(0, 16);
 const closure = c => `shut|${c.id}|${c.from}|${c.to}|${c.name}|${c.note ?? ""}`;
 const event = e => `evt|${e.id}|${e.on}|${e.name}|${e.sub ?? ""}`;
+const keydate = k => `kd|${k.id}|${k.from}|${k.to}|${k.name}|${k.note ?? ""}`;
 const lines = d => [`year|${d.MAD_YEAR.from}|${d.MAD_YEAR.to}`,
-                    ...d.MAD_CLOSURES.map(closure), ...d.MAD_EVENTS.map(event)];
+                    ...d.MAD_CLOSURES.map(closure), ...d.MAD_EVENTS.map(event),
+                    ...(d.MAD_KEYDATES || []).map(keydate)];
