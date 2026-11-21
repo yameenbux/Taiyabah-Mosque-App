@@ -316,14 +316,18 @@ export default function Home({ navigation }) {
         {/* The salām settles in on open — a short fade and rise, ending exactly
             where it sits now, so the diacritics are never pushed above the
             clip. Still under Reduce Motion. */}
-        {/* The salām leads the greeting-first home. In the times-first home it
-            steps aside for the prayer list below, which becomes the hero. */}
-        {!timesFirst && (
+        {/* The full salām, Arabic alone. It leads the greeting-first home at
+            full size; on the times-first home it sits a little smaller just
+            above the date, so the greeting is never lost — the prayer list
+            still leads below it. The line height stays generous (≈1.8×) in
+            both sizes, because fully vocalised Arabic carries its marks far
+            higher than any Latin ascender and the hero clips its overflow. */}
         <Appear rise={8} duration={560}>
-          <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(23), lineHeight: fs(42),
+          <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic,
+                         fontSize: fs(timesFirst ? 20 : 23), lineHeight: fs(timesFirst ? 36 : 42),
                          color: C.goldBright, writingDirection: "rtl" }}>
             السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</Text>
-        </Appear>)}
+        </Appear>
 
         <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 7,
                        borderWidth: 1, borderColor: "rgba(243,239,227,.18)", borderRadius: R.pill,
