@@ -676,7 +676,31 @@ export default function Home({ navigation }) {
  * the figures cannot disagree with the strip; the website carries the twin. */
 function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown, gap }) {
   const dir = rtl ? "row-reverse" : "row";
-  const begText = t("home.begins", "Begins {t}").replace("{t}", pretty(begins).replace(/ (am|pm)$/, ""));
+  const begT = pretty(begins).replace(/ (am|pm)$/, "");
+  const jamT = pretty(jamaah).replace(/ (am|pm)$/, "");
+
+  /* BOTH times, each under its own label — the beginning and the jamāʿah, the
+     two the "Beginning & jamāʿah" header names — so there is no doubt which
+     figure is which. Jamāʿah leads, since it is the one people act on. Uses the
+     masjid's own words for the labels (times.beginning, times.jamaah), already
+     translated in every pack. */
+  const times = onDark => (
+    <View style={{ alignItems: rtl ? "flex-start" : "flex-end", gap: 4 }}>
+      <View style={{ flexDirection: dir, alignItems: "baseline", gap: 6 }}>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), letterSpacing: 0.4, textTransform: "uppercase",
+                       color: onDark ? C.goldBright : C.muted }}>{t("times.jamaah", "Jamāʿah")}</Text>
+        <Text style={{ fontFamily: F.sansSemi, fontSize: fs(isNext ? 20 : 17),
+                       color: onDark ? "#fff" : C.ink }}>{jamT}</Text>
+      </View>
+      <View style={{ flexDirection: dir, alignItems: "baseline", gap: 6 }}>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(9.5), letterSpacing: 0.4, textTransform: "uppercase",
+                       color: onDark ? "rgba(220,187,99,.8)" : C.muted }}>{t("times.beginning", "Beginning")}</Text>
+        <Text style={{ fontFamily: F.sans, fontSize: fs(13),
+                       color: onDark ? "rgba(243,239,227,.85)" : C.ink }}>{begT}</Text>
+      </View>
+    </View>
+  );
+
   if (isNext) {
     return (
       <View style={{ borderRadius: R.card, overflow: "hidden" }}>
@@ -695,12 +719,7 @@ function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown,
               <Text style={{ fontFamily: F.sansSemi, fontSize: fs(11.5), color: C.goldBright, marginTop: 2 }}>
                 {t("app.next_jama_ah", "Next Jamāʿah") + " · " + countdown}</Text>
             </View>
-            <View style={{ alignItems: rtl ? "flex-start" : "flex-end" }}>
-              <Text style={{ fontFamily: F.sansSemi, fontSize: fs(23), color: "#fff" }}>
-                {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
-              <Text style={{ fontFamily: F.sans, fontSize: fs(10.5), color: "rgba(243,239,227,.7)", marginTop: 1 }}>
-                {begText}</Text>
-            </View>
+            {times(true)}
           </View>
           {/* The thin time-remaining bar the greeting-first hero carries, the
               same `gap` fraction, so the agenda's next row fills toward the
@@ -724,10 +743,8 @@ function AgendaRow({ t, fs, rtl, k, name, ar, begins, jamaah, isNext, countdown,
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(14.5), color: C.ink }}>{name}</Text>
           <Text accessibilityLanguage="ar" style={{ fontFamily: F.arabic, fontSize: fs(13.5), color: C.brand600 }}>{ar}</Text>
         </View>
-        <Text style={{ fontFamily: F.sans, fontSize: fs(11), color: C.muted, marginTop: 1 }}>{begText}</Text>
       </View>
-      <Text style={{ fontFamily: F.sansSemi, fontSize: fs(18), color: C.ink }}>
-        {pretty(jamaah).replace(/ (am|pm)$/, "")}</Text>
+      {times(false)}
     </View>
   );
 }

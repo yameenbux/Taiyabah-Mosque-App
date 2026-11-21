@@ -2311,6 +2311,5 @@
  "sysprefs.home_layout": "ہوم اسکرین",
  "sysprefs.home_layout_help": "منتخب کریں کہ ہوم اسکرین پر پہلے کیا دکھے: سلام، یا آج کے نماز کے اوقات۔",
  "sysprefs.greeting_first": "سلام",
- "sysprefs.times_first": "نماز کے اوقات",
- "home.begins": "شروع {t}"
+ "sysprefs.times_first": "نماز کے اوقات"
 }

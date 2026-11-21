@@ -2311,6 +2311,5 @@
  "sysprefs.home_layout": "الشاشة الرئيسية",
  "sysprefs.home_layout_help": "اختر ما يظهر أولاً في الشاشة الرئيسية: السلام، أو مواقيت صلاة اليوم.",
  "sysprefs.greeting_first": "السلام",
- "sysprefs.times_first": "مواقيت الصلاة",
- "home.begins": "يبدأ {t}"
+ "sysprefs.times_first": "مواقيت الصلاة"
 }
