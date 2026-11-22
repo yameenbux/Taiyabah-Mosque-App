@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "اردو",
  "nameEn": "Urdu",
  "dir": "rtl",
- "version": "611e233446f2",
+ "version": "0143c1421b46",
  "strings": {
   "menu.settings": "ترتیبات",
   "menu.resources": "وسائل",
@@ -564,7 +564,7 @@ window.LANG_PACK = {
   "donate.copy_failed": "نقل نہیں ہو سکا — براہِ کرم خود نقل کر لیں",
   "lang.download_failed": "وہ زبان کا پیکج ڈاؤن لوڈ نہیں ہو سکا۔ اپنا انٹرنیٹ دیکھ کر دوبارہ کوشش کریں۔",
   "quran.script_name": "اِنڈوپاک (کنگ فہد کمپلیکس نستعلیق، یونیکوڈ)",
-  "quran.translator": "عبداللہ یوسف علی",
+  "quran.translator": "مفتی تقی عثمانی",
   "zakat.last_known_price": "آخری معلوم {metal} قیمت · £{p}/گرام · {at} کی",
   "offline.still_works": "کوئی کنکشن نہیں۔ نماز کے اوقات، قرآن، اذکار اور قبلہ سب پھر بھی کام کرتے ہیں۔",
   "alerts.masjid_holds": "مسجد کے پاس",

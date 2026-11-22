@@ -127,8 +127,8 @@ Taiyabah Masjid is run by Bolton Central Islamic Society, registered charity 104
 
 **On Content Rights, you can tick this honestly. Verified:**
 
-- The Qurʼan translation is **Abdullah Yusuf Ali**, who died in 1953. UK
-  copyright expired in 2023, so it is public domain where it is published.
+- The Qurʼan translation is **Mufti Taqi Usmani**, a modern translation
+  reproduced with the written permission of the rights-holder.
 - **Ṣaḥīḥ al-Bukhārī** ships **Arabic only**, from an edition released under
   The Unlicense. English links out to sunnah.com rather than being bundled.
 - The **Hajj & ʿUmrah** material is the masjid's own throughout.
@@ -278,8 +278,8 @@ On rights to the material it carries:
   the live broadcast** are the mosque's own, published by the mosque that
   operates the app.
 - **The Qur'an** — the Arabic text, together with the English translation of
-  Abdullah Yusuf Ali, who died in 1953. That translation is out of copyright in
-  the United Kingdom, where it is published.
+  Mufti Taqi Usmani, a modern translation reproduced with the written
+  permission of the rights-holder.
 - **Ṣaḥīḥ al-Bukhārī** — the app bundles the Arabic text only, from a public
   domain edition released under The Unlicense. For English it links out to
   sunnah.com rather than reproducing any modern translation, so no third

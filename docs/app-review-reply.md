@@ -58,7 +58,7 @@ None. Identical in every region and storefront; nothing unlocked, hidden or subs
 
 6. REGULATED INDUSTRY AND THIRD-PARTY MATERIAL
 Not a regulated industry, no regulated service, no medical, legal or financial advice. Where an official rule applies - a visa condition, a vaccination requirement - the app says it is set by the Saudi authorities or UK health service and links to the source rather than restating it.
-Timetable, notices, madrasah information, service details, live broadcast: the mosque's own. Qur'an: Arabic with the English translation of Abdullah Yusuf Ali (d. 1953), out of copyright in the UK where the app is published. Sahih al-Bukhari: Arabic only, public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is included. Hajj and Umrah guidance: the mosque's own, settled by its scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed. Name, logo and wordmark: the charity's property.
+Timetable, notices, madrasah information, service details, live broadcast: the mosque's own. Qur'an: Arabic with the English translation of Mufti Taqi Usmani, a modern translation reproduced with the written permission of the rights-holder. Sahih al-Bukhari: Arabic only, public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is included. Hajj and Umrah guidance: the mosque's own, settled by its scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed. Name, logo and wordmark: the charity's property.
 ```
 
 ## Paste block 2 — App Review Information → Notes (3963 characters)
@@ -87,7 +87,7 @@ None. Identical in every region and storefront; nothing is unlocked, hidden or s
 
 6. RIGHTS AND REGULATION
 Not a regulated industry, no regulated service, no medical, legal or financial advice. Where an official rule applies - a visa condition, a vaccination requirement - the app states it is set by the Saudi authorities or the UK health service and links to the official source rather than restating it.
-Timetable, notices, madrasah information, service details and the live broadcast: the mosque's own. Qur'an: Arabic text with the English translation of Abdullah Yusuf Ali (d. 1953), out of copyright in the United Kingdom where the app is published. Sahih al-Bukhari: Arabic text only, from a public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is reproduced. Hajj and Umrah guidance: the mosque's own, settled by this mosque's scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed for this use. Name, logo and wordmark: the charity's property.
+Timetable, notices, madrasah information, service details and the live broadcast: the mosque's own. Qur'an: Arabic text with the English translation of Mufti Taqi Usmani, a modern translation reproduced with the written permission of the rights-holder. Sahih al-Bukhari: Arabic text only, from a public domain edition under The Unlicense; English links out to sunnah.com, so no modern translation is reproduced. Hajj and Umrah guidance: the mosque's own, settled by this mosque's scholars and written by the mosque. Photographs and diagrams: the mosque's own or licensed for this use. Name, logo and wordmark: the charity's property.
 ```
 
 ---
@@ -211,8 +211,8 @@ On rights to the material it carries:
   the live broadcast** are the mosque's own, published by the mosque that
   operates the app.
 - **The Qur'an** — the Arabic text, together with the English translation of
-  Abdullah Yusuf Ali, who died in 1953. That translation is out of copyright in
-  the United Kingdom, where it is published.
+  Mufti Taqi Usmani, a modern translation reproduced with the written
+  permission of the rights-holder.
 - **Ṣaḥīḥ al-Bukhārī** — the app bundles the Arabic text only, from a public
   domain edition released under The Unlicense. For English it links out to
   sunnah.com rather than reproducing any modern translation, so no third

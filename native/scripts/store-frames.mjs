@@ -93,7 +93,7 @@ const PANELS = [
   { shot: "11-surah", art: "plain", arc: "right", theme: "plum",
     lead: "The Qur’an in English.",
     turn: "Line beside line.",
-    proof: "All 114 sūrahs · Abdullah Yusuf Ali" },
+    proof: "All 114 sūrahs · Mufti Taqi Usmani" },
 
   { shot: "7-qibla", art: "plain", arc: "left", theme: "cream",
     lead: "Which way to face.",

@@ -819,11 +819,14 @@ see the right to ship content, and "it was on GitHub" is not an answer.
 **The Qurʼan.** The Arabic is the IndoPak (King Fahd Complex Nastaliq) text,
 converted to standard Unicode, from
 [quran-api](https://github.com/fawazahmed0/quran-api) (edition
-`ara-quranindopak`). The English is **Abdullah Yusuf Ali (1934)**, which is out
-of copyright, taken from [Tanzil](https://tanzil.net) — `en.yusufali`, one ayah
-per line, which is the file the JSON editions in circulation are made from.
-`scripts/fetch-quran.mjs` fetches both and refuses to write anything that does
-not match the canonical ayah counts.
+`ara-quranindopak`). The English is **Mufti Taqi Usmani**, a modern translation
+in copyright, shipped on the masjid's written permission from the rights-holder
+— the same footing as the Bukhārī English. It is taken from
+[quran.com](https://quran.com) (translation id 84), which carries the full text
+with its punctuation and diacritics intact, and was verified verse-for-verse
+against the central-mosque.com PDF the masjid supplied — identical wording on
+all 6,236 āyāt. `scripts/fetch-quran.mjs` fetches both and refuses to write
+anything that does not match the canonical ayah counts.
 
 **It needs a font that can draw it.** The IndoPak edition uses Arabic
 Extended-A as well as the main Arabic block — the waqf signs, the sajda and
@@ -859,8 +862,8 @@ font that draws it, or if a Qurʼanic mark turns up in a file Amiri draws.
 > which is why it survived every count this script already did: 114 sūrahs,
 > 6,236 āyāt, nothing empty, numbering unbroken. A translation can be whole and
 > still not be the translation. The script now also measures how many āyāt end
-> on a mark of punctuation and refuses a source below 95% — Yusuf Ali's own text
-> is 99.7%, the stripped edition 12.5%.
+> on a mark of punctuation and refuses a source below 95% — Usmani's own text
+> is 97.0%, the stripped edition 12.5%.
 
 **Ṣaḥīḥ al-Bukhārī** is Arabic text and book structure from
 [hadith-api](https://github.com/fawazahmed0/hadith-api) (edition `ara-bukhari`),

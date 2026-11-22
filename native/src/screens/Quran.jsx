@@ -5,7 +5,7 @@
  *               ask for by name,
  *               as page images. Streamed and then cached, because 848 pages is
  *               66MB and would nearly triple the download.
- *   Translation the Arabic verse by verse with Abdullah Yusuf Ali beneath it.
+ *   Translation the Arabic verse by verse with Mufti Taqi Usmani beneath it.
  *               Bundled, so it works with no signal — which is where people
  *               mostly are when they open it, sitting in the masjid.
  */

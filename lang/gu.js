@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "ગુજરાતી",
  "nameEn": "Gujarati",
  "dir": "ltr",
- "version": "79ba6a0ab9f0",
+ "version": "6ce66bb41244",
  "strings": {
   "menu.settings": "સેટિંગ્સ",
   "menu.resources": "સંસાધનો",
@@ -564,7 +564,7 @@ window.LANG_PACK = {
   "donate.copy_failed": "કૉપિ થઈ શક્યું નહીં — કૃપા કરીને જાતે કૉપિ કરો",
   "lang.download_failed": "તે ભાષા પૅક ડાઉનલોડ થઈ શક્યું નહીં. તમારું ઇન્ટરનેટ તપાસીને ફરી પ્રયાસ કરો.",
   "quran.script_name": "ઇન્ડોપાક (કિંગ ફહદ કૉમ્પ્લેક્સ નસ્તાલીક, યુનિકોડ)",
-  "quran.translator": "અબ્દુલ્લાહ યુસુફ અલી",
+  "quran.translator": "મુફ્તી તકી ઉસ્માની",
   "zakat.last_known_price": "છેલ્લી જાણીતી {metal} કિંમત · £{p}/ગ્રામ · {at}ની",
   "offline.still_works": "કોઈ કનેક્શન નથી. નમાઝના સમય, કુરઆન, અઝકાર અને કિબલા બધું હજી પણ કામ કરે છે.",
   "alerts.masjid_holds": "મસ્જિદ પાસે",

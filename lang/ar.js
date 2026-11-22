@@ -16,7 +16,7 @@ window.LANG_PACK = {
  "name": "العربية",
  "nameEn": "Arabic",
  "dir": "rtl",
- "version": "658c8ba776b4",
+ "version": "080467ca8718",
  "strings": {
   "menu.settings": "الإعدادات",
   "menu.resources": "الموارد",
@@ -564,7 +564,7 @@ window.LANG_PACK = {
   "donate.copy_failed": "تعذّر النسخ — انسخه يدويًا من فضلك",
   "lang.download_failed": "تعذّر تنزيل حزمة اللغة. تحقّق من اتصالك ثم أعد المحاولة.",
   "quran.script_name": "الرسم الهندي الباكستاني (مجمع الملك فهد، نستعليق، يونيكود)",
-  "quran.translator": "عبد الله يوسف علي",
+  "quran.translator": "مفتي تقي عثماني",
   "zakat.last_known_price": "آخر سعر معروف لـ{metal} · £{p}/غرام · من {at}",
   "offline.still_works": "لا يوجد اتصال. مواقيت الصلاة والقرآن والأذكار والقِبلة كلّها تعمل.",
   "alerts.masjid_holds": "لَدَى الْمَسْجِد",
