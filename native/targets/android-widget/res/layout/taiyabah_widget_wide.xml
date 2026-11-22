@@ -39,69 +39,49 @@
       android:paddingTop="11dp"
       android:paddingBottom="10dp">
 
-    <!-- Header -->
+    <!-- Header: the Taiyabah wordmark centred, with the next jamāʿah and its
+         countdown centred beneath it. -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_gravity="center_horizontal"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/taiyabah_wordmark"
+        android:contentDescription="@null" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal"
-        android:baselineAligned="false">
-      <LinearLayout
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TAIYABAH MASJID"
-            android:textColor="#CCDCBB63"
-            android:textSize="9sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.16"
-            android:maxLines="1" />
-        <TextView
-            android:id="@+id/tw_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:textColor="#FDF7EC"
-            android:textSize="23sp"
-            android:fontFamily="serif"
-            android:maxLines="1"
-            android:ellipsize="end" />
-      </LinearLayout>
-      <LinearLayout
+        android:gravity="center"
+        android:baselineAligned="true">
+      <TextView
+          android:id="@+id/tw_name"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="end">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="JAMĀʿAH IN"
-            android:textColor="#AFB98FAB"
-            android:textSize="8sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.12"
-            android:maxLines="1" />
-        <Chronometer
-            android:id="@+id/tw_until"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:textColor="#F0CF78"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:maxLines="1"
-            android:includeFontPadding="false" />
-      </LinearLayout>
+          android:textColor="#FDF7EC"
+          android:textSize="17sp"
+          android:fontFamily="serif"
+          android:maxLines="1"
+          android:ellipsize="end" />
+      <Chronometer
+          android:id="@+id/tw_until"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="11dp"
+          android:textColor="#F0CF78"
+          android:textSize="17sp"
+          android:textStyle="bold"
+          android:maxLines="1"
+          android:includeFontPadding="false" />
     </LinearLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="9dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/taiyabah_rule"
         android:contentDescription="@null" />
 
@@ -114,7 +94,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c0_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c0_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c0_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c0_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -128,7 +108,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c1_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c1_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c1_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c1_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -142,7 +122,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c2_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c2_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c2_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c2_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -156,7 +136,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c3_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c3_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c3_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c3_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -170,7 +150,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c4_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c4_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c4_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c4_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -184,7 +164,7 @@
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
           android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
-          android:id="@+id/tw_c5_box" android:paddingTop="3dp" android:paddingBottom="3dp">
+          android:id="@+id/tw_c5_box" android:paddingTop="2dp" android:paddingBottom="2dp">
         <TextView android:id="@+id/tw_c5_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c5_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"

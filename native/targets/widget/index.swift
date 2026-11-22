@@ -560,33 +560,28 @@ struct NextJamaahView: View {
           .opacity(0.038)
           .offset(x: g.size.width - g.size.height * 0.92, y: g.size.height - g.size.height * 0.82)
       }
-      VStack(alignment: .leading, spacing: 0) {
-        HStack(alignment: .top, spacing: 6) {
-          VStack(alignment: .leading, spacing: 1) {
-            Text("TAIYABAH MASJID")
-              .font(.system(size: 9, weight: .bold)).tracking(1.4)
-              .foregroundStyle(Brand.goldBright.opacity(0.8))
-              .lineLimit(1).minimumScaleFactor(0.8)
-            Text(entry.known ? entry.name : "Timetable")
-              .font(.system(size: 22, weight: .regular, design: .serif))
+      VStack(spacing: 0) {
+        Image("Wordmark")
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .frame(width: 132)
+        if entry.known {
+          HStack(alignment: .firstTextBaseline, spacing: 11) {
+            Text(entry.name)
+              .font(.system(size: 18, weight: .regular, design: .serif))
               .foregroundStyle(Brand.cream)
               .lineLimit(1).minimumScaleFactor(0.6)
+            Text(entry.at, style: .timer)
+              .font(.system(size: 18, weight: .bold)).monospacedDigit()
+              .foregroundStyle(Brand.goldBright)
+              .lineLimit(1).minimumScaleFactor(0.6)
           }
-          Spacer(minLength: 6)
-          if entry.known {
-            VStack(alignment: .trailing, spacing: 1) {
-              Text("JAMĀʿAH IN")
-                .font(.system(size: 8, weight: .bold)).tracking(0.9)
-                .foregroundStyle(Brand.cream.opacity(0.55))
-                .lineLimit(1).minimumScaleFactor(0.8)
-              Text(entry.at, style: .timer)
-                .font(.system(size: 20, weight: .bold)).monospacedDigit()
-                .foregroundStyle(Brand.goldBright)
-                .multilineTextAlignment(.trailing)
-                .lineLimit(1).minimumScaleFactor(0.5)
-                .frame(maxWidth: 96, alignment: .trailing)
-            }
-          }
+          .padding(.top, 5)
+        } else {
+          Text("Timetable not published yet")
+            .font(.system(size: 16, weight: .regular, design: .serif))
+            .foregroundStyle(Brand.cream)
+            .padding(.top, 5)
         }
         Rule().padding(.top, 9).padding(.bottom, 9)
         if entry.known && !entry.strip.isEmpty {
