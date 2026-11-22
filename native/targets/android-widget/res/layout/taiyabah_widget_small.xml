@@ -10,8 +10,15 @@
      not crash: the launcher simply says "Couldn't add widget" and the widget
      can never be placed, which is exactly what shipped.
      scripts/check-android-widget.mjs now holds the real list. -->
-<!-- SMALL — the mark signs the top right, the type stacks from the bottom
-     left, and the space between them is left alone. Only views RemoteViews
+<!-- SMALL — the mark signs the top right, and the next jamāʿah sits CENTRED in
+     what is left, with the hijri date under it. It used to stack the type from
+     the bottom and leave the middle blank, which on a short-but-wide tile — a
+     4×3 on a launcher whose cells are not tall enough to earn the wide layout —
+     read as an empty box. A centred block fills the same space as a composed
+     card instead of a label with a hole beneath it. Nothing dense is added,
+     because this layout still has to survive the smallest a launcher will let
+     anyone drag it to, 155×120dp, without a line being clipped — which the
+     richer "today's times" list cannot at that size. Only views RemoteViews
      can inflate: FrameLayout, LinearLayout, TextView, ImageView, Chronometer. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tw_root"
@@ -102,5 +109,23 @@
         android:textStyle="bold"
         android:letterSpacing="0.14"
         android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/tw_hijri"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#CCC6A24C"
+        android:textSize="8sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:letterSpacing="0.12"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
   </LinearLayout>
 </FrameLayout>

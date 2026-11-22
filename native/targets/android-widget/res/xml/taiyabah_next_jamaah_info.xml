@@ -5,9 +5,11 @@
      have been clipped off the bottom on a default placement — on Isha, which
      is the one people check latest.
 
-     The resize floor is 155 by 120dp, which is what the narrow layout
-     measures — roughly two cells each way on a current phone. It was 110 by
-     110 because that is a round number, not because anything fitted in it.
+     The resize floor is 155 by 138dp. The height went up from 120 when the
+     small layout gained the hijri line under the countdown: a centred card
+     with two lines of type needs about 135dp, and a floor below that would let
+     a launcher shrink the widget until the date was clipped off the bottom.
+     155 wide is still roughly two cells; 138 tall is about two and a half.
 
      updatePeriodMillis is zero on purpose: nothing here polls. The
      Chronometer ticks itself and one alarm redraws at the next jamāʿah. -->
@@ -15,7 +17,7 @@
     android:minWidth="300dp"
     android:minHeight="160dp"
     android:minResizeWidth="155dp"
-    android:minResizeHeight="120dp"
+    android:minResizeHeight="138dp"
     android:targetCellWidth="4"
     android:targetCellHeight="3"
     android:updatePeriodMillis="0"

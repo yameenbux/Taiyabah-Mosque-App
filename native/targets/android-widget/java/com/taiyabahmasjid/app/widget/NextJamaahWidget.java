@@ -150,8 +150,12 @@ public class NextJamaahWidget extends AppWidgetProvider {
       views.setChronometerCountDown(R.id.tw_until, true);
     }
 
+    /* The hijri date sits in both layouts now — on the wide one it heads the
+       column of times, on the small one it sits under the countdown so the
+       centred card has a second line and does not read as half-empty. */
+    views.setTextViewText(R.id.tw_hijri, hijri(days, 0));
+
     if (wide) {
-      views.setTextViewText(R.id.tw_hijri, hijri(days, 0));
       int[] rowName = { R.id.tw_r0_name, R.id.tw_r1_name, R.id.tw_r2_name,
                         R.id.tw_r3_name, R.id.tw_r4_name, R.id.tw_r5_name };
       int[] rowTime = { R.id.tw_r0_time, R.id.tw_r1_time, R.id.tw_r2_time,
