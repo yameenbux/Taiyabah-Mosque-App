@@ -142,11 +142,11 @@ public class NextJamaahWidget extends AppWidgetProvider {
       views.setTextViewText(R.id.tw_name, next.name);
       views.setTextViewText(R.id.tw_time, pretty(next.at));
       views.setViewVisibility(R.id.tw_until, android.view.View.VISIBLE);
-      /* Chronometer counts down from the device's elapsed-realtime base, so
-         the base is the jamāʿah expressed in that clock, not in wall time. */
-      long base = android.os.SystemClock.elapsedRealtime() + (next.at - System.currentTimeMillis());
-      views.setChronometer(R.id.tw_until, base, null, true);
-      views.setChronometerCountDown(R.id.tw_until, true);
+      /* Minutes, not a ticking clock: the masjid asked for "18 mins", not
+         18:42. A Chronometer can only count in seconds, so the countdown is a
+         plain string recomputed on each redraw, and scheduleNextRedraw() now
+         fires at the top of every minute to keep it honest. */
+      views.setTextViewText(R.id.tw_until, minsUntil(next.at));
     }
 
     /* The hijri date sits in both layouts now — on the wide one it heads the
@@ -355,11 +355,25 @@ public class NextJamaahWidget extends AppWidgetProvider {
         c.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
   }
 
+  /** Whole minutes to the jamāʿah: "18 mins" · "1 min" · "2h 5m" · "now". */
+  private String minsUntil(long at) {
+    long rem = at - System.currentTimeMillis();
+    if (rem <= 0) return "now";
+    long mins = (rem + 59999L) / 60000L;          // round up to the minute
+    if (mins < 60) return mins + (mins == 1 ? " min" : " mins");
+    long h = mins / 60, m = mins % 60;
+    return m == 0 ? h + "h" : h + "h " + m + "m";
+  }
+
   // ------------------------------------------------------------ the redraw
 
   /**
-   * One alarm, at the next jamāʿah. Not a repeating timer: the only moment the
-   * answer changes is when a congregation starts.
+   * One alarm, at the top of the next minute — because the countdown now reads
+   * in whole minutes and has to lose one each minute. It is capped at a beat
+   * past the next jamāʿah, so the widget also turns over to the prayer after
+   * exactly when a congregation starts. setAndAllowWhileIdle is inexact, which
+   * is fine: a minute's drift in Doze is invisible on a figure measured in
+   * minutes, and an exact alarm would want a permission Play asks about.
    */
   private void scheduleNextRedraw(Context context) {
     Slot next = nextFrom(timetable(context), System.currentTimeMillis());
@@ -372,8 +386,9 @@ public class NextJamaahWidget extends AppWidgetProvider {
     PendingIntent pending = PendingIntent.getBroadcast(
         context, 1, tick, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-    /* A second past the jamāʿah, so the widget has moved on by the time
-       somebody looks at it rather than sitting on a time that has passed. */
-    alarms.setAndAllowWhileIdle(AlarmManager.RTC, next.at + 1000L, pending);
+    long now = System.currentTimeMillis();
+    long nextMinute = ((now / 60000L) + 1L) * 60000L;
+    long fireAt = Math.min(nextMinute, next.at + 1000L);
+    alarms.setAndAllowWhileIdle(AlarmManager.RTC, fireAt, pending);
   }
 }

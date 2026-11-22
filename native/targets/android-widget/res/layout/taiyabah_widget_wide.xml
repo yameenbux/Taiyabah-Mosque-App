@@ -39,42 +39,56 @@
       android:paddingTop="11dp"
       android:paddingBottom="10dp">
 
-    <!-- Header: the Taiyabah wordmark centred, with the next jamāʿah and its
-         countdown centred beneath it. -->
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_gravity="center_horizontal"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/taiyabah_wordmark"
-        android:contentDescription="@null" />
+    <!-- Header: the mark in the left corner, the prayer name centred, and
+         "jamāʿah in <n> mins" in the right corner. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:baselineAligned="true">
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="19dp"
+          android:adjustViewBounds="true"
+          android:scaleType="fitStart"
+          android:src="@drawable/taiyabah_wordmark"
+          android:contentDescription="@null" />
       <TextView
           android:id="@+id/tw_name"
-          android:layout_width="wrap_content"
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:gravity="center"
           android:textColor="#FDF7EC"
-          android:textSize="17sp"
+          android:textSize="18sp"
           android:fontFamily="serif"
           android:maxLines="1"
           android:ellipsize="end" />
-      <Chronometer
-          android:id="@+id/tw_until"
+      <LinearLayout
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="11dp"
-          android:textColor="#F0CF78"
-          android:textSize="17sp"
-          android:textStyle="bold"
-          android:maxLines="1"
-          android:includeFontPadding="false" />
+          android:orientation="vertical"
+          android:gravity="end">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="JAMĀʿAH IN"
+            android:textColor="#AFB98FAB"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:maxLines="1" />
+        <TextView
+            android:id="@+id/tw_until"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#F0CF78"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:includeFontPadding="false" />
+      </LinearLayout>
     </LinearLayout>
 
     <ImageView

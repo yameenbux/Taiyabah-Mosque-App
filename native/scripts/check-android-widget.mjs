@@ -184,7 +184,7 @@ const anyTime = widestIn(clockTimes, "12:45pm");
 if (!prayerNames.length) say("could not find the provider's NAMES array, so the width check is measuring a guess");
 if (!hijriDates.length) say("could not read any hijri dates out of the timetable, so the hijri column is measuring a guess");
 
-const WIDEST = { tw_time: anyTime, tw_name: anyName, tw_until: "11:00:00",
+const WIDEST = { tw_time: anyTime, tw_name: anyName, tw_until: "12h 59m",
                  tw_hijri: widestIn(hijriDates, ""), tw_r0_name: anyName,
                  tw_r0_time: anyTime };
 

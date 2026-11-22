@@ -117,26 +117,15 @@ private struct Mark: View {
  * thing that makes a widget look like a component library. Tracked small caps
  * in the accent say the same thing and get out of the way. */
 private struct Until: View {
+  let from: Date
   let at: Date
   var body: some View {
-    /* .timer, NOT .relative.
-     *
-     * SwiftUI's .relative style prints the two largest units — "12 min,
-     * 22 sec" — which is both longer than this line has room for and more
-     * precision than anybody wants off a glance. It truncated to
-     * "IN 12 min, 22…" on a real phone.
-     *
-     * .timer is the mm:ss form and always one short token. On its own that
-     * reads as a clock time, which is exactly the confusion to avoid next to
-     * a 24-hour status bar — so it is never shown here without the "in"
-     * carrying it. The timeline only refreshes once per prayer, so a string
-     * computed here would be hours stale; both of these styles are redrawn
-     * by the system instead. */
-    (Text("in ") + Text(at, style: .timer))
+    /* "IN 18 MINS", in whole minutes — the masjid wanted minutes, not a
+       seconds clock. It reads off the entry's own minute, and the timeline
+       now carries one entry per minute, so this is fresh without a live
+       timer counting seconds. */
+    Text("in " + minsText(from: from, to: at))
       .font(.system(size: 11, weight: .bold))
-      /* Tracking is added in points and does NOT shrink with
-         minimumScaleFactor, so a heavily tracked line fights its own fallback.
-         Less of it here, now the string can be "in 10:30:14". */
       .tracking(0.6)
       .textCase(.uppercase)
       .foregroundStyle(Brand.goldBright)
@@ -392,8 +381,8 @@ struct Provider: TimelineProvider {
       completion(Timeline(entries: [empty], policy: .after(Date().addingTimeInterval(3600))))
       return
     }
-    let entries = upcoming(from: Date(), table: table)
-    if entries.isEmpty {
+    let jamaahs = upcoming(from: Date(), table: table)
+    if jamaahs.isEmpty {
       /* The timetable has run out — the masjid publishes a year at a time.
          Say so rather than showing a stale time. */
       let unknown = Jamaah(date: Date(), name: "", at: Date(), begins: nil,
@@ -401,8 +390,31 @@ struct Provider: TimelineProvider {
       completion(Timeline(entries: [unknown], policy: .after(Date().addingTimeInterval(21600))))
       return
     }
-    /* Reload when the last entry has passed, not on a fixed interval. */
-    completion(Timeline(entries: entries, policy: .after(entries.last!.at.addingTimeInterval(60))))
+    /* THE COUNTDOWN IS IN WHOLE MINUTES, not a ticking clock, because that is
+       what the masjid asked for. SwiftUI's live timer text can only count in
+       seconds, so instead the timeline carries one entry per minute: each is
+       tagged with the jamāʿah that is next at that minute, and the view works
+       out "<n> mins" from the entry's own date. A couple of hours of them is
+       plenty — the reload policy fetches the next batch, and a jamāʿah that
+       falls inside the window flips the whole widget to the prayer after it at
+       exactly the right minute. */
+    let cal = londonCalendar()
+    var minutes: [Jamaah] = []
+    var t = Date()
+    let horizon = t.addingTimeInterval(2 * 3600)
+    var guardN = 0
+    while t < horizon && guardN < 140 {
+      guard let j = jamaahs.first(where: { $0.at > t }) else { break }
+      minutes.append(Jamaah(date: t, name: j.name, at: j.at, begins: j.begins,
+                            known: true, hijri: j.hijri, today: j.today, strip: j.strip))
+      let comps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: t)
+      guard let minuteStart = cal.date(from: comps),
+            let nextMinute = cal.date(byAdding: .minute, value: 1, to: minuteStart) else { break }
+      t = nextMinute
+      guardN += 1
+    }
+    if minutes.isEmpty { minutes = [jamaahs[0]] }
+    completion(Timeline(entries: minutes, policy: .atEnd))
   }
 
   private func next() -> Jamaah? {
@@ -412,6 +424,18 @@ struct Provider: TimelineProvider {
 }
 
 // MARK: - How it looks
+
+/// Whole minutes to a jamāʿah: "18 mins" · "1 min" · "2h 5m" · "now". Read off
+/// the entry's own minute, so the per-minute timeline keeps it honest without a
+/// seconds clock.
+private func minsText(from: Date, to: Date) -> String {
+  let secs = max(0, Int(to.timeIntervalSince(from)))
+  let mins = (secs + 59) / 60
+  if mins <= 0 { return "now" }
+  if mins < 60 { return "\(mins) min" + (mins == 1 ? "" : "s") }
+  let h = mins / 60, m = mins % 60
+  return m == 0 ? "\(h)h" : "\(h)h \(m)m"
+}
 
 private func timeText(_ d: Date) -> String {
   let f = DateFormatter()
@@ -529,7 +553,7 @@ struct NextJamaahView: View {
             .foregroundStyle(.white)
             .lineLimit(1).minimumScaleFactor(0.6)
           HStack(alignment: .bottom, spacing: 8) {
-            Until(at: entry.at)
+            Until(from: entry.date, at: entry.at)
             Spacer(minLength: 0)
             Mark(width: 40)
           }
@@ -561,27 +585,30 @@ struct NextJamaahView: View {
           .offset(x: g.size.width - g.size.height * 0.92, y: g.size.height - g.size.height * 0.82)
       }
       VStack(spacing: 0) {
-        Image("Wordmark")
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .frame(width: 132)
-        if entry.known {
-          HStack(alignment: .firstTextBaseline, spacing: 11) {
-            Text(entry.name)
-              .font(.system(size: 18, weight: .regular, design: .serif))
-              .foregroundStyle(Brand.cream)
-              .lineLimit(1).minimumScaleFactor(0.6)
-            Text(entry.at, style: .timer)
-              .font(.system(size: 18, weight: .bold)).monospacedDigit()
-              .foregroundStyle(Brand.goldBright)
-              .lineLimit(1).minimumScaleFactor(0.6)
-          }
-          .padding(.top, 5)
-        } else {
-          Text("Timetable not published yet")
-            .font(.system(size: 16, weight: .regular, design: .serif))
+        /* Header: the mark in the left corner, the prayer name centred, and
+           "jamāʿah in <n> mins" in the right corner. */
+        HStack(alignment: .center, spacing: 8) {
+          Image("Wordmark")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(height: 20)
+          Text(entry.known ? entry.name : "Timetable")
+            .font(.system(size: 18, weight: .regular, design: .serif))
             .foregroundStyle(Brand.cream)
-            .padding(.top, 5)
+            .lineLimit(1).minimumScaleFactor(0.6)
+            .frame(maxWidth: .infinity, alignment: .center)
+          if entry.known {
+            VStack(alignment: .trailing, spacing: 1) {
+              Text("JAMĀʿAH IN")
+                .font(.system(size: 8, weight: .bold)).tracking(0.9)
+                .foregroundStyle(Brand.cream.opacity(0.55))
+                .lineLimit(1).minimumScaleFactor(0.8)
+              Text(minsText(from: entry.date, to: entry.at))
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(Brand.goldBright)
+                .lineLimit(1).minimumScaleFactor(0.6)
+            }
+          }
         }
         Rule().padding(.top, 9).padding(.bottom, 9)
         if entry.known && !entry.strip.isEmpty {

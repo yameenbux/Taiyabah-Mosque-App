@@ -99,13 +99,13 @@
         android:maxLines="1"
         android:includeFontPadding="false" />
 
-    <Chronometer
+    <TextView
         android:id="@+id/tw_until"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textColor="#DCBB63"
-        android:textSize="9sp"
+        android:textSize="10sp"
         android:textStyle="bold"
         android:letterSpacing="0.14"
         android:maxLines="1" />
