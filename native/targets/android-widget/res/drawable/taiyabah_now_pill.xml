@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The gold pill behind the current prayer's jamāʿah time in the strip.
+     Set from the provider with setBackgroundResource on the one column that
+     is next; every other column clears its background to transparent. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+  <solid android:color="#B98A2E" />
+  <corners android:radius="7dp" />
+</shape>

@@ -122,7 +122,6 @@ public class NextJamaahWidget extends AppWidgetProvider {
 
   private void draw(Context context, AppWidgetManager manager, int id) {
     JSONObject days = timetable(context);
-    List<Slot> today = daySlots(days, 0);
     Slot next = nextFrom(days, System.currentTimeMillis());
 
     Bundle options = manager.getAppWidgetOptions(id);
@@ -155,29 +154,7 @@ public class NextJamaahWidget extends AppWidgetProvider {
        centred card has a second line and does not read as half-empty. */
     views.setTextViewText(R.id.tw_hijri, hijri(days, 0));
 
-    if (wide) {
-      int[] rowName = { R.id.tw_r0_name, R.id.tw_r1_name, R.id.tw_r2_name,
-                        R.id.tw_r3_name, R.id.tw_r4_name, R.id.tw_r5_name };
-      int[] rowTime = { R.id.tw_r0_time, R.id.tw_r1_time, R.id.tw_r2_time,
-                        R.id.tw_r3_time, R.id.tw_r4_time, R.id.tw_r5_time };
-      for (int i = 0; i < rowName.length; i++) {
-        if (i < today.size()) {
-          Slot s = today.get(i);
-          boolean isNext = next != null && s.at == next.at;
-          boolean past = next != null && s.at < next.at;
-          views.setViewVisibility(rowName[i], android.view.View.VISIBLE);
-          views.setViewVisibility(rowTime[i], android.view.View.VISIBLE);
-          views.setTextViewText(rowName[i], s.name);
-          views.setTextViewText(rowTime[i], pretty(s.at));
-          int colour = isNext ? 0xFFDCBB63 : (past ? 0x57F6F1E6 : 0xE0F6F1E6);
-          views.setTextColor(rowName[i], colour);
-          views.setTextColor(rowTime[i], colour);
-        } else {
-          views.setViewVisibility(rowName[i], android.view.View.GONE);
-          views.setViewVisibility(rowTime[i], android.view.View.GONE);
-        }
-      }
-    }
+    if (wide) fillStrip(views, days, next);
 
     /* Tapping it opens the Times tab, the same deep link the iOS widget uses
        and the one native/scripts/test/links.test.mjs holds to a real route. */
@@ -188,6 +165,65 @@ public class NextJamaahWidget extends AppWidgetProvider {
     views.setOnClickPendingIntent(R.id.tw_root, tap);
 
     manager.updateAppWidget(id, views);
+  }
+
+  /* The six-column strip under the header: the day's begins on top, the
+     jamāʿah below, and the next jamāʿah boxed in gold. Sunrise (Shurūq)
+     carries a dash where a congregation time would be — there is no
+     congregation at sunrise. Reads begins AND jamaat straight off today's
+     record; on Friday the Zuhr column's jamāʿah is the first Jumuʿah sitting,
+     so the strip agrees with the header and the app. The one column whose
+     jamāʿah is `next` gets the pill; every other clears to transparent, which
+     a redraw must do or a stale highlight is left on the prayer just gone. */
+  private void fillStrip(RemoteViews v, JSONObject days, Slot next) {
+    Calendar day = londonNow();
+    JSONObject rec    = days == null ? null : days.optJSONObject(isoKey(day));
+    JSONObject begins = rec  == null ? null : rec.optJSONObject("begins");
+    JSONObject jamaat = rec  == null ? null : rec.optJSONObject("jamaat");
+    JSONObject jummah = rec  == null ? null : rec.optJSONObject("jummah");
+
+    final String[] bKeys = { "fajr", "sunrise", "zuhr", "asr", "maghrib", "isha" };
+    final String[] jKeys = { "fajr", null,      "zuhr", "asr", "maghrib", "isha" };
+    final String[] cName = { "Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha" };
+    final int[] nameId  = { R.id.tw_c0_name, R.id.tw_c1_name, R.id.tw_c2_name,
+                            R.id.tw_c3_name, R.id.tw_c4_name, R.id.tw_c5_name };
+    final int[] beginId = { R.id.tw_c0_begin, R.id.tw_c1_begin, R.id.tw_c2_begin,
+                            R.id.tw_c3_begin, R.id.tw_c4_begin, R.id.tw_c5_begin };
+    final int[] jamId   = { R.id.tw_c0_jam, R.id.tw_c1_jam, R.id.tw_c2_jam,
+                            R.id.tw_c3_jam, R.id.tw_c4_jam, R.id.tw_c5_jam };
+
+    for (int i = 0; i < 6; i++) {
+      v.setTextViewText(nameId[i], cName[i]);
+      String bg = begins == null ? null : emptyToNull(begins.optString(bKeys[i], ""));
+      v.setTextViewText(beginId[i], bg == null ? "" : bg);
+
+      String jm = null;
+      if (jKeys[i] != null && jamaat != null) {
+        if ("zuhr".equals(jKeys[i]) && jummah != null) {
+          jm = emptyToNull(jummah.optString("first", ""));
+        }
+        if (jm == null) jm = emptyToNull(jamaat.optString(jKeys[i], ""));
+      }
+
+      boolean isNow = false;
+      if (jm != null) {
+        long at = instant(day, jm);
+        isNow = next != null && at == next.at;
+        v.setTextViewText(jamId[i], jm);
+      } else {
+        v.setTextViewText(jamId[i], "—");   // an em dash for Sunrise
+      }
+
+      if (isNow) {
+        v.setInt(jamId[i], "setBackgroundResource", R.drawable.taiyabah_now_pill);
+        v.setTextColor(jamId[i], 0xFFFFFFFF);
+        v.setTextColor(nameId[i], 0xFFF0CF78);
+      } else {
+        v.setInt(jamId[i], "setBackgroundColor", 0x00000000);
+        v.setTextColor(jamId[i], jm == null ? 0x66F6F1E6 : 0xFFDCBB63);
+        v.setTextColor(nameId[i], 0xFFC9B2C2);
+      }
+    }
   }
 
   // ------------------------------------------------------------- the times

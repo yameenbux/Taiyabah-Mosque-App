@@ -187,10 +187,21 @@ if (!hijriDates.length) say("could not read any hijri dates out of the timetable
 const WIDEST = { tw_time: anyTime, tw_name: anyName, tw_until: "11:00:00",
                  tw_hijri: widestIn(hijriDates, ""), tw_r0_name: anyName,
                  tw_r0_time: anyTime };
+
+/* The wide layout's six-column strip (tw_cN_*) is NOT the old row list. Its
+   name cells only ever hold one of the six fixed labels — never a Jumuʿah
+   name, which is why they are measured against those and not against anyName.
+   Its begin/jam cells hold a 24-hour HH:mm off the timetable (or an em dash
+   for Sunrise's jamāʿah), which is narrower than the 12-hour times elsewhere. */
+const stripLabel = widestIn(["Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha"], "Maghrib");
+const stripTime  = widestIn(["00:00", "18:48", "22:45", "16:08", "07:49", "12:03"], "18:48");
+
 const widest = (el) => {
   const id = (attr(el, "id") || "").replace("@+id/", "");
   if (attr(el, "text") != null) return attr(el, "text");
   if (WIDEST[id]) return WIDEST[id];
+  if (/^tw_c\d_name$/.test(id)) return stripLabel;
+  if (/^tw_c\d_(begin|jam)$/.test(id)) return stripTime;
   if (/_name$/.test(id)) return WIDEST.tw_r0_name;
   if (/_time$/.test(id)) return WIDEST.tw_r0_time;
   return "";

@@ -218,6 +218,16 @@ struct Slot {
   let at: Date
 }
 
+/// One column of the medium size's strip: a prayer (or Sunrise), the day's
+/// begins time as a 24-hour string, and — where there is a congregation — its
+/// jamāʿah time and instant. Sunrise has no jamāʿah, so both are nil.
+struct Col {
+  let name: String
+  let begins: String
+  let jamaah: String?
+  let at: Date?
+}
+
 struct Jamaah: TimelineEntry {
   let date: Date          // when this entry becomes the one on screen
   let name: String        // "Asr"
@@ -228,6 +238,9 @@ struct Jamaah: TimelineEntry {
   /// Every jamāʿah of the day this entry falls on, so the medium size can
   /// show the whole day instead of being the small one stretched.
   let today: [Slot]
+  /// The six columns the medium size draws as a strip — Fajr … Isha with
+  /// Sunrise — each carrying begins and, where there is one, the jamāʿah.
+  let strip: [Col]
 }
 
 private let london: TimeZone = TimeZone(identifier: "Europe/London") ?? .current
@@ -286,6 +299,34 @@ private func daySlots(day: Date, record: Day) -> [Slot] {
   return out.sorted { $0.at < $1.at }
 }
 
+/// The six columns for the medium strip on a given day: begins for all six
+/// (Sunrise included), and the jamāʿah for the five congregations. On Friday
+/// the Zuhr column's jamāʿah is the first Jumuʿah sitting, so the strip, the
+/// header and the app all name the same time.
+private func stripFor(day: Date, record: Day) -> [Col] {
+  let cols: [(key: String, name: String, jam: String?)] = [
+    ("fajr", "Fajr", "fajr"),
+    ("sunrise", "Sunrise", nil),
+    ("zuhr", "Zuhr", "zuhr"),
+    ("asr", "Asr", "asr"),
+    ("maghrib", "Maghrib", "maghrib"),
+    ("isha", "Isha", "isha"),
+  ]
+  return cols.map { c in
+    let begins = record.begins[c.key] ?? ""
+    var jam: String? = nil
+    if let jk = c.jam {
+      if jk == "zuhr", let j = record.jummah, let first = j.first, !first.isEmpty {
+        jam = first
+      } else {
+        jam = record.jamaat[jk]
+      }
+    }
+    let at = jam.flatMap { instant(day: day, hhmm: $0) }
+    return Col(name: c.name, begins: begins, jamaah: jam, at: at)
+  }
+}
+
 /// Every remaining jamāʿah from `from` onwards, across as many days as the
 /// timetable holds, capped so a timeline stays a sensible size.
 private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah] {
@@ -299,6 +340,7 @@ private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah]
   while out.count < limit && guardDays < 14 {
     if let record = table.days[isoKey(day)] {
       let slots = daySlots(day: day, record: record)
+      let strip = stripFor(day: day, record: record)
       let hijri = record.hijri ?? ""
       for slot in slots {
         if slot.at <= from { continue }
@@ -322,7 +364,7 @@ private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah]
            for most of the night. */
         out.append(Jamaah(date: out.isEmpty ? from : previousAt ?? from,
                           name: slot.name, at: slot.at, begins: begins, known: true,
-                          hijri: hijri, today: slots))
+                          hijri: hijri, today: slots, strip: strip))
         previousAt = slot.at
       }
     }
@@ -336,7 +378,7 @@ private func upcoming(from: Date, table: Timetable, limit: Int = 60) -> [Jamaah]
 struct Provider: TimelineProvider {
   func placeholder(in context: Context) -> Jamaah {
     Jamaah(date: Date(), name: "Asr", at: Date().addingTimeInterval(3600), begins: nil,
-           known: true, hijri: "", today: [])
+           known: true, hijri: "", today: [], strip: [])
   }
 
   func getSnapshot(in context: Context, completion: @escaping (Jamaah) -> Void) {
@@ -346,7 +388,7 @@ struct Provider: TimelineProvider {
   func getTimeline(in context: Context, completion: @escaping (Timeline<Jamaah>) -> Void) {
     guard let table = Source.load() else {
       let empty = Jamaah(date: Date(), name: "", at: Date(), begins: nil,
-                         known: false, hijri: "", today: [])
+                         known: false, hijri: "", today: [], strip: [])
       completion(Timeline(entries: [empty], policy: .after(Date().addingTimeInterval(3600))))
       return
     }
@@ -355,7 +397,7 @@ struct Provider: TimelineProvider {
       /* The timetable has run out — the masjid publishes a year at a time.
          Say so rather than showing a stale time. */
       let unknown = Jamaah(date: Date(), name: "", at: Date(), begins: nil,
-                           known: false, hijri: "", today: [])
+                           known: false, hijri: "", today: [], strip: [])
       completion(Timeline(entries: [unknown], policy: .after(Date().addingTimeInterval(21600))))
       return
     }
@@ -502,18 +544,12 @@ struct NextJamaahView: View {
     }
   }
 
-  /* MEDIUM IS NOT THE SMALL ONE STRETCHED.
-   *
-   * It was: the same four lines, twice the width, nothing more in it. A
-   * medium widget costs somebody two small slots and has to earn them. The
-   * left column answers "am I about to miss it" and the right answers "what
-   * else is on today" — the two reasons anybody opens a prayer app, without
-   * opening it. The rule between them carries the weight.
-   *
-   * The next prayer is MARKED, not shouted: a gold dot in the margin and the
-   * accent colour. Bolding a whole row unbalances the column. Prayers already
-   * prayed are dimmed rather than removed, because a list that shrinks
-   * through the day loses its shape and people read these by position. */
+  /* MEDIUM — the whole day as a strip, which is the shape the masjid asked
+   * for after seeing it on another app. A header names the next jamāʿah and
+   * counts down to it; under a rule, six columns — Fajr, Sunrise, Zuhr, Asr,
+   * Maghrib, Isha — each carry the begins time on top and the jamāʿah below.
+   * Sunrise has a dash where a congregation time would be; there is none. The
+   * next jamāʿah's column is boxed in gold, so a glance lands on it. */
   private var medium: some View {
     ZStack {
       GeometryReader { g in
@@ -522,93 +558,92 @@ struct NextJamaahView: View {
           .frame(width: g.size.height * 1.35, height: g.size.height * 1.35)
           .rotationEffect(.degrees(14))
           .opacity(0.038)
-          .offset(x: -g.size.height * 0.52, y: g.size.height - g.size.height * 0.79)
+          .offset(x: g.size.width - g.size.height * 0.92, y: g.size.height - g.size.height * 0.82)
       }
-      HStack(alignment: .top, spacing: 15) {
-        VStack(alignment: .leading, spacing: 0) {
-          Eyebrow()
-          Rule(width: 34).padding(.top, 7)
-          Spacer(minLength: 0)
-          if entry.known {
-            Text(entry.name)
-              .font(.system(size: 18, weight: .regular, design: .serif))
+      VStack(alignment: .leading, spacing: 0) {
+        HStack(alignment: .top, spacing: 6) {
+          VStack(alignment: .leading, spacing: 1) {
+            Text("TAIYABAH MASJID")
+              .font(.system(size: 9, weight: .bold)).tracking(1.4)
+              .foregroundStyle(Brand.goldBright.opacity(0.8))
+              .lineLimit(1).minimumScaleFactor(0.8)
+            Text(entry.known ? entry.name : "Timetable")
+              .font(.system(size: 22, weight: .regular, design: .serif))
               .foregroundStyle(Brand.cream)
-              .lineLimit(1).minimumScaleFactor(0.7)
-            Text(timeText(entry.at))
-              .font(.system(size: 34, weight: .bold))
-              .tracking(-1.2)
-              .monospacedDigit()
-              .foregroundStyle(.white)
               .lineLimit(1).minimumScaleFactor(0.6)
-            Until(at: entry.at).padding(.top, 5)
-          } else {
-            Text("Timetable not\npublished yet")
-              .font(.system(size: 14, weight: .semibold))
-              .foregroundStyle(Brand.cream)
           }
-          Spacer(minLength: 0)
-          Mark(width: 68).padding(.leading, -2)
+          Spacer(minLength: 6)
+          if entry.known {
+            VStack(alignment: .trailing, spacing: 1) {
+              Text("JAMĀʿAH IN")
+                .font(.system(size: 8, weight: .bold)).tracking(0.9)
+                .foregroundStyle(Brand.cream.opacity(0.55))
+                .lineLimit(1).minimumScaleFactor(0.8)
+              Text(entry.at, style: .timer)
+                .font(.system(size: 20, weight: .bold)).monospacedDigit()
+                .foregroundStyle(Brand.goldBright)
+                .multilineTextAlignment(.trailing)
+                .lineLimit(1).minimumScaleFactor(0.5)
+                .frame(maxWidth: 96, alignment: .trailing)
+            }
+          }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-        VRule()
-
-        VStack(alignment: .leading, spacing: 0) {
-          if !entry.hijri.isEmpty {
-            /* "AH" is dropped: everybody reading a hijri date on a masjid's
-               widget knows which calendar it is, and the column is 139 points
-               wide. */
-            Text(hijriShort(entry.hijri))
-              .font(.system(size: 9, weight: .bold))
-              .tracking(1.1)
-              .textCase(.uppercase)
-              .foregroundStyle(Brand.gold.opacity(0.8))
-              .lineLimit(1).minimumScaleFactor(0.75)
-            Rule().padding(.top, 6).padding(.bottom, 7)
+        Rule().padding(.top, 9).padding(.bottom, 9)
+        if entry.known && !entry.strip.isEmpty {
+          HStack(alignment: .top, spacing: 0) {
+            ForEach(entry.strip, id: \.name) { col in
+              StripCol(col: col, isNow: col.at != nil && col.at == entry.at)
+                .frame(maxWidth: .infinity)
+            }
           }
-          ForEach(entry.today, id: \.name) { slot in
-            DayRow(slot: slot,
-                   isNext: entry.known && slot.at == entry.at,
-                   past: slot.at < entry.at)
-          }
-          Spacer(minLength: 0)
+        } else if !entry.known {
+          Text("Timetable not published yet")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(Brand.cream)
         }
-        .frame(width: 139, alignment: .leading)
+        Spacer(minLength: 0)
+        if !entry.hijri.isEmpty {
+          Text(hijriShort(entry.hijri))
+            .font(.system(size: 8, weight: .bold)).tracking(1.0)
+            .textCase(.uppercase)
+            .foregroundStyle(Brand.gold.opacity(0.65))
+            .frame(maxWidth: .infinity, alignment: .center)
+            .lineLimit(1).minimumScaleFactor(0.8)
+        }
       }
-      .padding(EdgeInsets(top: 15, leading: 16, bottom: 14, trailing: 16))
+      .padding(EdgeInsets(top: 13, leading: 16, bottom: 12, trailing: 16))
     }
   }
 }
 
-/* One line of the day's list.
- *
- * Its own view rather than a `let` or two inside the ForEach closure: result
- * builders only lifted their restrictions on local bindings in Swift 5.8, the
- * target still declares SWIFT_VERSION 5.0, and a build failing on that would
- * be a bad way to find out. It also reads better. */
-private struct DayRow: View {
-  let slot: Slot
-  let isNext: Bool
-  let past: Bool
+/* One column of the medium strip: a prayer name, its begins time, and its
+ * jamāʿah below — the jamāʿah boxed in gold when it is the next one. Its own
+ * view rather than a `let` or two inside the ForEach closure: result builders
+ * only lifted their restrictions on local bindings in Swift 5.8, the target
+ * still declares SWIFT_VERSION 5.0, and a build failing on that would be a bad
+ * way to find out. */
+private struct StripCol: View {
+  let col: Col
+  let isNow: Bool
 
   var body: some View {
-    HStack(spacing: 4) {
-      Text(slot.name)
-        .font(.system(size: 12, weight: isNext ? .bold : .medium))
-        .lineLimit(1)
-        .minimumScaleFactor(0.75)
-      Spacer(minLength: 4)
-      Text(timeText(slot.at))
-        .font(.system(size: 12, weight: isNext ? .bold : .medium))
-        .monospacedDigit()
-    }
-    .foregroundStyle(isNext ? Brand.goldBright
-                            : Brand.cream.opacity(past ? 0.34 : 0.88))
-    .padding(.vertical, 2.2)
-    .overlay(alignment: .leading) {
-      if isNext {
-        Circle().fill(Brand.goldBright).frame(width: 3, height: 3).offset(x: -9)
-      }
+    VStack(spacing: 3) {
+      Text(col.name)
+        .font(.system(size: 9, weight: .bold))
+        .foregroundStyle(isNow ? Brand.goldBright : Brand.cream.opacity(0.6))
+        .lineLimit(1).minimumScaleFactor(0.7)
+      Text(col.begins)
+        .font(.system(size: 13, weight: .bold)).monospacedDigit()
+        .foregroundStyle(Brand.cream)
+        .lineLimit(1).minimumScaleFactor(0.7)
+      Text(col.jamaah ?? "—")
+        .font(.system(size: 11, weight: .bold)).monospacedDigit()
+        .foregroundStyle(isNow ? Color.white
+                               : (col.jamaah == nil ? Brand.cream.opacity(0.38) : Brand.goldBright))
+        .lineLimit(1).minimumScaleFactor(0.7)
+        .padding(.horizontal, isNow ? 5 : 0)
+        .padding(.vertical, isNow ? 1 : 0)
+        .background(isNow ? Brand.gold : Color.clear, in: Capsule())
     }
   }
 }
