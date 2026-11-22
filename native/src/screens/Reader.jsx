@@ -33,10 +33,12 @@ import RABBANAS from "../data/rabbanas.json";
  * "Everyday Duʿās" and sparkles on the forty Rabbanā. Only where each row
  * GOES is the app's business, and that is all this table says. */
 const GOES = [
-  n => ({ to: "AthkarSet", params: { n: 0 } }),
-  n => ({ to: "AthkarSet", params: { n: 1 } }),
-  n => ({ to: "AthkarSet", params: { n: 2 } }),
-  /* The tasbīḥ counter sits here, fourth, because the masjid asked for it
+  n => ({ to: "AthkarSet", params: { n: 0 } }),   /* Morning & Evening (both) */
+  n => ({ to: "AthkarSet", params: { n: 1 } }),   /* Morning only */
+  n => ({ to: "AthkarSet", params: { n: 2 } }),   /* Evening only */
+  n => ({ to: "AthkarSet", params: { n: 3 } }),   /* After every Ṣalāh */
+  n => ({ to: "AthkarSet", params: { n: 4 } }),   /* Before Sleep */
+  /* The tasbīḥ counter sits here, after the five reading sets, because the masjid asked for it
      among the daily adhkār and not at the end after the duʿās: the three sets
      above it are things to READ and it is the thing you DO while reading the
      second of them. It is its own counter with its own count — the Hajj

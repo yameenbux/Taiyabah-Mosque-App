@@ -134,6 +134,24 @@ Both are in the document, and both want an answer in writing.
 | Issued | Parts | Reviewers | Approved on | Notes |
 | --- | --- | --- | --- | --- |
 | 2026-11-11 | A, B, C (142 entries) | *awaiting* | — | First issue. Generated from the data as it shipped in 2.1.0. |
+| 2026-11-22 | A, B, C (160 entries) | *awaiting* | — | Morning & Evening rebuilt from the masjid's own booklet into three parts (both / morning only / evening only); 18 supplications added or reworded. **Two things still need a human eye:** (a) the ʿulamā have not signed any issue yet, and these new Arabic wordings especially want checking; (b) the Urdu/Gujarati meanings of 21 new entries are a FIRST DRAFT by the app, flagged below, not a native speaker's — the Arabic meaning-line is the duʿā itself. |
+
+### 2026-11-22 — Morning & Evening rebuilt, 21 draft translations awaiting a native speaker
+
+The Morning & Evening section was rebuilt to mirror the masjid's "Morning &
+Evening Adhkār" booklet exactly. The Arabic was transcribed against the booklet
+in the app's own tashkīl; the English reuses the existing wording where a duʿā
+carried over and follows the standard translations for the new ones.
+
+Every supplication that carried over kept its already-written Urdu and Gujarati.
+The 21 genuinely-new meanings below were drafted by the app so the section could
+ship complete in all three languages, and each **needs a native speaker to read
+it** before it should be treated as settled (the same review the rest of the
+packs are waiting on):
+
+`athkar.morning-evening.5/6/7/9/14/16.en`, `athkar.morning.0–5/7/8.en`,
+`athkar.evening.0–6.en` — the Arabic-column meaning for each is the duʿā's own
+Arabic, not a separate translation.
 
 Add a row each time the document is reissued. If a part is approved while
 another is still out, say so — partial approval is expected and is better

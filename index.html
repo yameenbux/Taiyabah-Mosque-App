@@ -5655,6 +5655,20 @@ var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("co
               <span class="md-t2" data-i18n="athkar.after_fajr_and_after_asr">Once after Fajr and once after ʿAṣr</span>
             </span><span class="dr-ch">&rsaquo;</span>
           </button>
+          <button class="md-row" id="ak-go-morning">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"/><path d="M7.5 18a4.5 4.5 0 0 1 9 0"/><path d="M12 8.5V3.6M9.5 6l2.5-2.5L14.5 6"/><path d="M4.2 13.6l1.5 1M19.8 13.6l-1.5 1"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.morning_only">Morning only</span>
+              <span class="md-t2" data-i18n="athkar.between_fajr_and_sunrise">Between Fajr and sunrise</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
+          <button class="md-row" id="ak-go-evening">
+            <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"/><path d="M7.5 18a4.5 4.5 0 0 1 9 0"/><path d="M12 3.6V8.5M9.5 6l2.5 2.5L14.5 6"/><path d="M4.2 13.6l1.5 1M19.8 13.6l-1.5 1"/></svg></span>
+            <span class="md-t">
+              <span class="md-t1" data-i18n="athkar.evening_only">Evening only</span>
+              <span class="md-t2" data-i18n="athkar.between_asr_and_maghrib">Between ʿAṣr and Maghrib</span>
+            </span><span class="dr-ch">&rsaquo;</span>
+          </button>
           <button class="md-row" id="ak-go-1">
             <span class="md-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 20.5v-7a7.5 7.5 0 0 1 15 0v7"/><path d="M3.5 20.5h17"/><path d="M12 6V3.4"/><circle cx="12" cy="2.6" r="0.9" fill="currentColor" stroke="none"/></svg></span>
             <span class="md-t">
@@ -13376,8 +13390,10 @@ function initRecite(){
   document.getElementById('ak-close').addEventListener('click',closeAthkar);
   document.getElementById('ak-back').addEventListener('click', akShowModes);
   document.getElementById('ak-go-0').addEventListener('click', () => akOpenSection(0));
-  document.getElementById('ak-go-1').addEventListener('click', () => akOpenSection(1));
-  document.getElementById('ak-go-2').addEventListener('click', () => akOpenSection(2));
+  document.getElementById('ak-go-morning').addEventListener('click', () => akOpenSection(1));
+  document.getElementById('ak-go-evening').addEventListener('click', () => akOpenSection(2));
+  document.getElementById('ak-go-1').addEventListener('click', () => akOpenSection(3));
+  document.getElementById('ak-go-2').addEventListener('click', () => akOpenSection(4));
   document.getElementById('ak-go-tasbih').addEventListener('click', akShowTasbih);
   document.getElementById('tb-dial').addEventListener('click', tbTap);
   document.getElementById('tb-undo').addEventListener('click', tbUndo);

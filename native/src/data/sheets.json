@@ -4037,6 +4037,40 @@
    {
     "type": "row",
     "label": {
+     "k": "athkar.morning_only",
+     "t": "Morning only"
+    },
+    "sub": {
+     "k": "athkar.between_fajr_and_sunrise",
+     "t": "Between Fajr and sunrise"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 18h18\"></path><path d=\"M7.5 18a4.5 4.5 0 0 1 9 0\"></path><path d=\"M12 8.5V3.6M9.5 6l2.5-2.5L14.5 6\"></path><path d=\"M4.2 13.6l1.5 1M19.8 13.6l-1.5 1\"></path></svg>",
+    "href": null,
+    "id": "ak-go-morning",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
+     "k": "athkar.evening_only",
+     "t": "Evening only"
+    },
+    "sub": {
+     "k": "athkar.between_asr_and_maghrib",
+     "t": "Between ʿAṣr and Maghrib"
+    },
+    "card": true,
+    "ext": false,
+    "svg": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 18h18\"></path><path d=\"M7.5 18a4.5 4.5 0 0 1 9 0\"></path><path d=\"M12 3.6V8.5M9.5 6l2.5 2.5L14.5 6\"></path><path d=\"M4.2 13.6l1.5 1M19.8 13.6l-1.5 1\"></path></svg>",
+    "href": null,
+    "id": "ak-go-evening",
+    "soon": null
+   },
+   {
+    "type": "row",
+    "label": {
      "k": "athkar.after_every_salah",
      "t": "After Every Ṣalāh"
     },
