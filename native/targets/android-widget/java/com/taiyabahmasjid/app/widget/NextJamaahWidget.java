@@ -185,6 +185,8 @@ public class NextJamaahWidget extends AppWidgetProvider {
     final String[] bKeys = { "fajr", "sunrise", "zuhr", "asr", "maghrib", "isha" };
     final String[] jKeys = { "fajr", null,      "zuhr", "asr", "maghrib", "isha" };
     final String[] cName = { "Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha" };
+    final int[] boxId   = { R.id.tw_c0_box, R.id.tw_c1_box, R.id.tw_c2_box,
+                            R.id.tw_c3_box, R.id.tw_c4_box, R.id.tw_c5_box };
     final int[] nameId  = { R.id.tw_c0_name, R.id.tw_c1_name, R.id.tw_c2_name,
                             R.id.tw_c3_name, R.id.tw_c4_name, R.id.tw_c5_name };
     final int[] beginId = { R.id.tw_c0_begin, R.id.tw_c1_begin, R.id.tw_c2_begin,
@@ -215,10 +217,12 @@ public class NextJamaahWidget extends AppWidgetProvider {
       }
 
       if (isNow) {
+        v.setInt(boxId[i], "setBackgroundResource", R.drawable.taiyabah_now_col);
         v.setInt(jamId[i], "setBackgroundResource", R.drawable.taiyabah_now_pill);
         v.setTextColor(jamId[i], 0xFFFFFFFF);
         v.setTextColor(nameId[i], 0xFFF0CF78);
       } else {
+        v.setInt(boxId[i], "setBackgroundColor", 0x00000000);
         v.setInt(jamId[i], "setBackgroundColor", 0x00000000);
         v.setTextColor(jamId[i], jm == null ? 0x66F6F1E6 : 0xFFDCBB63);
         v.setTextColor(nameId[i], 0xFFC9B2C2);

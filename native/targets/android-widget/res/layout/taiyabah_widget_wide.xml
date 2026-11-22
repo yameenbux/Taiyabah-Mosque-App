@@ -113,79 +113,85 @@
         android:baselineAligned="false">
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c0_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c0_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c0_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c0_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c1_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c1_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c1_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c1_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c2_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c2_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c2_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c2_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c3_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c3_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c3_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c3_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c4_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c4_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c4_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c4_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>
 
       <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+          android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal"
+          android:id="@+id/tw_c5_box" android:paddingTop="3dp" android:paddingBottom="3dp">
         <TextView android:id="@+id/tw_c5_name" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#C9B2C2" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
         <TextView android:id="@+id/tw_c5_begin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
+            android:layout_marginTop="2dp" android:textColor="#F6F1E6" android:textSize="13sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
         <TextView android:id="@+id/tw_c5_jam" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
+            android:layout_marginTop="2dp" android:paddingStart="5dp" android:paddingEnd="5dp" android:paddingTop="1dp"
             android:paddingBottom="1dp" android:textColor="#DCBB63" android:textSize="10sp" android:textStyle="bold"
             android:includeFontPadding="false" android:maxLines="1" />
       </LinearLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The gold-tinted frame around the current prayer's whole column in the
+     strip: a faint gold wash and a gold hairline. Set from the provider with
+     setBackgroundResource on the one column that is next; every other column
+     clears its background. Inset so the frame does not touch its neighbours. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="4dp" android:insetRight="4dp"
+    android:insetTop="1dp" android:insetBottom="1dp">
+  <shape android:shape="rectangle">
+    <solid android:color="#1FC6A24C" />
+    <stroke android:width="1dp" android:color="#78C6A24C" />
+    <corners android:radius="13dp" />
+  </shape>
+</inset>

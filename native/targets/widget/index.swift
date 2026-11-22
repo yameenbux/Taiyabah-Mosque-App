@@ -645,6 +645,19 @@ private struct StripCol: View {
         .padding(.vertical, isNow ? 1 : 0)
         .background(isNow ? Brand.gold : Color.clear, in: Capsule())
     }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 5)
+    /* The current prayer's whole column gets a gold-washed frame, so a glance
+       lands on it before the pill is even read. */
+    .background(
+      RoundedRectangle(cornerRadius: 13)
+        .fill(Brand.gold.opacity(isNow ? 0.14 : 0))
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 13)
+        .stroke(Brand.gold.opacity(isNow ? 0.5 : 0), lineWidth: 1)
+    )
+    .padding(.horizontal, 3)
   }
 }
 
