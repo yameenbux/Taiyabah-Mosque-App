@@ -33,11 +33,17 @@ const D = {
     "M8 19.9c-1.1 0-1.8-.8-1.8-1.9",
     "M10 11h5M10 14h5",
   ],
+  /* A minbar: steps rising to the pulpit platform, two posts to the ground,
+     and an ogee (onion) domed canopy with a finial over the standing place —
+     the shape a khaṭīb speaks from. The old mark was an open box with a stick
+     on top beside a loose staircase, which read as a climbing frame. */
   minbar: [
-    "M4 20.5v-2.2h3v-2.4h3v-2.4h3",
-    "M13 20.5V9.2c0-.6.5-1.1 1.1-1.1H19c.6 0 1 .5 1 1.1v11.3",
-    "M13 12.2h7",
-    "M16.5 8V5.8",
+    "M3.5 20.5V18h3v-2.5h3V13h2",
+    "M11 13h8",
+    "M12.5 20.5V13",
+    "M18.5 20.5V13",
+    "M12 13c0-2 1-3.3 2.2-4 .7-.4 1-.9 1.3-1.8.3.9.6 1.4 1.3 1.8 1.2.7 2.2 2 2.2 4",
+    "M15.5 7.2V5.2",
   ],
   mihrab: [
     "M6.5 21V11.5C6.5 7.9 9 5 12 5s5.5 2.9 5.5 6.5V21",

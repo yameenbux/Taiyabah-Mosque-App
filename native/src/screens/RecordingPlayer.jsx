@@ -18,6 +18,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, Image, ActivityIndicator, PanResponder } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F } from "../theme";
 import { useApp } from "../store";
 import { tap } from "../ui";
@@ -33,6 +34,7 @@ function clock(ms) {
 
 export default function RecordingPlayer({ navigation }) {
   const { t, fs } = useApp();
+  const insets = useSafeAreaInsets();
   const rec = useRecordings();
   const { current, positionMs, durationMs, playing, state } = rec;
 
@@ -76,7 +78,8 @@ export default function RecordingPlayer({ navigation }) {
 
   return (
     <LinearGradient colors={[C.brand800, "#0E0309"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-      style={{ flex: 1, paddingTop: 54, paddingHorizontal: 26, paddingBottom: 40 }}>
+      style={{ flex: 1, paddingTop: insets.top + 16, paddingHorizontal: 26,
+                paddingBottom: insets.bottom + 22 }}>
 
       <Pressable onPress={() => { tap(); navigation.goBack(); }} hitSlop={12}
         accessibilityRole="button" accessibilityLabel={t("rec.minimise", "Minimise")}
