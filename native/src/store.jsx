@@ -180,23 +180,12 @@ export function AppProvider({ children, fallback = null }) {
       t, tx,
       rtl: RTL.has(prefs.lang),
       /* Text size multiplies every size in the app, exactly as --ts did on the
-       * web. Arabic and Urdu need a touch more height to stay legible.
-       *
-       * THE TWO SCALES USED TO MULTIPLY. React Native applies the phone's own
-       * font setting on top of whatever fontSize it is given, and this app
-       * has a text-size control of its own because the website does. Somebody
-       * with Android set to its largest text and "Extra large" chosen here got
-       * 1.3 x 1.42 — nearly twice the designed size, on every screen, and the
-       * layouts do not survive it.
-       *
-       * So the bigger of the two wins rather than the product, capped at 1.5.
-       * Dividing by the phone's scale here cancels the one React Native is
-       * about to apply, leaving exactly `want`.
-       *
-       * It never renders SMALLER than the phone asked for. Somebody who has
-       * told Android they need large text has said something about their
-       * eyesight, and no in-app setting should quietly undo it; the control
-       * here can still take them above it. */
+       * web. The in-app control is authoritative — the size the reader picks is
+       * the size they get, capped at 1.5 so the layouts hold — and fontSize()
+       * divides out the phone's own font scale so React Native's re-application
+       * of it at render leaves exactly that. See src/scale.js: this used to
+       * take the bigger of the two, which made the control do nothing on a
+       * phone already set to large text, and that is the iOS bug it fixes. */
       fs: n => fontSize(n, prefs.scale, osFontScale()),
       setLang: lang => save({ ...prefs, lang }),
       setScale: scale => save({ ...prefs, scale }),

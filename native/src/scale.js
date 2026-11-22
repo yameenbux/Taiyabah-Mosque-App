@@ -30,21 +30,27 @@
  * one-line edit. */
 export const SCALE_CEILING = 1.5;
 
-/* The bigger of the two wins, never the product.
+/* The app's own Text-size control is authoritative: the size the reader picks
+ * is the size they get, the same on every phone, capped so the layouts hold.
  *
- * It never returns LESS than the phone asked for: somebody who has told
- * Android they need large text has said something about their eyesight, and
- * no in-app setting should quietly undo it. The control in the app can still
- * take them above it. */
-export function wantedScale(chosen, osScale) {
-  const os = Number.isFinite(osScale) && osScale > 0 ? osScale : 1;
+ * It used to take the BIGGER of this and the phone's own OS font setting, so a
+ * phone already set to large text was never shrunk. That is exactly what made
+ * the control useless on such a phone: every in-app choice at or below the OS
+ * scale collapsed to the OS scale, so on an iPhone whose OS text was large the
+ * four buttons moved nothing at all. The reader's own choice now wins. */
+export function wantedScale(chosen) {
   const app = Number.isFinite(chosen) && chosen > 0 ? chosen : 1;
-  return Math.min(Math.max(os, app), SCALE_CEILING);
+  return Math.min(app, SCALE_CEILING);
 }
 
-/* What to hand React Native so that the text ends up at `wanted`. It is about
- * to multiply by the phone's scale, so that is divided out here. */
+/* The number handed to React Native. React Native multiplies whatever fontSize
+ * it is given by the phone's own font scale at render, so that scale is divided
+ * out here, leaving exactly the reader's chosen size once React Native has put
+ * it back. Handing it the raw size instead did not behave the same on both
+ * platforms — Android multiplied the OS scale on top of the app's, and iOS
+ * applied it so differently that the in-app control looked dead on iPhone —
+ * so dividing it out is what makes the control behave the same everywhere. */
 export function fontSize(n, chosen, osScale) {
   const os = Number.isFinite(osScale) && osScale > 0 ? osScale : 1;
-  return Math.round(n * wantedScale(chosen, os) / os);
+  return Math.round(n * wantedScale(chosen) / os);
 }
