@@ -16,6 +16,7 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { clampScale, clampOffset, doubleTap as dtap, pagerEnabled, MIN } from "../zoom";
 import { C, F, R } from "../theme";
 import { useApp } from "../store";
@@ -349,6 +350,14 @@ export function Mushaf({ route, navigation }) {
    * place in the app that turns sideways on purpose. The window is only the
    * STARTING guess, though — see `box` below. */
   const { width, height } = useWindowDimensions();
+  /* The reader draws edge-to-edge, so the system navigation bar (Android) and
+   * the home indicator (iOS) sit OVER the bottom of the screen. Without this,
+   * the page bar — the only place to jump, bookmark and favourite — is pinned
+   * flush to bottom:0 and ends up tucked under the nav bar, which is exactly
+   * how "the Qurʼan is cut off at the bottom, can't save/favourite" was
+   * reported. insets.bottom is 0 where there is no such bar (older iPhones,
+   * Android with hardware keys), so this is a no-op where it is not needed. */
+  const insets = useSafeAreaInsets();
   const start = route.params?.page || 1;
   const [page, setPage] = useState(start);
   const [jump, setJump] = useState(false);
@@ -538,7 +547,7 @@ export function Mushaf({ route, navigation }) {
           It stays out of the way while you are standing on it. */}
       {!!muMark && !marked && !jump && (
         <Press onPress={() => { tap(); goto(muMark); }}
-          style={{ position: "absolute", left: 0, right: 0, bottom: 74, alignItems: "center" }}>
+          style={{ position: "absolute", left: 0, right: 0, bottom: 74 + insets.bottom, alignItems: "center" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 7, paddingHorizontal: 14,
                          paddingVertical: 7, borderRadius: R.pill, backgroundColor: "rgba(220,187,99,.17)",
                          borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
@@ -550,7 +559,7 @@ export function Mushaf({ route, navigation }) {
 
       {!!toast && (
         <Press onPress={() => { tap(); setToast(null); setJump(true); }}
-          style={{ position: "absolute", left: 16, right: 16, bottom: 120, alignItems: "center" }}
+          style={{ position: "absolute", left: 16, right: 16, bottom: 120 + insets.bottom, alignItems: "center" }}
           accessibilityLabel={t("mushaf.view_favourites", "View favourites")}>
           <Text style={{ fontFamily: F.sans, fontSize: fs(12.5), color: C.cream, textAlign: "center",
                          backgroundColor: "rgba(21,6,15,.94)", borderWidth: 1, borderColor: "rgba(243,239,227,.18)",
@@ -575,7 +584,7 @@ export function Mushaf({ route, navigation }) {
                      }}
             style={{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row",
                      alignItems: "center", justifyContent: "center", gap: 10,
-                     paddingVertical: 11, backgroundColor: "rgba(21,6,15,.9)" }}>
+                     paddingTop: 11, paddingBottom: 11 + insets.bottom, backgroundColor: "rgba(21,6,15,.9)" }}>
         <Press onPress={() => goto(page - 1)} style={{ padding: 8 }}
           accessibilityLabel={t("mushaf.previous", "Previous")}>
           <Ionicons name="chevron-forward" size={20} color={C.goldBright} />
@@ -632,6 +641,7 @@ export function Mushaf({ route, navigation }) {
 
 function Jump({ page, here, onPick, onClose, onFav }) {
   const { t, fs, muFavSurahs, muMark } = useApp();
+  const insets = useSafeAreaInsets();
   const [mode, setMode] = useState("juz");
   const [typed, setTyped] = useState("");
 
@@ -722,7 +732,7 @@ function Jump({ page, here, onPick, onClose, onFav }) {
             data={items}
             keyExtractor={(x, i) => String(i)}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 30 }}
+            contentContainerStyle={{ paddingBottom: 30 + insets.bottom }}
             renderItem={({ item }) => (
               <Press onPress={() => { tap(); onPick(item.page); }}
                 style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 18, paddingVertical: 13,
