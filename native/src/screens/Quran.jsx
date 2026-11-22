@@ -702,7 +702,7 @@ function Jump({ page, here, onPick, onClose, onFav }) {
           style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: R.pill,
                    backgroundColor: "rgba(220,187,99,.18)", borderWidth: 1, borderColor: "rgba(220,187,99,.45)" }}>
           <Text style={{ fontFamily: F.sansSemi, fontSize: fs(12.5), color: C.goldBright }}>
-            {t("bukhari.go", "Go")}</Text>
+            {t("quran.go", "Go")}</Text>
         </Press>
       </View>
 

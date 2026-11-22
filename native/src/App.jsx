@@ -64,7 +64,6 @@ import Alerts from "./screens/Alerts";
 import Prefs from "./screens/Prefs";
 import Help from "./screens/Help";
 import Quran, { Surahs, Surah, Mushaf } from "./screens/Quran";
-import Bukhari, { BukhariBook, BukhariHadith } from "./screens/Bukhari";
 import { NewBuild, Giving } from "./screens/Donate";
 import { Portal, Privacy } from "./screens/Simple";
 import { Athkar, AthkarSet, Duas, Rabbanas } from "./screens/Reader";
@@ -379,9 +378,6 @@ function Root() {
                                                                        headerStyle: { backgroundColor: "#15060F" },
                                                                        headerTintColor: C.goldBright,
                                                                        headerTitleStyle: { fontFamily: F.display, fontSize: fs(16), color: C.cream } }} />
-        <Stack.Screen name="Bukhari"     component={Bukhari}     options={{ ...pushed, title: t("bukhari.title", "Ṣaḥīḥ al-Bukhārī") }} />
-        <Stack.Screen name="BukhariBook" component={BukhariBook} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
-        <Stack.Screen name="BukhariHadith" component={BukhariHadith} options={({ route }) => ({ ...pushed, title: route.params?.name || "" })} />
         {/* Daily Adhkār draws its own hero over the menu of six, so no header. */}
         <Stack.Screen name="Athkar"    component={Athkar}    options={{ ...sheet, title: t("athkar.daily_athkar", "Daily Athkār") }} />
         <Stack.Screen name="AthkarSet" component={AthkarSet}

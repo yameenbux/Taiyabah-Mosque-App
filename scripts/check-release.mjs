@@ -1687,167 +1687,21 @@ for (const f of ["index.html", "admin.html"]) {
   else ok("swipes — all gestures go through onSwipe and must beat the other axis, and no sheet scrolls sideways");
 }
 
-/* ---- 3y. the Bukhārī text is licensed before it ships ----
+/* ---- 3y. every home tile is wired, and every panel is reachable ----
 
-   The hadith text is NOT ours. It is third-party open data under the ODbL,
-   and that licence only holds if the attribution travels with it. An app
-   store can ask to see the right to ship this; "it was on GitHub" is not an
-   answer, and neither is a licence file nobody can find.
-
-   So: the pack must name its source and its licence, must carry the licence
-   text beside the data, and the app must both refuse to render a pack that
-   names neither AND print the attribution on screen rather than burying it.
-
-   The count is pinned too. A reference whose numbering silently changes
-   length is worse than no reference — somebody citing hadith 5,000 today
-   would be citing a different one tomorrow.                                */
+   A tile tappable but wired to nothing looks broken; a panel nothing can
+   open is dead weight and a trap for the next person adding a feature to it.
+   This once also guarded the Ṣaḥīḥ al-Bukhārī reader, which was removed on
+   the Imām's instruction — git history holds it for when it returns.      */
 {
-  const PACK = "quran/hadith/bukhari";
   const app = readFileSync("index.html", "utf8");
   const bad = [];
-  if (!existsSync(`${PACK}/index.json`)) {
-    bad.push("the Bukhārī pack is missing — run node scripts/build-bukhari.mjs");
-  } else {
-    let meta = null;
-    try { meta = JSON.parse(readFileSync(`${PACK}/index.json`, "utf8")); }
-    catch (e) { bad.push("the Bukhārī index.json does not parse: " + e.message); }
 
-    if (meta) {
-      if (!meta.source)      bad.push("the Bukhārī pack names no source — it cannot be shipped without saying where the text came from");
-      if (!meta.licence)     bad.push("the Bukhārī pack names no licence — this text is third-party open data, not ours");
-      if (!meta.attribution) bad.push("the Bukhārī pack carries no attribution line, which the ODbL requires to travel with the data");
-      if (meta.highest !== 7563)
-        bad.push(`the Bukhārī numbering runs to ${meta.highest}, expected 7563 — this is the number people cite, and changing it breaks every reference made from the app`);
-      if (meta.books !== 97)
-        bad.push(`the Bukhārī pack lists ${meta.books} books, expected 97`);
-
-      /* Every book the index promises must actually be there, and the books
-         must between them account for the hadith. A reference that silently
-         loses a book is worse than one that fails loudly. */
-      if (!existsSync(`${PACK}/books.json`)) {
-        bad.push("the Bukhārī pack has no books.json — there would be nothing to browse, only a flat list");
-      } else {
-        const books = JSON.parse(readFileSync(`${PACK}/books.json`, "utf8"));
-        const missing = books.filter(b => !existsSync(`${PACK}/b/${b.n}.json`));
-        if (missing.length)
-          bad.push(`the Bukhārī pack is missing ${missing.length} book file(s), first: book ${missing[0].n} (${missing[0].name})`);
-        const unnamed = books.filter(b => !b.name || /^Book \d+$/.test(b.name));
-        if (unnamed.length)
-          bad.push(`${unnamed.length} Bukhārī book(s) have no name, so the list would read as bare numbers`);
-        const total = books.reduce((a, b) => a + b.count, 0);
-        if (total < meta.count - 20)
-          bad.push(`the books account for ${total} hadith but the pack holds ${meta.count} — ${meta.count - total} are unreachable by browsing`);
-      }
-      if (!existsSync(`${PACK}/search.json`))
-        bad.push("the Bukhārī search index is missing, so search would fail on a device with no connection to rebuild it");
-    }
-    if (!existsSync(`${PACK}/LICENCE.txt`))
-      bad.push("the Bukhārī pack has no LICENCE.txt beside the data — the ODbL notice has to travel with it");
-    else {
-      const lic = readFileSync(`${PACK}/LICENCE.txt`, "utf8");
-      if (!/unlicense\.org|public domain/i.test(lic))
-        bad.push("the Bukhārī LICENCE.txt does not state the public-domain dedication it is shipped under");
-      if (!/hadith-api/i.test(lic))
-        bad.push("the Bukhārī LICENCE.txt does not record where the text came from");
-      /* The store question is "show me the right to ship this". With the
-         English bundled it must record the permission; Arabic-only, it must
-         say why no translation is there. Which one is read off the pack. */
-      const packMeta = existsSync(`${PACK}/index.json`)
-        ? JSON.parse(readFileSync(`${PACK}/index.json`, "utf8")) : {};
-      if (packMeta.arabicOnly) {
-        if (!/NO ENGLISH TRANSLATION/i.test(lic))
-          bad.push("the Bukhārī LICENCE.txt no longer explains why no translation is bundled — that is the part a store actually asks about");
-      } else {
-        if (!/muhsin khan/i.test(lic) || !/darussalam/i.test(lic))
-          bad.push("the Bukhārī LICENCE.txt ships an English translation but no longer names the translator and publisher it belongs to");
-        if (!/PERMISSION GRANTED/i.test(lic))
-          bad.push("the Bukhārī LICENCE.txt ships an English translation but records no permission for it — that is the one thing a store asks to see");
-      }
-    }
-  }
-
-  /* The app side: refuse an unlicensed pack, and show the credit. */
-  if (!/pack names no source or licence/.test(app))
-    bad.push("the app no longer refuses a Bukhārī pack that names no source and licence — it would render text the masjid cannot evidence rights to");
-  if (!/hd-attr/.test(app) || !/m\.attribution/.test(app))
-    bad.push("the app does not print where the Bukhārī text came from, which is how the masjid can answer for it");
-  /* The whole point of the rebuild: it must open on the books. */
-  if (!/hdShowBooks/.test(app) || !/books\.json/.test(app))
-    bad.push("the Bukhārī reader no longer browses by book — a flat list of 7,580 numbered paragraphs is not a readable Bukhārī");
-
-  /* The English must reach a non-Arabic reader, and the HOW is tied to the
-     pack. While the translation was not the masjid's to ship, the reader
-     linked out to it by number; now that permission has been granted it is
-     bundled beside the Arabic and shown in place. Whichever is true, the
-     permission is the gate: a bundled translation with no permission recorded
-     in LICENCE.txt is the one thing that must never ship. */
-  {
-    const lic = existsSync(`${PACK}/LICENCE.txt`) ? readFileSync(`${PACK}/LICENCE.txt`, "utf8") : "";
-    const granted = /PERMISSION GRANTED/i.test(lic);
-    const bundled = existsSync(`${PACK}/b/1.json`) && /"en"\s*:/.test(readFileSync(`${PACK}/b/1.json`, "utf8"));
-    if (bundled && !granted)
-      bad.push("an English translation has been bundled into the Bukhārī pack, but LICENCE.txt records no permission for it. " +
-               "Every complete English Bukhārī is in copyright; see store/PERMISSION-LETTERS.md before shipping one.");
-    if (bundled) {
-      if (!/hd-en-text/.test(app))
-        bad.push("the Bukhārī pack carries an English translation but the reader does not render it — a non-Arabic reader still gets nothing");
-      if (/https:\/\/sunnah\.com\/bukhari:/.test(app))
-        bad.push("the Bukhārī reader still links out to sunnah.com for English although the translation is now bundled — drop the link, it reads offline now");
-    } else {
-      if (!/https:\/\/sunnah\.com\/bukhari:/.test(app) || !/hd-en/.test(app))
-        bad.push("the Bukhārī reader no longer offers the English — the Arabic is linked to its translation by number, and without that link a non-Arabic reader gets nothing");
-    }
-  }
-  /* The search normaliser destroys Arabic if its ranges are wrong, and the
-     failure is silent: every query matches everything, or nothing.
-
-     The probe is taken FROM THE PACK, never typed here. A hand-typed Arabic
-     probe has now given a false answer three times in this codebase — the
-     characters get reordered in transit and the literal stops matching the
-     text it is meant to represent. Compare the app's normaliser against the
-     index the builder actually produced. */
-  if (existsSync(`${PACK}/b/1.json`) && existsSync(`${PACK}/search.json`)) {
-    const m = app.match(/function hdSearchable\(s\)\{[\s\S]*?\n\}/);
-    if (!m) {
-      bad.push("the Bukhārī search normaliser is gone");
-    } else {
-      const fn = new Function("return (" + m[0] + ")")();
-      const raw = JSON.parse(readFileSync(`${PACK}/b/1.json`, "utf8"))[0].ar;
-      const built = JSON.parse(readFileSync(`${PACK}/search.json`, "utf8"))[0][2];
-      const mine = fn(raw);
-      if (!mine.trim())
-        bad.push("the app's Bukhārī search normaliser reduces a real hadith to nothing — every query would match everything or nothing");
-      else if (mine !== built)
-        bad.push("the app normalises search text differently from the builder, so a query will never match the index it is searching " +
-                 `(app produced ${mine.length} chars, the index holds ${built.length})`);
-    }
-  }
-
-  /* The reader must not reuse the hall booking's element ids. They collided
-     once: bk-title, bk-prev, bk-next and bk-back existed twice, and
-     getElementById takes the first, which broke both screens at once. */
-  for (const id of ["bk-title", "bk-prev", "bk-next", "bk-back", "bk-list", "bk-search"]) {
-    const n = (app.match(new RegExp(`id="${id}"`, "g")) || []).length;
-    if (n > 1) bad.push(`id="${id}" appears ${n} times — the hall booking and the hadith reader are fighting over it, and only the first will ever be found`);
-  }
-
-  /* ---- and somebody has to be able to GET there ----
-
-     This is the one that was missed. The reader was added to the "Recite"
-     panel, which nothing in the app can open — no tab carries data-tab
-     "recite", nothing calls switchTab("recite"), no drawer row points at it.
-     The feature was complete, deployed, and unreachable.
-
-     The browser test passed because it called openBukhari() directly, which
-     is not a route a person has. A screen is not shipped until something a
-     finger can land on opens it. */
   const tiles = [...app.matchAll(/class="tile" data-tile="([a-z]+)"/g)].map(m => m[1]);
   const actions = (app.match(/const TILE_ACTIONS = \{[\s\S]*?\n\};/) || [""])[0];
   for (const tile of tiles)
     if (!new RegExp(`\\b${tile}:\\s*\\(\\)`).test(actions))
       bad.push(`the home tile "${tile}" is tappable and wired to nothing — it will look broken`);
-  if (!tiles.includes("bukhari"))
-    bad.push("Ṣaḥīḥ al-Bukhārī has no home tile, so there is no way into it from the app");
 
   /* Any panel nothing can open is dead weight and a trap for the next
      person adding a feature to it. */
@@ -1859,7 +1713,7 @@ for (const f of ["index.html", "admin.html"]) {
   }
 
   if (bad.length) bad.forEach(fail);
-  else ok(`Ṣaḥīḥ al-Bukhārī — 97 books browsable, numbering to 7563, public domain and sourced, reachable from the home screen, and all ${tiles.length} tiles wired`);
+  else ok(`home — all ${tiles.length} tiles wired to an action, and every panel reachable`);
 }
 
 /* ---- 4. the service worker cache changed when the app did ----

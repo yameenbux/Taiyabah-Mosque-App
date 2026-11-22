@@ -42,7 +42,7 @@ const SCREENS = {
   "sysprefs": ["screens/Prefs.jsx"], "quran": ["screens/Quran.jsx"],
   "giving": ["screens/Donate.jsx"], "collect": ["screens/Collect.jsx", "form.jsx"],
   "rabbanas": ["screens/Reader.jsx"], "athkar": ["screens/Reader.jsx"],
-  "bukhari": ["screens/Bukhari.jsx"], "duas": ["screens/Reader.jsx"],
+  "duas": ["screens/Reader.jsx"],
   "advice": ["screens/Advice.jsx", "form.jsx"], "marriage": ["screens/Marriage.jsx", "form.jsx"],
 };
 
@@ -66,12 +66,10 @@ const WONT_NEED = {
   "notices.notices": "the app has no screen called Notices any more — it has Events and Notifications",
   "duas.loading":                   "the duʿās are bundled — there is nothing to wait for",
   "athkar.loading":                 "the athkār are bundled — there is nothing to wait for",
-  "bukhari.loading":                "the book list is bundled; only a book's text is fetched",
   "rabbanas.couldn_t_load_these_du": "bundled, so it cannot fail to load",
   "quran.couldn_t_load_the_qur":    "the translation is bundled",
   "duas.all_du_as":                 "a back link; the app has a back arrow in the header",
   "athkar.back_to_athkar":          "a back link; the app has a back arrow in the header",
-  "bukhari.all_books":              "a back link; the app has a back arrow in the header",
   "quran.surahs":                   "a back link; the app has a back arrow in the header",
   "hajj.back_to_hajj_umrah":        "a back link; the website's chooser and branch list are one sheet, so it needs a way back inside it — the app pushes a screen and gets the header's back arrow for free",
   "hallhire.change":                "the website's form is two steps and this is its way back to the first; the app's is one page, so there is nothing to go back to",

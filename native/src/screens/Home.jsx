@@ -51,7 +51,6 @@ function ramadanIn(now) {
 const TILES = [
   { to: "Quran",    k: "tiles.holy_quran",         t: "Holy Qurʼan",          icon: "quran" },
   { to: "Athkar",   k: "tiles.daily_adhkar",       t: "Daily Adhkār",         icon: "beads" },
-  { to: "Bukhari",  k: "tiles.hadith",             t: "Ṣaḥīḥ al-Bukhārī",     icon: "book" },
   { to: "Videos",   k: "marriage.videos_bayaans",  t: "Videos & bayaans",     icon: "vids" },
   { to: "Qibla",    k: "tiles.qibla",              t: "Qibla",                icon: "compass" },
   { to: "Hajj",     k: "marriage.hajj_umrah",      t: "Hajj / Umrah",         icon: "hajj" },
