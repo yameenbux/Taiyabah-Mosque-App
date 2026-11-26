@@ -272,7 +272,8 @@ export default function Membership({ navigation }) {
           <>
             {!!info && (
               <Callout tone="gold" h={t("member.check_your_email", "Check your email")}
-                       ps={[{ t: info }]} />
+                       ps={[{ t: info },
+                            { t: t("member.check_junk_too", "Can’t see it? Check your junk or spam folder too — the email sometimes lands there.") }]} />
             )}
             <Field label={t("member.code_label", "Six-digit code")} type="num" value={code}
                    onChange={v => setCode(v.replace(/\D/g, "").slice(0, 6))} placeholder="123456" />

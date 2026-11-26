@@ -1433,6 +1433,7 @@
  "member.send_code": "Send me a code",
  "member.no_email_on_file": "No email on your record? The office can add one, or check your membership for you — ring 01204 535 997, 5pm to 7pm.",
  "member.check_your_email": "Check your email",
+ "member.check_junk_too": "Can’t see it? Check your junk or spam folder too — the email sometimes lands there.",
  "member.code_label": "Six-digit code",
  "member.checking": "Checking…",
  "member.see_my_membership": "See my membership",
