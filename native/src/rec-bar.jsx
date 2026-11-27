@@ -20,9 +20,9 @@
  * as on-air.jsx, for the same reasons — a thing arriving uninvited should not
  * look decisive.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Rect } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -48,6 +48,10 @@ function Bar({ onRec, onTabs, onGo }) {
   const show = !!current && !onRec;
   const [mounted, setMounted] = useState(false);
   const [h, setH] = useState(ON_AIR_ROOM);
+  /* The live value of `show`, so the unmount timer below can re-check it when
+     it fires without being rebuilt every time it changes. */
+  const showRef = useRef(show);
+  showRef.current = show;
 
   const y = useSharedValue(1);
   const fade = useSharedValue(0);
@@ -60,9 +64,21 @@ function Bar({ onRec, onTabs, onGo }) {
       else { fade.value = 1; y.value = withTiming(0, IN); }
       return;
     }
-    const done = ok => { if (ok) runOnJS(setMounted)(false); };
-    if (reduced) fade.value = withTiming(0, FADE, done);
-    else y.value = withTiming(1, OUT, done);
+    /* Hiding: play the slide/fade out, then unmount — but on the JS thread via
+       a timer that re-reads the live `show`, NOT the animation's UI-thread
+       callback. A withTiming callback that hops back with runOnJS(setMounted)
+       (false) can land AFTER another recording has already re-shown the bar: it
+       then unmounts a bar meant to be up, and because the mount effect keys only
+       on `show` (unchanged during that late callback) nothing mounts it again —
+       the bar stays gone until the next show toggles. That was the "open one,
+       stop it, open another, no bar" bug. The timer leaves a bar that has been
+       re-shown in the meantime alone, and the effect cleanup cancels it the
+       instant we re-show. */
+    if (reduced) fade.value = withTiming(0, FADE);
+    else y.value = withTiming(1, OUT);
+    const timer = setTimeout(() => { if (!showRef.current) setMounted(false); },
+                             (reduced ? FADE.duration : OUT.duration) + 60);
+    return () => clearTimeout(timer);
   }, [mounted, show, reduced]);
 
   const slide = useAnimatedStyle(() => ({ transform: [{ translateY: y.value * h }], opacity: fade.value }));

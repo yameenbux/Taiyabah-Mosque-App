@@ -33,10 +33,10 @@
  * complaint came from. This bar is the same control from inside the app, on
  * every screen the stream outlives.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, AccessibilityInfo } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat,
-                   Easing, runOnJS } from "react-native-reanimated";
+                   Easing } from "react-native-reanimated";
 import Svg, { Rect } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F } from "./theme";
@@ -84,6 +84,10 @@ function Bar({ onLive, onTabs, onGo }) {
   /* Measured rather than assumed, because the bar grows with the text size
      setting and a slide of the wrong distance leaves a sliver showing. */
   const [h, setH] = useState(ON_AIR_ROOM);
+  /* The live value of `show`, so the unmount timer below can re-check it when
+     it fires without being rebuilt every time it changes. */
+  const showRef = useRef(show);
+  showRef.current = show;
 
   const y = useSharedValue(1);       /* 1 = tucked away, 0 = in place */
   const fade = useSharedValue(0);
@@ -98,9 +102,19 @@ function Bar({ onLive, onTabs, onGo }) {
       else { fade.value = 1; y.value = withTiming(0, IN); }
       return;
     }
-    const done = ok => { if (ok) runOnJS(setMounted)(false); };
-    if (reduced) fade.value = withTiming(0, FADE, done);
-    else y.value = withTiming(1, OUT, done);
+    /* Hiding: play the slide/fade out, then unmount on the JS thread via a
+       timer that re-reads the live `show` — NOT the animation's UI-thread
+       callback. A withTiming callback hopping back with runOnJS(setMounted)
+       (false) can land AFTER the stream has been restarted and the bar
+       re-shown, unmounting a bar meant to be up; the mount effect keys only on
+       `show` (unchanged during that late callback) so nothing mounts it again.
+       The timer leaves a re-shown bar alone, and the effect cleanup cancels it
+       the instant we re-show. */
+    if (reduced) fade.value = withTiming(0, FADE);
+    else y.value = withTiming(1, OUT);
+    const timer = setTimeout(() => { if (!showRef.current) setMounted(false); },
+                             (reduced ? FADE.duration : OUT.duration) + 60);
+    return () => clearTimeout(timer);
   }, [mounted, show, reduced]);
 
   /* The ring going out from the dot, which is the website's box-shadow pulse
