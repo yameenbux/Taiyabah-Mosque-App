@@ -119,20 +119,47 @@ test("every prayer in ORDER gets a reminder on at least one day", async () => {
  * arm() across the real timetable and reads the titles it actually queued,
  * which is the only place the day and the word meet. */
 test("the Friday midday reminder is named Jumuʿah, not Zuhr", async () => {
-  const { per } = plan({ jamaah: true, mins: 10, kahf: false });
-  await arm(per, {});
+  /* Pin the clock to the small hours before running arm().
+   *
+   * arm() queues only prayers still to come, and its window is exactly
+   * DAYS_AHEAD (7) days — which is precisely one of each weekday, so the window
+   * holds exactly ONE Friday. On a Friday AFTER Zuhr that one Friday is today,
+   * whose Jumuʿah has already passed and is filtered out as past, and next
+   * Friday is one day beyond the horizon: nothing Jumuʿah is left to find, and
+   * this test failed one afternoon in seven on the wall clock alone.
+   *
+   * Moving "now" to 01:00 on today's real date keeps the real timetable and the
+   * real question of which day is Friday; it only winds the hour back so that
+   * Friday's own midday prayer is always still ahead when arm() reads the time.
+   * Overriding Date directly (rather than node:test's experimental mock.timers)
+   * keeps the gate output free of the experimental-API warning. */
+  const RealDate = Date;
+  const t = new RealDate();
+  const fixed = RealDate.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate(), 1, 0, 0);
+  // eslint-disable-next-line no-global-assign
+  Date = class extends RealDate {
+    constructor(...a) { super(); return a.length ? new RealDate(...a) : new RealDate(fixed); }
+    static now() { return fixed; }
+  };
+  try {
+    const { per } = plan({ jamaah: true, mins: 10, kahf: false });
+    await arm(per, {});
 
-  const friday = stub.log.scheduled.filter(r => {
-    const when = r.trigger?.date ? new Date(r.trigger.date) : null;
-    return when && when.getDay() === 5;
-  });
-  assert.ok(friday.length, "no reminders were queued for a Friday at all, so this proves nothing");
+    const friday = stub.log.scheduled.filter(r => {
+      const when = r.trigger?.date ? new Date(r.trigger.date) : null;
+      return when && when.getDay() === 5;
+    });
+    assert.ok(friday.length, "no reminders were queued for a Friday at all, so this proves nothing");
 
-  const titles = friday.map(r => r.content.title);
-  assert.ok(titles.some(t => t.includes("Jumuʿah")),
-    `a Friday was queued but nothing on it says Jumuʿah: ${titles.join(" | ")}`);
-  assert.ok(!titles.some(t => /\bZuhr\b/.test(t)),
-    `a Friday reminder still says Zuhr: ${titles.filter(t => /\bZuhr\b/.test(t)).join(" | ")}`);
+    const titles = friday.map(r => r.content.title);
+    assert.ok(titles.some(x => x.includes("Jumuʿah")),
+      `a Friday was queued but nothing on it says Jumuʿah: ${titles.join(" | ")}`);
+    assert.ok(!titles.some(x => /\bZuhr\b/.test(x)),
+      `a Friday reminder still says Zuhr: ${titles.filter(x => /\bZuhr\b/.test(x)).join(" | ")}`);
+  } finally {
+    // eslint-disable-next-line no-global-assign
+    Date = RealDate;
+  }
 });
 
 /* THE SWITCH THAT IS SAFE TO LEAVE ON.
